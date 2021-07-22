@@ -1,0 +1,624 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ff="http://readytech.com/functions"
+                template="/resources/tpl/Admin/ViewBase.xhtml">
+    <ui:param name="bean" value="#{estateSituationViewBean}"/>
+    <ui:param name="goBackRendered" value="false"/>
+    <ui:define name="view_body">
+        <p:remoteCommand name="removeFileCommand" update="form"/>
+        <div align="center">
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                         style="text-align: left;width: 75%;">
+                <p:column><span style="font-size:20px;">
+                    #{ff:upper(msg.estateSituationEditSubjectName)}
+                    <b>#{ff:upper(bean.requestEntity.nameStr)}</b>
+                </span></p:column>
+                <p:column><span style="font-size:20px;">
+                    #{ff:upper(msg.estateSituationEditConservatory)}
+                    <b>#{ff:upper(bean.requestEntity.aggregationLandChargesRegistryName)}</b>
+                </span></p:column>
+                <p:column><span style="font-size:20px;">
+                    #{ff:upper(msg.estateSituationEditRequestType)} #{ff:upper(bean.requestEntity.service.name)}
+                </span></p:column>
+                <p:column><span style="font-size:20px;">
+                    #{ff:upper(msg.estateSituationEditClientName)} #{ff:upper(bean.requestEntity.clientName)}
+                </span></p:column>
+            </p:panelGrid>
+        </div>
+        <p:fieldset legend="#{msg.databaseListSubjectProperties}" style="margin-top: 10px;">
+            <p:panelGrid columns="9" styleClass="ui-panelgrid-blank form-group" layout="grid">
+                <p:commandButton icon="fa fa-fw fa-plus" actionListener="#{bean.createNewProperty}"
+                                 style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%;"
+                                 rendered="#{!bean.viewRelatedEstate}"/>
+                <p:fileUpload label="#{msg.estateFormalityUploadPropertyXML}"
+                              fileUploadListener="#{bean.savePropertyXML}"
+                              multiple="false" allowTypes="/(\.|\/)(xml|p7m)$/" mode="advanced"
+                              styleClass="special-upload fileupload-simple" onstart="PF('progressPanel').show();"
+                              auto="true" update=":form:filePanel, :form:estateTab, :form:estateTabLand, subjectDialog"
+                              rendered="#{!bean.viewRelatedEstate}"/>
+                <p:commandButton
+                        style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%; width: 170px; height: 31px"
+                        value="#{msg.importFromDatabase}"
+                        update=":form:filePanel, :form:estateTab, :form:estateTabLand, messages"
+                        action="#{bean.loadMostRecentFile}"/>
+            </p:panelGrid>
+
+            <p:panel widgetVar="progressPanel" visible="false" style="border:none;" closable="true" toggleable="true">
+                <p:graphicImage value="/resources/images/ajax-loader_big.gif"/>
+            </p:panel>
+
+            <br/>
+            <p:outputPanel id="filePanel">
+                <p:dataTable id="fileTable" var="fileEntry" value="#{bean.uploadedFiles}" rowKey="#{fileEntry.id}"
+                             rendered="#{not empty bean.uploadedFiles}" styleClass="without-header simple-table">
+                    <p:column styleClass="filename_column">
+                        <h:outputText value="#{fileEntry.getTitle()}"/>
+                    </p:column>
+                    <p:column styleClass="action_column">
+                        <p:commandButton icon="fa fa-fw fa-file-pdf-o" action="#{bean.showPDF}" ajax="false">
+                            <f:setPropertyActionListener value="#{fileEntry.id}" target="#{bean.downloadFileId}"/>
+                        </p:commandButton>
+                    </p:column>
+                    <p:column styleClass="action_column">
+                        <p:commandButton icon="fa fa-fw fa-file-code-o" action="#{bean.showXML}" ajax="false">
+                            <f:setPropertyActionListener value="#{fileEntry.id}" target="#{bean.downloadFileId}"/>
+                        </p:commandButton>
+                    </p:column>
+                    <p:column styleClass="action_column" style="width: 100px">
+                        <p:commandButton action="#{bean.removeFile}" oncomplete="removeFileCommand()"
+                                         value="#{msg.estateSituationViewRemoveFile}">
+                            <f:setPropertyActionListener value="#{fileEntry.id}" target="#{bean.downloadFileId}"/>
+                            <f:setPropertyActionListener value="true" target="#{bean.property}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:outputPanel>
+            <br/>
+            <h3>#{msg.realEstateBuild}</h3>
+            <p:dataTable value="#{bean.lazyPropertyListBuilding}" lazy="true"
+                         style="width: 100%" styleClass="simple-table estate-table"
+                         var="item" id="estateTab"
+                         rowStyleClass="#{item.used?'user-row':''}"
+                         paginator="true" paginatorAlwaysVisible="false" rows="20"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="20,50,100">
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="2" colspan="2" headerText="N." styleClass="action_large_column"/>
+                        <p:column colspan="5" headerText="DATI IDENTIFICATIVI" style="width: 20%;"/>
+                        <p:column colspan="4" headerText="DATI DI CLASSAMENTO" style="width: 25%;"/>
+                        <p:column colspan="5" headerText="ALTRE INFORMAZIONI"/>
+                    </p:row>
+                    <p:row>
+                        <p:column headerText="Scheda"/>
+                        <p:column headerText="Sezione"/>
+                        <p:column headerText="Foglio"/>
+                        <p:column headerText="Particella"/>
+                        <p:column headerText="Sub"/>
+
+                        <p:column headerText="Cat"/>
+                        <p:column headerText="Consistenza"/>
+                        <p:column headerText="Superficie Catastale (MQ)"/>
+                        <p:column headerText="Rendita (€)"/>
+                        <p:column headerText="Indirizzo" style="width: 20%;"/>
+                        <p:column headerText="Comune" style="width: 15%;"/>
+                        <p:column headerText="Relazione" style="width: 20%;"/>
+                        <p:column headerText="Preg." styleClass="action_column"/>
+                        <p:column headerText="Pres." styleClass="action_column"/>
+                    </p:row>
+                </p:columnGroup>
+                <p:column styleClass="action_column" exportable="false">
+                    <p:commandButton icon="ui-icon ui-icon-pencil" update=":form"
+                                     action="#{bean.editProperty}">
+                        <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column styleClass="action_column" exportable="false">
+                    <p:commandButton icon="ui-icon ui-icon-close" update="estateTab"
+                                     action="#{bean.deleteProperty}">
+                        <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column style="width: 75px">
+                    <h:outputText value="#{item.schedas} / #{item.dataSchedas}" rendered="#{not empty item.schedas}"/>
+                </p:column>
+                <p:column>
+                    <p:repeat var="str" value="#{item.sectionList}">
+                        <h:outputText value="#{str}"/>
+                        <br/>
+                    </p:repeat>
+                </p:column>
+                <p:column>
+                    <p:repeat var="str" value="#{item.sheetList}">
+                        <h:outputText value="#{str}"/>
+                        <br/>
+                    </p:repeat>
+                </p:column>
+                <p:column>
+                    <p:repeat var="str" value="#{item.particleList}">
+                        <h:outputText value="#{str}"/>
+                        <br/>
+                    </p:repeat>
+                </p:column>
+                <p:column>
+                    <p:repeat var="str" value="#{item.subList}">
+                        <h:outputText value="#{str}"/>
+                        <br/>
+                    </p:repeat>
+                </p:column>
+
+                <p:column>
+                    <h:outputText value="#{item.category.codeInVisura}" id="category"/>
+                    <p:tooltip for="category" value="#{item.category.description}"/>
+                </p:column>
+
+                <p:column>
+                    <h:outputText value="#{item.consistency}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item.cadastralArea}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item.revenue}"/>
+                </p:column>
+                <p:column style="width: 20%;">
+                    <h:outputText value="#{item.address}"/>
+                </p:column>
+                <p:column style="width: 15%;">
+                    <h:outputText value="#{item.city}"/>
+                </p:column>
+                <p:column style="width: 20%;">
+                    <ui:repeat value="#{item.relationData}" var="str">
+                        <h:outputText value="#{str}" escape="false"/>
+                        <br/>
+                    </ui:repeat>
+                </p:column>
+                <p:column style="text-align: center;" styleClass="action_column">
+                    <p:commandButton rendered="#{bean.hasFormalities(item)}" icon="fa fa-search" immediate="true"
+                                     action="#{bean.loadFormalityDocs}" oncomplete="updateDialog();">
+                        <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column style="text-align: center;" styleClass="action_column">
+                    <p:commandButton icon="fa fa-address-card" rendered="#{item.hasReplacedSubject}"
+                                     action="#{bean.showReplacedSubjectDesc}" oncomplete="updateSubjectDescDialog();">
+                        <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+            <br/>
+            <h3>#{msg.realEstateLand}</h3>
+            <p:dataTable value="#{bean.lazyPropertyListLand}" lazy="true"
+                         style="width: 100%!important;"
+                         styleClass="simple-table estate-table" var="item" id="estateTabLand"
+                         paginator="true" paginatorAlwaysVisible="false" rows="20"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="20,50,100"
+                         rowStyleClass="#{item.used?'user-row':''}">
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="3" colspan="2" headerText="N." styleClass="action_column"/>
+                        <p:column colspan="4" headerText="DATI IDENTIFICATIVI" style="width: 20%;"/>
+                        <p:column colspan="6" headerText="DATI DI CLASSAMENTO" style="width: 30%;"/>
+                        <p:column colspan="4" headerText="ALTRE INFORMAZIONI"/>
+                    </p:row>
+                    <p:row>
+                        <p:column rowspan="2" headerText="Scheda"/>
+                        <p:column rowspan="2" headerText="Foglio"/>
+                        <p:column rowspan="2" headerText="Particella"/>
+                        <p:column rowspan="2" headerText="Sub"/>
+                        <p:column colspan="4" headerText="Superficie(m&sup2;)"/>
+                        <p:column colspan="2" headerText="Reddito"/>
+                        <p:column rowspan="2" headerText="Comune" style="width: 25%;"/>
+                        <p:column rowspan="2" headerText="Relazione" style="width: 25%;"/>
+                        <p:column rowspan="2" headerText="Preg." styleClass="action_column"/>
+                        <p:column rowspan="2" headerText="Pres." styleClass="action_column"/>
+                    </p:row>
+                    <p:row>
+                        <p:column headerText="mq"/>
+                        <p:column headerText="ha"/>
+                        <p:column headerText="are"/>
+                        <p:column headerText="ca"/>
+                        <p:column headerText="Dominicale"/>
+                        <p:column headerText="Agrario"/>
+                    </p:row>
+                </p:columnGroup>
+                <p:column styleClass="action_column" exportable="false">
+                    <p:commandButton icon="ui-icon ui-icon-pencil" update=":form"
+                                     action="#{bean.editProperty}">
+                        <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column styleClass="action_column" exportable="false">
+                    <p:commandButton icon="ui-icon ui-icon-close" update="estateTabLand"
+                                     action="#{bean.deleteProperty}">
+                        <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column style="width: 75px">
+                    <h:outputText value="#{item.schedas} / #{item.dataSchedas}" rendered="#{not empty item.schedas}"/>
+                </p:column>
+                <p:column>
+                    <p:repeat var="str" value="#{item.sheetList}">
+                        <h:outputText value="#{str}"/>
+                        <br/>
+                    </p:repeat>
+                </p:column>
+                <p:column>
+                    <p:repeat var="str" value="#{item.particleList}">
+                        <h:outputText value="#{str}"/>
+                        <br/>
+                    </p:repeat>
+                </p:column>
+                <p:column>
+                    <p:repeat var="str" value="#{item.subList}">
+                        <h:outputText value="#{str}"/>
+                        <br/>
+                    </p:repeat>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item.estateLandMQ}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item.hectares}" converter="propertyAreaConverter"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item.ares}" converter="propertyAreaConverter"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item.centiares}" converter="propertyAreaConverter"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item.cadastralIncome}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item.agriculturalIncome}"/>
+                </p:column>
+                <p:column style="width: 25%;">
+                    <h:outputText value="#{item.city}"/>
+                </p:column>
+                <p:column style="width: 25%;">
+                    <ui:repeat value="#{item.relationData}" var="str">
+                        <h:outputText value="#{str}" escape="false"/>
+                        <br/>
+                    </ui:repeat>
+                </p:column>
+                <p:column style="text-align: center;" styleClass="action_column">
+                    <p:commandButton rendered="#{bean.hasFormalities(item)}" icon="fa fa-search"
+                                     action="#{bean.loadFormalityDocs}" oncomplete="updateDialog();">
+                        <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column style="text-align: center;" styleClass="action_column">
+                    <p:commandButton icon="fa fa-address-card" rendered="#{item.hasReplacedSubject}"
+                                     action="#{bean.showReplacedSubjectDesc}" oncomplete="updateSubjectDescDialog();">
+                        <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+        </p:fieldset>
+        <p:remoteCommand name="updateDialog" onstart="PF('dlgFormalityDoc').show();" update="dialogFormalityDoc"/>
+        <p:remoteCommand name="updateSubjectDescDialog" onstart="PF('dlgReplacedSubjectDesc').show();"
+                         update="dialogReplacedSubjectDesc"/>
+        <p:remoteCommand name="updatePresumableSubjectDescDialog" onstart="PF('dlgPresumableSubjectDesc').show();"
+                         update="dialogPresumableSubjectDesc"/>
+        <p:fieldset legend="#{msg.estateFormality}" style="margin-top: 10px;">
+            <p:remoteCommand name="updateTab" update=":form:filePanel"/>
+            <p:panelGrid columns="9" styleClass="ui-panelgrid-blank form-group" layout="grid" style="margin-top: 3%">
+                <p:commandButton icon="fa fa-fw fa-plus" actionListener="#{bean.createNewEstateFormality}"
+                                 style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%;"
+                                 rendered="#{!bean.viewRelatedEstate}"/>
+
+                <p:fileUpload label="#{msg.estateFormalityUploadEstateFormalityXML}"
+                              fileUploadListener="#{bean.saveDocumentXML}"
+                              styleClass="special-upload" multiple="false" allowTypes="/(\.|\/)(xml|p7m)$/" auto="true"
+                              update=":form:formPanel, :form:formalityTab, subjectEstateFormalityDialog, conservatoryEstateFormalityDialog"
+                              rendered="#{!bean.viewRelatedEstate}"/>
+                <p:commandButton
+                        update="formPanel, formalityTab, messages, subjectEstateFormalityDialog, conservatoryEstateFormalityDialog"
+                        style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%; width: 170px; height: 31px"
+                        value="#{msg.importFromDatabase}" action="#{bean.loadMostRecentPresumableFile}"/>
+            </p:panelGrid>
+            <p:outputPanel id="formPanel">
+                <p:dataTable id="formTable" var="fileEntry" value="#{bean.formalityDocumentList}"
+                             rowKey="#{fileEntry.id}" rendered="#{not empty bean.formalityDocumentList}"
+                             styleClass="without-header simple-table">
+                    <p:column styleClass="filename_column">
+                        <h:outputText value="#{fileEntry.getTitle()}"/>
+                    </p:column>
+                    <p:column styleClass="action_column">
+                        <p:commandButton icon="fa fa-fw fa-file-pdf-o" action="#{bean.downloadEstateFormalityPDF}"
+                                         ajax="false">
+                            <f:setPropertyActionListener value="#{fileEntry.id}"
+                                                         target="#{bean.downloadFileId}"/>
+                        </p:commandButton>
+                    </p:column>
+                    <p:column styleClass="action_column">
+                        <p:commandButton icon="fa fa-fw fa-file-code-o" action="#{bean.showXML}" ajax="false">
+                            <f:setPropertyActionListener value="#{fileEntry.id}" target="#{bean.downloadFileId}"/>
+                        </p:commandButton>
+                    </p:column>
+                    <p:column styleClass="action_column" style="width: 100px">
+                        <p:commandButton action="#{bean.removeFile}"
+                                         oncomplete="removeFileCommand()"
+                                         value="#{msg.estateSituationViewRemoveFile}">
+                            <f:setPropertyActionListener value="#{fileEntry.id}" target="#{bean.downloadFileId}"/>
+                            <f:setPropertyActionListener value="false" target="#{bean.property}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:outputPanel>
+            <p:dataTable value="#{bean.lazyFormalityList}" lazy="true"
+                         styleClass="simple-table"
+                         var="item" id="formalityTab"
+                         paginator="true" paginatorAlwaysVisible="false" rows="20"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="20,50,100"
+                         rowStyleClass="#{item.updated ? 'receive_new_mail_style':''}">
+                <p:column styleClass="action_column special-toggler"
+                          exportable="false">
+                    <p:commandButton icon="ui-icon ui-icon-pencil" update=":form"
+                                     action="#{bean.editEstateFormality}">
+                        <f:setPropertyActionListener value="#{item.id}"
+                                                     target="#{bean.entityEditId}"/>
+                    </p:commandButton>
+                    <p:rowToggler rendered="#{item.showToggler}" expandLabel="#{msg.estateFormalityToggler}"
+                                  collapseLabel="#{msg.estateFormalityToggler}"/>
+                </p:column>
+                <p:column styleClass="action_column" exportable="false">
+                    <p:commandButton icon="ui-icon ui-icon-close" update="formalityTab"
+                                     action="#{bean.deleteEstateFormality}">
+                        <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column headerText="#{msg.estateFormalityAccountable}" width="10%">
+                    <p:selectBooleanCheckbox value="#{item.accountable}"/>
+                </p:column>
+                <p:column headerText="#{msg.estateFormalityConservatory}" width="15%">
+                    <h:outputText value="#{item.landChargesRegistry}"/>
+                </p:column>
+                <p:column headerText="#{msg.estateFormalityTypeNote}" style="width: 6%;">
+                    <h:outputText value="#{item.typeAct.type}" converter="enumConverter"/>
+                </p:column>
+                <p:column headerText="#{msg.estateFormalityTypeShort}" style="width: 3%;">
+                    <h:outputText value="#{item.estateFormalityType}" converter="enumConverter"/>
+                </p:column>
+                <p:column headerText="#{msg.estateFormalityDate}" width="6%">
+                    <h:outputText value="#{item.date}" converter="dateTimeConverter"/>
+                </p:column>
+                <p:column headerText="#{msg.estateFormalityNumRP}" width="6%">
+                    <h:outputText value="#{item.numRP}"/>
+                </p:column>
+                <p:column headerText="#{msg.estateFormalityNumRG}" width="6%">
+                    <h:outputText value="#{item.numRG}"/>
+                </p:column>
+                <p:column headerText="#{msg.estateFormalityTypeAct}">
+                    <h:outputText value="#{item.typeActString}"/>
+                </p:column>
+                <p:rowExpansion>
+                    <div align="center">
+                        <h:outputText value="#{item.expansionTextStr}" escape="false"/>
+                    </div>
+                </p:rowExpansion>
+            </p:dataTable>
+        </p:fieldset>
+
+        <p:fieldset legend="#{msg.pdfFormality}" style="margin-top: 10px;" id="formalityDettaglio">
+            <p:panelGrid columns="9" styleClass="ui-panelgrid-blank form-group" layout="grid" style="margin-top: 3%">
+                <p:commandButton icon="fa fa-fw fa-plus" actionListener="#{bean.createNewFormality}"
+                                 style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%;"/>
+                <p:fileUpload allowTypes="/(\.|\/)(pdf)$/" auto="true" label="#{msg.formalityUpload}"
+                              styleClass="special-upload middle-size-upload" multiple="false"
+                              update=":form:formPanel, :form:formalityPDFTab" oncomplete="PF('pdfPoll').start();"
+                              fileUploadListener="#{bean.saveDocumentPDF}" rendered="#{!bean.viewRelatedEstate}"/>
+                <p:commandButton update="formPanel, formalityTab, messages"
+                                 style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%; width: 100px; height: 31px"
+                                 value="#{msg.estateSituationViewSearch}" oncomplete="PF('searchFormalitiesWV').show();"/>
+            </p:panelGrid>
+            <p:poll widgetVar="pdfPoll" interval="10" listener="#{bean.updatePDFTable}" update="formalityPDFTab"
+                    autoStart="false"/>
+            <p:remoteCommand update="formalityPDFTab" name="updatePdfTable"/>
+            <p:dataTable value="#{bean.formalityPDFList}" styleClass="simple-table" var="item" id="formalityPDFTab">
+                <p:column styleClass="action_column" exportable="false">
+                    <p:commandButton icon="ui-icon ui-icon-pencil" update=":form"
+                                     action="#{bean.editFormality}">
+                        <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                        <f:setPropertyActionListener value="#{item.statusStr}" target="#{bean.entityEditStato}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column styleClass="action_column">
+                    <p:commandButton icon="ui-icon ui-icon-close" oncomplete="updatePdfTable()"
+                                     action="#{bean.deleteFormality}">
+                        <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column styleClass="action_column">
+                    <p:column headerText="#{msg.pdf}" styleClass="action_column">
+                        <p:commandButton icon="fa fa-file-pdf-o" action="#{bean.downloadFormalityPdf}" ajax="false">
+                            <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:column>
+                <p:column styleClass="action_column" exportable="false">
+                    <p:commandButton id="buttonVedi" icon="ui-icon ui-icon-search" update=":form"
+                                     action="#{bean.viewFormality}">
+                        <f:setPropertyActionListener value="#{item.id}"
+                                                     target="#{bean.entityEditId}"/>
+                    </p:commandButton>
+                    <p:tooltip for="buttonVedi" position="left" value="#{msg.formalityEdit}"/>
+                </p:column>
+                <p:column headerText="#{msg.estateFormalityConservatory}" width="15%">
+                    <h:outputText value="#{item.conservatoryName}"/>
+                </p:column>
+                <p:column headerText="#{msg.estateFormalityTypeNote}" width="6%">
+                    <h:outputText value="#{item.typeEnum}" converter="enumConverter"/>
+                </p:column>
+                <p:column headerText="#{msg.estateFormalityTypeShort}" width="3%">
+                    <h:outputText value="#{item.currentSubjectType}"/>
+                </p:column>
+                <p:column headerText="#{msg.formalityPresentationDate}" width="6%">
+                    <h:outputText value="#{item.presentationDate}" converter="dateTimeConverter"/>
+                </p:column>
+                <p:column headerText="#{msg.estateFormalityNumRG}" width="6%">
+                    <h:outputText value="#{item.generalRegister}"/>
+                </p:column>
+                <p:column headerText="#{msg.estateFormalityNumRP}" width="6%">
+                    <h:outputText value="#{item.particularRegister}"/>
+                </p:column>
+                <p:column headerText="#{msg.estateFormalityTypeAct}">
+                    <h:outputText value="#{item.actType}"/>
+                </p:column>
+                <p:column headerText="#{msg.status}" width="6%">
+                    <h:outputText value="#{item.statusStr}"/>
+                </p:column>
+                <p:column headerText="Pres." style="text-align: center;" styleClass="action_column">
+                    <p:commandButton icon="fa fa-address-card" rendered="#{not empty item.presumableSubjects}"
+                                     action="#{bean.showFormalitySubjectDesc}"
+                                     oncomplete="updatePresumableSubjectDescDialog();">
+                        <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                        <f:setPropertyActionListener value="#{item.presumableSubjects}"
+                                                     target="#{bean.presumableSubjectsIds}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+        </p:fieldset>
+
+        <p:dialog header="#{msg.formalityDocuments}" widgetVar="dlgFormalityDoc" modal="true" width="600"
+                  draggable="false" position="center center">
+            <p:outputPanel id="dialogFormalityDoc">
+                <p:dataTable value="#{bean.formalityDocList}" var="doc">
+                    <p:column headerText="#{msg.name}">
+                        <h:outputText value="#{doc.title}"/>
+                    </p:column>
+                    <p:column style="width: 30px;">
+                        <p:commandButton icon="fa fa-download" action="#{doc.downloadFile}" update=":form, messages"
+                                         ajax="false"/>
+                    </p:column>
+                </p:dataTable>
+            </p:outputPanel>
+        </p:dialog>
+        <p:dialog widgetVar="dlgReplacedSubjectDesc" modal="true" width="600"
+                  draggable="false" position="center center">
+            <p:outputPanel id="dialogReplacedSubjectDesc">
+                <h:outputText value="#{bean.subjectFromFile.fullDescriptionByEnum}" escape="false"
+                              style="font-size: large;"/>
+            </p:outputPanel>
+        </p:dialog>
+        <p:dialog widgetVar="dlgPresumableSubjectDesc" modal="true" width="600"
+                  draggable="false" position="center top" height="80%">
+            <p:outputPanel id="dialogPresumableSubjectDesc">
+                <p:dataList value="#{bean.presumableSubjects}" var="item">
+                    <h:outputText value="#{item.fullDescriptionByEnum}" escape="false"
+                                  style="font-size: large;"/>
+                </p:dataList>
+            </p:outputPanel>
+        </p:dialog>
+        <p:dialog header="#{msg.formalityDocuments}" widgetVar="formalityDialog" modal="true" width="600"
+                  draggable="false" position="center center">
+            <h:outputText value="#{msg.needSaveFormality}"/>
+            <br/><br/>
+            <div align="center">
+                <p:commandButton value="#{msg.yes}" action="#{bean.saveNewFormalities}"
+                                 oncomplete="PF('formalityDialog').hide();"/>
+                <p:commandButton value="#{msg.no}" action="#{bean.notSaveNewFormalities}"
+                                 oncomplete="PF('formalityDialog').hide()"/>
+            </div>
+        </p:dialog>
+        <p:dialog widgetVar="subjectUploadDialog" modal="true" width="600"
+                  draggable="false" position="center center">
+            <h:outputText value="#{msg.subjectUploadDialogBeginning}"/>
+            <h:outputText value="#{bean.subjectFromFile.fullDescriptionByEnum}" escape="false" id="subjectDialog"
+                          style="font-size: large;"/>
+            <h:outputText value="#{msg.subjectUploadDialogEnding}"/>
+            <br/><br/>
+            <div align="center">
+                <p:commandButton value="#{msg.yes}" action="#{bean.saveNewSubjectsProperties}"
+                                 onstart="PF('subjectUploadDialog').hide();"
+                                 update=":form:filePanel, :form:estateTab, :form:estateTabLand"/>
+                <p:commandButton value="#{msg.no}" action="#{bean.notSaveNewSubjectsProperties}"
+                                 onstart="PF('subjectUploadDialog').hide()"/>
+            </div>
+        </p:dialog>
+        <p:dialog widgetVar="subjectEstateFormalityUploadDialog" modal="true" width="600"
+                  draggable="false" position="center center">
+            <p:outputPanel id="subjectEstateFormalityDialog">
+                <h:outputText value="#{val.estateFormalityConservatorySuccessBgn}"/>
+                <h:outputText value="#{bean.conservatoryFromFile}"/><br/>
+                <h:outputText value="#{val.estateFormalityConservatorySuccessEnd}"/>
+                <h:outputText value="#{bean.subjectFromFile.fullDescriptionByEnumLine}" escape="false"/>
+            </p:outputPanel>
+            <br/><br/>
+            <div align="center">
+                <p:commandButton value="#{msg.yes}" action="#{bean.saveNewSubjectsEstateFormalities}"
+                                 onstart="PF('subjectEstateFormalityUploadDialog').hide();"
+                                 update=":form:formPanel, :form:formalityTab"/>
+                <p:commandButton value="#{msg.no}" action="#{bean.notSaveNewSubjectsEstateFormalities}"
+                                 onstart="PF('subjectEstateFormalityUploadDialog').hide()"/>
+            </div>
+        </p:dialog>
+        <p:dialog widgetVar="conservatoryEstateFormalityUploadDialog" modal="true" draggable="false"
+                  position="center center">
+            <p:outputPanel id="conservatoryEstateFormalityDialog">
+                <div class="ui-messages-error ui-corner-all">
+                    <span class="ui-messages-error-summary">#{val.validationFailed}</span><br/>
+                    <span class="ui-messages-error-detail">#{val.estateFormalityConservatoryError}
+                        #{bean.conservatoryFromFile}</span>
+                </div>
+            </p:outputPanel>
+        </p:dialog>
+        <p:dialog widgetVar="estateFormalityErrorDialog" id="estateFormalityErrorDialogId" modal="true"
+                  draggable="false"
+                  position="center center">
+            <div class="ui-messages-error ui-corner-all">
+                <span class="ui-messages-error-summary">#{val.validationFailed}</span><br/>
+                <span class="ui-messages-error-detail">
+                #{val.typeActNotConfigure}<br/>
+                    #{msg.estateFormalityActCode}: #{bean.errorActCode}<br/>
+                    #{msg.estateFormalityNoteType}: #{bean.errorNoteType}<br/>
+                    #{msg.description}: #{bean.errorDescription}
+                </span>
+            </div>
+        </p:dialog>
+        <p:dialog widgetVar="propertyErrorDialogWV" id="propertyErrorDialogId" modal="true" draggable="false"
+                  position="center center">
+            <div class="ui-messages-error ui-corner-all">
+                <span class="ui-messages-error-summary">#{bean.errorCityNoPresent}</span><br/>
+            </div>
+        </p:dialog>
+        <p:dialog widgetVar="previousRequest"
+                  modal="true" resizable="false" effect="SLIDE">
+            #{bean.previousRequestListMessage}<br/>
+            <span>#{msg.estateSituationPreviousRequestUpload}</span>
+            <br/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.submit}" action="#{bean.associatePreviousData}"
+                                 onclick="PF('previousRequest').hide()" update=":form"/>
+                <p:commandButton value="#{msg.no}" onclick="PF('previousRequest').hide()"/>
+            </div>
+        </p:dialog>
+
+        <p:remoteCommand name="associateFormalities" action="#{bean.associateFormalitiesToRequest()}"
+                         oncomplete="updatePdfTable()"/>
+        <ui:include src="../Dialogs/SearchFormalityDialog.xhtml">
+            <ui:param name="onCompleteSaveAction" value="associateFormalities()"/>
+            <ui:param name="selectionMode" value="multiple"/>
+        </ui:include>
+
+        <p:remoteCommand oncomplete="updatePdfTable();" name="updatePdfTableAfterAssociateImport"/>
+        <ui:include src="../Dialogs/EstateFormalityPresumableFormalityAssociationDialog.xhtml">
+            <ui:param name="presumableFormalityListByEstateFormality"
+                      value="#{bean.presumableFormalityListByEstateFormality}"/>
+            <ui:param name="oncomplete_confirm_presumable_formality_dialog" value="updatePdfTableAfterAssociateImport();"/>
+        </ui:include>
+    </ui:define>
+    <ui:define name="next_buttons">
+        <p:commandButton id="backBtn" action="#{bean.goCancel}" style="margin-top: 3%"
+                         value="#{msg.goBack}" rendered="#{!bean.viewRelatedEstate}"
+                         icon="fa fa-chevron-circle-left"/>
+    </ui:define>
+</ui:composition>

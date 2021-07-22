@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/resources/tpl/Admin/EditBase.xhtml">
+    <ui:param name="edit_title" value="#{msg.omiLandValueTitle}"/>
+    <ui:param name="bean" value="#{landOmiEditBean}"/>
+
+    <ui:define name="edit_body">
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" style="width: 40%">
+            <span><span class="red">*</span>#{msg.omiLandValueYear}</span>
+            <p:inputMask value="#{bean.entity.year}" maxlength="11" placeholder="#{msg.omiLandValueYear}"
+                         id="year" styleClass="input-width"
+                         mask="9999"
+                         label="#{msg.omiLandValueYear}"/>
+            <span><span class="red">*</span>#{msg.omiLandValueProvince}</span>
+            <p:selectOneMenu id="province" value="#{bean.selectedProvinceId}"
+                             label="#{msg.omiLandValueProvince}"
+                             styleClass="select-width">
+                <p:ajax update="province, city"
+                        listener="#{bean.handleProvinceChange}"/>
+                <f:selectItems value="#{bean.provinces}"/>
+            </p:selectOneMenu>
+            <span><span class="red">*</span>#{msg.omiLandValueCity}</span>
+            <p:selectCheckboxMenu id="city" value="#{bean.selectedCity}"
+                                  style="display: #{bean.foreignCountry ? 'none' : ''};"
+                                  filter="true" filterMatchMode="startsWith"
+                                  styleClass="full-width"
+                                  label="#{msg.omiLandValueCity}"
+                                  multiple="true" converter="citySelectConverter">
+                <f:selectItems value="#{bean.cities}"/>
+            </p:selectCheckboxMenu>
+        </p:panelGrid>
+        <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" id="landOmiValueForm"
+                     columnClasses="ui-grid-col-3, ui-grid-col-3, ui-grid-col-3, ui-grid-col-3" layout="grid">
+
+            <p:selectOneMenu value="#{bean.selectedQuality}" style="width:91%;" id="quality">
+                <f:selectItems value="#{bean.qualities}"/>
+            </p:selectOneMenu>
+
+            <p:inputNumber id="landvalue" value="#{bean.newLandOmiValue.value}" decimalPlaces="2" placeholder="#{msg.omiLandValue}" styleClass="input-width"/>
+                <p:commandButton icon="fa fa-fw fa-plus" action="#{bean.addLandOmiValue}" update="landOmiValue, landOmiValueForm"
+                                 style="margin-left: 2%; margin-bottom: 1%;"/>
+        </p:panelGrid>
+        <p:panel>
+            <p:dataTable value="#{bean.landOmiValueList}" var="item" id="landOmiValue" style="margin-top: 10px">
+                <p:column styleClass="action_column">
+                    <p:commandButton action="#{bean.deleteLandOmiValue}" update="landOmiValue"
+                                     icon="fa fa-fw fa-close">
+                        <f:setPropertyActionListener value="#{item}" target="#{bean.deletedLandOmiValue}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column headerText="#{msg.omiLandValueQuality}">
+                    <h:outputText value="#{item.quality}"/>
+                </p:column>
+                <p:column headerText="#{msg.omiLandValue}">
+                    <h:outputText value="#{item.value}"/>
+                </p:column>
+            </p:dataTable>
+        </p:panel>
+
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                template="/resources/tpl/Admin/FormBase.xhtml">
+    <ui:param name="bean" value="#{mailManagerViewBean}"/>
+    <ui:define name="form_body">
+    	<style>
+    	   .ui-messages-info,.ui-message-info {
+                border-left-color: rgb(82, 224, 82);
+                background: rgb(233, 251, 233);
+                color: green;
+            }
+            
+            body .ui-messages .ui-messages-info {
+    			background-color: green !important;
+    			border-color: green !important;
+    			color: #ffffff;
+			}
+			
+			#validationMessages {
+				width:30%
+			}
+
+    	</style>
+        <ui:include src="/resources/tpl/Admin/LetterView.xhtml"/>
+        <p:outputPanel id="print_panel" style="visibility: hidden; position: absolute;">
+            <p:remoteCommand name="clearPrintArea" action="#{bean.clearPrintArea}"/>
+            <script>
+                function closePrint() {
+                    document.body.removeChild(this.__container__);
+                    clearPrintArea();
+                }
+
+                function setPrint() {
+                    this.contentWindow.__container__ = this;
+                    this.contentWindow.onbeforeunload = closePrint;
+                    this.contentWindow.onafterprint = closePrint;
+                    this.contentWindow.focus(); // Required for IE
+                    this.contentWindow.print();
+                }
+
+                function printIframe() {
+                    var oHiddFrame = document.createElement("iframe");
+                    oHiddFrame.onload = setPrint;
+                    oHiddFrame.style.visibility = "hidden";
+                    oHiddFrame.style.position = "fixed";
+                    oHiddFrame.style.right = "0";
+                    oHiddFrame.style.bottom = "0";
+                    var existing = document.getElementById('mail_pdf_iframe');
+                    oHiddFrame.srcdoc = existing.srcdoc;
+                    document.body.appendChild(oHiddFrame);
+                }
+
+                function toggle(source) {
+                    var manager = $('#manager_input').is(":checked")
+                    var fiduciary = $('#fiduciary_input').is(":checked");
+                    if(source === 'manager'){
+                        if(manager === true){
+                        	PF('fiduciaryCheckBox').uncheck();
+                        }
+                    }else if(source === 'fiduciary'){
+                    	 if(fiduciary === true){
+                    		 PF('managerCheckBox').uncheck();
+                        }
+                    }  
+                };
+            </script>
+            <iframe id="mail_pdf_iframe" srcdoc="#{bean.mailPdf}"/>
+        </p:outputPanel>
+        <p:dialog id="confirmReadDlg" widgetVar="confirmReadDlgWV"
+                  draggable="false" modal="true" resizable="false">
+            <h:outputText value="#{msg.confirmReadMessage}"/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.ok}" action="#{bean.sendConfirmMail}"
+                                 oncomplete="PF('confirmReadDlgWV').hide();"/>
+                <p:commandButton value="#{msg.cancel}" action="#{bean.setConfirmMailRead}"
+                                 oncomplete="PF('confirmReadDlgWV').hide();"/>
+            </div>
+        </p:dialog>
+        <p:dialog widgetVar="imageFileDlgWV" width="300" draggable="false" modal="true" resizable="false"
+                  header="#{msg.mailManagerImgFiles}">
+            <p:dataTable value="#{bean.entity.imgFiles}" var="img" styleClass="without-header">
+                <p:column>
+                    <p:selectBooleanCheckbox value="#{img.imageSelected}"/>&nbsp;&nbsp;
+                    <i class="#{img.icon} #{img.style}"/>
+                    <p:commandLink title="#{msg.download}" ajax="false"
+                                   action="#{img.downloadFile}" value="&nbsp;#{img.fileName}"
+                                   style="color: black; padding-right: 5px;"/>
+                </p:column>
+            </p:dataTable>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" action="#{bean.addImage}" update="form"
+                                 oncomplete="PF('imageFileDlgWV').hide();"/>
+                <p:commandButton value="#{msg.cancel}"
+                                 oncomplete="PF('imageFileDlgWV').hide();"/>
+            </div>
+        </p:dialog>
+
+        <p:dialog id="enterPracticeReferenceDialog" widgetVar="enterPracticeReferenceWV" modal="true" width="600">
+            <h3>#{msg.enterPracticeReference}</h3>
+
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" id="referenceArea">
+                <span> #{msg.ndgText}</span>
+                <p:column>
+                    <p:inputText id="ndg" value="#{bean.ndg}"/>
+                </p:column>
+
+                <span> #{msg.cdrText}</span>
+                <p:column>
+                    <p:inputText id="cdr" value="#{bean.cdr}"/>
+                </p:column>
+
+                <span> #{msg.reference}</span>
+                <p:column>
+                    <p:inputText id="reference" value="#{bean.referencePractice}"/>
+                </p:column>
+            </p:panelGrid>
+
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" update="@form"
+                                 oncomplete="PF('enterPracticeReferenceWV').hide(); PF('chooseSingleOrMultipleRequestCreateWV').show();">
+                    <f:setPropertyActionListener value="#{true}" target="#{bean.confirmButtonIsClicked}"/>
+                </p:commandButton>
+                <p:commandButton value="#{msg.cancel}"
+                                 oncomplete="PF('enterPracticeReferenceWV').hide(); PF('chooseSingleOrMultipleRequestCreateWV').show();"/>
+            </div>
+        </p:dialog>
+
+        <p:dialog id="chooseSingleOrMultipleRequestCreate" widgetVar="chooseSingleOrMultipleRequestCreateWV" modal="true" width="300">
+            <h3>#{msg.mailManagerViewSingleOrMultipleRequest}:</h3>
+            <p:outputPanel style="justify-content: center; display: flex">
+                <p:selectOneRadio value="#{bean.multipleCreateRedirect}" unselectable="false">
+                    <f:selectItem itemLabel="#{msg.mailManagerViewSingleRequestCreate}" itemValue="#{false}"/>
+                    <f:selectItem itemLabel="#{msg.mailManagerViewMultipleRequestCreate}" itemValue="#{true}"/>
+                </p:selectOneRadio>
+            </p:outputPanel>
+            <br/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" update="@form"
+                                 action="#{bean.saveReference(true)}" oncomplete="PF('chooseSingleOrMultiplerequestCreateWV').hide();"/>
+            </div>
+        </p:dialog>
+        <ui:include src="../ConfigurationArea/ClientCreate.xhtml"/>
+        <ui:include src="../Dialogs/MailManagerViewRequestsDialog.xhtml"/>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core">
+<ui:composition template="/resources/tpl/Admin/LazyInListEditBase.xhtml">
+    <ui:param name="list_title" value="#{msg.regimeConiugi}"/>
+    <ui:param name="bean" value="#{regimeConiugiListBean}"/>
+    <ui:param name="entity_name" value="#{msg.regimeConiugi}"/>
+    <ui:param name="disableSelection" value="true"/>
+    <ui:param name="additionalEditAction" value="window.scrollTo(0,0);"/>
+
+    <ui:define name="edit_fields">
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+
+            <span><span class="red">*</span> #{msg.code}:</span>
+            <p:inputText id="code" maxlength="50" value="#{bean.entity.code}"
+                         label="#{msg.code}" onkeypress="numbers_letters_only('#code');"/>
+                         
+            <span><span class="red">*</span> #{msg.text}:</span>
+            <p:inputText id="text" maxlength="50" value="#{bean.entity.text}"
+                         label="#{msg.text}" onkeypress="numbers_letters_only('#text');"/>
+        </p:panelGrid>
+    </ui:define>
+
+    <ui:define name="columns">
+    	<p:column sortBy="#{item.code}" filterBy="#{item.code}"
+                  headerText="#{msg.code}">
+            <h:outputText value="#{item.code}"/>
+        </p:column>
+        
+        <p:column sortBy="#{item.text}" filterBy="#{item.text}"
+                  headerText="#{msg.text}">
+            <h:outputText value="#{item.text}"/>
+        </p:column>
+    </ui:define>
+
+</ui:composition>
+</html>

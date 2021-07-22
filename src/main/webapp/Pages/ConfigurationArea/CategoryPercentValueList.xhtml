@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/resources/tpl/Admin/LazyListTabBase.xhtml">
+    <ui:param name="view_title" value="#{msg.categoryPercentValueHeader}"/>
+    <ui:param name="bean" value="#{categoryPercentValueBean}"/>
+    <ui:define name="list_body">
+		<style>
+		.ui-datatable.groupTable tbody tr {
+		background-color: #ffffff !important;
+		}
+		.ui-datatable-empty-message {
+    		display: none;
+		}
+		
+		 .ui-datatable.borderless thead th, .ui-datatable.borderless tbody,
+			.ui-datatable.borderless tbody tr, .ui-datatable.borderless tbody td {
+			border-style: none;
+		} 
+		
+		.ui-datatable.withborder thead th, .ui-datatable.withborder tbody,
+			.ui-datatable.withborder tbody tr, .ui-datatable.withborder tbody td {
+			border-style: solid !important;
+		}
+		</style>
+		
+		
+		<p:tabView id="tabs">
+			<p:tab title="#{msg.categoryPercentValueTabPerCategorie}">
+				<p:commandButton value="#{msg.add}"
+					oncomplete="PF('categoryPercentValueWV').show();"
+					update="categoryPercentValueDlg"
+					action="#{bean.handleCategoryPercentValueDialogInit(null)}" />
+				<br />
+				<br />
+
+				<p:dataTable value="#{bean.lazyModel}" var="cat" id="table"
+					emptyMessage="#{msg.noRecordsFound}" rows="10" lazy="true"
+					paginator="true" paginatorAlwaysVisible="true"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,50" widgetVar="tableRealEstateWV">
+					<p:column headerText="#{msg.categoryPercentValueCategoryCode}">
+						<h:outputText value="#{cat.categoryCode}" />
+					</p:column>
+					<p:column headerText="#{msg.categoryPercentValuePercent}">
+						<h:outputText value="#{cat.percentOmi}" />
+					</p:column>
+					<p:column headerText="#{msg.categoryPercentValueCommercial}">
+						<h:outputText value="#{cat.percentCommercial}" />
+					</p:column>
+					<p:column styleClass="action_column" exportable="false">
+						<p:commandButton icon="ui-icon ui-icon-pencil"
+							update="table categoryPercentValueDlg"
+							oncomplete="PF('categoryPercentValueWV').show();"
+							action="#{bean.handleCategoryPercentValueDialogInit(cat)}">
+						</p:commandButton>
+					</p:column>
+					<p:column styleClass="action_column" exportable="false">
+						<p:commandButton icon="ui-icon ui-icon-close" update=":form"
+							action="#{bean.handleDeleteCategoryPercentValue(cat)}">
+							<p:confirm message="#{msg.delete}?" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+
+			</p:tab>
+			<p:tab title="#{msg.categoryPercentValueTabRiconducibili}">
+				<p:commandButton value="#{msg.categoryPercentValueAddGroup}"
+					oncomplete="PF('omiGroupValueWV').show();"
+					update="omiGroupValueDlg"
+					action="#{bean.handleGroupOmiDialogInit(null)}"/>
+				<br />
+				<br />
+				<p:dataTable value="#{bean.groupOmis}" var="group" id="groupOmi" styleClass="groupTable borderless"
+					paginator="false" paginatorAlwaysVisible="false"
+					widgetVar="tableGroupOMIWV" style="width: 35%;">
+					<p:column>#{group.name}
+						<p:commandButton icon="ui-icon ui-icon-pencil"
+							oncomplete="PF('omiGroupValueWV').show();"
+							update="omiGroupValueDlg"
+							action="#{bean.handleGroupOmiDialogInit(group)}"/>
+						&nbsp; &nbsp;
+						<p:commandButton icon="ui-icon ui-icon-close" update="groupOmi"
+							action="#{bean.handleDeleteGroupOmi(group)}">
+							<p:confirm message="#{msg.delete}?" />
+						</p:commandButton>
+						<br />
+						<br />
+						<p:commandButton id="addBtn" icon="fa fa-plus"
+							style="margin-left:10px"
+							oncomplete="PF('omiGroupItemWV').show();"
+							update="omiGroupItemDlg"
+							action="#{bean.handleGroupItemDialogInit(group,null)}" />
+						<br />
+						<br />
+						<p:dataTable value="#{group.categoryGroupItems}" var="item" id="items" styleClass="withborder"
+							widgetVar="tableItemsWV">
+							<p:column headerText="#{msg.categoryPercentValueGroupItemPosition}" style="width: 25%;">
+								<h:outputText value="#{item.position}" />
+							</p:column>
+							<p:column headerText="#{msg.categoryPercentValueGroupItemCategory}">
+								<h:outputText value="#{item.categoryCode}" />
+							</p:column>
+							<p:column styleClass="action_column" exportable="false">
+								<p:commandButton icon="ui-icon ui-icon-pencil"
+									update="omiGroupItemDlg"
+									oncomplete="PF('omiGroupItemWV').show();"
+									action="#{bean.handleGroupItemDialogInit(group,item)}">
+								</p:commandButton>
+							</p:column>
+							<p:column styleClass="action_column" exportable="false">
+								<p:commandButton icon="ui-icon ui-icon-close"
+								action="#{bean.handleDeleteCategoryItemGroupOmi(group,item)}" update="items">
+									<p:confirm message="#{msg.delete}?" />
+								</p:commandButton>
+							</p:column>
+						</p:dataTable>
+					</p:column>
+				</p:dataTable>
+			</p:tab>
+		</p:tabView>
+
+        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+            <p:outputPanel styleClass="btn_line">
+                <p:commandButton value="#{msg.confirm}" styleClass="ui-confirmdialog-yes"
+                                 update=":tabs:table"/>
+                <p:commandButton value="#{msg.cancel}" styleClass="ui-confirmdialog-no"/>
+            </p:outputPanel>
+        </p:confirmDialog>
+
+        <p:dialog id="categoryPercentValueDlg" widgetVar="categoryPercentValueWV"
+                  modal="true" draggable="false" resizable="false">
+            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:outputText value="#{msg.categoryPercentValueCategoryCode}"/>
+                <p:selectOneMenu value="#{bean.selectedCategory}">
+                    <f:selectItems value="#{bean.categorySelectItemList}"/>
+                </p:selectOneMenu>
+
+                <h:outputText value="#{msg.categoryPercentValuePercent}"/>
+                <p:inputNumber value="#{bean.percentOmi}" decimalPlaces="0"/>
+
+                <h:outputText value="#{msg.categoryPercentValueCommercial}"/>
+                <p:inputNumber value="#{bean.percentCommercial}" decimalPlaces="0"/>
+            </p:panelGrid>
+            <div class="btn_line">
+                <p:commandButton id="saveButton" value="#{msg.confirm}" update=":tabs:table"
+                                 action="#{bean.saveCategoryPV}" styleClass="green-button"
+                                 oncomplete="PF('categoryPercentValueWV').hide();"/>
+                <p:commandButton value="#{msg.cancel}"
+                                 oncomplete="PF('categoryPercentValueWV').hide();"/>
+            </div>
+        </p:dialog>
+        
+         <p:dialog id="omiGroupValueDlg" widgetVar="omiGroupValueWV"
+                  modal="true" draggable="false" resizable="false" width="400" >
+            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+               
+                <h:outputText value="#{msg.name}"/>
+                <p:inputText value="#{bean.groupOmiName}"/>
+
+                <h:outputText value="#{msg.categoryPercentValueGroupStep}"/>
+                <p:inputNumber value="#{bean.groupOmiStep}" decimalPlaces="0"/>
+            </p:panelGrid>
+            <div class="btn_line">
+                <p:commandButton id="saveGroupButton" value="#{msg.confirm}" update=":tabs:groupOmi"
+                                 action="#{bean.saveGroupOmi}" styleClass="green-button"
+                                 oncomplete="PF('omiGroupValueWV').hide();"/>
+                <p:commandButton value="#{msg.cancel}"
+                                 oncomplete="PF('omiGroupValueWV').hide();"/>
+            </div>
+        </p:dialog>
+        <p:dialog id="omiGroupItemDlg" widgetVar="omiGroupItemWV"
+                  modal="true" draggable="false" resizable="false">
+             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="width: 35%" id="addGroupItemPanel">
+                <h:outputText value="#{msg.categoryPercentValueGroupItemPosition}"/>
+                <p:inputNumber value="#{bean.groupItemPosition}" decimalPlaces="0" id="groupItemPosition"/>
+                <h:outputText value="#{msg.categoryPercentValueGroupItemCategory}"/>
+                <p:pickList value="#{bean.categoryColumns}" var="categoryColumn"
+						effect="explode" itemValue="#{categoryColumn.categoryItemGroupOmi}"
+						itemLabel="#{categoryColumn}" showSourceFilter="true"
+						showTargetFilter="true" id="categoryColumns" filterMatchMode="contains"
+						converter="categoryColumnConverter" />
+            </p:panelGrid>
+            <div class="btn_line">
+                <p:commandButton id="saveGroupItemButton" value="#{msg.confirm}"
+                  		update="addGroupItemPanel :tabs:groupOmi"
+                		action="#{bean.saveGroupItemOmi}" styleClass="green-button"/>
+                <p:commandButton value="#{msg.cancel}"
+                                 oncomplete="PF('omiGroupItemWV').hide();"/>
+            </div>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>
+</html>

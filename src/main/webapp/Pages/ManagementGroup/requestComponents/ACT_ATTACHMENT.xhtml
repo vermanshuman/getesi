@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <script type="text/javascript">
+        function dialogTop(buttonId) {
+            var dlg = document.getElementById('$2_dlg'.replace('$2', buttonId));
+            dlg.style.top = "10px";
+
+            if (dlg.style.top !== "10px") {
+                dlg.style.top = "10px";
+            } else {
+                setTimeout(function () {
+                    dialogTop(buttonId);
+                }, 50);
+            }
+        }
+    </script>
+
+    <span>#{enums.documentGenerationTagsACT_ATTACHMENT}<span class="red" style="#{block.isRequired()?'':'display:none;'}">*</span></span>
+
+    <p:panel id="ACT_ATTACHMENT" style="width: 100%; background: transparent; border: none">
+        <div class="ui-g">
+            <div class="ui-g-6">
+                <h:outputText value="#{msg.requestDocumentAddNew}:"/>
+            </div>
+            <div class="ui-g-6">
+                <p:commandButton value="#{msg.requestDocumentAddNewBtn}" oncomplete="PF('documentAttachmentDlgWV').show();"/>
+            </div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <p:dataTable var="doc" id="tableAttachemnts"
+                             rendered="#{not empty bean.attachments}"
+                             emptyMessage="#{msg.noRecordsFound}" value="#{bean.attachments}"
+                             rowKey="#{doc.id}" rowIndexVar="rowId"
+                             widgetVar="tableAttachemntsWV">
+
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.requestTableOfOtherDocumentsAssociatedWithSubject}"/>
+                    </f:facet>
+
+
+                    <p:column headerText="#{msg.requestFile}" colspan="2">
+                        <h:outputText value="#{doc.nameByPathOrTitle}"/>
+                    </p:column>
+
+                    <p:column styleClass=" action_midle_column" headerText="#{msg.pdf}">
+                        <p:commandButton icon="fa fa-fw fa-file-pdf-o"
+                                         action="#{bean.downloadPdfFile(doc)}" ajax="false" update="@form">
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-6">
+                <p:commandButton value="#{msg.requestDocumentAddFormality}" id="distraintFormalityDialogButton"
+                                 action="#{bean.openDistraintFormalityDialog}"
+                                 oncomplete="setTimeout(function () {dialogTop('distraintFormalityDialogButton');}, 50);">
+                    <p:ajax event="dialogReturn" listener="#{bean.onDistraintFormalityDialogClose}"  update="@form"/>
+                </p:commandButton>
+            </div>
+            <div class="ui-g-6">
+                <p:commandButton value="#{msg.requestDocumentSearchFormality}" oncomplete="PF('searchFormalitiesWV').show();"/>
+            </div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-12">
+	        	<p:panelGrid id="distraintFormalityTable"
+	        				style="width: 100%;"
+	        				rendered="#{bean.distraintFormality!=null}"
+	                        >
+	                <f:facet name="header">
+	                	<p:row>
+			                <p:column>
+			                	<h:outputText value="#{msg.requestPrintGeneralRegister}"/>
+			                </p:column>
+			                <p:column>
+			                	<h:outputText value="#{msg.requestPrintParticularRegister}"/>
+			                </p:column>
+			                <p:column>
+			                	<h:outputText value="#{msg.requestPrintFormalityPresentationDate}"/>
+			                </p:column>
+			                <p:column>
+			                	<h:outputText value="#{msg.name}"/>
+			                </p:column>
+	                	</p:row>
+	                </f:facet>
+	                <p:row>
+		                <p:column>
+		                	<h:outputText value="#{bean.distraintFormality.generalRegister}"/>
+		                </p:column>
+		                <p:column>
+		                	<h:outputText value="#{bean.distraintFormality.particularRegister}"/>
+		                </p:column>
+		                <p:column style="width: 72px; text-align: center;">
+		                	<h:outputText value="#{bean.distraintFormality.presentationDate}" converter="dateTimeConverter"/>
+		                </p:column>
+		                <p:column>
+		                	<h:outputText value="#{bean.distraintFormalityTableNameValue}"/>
+		                </p:column>
+	                </p:row>
+	            </p:panelGrid>
+			</div>
+        </div>
+    </p:panel>
+
+    <p:dialog header="#{msg.databaseListDocumentAddDlg}" modal="true"
+              id="documentAttachmentDlg" resizable="false" draggable="false"
+              dynamic="true" widgetVar="documentAttachmentDlgWV">
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+
+            <h:outputText value="#{msg.databaseListDocumentDocument}:"/>
+            <p:fileUpload mode="simple" value="#{bean.attachment}" skinSimple="true"
+                          label="#{msg.mailManagerChooseAttachedFiles}"
+                          uploadLabel="#{msg.mailManagerUploadAttachedFiles}"
+                          cancelLabel="#{msg.mailManagerCancelAttachedFiles}"/>
+
+        </p:panelGrid>
+        <div class="btn_line">
+            <p:commandButton value="#{msg.save}" ajax="false"
+                             action="#{bean.fillUploadedFileAttachmentsList}" update=":form:ACT_ATTACHMENT"
+                             oncomplete="PF('documentAttachmentDlgWV').hide();"/>
+            <p:commandButton value="#{msg.cancel}" ajax="false"
+                             action="#{bean.cancelSaveFile}" update="@form"
+                             oncomplete="PF('documentAttachmentDlgWV').hide();"/>
+        </div>
+
+    </p:dialog>
+
+    <p:remoteCommand name="associateFormality" action="#{bean.associateFormalityToRequest()}" update="@form"/>
+    <ui:include src="../../Dialogs/SearchFormalityDialog.xhtml">
+        <ui:param name="onCompleteSaveAction" value="associateFormality()"/>
+        <ui:param name="selectionMode" value="single"/>
+    </ui:include>
+
+</ui:composition>

@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                template="/resources/tpl/Admin/EditBase.xhtml">
+    <ui:param name="bean" value="#{estateFormalityBean}"/>
+    <ui:param name="saveButtonStyle" value="btn-green"/>
+    <ui:define name="edit_body">
+        <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                     columnClasses="ui-grid-col-1, ui-grid-col-3, ui-grid-col-1, ui-grid-col-3, ui-grid-col-1, ui-grid-col-3">
+            <p:column>
+                <span style="float: right; margin-top: 3%;">#{msg.estateFormalityConservatorship}</span>
+            </p:column>
+            <p:column>
+                <p:selectOneMenu styleClass="select-width" value="#{bean.landChargesRegistryId}" autoWidth="false"
+                id="estateFormalityConservatorship">
+                    <f:selectItems value="#{bean.landChargesRegistryList}"/>
+                </p:selectOneMenu>
+            </p:column>
+
+            <p:column/>
+            <p:column/>
+            <p:column/>
+            <p:column/>
+
+            <p:column>
+                <span style="float: right; margin-top: 3%;">#{msg.estateFormalityTypeNote}</span>
+            </p:column>
+            <p:column>
+                <p:selectOneMenu styleClass="select-width" value="#{bean.selectedTypeActType}">
+                    <f:selectItems value="#{bean.typeActTypeList}"/>
+                    <p:ajax listener="#{bean.handelTypeSelect}" update="typeAct"/>
+                </p:selectOneMenu>
+            </p:column>
+            <p:column>
+                <span style="float: right; margin-top: 3%;">#{msg.estateFormalityTypeShort}</span>
+            </p:column>
+            <p:column>
+                <p:selectOneMenu styleClass="select-width" value="#{bean.selectedEstateFormalityTypeId}">
+                    <f:selectItems value="#{bean.estateFormalityTypeList}"/>
+                </p:selectOneMenu>
+            </p:column>
+            <p:column>
+                <span style="float: right; margin-top: 3%;">#{msg.estateFormalityDate}</span>
+            </p:column>
+            <p:column>
+                <p:calendar value="#{bean.date}" pattern="dd/MM/yyyy" id="estateFormalityDate"
+                            styleClass="calendar-width" converter="fullDateTimeConverter"
+                            label="#{msg.estateFormalityDate}"/>
+            </p:column>
+            <p:column style="padding-left: 20px;">
+                <span style="float: right; margin-top: 3%;">#{msg.estateFormalityNumRP}</span><br/>
+            </p:column>
+            <p:column>
+                <p:inputText value="#{bean.numRP}" styleClass="input-width" id="estateFormalityNumRP"
+                             onkeypress="return numbers_slash_only('#estateFormalityNumRP')"
+                             label="#{msg.estateFormalityNumRP}"/>
+            </p:column>
+            <p:column>
+                <span style="float: right; margin-top: 3%;">#{msg.estateFormalityNumRG}</span>
+            </p:column>
+            <p:column>
+                <p:inputText value="#{bean.numRG}" styleClass="input-width" id="estateFormalityNumRG"
+                             onkeypress="return numbers_only(this, event, 9, 0)" label="#{msg.estateFormalityNumRG}"
+                             onkeyup="check_numbers(this, 9, 0);"/>
+            </p:column>
+            <p:column>
+                <span style="float: right; margin-top: 3%;">#{msg.estateFormalityTypeAct}</span>
+            </p:column>
+            <p:column>
+                <p:autoComplete id="typeAct" dropdown="true" var="item"
+                                styleClass="lazy-autocomplete autocomplete-estate"
+                                converter="typeActConverter" style="width: 100%;display: grid;"
+                                itemValue="#{item}" itemLabel="#{item}" scrollHeight="400"
+                                value="#{bean.selectedTypeAct}" completeMethod="#{bean.completeTypeAct}"/>
+            </p:column>
+            <p:column>
+                <span style="float: right; margin-top: 3%;">#{msg.estateFormalityAnno}</span>
+            </p:column>
+            <p:column>
+                <p:inputText value="#{bean.entity.referenceYear}" styleClass="input-width"
+                             id="estateFormalityReferenceYear"
+                             onkeypress="return numbers_only(this, event, 9, 0)" label="#{msg.estateFormalityAnno}"
+                             onkeyup="check_numbers(this, 9, 0);"/>
+            </p:column>
+        </p:panelGrid>
+        <h3>#{msg.estateFormalityRemarks}</h3>
+        <p:panelGrid columns="5" styleClass="ui-panelgrid-blank form-group" id="formalitySuccessForm"
+                     columnClasses="ui-grid-col-3, ui-grid-col-3, ui-grid-col-3, ui-grid-col-3" layout="grid">
+
+            <p:inputText value="#{bean.newFormalitySuccess.numRP}" styleClass="input-width" id="successRP"
+                         onkeypress="return numbers_slash_only('#successRP')"
+                         placeholder="#{msg.estateFormalityNumRP}"/>
+
+            <p:inputText value="#{bean.newFormalitySuccess.numRPB}" styleClass="input-width"
+                         onkeypress="return numbers_only(this, event, 9, 0)"
+                         onkeyup="check_numbers(this, 9, 0);" placeholder="#{msg.estateFormalityNumRPB}"/>
+
+            <p:calendar value="#{bean.newFormalitySuccess.date}" pattern="dd/MM/yyyy"
+                        styleClass="calendar-width" placeholder="#{msg.estateFormalityDate}"
+                        converter="fullDateTimeConverter"/>
+
+            <p:autoComplete dropdown="true" var="item" placeholder="#{msg.estateFormalityNoteType}"
+                            styleClass="lazy-autocomplete autocomplete-estate"
+                            converter="typeActConverter" style="width: 100%;display: grid;"
+                            itemValue="#{item}" itemLabel="#{item}" scrollHeight="400"
+                            value="#{bean.selectedFormalitySuccessTypeAct}"
+                            completeMethod="#{bean.completeFormalitySuccessTypeAct}"/>
+
+            <div align="center">
+                <p:commandButton value="#{msg.estateFormalityAdd}" action="#{bean.addNewFormalitySuccess}"
+                                 update="formalitySuccess, formalitySuccessForm"/>
+            </div>
+        </p:panelGrid>
+        <p:dataTable value="#{bean.formalitySuccessList}" var="item" id="formalitySuccess"
+                     style="margin-top: 10px">
+            <p:column styleClass="action_column">
+                <p:commandButton action="#{bean.deleteFormalitySuccess}" update="formalitySuccess"
+                                 icon="fa fa-fw fa-close">
+                    <f:setPropertyActionListener value="#{item}" target="#{bean.deleteFormalitySuccess}"/>
+                </p:commandButton>
+            </p:column>
+            <p:column headerText="#{msg.estateFormalityDescription}">
+                <h:outputText value="#{item.description}"/>
+            </p:column>
+            <p:column headerText="#{msg.estateFormalityDate}">
+                <h:outputText value="#{item.date}" converter="dateTimeConverter"/>
+            </p:column>
+            <p:column headerText="#{msg.estateFormalityNumRP}">
+                <h:outputText value="#{item.numRP}"/>
+            </p:column>
+            <p:column headerText="#{msg.estateFormalityNumRPB}">
+                <h:outputText value="#{item.numRPB}"/>
+            </p:column>
+            <p:column headerText="#{msg.estateFormalityActCode}">
+                <h:outputText value="#{item.actCode}"/>
+            </p:column>
+            <p:column headerText="#{msg.estateFormalityNoteType}">
+                <h:outputText value="#{item.noteType}" converter="enumConverter"/>
+            </p:column>
+            <p:column headerText="#{msg.estateFormalityYear}">
+                <h:outputText value="#{item.year}" converter="dateTimeConverter"/>
+            </p:column>
+        </p:dataTable>
+        <h3>#{msg.estateFormalityCommunicazione}</h3>
+        <p:panelGrid columns="5" styleClass="ui-panelgrid-blank form-group" id="formalityCommunicazionForm"
+                     columnClasses="ui-grid-col-3, ui-grid-col-3, ui-grid-col-3, ui-grid-col-3" layout="grid">
+
+            <p:inputText value="#{bean.newCommunication.particularRegister}" styleClass="input-width" id="particularRegister"
+                         placeholder="#{msg.communicationParticularRegister}"/>
+
+            <p:calendar value="#{bean.newCommunication.receiveDate}" pattern="dd/MM/yyyy"
+                        styleClass="calendar-width" placeholder="#{msg.communicationReceiveDate}"
+                        converter="fullDateTimeConverter"/>
+
+            <p:inputText value="#{bean.newCommunication.remark}" styleClass="input-width" id="remark"
+                         placeholder="#{msg.communicationRemark}"/>
+
+            <p:inputText value="#{bean.newCommunication.communicationCode}" styleClass="input-width" id="communicationCode"
+                         placeholder="#{msg.code}"/>
+
+            <p:commandButton value="#{msg.estateFormalityAdd}" action="#{bean.addNewCommunicationFormality}"
+                             update="formalityCommunicazionForm, formalityCommunicazionList"/>
+        </p:panelGrid>
+        <p:dataTable value="#{bean.formalityCommunicationList}" var="item" id="formalityCommunicazionList"
+                     style="margin-top: 10px">
+            <p:column styleClass="action_column">
+                <p:commandButton action="#{bean.deleteCommunicationFormality}" update="formalityCommunicazionList"
+                                 icon="fa fa-fw fa-close">
+                    <f:setPropertyActionListener value="#{item}" target="#{bean.deleteFormalityCommunication}"/>
+                </p:commandButton>
+            </p:column>
+            <p:column headerText="#{msg.communicationParticularRegister}">
+                <h:outputText value="#{item.particularRegister}"/>
+            </p:column>
+            <p:column headerText="#{msg.communicationReceiveDate}">
+                <h:outputText value="#{item.receiveDate}" converter="dateTimeConverter"/>
+            </p:column>
+            <p:column headerText="#{msg.communicationRemark}">
+                <h:outputText value="#{item.remark}"/>
+            </p:column>
+            <p:column headerText="#{msg.code}">
+                <h:outputText value="#{item.communicationCode}"/>
+            </p:column>
+        </p:dataTable>
+    </ui:define>
+    <ui:define name="additional_buttons">
+        <p:commandButton action="#{bean.pageSave}" value="#{msg.saveDuplicate}"
+                         icon="ui-icon-disk" update=":form, messages" styleClass="btn-green">
+            <f:setPropertyActionListener value="true" target="#{bean.saveDuplicate}"/>
+        </p:commandButton>
+    </ui:define>
+    <ui:define name="dialog_body">
+        <p:remoteCommand action="#{bean.goBack()}" name="goBack"/>
+        <ui:include src="../Dialogs/EstateFormalityPresumableFormalityAssociationDialog.xhtml">
+            <ui:param name="presumableFormalityListByEstateFormality"
+                      value="#{bean.presumableFormalityListByEstateFormality}"/>
+            <ui:param name="oncomplete_cancel_presumable_formality_dialog" value="goBack()"/>
+        </ui:include>
+    </ui:define>
+</ui:composition>

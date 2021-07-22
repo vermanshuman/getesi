@@ -1,0 +1,497 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/resources/tpl/Admin/EditBase.xhtml">
+    <ui:param name="bean" value="#{realEstateEditBean}"/>
+    <ui:param name="edit_title" value="#{msg.databaseListRealEstate}"/>
+    <ui:param name="disableSave" value="#{!bean.renderForm}"/>
+    <ui:param name="saveButtonStyle" value="btn-green"/>
+    <ui:define name="edit_body">
+        <script type="application/javascript">
+            function customFilter(label, filter) {
+                var descr = label.substr(label.indexOf(" ") + 1).toUpperCase();
+                var filUpp = filter.toUpperCase();
+                if (descr.includes(filUpp)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        </script>
+        <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                     columnClasses="ui-grid-col-1, ui-grid-col-3, ui-grid-col-1,
+                     ui-grid-col-3, ui-grid-col-1, ui-grid-col-3">
+            <span style="float: right; margin-top: 3%;"><span class="red">*</span>#{msg.databaseListRealEstateProvince}:</span>
+            <p:selectOneMenu id="province" value="#{bean.addressProvinceId}" label="#{msg.databaseListSubjectProvince}"
+                             styleClass="select-width">
+                <p:ajax update="form" listener="#{bean.handleAddressProvinceChange}"/>
+                <f:selectItems value="#{bean.provinces}"/>
+            </p:selectOneMenu>
+            <span style="float: right; margin-top: 3%;"><span
+                    class="red">*</span>#{msg.databaseListRealEstateCity}:</span>
+            <p:selectOneMenu id="city" value="#{bean.addressCityId}" styleClass="select-width"
+                             filterMatchMode="custom" filterFunction="customFilter"
+                             filter="true"
+                             label="#{msg.databaseListSubjectCity}">
+                <p:ajax update="form" listener="#{bean.handleAddressCityChange}"/>
+                <f:selectItems value="#{bean.addressCities}"/>
+            </p:selectOneMenu>
+            <span style="float: right; margin-top: 3%;"><span
+                    class="red">*</span>#{msg.databaseListRealEstateType}:</span>
+            <p:selectOneRadio value="#{bean.selectedTypeId}" id="realEstateType"
+                              label="#{msg.databaseListRealEstateType}">
+                <p:ajax update="form" listener="#{bean.handleTypeChange}"/>
+                <f:selectItems value="#{bean.realEstateTypes}"/>
+            </p:selectOneRadio>
+        </p:panelGrid>
+
+        <p:outputPanel rendered="#{bean.renderForm}">
+            <p:fieldset legend="#{msg.databaseListRealEstateLeadingPropertyData}">
+                <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" id="schedaPanel"
+                             columnClasses="ui-grid-col-1,ui-grid-col-2,ui-grid-col-1" layout="grid"
+                             rendered="#{bean.isBuilding}">
+                    <p:column>
+                        <p:selectBooleanCheckbox id="schedaCheckBox" value="#{bean.saveScheda}">
+                            <p:ajax update="schedaText, dataSchedaText"/>
+                        </p:selectBooleanCheckbox>
+                        <span style="margin-left: 3%">#{msg.databaseListRealEstateCadastralText}</span>
+                    </p:column>
+                    <p:inputText value="#{bean.newCadastralData.scheda}" styleClass="input-width" id='schedaText'
+                                 placeholder="#{msg.databaseListRealEstateCadastralNoteText}"
+                                 disabled="#{not bean.saveScheda}"
+                                 label="#{msg.databaseListRealEstateCadastralNoteText}"/>
+                    <p:inputText value="#{bean.newCadastralData.dataScheda}" styleClass="input-width"
+                                 id='dataSchedaText'
+                                 placeholder="#{msg.databaseListRealEstateCadastralDataNoteText}"
+                                 disabled="#{not bean.saveScheda}"
+                                 label="#{msg.databaseListRealEstateCadastralDataNoteText}"/>
+                </p:panelGrid>
+
+
+                <p:panelGrid columns="5" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                             columnClasses="ui-grid-col-3, ui-grid-col-3, ui-grid-col-3, ui-grid-col-3"
+                             id="addCadastralDataDLGPanel">
+                    <p:inputText value="#{bean.newCadastralData.section}" styleClass="input-width"
+                                 placeholder="#{msg.databaseListRealEstateSection}"/>
+                    <p:inputText value="#{bean.newCadastralData.sheet}" styleClass="input-width"
+                                 id="addCadastralDataDLGsheet" placeholder="#{msg.databaseListRealEstateSheet}"
+                                 label="#{msg.databaseListRealEstateSheet}"/>
+                    <p:inputText value="#{bean.newCadastralData.particle}" styleClass="input-width"
+                                 id="addCadastralDataDLGparticle" placeholder="#{msg.databaseListRealEstateParticle}"
+                                 label="#{msg.databaseListRealEstateParticle}"/>
+                    <p:inputText value="#{bean.newCadastralData.sub}" styleClass="input-width"
+                                 id="addCadastralDataDLGsub" placeholder="#{msg.databaseListRealEstateSub}"
+                                 label="#{msg.databaseListRealEstateSub}"/>
+                    <div class="btn_line">
+                        <p:commandButton value="#{msg.databaseListRealEstateCadastralBtn}"
+                                         action="#{bean.addCadastralData}"
+                                         update="addCadastralDataDLGPanel, schedaPanel, addCadastralDataDLGPanelDlg,
+                                         tableCadastralData, messages"/>
+                    </div>
+                </p:panelGrid>
+            </p:fieldset>
+            <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                         rendered="#{bean.isBuilding}">
+                <p:column>
+                    <h:outputText value="#{msg.databaseListRealEstateCategory}:"/>
+                    <p:selectOneMenu id="category" value="#{bean.categoryId}" styleClass="select-width"
+                                     label="#{msg.databaseListRealEstateCategory}:">
+                        <f:selectItems value="#{bean.categories}"/>
+                        <p:ajax update="categoryDesc"/>
+                    </p:selectOneMenu>
+
+                    <h:outputText value="#{msg.estateType}: "/>
+                    <h:outputText value="#{bean.categoryDescription}" id="categoryDesc"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{msg.databaseListRealEstateConsistency}:"/>
+                    <p:inputText value="#{bean.entity.consistency}" maxlength="30" styleClass="input-width"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{msg.databaseListRealEstateCadastralAreaShort}:"/>
+                    <p:inputNumber value="#{bean.entity.cadastralArea}" styleClass="input-width"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{msg.databaseListRealEstateRevenueEuro}:" escape="false"/>
+                    <p:inputText value="#{bean.entity.revenue}" maxlength="30" styleClass="input-width"
+                                 onkeypress="currency_field_only('#revenue');" id="revenue"/>
+                </p:column>
+            </p:panelGrid>
+            <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                         rendered="#{bean.isBuilding}" columnClasses="ui-grid-col-6, ui-grid-col-3, ui-grid-col-3">
+                <p:column>
+                    <h:outputText value="#{msg.databaseListRealEstateAddress}:"/>
+                    <p:inputText value="#{bean.entity.address}" maxlength="300" styleClass="input-width"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{msg.databaseListRealEstateFloor}:"/>
+                    <p:inputText value="#{bean.entity.floor}" styleClass="input-width" maxlength="10"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{msg.databaseListRealEstateInterno}:"/>
+                    <p:inputText value="#{bean.entity.interno}" styleClass="input-width"/>
+                </p:column>
+            </p:panelGrid>
+			<p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                         rendered="#{not empty bean.entity.zone}" columnClasses="ui-grid-col-6, ui-grid-col-3, ui-grid-col-3">
+                <p:column>
+                	<h:outputText value="#{msg.databaseListRealEstateZona}:"/>
+                    <p:inputText value="#{bean.entity.zone}" maxlength="300" styleClass="input-width"/>
+                </p:column>                
+            </p:panelGrid>
+			
+            <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                         rendered="#{!bean.isBuilding}">
+				<p:column>
+					<h:outputText value="#{msg.databaseListRealEstateCategory}:" />
+					<p:selectOneMenu id="tcategory" value="#{bean.categoryId}"
+						styleClass="select-width"
+						label="#{msg.databaseListRealEstateCategory}:">
+						<f:selectItems value="#{bean.categories}" />
+						<p:ajax update="tcategoryDesc" />
+					</p:selectOneMenu>
+
+					<h:outputText value="#{msg.estateType}: " />
+					<h:outputText value="#{bean.categoryDescription}" id="tcategoryDesc" />
+				</p:column>
+				<p:column>
+                    <h:outputText value="#{msg.databaseListRealEstateHectares}:"/>
+                    <p:inputText value="#{bean.entity.hectares}" styleClass="input-width" id="hectares"
+                                 onkeypress="return tro_num_with_zero_only('#hectares')"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{msg.databaseListRealEstateAres}:"/>
+                    <p:inputText value="#{bean.entity.ares}" styleClass="input-width" id="ares"
+                                 onkeypress="return tro_num_with_zero_only('#ares')"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{msg.databaseListRealEstateCentiares}:"/>
+                    <p:inputText value="#{bean.entity.centiares}" styleClass="input-width" id="centiares"
+                                 onkeypress="return tro_num_with_zero_only('#centiares')"
+                                 onkeyup="check_numbers(this, 10, 10);"/>
+                </p:column>
+            </p:panelGrid>
+
+            <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                         rendered="#{!bean.isBuilding}">
+                <p:column>
+                    <h:outputText value="#{msg.databaseListRealEstateCadastralIncomeEuro}:" escape="false"/>
+                    <p:inputText value="#{bean.entity.cadastralIncome}" styleClass="input-width"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{msg.databaseListRealEstateAgriculturalIncomeEuro}:" escape="false"/>
+                    <p:inputText value="#{bean.entity.agriculturalIncome}" styleClass="input-width"/>
+                </p:column>
+            </p:panelGrid>
+
+            <p:fieldset legend="#{msg.databaseListRealEstateSubjectsBlock}">
+
+                <div class="btn_line" style="text-align:left;margin-bottom: 10px;">
+                    <p:commandButton oncomplete="PF('addSubjectDLGWV').show();"
+                                     value="#{msg.databaseListRealEstateAddSubject}"
+                                     update=":form:addSubjectPanel" action="#{bean.addRelationship}"/>
+                </div>
+                <p:dataTable var="item" id="tableSubjects"
+                             emptyMessage="#{msg.noRecordsFound}" value="#{bean.subjectWrappers}"
+                             rowKey="#{item.id}" rows="10" paginator="true"
+                             paginatorAlwaysVisible="true" rowIndexVar="rowId"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,20,50" widgetVar="tableSubjectsWV">
+
+                    <p:column styleClass="action_column" exportable="false">
+                        <p:commandButton icon="ui-icon ui-icon-pencil"
+                                         oncomplete="PF('addSubjectDLGWV').show();"
+                                         update=":form:addSubjectPanel" action="#{bean.editRelationship}">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.relationshipEditId}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                    <p:column styleClass="action_column" exportable="false">
+                        <p:commandButton icon="ui-icon ui-icon-close"
+                                         oncomplete="PF('deleteSubjectDLGWV').show()">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.relationshipDeleteId}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                    <p:column headerText="#{msg.invoicesRecipientCompanyName}">
+                        <h:outputText value="#{item.businessName}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.searchName}">
+                        <h:outputText value="#{item.name}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.searchSurname}">
+                        <h:outputText value="#{item.surname}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.searchBirthDay}">
+                        <h:outputText value="#{item.birthDate}" converter="dateTimeConverter"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.searchFiscalCode}">
+                        <h:outputText value="#{item.fiscalCode}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListRealEstateQuote}">
+                        <h:outputText value="#{item.quote}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListRealEstatePropertyType}">
+                        <h:outputText value="#{item.propertyTypeStr}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListRealEstateSubjectType}">
+                        <h:outputText value="#{item.relationship.document.typeDescription eq null
+                        ? msg.databaseListRealEstateSubjectTypeManual
+                        : item.relationship.document.typeDescription}"/>
+                    </p:column>
+
+                    <p:column styleClass="action_column">
+                        <p:commandButton icon="fa fa-download" rendered="#{item.relationship.document.canDownload}"
+                                         action="#{bean.downloadFile}" ajax="false" update="@form">
+                            <f:setPropertyActionListener value="#{item.relationship.document.id}"
+                                                         target="#{bean.downloadFileId}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                </p:dataTable>
+            </p:fieldset>
+
+        </p:outputPanel>
+        <br/>
+        <p:outputPanel rendered="#{bean.renderForm}" id="editHistory">
+            <p:fieldset>
+                <p:commandButton value="#{msg.showEditHistory}" action="#{bean.showEditHistory}" update="editHistory"
+                                 rendered="#{!bean.entity.isNew()}"/>
+                <p:panel header="#{msg.databaseListRealEstateEstimateOMI}:" rendered="#{bean.showHistoryTables}">
+
+                    <p:dataTable var="item" id="tableEstimateOMI" emptyMessage="#{msg.noRecordsFound}"
+                                 value="#{bean.estimateOMIHistory}" rowKey="#{item.id}" rows="10"
+                                 paginator="true" paginatorAlwaysVisible="true" rowIndexVar="rowId"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="10,20,50" widgetVar="tableEstimateOMIWV">
+
+                        <p:column headerText="#{msg.databaseListRealEstateEstimateOMIValue}">
+                            <h:outputText value="#{item.estimateOMI}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.databaseListRealEstateEstimateOMIDate}">
+                            <h:outputText value="#{item.propertyAssessmentDate}" converter="dateTimeConverter"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.databaseListDocumentCreateUserFullName}">
+                            <h:outputText value="#{item.user}"/>
+                        </p:column>
+
+                    </p:dataTable>
+                    <div class="btn_line">
+                        <p:commandButton oncomplete="PF('addNewOMIDlgWV').show();"
+                                         value="#{msg.databaseListRealEstateEstimateOMIAdd}"/>
+                    </div>
+                </p:panel>
+                <p:panel header="#{msg.databaseListRealEstateCommercialValue}:" rendered="#{bean.showHistoryTables}">
+
+                    <p:dataTable var="item" id="tableCommercialValue" emptyMessage="#{msg.noRecordsFound}"
+                                 value="#{bean.commercialValueHistory}" rowKey="#{item.id}" rows="10"
+                                 paginator="true" paginatorAlwaysVisible="true" rowIndexVar="rowId"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="10,20,50" widgetVar="tableCommercialValueWV">
+
+                        <p:column headerText="#{msg.databaseListRealEstateCommercialValue}">
+                            <h:outputText value="#{item.commercialValue}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.databaseListRealEstateCommercialValueDate}">
+                            <h:outputText value="#{item.commercialValueDate}" converter="dateTimeConverter"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.databaseListDocumentCreateUserFullName}">
+                            <h:outputText value="#{item.user}"/>
+                        </p:column>
+
+                    </p:dataTable>
+                    <div class="btn_line">
+                        <p:commandButton oncomplete="PF('addNewCommercialValueDlgWV').show();"
+                                         value="#{msg.databaseListRealEstateCommercialValueAdd}"/>
+                    </div>
+                </p:panel>
+            </p:fieldset>
+        </p:outputPanel>
+    </ui:define>
+    <ui:define name="additional_buttons">
+        <p:commandButton action="#{bean.pageSave}" value="#{msg.saveDuplicate}" disabled="#{!bean.renderForm}"
+                         icon="ui-icon-disk" update=":form, messages" styleClass="btn-green">
+            <f:setPropertyActionListener value="true" target="#{bean.saveDuplicate}"/>
+        </p:commandButton>
+    </ui:define>
+    <ui:define name="dialog_body">
+        <p:remoteCommand name="updateCadastralFields" action="#{bean.updateFieldsCadastralData()}" update=":form:addCadastralDataDLGPanel"/>
+        <p:dialog header="#{msg.databaseListRealEstateCadastralBtn}" modal="true" width="800"
+                  widgetVar="cadastralDialogWV" onHide="updateCadastralFields();">
+            <p:panelGrid columns="5" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                         columnClasses="ui-grid-col-3, ui-grid-col-3, ui-grid-col-3, ui-grid-col-3"
+                         id="addCadastralDataDLGPanelDlg">
+                <p:inputText value="#{bean.newCadastralDataDlg.section}" styleClass="input-width"
+                             placeholder="#{msg.databaseListRealEstateSection}"/>
+                <p:inputText value="#{bean.newCadastralDataDlg.sheet}" styleClass="input-width"
+                             placeholder="#{msg.databaseListRealEstateSheet}"
+                             label="#{msg.databaseListRealEstateSheet}"/>
+                <p:inputText value="#{bean.newCadastralDataDlg.particle}" styleClass="input-width"
+                             id="addCadastralDataDLGparticleDlg" placeholder="#{msg.databaseListRealEstateParticle}"
+                             label="#{msg.databaseListRealEstateParticle}"/>
+                <p:inputText value="#{bean.newCadastralDataDlg.sub}" styleClass="input-width"
+                             placeholder="#{msg.databaseListRealEstateSub}"
+                             label="#{msg.databaseListRealEstateSub}"/>
+                <div class="btn_line">
+                    <p:commandButton icon="fa fa-plus" action="#{bean.addCadastralDataDlg}"
+                                     update="addCadastralDataDLGPanelDlg, schedaPanel, tableCadastralData, addCadastralDataDLGPanel"/>
+                </div>
+            </p:panelGrid>
+            <p:dataTable var="item" id="tableCadastralData"
+                         emptyMessage="#{msg.noRecordsFound}" value="#{bean.cadastralDataList}"
+                         rowKey="#{item.id}" rows="10" paginator="true"
+                         paginatorAlwaysVisible="true" rowIndexVar="rowId"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,20,50" widgetVar="tableCDWV">
+
+                <p:column headerText="#{msg.databaseListRealEstateSection}">
+                    <h:outputText value="#{item.section}"/>
+                </p:column>
+
+                <p:column headerText="#{msg.databaseListRealEstateSheet}">
+                    <h:outputText value="#{item.sheet}"/>
+                </p:column>
+
+                <p:column headerText="#{msg.databaseListRealEstateParticle}">
+                    <h:outputText value="#{item.particle}"/>
+                </p:column>
+
+                <p:column headerText="#{msg.databaseListRealEstateSub}">
+                    <h:outputText value="#{item.sub}"/>
+                </p:column>
+
+                <p:column headerText="#{msg.databaseListRealEstateAction}">
+                    <p:commandButton value="#{msg.delete}" action="#{bean.deleteCadastralData}"
+                                     update="tableCadastralData, addCadastralDataDLGPanel">
+                        <f:setPropertyActionListener value="#{item.tempId}" target="#{bean.deleteTempId}"/>
+                    </p:commandButton>
+                </p:column>
+
+            </p:dataTable>
+        </p:dialog>
+        <p:dialog draggable="false" id="addSubjectDLG" modal="true" resizable="false" widgetVar="addSubjectDLGWV"
+                  width="550">
+            <p:outputPanel id="addSubjectPanel">
+                <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                             columnClasses="ui-grid-col-3, ui-grid-col-9">
+					<span style="white-space: nowrap;"><span class="red">*</span>
+                        #{msg.databaseListRealEstateSubject}:</span>
+                    <ui:fragment>
+                        <p:autoComplete id="acSimple" value="#{bean.selectedSubject}" var="item" itemLabel="#{item}"
+                                        itemValue="#{item}" maxResults="9" completeMethod="#{bean.filterSubjects}"/>
+                        <p:commandButton icon="ui-icon-circle-plus" action="#{bean.openSubjectDlg}">
+                            <p:ajax event="dialogReturn" listener="#{bean.onEditSubjectDlgClose}"
+                                    update=":form:addSubjectPanel"/>
+                        </p:commandButton>
+                    </ui:fragment>
+
+                    <span> #{msg.databaseListRealEstateQuote}:</span>
+                    <p:column>
+                        <p:inputText id="inputQuote1" value="#{bean.editSubjectWrapper.quote1}"
+                                     onkeypress="numbers_only('#inputQuote1');"/>
+                        <h:outputText value=" / "/>
+                        <p:inputText id="inputQuote2" value="#{bean.editSubjectWrapper.quote2}"
+                                     onkeypress="numbers_only('#inputQuote2');"/>
+                    </p:column>
+                    <span> #{msg.databaseListRealEstatePropertyType}:</span>
+                    <p:selectOneMenu value="#{bean.editSubjectWrapper.propertyType}">
+                        <f:selectItems value="#{bean.editSubjectWrapper.propertyTypeList}"/>
+                    </p:selectOneMenu>
+                </p:panelGrid>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.save}" action="#{bean.saveRelationship}"
+                                     update=":form:addSubjectPanel, :form:tableSubjects, messages"/>
+                    <p:commandButton value="#{msg.cancel}" oncomplete="PF('addSubjectDLGWV').hide();"/>
+                </div>
+            </p:outputPanel>
+        </p:dialog>
+        <p:dialog draggable="false" id="deleteSubjectDLG" modal="true"
+                  resizable="false" widgetVar="deleteSubjectDLGWV">
+            <h:outputText value="#{msg.databaseListRealEstateDeleteSubject}"/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" update=":form:tableSubjects"
+                                 action="#{bean.deleteSubject}"
+                                 oncomplete="PF('deleteSubjectDLGWV').hide();"/>
+                <p:commandButton value="#{msg.cancel}"
+                                 oncomplete="PF('deleteSubjectDLGWV').hide();"/>
+            </div>
+        </p:dialog>
+        <p:dialog draggable="false" id="cadastralDataValidation" modal="true"
+                  resizable="false" widgetVar="cadastralDataValidationDlg">
+            <h:outputText value="#{msg.databaseListRealEstateCadastralValidate}" escape="false"/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" action="#{bean.pageSave}"
+                                 oncomplete="PF('cadastralDataValidationDlg').hide();">
+                    <f:setPropertyActionListener value="false" target="#{bean.needValidateCadastral}"/>
+                </p:commandButton>
+                <p:commandButton value="#{msg.cancel}"
+                                 oncomplete="PF('cadastralDataValidationDlg').hide();"/>
+            </div>
+        </p:dialog>
+        <p:dialog draggable="false" id="addNewOMIDlg" modal="true" header="#{msg.databaseListRealEstateEstimateOMI}"
+                  resizable="false" widgetVar="addNewOMIDlgWV">
+
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" id="addNewOMIDlgPanel">
+                <h:outputText value="#{msg.databaseListRealEstateEstimateOMIValue}:"/>
+                <p:inputText value="#{bean.currencyValue}" id="estimateOMIValue"
+                             label="#{msg.databaseListRealEstateEstimateOMIValue}"/>
+
+                <h:outputText value="#{msg.databaseListRealEstateEstimateOMIDate}:"/>
+                <p:calendar id="dateEstimateOMI" showOn="button"
+                            pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
+                            popupIconOnly="true" value="#{bean.currencyDate}"
+                            yearRange="c-10:c+10"/>
+            </p:panelGrid>
+
+            <div class="btn_line">
+                <p:commandButton value="#{msg.save}" action="#{bean.addNewEstimateOMI}"
+                                 update=":form:addNewOMIDlgPanel, :form:tableEstimateOMI"/>
+                <p:commandButton value="#{msg.cancel}" action="#{bean.cancelSave}"
+                                 update=":form:addNewOMIDlgPanel"
+                                 oncomplete="PF('addNewOMIDlgWV').hide();"/>
+            </div>
+        </p:dialog>
+
+        <p:dialog draggable="false" id="addNewCommercialValueDlg" modal="true"
+                  header="#{msg.databaseListRealEstateCommercialValue}"
+                  resizable="false" widgetVar="addNewCommercialValueDlgWV">
+
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" id="addNewComValPanel">
+                <h:outputText value="#{msg.databaseListRealEstateCommercialValue}:"/>
+                <p:inputText value="#{bean.commercialValue}" id="commercialValue"
+                             label="#{msg.databaseListRealEstateCommercialValue}"/>
+
+                <h:outputText value="#{msg.databaseListRealEstateCommercialValueDate}:"/>
+                <p:calendar id="dateComVal" showOn="button"
+                            pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
+                            popupIconOnly="true" value="#{bean.commercialDate}"
+                            yearRange="c-10:c+10"/>
+            </p:panelGrid>
+
+            <div class="btn_line">
+                <p:commandButton value="#{msg.save}" action="#{bean.addNewCommercialValue}"
+                                 update=":form:addNewComValPanel, :form:tableCommercialValue"/>
+                <p:commandButton value="#{msg.cancel}" action="#{bean.cancelSave}"
+                                 update=":form:addNewComValPanel"
+                                 oncomplete="PF('addNewCommercialValueDlgWV').hide();"/>
+            </div>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

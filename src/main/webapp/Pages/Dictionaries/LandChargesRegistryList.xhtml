@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/resources/tpl/Admin/LazyListBase.xhtml">
+    <ui:param name="list_title" value="#{msg.landChargesRegistry}"/>
+    <ui:param name="bean" value="#{landChargesRegistryListBean}"/>
+    <ui:param name="entity_name" value="#{msg.landChargesRegistryEntity}"/>
+
+    <ui:define name="columns">
+        <p:column sortBy="#{item.name}" filterBy="#{item.name}"
+                  headerText="#{msg.name}">
+            <h:outputText value="#{item.name}"/>
+        </p:column>
+        <p:column sortBy="#{item.description}" filterBy="#{item.description}"
+                  headerText="#{msg.description}">
+            <h:outputText value="#{item.description}"/>
+        </p:column>
+        <p:column sortBy="#{item.type}" filterBy="#{item.type}"
+                  headerText="#{msg.landChargesRegistryType}">
+            <h:outputText value="#{item.typeDescription}"/>
+        </p:column>
+
+        <p:column headerText="#{msg.clientAddressProvince}">
+            <p:dataGrid value="#{item.provinceDescriptions}" columns="1"
+                        styleClass="myGrid" var="exam"
+                        rendered="#{not empty item.provinceDescriptions}">
+                <p:column>
+                    <h:outputText value="#{exam}"
+                                  style="font-size: 1.1em; font-weight:bold;"/>
+                </p:column>
+            </p:dataGrid>
+        </p:column>
+        <p:column sortBy="#{item.symbol}" filterBy="#{item.symbol}"
+                  headerText="#{msg.symbol}">
+            <h:outputText value="#{item.symbol}"/>
+        </p:column>
+    </ui:define>
+
+</ui:composition>
+</html>

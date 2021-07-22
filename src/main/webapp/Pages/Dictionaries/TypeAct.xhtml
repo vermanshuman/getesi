@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+<ui:composition template="/resources/tpl/Admin/LazyInListEditBase.xhtml">
+    <ui:param name="list_title" value="#{msg.typeAct}"/>
+    <ui:param name="bean" value="#{typeActBean}"/>
+    <ui:param name="entity_name" value="#{msg.typeAct}"/>
+    <ui:param name="additionalEditAction" value="window.scrollTo(0,0);"/>
+
+    <ui:define name="edit_fields">
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" style="width: 40%">
+            <span>#{msg.typeActCode}</span>
+            <p:inputText value="#{bean.entity.code}" styleClass="input-width"/>
+            <span>#{msg.typeActDescription}</span>
+            <p:inputText value="#{bean.entity.description}" styleClass="input-width"/>
+            <span>#{msg.typeActType}</span>
+            <p:selectOneMenu value="#{bean.selectedType}" styleClass="select-width">
+                <f:selectItems value="#{bean.types}"/>
+            </p:selectOneMenu>
+            <span>#{msg.typeActTextInVisura}</span>
+            <p:inputText value="#{bean.entity.textInVisura}" styleClass="input-width"/>
+            <span>#{msg.typeActCodeInVisura}</span>
+            <p:inputText value="#{bean.entity.codeInVisura}" styleClass="input-width"/>
+        </p:panelGrid>
+    </ui:define>
+
+    <ui:define name="columns">
+        <p:column headerText="#{msg.typeActCode}" filterBy="#{item.code}">
+            <h:outputText value="#{item.code}"/>
+        </p:column>
+        <p:column headerText="#{msg.typeActDescription}">
+            <h:outputText value="#{item.description}"/>
+        </p:column>
+        <p:column headerText="#{msg.typeActType}">
+            <h:outputText value="#{item.type}" converter="enumConverter"/>
+        </p:column>
+        <p:column headerText="#{msg.typeActTextInVisura}">
+            <h:outputText value="#{item.textInVisura}"/>
+        </p:column>
+        <p:column headerText="#{msg.typeActCodeInVisura}">
+            <h:outputText value="#{item.codeInVisura}"/>
+        </p:column>
+    </ui:define>
+
+</ui:composition>
+</html>

@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE something>
+<module_page>
+	<data_entry>
+		<page_type>DICTIONARY_LIST</page_type>
+		<module_code entity_field="code">DICTIONARY</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>ROLE_LIST</page_type>
+		<module_code entity_field="code">PGR</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>USER_LIST</page_type>
+		<module_code entity_field="code">PGU</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>DOCUMENT_TEMPLATE_LIST</page_type>
+		<module_code entity_field="code">PGT</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>INSTANCE_PHASES_LIST</page_type>
+		<module_code entity_field="code">PGP</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>INPUT_CARD_LIST</page_type>
+		<module_code entity_field="code">ICP</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>CLIENT_LIST</page_type>
+		<module_code entity_field="code">PGPA</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>APPLICATION_SETTINGS</page_type>
+		<module_code entity_field="code">PSC</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>DOCUMENT_CONVERSION_SETTINGS</page_type>
+		<module_code entity_field="code">DCS</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>OMI_VALUATION_DOCUMENTS</page_type>
+		<module_code entity_field="code">OVD</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>DATI_AZIENDALI</page_type>
+		<module_code entity_field="code">DA</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>MONITORING_VIEW</page_type>
+		<module_code entity_field="code">PM</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>MAIL_MANAGER_LIST</page_type>
+		<module_code entity_field="code">PMM</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>MAIL_MANAGER_EDIT</page_type>
+		<module_code entity_field="code">PMME</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>MAIL_MANAGER_VIEW</page_type>
+		<module_code entity_field="code">PMMV</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>MAIL_MANAGER_FOLDER</page_type>
+		<module_code entity_field="code">PMMF</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>TEMPLATE_DOCUMENT_MODEL_LIST</page_type>
+		<module_code entity_field="code">PDTDM</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>DAY_PHRASE</page_type>
+		<module_code entity_field="code">PDP</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>TYPE_ACT</page_type>
+		<module_code entity_field="code">PTA</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>CADASTRAL_TOPOLOGY</page_type>
+		<module_code entity_field="code">PCD</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>TYPE_FORMALITY</page_type>
+		<module_code entity_field="code">PTF</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>STRUCTURE_LIST</page_type>
+		<module_code entity_field="code">SLR</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>REQUEST_TYPE_LIST</page_type>
+		<module_code entity_field="code">PTR</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>COST_CONFIGURATION_LIST</page_type>
+		<module_code entity_field="code">PCC</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>SERVICE_LIST</page_type>
+		<module_code entity_field="code">PS</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>LAND_CHARGES_REGISTRY_LIST</page_type>
+		<module_code entity_field="code">PLCR</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>AGGREGATION_LAND_CHARGES_REGISTRY_LIST</page_type>
+		<module_code entity_field="code">PALCR</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>DATABASE_LIST</page_type>
+		<module_code entity_field="code">DBL</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>REQUEST_LIST</page_type>
+		<module_code entity_field="code">RL</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>CADASTRAL_CATEGORY_LIST</page_type>
+		<module_code entity_field="code">CCL</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>REFERENT_LIST</page_type>
+		<module_code entity_field="code">RFRNTL</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>REQUEST_TEXT_EDIT</page_type>
+		<module_code entity_field="code">RTED</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>DATA_GROUP_LIST</page_type>
+		<module_code entity_field="code">DGP</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>COMMUNICATION_MESSAGE_LIST</page_type>
+		<module_code entity_field="code">CPL</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>EVENT_LIST</page_type>
+		<module_code entity_field="code">ELP</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>IBAN_LIST</page_type>
+		<module_code entity_field="code">IBAN</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>PAYMENT_TYPE_LIST</page_type>
+		<module_code entity_field="code">PAYT</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>INVOICE_LIST</page_type>
+		<module_code entity_field="code">INV</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>INVOICE_EDIT</page_type>
+		<module_code entity_field="code">INVED</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>CITIES_LIST</page_type>
+		<module_code entity_field="code">CITY</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>NOTARY_LIST</page_type>
+		<module_code entity_field="code">NOTARY</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>REPORT_LIST</page_type>
+		<module_code entity_field="code">REPORT</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>NOTARIAL_CERTIFICATION_LIST</page_type>
+		<module_code entity_field="code">NCL</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>OMI_KML_LIST</page_type>
+		<module_code entity_field="code">OKL</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>CATEGORY_PERCENT_VALUE_LIST</page_type>
+		<module_code entity_field="code">CPVL</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>COURT_LIST</page_type>
+		<module_code entity_field="code">CL</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>CODICI_CONSERVATORIE</page_type>
+		<module_code entity_field="code">CC</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>RELATIONSHIP_TYPES</page_type>
+		<module_code entity_field="code">RT</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>REGIME_CONIUGI_LIST</page_type>
+		<module_code entity_field="code">RC</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>SECTION_D_FORMAT_LIST</page_type>
+		<module_code entity_field="code">SDF</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>DUE_REQUESTS_VIEW</page_type>
+		<module_code entity_field="code">DR</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>LAND_OMI_LIST</page_type>
+		<module_code entity_field="code">OLVL</module_code>
+	</data_entry>
+</module_page>

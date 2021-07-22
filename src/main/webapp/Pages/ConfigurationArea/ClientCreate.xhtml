@@ -1,0 +1,318 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog widgetVar="associateToClientDlgWV" id="associateToClientDlg"
+              header="#{msg.mailManagerAssociateToClient}" width="900" height="700"
+              style="max-width: 900px; height: auto !important; min-height: 300px !important;
+                   max-height: 700px !important; margin-top: 45px !important" draggable="false"
+              modal="true" resizable="false" effect="SLIDE" position="top"
+              onHide="updateAddClientDialogData(); updateLetterViewForm();">
+
+        <p:outputPanel id="associateToClientDlgPanel">
+            <p:selectOneMenu value="#{bean.selectedClientId}" disabled="#{bean.relatedToClient}">
+                <p:ajax event="change" update=":form:confirmButton"/>
+                <f:selectItems value="#{bean.clients}"/>
+            </p:selectOneMenu>
+            <br/>
+            <br/>
+            <p:scrollPanel mode="native" style="width:870px; max-height: 550px">
+            <p:outputPanel id="createNewClient">
+                <p:commandButton value="#{msg.mailManagerNewClient}" update="createNewClient"
+                                 id="btn_new_client" styleClass="btn-green" onclick="changeStatusNewClientButton();"
+                                 rendered="#{bean.createClient}" oncomplete="updateRedStarFroms();" />
+                <br/>
+                <br/>
+                <p:panelGrid id="createNewClientArea" rendered="#{bean.newClientButtonClicked}">
+                    <p:panelGrid id="managerNoValidate" style="width: 100%"
+                                 styleClass="ui-panelgrid-blank form-group">
+                        <p:row>
+                            <p:column style="padding-right: 20px">
+                                <p:selectBooleanCheckbox id="manager"
+                                                         value="#{bean.clientCreateBean.entity.manager}"
+                                                         styleClass="booleanCheckbox"
+                                                         onchange="toggle('manager');updateRedStarFroms();"
+                                                         widgetVar="managerCheckBox"/>
+                                <span>#{msg.clientManager.toUpperCase()}</span>
+                                <br/>
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column style="padding-right: 20px">
+                                <p:selectBooleanCheckbox id="fiduciary"
+                                                         value="#{bean.clientCreateBean.entity.fiduciary}"
+                                                         styleClass="booleanCheckbox"
+                                                         onchange="toggle('fiduciary');updateRedStarFroms();"
+                                                         widgetVar="fiduciaryCheckBox"/>
+                                <span>#{msg.clientTrust}</span>
+                                <br/>
+                            </p:column>
+                        </p:row>
+                    </p:panelGrid>
+                    <p:panelGrid styleClass="ui-panelgrid-blank form-group" id="typegrid">
+                        <p:row>
+                            <p:column>
+					            <span>#{msg.clientProfName}<h:outputText value="*"
+                                                             rendered="#{bean.clientCreateBean.renderImportant}"
+                                                             styleClass="red"/></span>
+                            </p:column>
+                            <p:column>
+                                <p:inputText value="#{bean.clientCreateBean.entity.nameProfessional}"
+                                             styleClass="input-width" maxlength="200" id="nameProfessional"
+                                             label="#{msg.clientProfName}"/>
+                            </p:column>
+                        </p:row>
+                        <p:row id="email">
+                            <p:column>
+                                <span>#{msg.clientEmail}</span>
+                            </p:column>
+                            <p:column style="width: 400px">
+                                <p:inputText value="#{bean.clientCreateBean.clientEmail}"
+                                             id="clientEmail" styleClass="input-width"
+                                             label="#{msg.clientEmail}"/>
+                            </p:column>
+                        </p:row>
+                        
+                        <p:row id="client" rendered="#{not bean.clientCreateBean.renderImportant}">
+                            <p:column>
+                                <span>#{msg.client}:</span>
+                            </p:column>
+								<p:column style="width: 400px">
+									<p:selectCheckboxMenu
+										value="#{bean.clientCreateBean.selectedNonManagerOrFiduciaryClientIds}"
+										label="#{msg.clients}" style="margin-right: 15px!important;"
+										multiple="true" filter="true" filterMatchMode="startsWith">
+										<f:selectItems
+											value="#{bean.notManagerOrFiduciaryClients}" />
+									</p:selectCheckboxMenu>
+								</p:column>
+							</p:row>
+                    </p:panelGrid>
+                    <p:panelGrid columns="2" style="width: 100%" styleClass="ui-panelgrid-blank form-group">
+                        <p:outputPanel widgetVar="firstPanel" id="firstPanel"
+                                       style="margin: 15px 0 25px 0; position: relative">
+                            <p:selectBooleanCheckbox widgetVar="showSubjectInvoice"
+                                                     value="#{bean.clientCreateBean.subjectInvoice}"
+                                                     onchange="toggleSubjectInvoice()">
+                                <p:ajax event="change" update="firstPanel"/>
+                            </p:selectBooleanCheckbox>
+                            <span style="color: #788fa7 !important;">
+				            #{msg.clientHasSubjectInvoice.toUpperCase()}</span>
+
+                            <p:commandButton value="#{msg.clientSubjectAdd.toUpperCase()}"
+                                             styleClass="green-button" id="addEmptyInvoicesRecipientBtn"
+                                             style="position: absolute; right: 0; width: 200px!important; "
+                                             onclick="PF('invoicesRecipientDlg').show();"
+                                             update=":invoicesRecipientDialog"
+                                             rendered="#{bean.clientCreateBean.subjectInvoice}"/>
+
+                        </p:outputPanel>
+                    </p:panelGrid>
+
+
+                    <p:outputPanel id="subjectInvoice"
+                                   style="margin: 15px 0 25px 0;display: #{bean.clientCreateBean.subjectInvoice ? '' : 'none'}">
+
+                        <p:dataTable value="#{bean.clientCreateBean.billingRecipientTable}" var="itemB"
+                                     rows="10" styleClass="referent-table" paginator="true"
+                                     paginatorAlwaysVisible="true" rowIndexVar="rowId"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="10,20,50" emptyMessage="#{msg.noRecordsFound}"
+                                     id="invoicesRecipientTable" widgetVar="invoicesRecipientTableWV">
+                            <p:column
+                                    headerText="#{msg.invoicesRecipientCompanyName.toUpperCase()}">
+                                <h:outputText value="#{itemB.name}"/>
+                            </p:column>
+
+                            <p:column headerText="#{msg.invoicesRecipientVATNumber}">
+                                <h:outputText value="#{itemB.numberVAT}"/>
+                            </p:column>
+
+                            <p:column
+                                    headerText="#{msg.invoicesRecipientFiscalCode.toUpperCase()}">
+                                <h:outputText value="#{itemB.fiscalCode}"/>
+                            </p:column>
+
+                            <p:column
+                                    headerText="#{msg.invoicesRecipientAddressAndContact.toUpperCase()}">
+                                <h:outputText value="#{itemB.addressStreet}"/>
+                            </p:column>
+                            <p:column styleClass="action_column">
+                                <p:commandButton icon="fa fa-fw fa-times" update="invoicesRecipientTable, :form:agencyPanel"
+                                                 action="#{bean.clientCreateBean.deleteInvoicesRecipient}">
+                                    <f:setPropertyActionListener value="#{itemB.id}"
+                                                                 target="#{bean.clientCreateBean.deleteClientId}"/>
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </p:outputPanel>
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" style="width: 100%" id="agencyPanel">
+                        <p:outputPanel widgetVar="secondPanel" id="secondPanel"
+                                       style="margin: 15px 0 25px 0; position: relative">
+                            <p:selectBooleanCheckbox widgetVar="showAgency"
+                                                     value="#{bean.clientCreateBean.hasAgency}">
+                                <p:ajax event="change" update="secondPanel"
+                                        listener="#{bean.clientCreateBean.setOfficesByArea}"/>
+                            </p:selectBooleanCheckbox>
+                            <span style="color: #788fa7 !important;">
+				#{msg.clientHasAgency.toUpperCase()}</span>
+                            <br/>
+                            <br/>
+								<p:selectCheckboxMenu value="#{bean.clientCreateBean.selectedAreas}"
+									converter="#{bean.clientCreateBean.areaConverter}"
+									rendered="#{bean.clientCreateBean.hasAgency and !bean.clientCreateBean.clientFiduciaryOrManager}"
+									label="#{msg.area}" multiple="true">
+									<f:selectItems value="#{bean.clientCreateBean.areas}"
+										var="area" itemValue="#{area}" itemLabel="#{area.label}" />
+									<p:ajax event="change" update="secondPanel, fifthPanel"
+										listener="#{bean.clientCreateBean.setOfficesByArea}" />
+								</p:selectCheckboxMenu>
+								 <p:selectOneMenu value="#{bean.clientCreateBean.selectedArea}" converter="#{bean.clientCreateBean.areaConverter}"
+                                     rendered="#{bean.clientCreateBean.hasAgency and bean.clientCreateBean.clientFiduciaryOrManager}">
+                        <f:selectItems value="#{bean.clientCreateBean.areas}" var="area" itemValue="#{area}"
+                                       itemLabel="#{area.label}"/>
+                        <p:ajax event="change" update="secondPanel, fifthPanel" listener="#{bean.setOfficesByArea}"/>
+                    </p:selectOneMenu>
+                    
+											<!-- 	<p:selectOneMenu value="#{bean.clientCreateBean.selectedAreaId}"
+									rendered="#{bean.clientCreateBean.hasAgency}">
+									<f:selectItems value="#{bean.clientCreateBean.areas}" />
+									<p:ajax event="change" update="secondPanel, fifthPanel"
+										listener="#{bean.clientCreateBean.setOfficesByArea}" />
+								</p:selectOneMenu> -->
+							</p:outputPanel>
+
+							<p:outputPanel widgetVar="fifthPanel" id="fifthPanel"
+								style="margin: 15px 0 25px 0; position: relative">
+								<p:selectBooleanCheckbox widgetVar="showAgencyOffice"
+									value="#{bean.clientCreateBean.hasAgencyOffice}">
+									<p:ajax event="change" update="fifthPanel"
+										listener="#{bean.clientCreateBean.setOfficesByArea}" />
+								</p:selectBooleanCheckbox>
+								<span style="color: #788fa7 !important;">
+									#{msg.clientHasAgencyOffice.toUpperCase()}</span>
+								<br />
+								<br />
+								<p:selectCheckboxMenu value="#{bean.clientCreateBean.selectedOffices}"
+									converter="#{bean.clientCreateBean.officeConverter}"
+									rendered="#{bean.clientCreateBean.hasAgencyOffice and !bean.clientCreateBean.clientFiduciaryOrManager}"
+									label="#{msg.office}" multiple="true">
+									<f:selectItems value="#{bean.clientCreateBean.offices}" var="office"
+										itemValue="#{office}" itemLabel="#{office.label}" />
+									<p:ajax event="change" listener="#{bean.clientCreateBean.setOfficesByArea}" />
+								</p:selectCheckboxMenu>
+								<br/>
+                            	<br/>
+								<p:selectOneMenu value="#{bean.clientCreateBean.selectedOffice}"
+									converter="#{bean.clientCreateBean.officeConverter}"
+									rendered="#{bean.clientCreateBean.hasAgencyOffice and bean.clientCreateBean.clientFiduciaryOrManager}">
+									<f:selectItems value="#{bean.clientCreateBean.offices}" var="office"
+										itemValue="#{office}" itemLabel="#{office.label}" />
+									<p:ajax event="change" update="secondPanel, fifthPanel"
+										listener="#{bean.clientCreateBean.setOfficesByArea}" />
+								</p:selectOneMenu>
+							</p:outputPanel>
+
+							<!--   <p:outputPanel widgetVar="fifthPanel" id="fifthPanel"
+                                       style="margin: 15px 0 25px 0; position: relative">
+                            <p:selectBooleanCheckbox widgetVar="showAgencyOffice"
+                                                     value="#{bean.clientCreateBean.hasAgencyOffice}">
+                                <p:ajax event="change" update="fifthPanel"
+                                        listener="#{bean.clientCreateBean.setOfficesByArea}"/>
+                            </p:selectBooleanCheckbox>
+                            <span style="color: #788fa7 !important;">
+				#{msg.clientHasAgencyOffice.toUpperCase()}</span>
+                            <br/>
+                            <br/>
+                            <p:selectOneMenu value="#{bean.clientCreateBean.selectedOfficeId}"
+                                             rendered="#{bean.clientCreateBean.hasAgencyOffice}">
+                                <f:selectItems value="#{bean.clientCreateBean.offices}"/>
+                                <p:ajax event="change" update="secondPanel, fifthPanel"
+                                        listener="#{bean.clientCreateBean.setOfficesByArea}"/>
+                            </p:selectOneMenu>
+                        </p:outputPanel> -->
+                    </p:panelGrid>
+
+
+                    <p:outputPanel id="nextButton"
+                                   style="margin-top: 15px; position: relative;">
+                        <p:commandButton value="#{msg.save.toUpperCase()}"
+                                         styleClass="green-button" iconPos="right"
+                                         style="position: absolute; right: 0;"
+                                         update="associateToClientDlgPanel"
+                                         actionListener="#{bean.clientCreateSave}" icon="ui-icon-disk"/>
+                    </p:outputPanel>
+
+                </p:panelGrid>
+                <br/>
+                <br/>
+                <br/>
+                <p:dialog widgetVar="invoicesRecipientDlg" resizable="false"
+                          closable="false" draggable="false" modal="false">
+                    <p:outputPanel id="invoicesRecipientDialog">
+                        <h:outputText value="#{msg.client}:"/>
+                        <br/>
+                        <p:selectOneMenu value="#{bean.clientCreateBean.selectedClientId}">
+                            <f:selectItems value="#{bean.clientCreateBean.billingRecipients}"/>
+                        </p:selectOneMenu>
+                    </p:outputPanel>
+
+                    <div class="btn_line">
+                        <p:commandButton value="#{msg.yes}"
+                                         oncomplete="PF('invoicesRecipientDlg').hide();"
+                                         action="#{bean.clientCreateBean.addInvoicesRecipient}"
+                                         update=":form:subjectInvoice, :form:agencyPanel"/>
+                        <p:commandButton value="#{msg.no}"
+                                         onclick="PF('invoicesRecipientDlg').hide();"/>
+                    </div>
+                </p:dialog>
+
+            </p:outputPanel>
+        </p:scrollPanel>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" action="#{bean.confirmSelectedClient}"
+                                 update="form" disabled="#{empty bean.selectedClientId or bean.relatedToClient}"
+                                 id="confirmButton" oncomplete="PF('associateToClientDlgWV').hide();"/>
+                <p:commandButton value="#{msg.cancel}" action="#{bean.assosiateCancel}"
+                                 oncomplete="PF('associateToClientDlgWV').hide();"/>
+            </div>
+        </p:outputPanel>
+
+    </p:dialog>
+
+    <p:remoteCommand name="updateRedStarFroms" action="#{bean.clientCreateBean.updateForms()}"/>
+    <p:remoteCommand name="changeStatusNewClientButton" action="#{bean.changeStatusNewClientButton()}"/>
+    <p:remoteCommand name="updateAddClientDialogData" update="createNewClientArea,invoicesRecipientTable"
+                     action="#{bean.clientCreateBean.clearFormData}" actionListener="#{bean.setNewClientButtonClicked(false)}"/>
+    <p:remoteCommand name="updateLetterViewForm" update=":form:referenceAreaShow" actionListener="#{bean.updateComboboxes()}"/>
+
+    <script>
+        function toggleSubjectInvoice() {
+            if (PF('showSubjectInvoice').input[0].checked) {
+                $(document.getElementById('subjectInvoice')).fadeIn();
+            } else {
+                $(document.getElementById('subjectInvoice')).fadeOut();
+            }
+        }
+
+        function toggleAgency() {
+            if (PF('showAgency').input[0].checked) {
+                $(document.getElementById('agency')).fadeIn();
+            } else {
+                $(document.getElementById('agency')).fadeOut();
+            }
+        }
+
+        function toggleAgencyOffice() {
+            if (PF('showAgencyOffice').input[0].checked) {
+                $(document.getElementById('agencyOffice')).fadeIn();
+            } else {
+                $(document.getElementById('agencyOffice')).fadeOut();
+            }
+        }
+    </script>
+</ui:composition>

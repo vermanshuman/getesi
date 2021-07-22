@@ -1,0 +1,30 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/resources/tpl/Admin/EditBase.xhtml">
+    <ui:param name="edit_title" value="#{msg.omiValuationDocuments}"/>
+    <ui:param name="bean" value="#{omiValuationDocumentsBean}"/>
+
+    <ui:define name="edit_body">
+        <div align="center">
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                         columnClasses="ui-grid-col-3, ui-grid-col-9" style="width: 40%;">
+
+                <span>#{msg.omiValuationDocumentsKMLFiles}:</span>
+                <p:inputText value="#{bean.omiKmlFilesPath}" id="omiKmlFilesPath" styleClass="input-width"
+                             label="#{msg.omiValuationDocumentsKMLFiles}"/>
+
+                <span>#{msg.omiValuationDocumentsSecurities}:</span>
+                <p:inputText value="#{bean.omiSecuritiesFilePath}" id="omiSecuritiesPath"
+                             styleClass="input-width" label="#{msg.omiValuationDocumentsSecurities}"/>
+
+                <span>#{msg.omiValuationDocumentsCategories}:</span>
+                <p:inputText value="#{bean.omiCategoryFilePath}" id="omiCategoryPath"
+                             styleClass="input-width" label="#{msg.omiValuationDocumentsCategories}"/>
+
+            </p:panelGrid>
+        </div>
+    </ui:define>
+</ui:composition>

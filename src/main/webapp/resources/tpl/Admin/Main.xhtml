@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+<h:head>
+    <f:facet name="first">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+    </f:facet>
+
+    <title><h:outputText value="#{msg.title}"/></title>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <meta http-equiv="refresh"
+          content="#{session.maxInactiveInterval};url=#{facesContext.externalContext.requestContextPath}/login/?reason=expired"/>
+    <link rel="icon" href="#{facesContext.externalContext.requestContextPath}/resources/images/favicon.ico"/>
+    <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/default.css"
+          media="all" rel="stylesheet" type="text/css"/>
+    <link href="#{facesContext.externalContext.requestContextPath}/resources/poseidon-layout/css/layout-blue.css"
+          media="all" rel="stylesheet" type="text/css"/>
+    <link href="#{facesContext.externalContext.requestContextPath}/resources/poseidon-layout/css/nanoscroller.css"
+          media="all" rel="stylesheet" type="text/css"/>
+    <link href="#{facesContext.externalContext.requestContextPath}/resources/poseidon-layout/css/animate.css"
+          media="all" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript"
+            src="#{facesContext.externalContext.requestContextPath}/resources/poseidon-layout/js/nanoscroller.js"/>
+    <script type="text/javascript"
+            src="#{facesContext.externalContext.requestContextPath}/resources/poseidon-layout/js/layout.js"/>
+    <script type="text/javascript"
+            src="#{facesContext.externalContext.requestContextPath}/resources/poseidon-layout/js/swipe.js"/>
+    <script type="text/javascript"
+            src="#{facesContext.externalContext.requestContextPath}/resources/javascript/field-formatters.js"/>
+    <script type="text/javascript"
+            src="#{facesContext.externalContext.requestContextPath}/resources/javascript/locale.js"/>
+
+    <script type="text/javascript"
+            src="#{facesContext.externalContext.requestContextPath}/resources/javascript/cookie-manager.js"/>
+    <script type="text/javascript"
+            src="#{facesContext.externalContext.requestContextPath}/resources/javascript/Cookie.js"/>
+    <script type="text/javascript"
+            src="#{facesContext.externalContext.requestContextPath}/resources/javascript/jquery.maskedinput.js"/>
+    <script type="text/javascript"
+            src="#{facesContext.externalContext.requestContextPath}/resources/javascript/javascript_helper.js"/>
+</h:head>
+
+<h:body styleClass="main-body">
+    <script type="text/javascript">
+        $(document).ready(function () {
+            PrimeFaces.widget.DefaultCommand = PrimeFaces.widget.BaseWidget.extend({
+                init: function (b) {
+                    this.cfg = b;
+                    this.id = this.cfg.id;
+                    this.jqId = PrimeFaces.escapeClientId(this.id);
+                    this.jqTarget = $(PrimeFaces.escapeClientId(this.cfg.target));
+                    var a = this;
+                    this.jqTarget.parents("form:first").keypress(function (d) {
+                        var c = $.ui.keyCode;
+                        if (d.which == c.ENTER) {
+                            a.jqTarget.click();
+                            d.preventDefault()
+                        }
+                    });
+                    $(this.jqId + "_s").remove()
+                }
+            });
+        });
+    </script>
+
+    <p:outputPanel autoUpdate="false" id="rootPanel">
+
+        <div class="layout-wrapper menu-layout-horizontal">
+            <p:outputPanel id="panelHeaderMenu">
+                <ui:fragment rendered="#{empty renderHeaderMenu ? true : renderHeaderMenu}">
+                    <ui:include src="/resources/tpl/Admin/Include/Header.xhtml"></ui:include>
+                </ui:fragment>
+            </p:outputPanel>
+            <p:outputPanel id="panelSideMenu">
+                <ui:fragment rendered="#{empty renderSideMenu ? true : renderSideMenu}">
+                    <ui:include src="/resources/tpl/Admin/Include/Menu.xhtml"></ui:include>
+                </ui:fragment>
+            </p:outputPanel>
+            <p:outputPanel id="panelMarginStub" style="padding-bottom: 0;  padding-top: #{!removePaddingTop ?'105px' :'0px'}" />
+
+             <div  class="layout-main" style="padding-bottom: 0; padding-top: 0px">
+                <div class="layout-main-content" style="#{removePaddingTop ?'padding: 0' :''}">
+                    <div class="#{empty centerPartStyleClass ? 'center_part' : centerPartStyleClass}">
+                        <ui:insert name="body"></ui:insert>
+                    </div>
+                </div>
+                <p:outputPanel id="panelFooterMenu">
+                    <ui:fragment rendered="#{empty renderFooterMenu ? true : renderFooterMenu}">
+                        <ui:include src="/resources/tpl/Admin/Include/Footer.xhtml"></ui:include>
+                    </ui:fragment>
+                </p:outputPanel>
+            </div>
+        </div>
+
+        <p:ajaxStatus rendered="#{empty showAjax ? true: showAjax}"
+                      style="width:32px;height:32px;position:fixed;right:7px;bottom:7px">
+            <f:facet name="start">
+                <i class="fa fa-circle-o-notch fa-spin ajax-loader" aria-hidden="true"></i>
+            </f:facet>
+
+            <f:facet name="complete">
+                <h:outputText value=""/>
+            </f:facet>
+        </p:ajaxStatus>
+        <ui:insert name="applets"></ui:insert>
+    </p:outputPanel>
+
+</h:body>
+
+</html>

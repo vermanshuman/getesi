@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/resources/tpl/Admin/EditBase.xhtml">
+    <ui:param name="edit_title" value="#{msg.editAppSettings}"/>
+    <ui:param name="bean" value="#{appSettingsBean}"/>
+
+    <ui:define name="edit_body">
+        <p:tabView id="tab">
+
+            <p:tab title="#{msg.editAppSettingsTabGeneralSettings}"
+                   id="tabGeneralSettings">
+
+                <p:fieldset legend="#{msg.general}">
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
+                                 cellpadding="3" cellspacing="0" columnClasses="ui-grid-col-2,ui-grid-col-3"
+                                 layout="grid">
+                        <span>#{msg.editAppSettingsPasswordExpirationPeriod}:</span>
+                        <p:inputText id="passwordExpirationPeriod" maxlength="3"
+                                     value="#{bean.settingPasswordPeriodExpiration.value}"
+                                     onkeypress="return numbers_only(this, event, 3, 0)"
+                                     onkeyup="check_numbers(this, 3, 0);"/>
+
+                    </p:panelGrid>
+                </p:fieldset>
+                <br/>
+                <p:fieldset legend="#{msg.editAppSettingsAsapSioSettingsFileEntity}">
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
+                                 columnClasses="ui-grid-col-2,ui-grid-col-3" layout="grid"
+                                 cellpadding="3" cellspacing="0">
+
+                        <span>#{msg.editAppSettingsFileEntityPath}:</span>
+                        <p:inputText id="file_entity_path"
+                                     value="#{bean.settingFileEntityPath.value}" maxlength="255"/>
+                    </p:panelGrid>
+                </p:fieldset>
+                <br/>
+                <p:fieldset legend="#{msg.editAppSettingsSessionTimeoutSettings}">
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
+                                 columnClasses="ui-grid-col-2,ui-grid-col-3" layout="grid"
+                                 cellpadding="3" cellspacing="0">
+
+                        <span>#{msg.editAppSettingsSessionTimeout}:</span>
+                        <p:inputText id="session_timeout"
+                                     onkeypress="return numbers_only(this, event, 5, 0)"
+                                     onkeyup="check_numbers(this, 5, 0);"
+                                     value="#{bean.settingSessionTimeout.value}" maxlength="255"/>
+
+                        <span>#{msg.editAppSettingsSessionCheckTimeout}:</span>
+                        <p:inputText id="session_check_timeout"
+                                     onkeypress="return numbers_only(this, event, 5, 0)"
+                                     onkeyup="check_numbers(this, 5, 0);"
+                                     value="#{bean.settingSessionCheckTimeout.value}" maxlength="255"/>
+                    </p:panelGrid>
+                </p:fieldset>
+                <br/>
+                <p:fieldset legend="#{msg.editAppSettingsMailParametersReceive}">
+
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
+                                 columnClasses="ui-grid-col-2,ui-grid-col-3" layout="grid"
+                                 cellpadding="3" cellspacing="0">
+
+                        <span>#{msg.editAppSettingsMailName}:</span>
+                        <p:inputText value="#{bean.mailServerReceive.name}"/>
+
+                        <span>#{msg.editAppSettingsMailHost}:</span>
+                        <p:inputText value="#{bean.mailServerReceive.host}"/>
+
+                        <span>#{msg.editAppSettingsMailPort}:</span>
+                        <p:inputText value="#{bean.mailServerReceive.port}"
+                                     onkeypress="return numbers_only(this, event, 5, 0)"
+                                     onkeyup="check_numbers(this, 5, 0);"/>
+
+                        <span>#{msg.editAppSettingsMailLogin}:</span>
+                        <p:inputText value="#{bean.mailServerReceive.login}"/>
+
+                        <span>#{msg.editAppSettingsMailPassword}:</span>
+                        <p:inputText value="#{bean.mailServerReceive.password}"/>
+
+                        <span>#{msg.editAppSettingsMailKeepMessage}:</span>
+                        <p:selectBooleanCheckbox value="#{bean.mailServerReceive.keepMassages}"/>
+
+                        <span>#{msg.editAppSettingsMailUseSecuredConnection}:</span>
+                        <p:selectBooleanCheckbox
+                                value="#{bean.mailServerReceive.useSecuredConnection}"/>
+
+                        <span>#{msg.editAppSettingsMailTimeout}:</span>
+                        <p:inputText value="#{bean.mailServerReceive.timeout}"
+                                     onkeypress="return numbers_only(this, event, 5, 0)"
+                                     onkeyup="check_numbers(this, 5, 0);"/>
+
+                        <span>#{msg.editAppSettingsMailType}:</span>
+                        <p:inputText value="#{bean.mailServerReceive.type}"
+                                     onkeypress="return numbers_only(this, event, 5, 0)"
+                                     onkeyup="check_numbers(this, 5, 0);"/>
+
+                    </p:panelGrid>
+                </p:fieldset>
+                <br/>
+                <p:fieldset legend="#{msg.editAppSettingsMailParametersSend}">
+
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
+                                 columnClasses="ui-grid-col-2,ui-grid-col-3" layout="grid"
+                                 cellpadding="3" cellspacing="0">
+
+                        <span>#{msg.editAppSettingsMailName}:</span>
+                        <p:inputText value="#{bean.mailServerSend.name}"/>
+
+                        <span>#{msg.editAppSettingsMailHost}:</span>
+                        <p:inputText value="#{bean.mailServerSend.host}"/>
+
+                        <span>#{msg.editAppSettingsMailPort}:</span>
+                        <p:inputText value="#{bean.mailServerSend.port}"
+                                     onkeypress="return numbers_only(this, event, 5, 0)"
+                                     onkeyup="check_numbers(this, 5, 0);"/>
+
+                        <span>#{msg.editAppSettingsMailLogin}:</span>
+                        <p:inputText value="#{bean.mailServerSend.login}"/>
+
+                        <span>#{msg.editAppSettingsMailPassword}:</span>
+                        <p:inputText value="#{bean.mailServerSend.password}"/>
+
+                        <span>#{msg.editAppSettingsMailKeepMessage}:</span>
+                        <p:selectBooleanCheckbox value="#{bean.mailServerSend.keepMassages}"/>
+
+                        <span>#{msg.editAppSettingsMailUseSecuredConnection}:</span>
+                        <p:selectBooleanCheckbox
+                                value="#{bean.mailServerSend.useSecuredConnection}"/>
+
+                        <span>#{msg.editAppSettingsMailTimeout}:</span>
+                        <p:inputText value="#{bean.mailServerSend.timeout}"
+                                     onkeypress="return numbers_only(this, event, 5, 0)"
+                                     onkeyup="check_numbers(this, 5, 0);"/>
+
+                        <span>#{msg.editAppSettingsMailType}:</span>
+                        <p:inputText value="#{bean.mailServerSend.type}"
+                                     onkeypress="return numbers_only(this, event, 5, 0)"
+                                     onkeyup="check_numbers(this, 5, 0);"/>
+
+                    </p:panelGrid>
+                </p:fieldset>
+                
+                <p:fieldset legend="#{msg.cloud}">
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
+                                 cellpadding="3" cellspacing="0" columnClasses="ui-grid-col-2,ui-grid-col-3"
+                                 layout="grid">
+                        <span>#{msg.editAppSettingsCloudApiUid}:</span>
+                        <p:inputText id="cloudApiUid"
+                                     value="#{bean.settingPasswordPeriodExpiration.value}" />
+                        <span>#{msg.editAppSettingsCloudApiKey}:</span>
+                        <p:inputText id="cloudApiKey"
+                                     value="#{bean.settingPasswordPeriodExpiration.value}" />
+                    </p:panelGrid>
+                </p:fieldset>
+                
+            </p:tab>
+
+        </p:tabView>
+
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,1887 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE something>
+<type_act>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>100</code>
+        <description>ATTO TRA VIVI</description>
+        <textInVisura>atto tra vivi</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>101</code>
+        <description>AFFRANCAZIONE</description>
+        <textInVisura>affrancazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>102</code>
+        <description>ANTICRESI</description>
+        <textInVisura>anticresi</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>103</code>
+        <description>ASSEGNAZIONE A SOCIO DI COOPERATIVA EDILIZIA</description>
+        <textInVisura>assegnazione a socio di cooperativa edilizia</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>104</code>
+        <description>ASSEGNAZIONE A SOCIO PER SCIOGLIMENTO DI SOCIETA'</description>
+        <textInVisura>assegnazione a socio per scioglimento di società</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>105</code>
+        <description>ASSEGNAZIONE DIVISIONALE A CONTO DI FUTURA DIVISIONE</description>
+        <textInVisura>assegnazione divisionale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>149</code>
+        <description>ATTO DI CONFERMA</description>
+        <textInVisura>conferma</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>106</code>
+        <description>ATTO UNILATERALE D'OBBLIGO EDILIZIO</description>
+        <textInVisura>atto unilaterale d'obbligo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>107</code>
+        <description>CESSIONE DI BENI AI CREDITORI</description>
+        <textInVisura>cessione di beni</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>108</code>
+        <description>CESSIONE DI DIRITTI REALI A TITOLO GRATUITO</description>
+        <textInVisura>cessione di diritti reali a titolo gratuito</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>109</code>
+        <description>CESSIONE DI DIRITTI REALI A TITOLO ONEROSO</description>
+        <textInVisura>cessione di diritti reali a titolo oneroso</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>110</code>
+        <description>CESSIONE DI FITTI</description>
+        <textInVisura>cessione di fitti</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>111</code>
+        <description>CESSIONE DI PRIGIONI</description>
+        <textInVisura>cessione di prigioni</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>112</code>
+        <description>COMPRAVENDITA</description>
+        <textInVisura>compravendita</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>113</code>
+        <description>CONFERIMENTO DI ASSOCIAZIONE</description>
+        <textInVisura>conferimento di associazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>114</code>
+        <description>CONFERIMENTO DI CONSORZIO</description>
+        <textInVisura>conferimento di consorzio</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>115</code>
+        <description>CONFERIMENTO IN SOCIETA'</description>
+        <textInVisura>conferimento in società</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>116</code>
+        <description>CONVENZIONE AMMINISTRATIVA</description>
+        <textInVisura>convenzione ammiinistrativa</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>117</code>
+        <description>CONVENZIONE EDILIZIA</description>
+        <textInVisura>convenzione edilizia</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>118</code>
+        <description>CONVENZIONE MATRIMONIALE DI COMUNIONE LEGALE</description>
+        <textInVisura>convenzione matrimoniale comunione legale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>119</code>
+        <description>CONVENZIONE MATRIMONIALE DI COMUNIONE CONVENZIONALE</description>
+        <textInVisura>convenzione matrimoniale comunione convenzionale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>120</code>
+        <description>CONVENZIONE MATRIMONIALE DI SEPARAZIONE DEI BENI</description>
+        <textInVisura>convenzione matrimoniale separazione dei beni</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>121</code>
+        <description>COSTITUZIONE DI COMUNIONE REALE</description>
+        <textInVisura>costituzione comunione reale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>122</code>
+        <description>COSTITUZIONE DI DIRITTI REALI A TITOLO GRATUITO</description>
+        <textInVisura>costituzione di diritti a titolo gratuito</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>123</code>
+        <description>COSTITUZIONE DI DIRITTI REALI A TITOLO ONEROSO</description>
+        <textInVisura>costituzione di diritti a titolo oneroso</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>124</code>
+        <description>COSTITUZIONE DI FONDAZIONE</description>
+        <textInVisura>costituzione di fondazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>125</code>
+        <description>COSTITUZIONE DI FONDO PATRIMONIALE</description>
+        <textInVisura>costituzione di fondo patrimoniale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>126</code>
+        <description>COSTITUZIONE DI VINCOLO</description>
+        <textInVisura>costituzione di vincolo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>127</code>
+        <description>COSTITUZIONE DI VINCOLO DI DESTINAZIONE</description>
+        <textInVisura>costituzione di vincolo di destinazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>128</code>
+        <description>COSTITUZIONE DI VINCOLO DI INDIVISIBILITA'</description>
+        <textInVisura>costituzione di vincolo di indivisibilità</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>129</code>
+        <description>COSTITUZIONE DI VINCOLO MILITARE</description>
+        <textInVisura>costituzione di vincolo militare</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>130</code>
+        <description>DICHIARAZIONE DI NOMINA</description>
+        <textInVisura>dichiarazione di nomina</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>131</code>
+        <description>DIVISIONE</description>
+        <textInVisura>divisione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>132</code>
+        <description>DIVISIONE A STRALCIO</description>
+        <textInVisura>divisione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>133</code>
+        <description>DONAZIONE ACCETTATA</description>
+        <textInVisura>donazione accettata</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>134</code>
+        <description>DONAZIONE A FAVORE DI ENTE NON RICONOSCIUTO</description>
+        <textInVisura>donazione a favore di ente non riconosciuto</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>135</code>
+        <description>DONAZIONE A FAVORE DI NASCITURI</description>
+        <textInVisura>donazione a favore di nascituri</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>136</code>
+        <description>DONAZIONE OBNUNZIALE</description>
+        <textInVisura>donazione obnunziale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>137</code>
+        <description>FUSIONE DI SOCIETA'</description>
+        <textInVisura>fusione di società</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>138</code>
+        <description>FUSIONE DI SOCIETA' PER INCORPORAZIONE</description>
+        <textInVisura>fusione di società per incorporazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>155</code>
+        <description>FUSIONE DI SOCIETA' PER INCORPORAZIONE CON EFFETTO DIFFERITO</description>
+        <textInVisura>fusione di società per incorporazione differita</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>139</code>
+        <description>LIBERAZIONE DI FITTI</description>
+        <textInVisura>liberazione di fitti</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>140</code>
+        <description>LIBERAZIONI DI PIGIONI</description>
+        <textInVisura>liberazione di pigioni</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>141</code>
+        <description>LOCAZIONE ULTRANOVENNALE</description>
+        <textInVisura>locazione ultranovennale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>142</code>
+        <description>MUTAMENTO DI DENOMINAZIONE O RAGIONE SOCIALE</description>
+        <textInVisura>mutamento di denominazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>143</code>
+        <description>PERMUTA</description>
+        <textInVisura>permuta</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>150</code>
+        <description>PRESTAZIONE CON TRASFERIMENTO DI DIRITTI (ART. 1197 C.C.)</description>
+        <textInVisura>trasferimento diritti</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>151</code>
+        <description>QUIETANZA CON TRASFERIMENTO DI PROPRIETA</description>
+        <textInVisura>quietanza</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>144</code>
+        <description>REGOLAMENTO DI CONDOMINIO</description>
+        <textInVisura>regolamento di condominio</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>145</code>
+        <description>RETROCESSIONE</description>
+        <textInVisura>retrocessione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>152</code>
+        <description>RICOGNIZIONE DI DIRITTI REALI (ARTT. 177 E 178 C.C)</description>
+        <textInVisura>ricognizione di diritti</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>153</code>
+        <description>RICONOSCIMENTO DI PROPRIETA' (ARTT.2653, N. 5 E 2944 C.C)</description>
+        <textInVisura>riconoscimento di proprietà</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>146</code>
+        <description>RINUNZIA</description>
+        <textInVisura>rinunzia</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>148</code>
+        <description>TRASFERIMENTO SEDE SOCIALE</description>
+        <textInVisura>trasferimento sede sociale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>147</code>
+        <description>TRASFORMAZIONE DI SOCIETA'</description>
+        <textInVisura>trasformazione di società</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>154</code>
+        <description>VERBALE DI SEPARAZIONE CONSENSUALE CON ATTRIBUZIONE DI BENI</description>
+        <textInVisura>verbale di sperarazione consensuale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>300</code>
+        <description>ATTO PER CAUSA DI MORTE</description>
+        <textInVisura>atto per causa di morte</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>301</code>
+        <description>ACCETTAZIONE DI EREDITA CON BENEFICIO DI INVENTARIO</description>
+        <textInVisura>accettazione di eredità con beneficio di inventario</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>302</code>
+        <description>ACCETTAZIONE ESPRESSA DI EREDITA'</description>
+        <textInVisura>accettazione espressa di eredità</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>303</code>
+        <description>ACCETTAZIONE TACITA DI EREDITA'</description>
+        <textInVisura>accettazione tacita di eredità</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>304</code>
+        <description>ACQUISTO DI LEGATO</description>
+        <textInVisura>acquisto di legale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>305</code>
+        <description>CERTIFICATO DI DENUNCIATA SUCCESSIONE</description>
+        <textInVisura>successione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>306</code>
+        <description>COSTITUZIONE DI FONDO PATRIMONIALE PER TESTAMENTO</description>
+        <textInVisura>costituzione fondo patrimoniale per testamento</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>307</code>
+        <description>DECRETO DI NOMINA CURATORE EREDITARIO (ART. 509 C.C., 2. COMMA)</description>
+        <textInVisura>decreto di nomina curatore ereditario</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>308</code>
+        <description>RILASCIO DEI BENI AI CREDITORI</description>
+        <textInVisura>rilascio dei beni ai creditori</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>309</code>
+        <description>RILASCIO DEI BENI AI LEGATARI</description>
+        <textInVisura>rilascio dei beni ai legatari</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>313</code>
+        <description>RINUNZIA AD AZIONE DI RIDUZIONE</description>
+        <textInVisura>rinunzia ad azione di riduzione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>310</code>
+        <description>RINUNZIA AD ERDITA' (ART. 478 C.C)</description>
+        <textInVisura>rinunzia ad eredità</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>311</code>
+        <description>RINUNZIA PURA E SEMPLICE AD EREDITA'</description>
+        <textInVisura>rinunzia pura e semplice ad eredità</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>312</code>
+        <description>VERBALE DI PUBBLICAZIONE TESTAMENTO</description>
+        <textInVisura>verbale testamento</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>400</code>
+        <description>ATTO AMMINISTRATIVO</description>
+        <textInVisura>atto amministrativo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>413</code>
+        <description>CONCESSIONE EDILIZIA</description>
+        <textInVisura>concessione edilizia</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>401</code>
+        <description>CONCESSIONE MINERARIA</description>
+        <textInVisura>concessione mineraria</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>402</code>
+        <description>CONVENZIONE AMMINISTRATIVA</description>
+        <textInVisura>convenzione amministrativa</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>403</code>
+        <description>COSTITUZIONE SERVITU COATTIVA</description>
+        <textInVisura>costituzione servitù</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>404</code>
+        <description>COSTITUZIONE VINCOLI LEGALI</description>
+        <textInVisura>costituzione vincoli legale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>405</code>
+        <description>DEVOLUZIONE</description>
+        <textInVisura>devoluzione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>411</code>
+        <description>DEVOLUZIONE AD ENTI ECCLESIASTICI</description>
+        <textInVisura>devoluzione ad enti ecclesiastici</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>406</code>
+        <description>ESPROPRIAZIONE PER PUBBLICA UTILITA'</description>
+        <textInVisura>espropriazione per pubblica utilità</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>407</code>
+        <description>OCCUPAZIONE IMMEDIATA DEI FONDI</description>
+        <textInVisura>occupazione fondi</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>408</code>
+        <description>ORDINANZA DI SOSPENSIONE DI LOTTIZZAZIONE</description>
+        <textInVisura>ordinanza di sospensione di lottizzazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>409</code>
+        <description>PROVVEDIMENTO DI ACQUISIZIONE GRATUITA AL PATRIMONIO DEL COMUNE</description>
+        <textInVisura>provvedimento acquisizione al patrimonio comune</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>410</code>
+        <description>PROVVEDIMENTO DI ACQUISIZIONE GRATUITA AL PATRIMONIO DELLO STATO</description>
+        <textInVisura>provvedimento acquisizione al patrimonio stato</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>500</code>
+        <description>DOMANDA GIUDIZIALE</description>
+        <textInVisura>domanda giudiziale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>501</code>
+        <description>ACCERTAMENTO DI DIRITTI REALI</description>
+        <textInVisura>accertamento diritti reali</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>502</code>
+        <description>ACCERTAMENTO GIUDIZIALE SOTTOSCRIZIONE ATTI</description>
+        <textInVisura>accertamento sottoscrizione atti</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>503</code>
+        <description>ACCERTAMENTO SIMULAZIONE ATTI (ART. 2652, N. 4 C.C)</description>
+        <textInVisura>accertamento simulazione atti</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>504</code>
+        <description>AFFRANCAZIONE FONDO ENFITEUTICO</description>
+        <textInVisura>affrancazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>505</code>
+        <description>AZIONE DI RIVENDICAZIONE</description>
+        <textInVisura>rivendicazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>506</code>
+        <description>AZIONE NEGATORIA</description>
+        <textInVisura>azione negatoria</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>507</code>
+        <description>DEVOLUZIONE FONDO ENFITEUTICO</description>
+        <textInVisura>devoluzione fondo enfiteutico</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>508</code>
+        <description>DICHIARAZIONE DI ANNULLAMENTO DI ATTI</description>
+        <textInVisura>dichiarazione annullamento atti</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>509</code>
+        <description>DICHIARAZIONE DI ANNULLAMENTO DI ATTI</description>
+        <textInVisura>dichiarazione annullamento atti</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>509</code>
+        <description>DICHIARAZIONE DI INVALIDITA' TRASCRIZIONI</description>
+        <textInVisura>dichiarazione invalidità trascrizioni</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>510</code>
+        <description>DICHIARAZIONE DI NULLITA DI ATTI</description>
+        <textInVisura>dichiarazione nullità atti</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>511</code>
+        <description>DIVISIONE GIUDIZIALE</description>
+        <textInVisura>divisione giudiziale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>512</code>
+        <description>ESECUZIONE IN FORMA SPECIFICA</description>
+        <textInVisura>esecuzione in forma specifica</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>513</code>
+        <description>IMPUGNAZIONE DI ACQUISTI PER CAUSA DI MORTE</description>
+        <textInVisura>impugnazione di acquisti per causa morte</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>514</code>
+        <description>IMPUGNAZIONE DI RINUNZIA EREDITA' DA PARTE DEI CREDITORI (ART. 524 C.C)</description>
+        <textInVisura>impugnazione rinunzia eredità</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>515</code>
+        <description>INTERRUZIONE USUCAPIONE</description>
+        <textInVisura>interruzione usucapione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>516</code>
+        <description>OPPOSIZIONE DEI CREDITORI A DIVISIONE</description>
+        <textInVisura>opposizione dei creditoi a divisione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>517</code>
+        <description>OPPOSIZIONE DI TERZO CONTRO SENTENZE</description>
+        <textInVisura>opposizione di terzo contro sentenze</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>518</code>
+        <description>RESCISSIONE</description>
+        <textInVisura>rescissione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>519</code>
+        <description>REVOCA ATTI SOGGETTI A TRASCRIZIONE (ART. 2652, N.5 C.C.)</description>
+        <textInVisura>revoca atti soggetti a trascrizione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>521</code>
+        <description>REVOCAZIONE DI TERZO CONTRO SENTENZE</description>
+        <textInVisura>revocazione di terzo contro sentenze</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>520</code>
+        <description>REVOCAZIONE DONAZIONE</description>
+        <textInVisura>revocazione donazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>522</code>
+        <description>RIDUZIONE DISPOSIZIONE TESTAMENTARIA</description>
+        <textInVisura>riduzione disposizione testamentaria</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>523</code>
+        <description>RIDUZIONE DONAZIONE</description>
+        <textInVisura>riduzione donazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>524</code>
+        <description>RISCATTO IMMOBILI</description>
+        <textInVisura>riscatto immobili</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>525</code>
+        <description>RISOLUZIONE DI CONTRATTO</description>
+        <textInVisura>risoluzione di contratto</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>526</code>
+        <description>RISOLUZIONE PER INADEMPIMENTO DI ONERE (ARTT. 6488, 793, C.C)</description>
+        <textInVisura>risoluzione per inadempimento</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>527</code>
+        <description>SEPARAZIONE DEGLI IMMOBILI DOTALI</description>
+        <textInVisura>separazione degli immobili</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>528</code>
+        <description>SEPARAZIONE GIUDIZIALE DEI BENI</description>
+        <textInVisura>separazione giudiziale dei beni</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>600</code>
+        <description>ATTO GIUDIZIARIO</description>
+        <textInVisura>atto giudiziario</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>601</code>
+        <description>APPRENSIONE DI BENI DEL CONIUGE DEL FALLITO</description>
+        <textInVisura>apprensione beni</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>627</code>
+        <description>DECRETO DI ACQUISTO PER USUCAPIONE (ART. 1159 BIS C.C)</description>
+        <textInVisura>decreto di acquisto per usucapione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>602</code>
+        <description>DECRETO DI AMMISSIONE AMMINISTRAZIONE CONTROLLATA (ART. 118 L.F.)</description>
+        <textInVisura>decreto di ammissione amministrazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>603</code>
+        <description>DECRETO DI AMMISSIONE CONCORDATO PREVENTIVO</description>
+        <textInVisura>decreto di ammissione concordato preventivo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>604</code>
+        <description>DECRETO DI ATTRIBUZIONE QUOTE PER DIVISIONE (ART. 195 C.P.C)</description>
+        <textInVisura>decreto attribuzione quote per divisione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>605</code>
+        <description>DECRETO DI NOMINA DEL COMMISSARIO GIUDIZIALE (EX ART. 191 L.F. 2 COMMA)</description>
+        <textInVisura>decreto nomina del commissario giudiziale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>631</code>
+        <description>DECRETO DI RITRASFERIMENTO IMMOBILI (ART. 90 DPR 602/73</description>
+        <textInVisura>decreto ritrasferimento immobili</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>607</code>
+        <description>DECRETO DI TRASFERIMENTO IMMOBILI</description>
+        <textInVisura>decreto trasferimento immobili</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>608</code>
+        <description>LODO ARBITRALE COSTITUTIVO DI DIRITTI REALI</description>
+        <textInVisura>lodo arbritale diritti reali</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>609</code>
+        <description>LODO ARBITRALE MODIFICATIVO DELL'ESERCIZIO DI DIRITTI REALI</description>
+        <textInVisura>lodo arbritale modificativo diritti reali</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>610</code>
+        <description>LODO ARBITRALE PER DIVISIONE</description>
+        <textInVisura>lodo arbritale per divisione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>611</code>
+        <description>LODO ARBITRALE TRASLATIVO</description>
+        <textInVisura>lodo arbritale traslativo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>612</code>
+        <description>ORDINANZA DI APPROVAZIONE DEL PROGETTO DI DIVISIONE (ART. 789 C.P.C)</description>
+        <textInVisura>ordinanza approvazione divisione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>628</code>
+        <description>ORDINANZA DIVISIONALE (ART. 785 C.P.C)</description>
+        <textInVisura>ordinanza divisionale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>613</code>
+        <description>SENTENZA CHE ESTINGUE DIRITTI REALI PER PRESCRIZIONE (ART. 2651 C.C)</description>
+        <textInVisura>sentenza estinzione diritti reali per prescrizione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>614</code>
+        <description>SENTENZA COSTITUTIVA DI DIRITTI REALI</description>
+        <textInVisura>sentenza costitutiva diritti reali</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>615</code>
+        <description>SENTENZA DI ACQUISTO PER ALLUVIONE (ART. 2651 C.C)</description>
+        <textInVisura>sentenza acquisto per alluvione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>616</code>
+        <description>SENTENZA DI ACQUISTO PER USUCAPIONE (ART. 2651 C.C)</description>
+        <textInVisura>sentenza acquisto per usucapione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>617</code>
+        <description>SENTENZA DICHIARATIVA DI FALLIMENTO</description>
+        <textInVisura>sentenza dichiarativa fallimento</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>618</code>
+        <description>SENTENZA DI CONFISCA BENI (ART. 19 L. 28/2/85 N. 47</description>
+        <textInVisura>sentenza confisca beni</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>619</code>
+        <description>SENTENZA DI OMOLOGAZIONE CONCORDATO FALLIMENTARE</description>
+        <textInVisura>sentenza omologazione concordato preventivo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>620</code>
+        <description>SENTENZA MODIFICATIVA DELL'ESERCIZIO DEI DIRITTI REALI</description>
+        <textInVisura>sentenza modificativa diritti reali</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>621</code>
+        <description>SENTENZA PER DIVISIONE</description>
+        <textInVisura>sentenza per divisione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>622</code>
+        <description>SENTENZA TRASLATIVA</description>
+        <textInVisura>sentenza traslativa</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>623</code>
+        <description>VERBALE DI CONCILIAZIONE COSTITUTIVO DI DIRITTI REALI</description>
+        <textInVisura>verbale conciliazione costitutivo diritti reali</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>624</code>
+        <description>VERBALE DI CONCILIAZIONE MODIFICATIVO DELL'ESERCIZIO DI DIRITTI REALI</description>
+        <textInVisura>verbale conciliazione modificativo diritti reali</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>625</code>
+        <description>VERBALE DI CONCILIAZIONE TRASLATIVO</description>
+        <textInVisura>verbale conciliazione traslativo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>700</code>
+        <description>ATTO ESECUTIVO O CAUTELARE</description>
+        <textInVisura>atto esecutivo o cautelare</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>706</code>
+        <description>DECRETO DI SEQUESTRO CONSERVATIVO (ART. 672 C.P.C)</description>
+        <textInVisura>decreto sequestro conservativo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>732</code>
+        <description>ORDINANZA DI SEQUESTRO CONSERVATIVO (ART. 673 C.P.C)</description>
+        <textInVisura>ordinanza di sequestro conservativo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>733</code>
+        <description>ORDINANZA DI SEQUESTRO CONSERVATIVO PENALE (ART. 316 C.P.P)</description>
+        <textInVisura>ordinanza di sequestro conservativo penale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>712</code>
+        <description>PIGNORAMENTO ESATTORIALE</description>
+        <textInVisura>pignoramento esattoriale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">T</typeStr>
+        <code>726</code>
+        <description>VERBALE DI PIGNORAMENTO IMMOBILI</description>
+        <textInVisura>verbale pignoramento immobili</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>100</code>
+        <description>IPOTECA VOLONTARIA</description>
+        <textInVisura>ipoteca volontaria</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>174</code>
+        <description>CONCESSIONE A GARANZIA DI ANTICIPAZIONI FONDIARIE</description>
+        <textInVisura>concessione a garanzia di anticipazioni fondiarie</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>161</code>
+        <description>CONCESSIONE A GARANZIA DI APERTURA DI CREDITO</description>
+        <textInVisura>concessione a garanzia di aperura di credito</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>162</code>
+        <description>CONCESSIONE A GARANZIA DI CAMBIALI (ART.2831 C.C)</description>
+        <textInVisura>concessione a garanzia di cambiali</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>163</code>
+        <description>CONCESSIONE A GARANZIA DI CONCORDATO FALLIMENTARE</description>
+        <textInVisura>concessione a garanzia di concordato fallimentare</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>164</code>
+        <description>CONCESSIONE A GARANZIA DI CONCORDATO PREVENTIVO</description>
+        <textInVisura>concessione a garanzia di concordato preventivo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>165</code>
+        <description>CONCESSIONE A GARANZIA DI CONGUAGLIO DIVISIONALE</description>
+        <textInVisura>concessione a garanzia di conguaglio divisionale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>166</code>
+        <description>CONCESSIONE A GARANZIA DI DILAZIONE DI IMPOSTE DI SUCCESSIONE</description>
+        <textInVisura>concessione a garanzia dilazione imposte di successione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>167</code>
+        <description>CONCESSIONE A GARANZIA DI DILAZIONE DI IMPOSTA COMUNALE SULL'INCREMENTO DI VALORE DEGLI IMMOBILI
+            (INVIM)
+        </description>
+        <textInVisura>concessione a garanzia dilazione imposta comunale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>175</code>
+        <description>CONCESSIONE A GARANZIA DI FINANZIAMENTO</description>
+        <textInVisura>concessione a garanzia di finanziamento</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>169</code>
+        <description>CONCESSIONE A GARANZIA DI OBBLIGAZIONI AL PORTATORE</description>
+        <textInVisura>concessione a garanzia di obbligazioni al protatore</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>168</code>
+        <description>CONCESSIONE A GARANZIA DI MUTUO</description>
+        <textInVisura>concessione a garanzia di mutuo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>170</code>
+        <description>CONCESSIONE A GARANZIA DI MUTUO CONDIZIONATO</description>
+        <textInVisura>concessione a garanzia di mutuo condizionato</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>177</code>
+        <description>CONCESSIONE A GARANZIA DI MUTUO EDILIZIO</description>
+        <textInVisura>concessione a garanzia di mutuo edilizio</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>176</code>
+        <description>CONCESSIONE A GARANZIA DI MUTUO FONDIARIO</description>
+        <textInVisura>concessione a garanzia di mutuo fondiario</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>173</code>
+        <description>CONCESSIONE A GARANZIA DI RENDITA PERPETUA (ART. 1864 C.C.)</description>
+        <textInVisura>concessione a garanzia di rendita perpetua</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>171</code>
+        <description>CONCESSIONE A GARANZIA DI RENDITA VITALIZIA</description>
+        <textInVisura>concessione a garanzia di rendita vitalizia</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>172</code>
+        <description>CONCESSIONE A GARANZIA DI RESIDUO PREZZO</description>
+        <textInVisura>concessione a garanzia di residuo prezzo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>178</code>
+        <description>CONCESSIONE A GARANZIA PER OPERE PUBBLICHE</description>
+        <textInVisura>concessione a garanzia per opere pubbliche</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>200</code>
+        <description>IPOTECA GIUDIZIALE</description>
+        <textInVisura>ipoteca giudiziale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>289</code>
+        <description>ACCORDO DI CONCILIAZIONE SOTTOSCRITTO DALLE PARTI E DAGLI AVVOCATI (ART. 12 D. LGS. 28/2010
+        </description>
+        <textInVisura>accordo di conciliazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>291</code>
+        <description>ACCORDO RAGGIUNTO IN SEDE DI NEGOZIAZIONE ASSISTITA DA UN AVVOCATO</description>
+        <textInVisura>accordo raggiunto in sede di negoziazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>281</code>
+        <description>DECRETO INGIUNTIVO</description>
+        <textInVisura>decreto ingiuntivo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>282</code>
+        <description>LODO ARBITRALE</description>
+        <textInVisura>lodo arbritale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>287</code>
+        <description>ORDINANZA DI CONDANNA (ART.702-TER C.P.C.)</description>
+        <textInVisura>ordinanza di condanna</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>286</code>
+        <description>ORDINANZA DI INGIUNZIONE ESECUTIVA (ART. 186-TER C.P.C.)</description>
+        <textInVisura>ordinanza di inigunzione esecutiva</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>283</code>
+        <description>SENTENZA DI CONDANNA</description>
+        <textInVisura>sentenza di condanna</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>284</code>
+        <description>SENTENZA DI DIVORZIO</description>
+        <textInVisura>sentenza di divorzio</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>285</code>
+        <description>SENTENZA DI SEPARAZIONE PERSONALE (ART. 156 C.C)</description>
+        <textInVisura>sentenza di separazione personale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>288</code>
+        <description>VERBALE DI CONCILIAZIONE OMOLOGATO (ART. 12 D.LGS. 28/2010)</description>
+        <textInVisura>verbale conciliazione omologato</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>300</code>
+        <description>IPOTECA LEGALE</description>
+        <textInVisura>ipoteca legale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>350</code>
+        <description>COMPRAVENDITA</description>
+        <textInVisura>compravendita</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>355</code>
+        <description>DECRETO MINISTRO INDUSTRIA E COMMERCIO (ART. 31 D.P.R.13/2/59 N. 449)</description>
+        <textInVisura>decreto ministro industria e commercio</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>351</code>
+        <description>DIVISIONE</description>
+        <textInVisura>divisione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>352</code>
+        <description>DIVISIONE A STRALCIO</description>
+        <textInVisura>divisione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>353</code>
+        <description>ORDINANZA AUTORITA' GIUDIZIARIA</description>
+        <textInVisura>ordinanza autorità giudiziaria</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>354</code>
+        <description>PROVVEDIMENTO PRESIDENTE TRIBUNALE (L.7/1/29, N. 4 ART. 26)</description>
+        <textInVisura>provvedimento presidente tribunale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>400</code>
+        <description>IPOTECA SU CONCESSIONI AMMINISTRATIVE</description>
+        <textInVisura>ipoteca amministrativa</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>401</code>
+        <description>CONCESSIONE A GARANZIA DI FINANZIAMENTO</description>
+        <textInVisura>concessione a garanzia di finanziamento</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>420</code>
+        <description>IPOTECA DELLA RISCOSSIONE</description>
+        <textInVisura>ipoteca riscossione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>421</code>
+        <description>AVVISO DI ACCERTAMENTO ESECUTIVO (ART.29 D.L. 78/2010)</description>
+        <textInVisura>avviso di accertamento esecutivo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>422</code>
+        <description>AVVISO DI ADDEBITO ESECUTIVO (ART.30 D. L. 78/2010)</description>
+        <textInVisura>avviso addebito esecutivo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>423</code>
+        <description>DECRETO DEL GIUDICE TRIBUTARIO (ART.22 D. LGS. 472/1997)</description>
+        <textInVisura>decreto giudice tributario</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>424</code>
+        <description>RUOLO (ART. 77 D.P.R. N. 602/1973</description>
+        <textInVisura>ruolo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>425</code>
+        <description>SENTENZA DEL GIUDICE TRIBUTARIO (ART. 22 D. LGS. 472/1997</description>
+        <textInVisura>sentenza giudice tributario</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>500</code>
+        <description>ISCRIZIONE IN SEPARAZIONE DI BENI</description>
+        <textInVisura>iscrizione in sperazione di beni</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>541</code>
+        <description>A GARANZIA DI CREDITO</description>
+        <textInVisura>garanzia di credito</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>542</code>
+        <description>A GARANZIA DI LEGATO</description>
+        <textInVisura>garanzia di legato</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>543</code>
+        <description>NEL CASO DI DEFUNTO ED EREDE (ART. 518 C.C)</description>
+        <textInVisura>defunto ed erede</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>600</code>
+        <description>RINNOVO DI IPOTECA</description>
+        <textInVisura>rinnovo ipoteca</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>674</code>
+        <description>RINNOVO DI IPOTECA VOLONTARIA - CONCESSIONE A GARANZIA DI ANTICIPAZIONI FONDIARIE</description>
+        <textInVisura>rinnovo ipoteca - a garanzia di anticipazione fondiarie</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>661</code>
+        <description>RINNOVO DI IPOTECA VOLONTARIA - CONCESSIONE A GARANZIA DI APERTURA DI CREDITO</description>
+        <textInVisura>rinnovo ipoteca - a garanzia di apertura di credito</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>662</code>
+        <description>RINNOVO DI IPOTECA VOLONTARIA - CONCESSIONE A GARANZIA DI CAMBIALI (ART. 2831 C.C)</description>
+        <textInVisura>rinnovo ipoteca - a garanzia di cambiali</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>663</code>
+        <description>RINNOVO DI IPOTECA VOLONTARIA - CONCESSIONE A GARANZIA DI CONCORDATO FALLIMENTARE</description>
+        <textInVisura>rinnovo ipoteca - a garanzia di concordato fallimentare</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>664</code>
+        <description>RINNOVO DI IPOTECA VOLONTARIA - CONCESSIONE A GARANZIA DI CONCORDATO PREVENTIVO</description>
+        <textInVisura>rinnovo ipoteca - a garanzia di concordato preventivo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>665</code>
+        <description>RINNOVO DI IPOTECA VOLONTARIA - CONCESSIONE A GARANZIA DI CONGUAGLIO DIVISIONALE</description>
+        <textInVisura>rinnovo ipoteca a garanzia di conguaglio divisionale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>666</code>
+        <description>RINNOVO DI IPOTECA VOLONTARIA - CONCESSIONE A GARANZIA DI DILAZIONE DI IMPOSTE DI SUCCESSIONE
+        </description>
+        <textInVisura>rinnovo ipoteca a garanzia di dilazione di imposte successione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>667</code>
+        <description>RINNOVO DI IPOTECA VOLONTARIA - CONCESSIONE A GARANZIA DI DILAZIONE DI IMPOSTA COMUNALE
+            SULL'INCREMENTO DI VALORE DEGLI IMMOBILI (INVIM)
+        </description>
+        <textInVisura>rinnovo ipoteca a garanzia di dilazione imposta comunale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>675</code>
+        <description>RINNOVO DI IPOTECA VOLONTARIA - CONCESSIONE A GARANZIA DI FINANZIAMENTO</description>
+        <textInVisura>rinnovo ipoteca a garanzia di finanziamento</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>669</code>
+        <description>RINNOVO DI IPOTECA VOLONTARIA - CONCESSIONE A GARANZIA DI OBBLIGAZIONI AL PORTATORE</description>
+        <textInVisura>rinnovo ipoteca a garanzia di obbligazioni al portatore</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>668</code>
+        <description>RINNOVO DI IPOTECA VOLONTARIA - CONCESSIONE A GARANZIA DI MUTUO</description>
+        <textInVisura>rinnovo ipoteca a garanzia di mutuo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>670</code>
+        <description>RINNOVO DI IPOTECA VOLONTARIA - CONCESSIONE A GARANZIA DI MUTUO CONDIZIONATO</description>
+        <textInVisura>rinnovo ipoteca a garanzia di mutuo condizionato</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>677</code>
+        <description>RINNOVO DI IPOTECA VOLONTARIA - CONCESSIONE A GARANZIA DI MUTUO EDILIZIO</description>
+        <textInVisura>rinnovo ipoteca a garanzia di mutuo edilizio</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>676</code>
+        <description>RINNOVO DI IPOTECA VOLONTARIA - CONCESSIONE A GARANZIA DI MUTUO FONDIARIO</description>
+        <textInVisura>rinnovo ipoteca a garanzia di mutuo fondiario</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>673</code>
+        <description>RINNOVO DI IPOTECA VOLONTARIA - CONCESSIONE A GARANZIA DI RENDITA PERPETUA (ART. 1864 C.C)
+        </description>
+        <textInVisura>rinnovo ipoteca a garanzia di rendita perpetua</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>671</code>
+        <description>RINNOVO DI IPOTECA VOLONTARIA - CONCESSIONE A GARANZIA DI RENDITA VITALIZIA</description>
+        <textInVisura>rinnovo ipoteca a garanzia di rendita vitalizia</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>672</code>
+        <description>RINNOVO DI IPOTECA VOLONTARIA - CONCESSIONE A GARANZIA DI RESIDUO PREZZO</description>
+        <textInVisura>rinnovo ipoteca a garanzia di residuo prezzo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>678</code>
+        <description>RINNOVO DI IPOTECA VOLONTARIA - CONCESSIONE A GARANZIA PER OPERE PUBBLICHE</description>
+        <textInVisura>rinnovo ipoteca a garanzia per opere pubbliche</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>689</code>
+        <description>RINNOVO DI IPOTECA GIUDIZIALE - ACCORDO DI CONCILIAZIONE SOTTOSCRITTO DALLE PARTI E DAGLI AVVOCATI
+            (ART. 12 D. LGS. 28/2010
+        </description>
+        <textInVisura>rinnovo ipoteca accordo conciliazione sottoscritto dalla parti</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>691</code>
+        <description>RINNOVO DI IPOTECA GIUDIZIALE - ACCORDO RAGGIUNTO IN SEDE DI NEGOZIAZIONE ASSISTITA DA UN
+            AVVOCATO
+        </description>
+        <textInVisura>rinnovo ipoteca accordo raggiunto in sede di negoziazione assistita</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>681</code>
+        <description>RINNOVO DI IPOTECA GIUDIZIALE - DECRETO INGIUNTIVO</description>
+        <textInVisura>rinnovo di ipoteca giudiziale - decreto ingiuntivo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>682</code>
+        <description>RINNOVO DI IPOTECA GIUDIZIALE - LODO ARBITRALE</description>
+        <textInVisura>rinnovo di ipoteca - lodo arbitrale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>687</code>
+        <description>RINNOVO DI IPOTECA GIUDIZIALE - ORDINANAZA DI CONDANNA (ART. 702-TER C.P.C.)</description>
+        <textInVisura>rinnovo ipoteca a garanzia di residuo prezzo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code"></typeStr>
+        <code>686</code>
+        <description>RINNOVO DI IPOTECA GIUDIZIALE - ORDINANAZA DI INGIUNZIONE ESECUTIVA ( ART. 186-TER C.P.C.)
+        </description>
+        <textInVisura>rinnovo ipoteca a garanzia di residuo prezzo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>683</code>
+        <description>RINNOVO DI IPOTECA GIUDIZIALE - SENTENZA DI CONDANNA</description>
+        <textInVisura>rinnovo ipoteca a garanzia di residuo prezzo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>684</code>
+        <description>RINNOVO DI IPOTECA GIUDIZIALE - SENTENZA DI DIVORZIO</description>
+        <textInVisura>rinnovo ipoteca a garanzia di residuo prezzo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>685</code>
+        <description>RINNOVO DI IPOTECA GIUDIZIALE - SENTENZA DI SEPARAZIONE PERSONALE (ART. 156 C.C.)</description>
+        <textInVisura>rinnovo ipoteca a garanzia di residuo prezzo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>688</code>
+        <description>RINNOVO DI IPOTECA GIUDIZIALE - VERBALE DI CONCILIAZIONE OMOLOGATO (ART. 12 D. LGS. 28/2010
+        </description>
+        <textInVisura>rinnovo ipoteca a garanzia di residuo prezzo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>650</code>
+        <description>RINNOVO DI IPOTECA LEGALE - COMPRAVENDITA</description>
+        <textInVisura>rinnovo ipoteca a garanzia di residuo prezzo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>655</code>
+        <description>RINNOVO DI IPOTECA LEGALE - DECRETO MINISTRO INDUSTRIA E COMMERCIO (ART. 31 D.P.R. 13/2/59 N.
+            449)
+        </description>
+        <textInVisura>rinnovo ipoteca a garanzia di residuo prezzo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>651</code>
+        <description>RINNOVO DI IPOTECA LEGALE - DIVISIONE</description>
+        <textInVisura>rinnovo ipoteca a garanzia di residuo prezzo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>652</code>
+        <description>RINNOVO DI IPOTECA LEGALE - DIVISIONE A STRALCIO</description>
+        <textInVisura>rinnovo ipoteca a garanzia di residuo prezzo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>653</code>
+        <description>RINNOVO DI IPOTECA LEGALE - ORDINANZA AUTORITA' GIUDIZIARIA</description>
+        <textInVisura>rinnovo ipoteca a garanzia di residuo prezzo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>654</code>
+        <description>RINNOVO DI IPOTECA LEGALE - PROVVEDIMENTO PRESIDENTE TRIBUNALE (L. 7/1/29, N. 4 ART. 26)
+        </description>
+        <textInVisura>rinnovo ipoteca a garanzia di residuo prezzo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>700</code>
+        <description>IPOTECA IN RIPETIZIONE</description>
+        <textInVisura>ipoteca in ripetizione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>745</code>
+        <description>ASSEGNAZIONE PER RIORDINAMENTO PROPRIETA' RURALE (ART. 853 C.C)</description>
+        <textInVisura>assegnazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>746</code>
+        <description>DIVISIONE (ART. 2825 C.C. - 2 COMMA)</description>
+        <textInVisura>divisione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>810</code>
+        <description>PRIVILEGIO AGRARIO CONVENZIONALE</description>
+        <textInVisura>privilegio agrario</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>811</code>
+        <description>CONCESSIONE A GARANZIA DI PRESTITO AGRARIO</description>
+        <textInVisura>concessione a garanzia di prestito agrario</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>820</code>
+        <description>PRIVILEGIO SPECIALE INDUSTRIALE</description>
+        <textInVisura>privilegio speciale industriale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>821</code>
+        <description>CONCESSIONE A GARANZIA DI FINANZIAMENTO</description>
+        <textInVisura>concessione a garanzia di finanziamento</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>830</code>
+        <description>PRIVILEGIO</description>
+        <textInVisura>privilegio</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>910</code>
+        <description>PRIVILEGIO AGRARIO CONVENZIONALE</description>
+        <textInVisura>privilegio agrario convenzionale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>920</code>
+        <description>PRIVILEGIO SPECIALE INDUSTRIALE</description>
+        <textInVisura>privilegio speciale industriale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">I</typeStr>
+        <code>930</code>
+        <description>PRIVILEGIO</description>
+        <textInVisura>privilegio</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>700</code>
+        <description>ANNOTAZIONE ALLA TRASCRIZIONE</description>
+        <textInVisura>annotamento alla trascrizione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>734</code>
+        <description>ACCOLLO DI MUTUO (ART. 2825- BIS C.C)</description>
+        <textInVisura>accollo mutuo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>701</code>
+        <description>ANNULLAMENTO</description>
+        <textInVisura>annullamento</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>702</code>
+        <description>AVVENUTA TRASCRIZIONE DI ATTO (ART. 2655 C.C)</description>
+        <textInVisura>avvenuta trascrizione di atto</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>703</code>
+        <description>AVVENUTA TRASCRIZIONE DI DOMANDA GIUDIZIALE (ART. 2654 C.C)</description>
+        <textInVisura>avvenuta trascrizione domanda giudiziale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>704</code>
+        <description>AVVERAMENTO DI CONDIZIONE RISOLUTIVA (ART. 2655 C.C)</description>
+        <textInVisura>avveramento condizione risolutiva</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>705</code>
+        <description>CANCELLAZIONE</description>
+        <textInVisura>cancellazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>706</code>
+        <description>CANCELLAZIONE CONDIZIONE RISOLUTIVA (PER MANCATO AVVERAMENTO)</description>
+        <textInVisura>cancellazione condizione risolutiva</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>707</code>
+        <description>CANCELLAZIONE CONDIZIONE SOSPENSIVA (PER MANCATO AVVERMENTO)</description>
+        <textInVisura>cancellazione condizione sospensiva</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>708</code>
+        <description>CANCELLAZIONE TERMINE INIZIALE (ART. 2668 C.C., 3 COMMA)</description>
+        <textInVisura>cancellazione termine iniziale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>731</code>
+        <description>CANCELLAZIONE PARZIALE DI VINCOLO</description>
+        <textInVisura>cancellazione parziale di vincolo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>732</code>
+        <description>CANCELLAZIONE TOTALE DI VINCOLO</description>
+        <textInVisura>cancellazione totale di vincolo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>709</code>
+        <description>DECRETO DEFINITIVO DEL TRIBUNALE</description>
+        <textInVisura>decreto definitivo tribunale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>710</code>
+        <description>DECRETO DEFINITIVO CORTE D'APPELLO</description>
+        <textInVisura>decreto definitivo corte d'appello</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>711</code>
+        <description>DECRETO ESECUTIVO DEL TRIBUNALE</description>
+        <textInVisura>decreto esecutivo del tribunale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>712</code>
+        <description>DECRETO NOMINA CURATORE EREDITARIO (ART. 509 C.C)</description>
+        <textInVisura>decreto nomina curatore ereditario</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>713</code>
+        <description>DECRETO TRASFERIMENTO (ART. 2896 C.C)</description>
+        <textInVisura>decreto trasferimento</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>714</code>
+        <description>DEVOLUZIONE FONDO ENFITEUTICO</description>
+        <textInVisura>devoluzione fondo enfiteutico</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>715</code>
+        <description>DICHIARAZIONE DI RILASCIO BENI IPOTECATI (ART. 2861 C.C)</description>
+        <textInVisura>dichiarazione rilascio beni ipotecati</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>716</code>
+        <description>IMPEDIMENTO AD ACQUISTO PER CAUSA DI MORTE (ART. 2662 C.C.)</description>
+        <textInVisura>impedimento acquisto causa morte</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>717</code>
+        <description>INEFFICACIA PARZIALE</description>
+        <textInVisura>inefficazia parziale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>718</code>
+        <description>INEFFICACIA TOTALE</description>
+        <textInVisura>inefficacia totale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>719</code>
+        <description>MODIFICA CONVENZIONALE MATRIMONIALE (ART. 163 C.C., U.C.)</description>
+        <textInVisura>modifica convenzione matrimoniale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>720</code>
+        <description>NULLITA'</description>
+        <textInVisura>nullità</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>721</code>
+        <description>PROPOSIZIONE RECLAMO CORTE D'APPELLO (ART. 113 TER DISP. ATT.C.C.)</description>
+        <textInVisura>proposizione reclamo corte d'appello</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>722</code>
+        <description>PROPOSIZIONE RICORSO AL TRIBUNALE (ART. 113 TER DISP. ATT. C.C.)</description>
+        <textInVisura>proposizione ricorso al tribunale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>723</code>
+        <description>QUIETANZA</description>
+        <textInVisura>quietanza</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>724</code>
+        <description>RESCISSIONE</description>
+        <textInVisura>rescissione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>725</code>
+        <description>RESTRIZIONE DEI BENI</description>
+        <textInVisura>restrizione beni</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>726</code>
+        <description>REVOCAZIONE</description>
+        <textInVisura>revocazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>727</code>
+        <description>RILASCIO BENI AI CREDITORI ( ART. 507 C.C.)</description>
+        <textInVisura>rilascio beni ai creditori</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>728</code>
+        <description>RILASCIO BENI AI LEGATARI</description>
+        <textInVisura>rilascio beni ai legatari</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>729</code>
+        <description>RISOLUZIONE</description>
+        <textInVisura>risoluzione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>730</code>
+        <description>SENTENZA CONDANNA ESECUTIVA (ART. 156 DISP. ATT. C.P.C.)</description>
+        <textInVisura>sentenza condanna esecutiva</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>800</code>
+        <description>ANNOTAZIONE ALL'ISCRIZIONE</description>
+        <textInVisura>annotamento all'iscrizione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>801</code>
+        <description>ASSEGNAZIONE DEL CREDITO</description>
+        <textInVisura>assegnazione del credito</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>802</code>
+        <description>CAMBIAMENTO DOMICILIO IPOTECARIO</description>
+        <textInVisura>cambiamento domicilio ipotecario</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>803</code>
+        <description>CANCELLAZIONE TOTALE</description>
+        <textInVisura>cancellazione totale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>825</code>
+        <description>CANCELLAZIONE TOTALE DI PRIVILEGIO</description>
+        <textInVisura>cancellazione totale di privilegio</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>826</code>
+        <description>CANCELLAZIONE PARZIALE DI PRIVILEGIO</description>
+        <textInVisura>cancellazione paziale di privilegio</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>804</code>
+        <description>CESSIONE DELL'IPOTECA</description>
+        <textInVisura>cessione ipoteca</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>805</code>
+        <description>DECRETO DEFINITIVO DEL TRIBUNALE</description>
+        <textInVisura>decreto definitivo tribunale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>806</code>
+        <description>DECRETO DEFINITIVO CORTE D'APPELLO</description>
+        <textInVisura>decreto definitivo corte d'appello</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>807</code>
+        <description>DECRETO ESECUTIVO DEL TRIBUNALE</description>
+        <textInVisura>decreto esecutivo tribunale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>808</code>
+        <description>EROGAZIONE A SALDO</description>
+        <textInVisura>erogazione a saldo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>809</code>
+        <description>EROGAZIONE PARZIALE</description>
+        <textInVisura>erogazione parziale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>810</code>
+        <description>FRAZIONAMENTO IN QUOTA</description>
+        <textInVisura>frazionamento in quota</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>811</code>
+        <description>NOMINA RAPPRESENTANTI OBBLIGAZIONISTI</description>
+        <textInVisura>nomina rappresentati obbligazionisti</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>812</code>
+        <description>PEGNO</description>
+        <textInVisura>pegno</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>829</code>
+        <description>PERMANENZA DELL'IPOTECA EX ART. 40-BIS DEL D. LGS. 385/1993</description>
+        <textInVisura>permanenza ipoteca</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>813</code>
+        <description>PERMUTA DI GRADO</description>
+        <textInVisura>permuta di grado</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>814</code>
+        <description>PIGNORAMENTO</description>
+        <textInVisura>pignoramento</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>815</code>
+        <description>POSTEROGAZIONE DI GRADO</description>
+        <textInVisura>posterogazione di grado</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>816</code>
+        <description>PROPOSIZIONE RECLAMO CORTE D'APPELLO (ART. 113 TER DISP. ATT.C.C.)</description>
+        <textInVisura>proposizione reclamo</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>817</code>
+        <description>PROPOSIZIONE RICORSO AL TRIBUNALE (ART. 113 TER DISP. ATT. C.C.)</description>
+        <textInVisura>proposizione ricorso</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>818</code>
+        <description>QUIETANZA E CONFERMA</description>
+        <textInVisura>quietanza e conferma</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>819</code>
+        <description>RESTRIZIONE DI BENI</description>
+        <textInVisura>restrizione beni</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>820</code>
+        <description>RETTIFICA (ARTT. 2841 E 2886 C.C.)</description>
+        <textInVisura>rettifica</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>821</code>
+        <description>RIDUZIONE DI SOMMA</description>
+        <textInVisura>riduzione di somma</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>822</code>
+        <description>SEQUESTRO</description>
+        <textInVisura>sequestro</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>823</code>
+        <description>SUBINGRESSO ( ART. 2866 C.C. - 2 COMMA)</description>
+        <textInVisura>subingresso</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>824</code>
+        <description>SURROGAZIONE</description>
+        <textInVisura>surrogazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>831</code>
+        <description>SURROGAZIONE AI SENSI DELL'ARTICOLO 120-QUATER DEL D. LGS. 385/1993</description>
+        <textInVisura>surrogazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>828</code>
+        <description>SURROGAZIONE IN QUOTA DI MUTUO FRAZIONATO</description>
+        <textInVisura>surrogazione in quota di mutuo frazionato</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>832</code>
+        <description>SURROGAZIONE IN QUOTA DI MUTUO FRAZIONATO AI SENSI DELL'ARTICOLO 120-QUATER DEL D.LGS. 385/1993
+        </description>
+        <textInVisura>surrogazione in quota di mutuo frazionato ex art. 120 quater</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>827</code>
+        <description>SURROGAZIONE PARZIALE</description>
+        <textInVisura>surrogazione parziale</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>900</code>
+        <description>ANNOTAZIONE ALLA ANNOTAZIONE</description>
+        <textInVisura>annotamento all'annotamento</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>901</code>
+        <description>CANCELLAZIONE</description>
+        <textInVisura>cancellazione</textInVisura>
+    </data_entry>
+    <data_entry>
+        <typeStr entity_field="code">A</typeStr>
+        <code>902</code>
+        <description>ANNULLAMENTO PER ERRONEA ACQUISIZIONE</description>
+        <textInVisura>annullamento per erronea acquisizione</textInVisura>
+    </data_entry>
+</type_act>

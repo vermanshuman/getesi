@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                template="/resources/tpl/Admin/EditBase.xhtml">
+    <ui:param name="bean" value="#{communicationMessageEditBean}"/>
+    <ui:param name="edit_title" value="#{msg.communicationNew}"/>
+<ui:define name="edit_body">
+        <div class="ui-g">
+            <div class="ui-g-3"></div>
+            <div class="ui-g-1 css_grid_label">
+                <span><span class="red">*</span> #{msg.communicationDateFrom}:</span>
+            </div>
+            <div class="ui-g-2 css_grid_value">
+                <p:calendar id="communicationDateFrom" style="width: 91%;"
+                            pattern="dd/MM/yyyy"
+                            value="#{bean.entity.startDate}"
+                            label="#{msg.communicationDateFrom}"
+                            rendered="#{!bean.onlyView}">
+                </p:calendar>
+                <h:outputText value="#{bean.entity.startDate}" styleClass="dynamic_field_value" rendered="#{bean.onlyView}"/>
+            </div>
+            <div class="ui-g-4"></div>
+        </div>
+
+        <div class="ui-g">
+            <div class="ui-g-3"></div>
+            <div class="ui-g-1 css_grid_label">
+                <span><span class="red">*</span> #{msg.communicationDateTo}:</span>
+            </div>
+            <div class="ui-g-2 css_grid_value">
+                <p:calendar id="communicationDateTo" style="width: 91%;"
+                                 pattern="dd/MM/yyyy"
+                                 value="#{bean.entity.endDate}"
+                                 label="#{msg.communicationDateTo}"
+                                 rendered="#{!bean.onlyView}">
+                </p:calendar>
+                <h:outputText value="#{bean.entity.endDate}" styleClass="dynamic_field_value" rendered="#{bean.onlyView}"/>
+            </div>
+            <div class="ui-g-4"></div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-3"></div>
+            <div class="ui-g-1 css_grid_label">
+                <span><span class="red">*</span> #{msg.communicationRoles}:</span>
+            </div>
+            <div class="ui-g-2 css_grid_value">
+                <p:pickList id="communicationRoles" style="width: 91%;"
+                            var="role" itemValue="#{role}" itemLabel="#{role.name}"
+                            effect="explode" showSourceFilter="true" converter="roleConverter"
+                            showTargetFilter="true" value="#{bean.dualListOfRoles}"
+                            filterMatchMode="contains" rendered="#{!bean.onlyView}">
+                </p:pickList>
+            </div>
+            <div class="ui-g-4"></div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-3"></div>
+            <div class="ui-g-1 css_grid_label">
+                <span><span class="red">*</span> #{msg.communicationUsers}:</span>
+            </div>
+            <div class="ui-g-2 css_grid_value">
+                <p:pickList id="communicationUsers" style="width: 91%;"
+                            var="user" itemValue="#{user.id}" itemLabel="#{user.fullname}"
+                            effect="explode" showSourceFilter="true" converter="userConverter"
+                            showTargetFilter="true" value="#{bean.dualListOfUsers}"
+                            filterMatchMode="contains" rendered="#{!bean.onlyView}">
+                </p:pickList>
+            </div>
+            <div class="ui-g-4"></div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-1">
+                <p:commandButton value="#{msg.communicationAttachFile}"
+                                 oncomplete="PF('attachFielDlgWV').show();" icon="fa fa-paperclip"
+                                 styleClass="grey-button" style="margin-bottom: 10px"/>
+            </div>
+            <div class="ui-g-4">
+                <p:outputPanel id="listFile">
+                    <ui:repeat value="#{bean.attachedFiles}" var="file">
+                        <p:commandButton icon="fa fa-paperclip" title="#{msg.download}" update=":form, messages"
+                                         ajax="false"
+                                         action="#{bean.downloadFile}" value="&nbsp;#{file.fileName}"
+                                         style="background-color: transparent!important;color: #5f666c!important; padding-right: 5px;">
+                            <f:setPropertyActionListener value="#{file.id}" target="#{bean.downloadFileIndex}"/>
+                        </p:commandButton>
+                    </ui:repeat>
+                </p:outputPanel>
+            </div>
+        </div>
+         <span><span class="red">*</span> #{msg.communicationMessage}:</span>
+        <pe:ckEditor id="body" rendered="#{!bean.onlyView}"
+                     value="#{bean.entity.message}" label="#{msg.communicationMessage}"
+                     styleClass="for_editor" width="auto" height="500"
+                     contentsCss="#{facesContext.externalContext.requestContextPath}/resources/javascript/CKEditorStyles.css"
+                     customConfig="#{facesContext.externalContext.requestContextPath}/resources/javascript/configCKEditorMailManager.js"
+                     widgetVar="ckEditorWV">
+            <p:ajax event="initialize" onstart="onInitCkEditor();"/>
+        </pe:ckEditor>
+        <script>
+            function onInitCkEditor() {
+                console.log("start init CKEditor");
+                CKEDITOR.timestamp='17.07.2018';
+                CKEDITOR.env.isCompatible = true;
+                removeAllTooltips('#bodyPanel');
+                CKEDITOR.instances.body.on('fixWidth', function () {
+                    fixWidthCKEditorBody();
+                });
+                CKEDITOR.instances.body.ui.editor.toolbar[3].items[0].onClick('Times New Roman');
+                CKEDITOR.instances.body.ui.editor.toolbar[3].items[1].onClick('16');
+                CKEDITOR.instances.body.ui.editor.on('change', function () {
+                    $("#changeVar").val("change");
+                    change = true;
+                });
+
+                CKEDITOR.instances.body.ui.editor.on('key', HandleTabEvent, null, null, 0);
+
+                console.log("init success");
+            }
+
+            function fixWidthCKEditorBody() {
+                var newWidth = parseInt(($("#bodyPanel").width() - 27) / (CKEDITOR.instances.body.ui.editor.toolbar[8].items[0].lastValue / 100), 10);
+                $("#bodyPanel").find(".cke_wysiwyg_frame").contents().find("body").css('width', newWidth + 'px');
+            }
+
+            // Custom Key Events function
+            function HandleTabEvent(e) {
+                if (e.data.keyCode == 9){
+                    var selection = CKEDITOR.instances.body.ui.editor.getSelection();
+                    var startElement = selection.getStartElement();
+                    if (e.data.keyCode == 9){
+                        var handleTab = false;
+                        var x = $(".cke_button__bulletedlist");
+                        if(x &amp;&amp; x.attr('class') == 'cke_button cke_button__bulletedlist cke_button_on'){
+                            handleTab = true;
+                        }else {
+                            x = $(".cke_button__numberedlist");
+                            if(x &amp;&amp; x.attr('class') == 'cke_button cke_button__numberedlist cke_button_on'){
+                                handleTab = true;
+                            }
+                        }
+                        if(handleTab){
+                            var element = selection.getStartElement();
+                            var sText = element.getHtml();
+                            var text = jQuery('&lt;div&gt;').html(sText).text();
+                            var result = text.replace(/[^ -~]+/g, "");
+                            if(!result || 0 === result.length){
+                            }else {
+                                e.cancel();
+                                e.stop();
+                                CKEDITOR.instances.body.ui.editor.insertText('    ');
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
+        <p:remoteCommand update="listFile" name="updateFiles"/>
+        <p:dialog id="attachFielDlg" widgetVar="attachFielDlgWV" modal="true"
+                  resizable="false" draggable="false" width="80%" height="400" onHide="updateFiles()">
+            <p:ajax event="close" oncomplete="updateFiles()"/>
+
+            <h:outputText value="#{msg.communicationAttachFile}:"
+                          style="font-weight: bold;"/>
+
+            <p:dataTable emptyMessage="#{msg.noRecordsFound}" var="file" scrollable="true"
+                         value="#{bean.attachedFiles}" id="tableFiles">
+                <f:facet name="header">
+                    <p:fileUpload fileUploadListener="#{bean.handleFileUpload}"
+                                  mode="advanced" auto="true" multiple="true"
+                                  label="#{msg.communicationChooseAttachedFiles}" update="tableFiles"/>
+                </f:facet>
+                <p:column styleClass="action_column" exportable="false">
+                    <p:commandButton icon="fa fa-fw fa-times"
+                                     update=":form:tableFiles" action="#{bean.deleteFile}">
+                        <f:setPropertyActionListener value="#{file.id}"
+                                                     target="#{bean.deleteFileId}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column styleClass="action_column" exportable="false">
+                    <p:commandButton icon="fa fa-fw fa-download" ajax="false"
+                                     update=":form:tableFiles" action="#{bean.downloadFile}">
+                        <f:setPropertyActionListener value="#{file.id}" target="#{bean.downloadFileIndex}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column styleClass="action_column" exportable="false">
+                    <i class="#{file.icon} #{file.style}" style="font-size: 26px"/>
+                </p:column>
+                <p:column headerText="#{msg.mailManagerAttachedFileName}"
+                          style="border-width: 1px; border-style: solid; border-color: #DDDDDD;">
+                    <h:outputText value="#{file.fileName}"/>
+                </p:column>
+            </p:dataTable>
+        </p:dialog>
+
+    </ui:define>
+</ui:composition>
