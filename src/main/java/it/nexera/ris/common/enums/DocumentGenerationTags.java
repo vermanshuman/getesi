@@ -4,7 +4,7 @@ import it.nexera.ris.common.helpers.EnumHelper;
 import it.nexera.ris.common.helpers.ResourcesHelper;
 
 public enum DocumentGenerationTags {
-
+    ALLEGATO_A("allegato_a"),
     GENERAL_CURRENT_DATE("general_current_date"),
     GENERAL_CURRENT_USER("general_current_user"),
     REQUEST_CONSERVATORY("request_conservatory"),

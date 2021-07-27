@@ -1505,6 +1505,8 @@ public class TemplateEntity {
                }
                else
                    return "";
+            case ALLEGATO_A:
+//                if (getRequest().getClient().)
         }
         throw new CannotProcessException("Cannot process such method");
 
