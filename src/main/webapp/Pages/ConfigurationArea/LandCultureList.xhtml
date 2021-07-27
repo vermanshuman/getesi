@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/resources/tpl/Admin/LazyListBase.xhtml">
+    <ui:param name="bean" value="#{landCultureListBean}"/>
+    <ui:param name="list_title" value="#{msg.landCultureHeader}"/>
+    <ui:param name="entity_name" value="#{msg.landCultureHeader}"/>
+
+    <ui:define name="columns">
+        <p:column sortBy="#{item.name}"
+                  filterBy="#{item.name}">
+            <f:facet name="header">
+                <h:outputText
+                        value="#{msg.name.toUpperCase()}" />
+            </f:facet>
+            <h:outputText value="#{item.name}" />
+        </p:column>
+
+        <p:column>
+            <f:facet name="header">
+                <h:outputText value="#{msg.landCadstralCulture.toUpperCase()}" />
+            </f:facet>
+            <ui:repeat value="#{item.landCadastralCultures}" var="landCadastralCulture">
+                <h:outputText value="#{landCadastralCulture.description}" />
+                <h:outputText value="&lt;br /&gt;" escape="false" />
+            </ui:repeat>
+        </p:column>
+    </ui:define>
+</ui:composition>
+</html>

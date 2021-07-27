@@ -6,6 +6,7 @@ import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.TypeFormality;
 import it.nexera.ris.web.beans.wrappers.Pair;
 import it.nexera.ris.web.beans.wrappers.logic.RelationshipGroupingWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.TemplateEntity;
@@ -133,6 +134,12 @@ public class TemplatePdfTableHelper {
         String city = "";
         List<Pair<String, String>> result = new ArrayList<>();
 
+        if(!ValidationHelper.isNullOrEmpty(formality)){
+            TypeFormality typeFormality = formality.checkSalesDicTypeFormality();
+            if(typeFormality != null){
+                addCommercialAndOmi = Boolean.TRUE;
+            }
+        }
         for (Iterator<Map.Entry<List<RelationshipGroupingWrapper>, List<Property>>> iterator = sortedMap.entrySet().iterator();
              iterator.hasNext(); ) {
             List<String> joiner = new ArrayList<>();
@@ -162,7 +169,7 @@ public class TemplatePdfTableHelper {
     }
 
     private static void constructTableText(List<String> joiner, Iterator<Map.Entry<List<RelationshipGroupingWrapper>,
-            List<Property>>> iterator, Map.Entry<List<RelationshipGroupingWrapper>, List<Property>> entry, boolean addCommercialAndOmi, 
+            List<Property>>> iterator, Map.Entry<List<RelationshipGroupingWrapper>, List<Property>> entry, boolean addCommercialAndOmi,
             boolean showCadastralIncome,boolean showAgriculturalIncome) {
         joiner.add(entry.getKey().stream()
                 .map(p -> String.format("DIRITTI PARI A %s %s %s",

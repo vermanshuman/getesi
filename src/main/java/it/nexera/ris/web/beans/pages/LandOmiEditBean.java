@@ -6,6 +6,7 @@ import it.nexera.ris.common.helpers.ResourcesHelper;
 import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.common.xml.wrappers.CitySelectItem;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
+import it.nexera.ris.persistence.beans.entities.domain.LandCulture;
 import it.nexera.ris.persistence.beans.entities.domain.LandOmi;
 import it.nexera.ris.persistence.beans.entities.domain.LandOmiValue;
 import it.nexera.ris.persistence.beans.entities.domain.Property;
@@ -23,10 +24,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @ManagedBean(name = "landOmiEditBean")
@@ -53,9 +51,9 @@ public class LandOmiEditBean extends EntityEditPageBean<LandOmi>
 
     private List<CitySelectItem> cities;
 
-    private List<String> qualities;
+    private List<SelectItem> landCultures;
 
-    private String selectedQuality;
+    private Long selectedLandCultureId;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -69,12 +67,7 @@ public class LandOmiEditBean extends EntityEditPageBean<LandOmi>
         if(ValidationHelper.isNullOrEmpty(getLandOmiValueList())){
             setLandOmiValueList(new ArrayList<>());
         }
-        setQualities(new ArrayList<>());
-        getQualities().add(ResourcesHelper.getString("notSelected"));
-        getQualities().addAll(DaoManager.loadDistinctfield(Property.class, "quality", String.class,
-                null,  new Criterion[] {
-                        Restrictions.isNotNull("quality")
-                }));
+        setLandCultures(ComboboxHelper.fillList(LandCulture.class, Order.asc("name"), true));
     }
 
     @Override
@@ -155,15 +148,14 @@ public class LandOmiEditBean extends EntityEditPageBean<LandOmi>
         getLandOmiValueList().remove(getDeletedLandOmiValue());
     }
 
-    public void addLandOmiValue() {
-        if (!getNewLandOmiValue().isEmpty() && !ValidationHelper.isNullOrEmpty(getSelectedQuality())
-        && !getSelectedQuality().equalsIgnoreCase(ResourcesHelper.getString("notSelected"))) {
-            System.out.println(ResourcesHelper.getString("notSelected") + ">>>>>>>>>>>>>>>>>> " + getSelectedQuality());
-            getNewLandOmiValue().setQuality(getSelectedQuality());
+    public void addLandOmiValue() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+        if (!getNewLandOmiValue().isEmpty() && !ValidationHelper.isNullOrEmpty(getSelectedLandCultureId())
+        && getSelectedLandCultureId() > 0) {
+            getNewLandOmiValue().setLandCulture(DaoManager.get(LandCulture.class, getSelectedLandCultureId()));
             getLandOmiValueList().add(getNewLandOmiValue());
             setNewLandOmiValue(new LandOmiValue());
         }
-        setSelectedQuality(null);
+        setSelectedLandCultureId(null);
     }
 
     private void removeDeletedLandOmiValueFromDB() throws PersistenceBeanException {

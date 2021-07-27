@@ -22,14 +22,15 @@ public class LandOmiValue extends IndexedEntity {
     @JoinColumn(name = "land_omi_id")
     private LandOmi landOmi;
 
-    @Column(name = "quality")
-    private String quality;
+    @ManyToOne
+    @JoinColumn(name = "land_culture_id")
+    private LandCulture landCulture;
 
     @Column(name = "value")
     private Double value;
 
     public boolean isEmpty() {
-        if (!ValidationHelper.isNullOrEmpty(quality)) return false;
+        if (!ValidationHelper.isNullOrEmpty(landCulture)) return false;
         if (!ValidationHelper.isNullOrEmpty(value)) return false;
         return true;
     }
