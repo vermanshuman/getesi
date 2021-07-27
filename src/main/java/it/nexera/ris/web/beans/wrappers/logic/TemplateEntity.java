@@ -12,6 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import it.nexera.ris.common.helpers.*;
+import it.nexera.ris.common.helpers.tableGenerator.*;
 import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.web.beans.pages.RequestTextEditBean;
 import org.apache.commons.lang3.StringUtils;
@@ -33,13 +34,6 @@ import it.nexera.ris.common.enums.SectionCType;
 import it.nexera.ris.common.exceptions.CannotProcessException;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.exceptions.TypeFormalityNotConfigureException;
-import it.nexera.ris.common.helpers.tableGenerator.AlienatedTableGenerator;
-import it.nexera.ris.common.helpers.tableGenerator.CertificazioneTableGenerator;
-import it.nexera.ris.common.helpers.tableGenerator.DeceasedTableGenerator;
-import it.nexera.ris.common.helpers.tableGenerator.NegativeTableGenerator;
-import it.nexera.ris.common.helpers.tableGenerator.NoAssetsTableGenerator;
-import it.nexera.ris.common.helpers.tableGenerator.RealEstateRelationshipTableGenerator;
-import it.nexera.ris.common.helpers.tableGenerator.TagTableGenerator;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
@@ -1566,7 +1560,18 @@ public class TemplateEntity {
                 }
                 return attachmentBuffer.toString();
             case ALLEGATO_A:
-//                if (getRequest().getClient().)
+                StringBuilder allegatoStr = new StringBuilder();
+                allegatoStr.append("<div style=\"text-align: center;\"><span style=\"font-size:16px;\"><strong><span style=\"font-family:courier new,courier,monospace;\">Allegato A<br />\n" +
+                        "Valori OMI terreni</span></strong></span></div>");
+                allegatoStr.append("<br/>");
+                AllegatoATableGenerator table = new AllegatoATableGenerator(getRequest());
+                allegatoStr.append(table.compileTable());
+                return allegatoStr.toString();
+//                if (getRequest().getClient().getLandOmi() != null && getRequest().getClient().getLandOmi()) {
+//                    return "<h4>Allegato A</h4></br><h4>Allegato A</h4>";
+//                } else {
+//                    return "";
+//                }
         }
         throw new CannotProcessException("Cannot process such method");
 
