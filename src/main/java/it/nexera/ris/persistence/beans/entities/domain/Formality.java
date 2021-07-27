@@ -1170,8 +1170,8 @@ public class Formality extends IndexedEntity {
         return formality;
     }
 
-    public Date getComparedDate() {
-
+    public TypeFormality checkRenewalTypeFormality() {
+        TypeFormality typeFormality = null;
         TypeActEnum typeActEnum = getTypeEnum();
         Integer code = ValidationHelper.isNullOrEmpty(sectionA.getDerivedFromCode()) ?
                 0 : Integer.parseInt(sectionA.getDerivedFromCode());
@@ -1180,22 +1180,51 @@ public class Formality extends IndexedEntity {
             }
             code = code % 1000;
         }
-
-        TypeFormality typeFormality = null;
         try {
             List<TypeFormality> typeFormalities = DaoManager.load(TypeFormality.class, new Criterion[]{
                     Restrictions.eq("type", typeActEnum),
-                    Restrictions.eq("code", code.toString())
+                    Restrictions.eq("code", code.toString()),
+                    Restrictions.isNotNull("renewal"),
+                    Restrictions.eq("renewal", Boolean.TRUE)
             });
-            if (!ValidationHelper.isNullOrEmpty(typeFormalities)) {
+            if(!ValidationHelper.isNullOrEmpty(typeFormalities)){
                 typeFormality = typeFormalities.get(0);
             }
         } catch (Exception e) {
             LogHelper.log(log,e);
         }
-        if(!ValidationHelper.isNullOrEmpty(typeFormality)
-                && !ValidationHelper.isNullOrEmpty(typeFormality.getRenewal())
-        && typeFormality.getRenewal()){
+
+        return typeFormality;
+    }
+
+    public TypeFormality checkSalesDicTypeFormality() {
+        TypeFormality typeFormality = null;
+        TypeActEnum typeActEnum = getTypeEnum();
+        Integer code = ValidationHelper.isNullOrEmpty(sectionA.getDerivedFromCode()) ?
+                0 : Integer.parseInt(sectionA.getDerivedFromCode());
+        if (code / 1000 != 0) {
+            if (code / 1000 == 9 || code / 1000 == 8) {
+            }
+            code = code % 1000;
+        }
+        try {
+            List<TypeFormality> typeFormalities = DaoManager.load(TypeFormality.class, new Criterion[]{
+                    Restrictions.eq("type", typeActEnum),
+                    Restrictions.eq("code", code.toString()),
+                    Restrictions.isNotNull("salesDevelopmentOMI"),
+                    Restrictions.eq("salesDevelopmentOMI", Boolean.TRUE)
+            });
+            if(!ValidationHelper.isNullOrEmpty(typeFormalities)){
+                typeFormality = typeFormalities.get(0);
+            }
+        } catch (Exception e) {
+            LogHelper.log(log,e);
+        }
+
+        return typeFormality;
+    }
+    public Date getComparedDate() {
+        if(!ValidationHelper.isNullOrEmpty(checkRenewalTypeFormality())){
             if(!ValidationHelper.isNullOrEmpty(getSectionA())  &&
                     !ValidationHelper.isNullOrEmpty(getSectionA().getOtherData()))
                 return  getSectionA().getOtherData();

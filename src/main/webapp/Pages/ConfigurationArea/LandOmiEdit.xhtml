@@ -37,8 +37,8 @@
         <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" id="landOmiValueForm"
                      columnClasses="ui-grid-col-3, ui-grid-col-3, ui-grid-col-3, ui-grid-col-3" layout="grid">
 
-            <p:selectOneMenu value="#{bean.selectedQuality}" style="width:91%;" id="quality">
-                <f:selectItems value="#{bean.qualities}"/>
+            <p:selectOneMenu value="#{bean.selectedLandCultureId}" style="width:91%;" id="quality">
+                <f:selectItems value="#{bean.landCultures}"/>
             </p:selectOneMenu>
 
             <p:inputNumber id="landvalue" value="#{bean.newLandOmiValue.value}" decimalPlaces="2" placeholder="#{msg.omiLandValue}" styleClass="input-width"/>
@@ -53,8 +53,8 @@
                         <f:setPropertyActionListener value="#{item}" target="#{bean.deletedLandOmiValue}"/>
                     </p:commandButton>
                 </p:column>
-                <p:column headerText="#{msg.omiLandValueQuality}">
-                    <h:outputText value="#{item.quality}"/>
+                <p:column headerText="#{msg.omiLandValueQuality}" sortBy="#{item.landCulture.name}">
+                    <h:outputText value="#{item.landCulture.name}"/>
                 </p:column>
                 <p:column headerText="#{msg.omiLandValue}">
                     <h:outputText value="#{item.value}"/>

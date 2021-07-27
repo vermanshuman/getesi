@@ -60,7 +60,9 @@ public enum DocumentGenerationTags {
     TRASCRIZIONE_DATII_MMOBILI("trascrizione_dati_immobili"),
     TASCRIZIONE_DATI_SOGGETTI("tascrizione_dati_soggetti"),
     TASCRIZIONE_DTD("tascrizione_dtd"),
-    INIT_TEXT_REGISTRY_OR_TABLE("init_text_registry_or_table");
+    INIT_TEXT_REGISTRY_OR_TABLE("init_text_registry_or_table"),
+    ATTACHMENT_INDICATION("Indicazione allegati"),
+    ATTACHMENT_B("Allegato B");
 
 
     private String tag;

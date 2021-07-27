@@ -114,8 +114,7 @@ public class RealEstateRelationshipTableGenerator extends TagTableGenerator {
         String formalityStr = "";
         if (!ValidationHelper.isNullOrEmpty(situation.getFormalityList())) {
             List<Formality> toSort = new ArrayList<>(situation.getFormalityList());
-            toSort.sort(Comparator.comparing(Formality::getPresentationDateOrNewDateIfNull)
-                    .thenComparing(Formality::getPresentationDate)
+            toSort.sort(Comparator.comparing(Formality::getComparedDate)
                     .thenComparing(Formality::getGeneralRegister)
                     .thenComparing(Formality::getParticularRegister));
             StringJoiner joiner = new StringJoiner("<br/>");

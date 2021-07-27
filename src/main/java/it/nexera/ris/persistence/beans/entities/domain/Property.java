@@ -20,6 +20,7 @@ import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
 import it.nexera.ris.persistence.interfaces.BeforeSave;
 import it.nexera.ris.web.converters.PropertyAreaConverter;
 import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -651,6 +652,8 @@ public class Property extends IndexedEntity implements BeforeSave {
                 .append(getCurrentString(estateAnnuity, manageMoneyView(getRevenue()), true));
 
         if (addCommercialAndOmi) {
+            if(!StringUtils.endsWith(sb, "<br/>"))
+        	    sb.append("<br/>");
             sb.append(NumberUtils.isParsable(estimateOMIRequestText.replaceAll(",", ".")) ?
                     getCurrentString(estateValueOMI, manageMoneyView(estimateOMIRequestText), true) :
                     getCurrentString(estateValueOMI.replaceAll("&euro;", ""), estimateOMIRequestText, true));

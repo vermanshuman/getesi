@@ -124,7 +124,9 @@
                             <h:outputText value="#{estate.address}"/>
                         </f:facet>
                         <f:facet name="input">
-                            <p:inputText value="#{estate.address}"/>
+                            <p:inputText value="#{estate.address}">
+                                <p:ajax listener="#{estate.handleRowEditEvent()}" global="false" update="@this" />
+                            </p:inputText>
                         </f:facet>
                     </p:cellEditor>
                 </p:column>
@@ -177,7 +179,9 @@
                                         <p:outputPanel id="inputPanelOmi">
                                             <p:inputText value="#{omi.value}"
                                                          onkeypress="return numbers_only_if_should(#{omi.inappropriate},this, event, 9, 2);"
-                                                         onkeyup="check_numbers_if_should(#{omi.inappropriate},this, 9, 2);"/>
+                                                         onkeyup="check_numbers_if_should(#{omi.inappropriate},this, 9, 2);">
+                                                <p:ajax listener="#{estate.handleRowEditEvent()}" global="false" update="@this" />
+                                            </p:inputText>
                                             <h:outputText value="#{msg.estateLocationOMINotInappropriate} "
                                                           style="color: white;"/>
                                             <p:selectBooleanCheckbox value="#{omi.inappropriate}">
@@ -223,7 +227,9 @@
                                 <h:outputText value="#{msg.estateLocationCommercial}"/>
                                 <p:inputText value="#{estate.lastCommercial}"
                                              onkeypress="return numbers_only(this, event, 9, 2)"
-                                             onkeyup="check_numbers(this, 9, 2);"/>
+                                             onkeyup="check_numbers(this, 9, 2);">
+                                    <p:ajax listener="#{estate.handleRowEditEvent()}" global="false" update="@this" />
+                                </p:inputText>
                             </p:outputPanel>
                         </f:facet>
                     </p:cellEditor>
@@ -412,7 +418,9 @@
                                 <h:outputText value="#{salesestate.address}"/>
                             </f:facet>
                             <f:facet name="input">
-                                <p:inputText value="#{salesestate.address}"/>
+                                <p:inputText value="#{salesestate.address}">
+                                    <p:ajax listener="#{salesestate.handleRowEditEvent()}" global="false" update="@this" />
+                                </p:inputText>
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
@@ -477,7 +485,9 @@
                                             <p:outputPanel id="inputSalesPanelOmiNotSelected">
                                                 <p:inputText value="#{salesomi.value}"
                                                              onkeypress="return numbers_only_if_should(#{salesomi.inappropriate},this, event, 9, 2);"
-                                                             onkeyup="check_numbers_if_should(#{salesomi.inappropriate},this, 9, 2);"/>
+                                                             onkeyup="check_numbers_if_should(#{salesomi.inappropriate},this, 9, 2);">
+                                                    <p:ajax listener="#{salesestate.handleRowEditEvent()}" global="false" update="@this" />
+                                                </p:inputText>
                                                 <h:outputText value="#{msg.estateLocationOMINotInappropriate} "
                                                               style="color: white;"/>
                                                 <p:selectBooleanCheckbox value="#{salesomi.inappropriate}">
@@ -525,7 +535,9 @@
                                 <h:outputText value="#{msg.estateLocationCommercial}"/>
                                 <p:inputText value="#{salesestate.lastCommercial}"
                                              onkeypress="return numbers_only(this, event, 10, 10)"
-                                             onkeyup="check_numbers(this, 10, 10);"/>
+                                             onkeyup="check_numbers(this, 10, 10);">
+                                    <p:ajax listener="#{salesestate.handleRowEditEvent()}" global="false" update="@this" />
+                                </p:inputText>
                             </f:facet>
                         </p:cellEditor>
                         <p:panelGrid columns="1" styleClass="border-omi-value background-lightblue-td">
@@ -680,7 +692,9 @@
                                             <p:outputPanel id="inputPanelOmiNotSelected">
                                                 <p:inputText value="#{omi.value}"
                                                              onkeypress="return numbers_only_if_should(#{omi.inappropriate},this, event, 9, 2);"
-                                                             onkeyup="check_numbers_if_should(#{omi.inappropriate},this, 9, 2);"/>
+                                                             onkeyup="check_numbers_if_should(#{omi.inappropriate},this, 9, 2);">
+                                                    <p:ajax listener="#{estate.handleRowEditEvent()}" global="false" update="@this" />
+                                                </p:inputText>
                                                 <h:outputText value="#{msg.estateLocationOMINotInappropriate} "
                                                               style="color: white;"/>
                                                 <p:selectBooleanCheckbox value="#{omi.inappropriate}">
@@ -728,7 +742,9 @@
                                 <h:outputText value="#{msg.estateLocationCommercial}"/>
                                 <p:inputText value="#{estate.lastCommercial}"
                                              onkeypress="return numbers_only(this, event, 10, 10)"
-                                             onkeyup="check_numbers(this, 10, 10);"/>
+                                             onkeyup="check_numbers(this, 10, 10);">
+                                    <p:ajax listener="#{estate.handleRowEditEvent()}" global="false" update="@this" />
+                                </p:inputText>
                             </f:facet>
                         </p:cellEditor>
                         <p:panelGrid columns="1" styleClass="border-omi-value background-lightblue-td">

@@ -68,16 +68,6 @@
         <can_view>true</can_view>
         <can_edit>true</can_edit>
         <can_delete>true</can_delete>
-        <module_code>OLVL</module_code>
-        <role_id>1</role_id>
-    </data_entry>
-    <data_entry>
-        <can_create>true</can_create>
-        <can_list>true</can_list>
-        <can_list_created_by_user>true</can_list_created_by_user>
-        <can_view>true</can_view>
-        <can_edit>true</can_edit>
-        <can_delete>true</can_delete>
         <module_code>PGT</module_code>
         <role_id>1</role_id>
     </data_entry>
@@ -1022,6 +1012,16 @@
         <role_id>1</role_id>
     </data_entry>
     <data_entry>
+        <can_create>true</can_create>
+        <can_list>true</can_list>
+        <can_list_created_by_user>true</can_list_created_by_user>
+        <can_view>true</can_view>
+        <can_edit>true</can_edit>
+        <can_delete>true</can_delete>
+        <module_code>LCl</module_code>
+        <role_id>1</role_id>
+    </data_entry>
+    <data_entry>
         <can_create>false</can_create>
         <can_list>false</can_list>
         <can_list_created_by_user>false</can_list_created_by_user>
@@ -1031,5 +1031,14 @@
         <module_code>OLVL</module_code>
         <role_id>2</role_id>
     </data_entry>
-
+    <data_entry>
+        <can_create>false</can_create>
+        <can_list>false</can_list>
+        <can_list_created_by_user>false</can_list_created_by_user>
+        <can_view>false</can_view>
+        <can_edit>false</can_edit>
+        <can_delete>false</can_delete>
+        <module_code>LCl</module_code>
+        <role_id>2</role_id>
+    </data_entry>
 </permission>

@@ -142,7 +142,10 @@ public enum PageTypes {
     DUE_REQUESTS_VIEW("/Pages/Dictionaries/DueRequestsView.jsf", true),
 
     LAND_OMI_LIST("/Pages/ConfigurationArea/LandOmiList.jsf", true),
-    LAND_OMI_EDIT("/Pages/ConfigurationArea/LandOmiEdit.jsf", true);
+    LAND_OMI_EDIT("/Pages/ConfigurationArea/LandOmiEdit.jsf", true),
+
+    LAND_CULTURE_LIST("/Pages/ConfigurationArea/LandCultureList.jsf", true),
+    LAND_CULTURE_EDIT("/Pages/ConfigurationArea/LandCultureEdit.jsf", true);
 
     private String page;
 

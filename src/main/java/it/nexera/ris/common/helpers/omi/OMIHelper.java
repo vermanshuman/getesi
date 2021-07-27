@@ -151,15 +151,13 @@ public final class OMIHelper {
                         CategoryItemGroupOmi categoryItemGroupOmi = categoryItemGroupOmis.get(0);
                         ItemGroupOmi itemGroupOmi = categoryItemGroupOmi.getItemGroupOmi();
                         int position = categoryItemGroupOmi.getItemGroupOmi().getPosition();
-                        int previousPosition = -1;
-                        int nextPosition = -1;
                         boolean isPrevious = true;
                         boolean isNext = true;
                         int currentPosition = 1;
                         int matchedPosition = -1;
-                        while(true) {
-                            previousPosition = position - currentPosition;
-                            nextPosition = position + currentPosition;
+                        int previousPosition = position - currentPosition;
+                        int nextPosition = position + currentPosition;
+                        while(previousPosition >= -1) {
                             List<CategoryItemGroupOmi> previousCategoryItemGroupOmis = DaoManager.load(
                                     CategoryItemGroupOmi.class, 
                                     new CriteriaAlias[]{
@@ -208,6 +206,8 @@ public final class OMIHelper {
                                 break;
 
                             currentPosition++;
+                            previousPosition = position - currentPosition;
+                            nextPosition = position + currentPosition;
                         }
 
                         LogHelper.debugInfo(log, "Matched position " + matchedPosition + ". For poisition : " + position);

@@ -6,25 +6,21 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import it.nexera.ris.common.helpers.*;
+import it.nexera.ris.persistence.beans.entities.domain.*;
+import it.nexera.ris.web.beans.pages.RequestTextEditBean;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
+import org.springframework.validation.annotation.Validated;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -37,12 +33,6 @@ import it.nexera.ris.common.enums.SectionCType;
 import it.nexera.ris.common.exceptions.CannotProcessException;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.exceptions.TypeFormalityNotConfigureException;
-import it.nexera.ris.common.helpers.DateTimeHelper;
-import it.nexera.ris.common.helpers.ImportXMLHelper;
-import it.nexera.ris.common.helpers.ListHelper;
-import it.nexera.ris.common.helpers.LogHelper;
-import it.nexera.ris.common.helpers.TemplatePdfTableHelper;
-import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.common.helpers.tableGenerator.AlienatedTableGenerator;
 import it.nexera.ris.common.helpers.tableGenerator.CertificazioneTableGenerator;
 import it.nexera.ris.common.helpers.tableGenerator.DeceasedTableGenerator;
@@ -52,17 +42,6 @@ import it.nexera.ris.common.helpers.tableGenerator.RealEstateRelationshipTableGe
 import it.nexera.ris.common.helpers.tableGenerator.TagTableGenerator;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
-import it.nexera.ris.persistence.beans.entities.domain.CadastralData;
-import it.nexera.ris.persistence.beans.entities.domain.EstateFormality;
-import it.nexera.ris.persistence.beans.entities.domain.Property;
-import it.nexera.ris.persistence.beans.entities.domain.Relationship;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
-import it.nexera.ris.persistence.beans.entities.domain.RequestFormality;
-import it.nexera.ris.persistence.beans.entities.domain.SectionB;
-import it.nexera.ris.persistence.beans.entities.domain.SectionC;
-import it.nexera.ris.persistence.beans.entities.domain.SectionD;
-import it.nexera.ris.persistence.beans.entities.domain.Subject;
-import it.nexera.ris.persistence.beans.entities.domain.User;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.LandChargesRegistry;
@@ -1505,6 +1484,87 @@ public class TemplateEntity {
                }
                else
                    return "";
+
+            case ATTACHMENT_INDICATION:
+                Boolean showTag = Boolean.FALSE;
+                StringBuffer attachmentBuffer = new StringBuffer();
+
+                if(!ValidationHelper.isNullOrEmpty(request.getClient()) &&
+                        !ValidationHelper.isNullOrEmpty(request.getClient().getLandOmi()) &&
+                request.getClient().getLandOmi()){
+                    List<EstateSituation> estateSituations = getRequest().getSituationEstateLocations();
+                    if(!ValidationHelper.isNullOrEmpty(estateSituations)){
+                        List<Property> propertyList = estateSituations
+                                .stream()
+                                .map(EstateSituation::getPropertyList).flatMap(List::stream)
+                                .collect(Collectors.toList());
+
+                        EstateSituation salesEstateSituation = getRequest().getSituationEstateLocations().stream()
+                                .filter(es -> !ValidationHelper.isNullOrEmpty(es.getSalesDevelopment()) &&
+                                        es.getSalesDevelopment())
+                                .findFirst()
+                                .orElse(null);
+
+                        Property landProperty = propertyList
+                                .stream()
+                                .filter(p -> !ValidationHelper.isNullOrEmpty(p.getType()) &&
+                                        RealEstateType.LAND.getId().equals(p.getType()))
+                                .findFirst()
+                                .orElse(null);
+
+                        if(!ValidationHelper.isNullOrEmpty(salesEstateSituation) ||
+                                !ValidationHelper.isNullOrEmpty(landProperty)){
+                            showTag = Boolean.TRUE;
+                        }
+
+                        if(showTag){
+                            attachmentBuffer.append("Sono presenti:<br/>");
+                            attachmentBuffer.append("<ul>");
+                            if(!ValidationHelper.isNullOrEmpty(salesEstateSituation)){
+                                attachmentBuffer.append("<li>");
+                                attachmentBuffer.append("Valori OMI terreni, vedere Allegato A");
+                                attachmentBuffer.append("</li>");
+                            }
+
+                            if(!ValidationHelper.isNullOrEmpty(landProperty)){
+                                attachmentBuffer.append("<li>");
+                                attachmentBuffer.append("Sviluppo atti di alienazione degli ultimi 5 anni, vedere Allegato B");
+                                attachmentBuffer.append("</li>");
+                            }
+                            attachmentBuffer.append("</ul>");
+                        }
+                    }
+                }
+                return attachmentBuffer.toString();
+
+            case ATTACHMENT_B:
+                attachmentBuffer = new StringBuffer();
+
+                List<EstateSituation> estateSituations = DaoManager.load(EstateSituation.class, new Criterion[]{
+                        Restrictions.eq("request.id", getRequest().getId()),
+                        Restrictions.eq("salesDevelopment", Boolean.TRUE)
+                });
+                if(!ValidationHelper.isNullOrEmpty(estateSituations)){
+                    estateSituations.sort(new RequestTextEditBean.SortByInnerEstateFormalityDate());
+                    List<Formality> formalities = estateSituations.get(0).getFormalityList();
+                    if (ValidationHelper.isNullOrEmpty(formalities)) {
+                        return "";
+                    }
+                    formalities.sort(Comparator.comparing(Formality::getComparedDate)
+                            .thenComparing(Formality::getGeneralRegister)
+                            .thenComparing(Formality::getParticularRegister));
+                    attachmentBuffer.append("<style type=\"text/css\">\n" +
+                            "        table {page-break-after: always;}\n" +
+                            "    </style>");
+                    attachmentBuffer.append("... content in page 1 ...\n" +
+                            "<p style=\"page-break-after: always;\">&nbsp;</p>\n" +
+                            "<p style=\"page-break-before: always;\">&nbsp;</p>\n" +
+                            "... content in page 2 ...");
+                    attachmentBuffer.append("<div style=\"font-weight: bold;\">");
+                    attachmentBuffer.append(ResourcesHelper.getString("formalityListSDHeader"));
+                    attachmentBuffer.append("</div>");
+                }
+                return attachmentBuffer.toString();
         }
         throw new CannotProcessException("Cannot process such method");
 

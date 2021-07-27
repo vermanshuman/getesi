@@ -349,7 +349,7 @@ public abstract class TagTableGenerator {
                 .thenComparing(Formality::getParticularRegister));
         setTagTableList(new ArrayList<>());
         int counter = 1;
-        fillPartedPairsByCityWrapper(formalities, Boolean.TRUE);
+        fillPartedPairsByCityWrapper(formalities, Boolean.FALSE);
 
         for (PartedPairsByCityWrapper partedPairsByCityWrapper : getPartedPairsByCityWrapperList()) {
             for (List<Pair<String, String>> pairList : partedPairsByCityWrapper.getPatredList()) {

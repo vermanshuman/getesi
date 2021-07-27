@@ -321,6 +321,9 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
         save();
     }
 
+    public void handleRowEditEvent() {
+    }
+
     @Getter
     @Setter
     @AllArgsConstructor
