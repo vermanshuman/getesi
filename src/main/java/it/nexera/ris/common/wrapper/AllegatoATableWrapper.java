@@ -13,4 +13,5 @@ public class AllegatoATableWrapper {
     private Double totalMq;
     private Double totalOmi;
     List<AllegatoAWrapper> tableData;
+    List<AllegatoAWrapper> nonDisponTableData;
 }

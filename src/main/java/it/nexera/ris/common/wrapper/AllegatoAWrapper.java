@@ -9,5 +9,5 @@ public class AllegatoAWrapper {
     private String coltura;
     private String datiTerreno;
     private Double estensione;
-    private String valore;
+    private Double valore;
 }

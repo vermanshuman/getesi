@@ -274,13 +274,11 @@ public abstract class TagTableGenerator {
     }
 
     protected void addHeader() {
-        StringBuilder data = new StringBuilder();
-        data.append("<p>Comune: MARZANO APPIO"+ "</p>");
-        data.append("<p>Provincia: Provincia"+ "</p>");
-        data.append("<p style='text-center:left'>Aggiornamento dati valori OMI: 2018"+ "</p>");
-        String sb = getCell("", HEADER_STYLE + TEXT_CENTER + STANDARD_TABLE_COLUMN_1_WIDTH) +
-                getCellColspan(data.toString(),3, BORDER);
-        getJoiner().add("<thead>"+sb+"</thead>");
+        String sb = getCell("N.", HEADER_STYLE + TEXT_CENTER + STANDARD_TABLE_COLUMN_1_WIDTH) +
+                getCell("PROVEN.", HEADER_STYLE + TEXT_CENTER + STANDARD_TABLE_COLUMN_2_WIDTH) +
+                getCell("COMUNE", HEADER_STYLE + TEXT_CENTER + STANDARD_TABLE_COLUMN_3_WIDTH) +
+                getCell("OGGETTO", HEADER_STYLE + TEXT_CENTER + STANDARD_TABLE_COLUMN_4_WIDTH);
+        getJoiner().add(sb);
     }
 
     protected void addFooter() {

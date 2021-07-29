@@ -1560,18 +1560,16 @@ public class TemplateEntity {
                 }
                 return attachmentBuffer.toString();
             case ALLEGATO_A:
-                StringBuilder allegatoStr = new StringBuilder();
-                allegatoStr.append("<div style=\"text-align: center;\"><span style=\"font-size:16px;\"><strong><span style=\"font-family:courier new,courier,monospace;\">Allegato A<br />\n" +
-                        "Valori OMI terreni</span></strong></span></div>");
-                allegatoStr.append("<br/>");
-                AllegatoATableGenerator table = new AllegatoATableGenerator(getRequest());
-                allegatoStr.append(table.compileTable());
-                return allegatoStr.toString();
-//                if (getRequest().getClient().getLandOmi() != null && getRequest().getClient().getLandOmi()) {
-//                    return "<h4>Allegato A</h4></br><h4>Allegato A</h4>";
-//                } else {
-//                    return "";
-//                }
+                if (getRequest().getClient().getLandOmi() != null && getRequest().getClient().getLandOmi()) {
+                    StringBuilder allegatoStr = new StringBuilder();
+                    allegatoStr.append("<div style=\"text-align: center;\"><span style=\"font-size:16px;\"><strong><span style=\"font-family:courier new,courier,monospace;\">Allegato A<br />\n" +
+                            "Valori OMI terreni</span></strong></span></div>");
+                    AllegatoATableGenerator table = new AllegatoATableGenerator(getRequest());
+                    allegatoStr.append(table.compileTable());
+                    return allegatoStr.toString();
+                } else {
+                    return "";
+                }
         }
         throw new CannotProcessException("Cannot process such method");
 

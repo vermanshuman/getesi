@@ -806,7 +806,7 @@ public class Property extends IndexedEntity implements BeforeSave {
         return bold ? spanBold + body + end : body;
     }
 
-    private String getDraftString() {
+    public String getDraftString() {
         if (!ValidationHelper.isNullOrEmpty(getCadastralData()) && getCadastralData().size() == 1) {
             StringBuilder str = new StringBuilder();
             String estateSezione = ResourcesHelper.getString("estateSezionePrefix");
