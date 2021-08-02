@@ -483,6 +483,11 @@ public class RealEstateHelper {
                     newRelation.setPropertyType(relationship.getPropertyType());
                     newRelation.setProperty(relationship.getProperty());
                     wrapper.setRelationship(newRelation);
+                } else {
+                    relationship.setQuote(wrapper.getQuote());
+                    relationship.setPropertyType(wrapper.getPropertyTypeStr());
+                    relationship.setProperty(property);
+                    wrapper.setRelationship(relationship);
                 }
             }
             ConnectionManager.save(wrapper.getRelationship(), session);
