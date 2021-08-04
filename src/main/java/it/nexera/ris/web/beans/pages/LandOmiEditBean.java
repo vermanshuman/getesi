@@ -47,6 +47,10 @@ public class LandOmiEditBean extends EntityEditPageBean<LandOmi>
 
     private LandOmiValue deletedLandOmiValue;
 
+    private LandOmiValue editedLandOmiValue;
+
+    private boolean isEdit = false;
+
     private List<CitySelectItem> selectedCity;
 
     private List<CitySelectItem> cities;
@@ -148,13 +152,26 @@ public class LandOmiEditBean extends EntityEditPageBean<LandOmi>
         getLandOmiValueList().remove(getDeletedLandOmiValue());
     }
 
+    public void prepareLandOmiValue() {
+        isEdit = true;
+        setNewLandOmiValue(editedLandOmiValue);
+        setSelectedLandCultureId(editedLandOmiValue.getLandCulture().getId());
+    }
+
     public void addLandOmiValue() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         if (!getNewLandOmiValue().isEmpty() && !ValidationHelper.isNullOrEmpty(getSelectedLandCultureId())
         && getSelectedLandCultureId() > 0) {
             getNewLandOmiValue().setLandCulture(DaoManager.get(LandCulture.class, getSelectedLandCultureId()));
-            getLandOmiValueList().add(getNewLandOmiValue());
+            if(isEdit) {
+                int index = getLandOmiValueList().indexOf(editedLandOmiValue);
+                getLandOmiValueList().set(index, getNewLandOmiValue());
+                setEditedLandOmiValue(new LandOmiValue());
+            } else {
+                getLandOmiValueList().add(getNewLandOmiValue());
+            }
             setNewLandOmiValue(new LandOmiValue());
         }
+        isEdit = false;
         setSelectedLandCultureId(null);
     }
 

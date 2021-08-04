@@ -48,6 +48,11 @@
         <p:panel>
             <p:dataTable value="#{bean.landOmiValueList}" var="item" id="landOmiValue" style="margin-top: 10px">
                 <p:column styleClass="action_column">
+                    <p:commandButton icon="fa fa-fw fa-edit" action="#{bean.prepareLandOmiValue}" update="quality,landvalue">
+                        <f:setPropertyActionListener value="#{item}" target="#{bean.editedLandOmiValue}"/>
+                    </p:commandButton>
+                </p:column>
+                <p:column styleClass="action_column">
                     <p:commandButton action="#{bean.deleteLandOmiValue}" update="landOmiValue"
                                      icon="fa fa-fw fa-close">
                         <f:setPropertyActionListener value="#{item}" target="#{bean.deletedLandOmiValue}"/>
