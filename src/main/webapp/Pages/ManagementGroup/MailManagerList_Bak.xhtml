@@ -4,13 +4,8 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:p="http://primefaces.org/ui">
-<ui:composition template="/resources/tpl/Admin/LazyListTabBaseSimplev2.xhtml">
+<ui:composition template="/resources/tpl/Admin/LazyListTabBaseSimple.xhtml">
     <ui:param name="bean" value="#{mailManagerListBean}"/>
-    <ui:define name="viewname">
-        <li>
-            <p:link outcome="/Pages/ManagementGroup/MailManagerList.jsf">#{msg.headerMailManager}</p:link>
-        </li>
-    </ui:define>
     <ui:define name="list_body">
         <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/mail.css"
               media="all" rel="stylesheet" type="text/css"/>
@@ -85,27 +80,27 @@
         <p:poll interval="30" listener="#{bean.executePoll}"/>
         <div id="list_panel">
             <p:panelGrid columns="6" id="filterSearchPanel" styleClass="ui-panelgrid-blank ui-fluid" layout="grid"
-                         columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2,ui-grid-col-2,ui-grid-col-2">
+                          columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2,ui-grid-col-2,ui-grid-col-2">
                 <p:column>
-                    <p:calendar id="filterDateFrom" readonlyInput="false" showOn="button"
-                                onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
-                                pattern="dd/MM/yyyy" mask="true"
-                                locale="it" navigator="true" popupIconOnly="true"
-                                onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
-                                value="#{bean.dateFrom}" placeholder="#{msg.mailManagerDateFrom}" />
+                     <p:calendar id="filterDateFrom" readonlyInput="false" showOn="button"
+                            onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+                            pattern="dd/MM/yyyy" mask="true"
+                            locale="it" navigator="true" popupIconOnly="true"
+                            onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+                            value="#{bean.dateFrom}" placeholder="#{msg.mailManagerDateFrom}" />
                 </p:column>
-
+               
                 <p:column>
-                    <p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
-                                onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
-                                pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateTo}"
-                                onblur="check_date(this)" value="#{bean.dateTo}" />
+                  <p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
+                            onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                            pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateTo}"
+                            onblur="check_date(this)" value="#{bean.dateTo}" />
                 </p:column>
                 <p:column>
-                    <p:selectCheckboxMenu value="#{bean.selectedSearchStateIds}"
-                                          label="#{msg.mailManagerStates}"
-                                          style="margin-right: 15px!important;">
-                        <f:selectItems value="#{bean.searchStates}"/>
+                    <p:selectCheckboxMenu value="#{bean.selectedSearchStateIds}" 
+			                						label="#{msg.mailManagerStates}"
+			                						style="margin-right: 15px!important;">
+			                    <f:selectItems value="#{bean.searchStates}"/>
                     </p:selectCheckboxMenu>
                 </p:column>
                 <p:column>
@@ -115,26 +110,26 @@
                     <p:inputText id="filterEmailTo" value="#{bean.filterEmailTo}" placeholder="#{msg.mailManagerEmailTo}"/>
                 </p:column>
                 <p:column>
-                    <p:inputText id="filterEmailSubject" value="#{bean.filterEmailSubject}" placeholder="#{msg.mailManagerEmailSubject}"/>
+                     <p:inputText id="filterEmailSubject" value="#{bean.filterEmailSubject}" placeholder="#{msg.mailManagerEmailSubject}"/>
                 </p:column>
                 <p:column>
-                    <p:inputText id="filterEmailBody" value="#{bean.filterEmailBody}" placeholder="#{msg.mailManagerEmailBody}"/>
+                      <p:inputText id="filterEmailBody" value="#{bean.filterEmailBody}" placeholder="#{msg.mailManagerEmailBody}"/>
                 </p:column>
                 <p:column>
                     <p:inputText id="filterEmailFile" value="#{bean.filterEmailFile}" placeholder="#{msg.mailManagerEmailFile}"/>
                 </p:column>
                 <p:column>
                     <p:inputText value="#{bean.filterAll}"
-                                 placeholder="#{msg.mailManagerEmailFrom}/#{msg.mailManagerEmailTo}/#{msg.mailManagerEmailSubject}/#{msg.mailManagerEmailBody}/#{msg.mailManagerEmailFile}"/>
+                             placeholder="#{msg.mailManagerEmailFrom}/#{msg.mailManagerEmailTo}/#{msg.mailManagerEmailSubject}/#{msg.mailManagerEmailBody}/#{msg.mailManagerEmailFile}"/>
                 </p:column>
                 <p:column>
                     <p:commandButton value="#{msg.search}" id="searchButton" onclick="checkDates(); filterTableFromPanel();"
                                      update="searchPanel" styleClass="grey-btn" style="width:50%"/>
                 </p:column>
-
-
+                    
+                    
             </p:panelGrid>
-
+           
 
             <p:panel id="table_div">
                 <ui:fragment id="searchPanel">
@@ -148,7 +143,7 @@
                                          actionListener="#{bean.gotoFolders}" update="@form" styleClass="grey-btn"/>
                         <p:commandButton value="&nbsp;#{msg.mailManagerUpdate}" styleClass="grey-btn"
                                          style="float: left"
-                                         update=":form:table_panel"/>
+                                         update="menuform, header_form_panel, :form:table_panel"/>
                         <p:commandButton icon="fa fa-arrow-right" title="#{msg.mailManagerForward}"
                                          value="#{msg.mailManagerForward}" styleClass="grey-btn"
                                          action="#{bean.forwardMail}" update=":form" style="float: left;"

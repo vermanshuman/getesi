@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+<!DOCTYPE  html [
+        <!ENTITY nbsp "&#160;">
+        ]>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
@@ -58,6 +60,8 @@
         <h:outputStylesheet name="css/primeicons.css" library="babylon-layout" />
         <h:outputStylesheet name="css/primeflex.min.css" library="babylon-layout" />
         <h:outputStylesheet name="css/layout-blue.css" library="babylon-layout" />
+        <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/main.css"
+              media="all" rel="stylesheet" type="text/css"/>
     </h:body>
 
 </html>
