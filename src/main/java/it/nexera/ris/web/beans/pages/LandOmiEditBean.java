@@ -2,14 +2,13 @@ package it.nexera.ris.web.beans.pages;
 
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.ComboboxHelper;
-import it.nexera.ris.common.helpers.ResourcesHelper;
+import it.nexera.ris.common.helpers.LogHelper;
 import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.common.xml.wrappers.CitySelectItem;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.LandCulture;
 import it.nexera.ris.persistence.beans.entities.domain.LandOmi;
 import it.nexera.ris.persistence.beans.entities.domain.LandOmiValue;
-import it.nexera.ris.persistence.beans.entities.domain.Property;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
 import it.nexera.ris.web.beans.EntityEditPageBean;
@@ -47,10 +46,6 @@ public class LandOmiEditBean extends EntityEditPageBean<LandOmi>
 
     private LandOmiValue deletedLandOmiValue;
 
-    private LandOmiValue editedLandOmiValue;
-
-    private boolean isEdit = false;
-
     private List<CitySelectItem> selectedCity;
 
     private List<CitySelectItem> cities;
@@ -59,11 +54,14 @@ public class LandOmiEditBean extends EntityEditPageBean<LandOmi>
 
     private Long selectedLandCultureId;
 
+    private Integer editedTempId;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
             IllegalAccessException {
 
+        setEditedTempId(null);
         setProvinces(ComboboxHelper.fillList(Province.class, Order.asc("description")));
         getProvinces().add(new SelectItem(Province.FOREIGN_COUNTRY_ID, Province.FOREIGN_COUNTRY));
         fillFields();
@@ -152,27 +150,18 @@ public class LandOmiEditBean extends EntityEditPageBean<LandOmi>
         getLandOmiValueList().remove(getDeletedLandOmiValue());
     }
 
-    public void prepareLandOmiValue() {
-        isEdit = true;
-        setNewLandOmiValue(editedLandOmiValue);
-        setSelectedLandCultureId(editedLandOmiValue.getLandCulture().getId());
-    }
-
     public void addLandOmiValue() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         if (!getNewLandOmiValue().isEmpty() && !ValidationHelper.isNullOrEmpty(getSelectedLandCultureId())
-        && getSelectedLandCultureId() > 0) {
+                && getSelectedLandCultureId() > 0) {
             getNewLandOmiValue().setLandCulture(DaoManager.get(LandCulture.class, getSelectedLandCultureId()));
-            if(isEdit) {
-                int index = getLandOmiValueList().indexOf(editedLandOmiValue);
-                getLandOmiValueList().set(index, getNewLandOmiValue());
-                setEditedLandOmiValue(new LandOmiValue());
-            } else {
+            if(ValidationHelper.isNullOrEmpty(getEditedTempId()))
                 getLandOmiValueList().add(getNewLandOmiValue());
-            }
+            else
+                getLandOmiValueList().set(getEditedTempId(), getNewLandOmiValue());
             setNewLandOmiValue(new LandOmiValue());
         }
-        isEdit = false;
         setSelectedLandCultureId(null);
+        setEditedTempId(null);
     }
 
     private void removeDeletedLandOmiValueFromDB() throws PersistenceBeanException {
@@ -188,6 +177,26 @@ public class LandOmiEditBean extends EntityEditPageBean<LandOmi>
                 landOmiValue.setLandOmi(null);
                 DaoManager.remove(landOmiValue);
             }
+        }
+    }
+
+    public void editLandOmiValue() {
+        try {
+            if(!ValidationHelper.isNullOrEmpty(getEditedTempId())){
+                LandOmiValue landOmiValue = getLandOmiValueList().get(getEditedTempId());
+                if(landOmiValue != null){
+                    setNewLandOmiValue(landOmiValue);
+                    if(landOmiValue.getLandCulture() !=null &&
+                           landOmiValue.getLandCulture().getId() != null)
+                        setSelectedLandCultureId(landOmiValue.getLandCulture().getId());
+                    else
+                        setSelectedLandCultureId(null);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogHelper.log(log, e);
+            e.printStackTrace();
         }
     }
 }

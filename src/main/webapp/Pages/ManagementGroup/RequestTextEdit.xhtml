@@ -349,7 +349,7 @@
                                      onclick="PF('printSpecialPdfButton').disable();"
                                      oncomplete="PF('categoryNotPresentWV').hide(); PF('printSpecialPdfButton').enable();
                                      PF('requestDocumentDlg').show();"
-                                     update="requestDocumentTable"/>
+                                     update="requestDocumentTable requestDocumentNonSaleTable requestDocumentSaleTable"/>
                     <p:commandButton value="#{msg.cancel}" styleClass="red-button"
                                      oncomplete="PF('categoryNotPresentWV').hide();"/>
                 </div>
@@ -476,7 +476,7 @@
                     <p:commandButton value="#{msg.confirm}"
                                      action="#{bean.openMailManagerEditor(false)}" styleClass="green-button"
                                      oncomplete="PF('requestsStillBeingWorkedOnDialogWV').hide();"
-                                     update="requestDocumentTable"/>
+                                     update="requestDocumentTable requestDocumentNonSaleTable requestDocumentSaleTable"/>
                     <p:commandButton value="#{msg.cancel}" styleClass="red-button"
                                      oncomplete="PF('requestsStillBeingWorkedOnDialogWV').hide();"/>
                 </div>
@@ -517,10 +517,14 @@
                 <p:commandButton value="#{msg.confirm}"
                                  action="#{bean.viewExtraCost}" styleClass="green-button, right-side"
                                  oncomplete="PF('requestNumberActGreaterThenClientNumberAct').hide();"
-                                 update="requestDocumentTable" />
+                                 update="requestDocumentTable requestDocumentNonSaleTable requestDocumentSaleTable" />
             </p:dialog>
 
-            <p:dialog widgetVar="subjectSelectDlg" modal="true" draggable="false" position="center center" width="1500">
+            <p:dialog 	widgetVar="subjectSelectDlg"
+                         modal="true" draggable="false"
+                         position="center center" width="1500"
+                         onShow="updateSubjectSelectDialog()">
+                <p:remoteCommand name="updateSubjectSelectDialog" update="restoreSubjectTable"/>
                 <p:dataTable value="#{bean.subjectsToSelect}" var="subject" selection="#{bean.selectedSubjectToGenerate}"
                              rowKey="#{subject.id}" id="restoreSubjectTable">
                     <p:column selectionMode="single" style="width:16px;text-align:center"/>

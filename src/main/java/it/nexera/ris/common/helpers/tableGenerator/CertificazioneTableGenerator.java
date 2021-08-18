@@ -19,7 +19,11 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import it.nexera.ris.common.enums.*;
 import it.nexera.ris.common.exceptions.TypeFormalityNotConfigureException;
+import it.nexera.ris.persistence.beans.entities.domain.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
@@ -28,11 +32,6 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
-import it.nexera.ris.common.enums.DocumentGenerationTags;
-import it.nexera.ris.common.enums.DocumentType;
-import it.nexera.ris.common.enums.RealEstateType;
-import it.nexera.ris.common.enums.SectionCType;
-import it.nexera.ris.common.enums.SexTypes;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.DateTimeHelper;
 import it.nexera.ris.common.helpers.ResourcesHelper;
@@ -40,20 +39,6 @@ import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.Dictionary;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
-import it.nexera.ris.persistence.beans.entities.domain.CadastralData;
-import it.nexera.ris.persistence.beans.entities.domain.DatafromProperty;
-import it.nexera.ris.persistence.beans.entities.domain.Document;
-import it.nexera.ris.persistence.beans.entities.domain.DocumentSubject;
-import it.nexera.ris.persistence.beans.entities.domain.EstateSituation;
-import it.nexera.ris.persistence.beans.entities.domain.EstateSituationFormalityProperty;
-import it.nexera.ris.persistence.beans.entities.domain.Formality;
-import it.nexera.ris.persistence.beans.entities.domain.Property;
-import it.nexera.ris.persistence.beans.entities.domain.Relationship;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
-import it.nexera.ris.persistence.beans.entities.domain.SectionB;
-import it.nexera.ris.persistence.beans.entities.domain.SectionC;
-import it.nexera.ris.persistence.beans.entities.domain.SituationProperty;
-import it.nexera.ris.persistence.beans.entities.domain.Subject;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.CadastralCategory;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.TypeFormality;
 
@@ -65,6 +50,9 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
     private String bodyText;
     private String bodyContent;
     private boolean isSingularProperty;
+    @Getter
+    @Setter
+    private static Client requestClient;
 
     public CertificazioneTableGenerator(Request request) {
         super(request);
@@ -83,7 +71,9 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
     @Override
     void fillTagTableList() throws PersistenceBeanException, IllegalAccessException {
         StringBuilder sb = new StringBuilder();
-
+        if(!ValidationHelper.isNullOrEmpty(getRequest()) && !ValidationHelper.isNullOrEmpty(getRequest().getClient())){
+            setRequestClient(getRequest().getClient());
+        }
         Formality formality = getRequest().getDistraintFormality();
 
         if (!ValidationHelper.isNullOrEmpty(formality)) {
@@ -376,10 +366,23 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
             sb.append(relationship.getQuote().toLowerCase());
             sb.append(" del diritto di ");
             sb.append(relationship.getPropertyType().toLowerCase());
-            
+
             if(!ValidationHelper.isNullOrEmpty(relationship.getRegime())){
-                sb.append(" in regime di ");
-                sb.append(relationship.getRegime().toLowerCase());
+
+                boolean showRegime = false;
+                if(!ValidationHelper.isNullOrEmpty(relationship.getRelationshipTypeId()) &&
+                        relationship .getRelationshipTypeId().equals(RelationshipType.FORMALITY) &&
+                        !ValidationHelper.isNullOrEmpty(getRequestClient().getRegime()) &&
+                        getRequestClient().getRegime()){
+                    showRegime = true;
+                }else if(ValidationHelper.isNullOrEmpty(relationship.getRelationshipTypeId()) ||
+                        !relationship .getRelationshipTypeId().equals(RelationshipType.FORMALITY)){
+                    showRegime = true;
+                }
+                if(showRegime){
+                    sb.append(" in regime di ");
+                    sb.append(relationship.getRegime().toLowerCase());
+                }
             }
             sb.append("</i>");
         }
@@ -1130,8 +1133,20 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                     sb.append(", ").append("<i>").append(relationship.getPropertyType());
                     sb.append(" per ").append(relationship.getQuote());
 
-                    sb.append(frmTxt(relationship.getRegime(), " in regime di ", "",
-                            x -> x.replaceAll("in regime di ", "")));
+                    boolean showRegime = false;
+                    if(!ValidationHelper.isNullOrEmpty(relationship.getRelationshipTypeId()) &&
+                            relationship .getRelationshipTypeId().equals(RelationshipType.FORMALITY.getId()) &&
+                            !ValidationHelper.isNullOrEmpty(getRequestClient().getRegime()) &&
+                            getRequestClient().getRegime()){
+                        showRegime = true;
+                    }else if(ValidationHelper.isNullOrEmpty(relationship.getRelationshipTypeId()) ||
+                            !relationship.getRelationshipTypeId().equals(RelationshipType.FORMALITY.getId())){
+                        showRegime = true;
+                    }
+                    if(showRegime) {
+                        sb.append(frmTxt(relationship.getRegime(), " in regime di ", "",
+                                x -> x.replaceAll("in regime di ", "")));
+                    }
 
                     sb.append(";").append("</i>");
                 }
@@ -1212,11 +1227,6 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
 
     @Override
     protected void addFooter() {
-
-    }
-
-    @Override
-    void addBeforeEstateFormality() throws HibernateException, IllegalAccessException, PersistenceBeanException, TypeFormalityNotConfigureException {
 
     }
 

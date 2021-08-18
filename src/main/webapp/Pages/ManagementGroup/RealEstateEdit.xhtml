@@ -136,8 +136,8 @@
                     <p:inputText value="#{bean.entity.interno}" styleClass="input-width"/>
                 </p:column>
             </p:panelGrid>
-			<p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" layout="grid"
-                         rendered="#{not empty bean.entity.zone}" columnClasses="ui-grid-col-6, ui-grid-col-3, ui-grid-col-3">
+			<p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                         rendered="#{bean.isBuilding}" columnClasses="ui-grid-col-3">
                 <p:column>
                 	<h:outputText value="#{msg.databaseListRealEstateZona}:"/>
                     <p:inputText value="#{bean.entity.zone}" maxlength="300" styleClass="input-width"/>
@@ -185,6 +185,15 @@
                 <p:column>
                     <h:outputText value="#{msg.databaseListRealEstateAgriculturalIncomeEuro}:" escape="false"/>
                     <p:inputText value="#{bean.entity.agriculturalIncome}" styleClass="input-width"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{msg.databaseListRealEstateQuality}:" escape="false"/>
+                    <p:inputText value="#{bean.entity.quality}" styleClass="input-width"/>
+                </p:column>
+
+                <p:column>
+                    <h:outputText value="#{msg.databaseListRealEstateZona}:" escape="false"/>
+                    <p:inputText value="#{bean.entity.zone}" styleClass="input-width"/>
                 </p:column>
             </p:panelGrid>
 

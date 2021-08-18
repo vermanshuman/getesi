@@ -2,11 +2,8 @@ package it.nexera.ris.common.helpers.tableGenerator;
 
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.exceptions.TypeFormalityNotConfigureException;
-import it.nexera.ris.common.helpers.ResourcesHelper;
-import it.nexera.ris.common.helpers.ValidationHelper;
-import it.nexera.ris.persistence.beans.entities.domain.EstateSituation;
-import it.nexera.ris.persistence.beans.entities.domain.Formality;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
+import it.nexera.ris.common.helpers.*;
+import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.web.beans.wrappers.Pair;
 import it.nexera.ris.web.beans.wrappers.PartedPairsByCityWrapper;
 import org.hibernate.HibernateException;
@@ -70,7 +67,7 @@ public class AlienatedTableGenerator extends InterlayerTableGenerator {
         setTagTableList(new ArrayList<>());
         int counter = 1;
 
-        fillPartedPairsByCityWrapper(formalities);
+        fillPartedPairsByCity(formalities, Boolean.TRUE);
 
         for (PartedPairsByCityWrapper partedPairsByCityWrapper : getPartedPairsByCityWrapperList()) {
             for (List<Pair<String, String>> pairList : partedPairsByCityWrapper.getPatredList()) {
@@ -100,9 +97,36 @@ public class AlienatedTableGenerator extends InterlayerTableGenerator {
         }
     }
 
-    @Override
-    void addBeforeEstateFormality() throws HibernateException, TypeFormalityNotConfigureException,
-            PersistenceBeanException, IllegalAccessException {
-        addSalesDevelopmentFormalities();
+    private void fillPartedPairsByCity(List<Formality> formalities, Boolean addCommercialAndOmi )
+            throws PersistenceBeanException, IllegalAccessException {
+        List<Long> listIds = EstateSituationHelper.getIdSubjects(getRequest());
+        List<Subject> presumableSubjects = EstateSituationHelper.getListSubjects(listIds);
+        List<Subject> unsuitableSubjects = SubjectHelper.deleteUnsuitable(presumableSubjects, formalities);
+        presumableSubjects.removeAll(unsuitableSubjects);
+        presumableSubjects.add(getRequest().getSubject());
+        for (Formality formality : formalities) {
+
+            Boolean showCadastralIncome = Boolean.FALSE;
+            Boolean showAgriculturalIncome = Boolean.FALSE;
+
+            if(!ValidationHelper.isNullOrEmpty(getRequest().getClient()) &&
+                    !ValidationHelper.isNullOrEmpty(getRequest().getClient().getShowCadastralIncome())){
+                showCadastralIncome = getRequest().getClient().getShowCadastralIncome();
+            }
+            if(!ValidationHelper.isNullOrEmpty(getRequest().getClient()) &&
+                    !ValidationHelper.isNullOrEmpty(getRequest().getClient().getShowAgriculturalIncome())){
+                showAgriculturalIncome = getRequest().getClient().getShowAgriculturalIncome();
+            }
+            List<Property> properties = formality.loadPropertiesByRelationship(presumableSubjects);
+            List<Pair<String, String>> tempPairs = TemplatePdfTableHelper.groupPropertiesByQuoteTypeListLikePairs(properties,
+                    getRequest().getSubject(), presumableSubjects, false, formality, showCadastralIncome, showAgriculturalIncome, addCommercialAndOmi);
+
+            PartedPairsByCityWrapper pairsByCityWrapper = new PartedPairsByCityWrapper(formality, tempPairs);
+            pairsByCityWrapper.fillPatredList();
+
+            getPartedPairsByCityWrapperList().add(pairsByCityWrapper);
+
+        }
+
     }
 }

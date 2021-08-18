@@ -3490,6 +3490,10 @@ public class ImportXMLHelper extends BaseHelper {
                     value = "ANNOTAZIONE";
                 } else if ("I".equalsIgnoreCase(tempValue)) {
                     value = "ISCRIZIONE";
+                }else if ("PA".equalsIgnoreCase(tempValue)) {
+                    value = "PRIVILEGIO AGRARIO";
+                } else if ("PS".equalsIgnoreCase(tempValue)) {
+                    value = "PRIVILEGIO SPECIALE";
                 }
 
                 break;

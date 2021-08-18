@@ -1,42 +1,7 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui" xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
-<ui:composition template="/resources/tpl/Admin/Main.xhtml">
-    <ui:param name="bean" value="#{homeBean}"/>
-    <ui:define name="body">
-        <h:form>
-            <div class="ui-g dashboard">
-                <p:outputPanel rendered="#{not bean.currentUser.external}" style="padding:0; width: 100%;">
-                    <ui:include src="/Pages/home/TopContentBox.xhtml"/>
-                </p:outputPanel>
-                <div class="ui-g-12 ui-md-8">
-                    <p:panel header="Calendar" style="height:100%">
-                        <p:schedule value="#{bean.eventModel}" timeFormat="HH:mm" axisFormat="HH:mm" draggable="false"
-                                    resizable="false">
-                            <p:ajax event="eventSelect" listener="#{bean.onEventSelect}" update="eventDetails"
-                                    oncomplete="PF('eventDialog').show();"/>
-                        </p:schedule>
-                    </p:panel>
-                    <ui:include src="/resources/tpl/Admin/Include/EventDialog.xhtml"/>
-                </div>
-                <div class="ui-g-12 ui-md-4">
-                    <p:panel header="#{msg.phrases}" style="margin-bottom: 3%">
-                        <div align="center" style="font-size: 26px; font-style: italic">
-                            <i class="fa fa-fw fa-quote-left " style="margin-right: 1%"/>
-                            <span>#{bean.phrase}</span>
-                            <i class="fa fa-fw fa-quote-right" style="margin-left: 1%"/>
-                        </div>
-                    </p:panel>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+                template="/resources/tpl/Admin/template.xhtml">
 
-                    <p:panel header="#{msg.forecast}">
-                        <ui:include src="/Pages/home/WeatherBlock.xhtml"/>
-                    </p:panel>
-                </div>
-            </div>
-            <p:poll interval="#{sessionBean.getTimeToRefresh()}" update="@form"/>
-        </h:form>
-    </ui:define>
+
 </ui:composition>
-</html>

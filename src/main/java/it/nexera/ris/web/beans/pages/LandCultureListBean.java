@@ -32,7 +32,7 @@ public class LandCultureListBean extends EntityLazyListPageBean<LandCulture> imp
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
             InstantiationException, IllegalAccessException, IOException {
-        this.loadList(LandCulture.class, new Criterion[]{}, new Order[]{Order.desc("name")});
+        this.loadList(LandCulture.class, new Criterion[]{}, new Order[]{Order.asc("name")});
     }
 }
 

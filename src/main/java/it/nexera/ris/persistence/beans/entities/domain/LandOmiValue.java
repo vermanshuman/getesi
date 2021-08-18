@@ -1,18 +1,14 @@
 package it.nexera.ris.persistence.beans.entities.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.atmosphere.config.service.Get;
 
-@Data
 @Entity
 @Table(name = "land_omi_value")
 public class LandOmiValue extends IndexedEntity {
@@ -29,8 +25,31 @@ public class LandOmiValue extends IndexedEntity {
     @Column(name = "value")
     private Double value;
 
+    public LandOmi getLandOmi() {
+        return landOmi;
+    }
+
+    public void setLandOmi(LandOmi landOmi) {
+        this.landOmi = landOmi;
+    }
+
+    public LandCulture getLandCulture() {
+        return landCulture;
+    }
+
+    public void setLandCulture(LandCulture landCulture) {
+        this.landCulture = landCulture;
+    }
+
+    public Double getValue() {
+        return value;
+    }
+
+    public void setValue(Double value) {
+        this.value = value;
+    }
+
     public boolean isEmpty() {
-        if (!ValidationHelper.isNullOrEmpty(landCulture)) return false;
         if (!ValidationHelper.isNullOrEmpty(value)) return false;
         return true;
     }

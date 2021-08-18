@@ -2,6 +2,8 @@ package it.nexera.ris.persistence.beans.entities.domain.dictionary;
 
 import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.entities.Dictionary;
+import it.nexera.ris.persistence.beans.entities.domain.LandOmi;
+import it.nexera.ris.persistence.beans.entities.domain.SectionB;
 import org.apache.commons.lang3.text.WordUtils;
 
 import javax.persistence.*;
@@ -49,7 +51,11 @@ public class City extends Dictionary {
 
     @Column(name = "external")
     private Boolean external;
-    
+
+
+    @ManyToMany(mappedBy = "cities")
+    private List<LandOmi> landOmis;
+
     @Transient
     @XmlElement(name = "asl_region_code")
     private String asl_region_code;
@@ -193,4 +199,12 @@ public class City extends Dictionary {
 	public void setExternal(Boolean external) {
 		this.external = external;
 	}
+
+    public List<LandOmi> getLandOmis() {
+        return landOmis;
+    }
+
+    public void setLandOmis(List<LandOmi> landOmis) {
+        this.landOmis = landOmis;
+    }
 }

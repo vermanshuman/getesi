@@ -28,9 +28,4 @@ public class NoAssetsTableGenerator extends TagTableGenerator {
     void fillTagTableList() {
         addEmptyRow(7);
     }
-
-    @Override
-    void addBeforeEstateFormality() throws HibernateException {
-
-    }
 }

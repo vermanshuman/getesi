@@ -179,9 +179,4 @@ public class RealEstateRelationshipTableGenerator extends TagTableGenerator {
         }
         return "";
     }
-
-    @Override
-    void addBeforeEstateFormality() throws HibernateException, IllegalAccessException, PersistenceBeanException, TypeFormalityNotConfigureException {
-        addSalesDevelopmentFormalities();
-    }
 }

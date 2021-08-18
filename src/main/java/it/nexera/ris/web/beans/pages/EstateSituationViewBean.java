@@ -124,6 +124,12 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 
 	private String entityEditStato;
 
+	private String selectedPropertyQuality;
+
+	private String selectedLandCultureId;
+
+	private List<SelectItem> landCultures;
+
 	@Override
 	public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
 		String id = getRequestParameter(RedirectHelper.ID_PARAMETER);
@@ -1213,6 +1219,28 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 		}
 	}
 
+	public void selectLandCulture() throws HibernateException, IllegalAccessException, PersistenceBeanException {
+		if(!ValidationHelper.isNullOrEmpty(getSelectedPropertyQuality())) {
+			List<LandCulture> landCulturesTemp = DaoManager.load(LandCulture.class, new CriteriaAlias[] {} , new Criterion[] {},
+					Order.asc("name"));
+			setLandCultures(ComboboxHelper.fillList(landCulturesTemp.toArray()));
+			RequestContext.getCurrentInstance().update("selectLandCultureDialogId");
+			executeJS("PF('selectLandCultureDialog').show();");
+		}
+	}
+
+	public void assosiateLandCulture() throws NumberFormatException, HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+		if(!ValidationHelper.isNullOrEmpty(getSelectedLandCultureId())) {
+			LandCulture culture = DaoManager.get(LandCulture.class, Long.parseLong(getSelectedLandCultureId()));
+			LandCadastralCulture lcc = new LandCadastralCulture();
+			lcc.setDescription(getSelectedPropertyQuality());
+			lcc.setLandCulture(culture);
+			DaoManager.save(lcc, true);
+			RedirectHelper.goTo(PageTypes.REQUEST_ESTATE_SITUATION_VIEW, getRequestId(), null);
+		}
+	}
+
+
 
 	public boolean isViewRelatedEstate() {
 		return viewRelatedEstate;
@@ -1527,5 +1555,29 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 
 	public void setEntityEditStato(String entityEditStato) {
 		this.entityEditStato = entityEditStato;
+	}
+
+	public String getSelectedPropertyQuality() {
+		return selectedPropertyQuality;
+	}
+
+	public void setSelectedPropertyQuality(String selectedPropertyQuality) {
+		this.selectedPropertyQuality = selectedPropertyQuality;
+	}
+
+	public List<SelectItem> getLandCultures() {
+		return landCultures;
+	}
+
+	public void setLandCultures(List<SelectItem> landCultures) {
+		this.landCultures = landCultures;
+	}
+
+	public String getSelectedLandCultureId() {
+		return selectedLandCultureId;
+	}
+
+	public void setSelectedLandCultureId(String selectedLandCultureId) {
+		this.selectedLandCultureId = selectedLandCultureId;
 	}
 }

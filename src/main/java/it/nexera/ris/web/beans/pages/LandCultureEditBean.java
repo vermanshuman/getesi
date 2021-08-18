@@ -57,9 +57,6 @@ public class LandCultureEditBean extends EntityEditPageBean<LandCulture>
         if(ValidationHelper.isNullOrEmpty(getEntity().getName())) {
             addRequiredFieldException("form:landCultureName");
         }
-        if(ValidationHelper.isNullOrEmpty(getSelectedQuality())) {
-            addRequiredFieldException("form:landCadastralCultureDescription");
-        }
     }
 
     @Override

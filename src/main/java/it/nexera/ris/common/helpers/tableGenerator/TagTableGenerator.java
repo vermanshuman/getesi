@@ -45,7 +45,7 @@ public abstract class TagTableGenerator {
     static final String BORDER = "border: 1px solid black;";
     static final String BORDER_NONE = "border: 0px;";
 
-    static final String TABLE_OPEN = "<table align=\"left\" style=\"border-collapse: collapse; " + STANDARD_TABLE_WIDTH + "\">";
+    static final String TABLE_OPEN = "<table align=\"left\" style=\"display: contents;border-collapse: collapse; " + STANDARD_TABLE_WIDTH + "\">";
     // be careful with TABLE_OPEN_FULLSIZE - it is for Certificazione template
     static final String TABLE_OPEN_FULLSIZE = "<table align=\"left\" style=\" border-collapse: collapse; font-size:14px; " +
                                               "margin-top: -9px; font-family: 'Calibri'; " + FULL_SIZE_TABLE_WIDTH + "\">";
@@ -88,7 +88,6 @@ public abstract class TagTableGenerator {
         addBeginning();
         addBody();
         addRequestComment();
-        addBeforeEstateFormality();
         addEstateFormality();
         addFinalCost();
         addFooter();
@@ -484,7 +483,6 @@ public abstract class TagTableGenerator {
         }
 
     }
-    abstract void addBeforeEstateFormality() throws HibernateException, IllegalAccessException, PersistenceBeanException, TypeFormalityNotConfigureException;
 
     String checkerNumRP(String value) {
         return ValidationHelper.isNullOrEmpty(value) ? "" : value;

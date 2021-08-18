@@ -449,8 +449,13 @@ public class ApplicationListener implements ServletContextListener, IConnectionL
     }
 
     private void startServices() {
-        ServiceHolder.getInstance().setKeepAliveService(new KeepAliveService());
+        ServiceHolder.getInstance().setShowMemoryService(new ShowMemoryService());
+        if (Boolean.TRUE.toString().equals(projectProperties.getProperty("showMemoryService"))) {
+            System.out.println("Running ShowMemoryService...");
+            ServiceHolder.getInstance().getShowMemoryService().start();
+        }
 
+        ServiceHolder.getInstance().setKeepAliveService(new KeepAliveService());
         if (Boolean.TRUE.toString().equals(projectProperties.getProperty("keepAliveService"))) {
             System.out.println("Running KeepAliveService...");
             ServiceHolder.getInstance().getKeepAliveService().start();
@@ -589,6 +594,12 @@ public class ApplicationListener implements ServletContextListener, IConnectionL
                 System.out.println("Stopping RemoveSubjectsService...");
                 ServiceHolder.getInstance().getRemoveSubjectsService().stop();
                 ServiceHolder.getInstance().setRemoveSubjectsService(null);
+            }
+
+            if (ServiceHolder.getInstance().getShowMemoryService() != null) {
+                System.out.println("Stopping ShowMemoryService...");
+                ServiceHolder.getInstance().getShowMemoryService().stop();
+                ServiceHolder.getInstance().setShowMemoryService(null);
             }
         } catch (Exception e) {
             LogHelper.log(log, e);

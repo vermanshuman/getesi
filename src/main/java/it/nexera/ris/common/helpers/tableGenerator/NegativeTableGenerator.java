@@ -82,11 +82,6 @@ public class NegativeTableGenerator extends TagTableGenerator {
         addEmptyRow(18);
     }
 
-    @Override
-    void addBeforeEstateFormality() throws HibernateException, IllegalAccessException, PersistenceBeanException, TypeFormalityNotConfigureException {
-
-    }
-
     public boolean isNational() {
         return isNational;
     }

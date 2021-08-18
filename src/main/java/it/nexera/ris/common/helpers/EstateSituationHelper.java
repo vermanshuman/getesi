@@ -401,13 +401,24 @@ public class EstateSituationHelper extends BaseHelper {
             return null;
         }
 
+        List<Long> chargesRegistryIds = request.getAggregationLandChargesRegistersIds();
         List<Long> ids = ValidationHelper.isNullOrEmpty(request.getSubject()) ? new ArrayList<>() :
                 DaoManager.loadIds(Formality.class, new CriteriaAlias[]{
                         new CriteriaAlias("sectionC", "sc", JoinType.INNER_JOIN),
                         new CriteriaAlias("sc.subject", "ss", JoinType.INNER_JOIN)
                 }, new Criterion[]{
-                                        Restrictions.eq("sc.sectionCType", SectionCType.CONTRO.getName()),
-                                        Restrictions.eq("ss.id", request.getSubject().getId())
+                        Restrictions.eq("sc.sectionCType", SectionCType.CONTRO.getName()),
+                        Restrictions.or(
+                                Restrictions.and(
+                                        Restrictions.isNotNull("reclamePropertyService"),
+                                        Restrictions.in("reclamePropertyService.id", chargesRegistryIds)
+                                ),
+                                Restrictions.and(
+                                        Restrictions.isNull("reclamePropertyService"),
+                                        Restrictions.in("provincialOffice.id", chargesRegistryIds)
+                                )
+                        ),
+                        Restrictions.eq("ss.id", request.getSubject().getId())
 
                 });
 
@@ -419,7 +430,17 @@ public class EstateSituationHelper extends BaseHelper {
                     new CriteriaAlias("sc.subject", "ss", JoinType.INNER_JOIN)
             }, new Criterion[]{
                     Restrictions.eq("sc.sectionCType", SectionCType.CONTRO.getName()),
-                    Restrictions.in("ss.id", idSubjects)
+                    Restrictions.in("ss.id", idSubjects),
+                    Restrictions.or(
+                            Restrictions.and(
+                                    Restrictions.isNotNull("reclamePropertyService"),
+                                    Restrictions.in("reclamePropertyService.id",chargesRegistryIds)
+                            ),
+                            Restrictions.and(
+                                    Restrictions.isNull("reclamePropertyService"),
+                                    Restrictions.in("provincialOffice.id",chargesRegistryIds)
+                            )
+                    )
             });
         }
         ids.addAll(formalityIdsBySubject);
@@ -992,6 +1013,160 @@ public class EstateSituationHelper extends BaseHelper {
                 .filter(Objects::nonNull).map(Document::getId).collect(Collectors.toList());
 
         List<Long> notInIds = documentList.stream().map(Document::getId).collect(Collectors.toList());
+
+        if (!ValidationHelper.isNullOrEmpty(documentIds)) {
+            restrictionsList.add(Restrictions.in("id", documentIds));
+            if (!ValidationHelper.isNullOrEmpty(notInIds)) {
+                restrictionsList.add(Restrictions.not(Restrictions.in("id", notInIds)));
+            }
+        }
+
+        return restrictionsList.toArray(new Criterion[0]);
+    }
+
+    public static List<Document> getDocumentsNonSale(RequestOutputTypes type, Request request) throws PersistenceBeanException,
+            IllegalAccessException {
+        List<Criterion> restrictions = new ArrayList<>();
+        restrictions.add(Restrictions.eq("request.id", request.getId()));
+        restrictions.add(Restrictions.eq("typeId", DocumentType.FORMALITY.getId()));
+
+        List<Document> documentList = DaoManager.load(Document.class, restrictions.toArray(new Criterion[0]));
+        if ((type == RequestOutputTypes.ALL || type == RequestOutputTypes.ONLY_EDITOR)
+                && !ValidationHelper.isNullOrEmpty(request.getSituationEstateLocations())
+                && request.getSituationEstateLocations().stream()
+                .map(EstateSituation::getFormalityList).flatMap(List::stream).anyMatch(Objects::nonNull)) {
+            Criterion[] criterions = getNonSaleCriterions(request, documentList);
+
+            documentList.clear();
+            if (criterions.length != 0) {
+                List<Document> formalityDocs = DaoManager.load(Document.class, criterions);
+                documentList.addAll(formalityDocs);
+            }
+        }
+        if (!ValidationHelper.isNullOrEmpty(documentList)) {
+            List<Formality> formalities = new ArrayList<>();
+            for (Document tempDocument : documentList) {
+                if (DocumentType.FORMALITY.getId().equals(tempDocument.getTypeId())) {
+                    formalities.addAll(tempDocument.getFormality());
+                }
+            }
+
+            DaoManager.refresh(request);
+            request.setFormalityPdfList(formalities);
+            DaoManager.save(request, true);
+        }
+
+        documentList.forEach(document -> document.setSelectedForEmail(true));
+        List<Document> documentListToView = new ArrayList<>();
+        for (Document document : documentList) {
+            if (!ValidationHelper.isNullOrEmpty(document.getFormality())) {
+                for (Formality formality : document.getFormality()) {
+                    if (!ValidationHelper.isNullOrEmpty(formality.getEstateSituationList()) && formality
+                            .getEstateSituationList().stream().anyMatch(x -> x.getRequest().equals(request))) {
+                        documentListToView.add(document);
+                    }
+                }
+            } else {
+                documentListToView.add(document);
+            }
+        }
+        return documentListToView;
+    }
+
+
+    public static List<Document> getDocumentsSale(RequestOutputTypes type, Request request) throws PersistenceBeanException,
+            IllegalAccessException {
+        List<Criterion> restrictions = new ArrayList<>();
+        restrictions.add(Restrictions.eq("request.id", request.getId()));
+        restrictions.add(Restrictions.eq("typeId", DocumentType.FORMALITY.getId()));
+
+        List<Document> documentList = DaoManager.load(Document.class, restrictions.toArray(new Criterion[0]));
+        if ((type == RequestOutputTypes.ALL || type == RequestOutputTypes.ONLY_EDITOR)
+                && !ValidationHelper.isNullOrEmpty(request.getSituationEstateLocations())
+                && request.getSituationEstateLocations().stream()
+                .map(EstateSituation::getFormalityList).flatMap(List::stream).anyMatch(Objects::nonNull)) {
+            Criterion[] criterions = getSaleCriterions(request, documentList);
+
+            documentList.clear();
+            if (criterions.length != 0) {
+                List<Document> formalityDocs = DaoManager.load(Document.class, criterions);
+                documentList.addAll(formalityDocs);
+            }
+        }
+        if (!ValidationHelper.isNullOrEmpty(documentList)) {
+            List<Formality> formalities = new ArrayList<>();
+            for (Document tempDocument : documentList) {
+                if (DocumentType.FORMALITY.getId().equals(tempDocument.getTypeId())) {
+                    formalities.addAll(tempDocument.getFormality());
+                }
+            }
+
+            DaoManager.refresh(request);
+            request.setFormalityPdfList(formalities);
+            DaoManager.save(request, true);
+        }
+
+        documentList.forEach(document -> document.setSelectedForEmail(true));
+        List<Document> documentListToView = new ArrayList<>();
+        for (Document document : documentList) {
+            if (!ValidationHelper.isNullOrEmpty(document.getFormality())) {
+                for (Formality formality : document.getFormality()) {
+                    if (!ValidationHelper.isNullOrEmpty(formality.getEstateSituationList()) && formality
+                            .getEstateSituationList().stream().anyMatch(x -> x.getRequest().equals(request))) {
+                        documentListToView.add(document);
+                    }
+                }
+            } else {
+                documentListToView.add(document);
+            }
+        }
+        return documentListToView;
+    }
+
+    private static Criterion[] getNonSaleCriterions(Request request, List<Document> documentList) {
+        List<Criterion> restrictionsList = new ArrayList<>();
+
+        List<Long> documentIds = request
+                .getSituationEstateLocations()
+                .stream()
+                .filter(s -> s.getSalesDevelopment() == null || !s.getSalesDevelopment())
+                .map(EstateSituation::getFormalityList)
+                .flatMap(List::stream)
+                .map(Formality::getDocument)
+                .filter(Objects::nonNull)
+                .map(Document::getId)
+                .collect(Collectors.toList());
+
+        List<Long> notInIds = documentList.stream().map(Document::getId).collect(Collectors.toList());
+
+
+        if (!ValidationHelper.isNullOrEmpty(documentIds)) {
+            restrictionsList.add(Restrictions.in("id", documentIds));
+            if (!ValidationHelper.isNullOrEmpty(notInIds)) {
+                restrictionsList.add(Restrictions.not(Restrictions.in("id", notInIds)));
+            }
+        }
+
+        return restrictionsList.toArray(new Criterion[0]);
+    }
+
+
+    private static Criterion[] getSaleCriterions(Request request, List<Document> documentList) {
+        List<Criterion> restrictionsList = new ArrayList<>();
+
+        List<Long> documentIds = request
+                .getSituationEstateLocations()
+                .stream()
+                .filter(s -> s.getSalesDevelopment() != null && s.getSalesDevelopment())
+                .map(EstateSituation::getFormalityList)
+                .flatMap(List::stream)
+                .map(Formality::getDocument)
+                .filter(Objects::nonNull)
+                .map(Document::getId)
+                .collect(Collectors.toList());
+
+        List<Long> notInIds = documentList.stream().map(Document::getId).collect(Collectors.toList());
+
 
         if (!ValidationHelper.isNullOrEmpty(documentIds)) {
             restrictionsList.add(Restrictions.in("id", documentIds));

@@ -15,8 +15,6 @@
     	<link href="#{facesContext.externalContext.requestContextPath}/resources/styles/request.css"
               media="all" rel="stylesheet" type="text/css"/>
     	<style>
-    	
-    	
     	</style>
         <script>
             var doChange = true;
@@ -552,16 +550,18 @@
 
         <p:dialog id="documentDialog" widgetVar="documentDialog" modal="true" resizable="false" draggable="false"
                   width="700">
-            <p:dataTable value="#{bean.requestDocuments}" var="doc" id="requestDocs">
-                <p:column headerText="#{msg.name}">
-                    <h:outputText value="#{doc.title}#{not empty doc.fileExtension ? doc.fileExtension : '' }"/>
-                </p:column>
-                <p:column styleClass="action_column">
-                    <p:commandButton icon="fa fa-download" action="#{bean.downloadRequestFile}" ajax="false">
-                        <f:setPropertyActionListener value="#{doc.id}" target="#{bean.entityEditId}"/>
-                    </p:commandButton>
-                </p:column>
-            </p:dataTable>
+            <p:scrollPanel mode="native"  style="width: 100%; min-height: 300px; max-height: 600px;">
+                <p:dataTable value="#{bean.requestDocuments}" var="doc" id="requestDocs">
+                    <p:column headerText="#{msg.name}">
+                        <h:outputText value="#{doc.title}#{not empty doc.fileExtension ? doc.fileExtension : '' }"/>
+                    </p:column>
+                    <p:column styleClass="action_column">
+                        <p:commandButton icon="fa fa-download" action="#{bean.downloadRequestFile}" ajax="false">
+                            <f:setPropertyActionListener value="#{doc.id}" target="#{bean.entityEditId}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:scrollPanel>
         </p:dialog>
         <p:dialog id="dlg2" widgetVar="dlg2" modal="true" resizable="false"
                   draggable="false" effect="SLIDE">

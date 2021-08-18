@@ -395,6 +395,9 @@ public class PropertyXMLWrapper extends BaseXMLWrapper<Property> {
                     break;
 
                 case QUALITY:
+                case QUALITY_ALT:
+                    if(!ValidationHelper.isNullOrEmpty(value))
+                        value = value.trim();
                     setQuality(value);
                     break;
 

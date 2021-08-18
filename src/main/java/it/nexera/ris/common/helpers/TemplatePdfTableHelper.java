@@ -134,7 +134,7 @@ public class TemplatePdfTableHelper {
         String city = "";
         List<Pair<String, String>> result = new ArrayList<>();
 
-        if(!ValidationHelper.isNullOrEmpty(formality)){
+        if(!ValidationHelper.isNullOrEmpty(formality) && !addCommercialAndOmi){
             TypeFormality typeFormality = formality.checkSalesDicTypeFormality();
             if(typeFormality != null){
                 addCommercialAndOmi = Boolean.TRUE;

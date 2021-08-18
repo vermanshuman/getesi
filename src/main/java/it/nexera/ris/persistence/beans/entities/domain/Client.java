@@ -256,6 +256,15 @@ public class Client extends IndexedEntity implements Serializable {
     @Column(name = "land_omi")
     private Boolean landOmi;
 
+    @Column(name = "send_formality")
+    private Boolean sendFormality;
+
+    @Column(name = "send_sales_development_formality")
+    private Boolean sendSalesDevelopmentFormality;
+
+    @Column(name = "regime")
+    private Boolean regime;
+
     @Override
     public String toString() {
         if (ClientType.PROFESSIONAL.getId().equals(getTypeId())) {
@@ -817,5 +826,29 @@ public class Client extends IndexedEntity implements Serializable {
 
     public void setLandOmi(Boolean landOmi) {
         this.landOmi = landOmi;
+    }
+
+    public Boolean getSendFormality() {
+        return sendFormality;
+    }
+
+    public void setSendFormality(Boolean sendFormality) {
+        this.sendFormality = sendFormality;
+    }
+
+    public Boolean getSendSalesDevelopmentFormality() {
+        return sendSalesDevelopmentFormality;
+    }
+
+    public void setSendSalesDevelopmentFormality(Boolean sendSalesDevelopmentFormality) {
+        this.sendSalesDevelopmentFormality = sendSalesDevelopmentFormality;
+    }
+
+    public Boolean getRegime() {
+        return regime;
+    }
+
+    public void setRegime(Boolean regime) {
+        this.regime = regime;
     }
 }

@@ -491,7 +491,6 @@ public class RealEstateHelper {
                 }
             }
             ConnectionManager.save(wrapper.getRelationship(), session);
-
         }
 
         for (SubjectRelationshipWrapper sw : subjectWrapperToDeleteList) {

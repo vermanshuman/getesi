@@ -205,7 +205,7 @@
                         <p:column rowspan="3" colspan="2" headerText="N." styleClass="action_column"/>
                         <p:column colspan="4" headerText="DATI IDENTIFICATIVI" style="width: 20%;"/>
                         <p:column colspan="6" headerText="DATI DI CLASSAMENTO" style="width: 30%;"/>
-                        <p:column colspan="4" headerText="ALTRE INFORMAZIONI"/>
+                        <p:column colspan="6" headerText="ALTRE INFORMAZIONI"/>
                     </p:row>
                     <p:row>
                         <p:column rowspan="2" headerText="Scheda"/>
@@ -218,6 +218,7 @@
                         <p:column rowspan="2" headerText="Relazione" style="width: 25%;"/>
                         <p:column rowspan="2" headerText="Preg." styleClass="action_column"/>
                         <p:column rowspan="2" headerText="Pres." styleClass="action_column"/>
+                        <p:column rowspan="2" headerText="Coltura" styleClass="action_column"/>
                     </p:row>
                     <p:row>
                         <p:column headerText="mq"/>
@@ -300,6 +301,15 @@
                         <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                     </p:commandButton>
                 </p:column>
+                <p:column style="text-align: center;" styleClass="action_column">
+                    <p:commandButton icon="fa fa-link" rendered="#{not empty item.quality and (item.cadastralCulture == null or item.cadastralCulture.landCulture == null)}"
+                                     action="#{bean.selectLandCulture}">
+                        <f:setPropertyActionListener value="#{item.quality}" target="#{bean.selectedPropertyQuality}"/>
+                    </p:commandButton>
+                    <h:outputText rendered="#{item.cadastralCulture != null and item.cadastralCulture.landCulture != null}"
+                                  value="#{item.cadastralCulture.landCulture.name}"/>
+                </p:column>
+
             </p:dataTable>
         </p:fieldset>
         <p:remoteCommand name="updateDialog" onstart="PF('dlgFormalityDoc').show();" update="dialogFormalityDoc"/>
@@ -615,6 +625,10 @@
                       value="#{bean.presumableFormalityListByEstateFormality}"/>
             <ui:param name="oncomplete_confirm_presumable_formality_dialog" value="updatePdfTableAfterAssociateImport();"/>
         </ui:include>
+        <ui:include src="/Pages/Dialogs/SelectLandCultureDialog.xhtml">
+            <ui:param name="selectedPropertyQuality" value="#{bean.selectedPropertyQuality}"></ui:param>
+        </ui:include>
+
     </ui:define>
     <ui:define name="next_buttons">
         <p:commandButton id="backBtn" action="#{bean.goCancel}" style="margin-top: 3%"

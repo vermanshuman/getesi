@@ -51,7 +51,8 @@ public enum PropertyXMLElements implements XMLElements {
     DATA_FROM_ALT("DatiDerivantiDa.Descrizione", false),
     CONSISTENCY_ALT("ClassamentoT.SuperficieMQ", false),
     AGRICULTURAL_INCOME_ALT("ClassamentoT.RedditoAgrarioEuro", false, true),
-    CADASTRAL_INCOME_ALT("ClassamentoT.RedditoDominicaleEuro", false, true);
+    CADASTRAL_INCOME_ALT("ClassamentoT.RedditoDominicaleEuro", false, true),
+    QUALITY_ALT("ClassamentoT.Qualita", false),;
 
     private String element;
 

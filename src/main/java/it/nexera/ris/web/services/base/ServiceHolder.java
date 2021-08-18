@@ -31,6 +31,8 @@ public class ServiceHolder {
 
     private RemoveSubjectsService removeSubjectsService;
 
+    private ShowMemoryService showMemoryService;
+
     private static ServiceHolder instance;
 
     public static synchronized ServiceHolder getInstance() {
@@ -145,5 +147,13 @@ public class ServiceHolder {
 
     public void setRemoveSubjectsService(RemoveSubjectsService removeSubjectsService) {
         this.removeSubjectsService = removeSubjectsService;
+    }
+
+    public ShowMemoryService getShowMemoryService() {
+        return showMemoryService;
+    }
+
+    public void setShowMemoryService(ShowMemoryService showMemoryService) {
+        this.showMemoryService = showMemoryService;
     }
 }

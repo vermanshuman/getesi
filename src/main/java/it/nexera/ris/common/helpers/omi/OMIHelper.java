@@ -319,7 +319,7 @@ public final class OMIHelper {
         }
     }
 
-    private static String getCode(String propertyCategoryCode) {
+    public static String getCode(String propertyCategoryCode) {
         
         Optional<CategoryCodeForOmi> categoryCodeForOmi = CATEGORY_CODE_FOR_OMI_COLLECTION.stream()
                 .filter(c -> c.getCategory().equals(propertyCategoryCode)).findFirst();

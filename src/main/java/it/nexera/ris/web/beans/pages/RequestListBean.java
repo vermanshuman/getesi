@@ -762,7 +762,8 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     public void modifyRequests()
         throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         filterTableFromPanel();
-        //setAllRequestViewsToModify(DaoManager.load(RequestView.class, getFilterRestrictions().toArray(new Criterion[0])));
+        setAllRequestViewsToModify(
+            DaoManager.load(RequestView.class, getFilterRestrictions().toArray(new Criterion[0])));
         List<Long> requestIdList = getAllRequestViewsToModify().stream()
             .map(RequestView::getId).collect(Collectors.toList());
         if (!ValidationHelper.isNullOrEmpty(getSelectedState())) {
@@ -780,7 +781,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     public void loadRequestsExcel() throws PersistenceBeanException,
             IllegalAccessException, IOException, InstantiationException {
         filterTableFromPanel();
-        //setAllRequestViewsToModify(DaoManager.load(RequestView.class, getFilterRestrictions().toArray(new Criterion[0])));
+        setAllRequestViewsToModify(DaoManager.load(RequestView.class, getFilterRestrictions().toArray(new Criterion[0])));
         List<Long> requestIdList = getAllRequestViewsToModify().stream().map(RequestView::getId).collect(Collectors.toList());
         if (!ValidationHelper.isNullOrEmpty(requestIdList)) {
             List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.in("id", requestIdList)});
@@ -830,7 +831,8 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public void loadRequestsPdf() throws PersistenceBeanException, IllegalAccessException {
-        //setAllRequestViewsToModify(DaoManager.load(RequestView.class, getFilterRestrictions().toArray(new Criterion[0])));
+        setAllRequestViewsToModify(DaoManager.load(RequestView.class,
+            getFilterRestrictions().toArray(new Criterion[0])));
         List<Long> requestIdList = getAllRequestViewsToModify().stream()
             .map(RequestView::getId).collect(Collectors.toList());
         try {
@@ -1007,8 +1009,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                 new Order[]{Order.desc("createDate")});
         
         List<RequestView> requestList = DaoManager.load(RequestView.class, restrictions.toArray(new Criterion[0]));
-
-        setAllRequestViewsToModify(requestList);
         
         List<Long> cityIds = new ArrayList<Long>();
         

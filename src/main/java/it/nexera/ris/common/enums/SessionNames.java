@@ -9,5 +9,6 @@ public enum SessionNames {
     ImportVisureDH,
     ImportRequestOLD,
     ImportDocuments,
-    RemoveSubjectsService;
+    RemoveSubjectsService,
+    ShowMemoryService;
 }

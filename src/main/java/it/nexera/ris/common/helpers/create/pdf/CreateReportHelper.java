@@ -314,11 +314,14 @@ public abstract class CreateReportHelper extends BaseHelper {
                             Restrictions.eq("service", service)});
             if (!ValidationHelper.isNullOrEmpty(priceList)) {
                 PriceList first = priceList.get(0);
-                Double conservationCosts = Double.parseDouble(first.getFirstPrice().replaceAll(",", "."));
-                if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())
-                        && !ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getLandChargesRegistries())) {
-                    result = conservationCosts * request.getAggregationLandChargesRegistry()
-                            .getNumberOfVisualizedLandChargesRegistries();
+                String firstPrice = first.getFirstPrice().replaceAll(",", ".");
+                if(!ValidationHelper.isNullOrEmpty(firstPrice)){
+                    Double conservationCosts = Double.parseDouble(firstPrice);
+                    if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())
+                            && !ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getLandChargesRegistries())) {
+                        result = conservationCosts * request.getAggregationLandChargesRegistry()
+                                .getNumberOfVisualizedLandChargesRegistries();
+                    }
                 }
             }
         }

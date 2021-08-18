@@ -25,6 +25,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.annotations.Formula;
 import org.hibernate.criterion.Criterion;
@@ -253,6 +254,9 @@ public class Property extends IndexedEntity implements BeforeSave {
 
     @Transient
     private Request currentRequest;
+
+    @Transient
+    private LandCadastralCulture cadastralCulture;
 
     @Override
     public void beforeSave() {
@@ -720,12 +724,24 @@ public class Property extends IndexedEntity implements BeforeSave {
             if (!ValidationHelper.isNullOrEmpty(noCamelCaseWords)) {
                 for (NoCamelCaseWord caseWord : noCamelCaseWords) {
                     String wordToFind = caseWord.getDescription();
-                    Pattern word = Pattern.compile(wordToFind);
+                     Pattern word = Pattern.compile(wordToFind);
                     Matcher match = word.matcher(address);
                     while (match.find()) {
-                        result += WordUtils.capitalizeFully(address.substring(0, match.start()))
-                                + address.substring(match.start(), match.end())
-                                + WordUtils.capitalizeFully(address.substring(match.end(), address.length()));
+                        boolean isStart = true;
+                        boolean isEnd = true;
+                        if(match.end() < address.length()){
+                            if(StringUtils.isNotBlank(address.substring(match.end(),match.end()+1)))
+                                isStart = false;
+                        }
+                        if(match.start() > 0){
+                            if(StringUtils.isNotBlank(address.substring(match.start()-1,match.start())))
+                                isEnd = false;
+                        }
+                        if(isStart && isEnd){
+                            result += WordUtils.capitalizeFully(address.substring(0, match.start()))
+                                    + address.substring(match.start(), match.end())
+                                    + WordUtils.capitalizeFully(address.substring(match.end()));
+                        }
                     }
                 }
             }
@@ -806,7 +822,7 @@ public class Property extends IndexedEntity implements BeforeSave {
         return bold ? spanBold + body + end : body;
     }
 
-    public String getDraftString() {
+    private String getDraftString() {
         if (!ValidationHelper.isNullOrEmpty(getCadastralData()) && getCadastralData().size() == 1) {
             StringBuilder str = new StringBuilder();
             String estateSezione = ResourcesHelper.getString("estateSezionePrefix");
@@ -1497,5 +1513,15 @@ public class Property extends IndexedEntity implements BeforeSave {
 
     public void setZone(String zone) {
         this.zone = zone;
+    }
+
+    public LandCadastralCulture getCadastralCulture() throws HibernateException, InstantiationException,
+            IllegalAccessException, PersistenceBeanException {
+        if(ValidationHelper.isNullOrEmpty(cadastralCulture) && !ValidationHelper.isNullOrEmpty(getQuality())) {
+            cadastralCulture = DaoManager.get(LandCadastralCulture.class, new Criterion[] {
+                    Restrictions.eq("description", getQuality()).ignoreCase()
+            });
+        }
+        return cadastralCulture;
     }
 }

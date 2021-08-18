@@ -9,6 +9,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import it.nexera.ris.persistence.beans.entities.domain.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
@@ -65,6 +67,14 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
     private Long editSalesId;
 
     private Long deletedSalesId;
+
+    @Getter
+    @Setter
+    private List<Document> requestNonSaleDocuments;
+
+    @Getter
+    @Setter
+    private List<Document> requestSaleDocuments;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,

@@ -1,17 +1,21 @@
 package it.nexera.ris.web.beans.wrappers.logic.editInTable;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import it.nexera.ris.common.enums.ApplicationSettingsKeys;
+import it.nexera.ris.common.helpers.create.xls.XlsxHelper;
 import it.nexera.ris.persistence.beans.entities.domain.*;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.OmiValue;
+import it.nexera.ris.settings.ApplicationSettingsHolder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.hibernate.Hibernate;
 
 import it.nexera.ris.common.enums.RelationshipType;
@@ -61,6 +65,12 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
     private Double cadastralArea;
 
     private String revenue;
+
+    private Long minimumValue;
+
+    private Long maximumValue;
+
+    private boolean calculateOmiValue;
 
     public PropertyEditInTableWrapper(Property property, EstateSituation situation) {
         super(property.getId(), property.getComment());
@@ -142,6 +152,10 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
                     this.calculatedOmi.setMultipleCoordinates(calculatedOmi.isMultipleCoordinates());
                 }
                 this.calculatedOmi.setCategoryCodeMissing(calculatedOmi.isCategoryCodeMissing());
+                if(this.calculatedOmi.categoryCodeMissing){
+                    setCalculateOmiValue(Boolean.TRUE);
+                }else
+                    setCalculateOmiValue(Boolean.FALSE);
             } catch (Exception e) {
                 LogHelper.log(log, e);
             }

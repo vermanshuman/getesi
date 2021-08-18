@@ -1223,6 +1223,115 @@ public class Formality extends IndexedEntity {
 
         return typeFormality;
     }
+
+    public String getDicTypeFormalityText() {
+        TypeFormality typeFormality = null;
+        String textInVisura = "";
+        TypeActEnum typeActEnum = getTypeEnum();
+        Integer code = ValidationHelper.isNullOrEmpty(sectionA.getDerivedFromCode()) ?
+                0 : Integer.parseInt(sectionA.getDerivedFromCode());
+        if (code / 1000 != 0) {
+            if (code / 1000 == 9 || code / 1000 == 8) {
+            }
+            code = code % 1000;
+        }
+        try {
+            List<TypeFormality> typeFormalities = DaoManager.load(TypeFormality.class, new Criterion[]{
+                    Restrictions.eq("type", typeActEnum),
+                    Restrictions.eq("code", code.toString()),
+                    Restrictions.isNotNull("salesDevelopmentOMI"),
+                    Restrictions.eq("salesDevelopmentOMI", Boolean.TRUE)
+            });
+            if(!ValidationHelper.isNullOrEmpty(typeFormalities)){
+                typeFormality = typeFormalities.get(0);
+            }
+        } catch (Exception e) {
+            LogHelper.log(log,e);
+        }
+
+        if(typeFormality != null){
+            if (!ValidationHelper.isNullOrEmpty(getSectionA())
+                    && !ValidationHelper.isNullOrEmpty(getSectionA().getDerivedFromCode())) {
+
+                if(getSectionA().getDerivedFromCode().trim().endsWith("00")) {
+                    StringBuilder result = new StringBuilder();
+                    switch (getTypeEnum()) {
+                        case TYPE_I:
+                            String mortgageSpecies = getSectionA().getMortgageSpecies();
+                            if(StringUtils.isNotBlank(mortgageSpecies) && Character.isDigit(mortgageSpecies.charAt(0))) {
+                                String startDigits = mortgageSpecies.split("\\s+")[0];
+                                mortgageSpecies = mortgageSpecies.replaceFirst(startDigits, "").trim();
+                            }
+                            String derivedFrom =  getSectionA().getDerivedFrom();
+                            if(StringUtils.isNotBlank(derivedFrom) && Character.isDigit(derivedFrom.charAt(0))) {
+                                String startDigits = derivedFrom.split("\\s+")[0];
+                                derivedFrom = derivedFrom.replaceFirst(startDigits, "").trim();
+                            }
+
+                            if(StringUtils.isNotBlank(mortgageSpecies)) {
+                                result.append(mortgageSpecies);
+                            }
+                            if(StringUtils.isNotBlank(mortgageSpecies) && StringUtils.isNotBlank(derivedFrom)) {
+                                result.append("-");
+                            }
+                            if(StringUtils.isNotBlank(derivedFrom)) {
+                                result.append(derivedFrom);
+                            }
+                            textInVisura = result.toString();
+                            break;
+                        case TYPE_T:
+
+                            String conventionSpecies = getSectionA().getConventionSpecies();
+                            if(StringUtils.isNotBlank(conventionSpecies) && Character.isDigit(conventionSpecies.charAt(0))) {
+                                String startDigits = conventionSpecies.split("\\s+")[0];
+                                conventionSpecies = conventionSpecies.replaceFirst(startDigits, "").trim();
+                            }
+
+                            String conventionDescription =  getSectionA().getConventionDescription();
+                            if(StringUtils.isNotBlank(conventionDescription) && Character.isDigit(conventionDescription.charAt(0))) {
+                                String startDigits = conventionDescription.split("\\s+")[0];
+                                conventionDescription = conventionDescription.replaceFirst(startDigits, "").trim();
+                            }
+
+                            if(StringUtils.isNotBlank(conventionSpecies)) {
+                                result.append(conventionSpecies);
+                            }
+                            if(StringUtils.isNotBlank(conventionSpecies) && StringUtils.isNotBlank(conventionDescription)) {
+                                result.append("-");
+                            }
+                            if(StringUtils.isNotBlank(conventionDescription)) {
+                                result.append(conventionDescription);
+                            }
+                            textInVisura = result.toString();
+
+                            break;
+                        case TYPE_A:
+                            String annotationType  = getSectionA().getAnnotationType();
+
+                            String annotationDescription  =  getSectionA().getAnnotationDescription();
+                            if(StringUtils.isNotBlank(annotationDescription) && Character.isDigit(annotationDescription.charAt(0))) {
+                                String startDigits = annotationDescription.split("\\s+")[0];
+                                annotationDescription = annotationDescription.replaceFirst(startDigits, "").trim();
+                            }
+                            if(StringUtils.isNotBlank(annotationType)) {
+                                result.append(annotationType);
+                            }
+                            if(StringUtils.isNotBlank(annotationType) && StringUtils.isNotBlank(annotationDescription)) {
+                                result.append("-");
+                            }
+                            if(StringUtils.isNotBlank(annotationDescription)) {
+                                result.append(annotationDescription);
+                            }
+                            textInVisura =  result.toString();
+                            break;
+                    }
+                }
+            }
+            if(textInVisura == null || textInVisura.trim().isEmpty())
+                textInVisura = typeFormality.getTextInVisura();
+        }
+        return textInVisura;
+    }
     public Date getComparedDate() {
         if(!ValidationHelper.isNullOrEmpty(checkRenewalTypeFormality())){
             if(!ValidationHelper.isNullOrEmpty(getSectionA())  &&

@@ -75,9 +75,4 @@ public class DeceasedTableGenerator extends InterlayerTableGenerator {
             }
         }
     }
-
-    @Override
-    void addBeforeEstateFormality() throws HibernateException, IllegalAccessException, PersistenceBeanException, TypeFormalityNotConfigureException {
-
-    }
 }
