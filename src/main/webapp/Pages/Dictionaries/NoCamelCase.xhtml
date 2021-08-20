@@ -47,7 +47,7 @@
                                               styleClass="action_column"
                                               exportable="false">
 
-                                        <p:commandButton icon="ui-icon ui-icon-pencil"
+                                        <p:commandButton icon="ui-icon ui-icon-pencil pi pi-pencil"
                                                          disabled="#{!left_bean.canEdit}"
                                                          update=":right_form"
                                                          action="#{left_bean.editNoCamelCaseEntity}" oncomplete="#{additionalEditAction}">
@@ -58,7 +58,7 @@
 
                                     <p:column rendered="#{empty showDelete? true : showDelete}"
                                               styleClass="action_column" exportable="false">
-                                        <p:commandButton icon="ui-icon ui-icon-close"
+                                        <p:commandButton icon="ui-icon ui-icon-close pi pi-trash"
                                                          oncomplete="PF('camel_dlg').show()"
                                                          disabled="#{!left_bean.canDelete
                                                          || (item.id==sessionBean.currentUser.id and left_bean.userEntityPage)}">

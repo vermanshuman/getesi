@@ -113,13 +113,13 @@
                     </p:row>
                 </p:columnGroup>
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon ui-icon-pencil" update=":form"
+                    <p:commandButton icon="ui-icon ui-icon-pencil pi pi-pencil" update=":form"
                                      action="#{bean.editProperty}">
                         <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                     </p:commandButton>
                 </p:column>
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon ui-icon-close" update="estateTab"
+                    <p:commandButton icon="ui-icon ui-icon-close pi pi-trash" update="estateTab"
                                      action="#{bean.deleteProperty}">
                         <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                     </p:commandButton>
@@ -230,13 +230,13 @@
                     </p:row>
                 </p:columnGroup>
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon ui-icon-pencil" update=":form"
+                    <p:commandButton icon="ui-icon ui-icon-pencil pi pi-pencil" update=":form"
                                      action="#{bean.editProperty}">
                         <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                     </p:commandButton>
                 </p:column>
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon ui-icon-close" update="estateTabLand"
+                    <p:commandButton icon="ui-icon ui-icon-close pi pi-trash" update="estateTabLand"
                                      action="#{bean.deleteProperty}">
                         <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                     </p:commandButton>
@@ -372,7 +372,7 @@
                          rowStyleClass="#{item.updated ? 'receive_new_mail_style':''}">
                 <p:column styleClass="action_column special-toggler"
                           exportable="false">
-                    <p:commandButton icon="ui-icon ui-icon-pencil" update=":form"
+                    <p:commandButton icon="ui-icon ui-icon-pencil pi pi-pencil" update=":form"
                                      action="#{bean.editEstateFormality}">
                         <f:setPropertyActionListener value="#{item.id}"
                                                      target="#{bean.entityEditId}"/>
@@ -381,7 +381,7 @@
                                   collapseLabel="#{msg.estateFormalityToggler}"/>
                 </p:column>
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon ui-icon-close" update="formalityTab"
+                    <p:commandButton icon="ui-icon ui-icon-close pi pi-trash" update="formalityTab"
                                      action="#{bean.deleteEstateFormality}">
                         <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                     </p:commandButton>
@@ -435,14 +435,14 @@
             <p:remoteCommand update="formalityPDFTab" name="updatePdfTable"/>
             <p:dataTable value="#{bean.formalityPDFList}" styleClass="simple-table" var="item" id="formalityPDFTab">
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon ui-icon-pencil" update=":form"
+                    <p:commandButton icon="ui-icon ui-icon-pencil pi pi-pencil" update=":form"
                                      action="#{bean.editFormality}">
                         <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                         <f:setPropertyActionListener value="#{item.statusStr}" target="#{bean.entityEditStato}"/>
                     </p:commandButton>
                 </p:column>
                 <p:column styleClass="action_column">
-                    <p:commandButton icon="ui-icon ui-icon-close" oncomplete="updatePdfTable()"
+                    <p:commandButton icon="ui-icon ui-icon-close pi pi-trash" oncomplete="updatePdfTable()"
                                      action="#{bean.deleteFormality}">
                         <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                     </p:commandButton>
@@ -455,7 +455,7 @@
                     </p:column>
                 </p:column>
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton id="buttonVedi" icon="ui-icon ui-icon-search" update=":form"
+                    <p:commandButton id="buttonVedi" icon="ui-icon ui-icon-search pi pi-search" update=":form"
                                      action="#{bean.viewFormality}">
                         <f:setPropertyActionListener value="#{item.id}"
                                                      target="#{bean.entityEditId}"/>

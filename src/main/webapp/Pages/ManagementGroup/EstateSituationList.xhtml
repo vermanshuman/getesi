@@ -108,7 +108,7 @@
                     <p:commandButton icon="fa fa-download" action="#{item.downloadFile}" ajax="false"/>
                 </p:column>
                 <p:column styleClass="action_column">
-                    <p:commandButton icon="ui-icon ui-icon-close" update=":form"
+                    <p:commandButton icon="ui-icon ui-icon-close pi pi-trash" update=":form"
                                      action="#{bean.deleteEntityDocument}">
                         <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityDeleteId}"/>
                     </p:commandButton>
@@ -118,12 +118,12 @@
         <ui:fragment><br /></ui:fragment>
         <p:fieldset legend="#{msg.estateSituationSalesDevelopmentHeader}" rendered="#{bean.salesDevelopmentShowing}">
             <p:commandButton disabled="#{!bean.canCreate}" id="buttonCreateSalesDevelopment"
-                             icon="ui-icon-circle-plus"
+                             icon="ui-icon-circle-plus pi pi-plus-circle"
                              value="#{not empty addButtonTitle ? addButtonTitle : msg.newItem}"
                              update="sales_dev"
                              action="#{bean.addSalesEntity()}"/>
             <p:commandButton disabled="#{!bean.canCreate}" id="autoCreateSalesDevelopment"
-                             icon="ui-icon-circle-plus" value="#{msg.estateSituationSalesDevelopmentAutoCreate}"
+                             icon="ui-icon-circle-plus pi pi-plus-circle" value="#{msg.estateSituationSalesDevelopmentAutoCreate}"
                              update="sales_dev" onclick="PF('autoCreateSalesDevelopment').disable()"
                              oncomplete="PF('autoCreateSalesDevelopment').enable()"
                              action="#{bean.autoAddEntity()}" widgetVar="autoCreateSalesDevelopment"/>
@@ -137,7 +137,7 @@
                          paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                          rowsPerPageTemplate="10,20,50" widgetVar="salesTableWV">
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon ui-icon-pencil"
+                    <p:commandButton icon="ui-icon ui-icon-pencil pi pi-pencil"
                                      disabled="#{!bean.canEdit}" update=":form"
                                      action="#{bean.editEntity}">
                         <f:setPropertyActionListener value="#{item.id}"
@@ -145,7 +145,7 @@
                     </p:commandButton>
                 </p:column>
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon ui-icon-close"
+                    <p:commandButton icon="ui-icon ui-icon-close pi pi-trash"
                                      oncomplete="PF('salesdlg').show()"
                                      disabled="#{!bean.canDelete || (item.id==sessionBean.currentUser.id and bean.userEntityPage)}">
                         <f:setPropertyActionListener value="#{item.id}"

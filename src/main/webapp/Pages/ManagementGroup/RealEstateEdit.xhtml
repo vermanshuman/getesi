@@ -212,7 +212,7 @@
                              rowsPerPageTemplate="10,20,50" widgetVar="tableSubjectsWV">
 
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton icon="ui-icon ui-icon-pencil"
+                        <p:commandButton icon="ui-icon ui-icon-pencil pi pi-pencil"
                                          oncomplete="PF('addSubjectDLGWV').show();"
                                          update=":form:addSubjectPanel" action="#{bean.editRelationship}">
                             <f:setPropertyActionListener value="#{item.id}"
@@ -221,7 +221,7 @@
                     </p:column>
 
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton icon="ui-icon ui-icon-close"
+                        <p:commandButton icon="ui-icon ui-icon-close pi pi-trash"
                                          oncomplete="PF('deleteSubjectDLGWV').show()">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.relationshipDeleteId}"/>
@@ -405,7 +405,7 @@
                     <ui:fragment>
                         <p:autoComplete id="acSimple" value="#{bean.selectedSubject}" var="item" itemLabel="#{item}"
                                         itemValue="#{item}" maxResults="9" completeMethod="#{bean.filterSubjects}"/>
-                        <p:commandButton icon="ui-icon-circle-plus" action="#{bean.openSubjectDlg}">
+                        <p:commandButton icon="ui-icon-circle-plus pi pi-plus-circle" action="#{bean.openSubjectDlg}">
                             <p:ajax event="dialogReturn" listener="#{bean.onEditSubjectDlgClose}"
                                     update=":form:addSubjectPanel"/>
                         </p:commandButton>

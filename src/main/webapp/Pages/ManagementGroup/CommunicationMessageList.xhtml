@@ -68,7 +68,7 @@
                      rowsPerPageTemplate="10,20,50" widgetVar="tableWV">
 
             <p:column styleClass="action_column min_padding_margin" exportable="false">
-                <p:commandButton icon="ui-icon ui-icon-close" update=":form"
+                <p:commandButton icon="ui-icon ui-icon-close pi pi-trash" update=":form"
                                  oncomplete="PF('dlg2').show()" disabled="#{!bean.canDelete}">
                     <f:setPropertyActionListener value="#{item.id}"
                                                  target="#{bean.entityDeleteId}"/>

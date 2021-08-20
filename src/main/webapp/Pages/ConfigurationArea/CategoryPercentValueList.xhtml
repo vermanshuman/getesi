@@ -54,14 +54,14 @@
 						<h:outputText value="#{cat.percentCommercial}" />
 					</p:column>
 					<p:column styleClass="action_column" exportable="false">
-						<p:commandButton icon="ui-icon ui-icon-pencil"
+						<p:commandButton icon="ui-icon ui-icon-pencil pi pi-pencil"
 							update="table categoryPercentValueDlg"
 							oncomplete="PF('categoryPercentValueWV').show();"
 							action="#{bean.handleCategoryPercentValueDialogInit(cat)}">
 						</p:commandButton>
 					</p:column>
 					<p:column styleClass="action_column" exportable="false">
-						<p:commandButton icon="ui-icon ui-icon-close" update=":form"
+						<p:commandButton icon="ui-icon ui-icon-close pi pi-trash" update=":form"
 							action="#{bean.handleDeleteCategoryPercentValue(cat)}">
 							<p:confirm message="#{msg.delete}?" />
 						</p:commandButton>
@@ -80,12 +80,12 @@
 					paginator="false" paginatorAlwaysVisible="false"
 					widgetVar="tableGroupOMIWV" style="width: 35%;">
 					<p:column>#{group.name}
-						<p:commandButton icon="ui-icon ui-icon-pencil"
+						<p:commandButton icon="ui-icon ui-icon-pencil pi pi-pencil"
 							oncomplete="PF('omiGroupValueWV').show();"
 							update="omiGroupValueDlg"
 							action="#{bean.handleGroupOmiDialogInit(group)}"/>
 						&nbsp; &nbsp;
-						<p:commandButton icon="ui-icon ui-icon-close" update="groupOmi"
+						<p:commandButton icon="ui-icon ui-icon-close pi pi-trash" update="groupOmi"
 							action="#{bean.handleDeleteGroupOmi(group)}">
 							<p:confirm message="#{msg.delete}?" />
 						</p:commandButton>
@@ -107,14 +107,14 @@
 								<h:outputText value="#{item.categoryCode}" />
 							</p:column>
 							<p:column styleClass="action_column" exportable="false">
-								<p:commandButton icon="ui-icon ui-icon-pencil"
+								<p:commandButton icon="ui-icon ui-icon-pencil pi pi-pencil"
 									update="omiGroupItemDlg"
 									oncomplete="PF('omiGroupItemWV').show();"
 									action="#{bean.handleGroupItemDialogInit(group,item)}">
 								</p:commandButton>
 							</p:column>
 							<p:column styleClass="action_column" exportable="false">
-								<p:commandButton icon="ui-icon ui-icon-close"
+								<p:commandButton icon="ui-icon ui-icon-close pi pi-trash"
 								action="#{bean.handleDeleteCategoryItemGroupOmi(group,item)}" update="items">
 									<p:confirm message="#{msg.delete}?" />
 								</p:commandButton>

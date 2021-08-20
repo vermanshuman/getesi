@@ -74,7 +74,7 @@
         <p:dataTable value="#{bean.entity.validRequests}" styleClass="simple-table" var="item"
                      rendered="#{not empty bean.entity.validRequests}">
             <p:column styleClass=" action_column">
-                <p:commandButton icon="ui-icon ui-icon-pencil" update=":form" action="#{bean.gotoEditRequest}">
+                <p:commandButton icon="ui-icon ui-icon-pencil pi pi-pencil" update=":form" action="#{bean.gotoEditRequest}">
                     <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                 </p:commandButton>
             </p:column>

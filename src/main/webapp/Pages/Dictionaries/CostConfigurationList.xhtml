@@ -12,7 +12,7 @@
 
     <ui:define name="columns">
         <p:column styleClass="action_column">
-            <p:commandButton icon="ui-icon ui-icon-search" update=":form"
+            <p:commandButton icon="ui-icon ui-icon-search pi pi-search" update=":form"
                              action="#{bean.viewEntity}" disabled="#{!bean.canView}">
                 <f:setPropertyActionListener value="#{item.id}"
                                              target="#{bean.entityEditId}"/>

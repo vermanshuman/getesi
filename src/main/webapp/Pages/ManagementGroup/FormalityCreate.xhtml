@@ -275,7 +275,7 @@
                         </p:columnGroup>
 
                         <p:column styleClass="action_column" exportable="false">
-                            <p:commandButton icon="ui-icon ui-icon-pencil" update=":form"
+                            <p:commandButton icon="ui-icon ui-icon-pencil pi pi-pencil" update=":form"
                                              oncomplete="PF('sectionBAddDlgWV').show();"
                                              action="#{bean.handleEditProperty(item,elem)}">
                                 <f:setPropertyActionListener value="#{item.id}"
@@ -284,7 +284,7 @@
                         </p:column>
 
                         <p:column styleClass="action_column" exportable="false">
-                            <p:commandButton icon="ui-icon ui-icon-close" update=":form"
+                            <p:commandButton icon="ui-icon ui-icon-close pi pi-trash" update=":form"
                                              action="#{bean.handleDeleteProperty(item,elem)}">
                             </p:commandButton>
                         </p:column>
@@ -404,14 +404,14 @@
                     <h:outputText value="#{subj.numberVAT}"/>
                 </p:column>
                 <p:column styleClass="action_column">
-                    <p:commandButton icon="ui-icon ui-icon-pencil" update=":form"
+                    <p:commandButton icon="ui-icon ui-icon-pencil pi pi-pencil" update=":form"
                                      oncomplete="PF('sectionCAddDlgWV').show();"
                                      action="#{bean.handleEditSubject(subj,bean.aFavoreSectionC)}">
                     </p:commandButton>
                 </p:column>
 
                 <p:column styleClass="action_column">
-                    <p:commandButton icon="ui-icon ui-icon-close" update=":form"
+                    <p:commandButton icon="ui-icon ui-icon-close pi pi-trash" update=":form"
                                      action="#{bean.handleDeleteSubject(subj,bean.aFavoreSectionC)}">
                     </p:commandButton>
                 </p:column>
@@ -491,14 +491,14 @@
                     <h:outputText value="#{item.numberVAT}"/>
                 </p:column>
                 <p:column styleClass="action_column">
-                    <p:commandButton icon="ui-icon ui-icon-pencil" update=":form"
+                    <p:commandButton icon="ui-icon ui-icon-pencil pi pi-pencil" update=":form"
                                      oncomplete="PF('sectionCAddDlgWV').show();"
                                      action="#{bean.handleEditSubject(item,bean.controSectionC)}">
                     </p:commandButton>
                 </p:column>
 
                 <p:column styleClass="action_column">
-                    <p:commandButton icon="ui-icon ui-icon-close" update=":form"
+                    <p:commandButton icon="ui-icon ui-icon-close pi pi-trash" update=":form"
                                      action="#{bean.handleDeleteSubject(item,bean.controSectionC)}">
                     </p:commandButton>
                 </p:column>
@@ -570,14 +570,14 @@
                     <h:outputText value="#{subj.numberVAT}"/>
                 </p:column>
                 <p:column styleClass="action_column">
-                    <p:commandButton icon="ui-icon ui-icon-pencil" update=":form"
+                    <p:commandButton icon="ui-icon ui-icon-pencil pi pi-pencil" update=":form"
                                      oncomplete="PF('sectionCAddDlgWV').show();"
                                      action="#{bean.handleEditSubject(subj,bean.debitoriSectionC)}">
                     </p:commandButton>
                 </p:column>
 
                 <p:column styleClass="action_column">
-                    <p:commandButton icon="ui-icon ui-icon-close" update=":form"
+                    <p:commandButton icon="ui-icon ui-icon-close pi pi-trash" update=":form"
                                      action="#{bean.handleDeleteSubject(subj,bean.debitoriSectionC)}">
                     </p:commandButton>
                 </p:column>

@@ -48,7 +48,7 @@
 
     <ui:define name="additional_buttons">
         <p:commandButton value="#{msg.edit}" rendered="#{bean.onlyView and not bean.fromClient}" update=":form"
-                         action="#{bean.editEntity}" icon="ui-icon ui-icon-pencil"/>
+                         action="#{bean.editEntity}" icon="ui-icon ui-icon-pencil pi pi-pencil"/>
         <p:commandButton value="#{msg.save}" rendered="#{bean.fromClient}" update=":form"
                          action="#{bean.saveFromDialog}" icon="ui-icon ui-icon-disk"/>
         <p:commandButton action="#{bean.closeDialog}" rendered="#{bean.fromClient}" value="#{msg.cancel}"
