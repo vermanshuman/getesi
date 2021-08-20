@@ -1,5 +1,6 @@
 package it.nexera.ris.web.beans.pages;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -11,11 +12,16 @@ import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.common.utils.ForecastUtil;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.Event;
+import it.nexera.ris.persistence.beans.entities.domain.Request;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.DayPhrase;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
 import it.nexera.ris.web.beans.BaseValidationPageBean;
+import it.nexera.ris.web.beans.wrappers.ChartDataWrapper;
+import it.nexera.ris.web.beans.wrappers.ChartWrapper;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.DefaultScheduleModel;
 import org.primefaces.model.ScheduleEvent;
@@ -29,13 +35,13 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
+import java.time.LocalDate;
+import java.util.*;
 
 @ManagedBean(name = "homeBean")
 @ViewScoped
+@Getter
+@Setter
 public class HomeBean extends BaseValidationPageBean implements Serializable {
 
     private static final long serialVersionUID = 4618457741093417637L;
@@ -56,10 +62,14 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
 
     private ScheduleEvent eventSelect;
 
+    private boolean nextSlide = false;
+
+    private String chartData;
+
     @Override
     protected void onConstruct() {
         try {
-//            (actually we may set this value as 0)
+            createDashboardChart();
             setNumberTotalRequests(0L);
             setNumberDBRecords(0L);
             setEventModel(new DefaultScheduleModel());
@@ -73,6 +83,54 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
         } catch (InstantiationException | IllegalAccessException | PersistenceBeanException e) {
             LogHelper.log(log, e);
         }
+    }
+
+
+    public void createDashboardChart() throws PersistenceBeanException, IllegalAccessException {
+
+        ChartWrapper chartWrapper = new ChartWrapper();
+        LocalDate today = LocalDate.now();
+        int month = today.getMonthValue();
+
+        chartWrapper.setType("line");
+        chartWrapper.setLabels(new ArrayList<>());
+        for(int m = 1 ; m <= month; m++){
+            chartWrapper.getLabels().add(DateTimeHelper.getMonth(m));
+        }
+        Random randomObject = new Random();
+        List<ChartDataWrapper> dataSets = new ArrayList<>();
+        List<RequestType> requestTypes = DaoManager.load(RequestType.class, new Criterion[]{Restrictions.isNotNull("name")});
+        for(RequestType requestType : requestTypes) {
+            List<Long> data = new ArrayList<>();
+            for(int m = 1 ; m <= month; m++){
+                Long requestCount = DaoManager.getCount(Request.class,"id",
+                        new Criterion[]{
+                                Restrictions.eq("requestType", requestType),
+                                Restrictions.ge("evasionDate", DateTimeHelper.getMonthStart(m)),
+                                Restrictions.le("evasionDate", DateTimeHelper.getMonthEnd(m))
+                        }
+                );
+                if(requestCount > 0)
+                    data.add(requestCount);
+            }
+
+            if(data.size() > 0){
+                int rand_num = randomObject.nextInt(0xffffff + 1);
+                String colorCode = String.format("#%06x", rand_num);
+                int pointRadius = randomObject.nextInt((6 - 3) + 1) + 3;
+                ChartDataWrapper dataSet = ChartDataWrapper.builder()
+                        .label(requestType.getName())
+                        .data(data)
+                        .borderColor(colorCode)
+                        .borderWidth(3)
+                        .fill(false)
+                        .pointRadius(pointRadius)
+                        .build();
+                dataSets.add(dataSet);
+            }
+        }
+        chartWrapper.setDatasets(dataSets);
+        setChartData(new Gson().toJson(chartWrapper));
     }
 
     public void generateForecast() {
@@ -139,65 +197,5 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
                 break;
             }
         }
-    }
-
-    public void onEventSelect(SelectEvent selectEvent) {
-        eventSelect = (ScheduleEvent) selectEvent.getObject();
-    }
-
-    public Long getNumberTotalRequests() {
-        return numberTotalRequests;
-    }
-
-    public void setNumberTotalRequests(Long numberTotalRequests) {
-        this.numberTotalRequests = numberTotalRequests;
-    }
-
-    public Long getNumberDBRecords() {
-        return numberDBRecords;
-    }
-
-    public void setNumberDBRecords(Long numberDBRecords) {
-        this.numberDBRecords = numberDBRecords;
-    }
-
-    public ScheduleModel getEventModel() {
-        return eventModel;
-    }
-
-    public void setEventModel(ScheduleModel eventModel) {
-        this.eventModel = eventModel;
-    }
-
-    public String getPhrase() {
-        return phrase;
-    }
-
-    public void setPhrase(String phrase) {
-        this.phrase = phrase;
-    }
-
-    public ForecastUtil getForecastToday() {
-        return forecastToday;
-    }
-
-    public void setForecastToday(ForecastUtil forecastToday) {
-        this.forecastToday = forecastToday;
-    }
-
-    public List<ForecastUtil> getFutureForecast() {
-        return futureForecast;
-    }
-
-    public void setFutureForecast(List<ForecastUtil> futureForecast) {
-        this.futureForecast = futureForecast;
-    }
-
-    public ScheduleEvent getEventSelect() {
-        return eventSelect;
-    }
-
-    public void setEventSelect(ScheduleEvent eventSelect) {
-        this.eventSelect = eventSelect;
     }
 }

@@ -1,4 +1,142 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ct="http://www.chartistjsf.org/charts"
                 template="/resources/tpl/Admin/template.xhtml">
+
+    <ui:define name="title">Dashboard</ui:define>
+
+
+
+    <ui:define name="content">
+
+        <h:outputScript name="chartjs/chart.js" library="chart"/>
+        <script type="text/javascript">
+            $(function () {
+                var chartData = JSON.parse('#{homeBean.chartData}');
+                var ctx = document.getElementById("dashboard-chart").getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: chartData.type,
+                    data: {
+                        labels: chartData.labels,
+                        datasets: chartData.datasets
+                    },
+                    options: {
+                        responsive: true,
+                        hover: {
+                            mode: 'index'
+                        },
+                        scales: {
+                            xAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Month'
+                                }
+                            }],
+                            yAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Request'
+                                }
+                            }]
+                        }
+                    }
+                });
+            });
+        </script>
+        <div class="layout-dashboard" style="max-width: 98%;">
+            <h:panelGroup id="slides" layout="block" styleClass="p-grid">
+                <div class="p-col-12 p-lg-6 p-xl-3" style="display: #{homeBean.nextSlide ? 'none' : ''}">
+                    <div class="overview-box sales" style="background-color: #FF9966;">
+                        <i class="overview-icon topbar-icon fa fa-fw fa-envelope-o" style="color:white;"/>
+                        <span class="overview-title">#{msg.numberUnreadEmails}</span>
+                        <div class="overview-numbers">
+                            <h:outputText id="newMailCount"
+                                          value="#{sessionBean.newMailCount}"/>
+                        </div>
+                        <div class="overview-subinfo">
+                        </div>
+                    </div>
+                </div>
+                <div class="p-col-12 p-lg-6 p-xl-3" style="display: #{homeBean.nextSlide ? 'none' : ''}">
+                    <div class="overview-box views" style="background-color: #5EA2CC;">
+                        <i class="overview-icon fa fa-fw fa-list" style="color:white;"/>
+                        <span class="overview-title">Pratiche nuove</span>
+                        <div class="overview-numbers">
+                            <h:outputText id="numberUnclosedRequests"
+                                          value="#{sessionBean.numberUnclosedRequests}"/>
+                        </div>
+                        <div class="overview-subinfo">
+                        </div>
+                    </div>
+                </div>
+                <div class="p-col-12 p-lg-6 p-xl-3">
+                    <div class="overview-box checkin">
+                        <i class="overview-icon pi pi-pencil"/>
+                        <span class="overview-title">#{msg.numberTotalRequests}</span>
+                        <div class="overview-numbers">
+                            <h:outputText id="numberUnclosedRequestsInWork"
+                                          value="#{sessionBean.numberUnclosedRequestsInWork}"/>
+                        </div>
+                        <div class="overview-subinfo">
+                        </div>
+                    </div>
+                </div>
+                <div class="p-col-12 p-lg-6 p-xl-3">
+                    <div class="overview-box checkin" style="background-color: #DF6161;">
+                        <i class="overview-icon pi pi-clock"/>
+                        <span class="overview-title">#{msg.numberOverdueRequests}</span>
+                        <div class="overview-numbers">
+                            <h:outputText
+                                          value="&#160;"/>
+                        </div>
+                        <div class="overview-subinfo">
+                        </div>
+                    </div>
+                </div>
+                <div class="p-col-12 p-lg-6 p-xl-3" style="display: #{homeBean.nextSlide ? '' : 'none'}">
+                    <div class="overview-box views">
+                        <i class="overview-icon pi pi-calendar"/>
+                        <span class="overview-title">#{msg.numberRequestsDue}</span>
+                        <div class="overview-numbers">
+                            <h:outputText
+                                    value="&#160;"/>
+                        </div>
+                        <div class="overview-subinfo">
+                        </div>
+                    </div>
+                </div>
+                <div class="p-col-12 p-lg-6 p-xl-3" style="display: #{homeBean.nextSlide ? '' : 'none'}">
+                    <div class="overview-box checkin" style="background-color: #C488C4;">
+                        <i class="overview-icon fa fa-fw fa-database"/>
+                        <span class="overview-title">#{msg.numberDBRecords}</span>
+                        <div class="overview-numbers">
+                            <h:outputText id="sumOfEntriesCountInManyTables"
+                                          value="#{sessionBean.sumOfEntriesCountInManyTables}"/>
+                        </div>
+                        <div class="overview-subinfo">
+                        </div>
+                    </div>
+                </div>
+
+            </h:panelGroup>
+            <div class="p-col-12 p-lg-8">
+                <div class="card card-w-title statistics">
+                    <h5>Statistics</h5>
+                    <canvas id="dashboard-chart"/>
+                </div>
+            </div>
+        </div>
+        <div id="layout-config" class="layout-config">
+            <div class="layout-config-content">
+                <p:commandLink id="slideNextBtn" update=":slides :slideNextBtn" action="#{homeBean.setNextSlide(!homeBean.nextSlide)}" styleClass="layout-config-button" style="background-color: transparent;top: 125px;color: gray;">
+                    <i class="pi #{homeBean.nextSlide ? 'pi-angle-double-left' : 'pi-angle-double-right'}"/>
+                </p:commandLink>
+            </div>
+        </div>
+    </ui:define>
 </ui:composition>

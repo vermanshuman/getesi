@@ -27,11 +27,19 @@
             <ui:fragment id="topbarProfile">
                 <li class="user-profile">
                     <a href="#{facesContext.externalContext.requestContextPath}/Pages/Configuration/UserProfileView.jsf">
-                        <p:graphicImage rendered="#{not empty sessionBean.currentUser.photo}" value="#{sessionBean.currentUser.photo}" width="35" />
+                        <p:graphicImage styleClass="profileImg" rendered="#{not empty sessionBean.currentUser.photo}" value="#{sessionBean.currentUser.photo}" width="35" />
                         <ui:fragment rendered="#{empty sessionBean.currentUser.photo}">
                             <i class="topbar-icon fa fa-fw fa-user-circle"/>
                         </ui:fragment>
                     </a>
+                </li>
+            </ui:fragment>
+            <ui:fragment id="currentCal">
+                <li>
+                    <p:calendar id="currentDay" readonlyInput="false" showOn="button"
+                                onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+                                pattern="dd/MM/yyyy" mask="true"
+                                locale="it" navigator="false" styleClass="only-date-icon"/>
                 </li>
             </ui:fragment>
             <ui:fragment rendered="#{sessionBean.canViewPage('APPLICATION_SETTINGS')}">

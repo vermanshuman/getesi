@@ -7,6 +7,12 @@
     <ui:param name="edit_title" value="#{msg.omiValuationDocuments}"/>
     <ui:param name="bean" value="#{corporateDataBean}"/>
 
+    <ui:define name="viewname">
+        <li>
+            <p:link href="/Pages/Configuration/DatiAziendali.jsf">#{msg.omiValuationDocuments}</p:link>
+        </li>
+    </ui:define>
+
     <ui:define name="edit_body">
         <div align="center">
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"

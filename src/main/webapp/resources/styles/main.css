@@ -3,4 +3,139 @@
     color: black !important;
     font-weight: bold !important;
 }
+.selected-button {
+    background-color: #000066 !important;
+}
+body .cyan-blue-btn {
+    background-color: #547ac4 !important;
+}
+
+body .ui-button {
+    background: #547ac4;
+    color: #ffffff;
+    border: 1px solid #547ac4  !important;
+    margin: 0;
+    outline: 0 none;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.mail_style {
+    color: #4c5156 !important;
+}
 /* MailManagerList End */
+
+/* Menu Start */
+.notarialCertificationListIcon {
+    display: inline-block;
+    background-size: 79% !important;
+    width: 25px !important;
+    height: 22px;
+    background: url("../images/notarial-cerification-list-logo.png") top left no-repeat;
+    filter: invert(100%) sepia(100%) saturate(100%) hue-rotate(197deg) brightness(103%) contrast(101%) !important;
+}
+/* Menu End */
+
+/* Footer Start */
+.footer-text-right {
+    color: #778087;
+}
+/* Footer End */
+
+/* Topbar Start */
+
+.profileImg {
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+}
+
+.only-date-icon .ui-inputfield{
+    display: none;
+}
+
+/* Topbar End */
+
+body .ui-widget-header {
+    background-color: #788FA7 !important;
+}
+
+body .ui-widget-header {
+    background-color: #2f8ee5;
+    color: #ffffff !important;
+}
+
+body .ui-paginator .ui-paginator-current {
+    color: #ffffff !important;
+}
+
+body .ui-state-active, body .ui-state-highlight {
+    background-color: #2d353c !important;
+    color: #ffffff;
+}
+
+body .ui-paginator .ui-paginator-pages .ui-paginator-page {
+    color: #ffffff !important;
+}
+
+body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
+    background-color: #f0f3f5 !important;
+}
+
+body .ui-widget-content {
+    background-color: #ffffff;
+    border: 1px solid #c9cdd2 !important;
+}
+
+body .ui-datatable thead th.ui-state-hover {
+    background-color: #f0f3f5 !important;
+    color: #5f666c !important;
+}
+
+body .ui-datatable thead th {
+    background-color: #ffffff !important;
+    padding: 8px 14px !important;
+    border-color: #c9cdd2 !important;
+    color: #5f666c !important;
+}
+
+.ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+    padding: 4px 10px!important;
+    overflow: hidden!important;
+    border-width: 1px!important;
+    border-style: solid!important;
+}
+
+
+body .ui-datatable .ui-datatable-data tr td {
+    padding: 6px 12px;
+}
+.ui-datatable tbody td {
+    border-color: inherit;
+}
+.ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+    padding: 4px 10px;
+    overflow: hidden;
+    border-width: 1px;
+    border-style: solid;
+}
+.min_padding_margin {
+    text-align: center;
+    table-layout: auto;
+    margin-left: 2px !important;
+    padding-left: 2px !important;
+    padding-right: 4px !important;
+}
+
+.ui-paginator {
+    padding-bottom: 5px !important;
+    padding-top: 5px !important;
+}
+
+body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev, body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last {
+    color: #ffffff !important;
+}
+
+body .ui-paginator .ui-paginator-first.ui-state-hover, body .ui-paginator .ui-paginator-prev.ui-state-hover, body .ui-paginator .ui-paginator-next.ui-state-hover, body .ui-paginator .ui-paginator-last.ui-state-hover {
+    color: #2d353c !important;
+}
