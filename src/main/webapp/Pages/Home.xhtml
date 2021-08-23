@@ -3,11 +3,10 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
-                xmlns:ct="http://www.chartistjsf.org/charts"
+                xmlns:ff="http://readytech.com/functions"
                 template="/resources/tpl/Admin/template.xhtml">
 
     <ui:define name="title">Dashboard</ui:define>
-
 
 
     <ui:define name="content">
@@ -43,6 +42,9 @@
                                     labelString: 'Request'
                                 }
                             }]
+                        },
+                        plugins: {
+                            tooltip: {}
                         }
                     }
                 });
@@ -92,7 +94,7 @@
                         <span class="overview-title">#{msg.numberOverdueRequests}</span>
                         <div class="overview-numbers">
                             <h:outputText
-                                          value="&#160;"/>
+                                    value="&#160;"/>
                         </div>
                         <div class="overview-subinfo">
                         </div>
@@ -124,16 +126,83 @@
                 </div>
 
             </h:panelGroup>
-            <div class="p-col-12 p-lg-8">
-                <div class="card card-w-title statistics">
-                    <h5>Statistics</h5>
-                    <canvas id="dashboard-chart"/>
+            <div class="p-grid">
+                <div class="p-col-6">
+                    <div>
+                        <fieldset>
+                            <legend>FRASE DEL GIORNO</legend>
+                            <div align="center" style="font-size: 26px; font-style: italic">
+                                <i class="fa fa-fw fa-quote-left " style="margin-right: 1%"/>
+                                <span>#{homeBean.phrase}</span>
+                                <i class="fa fa-fw fa-quote-right" style="margin-left: 1%"/>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+                <div class="p-col-6">
+                    <div>
+                        <fieldset>
+                            <legend>#{ff:upper(msg.forecastCity)} #{homeBean.currentDayString}</legend>
+                            <ui:include src="/Pages/home/WeatherBlock.xhtml"/>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+            <div class="p-grid">
+                <div class="p-col-12 p-lg-8">
+                    <div class="card card-w-title statistics">
+                        <h5>#{msg.chartHeader}</h5>
+                        <canvas id="dashboard-chart"/>
+                    </div>
+                </div>
+                <div class="p-col-12 p-lg-4">
+                    <div class="card card-w-title tasks">
+                        <h5 class="carico-heading"><i class="overview-icon pi pi-clone"
+                                                      style="color:white;"/>#{msg.workloadHeader}</h5>
+                        <div class="p-grid">
+                            <div class="p-col-6"></div>
+                            <div class="p-col-6">
+                                <p:selectOneMenu id="changeUserList" value="#{homeBean.selectedUserId}"
+                                                 style="width: 91%;"
+                                                 label="#{msg.user}" rendered="#{homeBean.currentUser.isAdmin()}">
+                                    <f:selectItems value="#{homeBean.users}"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+                        <ul style="color: #778087;">
+                            <ui:repeat value="#{homeBean.workLoadWrappers}" var="workLoad">
+                                <li>
+                                    <div class="p-grid">
+                                        <div class="p-col-1">
+                                            <i class="carico-icon topbar-icon #{workLoad.icon}" style="#{workLoad.style}"/>
+                                        </div>
+                                        <div class="p-col-5">
+                                            <div style="font-size: 1.25rem;color: black">
+                                                <h:outputText value="#{workLoad.name}"/>
+                                            </div>
+                                            <div>
+                                                <h:outputText
+                                                        value="#{workLoad.numberUnclosedRequestsInWork}"/> in lavorazione
+                                            </div>
+                                        </div>
+                                        <div class="p-col-6">
+                                            <p:progressBar value="#{workLoad.percentage}" displayOnly="true"
+                                                           style="height: .5rem"/>
+                                        </div>
+                                    </div>
+
+                                </li>
+                            </ui:repeat>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
         <div id="layout-config" class="layout-config">
             <div class="layout-config-content">
-                <p:commandLink id="slideNextBtn" update=":slides :slideNextBtn" action="#{homeBean.setNextSlide(!homeBean.nextSlide)}" styleClass="layout-config-button" style="background-color: transparent;top: 125px;color: gray;">
+                <p:commandLink id="slideNextBtn" update=":slides :slideNextBtn"
+                               action="#{homeBean.setNextSlide(!homeBean.nextSlide)}" styleClass="layout-config-button"
+                               style="background-color: transparent;top: 125px;color: gray;">
                     <i class="pi #{homeBean.nextSlide ? 'pi-angle-double-left' : 'pi-angle-double-right'}"/>
                 </p:commandLink>
             </div>

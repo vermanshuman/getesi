@@ -16,12 +16,12 @@
                         <ui:include src="/resources/tpl/common/ValidationMessages.xhtml"/>
                         <div align="center">
                             <ui:insert name="edit_fields"></ui:insert>
-                            <div>
+                            <div class="button-top-margin">
                                 <p:commandButton value="#{msg.save}" update=":form, messages"
-                                                 icon="ui-icon-disk" action="#{bean.pageSave}">
+                                                 icon="pi pi-save" action="#{bean.pageSave}" styleClass="p-mr-2 p-mb-2">
                                 </p:commandButton>
                                 <p:commandButton value="#{msg.reset}" update="editPanel"
-                                                 icon="ui-icon-circle-close" action="#{bean.resetFields}">
+                                                 icon="pi pi-times-circle" action="#{bean.resetFields}" styleClass="p-mr-2 p-mb-2">
                                 </p:commandButton>
                             </div>
                         </div>

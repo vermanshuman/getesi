@@ -280,7 +280,7 @@
                          rowsPerPageTemplate="10,20,50" widgetVar="tableSubjectsWV">
 
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon ui-icon-pencil pi pi-pencil"
+                    <p:commandButton icon="ui-icon ui-icon-pencil"
                                      oncomplete="PF('addSubjectDLGWV').show();"
                                      update=":form:addSubjectPanel" action="#{bean.editRelationship}">
                         <f:setPropertyActionListener value="#{item.id}"
@@ -289,7 +289,7 @@
                 </p:column>
 
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon ui-icon-close pi pi-trash"
+                    <p:commandButton icon="ui-icon ui-icon-close"
                                      oncomplete="PF('deleteSubjectDLGWV').show()">
                         <f:setPropertyActionListener value="#{item.id}"
                                                      target="#{bean.relationshipDeleteId}"/>
@@ -572,7 +572,7 @@
                         <!--label="#{msg.databaseListRealEstateSubject}">-->
                         <!--<f:selectItems value="#{bean.allSubjects}"/>-->
                         <!--</p:selectOneMenu>-->
-                        <p:commandButton icon="ui-icon-circle-plus pi pi-plus-circle"
+                        <p:commandButton icon="ui-icon-circle-plus"
                                          action="#{bean.openSubjectDlg}">
                             <p:ajax event="dialogReturn"
                                     listener="#{bean.onEditSubjectDlgClose}"
@@ -679,7 +679,7 @@
         <p:commandButton value="#{msg.edit}"
                          rendered="#{bean.onlyView}"
                          update=":form" action="#{bean.editSubject}"
-                         icon="ui-icon ui-icon-pencil pi pi-pencil"/>
+                         icon="ui-icon ui-icon-pencil"/>
         <p:commandButton value="#{msg.save}"
                          rendered="#{bean.fromRequestPrint and not bean.fromSubjectView}"
                          update=":form" action="#{bean.saveFromDialog}"

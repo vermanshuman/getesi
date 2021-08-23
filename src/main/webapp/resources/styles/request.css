@@ -71,11 +71,11 @@ input {
 	min-height: 28px;
 }
 
-.ui-datepicker-trigger {
+.ui-calendar:not(#currentDay) .ui-datepicker-trigger {
 	color: #003871 !important;;
 }
 
-body .ui-calendar .ui-button {
+body .ui-calendar:not(#currentDay) .ui-button {
 	background-color: transparent !important;
 	margin-left: -37px;
 }

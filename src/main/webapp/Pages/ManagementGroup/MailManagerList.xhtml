@@ -149,7 +149,7 @@
                         <p:commandButton value="&nbsp;#{msg.mailManagerUpdate}" styleClass="cyan-blue-btn p-mr-2 p-mb-2"
                                          style="float: left"
                                          update=":form:table_panel"/>
-                        <p:commandButton icon="fa fa-arrow-right" title="#{msg.mailManagerForward}"
+                        <p:commandButton icon="pi pi-arrow-right" title="#{msg.mailManagerForward}"
                                          value="#{msg.mailManagerForward}" styleClass="cyan-blue-btn p-mr-2 p-mb-2"
                                          action="#{bean.forwardMail}" update=":form" style="float: left;"
                                          rendered="#{(bean.selectedInboxes.size() == 1) and not bean.selectedInboxes[0].isNew and bean.canCreate}"/>
@@ -203,14 +203,14 @@
                                          value="#{bean.getMailManagerDRAFT()}">
                             <f:setPropertyActionListener value="0" target="#{bean.mailManagerButtonSelectedId}"/>
                         </p:commandButton>
-                        <p:commandButton ajax="true" icon="fa fa-arrow-right" oncomplete="editFormat(false);"
+                        <p:commandButton ajax="true" icon="pi pi-arrow-right" oncomplete="editFormat(false);"
                                          action="#{bean.filterLetterByOwner}"
                                          styleClass="#{bean.mailManagerButtonSelectedId==1?'selected-button p-mr-2 p-mb-2':'cyan-blue-btn p-mr-2 p-mb-2'}"
                                          update="form" id="mail_item_1" style="float: right"
                                          value="#{bean.getMailManagerSENT()}">
                             <f:setPropertyActionListener value="1" target="#{bean.mailManagerButtonSelectedId}"/>
                         </p:commandButton>
-                        <p:commandButton ajax="true" icon="fa fa-arrow-left" oncomplete="editFormat(false);"
+                        <p:commandButton ajax="true" icon="pi pi-arrow-left" oncomplete="editFormat(false);"
                                          action="#{bean.filterLetterByOwner}"
                                          styleClass="#{bean.mailManagerButtonSelectedId==2?'selected-button p-mr-2 p-mb-2':'cyan-blue-btn p-mr-2 p-mb-2' }"
                                          update="@form" id="mail_item_2" style="float: right"

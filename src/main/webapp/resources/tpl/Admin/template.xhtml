@@ -21,6 +21,8 @@
         <script type="text/javascript"
                 src="#{facesContext.externalContext.requestContextPath}/resources/javascript/javascript_helper.js"/>
         <ui:insert name="head"/>
+        <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/main.css"
+              media="all" rel="stylesheet" type="text/css"/>
     </h:head>
 
     <h:body styleClass="outlined">
@@ -60,8 +62,6 @@
         <h:outputStylesheet name="css/primeicons.css" library="babylon-layout" />
         <h:outputStylesheet name="css/primeflex.min.css" library="babylon-layout" />
         <h:outputStylesheet name="css/layout-blue.css" library="babylon-layout" />
-        <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/main.css"
-              media="all" rel="stylesheet" type="text/css"/>
     </h:body>
 
 </html>

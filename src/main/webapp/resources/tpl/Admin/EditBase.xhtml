@@ -8,6 +8,12 @@
 >
 <ui:composition template="/resources/tpl/Admin/template.xhtml">
 
+    <ui:define name="viewname">
+        <li>
+            <p:link outcome="#{bean.currentPage.page}">#{page_header}</p:link>
+        </li>
+    </ui:define>
+
     <ui:define name="content">
 
         <div class="ui-g">
@@ -34,14 +40,14 @@
                                                                  rendered="#{empty showSave ? true : showSave}"
                                                                  disabled="#{empty disableSave ? false : disableSave}"
                                                                  value="#{empty save_button_text ? msg.save : save_button_text}"
-                                                                 oncomplete="#{save_oncomplete}" icon="ui-icon-disk"
+                                                                 oncomplete="#{save_oncomplete}" icon="pi pi-save"
                                                                  update=":form, #{save_update}, messages"
-                                                                 styleClass="#{saveButtonStyle}"/>
+                                                                 styleClass="#{saveButtonStyle} p-mr-2 p-mb-2"/>
 
-                                                <p:commandButton id="cancel_btn" action="#{bean.goBack}"
+                                                <p:commandButton id="cancel_btn" action="#{bean.goBack}" styleClass="p-mr-2 p-mb-2"
                                                                  rendered="#{empty showCancel ? true : showCancel}"
                                                                  value="#{empty customCancelMsg ? msg.cancel : customCancelMsg}"
-                                                                 icon="ui-icon-circle-close"/>
+                                                                 icon="pi pi-times-circle"/>
 
                                                 <p:commandButton value="#{msg.setDefault}"
                                                                  rendered="#{!empty showDefaultBtn}"

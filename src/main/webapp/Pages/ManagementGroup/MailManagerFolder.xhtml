@@ -75,14 +75,14 @@
             <p:rowToggler/>
         </p:column>
         <p:column styleClass="action_column" exportable="false">
-            <p:commandButton icon="ui-icon ui-icon-pencil pi pi-pencil" disabled="#{!bean.canEdit or item.defaultFolder}"
+            <p:commandButton icon="ui-icon ui-icon-pencil" disabled="#{!bean.canEdit or item.defaultFolder}"
                              update=":form"
                              action="#{bean.editEntity}">
                 <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
             </p:commandButton>
         </p:column>
         <p:column styleClass="action_column" exportable="false">
-            <p:commandButton icon="ui-icon ui-icon-close pi pi-trash" oncomplete="PF('dlg2').show()"
+            <p:commandButton icon="ui-icon ui-icon-close" oncomplete="PF('dlg2').show()"
                              disabled="#{!bean.canDelete || item.defaultFolder}">
                 <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityDeleteId}"/>
             </p:commandButton>
@@ -132,7 +132,7 @@
                     <p:commandButton icon="fa fa-search" onclick="gotoView([{name:'param', value:'#{mail.id}'}]);"/>
                 </p:column>
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton disabled="#{!bean.canDelete}" icon="ui-icon ui-icon-close pi pi-trash"
+                    <p:commandButton disabled="#{!bean.canDelete}" icon="ui-icon ui-icon-close"
                                      onclick="deleteMail([{name:'param', value:'#{mail.id}'}]);"/>
                 </p:column>
 				<p:column styleClass="action_column" exportable="false">

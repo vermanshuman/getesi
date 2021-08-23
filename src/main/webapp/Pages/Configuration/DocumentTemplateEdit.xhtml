@@ -12,7 +12,7 @@
     <ui:param name="bean" value="#{documentTemplateEditBean}"/>
     <ui:param name="save_oncomplete" value="onCompleteSave();"/>
 
-    <ui:define name="body">
+    <ui:define name="content">
         <script type="text/javascript">
 
             function onInitCkEditor(key) {
@@ -329,11 +329,11 @@
                         <p:outputPanel id="btn_line">
                             <div class="btn_line">
                                 <p:commandButton action="#{bean.pageSave}" value="#{msg.save}"
-                                                 oncomplete="#{save_oncomplete}" icon="ui-icon-disk"
+                                                 oncomplete="#{save_oncomplete}" icon="pi pi-save" styleClass="p-mr-2 p-mb-2"
                                                  update="mainPanel, messages, spinnerHeaderHeight, spinnerFooterHeight, headerValidator, bodyValidator, footerValidator"/>
 
                                 <p:commandButton action="#{bean.goBack}" value="#{msg.cancel}"
-                                                 icon="ui-icon-circle-close"/>
+                                                 icon="pi pi-times-circle"/>
                             </div>
                         </p:outputPanel>
                     </p:panel>

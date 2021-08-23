@@ -30,7 +30,8 @@
             <p:inputText value="#{bean.filterCityCfis}"  id="cityCfis" placeholder="#{msg.omiSearchCityCfis}"
                          style="width: 10%;margin-left: 15px!important;" styleClass="search_group"/>
 
-            <p:commandButton value="#{msg.search}" id="searchButton" update="searchPanel" onclick="filterTableFromPanel();"  styleClass="grey-btn"/>
+            <p:commandButton value="#{msg.search}" id="searchButton" update="searchPanel" onclick="filterTableFromPanel();"
+                             style="margin-left: 15px!important"/>
         </p:panel>
     </ui:define>
     <ui:define name="columns">

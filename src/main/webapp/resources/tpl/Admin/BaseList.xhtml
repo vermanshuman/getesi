@@ -8,6 +8,12 @@
 >
 <ui:composition template="/resources/tpl/Admin/template.xhtml">
 
+    <ui:define name="viewname">
+        <li>
+            <p:link outcome="#{bean.currentPage.page}">#{list_title}</p:link>
+        </li>
+    </ui:define>
+
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12">
@@ -30,7 +36,7 @@
                                     <div class="">
                                         <ui:insert name="buttons_panel"></ui:insert>
                                         <p:commandButton disabled="#{!bean.canCreate}" id="buttonCreate"
-                                                         icon="ui-icon-circle-plus pi pi-plus-circle"
+                                                         icon="pi pi-plus-circle"
                                                          value="#{not empty addButtonTitle ? addButtonTitle : msg.newItem}"
                                                          update=":form"
                                                          action="#{bean.addEntity}"/>
@@ -57,7 +63,7 @@
                                               styleClass="action_column"
                                               exportable="false">
 
-                                        <p:commandButton icon="ui-icon ui-icon-pencil pi pi-pencil"
+                                        <p:commandButton icon="ui-icon pi pi-pencil"
                                                          disabled="#{!bean.canEdit}" update=":form"
                                                          action="#{bean.editEntity}" oncomplete="#{additionalEditAction}">
                                             <f:setPropertyActionListener value="#{item.id}"
@@ -67,7 +73,7 @@
 
                                     <p:column rendered="#{empty showDelete? true : showDelete}"
                                               styleClass="action_column" exportable="false">
-                                        <p:commandButton icon="ui-icon ui-icon-close pi pi-trash"
+                                        <p:commandButton icon="ui-icon pi pi-times"
                                                          oncomplete="PF('dlg2').show()"
                                                          disabled="#{!bean.canDelete || (item.id==sessionBean.currentUser.id and bean.userEntityPage)}">
                                             <f:setPropertyActionListener value="#{item.id}"
@@ -77,7 +83,7 @@
 
                                     <p:column rendered="#{empty showMyDelete ? false : showMyDelete}"
                                               styleClass="action_column" exportable="false">
-                                        <p:commandButton icon="ui-icon ui-icon-close pi pi-trash"
+                                        <p:commandButton icon="ui-icon pi pi-times"
                                                          oncomplete="PF('dlg2').show()"
                                                          disabled="#{!bean.getCanDelete(item) ||
                                                          (item.id==sessionBean.currentUser.id

@@ -8,6 +8,7 @@
 
 <ui:composition template="/resources/tpl/Admin/LazyListTabBase.xhtml">
     <ui:param name="bean" value="#{clientListBean}"/>
+    <ui:param name="list_header" value="#{msg.client}"/>
     <ui:param name="excludeColumns" value="0,1,2"/>
     <ui:define name="list_body">
         <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/client.css"

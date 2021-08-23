@@ -7,6 +7,13 @@
 >
 
 <ui:composition template="/resources/tpl/Admin/template.xhtml">
+
+    <ui:define name="viewname">
+        <li>
+            <p:link outcome="#{bean.currentPage.page}">#{page_header}</p:link>
+        </li>
+    </ui:define>
+
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12">

@@ -144,7 +144,7 @@
             </p:column>
             
             <p:column styleClass="action_column">
-                <p:commandButton icon="ui-icon ui-icon-close pi pi-trash" update=":form" styleClass="btn-red"
+                <p:commandButton icon="ui-icon ui-icon-close" update=":form" styleClass="btn-red"
                                  oncomplete="PF('dlg2').show()" disabled="#{!bean.canDelete}">
                     <f:setPropertyActionListener value="#{item.id}"
                                                  target="#{bean.entityDeleteId}"/>

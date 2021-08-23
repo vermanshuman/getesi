@@ -4,31 +4,31 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:ui="http://java.sun.com/jsf/facelets">
 
-    <h2>#{msg.forecastCity} - #{msg.forecastCountry}</h2>
+<!--    <h2>#{msg.forecastCity} - #{msg.forecastCountry}</h2>-->
     <h1>
-        <span class="forecast-text-center">#{bean.forecastToday.temp}°</span>
-        <img class="forecast-big-icon" src="#{bean.forecastToday.code.img}"/>
-        <span class="forecast-text-center">#{bean.forecastToday.code.toString()}</span>
+        <span class="forecast-text-center">#{homeBean.forecastToday.temp}°</span>
+        <img class="forecast-big-icon" src="#{request.contextPath}#{homeBean.forecastToday.code.img}"/>
+        <span class="forecast-text-center">#{homeBean.forecastToday.code.toString()}</span>
     </h1>
     <span>
         #{msg.forecastHumidity}:
-        <h:outputText value="#{bean.forecastToday.humidity}" converter="percentageConverter"/>
+          <h:outputText value="#{homeBean.forecastToday.humidity}"/>
     </span><br/>
     <span>
         #{msg.forecastWindSpeed}:
-        <h:outputText value="#{bean.forecastToday.windSpeed}"/>
+        <h:outputText value="#{homeBean.forecastToday.windSpeed}"/>
     </span><br/><br/>
-    <p:dataTable value="#{bean.futureForecast}" var="item" styleClass="without-header">
-        <p:column styleClass="forecast-date-column">
-            #{item.day}<br/>#{item.date}
-        </p:column>
-        <p:column>
-            <img class="forecast-small-icon" src="#{item.code.img}"/>
-            <span class="forecast-text-center">#{item.code.toString()}</span>
-        </p:column>
-        <p:column styleClass="forecast-temp-column">
-            <i class="fa fa-fw  fa-long-arrow-up forecast-temp-arrow-up"/>#{item.maxTemp}°
-            <i class="fa fa-fw  fa-long-arrow-down forecast-temp-arrow-down"/>#{item.minTemp}°
-        </p:column>
-    </p:dataTable>
+<!--    <p:dataTable value="#{homeBean.futureForecast}" var="item" styleClass="without-header">-->
+<!--        <p:column styleClass="forecast-date-column">-->
+<!--            #{item.day}<br/>#{item.date}-->
+<!--        </p:column>-->
+<!--        <p:column>-->
+<!--            <img class="forecast-small-icon" src="#{request.contextPath}#{item.code.img}"/>-->
+<!--            <span class="forecast-text-center">#{item.code.toString()}</span>-->
+<!--        </p:column>-->
+<!--        <p:column styleClass="forecast-temp-column">-->
+<!--            <i class="fa fa-fw  fa-long-arrow-up forecast-temp-arrow-up"/>#{item.maxTemp}°-->
+<!--            <i class="fa fa-fw  fa-long-arrow-down forecast-temp-arrow-down"/>#{item.minTemp}°-->
+<!--        </p:column>-->
+<!--    </p:dataTable>-->
 </ui:composition>
