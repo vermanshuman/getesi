@@ -5,8 +5,10 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
+    <link href="#{facesContext.externalContext.requestContextPath}/resources/chart/css/demo.css"
+          media="all" rel="stylesheet" type="text/css"/>
     <p:panel id="button_panel" toggleable="true"
-             style="overflow-y: auto; overflow-x: hidden; word-wrap: break-word; white-space: normal; border: 0; position: fixed; width: 96.5%; z-index: 1000">
+             style="overflow-y: auto; overflow-x: hidden; word-wrap: break-word; white-space: normal; border: 0;z-index: 1000">
         <ui:include src="/resources/tpl/Admin/Include/LetterLine.xhtml"/>
     </p:panel>
 
@@ -71,29 +73,44 @@
             </p:outputPanel>
         </p:panelGrid>
         <br/><br/>
-        <p:dataTable value="#{bean.entity.validRequests}" styleClass="simple-table" var="item"
-                     rendered="#{not empty bean.entity.validRequests}">
-            <p:column styleClass=" action_column">
-                <p:commandButton icon="ui-icon ui-icon-pencil" update=":form" action="#{bean.gotoEditRequest}">
-                    <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
-                </p:commandButton>
-            </p:column>
-            <p:column headerText="#{msg.databaseListRealEstateSubject}">
-                <h:outputText value="#{item.mailViewSubject}"/>
-            </p:column>
-            <p:column headerText="#{msg.requestListRequestType}">
-                <h:outputText value="#{item.requestTypeName}"/>
-            </p:column>
-            <p:column headerText="#{msg.requestListService}">
-                <h:outputText value="#{item.service ne null ? item.serviceName : (item.multipleServices ne null ? item.multipleServiceNames : '')}"/>
-            </p:column>
-            <p:column headerText="#{msg.requestListCorservatoryName}">
-                <h:outputText value="#{item.aggregationLandCharRegNameOrCity}"/>
-            </p:column>
-            <p:column headerText="#{msg.requestState}">
-                <h:outputText value="#{item.stateDescription}"/>
-            </p:column>
-        </p:dataTable>
+        <div class="p-grid table-demo">
+            <div class="p-col-12">
+                <div class="card">
+                    <p:dataTable widgetVar="validRequestsDT" var="item" value="#{bean.entity.validRequests}" reflow="true">
+                        <f:facet name="header">
+                            <div class="customers-table-header">
+                                <span style="font-weight: bold"></span>
+
+                                <span class="ui-input-icon-left filter-container">
+                                                    <i class="pi pi-search"/>
+                                                    <p:inputText id="globalFilter" onkeyup="PF('validRequestsDT').filter()" placeholder="Global Search"/>
+                                                </span>
+                            </div>
+                        </f:facet>
+                        <p:column styleClass=" action_column">
+                            <p:commandButton icon="ui-icon pi pi-pencil" update=":form" action="#{bean.gotoEditRequest}">
+                                <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                            </p:commandButton>
+                        </p:column>
+                        <p:column headerText="#{msg.databaseListRealEstateSubject}" sortBy="#{item.mailViewSubject}" filterBy="#{item.mailViewSubject}">
+                            <h:outputText value="#{item.mailViewSubject}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.requestListRequestType}" sortBy="#{item.mailViewSubject}" filterBy="#{item.mailViewSubject}">
+                            <h:outputText value="#{item.requestTypeName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.requestListService}" sortBy="#{item.mailViewSubject}" filterBy="#{item.mailViewSubject}">
+                            <h:outputText value="#{item.service ne null ? item.serviceName : (item.multipleServices ne null ? item.multipleServiceNames : '')}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.requestListCorservatoryName}" sortBy="#{item.mailViewSubject}" filterBy="#{item.mailViewSubject}">
+                            <h:outputText value="#{item.aggregationLandCharRegNameOrCity}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.requestState}" sortBy="#{item.mailViewSubject}" filterBy="#{item.mailViewSubject}">
+                            <h:outputText value="#{item.stateDescription}"/>
+                        </p:column>
+                    </p:dataTable>
+                </div>
+            </div>
+        </div>
         <br/><br/>
         <div style="overflow: hidden; width: 0px; height: 0px; margin: 0; padding: 0; display: none">
             <p:fileUpload id="mail_file_upload" fileUploadListener="#{bean.handleFileUpload}"

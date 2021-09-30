@@ -533,7 +533,7 @@ a {
   padding-bottom: 100px;
 }
 .layout-wrapper .layout-menu-container .layout-menu-logo {
-  background-color: #42A5F5;
+  background-color: #2196F3;
 }
 .layout-wrapper .layout-menu-container .layout-menu-logo a {
   display: block;
@@ -816,7 +816,7 @@ a {
 .layout-wrapper.layout-menu-dark .layout-menu-container {
   background-color: #212121;
 }
-.layout-wrapper.layout-menu-dark .layout-menu-container .layout-menu-wrapper {
+.layout-wrapper.layout-menu-dark .layout-menu-container {
   border-right: 1px solid #212121;
 }
 .layout-wrapper.layout-menu-dark .layout-menu-container .layout-profile {
@@ -4727,3 +4727,10 @@ html {
 }
 
 /* Add your customizations of layout here */
+.layout-dashboard .user-card .user-card-content .user-detail ul li .project-detail {
+  float: right;
+}
+
+.layout-dashboard .user-card .user-card-content .user-detail ul li .project-progressbar {
+  width: calc(70% - 100px);
+}

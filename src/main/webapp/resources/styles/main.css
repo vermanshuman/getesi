@@ -7,7 +7,8 @@ body {
 fieldset {
     border: 2px solid lightgray;
     border-radius: 5px;
-    min-height: 88px;
+    min-height: 105px;
+    /*max-height: 105px;*/
     color: #778087;
 }
 
@@ -32,6 +33,12 @@ fieldset div {
     margin-left: -5px;
 }
 
+.carico-heading i {
+    color: white;
+    margin-right: 14px;
+    font-size: 24px;
+}
+
 .ui-progressbar .ui-widget-header {
     background: #1e90ff !important;
 }
@@ -41,8 +48,15 @@ fieldset div {
     border-radius: 5px;
     margin-right: 1%;
     margin-left: 1%;
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
+}
+.layout-dashboard .tasks ul li {
+    border-bottom: 2px solid #c1c1c1;
+}
+
+.layout-dashboard .ui-progressbar {
+    background-color: #cecece;
 }
 /* Dashboard End */
 
@@ -61,7 +75,7 @@ body .cyan-blue-btn {
 body .ui-button {
     background: #547ac4;
     color: #ffffff;
-    border: 1px solid #547ac4  !important;
+    border: none !important;
     margin: 0;
     outline: 0 none;
     border-radius: 4px;
@@ -71,6 +85,7 @@ body .ui-button {
 .mail_style {
     color: #4c5156 !important;
 }
+
 /* MailManagerList End */
 
 /* Menu Start */
@@ -124,7 +139,7 @@ body #currentDay .ui-button .ui-icon {
     margin-top: -12px;
 }
 
-body #ui-datepicker-div .ui-widget-header {
+body .top-bar-cal .ui-widget-header {
     background-color: transparent !important;
     color: #000 !important;
     padding-left: 0px !important;
@@ -133,16 +148,16 @@ body #ui-datepicker-div .ui-widget-header {
     border: none !important;
 }
 
-td.ui-datepicker-week-end:first-child a {
+.top-bar-cal td.ui-datepicker-week-end:first-child a {
     border-radius: 0 !important;
     color: #4ead99 !important;
 }
 
-td.ui-datepicker-week-end:first-child {
+.top-bar-cal td.ui-datepicker-week-end:first-child {
     background-color: #e7f3f1;
 }
 
-body .ui-datepicker .ui-datepicker-next, body .ui-datepicker .ui-datepicker-prev {
+body .top-bar-cal .ui-datepicker-next, body .top-bar-cal .ui-datepicker-prev {
     display: none;
 }
 
@@ -150,24 +165,34 @@ body .ui-datepicker .ui-datepicker-next, body .ui-datepicker .ui-datepicker-prev
     border: 2px solid lightgray;
 }
 
-body .ui-datepicker .ui-datepicker-calendar th {
+body .top-bar-cal .ui-datepicker-calendar th {
     background-color: #e6e6e6;
     border-right: 2px solid lightgray;
 }
 
-body .ui-datepicker .ui-datepicker-calendar td {
+body .top-bar-cal .ui-datepicker-calendar td {
     border: 2px solid lightgray;
 }
 
-.ui-datepicker-month {
+.top-bar-cal .ui-datepicker-month {
     float: left;
     font-size: 22px;
     color: #4ead99;
+    text-transform: uppercase;
 }
 
-.ui-datepicker-year {
+.top-bar-cal .ui-datepicker-year {
     float: right;
     font-size: 22px;
+}
+body .top-bar-cal .ui-widget-header {
+    background-color: #fff !important;
+}
+.top-bar-cal .ui-datepicker-month {
+    float: left;
+    font-size: 22px;
+    color: #4ead99;
+    text-transform: uppercase;
 }
 
 /* Topbar End */
@@ -181,7 +206,7 @@ body .ui-datepicker .ui-datepicker-calendar td {
     width: 25px;
     height: 25px;
     margin: 0 auto;
-    display: block;
+    display: inline-block;
 }
 
 .camerale-icon {
@@ -191,7 +216,7 @@ body .ui-datepicker .ui-datepicker-calendar td {
     width: 25px;
     height: 25px;
     margin: 0 auto;
-    display: block;
+    display: inline-block;
 }
 
 .immobiliare-icon {
@@ -201,7 +226,7 @@ body .ui-datepicker .ui-datepicker-calendar td {
     width: 25px;
     height: 25px;
     margin: 0 auto;
-    display: block;
+    display: inline-block;
 }
 
 .investigativo-icon {
@@ -211,7 +236,7 @@ body .ui-datepicker .ui-datepicker-calendar td {
     width: 25px;
     height: 25px;
     margin: 0 auto;
-    display: block;
+    display: inline-block;
 }
 
 .anagrafico-icon-3x {
@@ -357,6 +382,15 @@ body .ui-button.ui-state-active {
 }
 /* Database List End */
 
+/* Eventi List Start */
+.fc .fc-button-group {
+    position: relative !important;
+    display: inline-flex !important;;
+    vertical-align: middle !important;
+}
+
+/* Eventi List End */
+
 body .ui-paginator .ui-paginator-current {
     color: #ffffff !important;
 }
@@ -378,13 +412,13 @@ body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
     background-color: #f0f3f5 !important;
 }
 
-body #ui-datepicker-div.ui-widget-content {
+body .top-bar-cal.ui-widget-content {
     background-color: #ffffff;
     border: 1px solid #c9cdd2 !important;
     top: 50px !important;
     width: 600px;
     right: 0;
-    left: auto;
+    left: auto !important;
 }
 
 body .ui-datatable thead th.ui-state-hover {
@@ -507,7 +541,33 @@ select-width {
 .ui-datatable thead th, .ui-datatable tfoot td {
     text-align: center !important;
 }
-@media screen and (max-width: 991px) {
+
+.layout-wrapper .layout-menu-container .layout-menu-logo {
+    text-align: center;
+    height: 60px;
+}
+
+.layout-wrapper .layout-menu-container .layout-menu-logo img {
+    width: 60px;
+    margin-top: 15px;
+}
+
+
+.mtb-10 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.layout-dashboard .user-card .user-card-content .fa-user-circle {
+    font-size: 4.2em;
+    margin: -30px 0 0 24px;
+    color: #fff;
+    background-color: #000;
+    border-radius: 50%;
+    width: auto;
+}
+
+/*@media screen and (max-width: 991px) {
     .layout-wrapper .layout-menu-container {
         width: 300px;
         left: -300px;
@@ -530,5 +590,5 @@ select-width {
     .layout-wrapper .layout-topbar {
         left: 300px;
     }
-}
+}*/
 

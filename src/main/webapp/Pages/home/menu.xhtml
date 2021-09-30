@@ -5,29 +5,112 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:pb="http://primefaces.org/babylon">
 
-    <div class="layout-menu-container">
+    <div class="layout-menu-container menu-shadow">
         <style>
             #logolink {
                 text-align: center !important;
                 padding-left: 0px !important;
             }
+
             .layout-menu-logo a img {
                 margin-top: 5px !important;
                 height: 50px !important;
             }
+
+            .menu-background {
+                background-color: #EAF3F8;
+            }
+
+            .layout-wrapper.layout-menu-dark .layout-menu-container .layout-menu li a .layout-menuitem-text {
+                color: #000000;
+                font-size: 17px;
+            }
+
+            .layout-wrapper.layout-menu-dark .layout-menu-container .layout-menu li a .layout-menuitem-icon,
+            .layout-wrapper.layout-menu-dark .layout-menu-container .layout-menu li a .layout-submenu-toggler {
+                color: #252529;
+            }
+
+            .layout-wrapper.layout-menu-dark .layout-menu-container .layout-menu>li>div {
+                color: #000000;
+            }
+
+            .layout-wrapper.layout-menu-dark .layout-menu-container .layout-menu li a:hover {
+                background-color: #dee2e6;
+            }
+
+            .menu-shadow {
+                box-shadow: 2px 0px black;
+            }
         </style>
-        <div class="layout-menu-logo">
+        <div class="layout-menu-logo menu-shadow" >
             <p:graphicImage name="logo.png" library="images" />
         </div>
 
-        <div class="layout-menu-wrapper">
-            <div class="menu-scroll-content">
+        <div class="layout-menu-wrapper menu-background">
+        <div class="menu-scroll-content">
                 <h:form id="menuform">
                     <script>
                         $( document ).ready(function() {
                             umc();
                             urc();
+                            changeMenuMode('layout-slim');
+                            changeSectionTheme('light', 'layout-menu');
                         });
+
+                        function changeMenuMode(menuMode) {
+                            var wrapper = $(document.body).children('.layout-wrapper');
+                            switch (menuMode) {
+                                case 'layout-static layout-static-active':
+                                    wrapper.addClass('layout-static layout-static-active').removeClass('layout-overlay layout-slim layout-horizontal ');
+                                    this.clearLayoutState();
+                                    break;
+
+                                case 'layout-overlay':
+                                    wrapper.addClass('layout-overlay').removeClass('layout-static layout-slim layout-horizontal  layout-static-active');
+                                    this.clearLayoutState();
+                                    break;
+
+                                case 'layout-horizontal':
+                                    wrapper.addClass('layout-horizontal').removeClass('layout-static layout-overlay  layout-slim  layout-static-active');
+                                    this.clearLayoutState();
+                                    break;
+
+                                case 'layout-slim':
+                                    wrapper.addClass('layout-slim').removeClass('layout-static layout-overlay layout-horizontal layout-static-active');
+                                    this.clearLayoutState();
+                                    break;
+
+                                default:
+                                    wrapper.addClass('layout-static').removeClass('layout-overlay layout-slim layout-horizontal ');
+                                    this.clearLayoutState();
+                                    break;
+                            }
+                        };
+
+                        function changeSectionTheme(theme, section) {
+                            var wrapperElement = $('.layout-wrapper');
+
+                            var styleClass = wrapperElement.attr('class');
+                            var tokens = styleClass.split(' ');
+                            var sectionClass;
+                            for (var i = 0; i &lt; tokens.length; i++) {
+                                if (tokens[i].indexOf(section + '-') > -1) {
+                                    sectionClass = tokens[i];
+                                    break;
+                                }
+                            }
+
+                            wrapperElement.attr('class', styleClass.replace(sectionClass, section + '-' + theme));
+                        };
+
+                        function clearLayoutState () {
+                            var menu = PF('babylonMenuWidget');
+
+                            if (menu) {
+                                menu.clearLayoutState();
+                            }
+                        }
                     </script>
                     <p:remoteCommand name="umc" action="#{sessionBean.updateMailCount()}" update="@widgetVar(babylonMenuWidget)"/>
                     <p:remoteCommand name="urc" action="#{sessionBean.updateNumberUnclosedRequests()}" update="@widgetVar(babylonMenuWidget)"/>
@@ -72,7 +155,7 @@
 
                     <pb:menu widgetVar="babylonMenuWidget">
                         <p:submenu id="principali" label="Principali" icon="pi pi-home">
-                            <p:menuitem id="homePage" value="#{msg.home}" icon="topbar-icon fa fa-fw fa-home" outcome="/Pages/Home.jsf"/>
+                            <p:menuitem id="homePage" styleClass="main" value="#{msg.home}" icon="topbar-icon fa fa-fw fa-home" outcome="/Pages/Home.jsf"/>
                             <p:menuitem id="mailManager" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/MailManagerList.jsf')}" value="#{msg.headerMailManager}#{sessionBean.mailCounts gt 0 ? ' ('.concat(sessionBean.mailCounts).concat(')') : ''}" icon="topbar-icon fa fa-fw  fa-envelope-o" outcome="/Pages/ManagementGroup/MailManagerList.jsf"/>
                             <p:menuitem id="requestList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/RequestList.jsf')}" value="#{msg.headerRequestList}#{sessionBean.requestCounts gt 0 ? ' ('.concat(sessionBean.requestCounts).concat(')') : ''}" icon="topbar-icon fa fa-fw fa-list"
                                         action="#{sessionBean.getRequestListPage()}" actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>

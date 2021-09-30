@@ -63,7 +63,8 @@
 					</p:column>
 					<p:column styleClass="action_column" exportable="false">
 						<p:commandButton icon="ui-icon pi pi-times" update=":form"
-							action="#{bean.handleDeleteCategoryPercentValue(cat)}">
+							action="#{bean.handleDeleteCategoryPercentValue(cat)}"
+										 style="background-color: red;border: none !important;">
 							<p:confirm message="#{msg.delete}?" />
 						</p:commandButton>
 					</p:column>
@@ -87,12 +88,13 @@
 							action="#{bean.handleGroupOmiDialogInit(group)}"/>
 						&nbsp; &nbsp;
 						<p:commandButton icon="pi pi-times" update="groupOmi"
-							action="#{bean.handleDeleteGroupOmi(group)}">
+							action="#{bean.handleDeleteGroupOmi(group)}"
+										 style="background-color: red;border: none !important;">
 							<p:confirm message="#{msg.delete}?" />
 						</p:commandButton>
 						<br />
 						<br />
-						<p:commandButton id="addBtn" icon="fa fa-plus"
+						<p:commandButton id="addBtn" icon="pi pi-plus"
 							style="margin-left:10px"
 							oncomplete="PF('omiGroupItemWV').show();"
 							update="omiGroupItemDlg"
@@ -116,6 +118,7 @@
 							</p:column>
 							<p:column styleClass="action_column" exportable="false">
 								<p:commandButton icon="pi pi-times"
+												 style="background-color: red;border: none !important;"
 								action="#{bean.handleDeleteCategoryItemGroupOmi(group,item)}" update="items">
 									<p:confirm message="#{msg.delete}?" />
 								</p:commandButton>

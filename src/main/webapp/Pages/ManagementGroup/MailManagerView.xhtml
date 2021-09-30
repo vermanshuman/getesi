@@ -9,7 +9,9 @@
                 template="/resources/tpl/Admin/FormBase.xhtml">
     <ui:param name="bean" value="#{mailManagerViewBean}"/>
     <ui:define name="form_body">
-    	<style>
+        <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/mail.css"
+              media="all" rel="stylesheet" type="text/css"/>
+        <style>
     	   .ui-messages-info,.ui-message-info {
                 border-left-color: rgb(82, 224, 82);
                 background: rgb(233, 251, 233);
@@ -26,6 +28,45 @@
 				width:30%
 			}
 
+            .card {
+                border: none !important;
+                padding: 0px;
+            }
+
+            .layout-wrapper .layout-main .layout-content {
+                padding: 0px !important;
+            }
+
+            body .ui-widget-header {
+                background: #f8f9fa !important;
+                color: #495057 !important;
+            }
+
+            body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
+                background-color: #fff !important;
+            }
+
+            .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+                border-width: 0 0 1px 0 !important;
+            }
+
+            body .ui-datatable thead th {
+                background-color: #f8f9fa !important;
+                color: #495057 !important;
+                padding: 1rem 1rem !important;
+            }
+
+            body .ui-datatable .ui-datatable-data tr td {
+                padding: 1rem 1rem !important;
+            }
+
+            body .ui-datatable thead th.ui-state-active {
+                color: #2196F3 !important;
+            }
+
+            body .ui-datatable .ui-datatable-data > tr:hover {
+                background: #e9ecef !important;
+            }
     	</style>
         <ui:include src="/resources/tpl/Admin/LetterView.xhtml"/>
         <p:outputPanel id="print_panel" style="visibility: hidden; position: absolute;">

@@ -16,4 +16,6 @@ public class WorkLoadWrapper {
     private int percentage;
 
     private long numberUnclosedRequestsInWork;
+
+    private long total;
 }

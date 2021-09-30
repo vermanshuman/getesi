@@ -59,6 +59,7 @@
                                     <p:column rendered="#{empty showDelete? true : showDelete}"
                                               styleClass="action_column" exportable="false">
                                         <p:commandButton icon="pi pi-times"
+                                                         style="background-color: red;border: none !important;"
                                                          oncomplete="PF('camel_dlg').show()"
                                                          disabled="#{!left_bean.canDelete
                                                          || (item.id==sessionBean.currentUser.id and left_bean.userEntityPage)}">

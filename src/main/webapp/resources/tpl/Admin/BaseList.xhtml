@@ -36,7 +36,7 @@
                                     <div class="">
                                         <ui:insert name="buttons_panel"></ui:insert>
                                         <p:commandButton disabled="#{!bean.canCreate}" id="buttonCreate"
-                                                         icon="pi pi-plus-circle"
+                                                         icon="pi pi-plus-circle" styleClass="ui-button-success p-mr-2 p-mb-2"
                                                          value="#{not empty addButtonTitle ? addButtonTitle : msg.newItem}"
                                                          update=":form"
                                                          action="#{bean.addEntity}"/>
@@ -63,7 +63,7 @@
                                               styleClass="action_column"
                                               exportable="false">
 
-                                        <p:commandButton icon="ui-icon pi pi-pencil"
+                                        <p:commandButton icon="ui-icon pi pi-pencil" style="border: none !important;"
                                                          disabled="#{!bean.canEdit}" update=":form"
                                                          action="#{bean.editEntity}" oncomplete="#{additionalEditAction}">
                                             <f:setPropertyActionListener value="#{item.id}"
@@ -74,6 +74,7 @@
                                     <p:column rendered="#{empty showDelete? true : showDelete}"
                                               styleClass="action_column" exportable="false">
                                         <p:commandButton icon="ui-icon pi pi-times"
+                                                         style="background-color: red;border: none !important;"
                                                          oncomplete="PF('dlg2').show()"
                                                          disabled="#{!bean.canDelete || (item.id==sessionBean.currentUser.id and bean.userEntityPage)}">
                                             <f:setPropertyActionListener value="#{item.id}"

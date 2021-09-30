@@ -1,3 +1,4 @@
+
 package it.nexera.ris.persistence.beans.entities.domain;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;

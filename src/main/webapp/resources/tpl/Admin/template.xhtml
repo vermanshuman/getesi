@@ -15,7 +15,8 @@
             <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
             <meta name="apple-mobile-web-app-capable" content="yes" />
         </f:facet>
-        <title><ui:insert name="title">PrimeFaces Babylon</ui:insert></title>
+        <link rel="icon" href="#{facesContext.externalContext.requestContextPath}/resources/images/favicon.ico"/>
+        <title><h:outputText value="#{msg.title}"/></title>
         <h:outputScript name="js/prism.js" library="babylon-layout" />
         <h:outputScript name="js/layout.js" library="babylon-layout" />
         <script type="text/javascript"
