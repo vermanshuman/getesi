@@ -15,6 +15,51 @@
     	<link href="#{facesContext.externalContext.requestContextPath}/resources/styles/request.css"
               media="all" rel="stylesheet" type="text/css"/>
     	<style>
+    		.search-btn {
+    			margin-top: 18px !important;
+    		}
+    		
+    		body .ui-datatable .ui-paginator.ui-paginator-top {
+    			background-color: #2f8ee5 !important;
+    			color: #ffffff !important;
+			}
+
+			body .ui-datatable .ui-paginator.ui-paginator-bottom {
+			    background-color: #2f8ee5 !important;
+			    color: #ffffff !important;
+			}
+			
+			body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page, 
+					body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev, 
+					body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last {
+			    color: #FFFFFF !important;
+			}
+			
+			body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+			    background: #FFF !important;
+			    color: #000000 !important;
+			}
+			
+			.card{
+				border: 1px solid #c9cdd2;
+			}
+			
+			.layout-wrapper .route-bar {
+    			border-bottom: 1px solid #c9cdd2;
+    		}
+    		
+    		.layout-footer {
+			    border-top: 1px solid #c9cdd2;
+			}
+			
+    		body .ui-datatable .ui-datatable-data > tr > td {
+    			border: 1px solid #c9cdd2;
+    			border-width: 0 0 1px 0;
+			}
+			
+			input {
+			    min-height: 41px;
+			}
     	</style>
         <script>
             var doChange = true;
@@ -74,7 +119,7 @@
 				<p:column>
                    <h:outputText value=""/>
                     <p:selectOneMenu id="client" value="#{bean.selectedClientId}"
-                                     label="#{msg.requestClient}" style="width: calc( 100% - 27px);margin-top: 20px;">
+                                     label="#{msg.requestClient}" style="width: calc( 100% - 27px);margin-top: 18px;">
                         <f:selectItem itemLabel="#{ff:upper(msg.requestListClient)}" itemValue="#{null}"
                                       noSelectionOption="true" />
                         <f:selectItems value="#{bean.clients}"/>
@@ -101,7 +146,7 @@
 				
 				 <p:column>
                    <h:outputText value=" "/>
-                    <p:selectOneMenu id="office" value="#{bean.aggregationFilterId}"  style="width: calc( 100% - 27px);margin-top: 20px;">
+                    <p:selectOneMenu id="office" value="#{bean.aggregationFilterId}"  style="width: calc( 100% - 27px);margin-top: 18px;">
                         <f:selectItem itemLabel="#{msg.subjectViewFormalityConservatoryCap}" itemValue="#{null}"
                                       noSelectionOption="true" />
                         <f:selectItems value="#{bean.landAggregations}"/>
@@ -147,7 +192,7 @@
                 
                 <p:column>
                       <h:outputText value=""/>
-                    <p:selectOneMenu value="#{bean.managerClientFilterid}"  style="width: calc( 100% - 27px);margin-top: 20px;">
+                    <p:selectOneMenu value="#{bean.managerClientFilterid}"  style="width: calc( 100% - 27px);margin-top: 18px;">
                         <f:selectItem itemLabel="#{ff:upper(msg.clientManager)}" itemValue="#{null}"
                                       noSelectionOption="true" />
                         <f:selectItems value="#{bean.managerClients}"/>
@@ -156,7 +201,7 @@
                 
                 <p:column>
                     <h:outputText value=""/>
-                    <p:selectOneMenu value="#{bean.fiduciaryClientFilterId}" style="width: calc( 100% - 27px);margin-top: 20px;">
+                    <p:selectOneMenu value="#{bean.fiduciaryClientFilterId}" style="width: calc( 100% - 27px);margin-top: 18px;">
                         <f:selectItem itemLabel="#{ff:upper(msg.mailTrust)}" itemValue="#{null}"
                                       noSelectionOption="true" />
                         <f:selectItems value="#{bean.fiduciaryClients}"/>
@@ -198,7 +243,7 @@
 				</p:column>
                 <p:column>
                 	 <p:commandButton rendered="#{bean.showPrintButton}" value="#{msg.requestPrintExcel}"
-                                     styleClass="search-btn" style="width: 30%;"
+                                     styleClass="search-btn" style="width: 30%; margin-right: 3px;"
                                      id="printExcelButton" oncomplete="PF('createTotalCosthDocumentDialogWV').show()"/>
                     <p:commandButton rendered="#{bean.showPrintButton}" value="#{msg.requestEditAndPrint}"
                                      styleClass="search-btn" style="width: calc( 70% - 3px);"
