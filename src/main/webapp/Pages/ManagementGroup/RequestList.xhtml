@@ -57,8 +57,112 @@
     			border-width: 0 0 1px 0;
 			}
 			
+			.btn-green {
+				background: #689F38 !important;
+    			color: #ffffff !important;
+    			border: 1px solid #689F38 !important;
+			}
+			
+			body .ui-button.ui-button-warn, body .ui-splitbutton.ui-button-warn > .ui-button {
+			    background: #ff8b00;
+			    color: #FFFFFF;
+			    border: 1px solid #ff8b00 !important;
+			}
+			
+			body .ui-button.ui-button-warn.ui-state-hover, body .ui-splitbutton.ui-button-warn.ui-state-hover > .ui-button.ui-state-hover {
+				background: #ff8b00;
+			    color: #FFFFFF;
+			    border: 1px solid #ff8b00 !important;
+			} 
+			
+			body .ui-button.ui-button-warn.ui-state-focus, body .ui-splitbutton.ui-button-warn.ui-state-focus > .ui-button.ui-state-focus {
+				box-shadow: 0 0 0 0.2rem orange;
+			}
+			
+			body .ui-button.ui-button-warn.ui-state-active, body .ui-splitbutton.ui-button-warn.ui-state-active > .ui-button.ui-state-active {
+				background-color: #ff8b00 !important;
+			    color: #FFFFFF;
+			    border: 1px solid #ff8b00 !important;
+			}
+			
+			body .ui-button.ui-button-warning-icon, body .ui-splitbutton.ui-button-warning-icon > .ui-button {
+			    background: #fb6e51;
+			    color: #FFFFFF;
+			    border: 1px solid #fb6e51 !important;
+			}
+			
+			body .ui-button.ui-button-warning-icon.ui-state-focus, body .ui-splitbutton.ui-button-warning-icon > .ui-button.ui-state-focus {
+				box-shadow: 0 0 0 0.2rem orange !important;
+			}
+			
+			body .ui-button.ui-button-warning-icon.ui-state-active, body .ui-splitbutton.ui-button-warning-icon.ui-state-active > .ui-button.ui-state-active {
+				background-color: #ff8b00 !important;
+			    color: #FFFFFF;
+			    border: 1px solid #ff8b00 !important;
+			}
+			
+			.search-btn {
+    			margin-top: 0px !important; 
+			}
+			
+			.alignEnd {
+			    place-content: flex-end;
+			}
+			
+			@media screen and (max-width: 1200px) {
+			    #settingPanel {
+			        margin-top: 90px;
+			    }
+			    .alignEnd {
+			        place-content: flex-start;
+			    }
+			}
+			
 			input {
-			    min-height: 41px;
+			    min-height: 36px;
+			}
+			
+			#settingPanel {
+			    position: absolute;
+			    z-index: 1;
+			    margin-top: 38px;
+			    max-width: 500px;
+			    right: 33px;
+			    border: 1px solid #547ac4;
+			}
+			
+			body .ui-calendar.ui-trigger-calendar input.hasDatepicker {
+			    width: calc( 100% - 5px);
+			}
+			
+			.ui-datatable tbody.ui-datatable-data {
+			    outline: 0;
+			    background-color: white;
+			}
+			
+			#stateSelectCheckboxPanel {
+    			left: 1420px !important;
+			}
+			
+			#requestTypeSelectCheckboxPanel {
+			    left: 1170px !important;
+			}
+			
+			#serviceSelectCheckboxPanel {
+    			left: 1315px !important;
+    			width: 320px !important;
+			}
+			
+			#requestTypeSelectCheckboxPanelDataTable .ui-chkbox .ui-chkbox-box.ui-state-active {
+			    background-color: transparent !important;
+			    border-color: #4D759D !important;
+			    color: #5f666c !important;
+			}
+			
+			#serviceSelectCheckboxPanelDataTable .ui-chkbox .ui-chkbox-box.ui-state-active {
+			    background-color: transparent !important;
+			    border-color: #4D759D !important;
+			    color: #5f666c !important;
 			}
     	</style>
         <script>
@@ -79,9 +183,189 @@
                     updateCalendarTo(null);
                 }
             };
+            
+            function resetData() {
+            	$("#filterDateFrom_input").val("");
+            	$("#filterDateTo_input").val("");
+            	$("#filterDateFromEvasione_input").val("");
+            	$("#filterDateToEvasione_input").val("");
+            	$("#client_label").text("#{ff:upper(msg.requestListClient)}");
+            	$("#manager_label").text("#{ff:upper(msg.clientManager)}");
+            	$("#fiduciario_label").text("#{ff:upper(msg.mailTrust)}");
+            	$("#office_label").text("#{msg.subjectViewFormalityConservatoryCap}");
+            	$("#filterExpiration_input").val("");
+            	return true;
+            }
         </script>
-
-        <p:outputPanel id="searchPanel">
+				
+		<div class="p-grid">
+          	<div class="p-col-12 p-md-12">
+              	<div class="">
+                  	<div class="p-grid">
+                      	<div class="p-col-8">
+                          	<div class="p-formgroup-inline">
+                              	<div class="p-field">
+                                  	<p:commandButton value="#{ff:upper(msg.requestNew)}" id="btn_new"
+										styleClass="btn-green search-btn" style="margin-left:20px;"
+										disabled="#{!bean.canCreate}" action="#{bean.createNewRequest}" />
+								</div>
+								<div class="p-field">
+									<p:commandButton value="#{ff:upper(msg.requestNewMultiple)}"
+										id="btn_new_multipe" styleClass="btn-green search-btn"
+										disabled="#{!bean.canCreate}"
+										action="#{bean.createNewMultipleRequest}" />
+                              	</div>
+                          	</div>
+                      	</div>
+                      	<div class="p-col-4">
+                          	<div class="p-formgroup-inline alignEnd">
+                          
+                              	<div class="p-field">
+                                  	<p:inputText value="#{bean.searchLastName}" placeholder="#{ff:upper(msg.requestEditSubjectListName)}"
+                           				style=""/>
+                              	</div>
+                              	<div class="p-field">
+                                  	<p:inputText value="#{bean.searchFiscalCode}" placeholder="#{ff:upper(msg.requestFiscalCodeCap)}"
+                           				style=""/>
+                              	</div>
+                              	
+                              	<div class="p-field">
+                                  	<p:commandButton 
+										style="" id="searchButton" styleClass="ui-button-warning-icon"
+										onclick="checkDates(); filterTableFromPanel();"
+										action="#{bean.prepareToModify}" icon="ui-icon ui-icon-search pi pi-search"
+										update=":form:table,searchPanel,editAndPrintDialog" />
+                              	</div>
+                              	<div class="p-field">
+                              		<p:commandButton id="settingButton" onclick="resetData(); PF('panelSetting').toggle();" type="button"
+                                             styleClass="ui-button-warning-icon"  icon="ui-icon ui-icon-search pi pi-sliders-h"/>
+                              	</div>
+                              	<p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" collapsed="true">
+                                  	<div class="p-grid">
+                                      	<div class="p-col-12" style="text-align: center;">
+                                         	<h2>Filtra per</h2>
+                                      	</div>
+                                      	<div class="p-col-12">
+                                      		<div style="">
+                                          		<h:outputText style="color: #003871;"
+													value="#{ff:upper(msg.requestListDateOfInput)}:" />
+											</div>
+										</div>
+										<div class="p-col-6">		
+                                          	<p:calendar id="filterDateFrom" readonlyInput="false"
+												showOn="button"
+												onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+												pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
+												popupIconOnly="true"
+												onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+												value="#{bean.dateFrom}"
+												placeholder="#{msg.mailManagerDateFromReqlist}" />
+                                          	<div id="hyphen"></div>
+                                        </div>
+                                        <div class="p-col-6">
+                                        	<p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
+												onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+												pattern="dd/MM/yyyy" mask="true" 
+												locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateToReqlist}"
+												onblur="check_date(this)" value="#{bean.dateTo}" /> 
+                                        </div>
+										<div class="p-col-12">
+											<div style="">	
+												<h:outputText style="color: #003871;"
+													value="#{ff:upper(msg.requestListDateOfEvasion)}:" />
+											</div>
+										</div>
+										<div class="p-col-6">
+											<p:calendar id="filterDateFromEvasione" readonlyInput="false"
+												showOn="button" 
+												onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+												pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
+												popupIconOnly="true"
+												onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+												value="#{bean.dateFromEvasion}"
+												placeholder="#{msg.mailManagerDateFromReqlist}" />
+                                      	</div>
+                                      	<div class="p-col-6">
+                                      		<p:calendar id="filterDateToEvasione" readonlyInput="false"
+												showOn="button"
+												onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+												pattern="dd/MM/yyyy" mask="true"
+												locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateToReqlist}"
+												onblur="check_date(this)" value="#{bean.dateToEvasion}" />
+                                      	</div>
+                                      	<div class="p-col-6">
+                                      		<p:selectOneMenu id="client" value="#{bean.selectedClientId}"
+						                                     label="#{msg.requestClient}" style="width: calc( 100% - 5px);">
+						                        <f:selectItem itemLabel="#{ff:upper(msg.requestListClient)}" itemValue="#{null}"
+						                                      noSelectionOption="true" />
+						                        <f:selectItems value="#{bean.clients}"/>
+						                    </p:selectOneMenu>
+                                      	</div>
+                                      	<div class="p-col-6">
+                                      		<p:outputPanel id="statuses" style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
+                    							<h:outputText value="#{ff:upper(msg.status)}" style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
+                   								<i class="fa fa-angle-down" style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
+                   		 						onclick="PF('stateSelectCheckboxWV').show(); event.stopImmediatePropagation();" />
+                    						</p:outputPanel>
+                                      	</div>
+                                      	<div class="p-col-6">
+                                      		<p:outputPanel id="requestTypes" style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
+						                    	<h:outputText value="#{ff:upper(msg.requestListServiceTypeCap)}" style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
+						                   		<i class="fa fa-angle-down" style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
+						                   		 onclick="PF('requestTypeSelectCheckboxWV').show(); event.stopImmediatePropagation();" />
+						                    </p:outputPanel>
+                                      	</div>
+                                      	<div class="p-col-6">
+                                      		<p:outputPanel id="services" style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
+						                    	<h:outputText value="#{ff:upper(msg.requestListService)}" style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
+						                   		<i class="fa fa-angle-down" style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
+						                   		 onclick="PF('serviceSelectCheckboxWV').show(); event.stopImmediatePropagation();" />
+						                    </p:outputPanel>
+                                      	</div>
+                                      	<div class="p-col-6">
+                                      		<p:selectOneMenu id="manager" value="#{bean.managerClientFilterid}"  style="width: calc( 100% - 5px);">
+						                        <f:selectItem itemLabel="#{ff:upper(msg.clientManager)}" itemValue="#{null}"
+						                                      noSelectionOption="true" />
+						                        <f:selectItems value="#{bean.managerClients}"/>
+						                    </p:selectOneMenu>
+                                      	</div>
+                                      	<div class="p-col-6">
+	                                      	<p:selectOneMenu id="fiduciario" value="#{bean.fiduciaryClientFilterId}" style="width: calc( 100% - 5px);">
+						                        <f:selectItem itemLabel="#{ff:upper(msg.mailTrust)}" itemValue="#{null}"
+						                                      noSelectionOption="true" />
+						                        <f:selectItems value="#{bean.fiduciaryClients}"/>
+						                    </p:selectOneMenu>
+                                      	</div>
+                                      	<div class="p-col-6">
+	                                      	<p:selectOneMenu id="office" value="#{bean.aggregationFilterId}"  style="width: calc( 100% - 5px);">
+						                        <f:selectItem itemLabel="#{msg.subjectViewFormalityConservatoryCap}" itemValue="#{null}"
+						                                      noSelectionOption="true" />
+						                        <f:selectItems value="#{bean.landAggregations}"/>
+						                    </p:selectOneMenu>
+						                </div>
+						                <div class="p-col-6">
+						                	<p:calendar id="filterExpiration" readonlyInput="false" showOn="button"
+				                                onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+				                                pattern="dd/MM/yyyy" mask="true"
+				                                locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.expirationDateCap}"
+				                                value="#{bean.dateExpiration}"/>
+                                      	</div>
+                                      	<div class="p-col-12" style="text-align: center;">
+                                          	<p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}"  update="settingPanel" oncomplete="PF('panelSetting').toggle()"/>
+                                          	<p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #009900; margin-left:3px;" id="searchButton12345"
+                                                           onclick="checkDates(); filterTableFromPanel();" update="searchPanel" oncomplete="PF('panelSetting').toggle()"/>
+                                      	</div>
+                                  	</div>
+                              	</p:panel>
+                          	</div>
+                      	</div>
+                  	</div>
+              	</div>
+          	</div>
+      	</div>
+				
+				
+        <p:outputPanel id="searchPanel" style="display:none;" >
                 <p:commandButton icon="fa fa-fw fa-file-pdf-o"  rendered="false"
                                  action="#{bean.downloadPdfFile}" ajax="false" update="@form">
                     <f:setPropertyActionListener value="612"
@@ -91,7 +375,7 @@
             <p:remoteCommand name="updateCalendarTo" update=":form:filterDateTo"/>
             <p:remoteCommand name="filterTableFromPanel"
                              action="#{bean.filterTableFromPanel}" update=":form:table"/>
-              <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid" style="margin-bottom: 20px;"
+           <!--   <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid" style="margin-bottom: 20px;"
                          columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2">
 				<p:column>
 					<h:outputText style="color: #003871;"
@@ -262,8 +546,8 @@
 						style="width: 100%;"
 						disabled="#{!bean.canCreate}"
 						action="#{bean.createNewMultipleRequest}" />
-				</p:column>
-            </p:panelGrid>
+				</p:column> 
+            </p:panelGrid> -->
         </p:outputPanel>
 
         <p:overlayPanel id="stateSelectCheckboxPanel" my="left top" at="right bottom"
