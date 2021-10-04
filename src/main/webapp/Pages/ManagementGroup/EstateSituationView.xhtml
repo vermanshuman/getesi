@@ -47,6 +47,45 @@
                 color: #A7A8AB;
                 font-weight: 600;
             }
+            
+			body .ui-fileupload .ui-fileupload-buttonbar {
+			    border: none !important; 
+			    background: none !important; 
+			    padding: 0 !important; 
+			    margin-top: 8px !important;
+			}
+			
+			body .ui-widget-header {
+			    background-color: #FFFFFF !important;
+			}
+			
+			body .ui-fileupload .ui-fileupload-content {
+			    border: none !important;
+			}
+			    
+			body .ui-fieldset .ui-fieldset-legend {
+			    background-color: #788FA7 !important;
+			}
+			
+			body .ui-fieldset .ui-fieldset-legend {
+			    border: 1px solid #dee2e6 !important;
+			    color: #FFFFFF !important;
+			    padding: .6em 1em !important;
+			    font-weight: normal !important;
+			    border-radius: 4px !important;
+			    user-select: none !important;
+			    font-size: 14px !important;
+			    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+			}
+			
+			.red-btn {
+				background-color: red !important;
+				border: none !important;
+			}
+			
+			.estateTabTable tr td {
+			    padding-left: 5px !important;
+			}
         </style>
         <p:remoteCommand name="removeFileCommand" update="form"/>
         <div align="center">
@@ -93,7 +132,7 @@
             <br/>
             <p:outputPanel id="filePanel">
                 <p:dataTable id="fileTable" var="fileEntry" value="#{bean.uploadedFiles}" rowKey="#{fileEntry.id}"
-                             rendered="#{not empty bean.uploadedFiles}" styleClass="without-header simple-table">
+                             rendered="#{not empty bean.uploadedFiles}" styleClass="without-header simple-table estate-table">
                     <p:column styleClass="filename_column">
                         <h:outputText value="#{fileEntry.getTitle()}"/>
                     </p:column>
@@ -119,7 +158,7 @@
             <br/>
             <h3 style="text-align: left;margin-bottom: 20px;font-weight: 100;">#{msg.realEstateBuild}</h3>
             <p:dataTable value="#{bean.lazyPropertyListBuilding}" lazy="true"
-                         style="width: 100%" styleClass="simple-table estate-table"
+                         style="width: 100%" styleClass="simple-table estate-table estateTabTable"
                          var="item" id="estateTab"
                          rowStyleClass="#{item.used?'user-row':''}"
                          paginator="true" paginatorAlwaysVisible="false" rows="20"
@@ -157,7 +196,7 @@
                     </p:commandButton>
                 </p:column>
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon pi pi-times" update="estateTab"
+                    <p:commandButton icon="ui-icon pi pi-times" update="estateTab" styleClass="red-btn"
                                      action="#{bean.deleteProperty}">
                         <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                     </p:commandButton>
@@ -274,7 +313,7 @@
                     </p:commandButton>
                 </p:column>
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon pi pi-times" update="estateTabLand"
+                    <p:commandButton icon="ui-icon pi pi-times" update="estateTabLand" styleClass="red-btn"
                                      action="#{bean.deleteProperty}">
                         <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                     </p:commandButton>
@@ -375,7 +414,7 @@
             <p:outputPanel id="formPanel">
                 <p:dataTable id="formTable" var="fileEntry" value="#{bean.formalityDocumentList}"
                              rowKey="#{fileEntry.id}" rendered="#{not empty bean.formalityDocumentList}"
-                             styleClass="without-header simple-table">
+                             styleClass="without-header simple-table estate-table">
                     <p:column styleClass="filename_column">
                         <h:outputText value="#{fileEntry.getTitle()}"/>
                     </p:column>
@@ -402,7 +441,7 @@
                 </p:dataTable>
             </p:outputPanel>
             <p:dataTable value="#{bean.lazyFormalityList}" lazy="true"
-                         styleClass="simple-table simple-table-layout"
+                         styleClass="simple-table simple-table-layout estate-table"
                          var="item" id="formalityTab"
                          paginator="true" paginatorAlwaysVisible="false" rows="20"
                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
@@ -419,7 +458,7 @@
                                   collapseLabel="#{msg.estateFormalityToggler}"/>
                 </p:column>
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon pi pi-times" update="formalityTab"
+                    <p:commandButton icon="ui-icon pi pi-times" update="formalityTab" styleClass="red-btn"
                                      action="#{bean.deleteEstateFormality}">
                         <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                     </p:commandButton>
@@ -471,16 +510,16 @@
             <p:poll widgetVar="pdfPoll" interval="10" listener="#{bean.updatePDFTable}" update="formalityPDFTab"
                     autoStart="false"/>
             <p:remoteCommand update="formalityPDFTab" name="updatePdfTable"/>
-            <p:dataTable value="#{bean.formalityPDFList}" styleClass="simple-table" var="item" id="formalityPDFTab">
+            <p:dataTable value="#{bean.formalityPDFList}" styleClass="simple-table estate-table" var="item" id="formalityPDFTab">
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon ui-icon-pencil" update=":form"
+                    <p:commandButton icon="ui-icon pi pi-pencil" update=":form"
                                      action="#{bean.editFormality}">
                         <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                         <f:setPropertyActionListener value="#{item.statusStr}" target="#{bean.entityEditStato}"/>
                     </p:commandButton>
                 </p:column>
                 <p:column styleClass="action_column">
-                    <p:commandButton icon="ui-icon ui-icon-close" oncomplete="updatePdfTable()"
+                    <p:commandButton icon="ui-icon pi pi-times" oncomplete="updatePdfTable()" styleClass="red-btn"
                                      action="#{bean.deleteFormality}">
                         <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                     </p:commandButton>
@@ -493,7 +532,7 @@
                     </p:column>
                 </p:column>
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton id="buttonVedi" icon="ui-icon ui-icon-search" update=":form"
+                    <p:commandButton id="buttonVedi" icon="ui-icon ui-icon-search pi pi-search" update=":form"
                                      action="#{bean.viewFormality}">
                         <f:setPropertyActionListener value="#{item.id}"
                                                      target="#{bean.entityEditId}"/>
