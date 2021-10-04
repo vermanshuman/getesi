@@ -21,6 +21,10 @@
                 background-color: #EAF3F8;
             }
 
+            .layout-wrapper.layout-slim.layout-menu-dark .layout-menu-container .layout-menu > li > ul {
+                background-color: #EAF3F8 !important;
+            }
+
             .layout-wrapper.layout-menu-dark .layout-menu-container .layout-menu li a .layout-menuitem-text {
                 color: #000000;
                 font-size: 17px;
@@ -42,6 +46,9 @@
             .menu-shadow {
                 box-shadow: 2px 0px black;
             }
+            .layout-wrapper .layout-topbar .layout-menu-button {
+                display: none !important;
+            }
         </style>
         <div class="layout-menu-logo menu-shadow" >
             <p:graphicImage name="logo.png" library="images" />
@@ -51,14 +58,34 @@
         <div class="menu-scroll-content">
                 <h:form id="menuform">
                     <script>
+                        //var isOverlayMode = '#{sessionBean.overLayMode}';
+                        var isOverlayMode =  $('input[id*="overLayModeData"]').attr('value');
                         $( document ).ready(function() {
                             umc();
                             urc();
-                            changeMenuMode('layout-slim');
-                            changeSectionTheme('light', 'layout-menu');
+
+                            changeMenuMode((isOverlayMode === true || isOverlayMode === "true") ? 'layout-overlay layout-overlay-active' : 'layout-slim');
+                            //changeSectionTheme('light', 'layout-menu');
+                            document.querySelector(".layout-menu-button-mode i").addEventListener("click", () => {
+                                changeMenuOverlay();
+                            });
                         });
 
+                        function changeMenuOverlay() {
+                            var currentMode =  $('input[id*="overLayModeData"]').attr('value');
+                            isOverlayMode = !currentMode;
+                            if(currentMode === false || currentMode === "false"){
+                                isOverlayMode = true;
+                            }else {
+                                isOverlayMode = false;
+                            }
+                            $('input[name="overLayModeData"]').val(isOverlayMode);
+                            uplm([{name: 'overlay_mode', value: isOverlayMode}]);
+                            changeMenuMode((isOverlayMode === true || isOverlayMode === "true") ? 'layout-overlay layout-overlay-active' : 'layout-slim');
+                        }
+
                         function changeMenuMode(menuMode) {
+                            console.log(isOverlayMode, "menu mode" , menuMode);
                             var wrapper = $(document.body).children('.layout-wrapper');
                             switch (menuMode) {
                                 case 'layout-static layout-static-active':
@@ -114,9 +141,12 @@
                     </script>
                     <p:remoteCommand name="umc" action="#{sessionBean.updateMailCount()}" update="@widgetVar(babylonMenuWidget)"/>
                     <p:remoteCommand name="urc" action="#{sessionBean.updateNumberUnclosedRequests()}" update="@widgetVar(babylonMenuWidget)"/>
+                    <p:remoteCommand name="uplm" action="#{sessionBean.updateOverLayMode()}" update="@([id$=overLayModeData])"/>
                     <ui:fragment id="menuProfile" rendered="#{guestPreferences.profileMode == 'inline' ? true : false}">
+
                         <div class="layout-profile">
                             <a class="layout-profile-button" href="#">
+
                                 <p:graphicImage name="images/avatar.png" library="babylon-layout" />
                                 <div class="layout-profile-userinfo">
                                     <span class="layout-profile-name">Arlene Welch</span>
@@ -154,6 +184,7 @@
                     </ui:fragment>
 
                     <pb:menu widgetVar="babylonMenuWidget">
+
                         <p:submenu id="principali" label="Principali" icon="pi pi-home">
                             <p:menuitem id="homePage" styleClass="main" value="#{msg.home}" icon="topbar-icon fa fa-fw fa-home" outcome="/Pages/Home.jsf"/>
                             <p:menuitem id="mailManager" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/MailManagerList.jsf')}" value="#{msg.headerMailManager}#{sessionBean.mailCounts gt 0 ? ' ('.concat(sessionBean.mailCounts).concat(')') : ''}" icon="topbar-icon fa fa-fw  fa-envelope-o" outcome="/Pages/ManagementGroup/MailManagerList.jsf"/>

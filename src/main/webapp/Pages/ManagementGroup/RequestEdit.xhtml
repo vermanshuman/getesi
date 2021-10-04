@@ -12,41 +12,42 @@
     <ui:param name="goBackRendered" value="false"/>
 
     <ui:define name="view_body">
-    	<style>
-    		.select-width {
-    			width: 100% !important;
-			}
-			
-			body .ui-button {
-    			margin-right: 3px !important;
-			}
-			
-			body .ui-widget-header {
-			    background-color: #788FA7 !important;
-			    color: #ffffff;
-			}
+        <style>
+            .select-width {
+                width: 100% !important;
+            }
 
-			body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem {
-				background: #788FA7 !important;
-			}
-			
-			body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem a {
-			     color: #ffffff;
-			}
-			
-			body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem.ui-state-active {
-			    background: #2d353c !important;
-			    border-color: #788FA7 !important;
-			}
-			
-			body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem.ui-state-active a {
-				color: #ffffff !important;
-			}
-			
-			body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem {
-				border-color: #788FA7 !important;
-			}
-    	</style>
+            body .ui-button {
+                margin-right: 3px !important;
+            }
+
+            body .ui-widget-header {
+                background-color: #788FA7 !important;
+                color: #ffffff;
+            }
+
+            body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem {
+                background: #788FA7 !important;
+            }
+
+            body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem a {
+                color: #ffffff;
+            }
+
+            body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem.ui-state-active {
+                background: #2d353c !important;
+                border-color: #788FA7 !important;
+            }
+
+            body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem.ui-state-active a {
+                color: #ffffff !important;
+            }
+
+            body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem {
+                border-color: #788FA7 !important;
+            }
+        </style>
+
         <p:remoteCommand name="updateSubjects" update="form"/>
         
         <p:tabMenu activeIndex="#{bean.activeMenuTabNum}" model="#{bean.topMenuModel}" 

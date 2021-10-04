@@ -92,7 +92,7 @@
     <ui:define name="dialogs_body">
         <style>
             body .ui-fieldset .ui-fieldset-legend {
-                border: 1px solid #dee2e6;
+                border: 1px solid #c9cdd2;
                 background: #f8f9fa;
                 color: #FFFFFF !important;
                 padding: 1rem;
@@ -166,6 +166,50 @@
                 background-color: red !important;
                 color: #FFFFFF !important;
             }
+
+            .without-header thead {
+                display: none;
+            }
+
+            body .ui-datatable .ui-paginator.ui-paginator-top {
+                background-color: #2f8ee5 !important;
+                color: #ffffff !important;
+            }
+
+            body .ui-datatable .ui-paginator.ui-paginator-bottom {
+                background-color: #2f8ee5 !important;
+                color: #ffffff !important;
+            }
+
+            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page,
+            body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev,
+            body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last {
+                color: #FFFFFF !important;
+            }
+
+            body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+                background: #FFF !important;
+                color: #000000 !important;
+            }
+
+            .layout-wrapper .route-bar {
+                border-bottom: 1px solid #c9cdd2;
+            }
+
+            .layout-footer {
+                border-top: 1px solid #c9cdd2;
+            }
+
+            .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+                border: 1px solid #c9cdd2 !important;
+            }
+
+            body {
+                font-family: "cabin", sans-serif !important;
+                font-size: 1rem !important;
+                text-decoration: none;
+            }
+
         </style>
         <br/><br/><br/>
         <p:fieldset legend="#{msg.estateSituationListDocuments}">

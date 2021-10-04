@@ -12,159 +12,159 @@
     <ui:param name="renderMenu" value="false"/>
     <ui:param name="centerPartStyleClass" value="false"/>
     <ui:define name="list_body">
-    	<link href="#{facesContext.externalContext.requestContextPath}/resources/styles/request.css"
+        <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/request.css"
               media="all" rel="stylesheet" type="text/css"/>
-    	<style>
-    		.search-btn {
-    			margin-top: 18px !important;
-    		}
-    		
-    		body .ui-datatable .ui-paginator.ui-paginator-top {
-    			background-color: #2f8ee5 !important;
-    			color: #ffffff !important;
-			}
+        <style>
+            .search-btn {
+                margin-top: 18px !important;
+            }
 
-			body .ui-datatable .ui-paginator.ui-paginator-bottom {
-			    background-color: #2f8ee5 !important;
-			    color: #ffffff !important;
-			}
-			
-			body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page, 
-					body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev, 
-					body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last {
-			    color: #FFFFFF !important;
-			}
-			
-			body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
-			    background: #FFF !important;
-			    color: #000000 !important;
-			}
-			
-			.card{
-				border: 1px solid #c9cdd2;
-			}
-			
-			.layout-wrapper .route-bar {
-    			border-bottom: 1px solid #c9cdd2;
-    		}
-    		
-    		.layout-footer {
-			    border-top: 1px solid #c9cdd2;
-			}
-			
-    		body .ui-datatable .ui-datatable-data > tr > td {
-    			border: 1px solid #c9cdd2;
-    			border-width: 0 0 1px 0;
-			}
-			
-			.btn-green {
-				background: #689F38 !important;
-    			color: #ffffff !important;
-    			border: 1px solid #689F38 !important;
-			}
-			
-			body .ui-button.ui-button-warn, body .ui-splitbutton.ui-button-warn > .ui-button {
-			    background: #ff8b00;
-			    color: #FFFFFF;
-			    border: 1px solid #ff8b00 !important;
-			}
-			
-			body .ui-button.ui-button-warn.ui-state-hover, body .ui-splitbutton.ui-button-warn.ui-state-hover > .ui-button.ui-state-hover {
-				background: #ff8b00;
-			    color: #FFFFFF;
-			    border: 1px solid #ff8b00 !important;
-			} 
-			
-			body .ui-button.ui-button-warn.ui-state-focus, body .ui-splitbutton.ui-button-warn.ui-state-focus > .ui-button.ui-state-focus {
-				box-shadow: 0 0 0 0.2rem orange;
-			}
-			
-			body .ui-button.ui-button-warn.ui-state-active, body .ui-splitbutton.ui-button-warn.ui-state-active > .ui-button.ui-state-active {
-				background-color: #ff8b00 !important;
-			    color: #FFFFFF;
-			    border: 1px solid #ff8b00 !important;
-			}
-			
-			body .ui-button.ui-button-warning-icon, body .ui-splitbutton.ui-button-warning-icon > .ui-button {
-			    background: #fb6e51;
-			    color: #FFFFFF;
-			    border: 1px solid #fb6e51 !important;
-			}
-			
-			body .ui-button.ui-button-warning-icon.ui-state-focus, body .ui-splitbutton.ui-button-warning-icon > .ui-button.ui-state-focus {
-				box-shadow: 0 0 0 0.2rem orange !important;
-			}
-			
-			body .ui-button.ui-button-warning-icon.ui-state-active, body .ui-splitbutton.ui-button-warning-icon.ui-state-active > .ui-button.ui-state-active {
-				background-color: #ff8b00 !important;
-			    color: #FFFFFF;
-			    border: 1px solid #ff8b00 !important;
-			}
-			
-			.search-btn {
-    			margin-top: 0px !important; 
-			}
-			
-			.alignEnd {
-			    place-content: flex-end;
-			}
-			
-			@media screen and (max-width: 1200px) {
-			    #settingPanel {
-			        margin-top: 90px;
-			    }
-			    .alignEnd {
-			        place-content: flex-start;
-			    }
-			}
-			
-			input {
-			    min-height: 36px;
-			}
-			
-			#settingPanel {
-			    position: absolute;
-			    z-index: 1;
-			    margin-top: 38px;
-			    max-width: 500px;
-			    right: 33px;
-			    border: 1px solid #547ac4;
-			}
-			
-			body .ui-calendar.ui-trigger-calendar input.hasDatepicker {
-			    width: calc( 100% - 5px);
-			}
-			
-			.ui-datatable tbody.ui-datatable-data {
-			    outline: 0;
-			    background-color: white;
-			}
-			
-			#stateSelectCheckboxPanel {
-    			left: 1420px !important;
-			}
-			
-			#requestTypeSelectCheckboxPanel {
-			    left: 1170px !important;
-			}
-			
-			#serviceSelectCheckboxPanel {
-    			left: 1315px !important;
-    			width: 320px !important;
-			}
-			
-			#requestTypeSelectCheckboxPanelDataTable .ui-chkbox .ui-chkbox-box.ui-state-active {
-			    background-color: transparent !important;
-			    border-color: #4D759D !important;
-			    color: #5f666c !important;
-			}
-			
-			#serviceSelectCheckboxPanelDataTable .ui-chkbox .ui-chkbox-box.ui-state-active {
-			    background-color: transparent !important;
-			    border-color: #4D759D !important;
-			    color: #5f666c !important;
-			}
-    	</style>
+            body .ui-datatable .ui-paginator.ui-paginator-top {
+                background-color: #2f8ee5 !important;
+                color: #ffffff !important;
+            }
+
+            body .ui-datatable .ui-paginator.ui-paginator-bottom {
+                background-color: #2f8ee5 !important;
+                color: #ffffff !important;
+            }
+
+            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page,
+            body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev,
+            body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last {
+                color: #FFFFFF !important;
+            }
+
+            body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+                background: #FFF !important;
+                color: #000000 !important;
+            }
+
+            .card{
+                border: 1px solid #c9cdd2;
+            }
+
+            .layout-wrapper .route-bar {
+                border-bottom: 1px solid #c9cdd2;
+            }
+
+            .layout-footer {
+                border-top: 1px solid #c9cdd2;
+            }
+
+            body .ui-datatable .ui-datatable-data > tr > td {
+                border: 1px solid #c9cdd2;
+                border-width: 0 0 1px 0;
+            }
+
+            .btn-green {
+                background: #689F38 !important;
+                color: #ffffff !important;
+                border: 1px solid #689F38 !important;
+            }
+
+            body .ui-button.ui-button-warn, body .ui-splitbutton.ui-button-warn > .ui-button {
+                background: #ff8b00;
+                color: #FFFFFF;
+                border: 1px solid #ff8b00 !important;
+            }
+
+            body .ui-button.ui-button-warn.ui-state-hover, body .ui-splitbutton.ui-button-warn.ui-state-hover > .ui-button.ui-state-hover {
+                background: #ff8b00;
+                color: #FFFFFF;
+                border: 1px solid #ff8b00 !important;
+            }
+
+            body .ui-button.ui-button-warn.ui-state-focus, body .ui-splitbutton.ui-button-warn.ui-state-focus > .ui-button.ui-state-focus {
+                box-shadow: 0 0 0 0.2rem orange;
+            }
+
+            body .ui-button.ui-button-warn.ui-state-active, body .ui-splitbutton.ui-button-warn.ui-state-active > .ui-button.ui-state-active {
+                background-color: #ff8b00 !important;
+                color: #FFFFFF;
+                border: 1px solid #ff8b00 !important;
+            }
+
+            body .ui-button.ui-button-warning-icon, body .ui-splitbutton.ui-button-warning-icon > .ui-button {
+                background: #fb6e51;
+                color: #FFFFFF;
+                border: 1px solid #fb6e51 !important;
+            }
+
+            body .ui-button.ui-button-warning-icon.ui-state-focus, body .ui-splitbutton.ui-button-warning-icon > .ui-button.ui-state-focus {
+                box-shadow: 0 0 0 0.2rem orange !important;
+            }
+
+            body .ui-button.ui-button-warning-icon.ui-state-active, body .ui-splitbutton.ui-button-warning-icon.ui-state-active > .ui-button.ui-state-active {
+                background-color: #ff8b00 !important;
+                color: #FFFFFF;
+                border: 1px solid #ff8b00 !important;
+            }
+
+            .search-btn {
+                margin-top: 0px !important;
+            }
+
+            .alignEnd {
+                place-content: flex-end;
+            }
+
+            @media screen and (max-width: 1200px) {
+                #settingPanel {
+                    margin-top: 90px;
+                }
+                .alignEnd {
+                    place-content: flex-start;
+                }
+            }
+
+            input {
+                min-height: 36px;
+            }
+
+            #settingPanel {
+                position: absolute;
+                z-index: 1;
+                margin-top: 38px;
+                max-width: 500px;
+                right: 33px;
+                border: 1px solid #547ac4;
+            }
+
+            body .ui-calendar.ui-trigger-calendar input.hasDatepicker {
+                width: calc( 100% - 5px);
+            }
+
+            .ui-datatable tbody.ui-datatable-data {
+                outline: 0;
+                background-color: white;
+            }
+
+            #stateSelectCheckboxPanel {
+                left: 1420px !important;
+            }
+
+            #requestTypeSelectCheckboxPanel {
+                left: 1170px !important;
+            }
+
+            #serviceSelectCheckboxPanel {
+                left: 1315px !important;
+                width: 320px !important;
+            }
+
+            #requestTypeSelectCheckboxPanelDataTable .ui-chkbox .ui-chkbox-box.ui-state-active {
+                background-color: transparent !important;
+                border-color: #4D759D !important;
+                color: #5f666c !important;
+            }
+
+            #serviceSelectCheckboxPanelDataTable .ui-chkbox .ui-chkbox-box.ui-state-active {
+                background-color: transparent !important;
+                border-color: #4D759D !important;
+                color: #5f666c !important;
+            }
+        </style>
         <script>
             var doChange = true;
             function checkDates() {
@@ -183,373 +183,374 @@
                     updateCalendarTo(null);
                 }
             };
-            
+
             function resetData() {
-            	$("#filterDateFrom_input").val("");
-            	$("#filterDateTo_input").val("");
-            	$("#filterDateFromEvasione_input").val("");
-            	$("#filterDateToEvasione_input").val("");
-            	$("#client_label").text("#{ff:upper(msg.requestListClient)}");
-            	$("#manager_label").text("#{ff:upper(msg.clientManager)}");
-            	$("#fiduciario_label").text("#{ff:upper(msg.mailTrust)}");
-            	$("#office_label").text("#{msg.subjectViewFormalityConservatoryCap}");
-            	$("#filterExpiration_input").val("");
-            	resetTableData();
-            	return true;
+                $("#filterDateFrom_input").val("");
+                $("#filterDateTo_input").val("");
+                $("#filterDateFromEvasione_input").val("");
+                $("#filterDateToEvasione_input").val("");
+                $("#client_label").text("#{ff:upper(msg.requestListClient)}");
+                $("#manager_label").text("#{ff:upper(msg.clientManager)}");
+                $("#fiduciario_label").text("#{ff:upper(msg.mailTrust)}");
+                $("#office_label").text("#{msg.subjectViewFormalityConservatoryCap}");
+                $("#filterExpiration_input").val("");
+                resetTableData();
+                return true;
             }
         </script>
-				
-		<div class="p-grid">
-          	<div class="p-col-12 p-md-12">
-              	<div class="">
-                  	<div class="p-grid">
-                      	<div class="p-col-8">
-                          	<div class="p-formgroup-inline">
-                              	<div class="p-field">
-                                  	<p:commandButton value="#{ff:upper(msg.requestNew)}" id="btn_new"
-										styleClass="btn-green search-btn" style="margin-left:20px;"
-										disabled="#{!bean.canCreate}" action="#{bean.createNewRequest}" />
-								</div>
-								<div class="p-field">
-									<p:commandButton value="#{ff:upper(msg.requestNewMultiple)}"
-										id="btn_new_multipe" styleClass="btn-green search-btn"
-										disabled="#{!bean.canCreate}"
-										action="#{bean.createNewMultipleRequest}" />
-                              	</div>
-                          	</div>
-                      	</div>
-                      	<div class="p-col-4">
-                          	<div class="p-formgroup-inline alignEnd">
-                          
-                              	<div class="p-field">
-                                  	<p:inputText value="#{bean.searchLastName}" placeholder="#{ff:upper(msg.requestEditSubjectListName)}"
-                           				style=""/>
-                              	</div>
-                              	<div class="p-field">
-                                  	<p:inputText value="#{bean.searchFiscalCode}" placeholder="#{ff:upper(msg.requestFiscalCodeCap)}"
-                           				style=""/>
-                              	</div>
-                              	
-                              	<div class="p-field">
-                                  	<p:commandButton 
-										style="" id="searchButton" styleClass="ui-button-warning-icon"
-										onclick="checkDates(); filterTableFromPanel();"
-										action="#{bean.prepareToModify}" icon="ui-icon ui-icon-search pi pi-search"
-										update=":form:table,searchPanel,editAndPrintDialog" />
-                              	</div>
-                              	<div class="p-field">
-                              		<p:commandButton id="settingButton" onclick="resetData(); PF('panelSetting').toggle();" type="button"
-                                             styleClass="ui-button-warning-icon"  icon="ui-icon ui-icon-search pi pi-sliders-h"/>
-                              	</div>
-                              	<p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" collapsed="true">
-                                  	<div class="p-grid">
-                                      	<div class="p-col-12" style="text-align: center;">
-                                         	<h2>Filtra per</h2>
-                                      	</div>
-                                      	<div class="p-col-12">
-                                      		<div style="">
-                                          		<h:outputText style="color: #003871;"
-													value="#{ff:upper(msg.requestListDateOfInput)}:" />
-											</div>
-										</div>
-										<div class="p-col-6">		
-                                          	<p:calendar id="filterDateFrom" readonlyInput="false"
-												showOn="button"
-												onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
-												pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
-												popupIconOnly="true"
-												onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
-												value="#{bean.dateFrom}"
-												placeholder="#{msg.mailManagerDateFromReqlist}" />
-                                          	<div id="hyphen"></div>
+
+        <div class="p-grid">
+            <div class="p-col-12 p-md-12">
+                <div class="">
+                    <div class="p-grid">
+                        <div class="p-col-8">
+                            <div class="p-formgroup-inline">
+                                <div class="p-field">
+                                    <p:commandButton value="#{ff:upper(msg.requestNew)}" id="btn_new"
+                                                     styleClass="btn-green search-btn" style="margin-left:20px;"
+                                                     disabled="#{!bean.canCreate}" action="#{bean.createNewRequest}" />
+                                </div>
+                                <div class="p-field">
+                                    <p:commandButton value="#{ff:upper(msg.requestNewMultiple)}"
+                                                     id="btn_new_multipe" styleClass="btn-green search-btn"
+                                                     disabled="#{!bean.canCreate}"
+                                                     action="#{bean.createNewMultipleRequest}" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-col-4">
+                            <div class="p-formgroup-inline alignEnd">
+
+                                <div class="p-field">
+                                    <p:inputText value="#{bean.searchLastName}" placeholder="#{ff:upper(msg.requestEditSubjectListName)}"
+                                                 style=""/>
+                                </div>
+                                <div class="p-field">
+                                    <p:inputText value="#{bean.searchFiscalCode}" placeholder="#{ff:upper(msg.requestFiscalCodeCap)}"
+                                                 style=""/>
+                                </div>
+
+                                <div class="p-field">
+                                    <p:commandButton
+                                            style="" id="searchButton" styleClass="ui-button-warning-icon"
+                                            onclick="checkDates(); filterTableFromPanel();"
+                                            action="#{bean.prepareToModify}" icon="ui-icon ui-icon-search pi pi-search"
+                                            update=":form:table,searchPanel,editAndPrintDialog" />
+                                </div>
+                                <div class="p-field">
+                                    <p:commandButton id="settingButton" onclick="PF('panelSetting').toggle();" type="button"
+                                                     styleClass="ui-button-warning-icon"  icon="ui-icon ui-icon-search pi pi-sliders-h"/>
+                                </div>
+                                <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" collapsed="true">
+                                    <div class="p-grid">
+                                        <div class="p-col-12" style="text-align: center;">
+                                            <h2>Filtra per</h2>
+                                        </div>
+                                        <div class="p-col-12">
+                                            <div style="">
+                                                <h:outputText style="color: #003871;"
+                                                              value="#{ff:upper(msg.requestListDateOfInput)}:" />
+                                            </div>
                                         </div>
                                         <div class="p-col-6">
-                                        	<p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
-												onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
-												pattern="dd/MM/yyyy" mask="true" 
-												locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateToReqlist}"
-												onblur="check_date(this)" value="#{bean.dateTo}" /> 
+                                            <p:calendar id="filterDateFrom" readonlyInput="false"
+                                                        showOn="button"
+                                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+                                                        pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
+                                                        popupIconOnly="true"
+                                                        onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+                                                        value="#{bean.dateFrom}"
+                                                        placeholder="#{msg.mailManagerDateFromReqlist}" />
+                                            <div id="hyphen"></div>
                                         </div>
-										<div class="p-col-12">
-											<div style="">	
-												<h:outputText style="color: #003871;"
-													value="#{ff:upper(msg.requestListDateOfEvasion)}:" />
-											</div>
-										</div>
-										<div class="p-col-6">
-											<p:calendar id="filterDateFromEvasione" readonlyInput="false"
-												showOn="button" 
-												onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
-												pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
-												popupIconOnly="true"
-												onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
-												value="#{bean.dateFromEvasion}"
-												placeholder="#{msg.mailManagerDateFromReqlist}" />
-                                      	</div>
-                                      	<div class="p-col-6">
-                                      		<p:calendar id="filterDateToEvasione" readonlyInput="false"
-												showOn="button"
-												onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
-												pattern="dd/MM/yyyy" mask="true"
-												locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateToReqlist}"
-												onblur="check_date(this)" value="#{bean.dateToEvasion}" />
-                                      	</div>
-                                      	<div class="p-col-6">
-                                      		<p:selectOneMenu id="client" value="#{bean.selectedClientId}"
-						                                     label="#{msg.requestClient}" style="width: calc( 100% - 5px);">
-						                        <f:selectItem itemLabel="#{ff:upper(msg.requestListClient)}" itemValue="#{null}"
-						                                      noSelectionOption="true" />
-						                        <f:selectItems value="#{bean.clients}"/>
-						                    </p:selectOneMenu>
-                                      	</div>
-                                      	<div class="p-col-6">
-                                      		<p:outputPanel id="statuses" style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
-                    							<h:outputText value="#{ff:upper(msg.status)}" style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
-                   								<i class="fa fa-angle-down" style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
-                   		 						onclick="PF('stateSelectCheckboxWV').show(); event.stopImmediatePropagation();" />
-                    						</p:outputPanel>
-                                      	</div>
-                                      	<div class="p-col-6">
-                                      		<p:outputPanel id="requestTypes" style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
-						                    	<h:outputText value="#{ff:upper(msg.requestListServiceTypeCap)}" style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
-						                   		<i class="fa fa-angle-down" style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
-						                   		 onclick="PF('requestTypeSelectCheckboxWV').show(); event.stopImmediatePropagation();" />
-						                    </p:outputPanel>
-                                      	</div>
-                                      	<div class="p-col-6">
-                                      		<p:outputPanel id="services" style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
-						                    	<h:outputText value="#{ff:upper(msg.requestListService)}" style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
-						                   		<i class="fa fa-angle-down" style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
-						                   		 onclick="PF('serviceSelectCheckboxWV').show(); event.stopImmediatePropagation();" />
-						                    </p:outputPanel>
-                                      	</div>
-                                      	<div class="p-col-6">
-                                      		<p:selectOneMenu id="manager" value="#{bean.managerClientFilterid}"  style="width: calc( 100% - 5px);">
-						                        <f:selectItem itemLabel="#{ff:upper(msg.clientManager)}" itemValue="#{null}"
-						                                      noSelectionOption="true" />
-						                        <f:selectItems value="#{bean.managerClients}"/>
-						                    </p:selectOneMenu>
-                                      	</div>
-                                      	<div class="p-col-6">
-	                                      	<p:selectOneMenu id="fiduciario" value="#{bean.fiduciaryClientFilterId}" style="width: calc( 100% - 5px);">
-						                        <f:selectItem itemLabel="#{ff:upper(msg.mailTrust)}" itemValue="#{null}"
-						                                      noSelectionOption="true" />
-						                        <f:selectItems value="#{bean.fiduciaryClients}"/>
-						                    </p:selectOneMenu>
-                                      	</div>
-                                      	<div class="p-col-6">
-	                                      	<p:selectOneMenu id="office" value="#{bean.aggregationFilterId}"  style="width: calc( 100% - 5px);">
-						                        <f:selectItem itemLabel="#{msg.subjectViewFormalityConservatoryCap}" itemValue="#{null}"
-						                                      noSelectionOption="true" />
-						                        <f:selectItems value="#{bean.landAggregations}"/>
-						                    </p:selectOneMenu>
-						                </div>
-						                <div class="p-col-6">
-						                	<p:calendar id="filterExpiration" readonlyInput="false" showOn="button"
-				                                onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
-				                                pattern="dd/MM/yyyy" mask="true"
-				                                locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.expirationDateCap}"
-				                                value="#{bean.dateExpiration}"/>
-                                      	</div>
-                                      	<div class="p-col-12" style="text-align: center;">
-                                          	<p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}"  update="settingPanel" oncomplete="PF('panelSetting').toggle()"/>
-                                          	<p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #009900; margin-left:3px;" id="searchButton12345"
-                                                           onclick="checkDates(); filterTableFromPanel();" update="searchPanel" oncomplete="PF('panelSetting').toggle()"/>
-                                      	</div>
-                                  	</div>
-                              	</p:panel>
-                          	</div>
-                      	</div>
-                  	</div>
-              	</div>
-          	</div>
-      	</div>
-				
-		<p:remoteCommand name="resetTableData"
-                             action="#{bean.onLoad}" update=":form:table"/>		
+                                        <div class="p-col-6">
+                                            <p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
+                                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                                                        pattern="dd/MM/yyyy" mask="true"
+                                                        locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateToReqlist}"
+                                                        onblur="check_date(this)" value="#{bean.dateTo}" />
+                                        </div>
+                                        <div class="p-col-12">
+                                            <div style="">
+                                                <h:outputText style="color: #003871;"
+                                                              value="#{ff:upper(msg.requestListDateOfEvasion)}:" />
+                                            </div>
+                                        </div>
+                                        <div class="p-col-6">
+                                            <p:calendar id="filterDateFromEvasione" readonlyInput="false"
+                                                        showOn="button"
+                                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+                                                        pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
+                                                        popupIconOnly="true"
+                                                        onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+                                                        value="#{bean.dateFromEvasion}"
+                                                        placeholder="#{msg.mailManagerDateFromReqlist}" />
+                                        </div>
+                                        <div class="p-col-6">
+                                            <p:calendar id="filterDateToEvasione" readonlyInput="false"
+                                                        showOn="button"
+                                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                                                        pattern="dd/MM/yyyy" mask="true"
+                                                        locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateToReqlist}"
+                                                        onblur="check_date(this)" value="#{bean.dateToEvasion}" />
+                                        </div>
+                                        <div class="p-col-6">
+                                            <p:selectOneMenu id="client" value="#{bean.selectedClientId}"
+                                                             label="#{msg.requestClient}" style="width: calc( 100% - 5px);">
+                                                <f:selectItem itemLabel="#{ff:upper(msg.requestListClient)}" itemValue="#{null}"
+                                                              noSelectionOption="true" />
+                                                <f:selectItems value="#{bean.clients}"/>
+                                            </p:selectOneMenu>
+                                        </div>
+                                        <div class="p-col-6">
+                                            <p:outputPanel id="statuses" style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
+                                                <h:outputText value="#{ff:upper(msg.status)}" style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
+                                                <i class="fa fa-angle-down" style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
+                                                   onclick="PF('stateSelectCheckboxWV').show(); event.stopImmediatePropagation();" />
+                                            </p:outputPanel>
+                                        </div>
+                                        <div class="p-col-6">
+                                            <p:outputPanel id="requestTypes" style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
+                                                <h:outputText value="#{ff:upper(msg.requestListServiceTypeCap)}" style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
+                                                <i class="fa fa-angle-down" style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
+                                                   onclick="PF('requestTypeSelectCheckboxWV').show(); event.stopImmediatePropagation();" />
+                                            </p:outputPanel>
+                                        </div>
+                                        <div class="p-col-6">
+                                            <p:outputPanel id="services" style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
+                                                <h:outputText value="#{ff:upper(msg.requestListService)}" style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
+                                                <i class="fa fa-angle-down" style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
+                                                   onclick="PF('serviceSelectCheckboxWV').show(); event.stopImmediatePropagation();" />
+                                            </p:outputPanel>
+                                        </div>
+                                        <div class="p-col-6">
+                                            <p:selectOneMenu id="manager" value="#{bean.managerClientFilterid}"  style="width: calc( 100% - 5px);">
+                                                <f:selectItem itemLabel="#{ff:upper(msg.clientManager)}" itemValue="#{null}"
+                                                              noSelectionOption="true" />
+                                                <f:selectItems value="#{bean.managerClients}"/>
+                                            </p:selectOneMenu>
+                                        </div>
+                                        <div class="p-col-6">
+                                            <p:selectOneMenu id="fiduciario" value="#{bean.fiduciaryClientFilterId}" style="width: calc( 100% - 5px);">
+                                                <f:selectItem itemLabel="#{ff:upper(msg.mailTrust)}" itemValue="#{null}"
+                                                              noSelectionOption="true" />
+                                                <f:selectItems value="#{bean.fiduciaryClients}"/>
+                                            </p:selectOneMenu>
+                                        </div>
+                                        <div class="p-col-6">
+                                            <p:selectOneMenu id="office" value="#{bean.aggregationFilterId}"  style="width: calc( 100% - 5px);">
+                                                <f:selectItem itemLabel="#{msg.subjectViewFormalityConservatoryCap}" itemValue="#{null}"
+                                                              noSelectionOption="true" />
+                                                <f:selectItems value="#{bean.landAggregations}"/>
+                                            </p:selectOneMenu>
+                                        </div>
+                                        <div class="p-col-6">
+                                            <p:calendar id="filterExpiration" readonlyInput="false" showOn="button"
+                                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                                                        pattern="dd/MM/yyyy" mask="true"
+                                                        locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.expirationDateCap}"
+                                                        value="#{bean.dateExpiration}"/>
+                                        </div>
+                                        <div class="p-col-12 search-panel-btns" style="text-align: center;">
+                                            <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}"  update="settingPanel searchPanel" oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').toggle();"/>
+                                            <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #009900; margin-left:3px;" id="searchButton12345"
+                                                             onclick="checkDates(); filterTableFromPanel();" update="searchPanel" oncomplete="PF('panelSetting').toggle()"/>
+                                        </div>
+                                    </div>
+                                </p:panel>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <p:remoteCommand name="resetTableData"
+                         action="#{bean.onLoad}" update=":form:table"/>
         <p:outputPanel id="searchPanel" style="display:none;" >
-                <p:commandButton icon="fa fa-fw fa-file-pdf-o"  rendered="false"
-                                 action="#{bean.downloadPdfFile}" ajax="false" update="@form">
-                    <f:setPropertyActionListener value="612"
-                                                 target="#{bean.downloadRequestId}"/>
-                </p:commandButton>
-        
+            <p:commandButton icon="fa fa-fw fa-file-pdf-o"  rendered="false"
+                             action="#{bean.downloadPdfFile}" ajax="false" update="@form">
+                <f:setPropertyActionListener value="612"
+                                             target="#{bean.downloadRequestId}"/>
+            </p:commandButton>
+
             <p:remoteCommand name="updateCalendarTo" update=":form:filterDateTo"/>
             <p:remoteCommand name="filterTableFromPanel"
                              action="#{bean.filterTableFromPanel}" update=":form:table"/>
-           <!--   <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid" style="margin-bottom: 20px;"
-                         columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2">
-				<p:column>
-					<h:outputText style="color: #003871;"
-						value="#{ff:upper(msg.requestListDateOfInput)}:" />
-					<br />
-					<p:calendar id="filterDateFrom" readonlyInput="false"
-						showOn="button"
-						onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
-						pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
-						popupIconOnly="true"
-						onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
-						value="#{bean.dateFrom}"
-						placeholder="#{msg.mailManagerDateFromReqlist}" />
-				</p:column>
-				<p:column>
-					<h:outputText value="" />
-					<br />
-					<p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
-						onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
-						pattern="dd/MM/yyyy" mask="true" 
-						locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateToReqlist}"
-						onblur="check_date(this)" value="#{bean.dateTo}" />
-				</p:column>
-
-				<p:column>
-                   <h:outputText value=""/>
-                    <p:selectOneMenu id="client" value="#{bean.selectedClientId}"
-                                     label="#{msg.requestClient}" style="width: calc( 100% - 27px);margin-top: 18px;">
-                        <f:selectItem itemLabel="#{ff:upper(msg.requestListClient)}" itemValue="#{null}"
-                                      noSelectionOption="true" />
-                        <f:selectItems value="#{bean.clients}"/>
-                    </p:selectOneMenu>
-                </p:column>
-                
+            <!--   <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid" style="margin-bottom: 20px;"
+                          columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2">
                  <p:column>
-                    <br/>
-                    <p:outputPanel id="requestTypes" style="width: calc( 100% - 10px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
-                    	<h:outputText value="#{ff:upper(msg.requestListServiceTypeCap)}" style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
-                   		<i class="fa fa-angle-down" style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
-                   		 onclick="PF('requestTypeSelectCheckboxWV').show(); event.stopImmediatePropagation();" />
-                    </p:outputPanel>
-				</p:column>
-				
-				<p:column>
-                    <br/>
-                    <p:outputPanel id="services" style="width: calc( 100% - 10px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
-                    	<h:outputText value="#{ff:upper(msg.requestListService)}" style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
-                   		<i class="fa fa-angle-down" style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
-                   		 onclick="PF('serviceSelectCheckboxWV').show(); event.stopImmediatePropagation();" />
-                    </p:outputPanel>
-				</p:column>
-				
-				 <p:column>
-                   <h:outputText value=" "/>
-                    <p:selectOneMenu id="office" value="#{bean.aggregationFilterId}"  style="width: calc( 100% - 27px);margin-top: 18px;">
-                        <f:selectItem itemLabel="#{msg.subjectViewFormalityConservatoryCap}" itemValue="#{null}"
-                                      noSelectionOption="true" />
-                        <f:selectItems value="#{bean.landAggregations}"/>
-                    </p:selectOneMenu>
-                </p:column>
-				
-				<p:column>
-					<h:outputText style="color: #003871;"
-						value="#{ff:upper(msg.requestListDateOfEvasion)}:" />
-					<br />
-					<p:calendar id="filterDateFromEvasione" readonlyInput="false"
-						showOn="button"
-						onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
-						pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
-						popupIconOnly="true"
-						onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
-						value="#{bean.dateFromEvasion}"
-						placeholder="#{msg.mailManagerDateFromReqlist}" />
-				</p:column>
-				<p:column>
-					<h:outputText value="" />
-					<br />
+                     <h:outputText style="color: #003871;"
+                         value="#{ff:upper(msg.requestListDateOfInput)}:" />
+                     <br />
+                     <p:calendar id="filterDateFrom" readonlyInput="false"
+                         showOn="button"
+                         onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+                         pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
+                         popupIconOnly="true"
+                         onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+                         value="#{bean.dateFrom}"
+                         placeholder="#{msg.mailManagerDateFromReqlist}" />
+                 </p:column>
+                 <p:column>
+                     <h:outputText value="" />
+                     <br />
+                     <p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
+                         onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                         pattern="dd/MM/yyyy" mask="true"
+                         locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateToReqlist}"
+                         onblur="check_date(this)" value="#{bean.dateTo}" />
+                 </p:column>
 
-					<p:calendar id="filterDateToEvasione" readonlyInput="false"
-						showOn="button"
-						onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
-						pattern="dd/MM/yyyy" mask="true"
-						locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateToReqlist}"
-						onblur="check_date(this)" value="#{bean.dateToEvasion}" />
-				</p:column>
-				
-				<p:column>
-                    <br/>
-                    <p:inputText value="#{bean.searchLastName}" placeholder="#{ff:upper(msg.requestEditSubjectListName)}"
-                                 style="width: calc( 100% - 10px);"/>
-                </p:column>
-                
-                <p:column>
-                    <br/>
-                    <p:inputText value="#{bean.searchFiscalCode}" placeholder="#{ff:upper(msg.requestFiscalCodeCap)}"
-                                 style="width: calc( 100% - 10px);"/>
-                </p:column>
-                
-                <p:column>
-                      <h:outputText value=""/>
-                    <p:selectOneMenu value="#{bean.managerClientFilterid}"  style="width: calc( 100% - 27px);margin-top: 18px;">
-                        <f:selectItem itemLabel="#{ff:upper(msg.clientManager)}" itemValue="#{null}"
-                                      noSelectionOption="true" />
-                        <f:selectItems value="#{bean.managerClients}"/>
-                    </p:selectOneMenu>
-                </p:column>
-                
-                <p:column>
+                 <p:column>
                     <h:outputText value=""/>
-                    <p:selectOneMenu value="#{bean.fiduciaryClientFilterId}" style="width: calc( 100% - 27px);margin-top: 18px;">
-                        <f:selectItem itemLabel="#{ff:upper(msg.mailTrust)}" itemValue="#{null}"
-                                      noSelectionOption="true" />
-                        <f:selectItems value="#{bean.fiduciaryClients}"/>
-                    </p:selectOneMenu>
-                </p:column>
-                
-                <p:column>
-                    <br/>
-                    <p:calendar id="filterExpiration" readonlyInput="false" showOn="button"
-                                onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
-                                pattern="dd/MM/yyyy" mask="true"
-                                locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.expirationDateCap}"
-                                value="#{bean.dateExpiration}"/>
-                </p:column>
-                
-                <p:column>
-                    <br/>
-                    <p:outputPanel id="statuses" style="width: calc( 100% - 10px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
-                    	<h:outputText value="#{ff:upper(msg.status)}" style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
-                    	
-                   		<i class="fa fa-angle-down" style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
-                   		 onclick="PF('stateSelectCheckboxWV').show(); event.stopImmediatePropagation();" />
-                    </p:outputPanel>
-				</p:column>
+                     <p:selectOneMenu id="client" value="#{bean.selectedClientId}"
+                                      label="#{msg.requestClient}" style="width: calc( 100% - 27px);margin-top: 18px;">
+                         <f:selectItem itemLabel="#{ff:upper(msg.requestListClient)}" itemValue="#{null}"
+                                       noSelectionOption="true" />
+                         <f:selectItems value="#{bean.clients}"/>
+                     </p:selectOneMenu>
+                 </p:column>
 
-               
-				<p:column rendered="false">
-                    <br/>
-                    <p:inputText value="#{bean.searchCreateUser}" placeholder="#{msg.requestCreateUser}"
-                                 style="width: 92%;"/>
-                </p:column>
-                
-                <p:column>
-					<p:commandButton value="#{ff:upper(msg.search)}"
-						style="width: 100%;" styleClass="search-btn" id="searchButton"
-						onclick="checkDates(); filterTableFromPanel();"
-						action="#{bean.prepareToModify}"
-						update=":form:table,searchPanel,editAndPrintDialog" />
-				</p:column>
-                <p:column>
-                	 <p:commandButton rendered="#{bean.showPrintButton}" value="#{msg.requestPrintExcel}"
-                                     styleClass="search-btn" style="width: 30%; margin-right: 3px;"
-                                     id="printExcelButton" oncomplete="PF('createTotalCosthDocumentDialogWV').show()"/>
-                    <p:commandButton rendered="#{bean.showPrintButton}" value="#{msg.requestEditAndPrint}"
-                                     styleClass="search-btn" style="width: calc( 70% - 3px);"
-                                     id="editAndPrintButton" oncomplete="PF('editAndPrintDialogWV').show();"
-                                     process="searchPanel"/>
-                </p:column>
-                <p:column>
-					<p:commandButton value="#{ff:upper(msg.requestNew)}" id="btn_new"
-						styleClass="btn-green search-btn"
-						style="width: 100%;"
-						disabled="#{!bean.canCreate}" action="#{bean.createNewRequest}" />
-				</p:column>
-                <p:column>
-					<p:commandButton value="#{ff:upper(msg.requestNewMultiple)}"
-						id="btn_new_multipe" styleClass="btn-green search-btn"
-						style="width: 100%;"
-						disabled="#{!bean.canCreate}"
-						action="#{bean.createNewMultipleRequest}" />
-				</p:column> 
-            </p:panelGrid> -->
+                  <p:column>
+                     <br/>
+                     <p:outputPanel id="requestTypes" style="width: calc( 100% - 10px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
+                         <h:outputText value="#{ff:upper(msg.requestListServiceTypeCap)}" style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
+                            <i class="fa fa-angle-down" style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
+                             onclick="PF('requestTypeSelectCheckboxWV').show(); event.stopImmediatePropagation();" />
+                     </p:outputPanel>
+                 </p:column>
+
+                 <p:column>
+                     <br/>
+                     <p:outputPanel id="services" style="width: calc( 100% - 10px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
+                         <h:outputText value="#{ff:upper(msg.requestListService)}" style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
+                            <i class="fa fa-angle-down" style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
+                             onclick="PF('serviceSelectCheckboxWV').show(); event.stopImmediatePropagation();" />
+                     </p:outputPanel>
+                 </p:column>
+
+                  <p:column>
+                    <h:outputText value=" "/>
+                     <p:selectOneMenu id="office" value="#{bean.aggregationFilterId}"  style="width: calc( 100% - 27px);margin-top: 18px;">
+                         <f:selectItem itemLabel="#{msg.subjectViewFormalityConservatoryCap}" itemValue="#{null}"
+                                       noSelectionOption="true" />
+                         <f:selectItems value="#{bean.landAggregations}"/>
+                     </p:selectOneMenu>
+                 </p:column>
+
+                 <p:column>
+                     <h:outputText style="color: #003871;"
+                         value="#{ff:upper(msg.requestListDateOfEvasion)}:" />
+                     <br />
+                     <p:calendar id="filterDateFromEvasione" readonlyInput="false"
+                         showOn="button"
+                         onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+                         pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
+                         popupIconOnly="true"
+                         onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+                         value="#{bean.dateFromEvasion}"
+                         placeholder="#{msg.mailManagerDateFromReqlist}" />
+                 </p:column>
+                 <p:column>
+                     <h:outputText value="" />
+                     <br />
+
+                     <p:calendar id="filterDateToEvasione" readonlyInput="false"
+                         showOn="button"
+                         onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                         pattern="dd/MM/yyyy" mask="true"
+                         locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateToReqlist}"
+                         onblur="check_date(this)" value="#{bean.dateToEvasion}" />
+                 </p:column>
+
+                 <p:column>
+                     <br/>
+                     <p:inputText value="#{bean.searchLastName}" placeholder="#{ff:upper(msg.requestEditSubjectListName)}"
+                                  style="width: calc( 100% - 10px);"/>
+                 </p:column>
+
+                 <p:column>
+                     <br/>
+                     <p:inputText value="#{bean.searchFiscalCode}" placeholder="#{ff:upper(msg.requestFiscalCodeCap)}"
+                                  style="width: calc( 100% - 10px);"/>
+                 </p:column>
+
+                 <p:column>
+                       <h:outputText value=""/>
+                     <p:selectOneMenu value="#{bean.managerClientFilterid}"  style="width: calc( 100% - 27px);margin-top: 18px;">
+                         <f:selectItem itemLabel="#{ff:upper(msg.clientManager)}" itemValue="#{null}"
+                                       noSelectionOption="true" />
+                         <f:selectItems value="#{bean.managerClients}"/>
+                     </p:selectOneMenu>
+                 </p:column>
+
+                 <p:column>
+                     <h:outputText value=""/>
+                     <p:selectOneMenu value="#{bean.fiduciaryClientFilterId}" style="width: calc( 100% - 27px);margin-top: 18px;">
+                         <f:selectItem itemLabel="#{ff:upper(msg.mailTrust)}" itemValue="#{null}"
+                                       noSelectionOption="true" />
+                         <f:selectItems value="#{bean.fiduciaryClients}"/>
+                     </p:selectOneMenu>
+                 </p:column>
+
+                 <p:column>
+                     <br/>
+                     <p:calendar id="filterExpiration" readonlyInput="false" showOn="button"
+                                 onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                                 pattern="dd/MM/yyyy" mask="true"
+                                 locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.expirationDateCap}"
+                                 value="#{bean.dateExpiration}"/>
+                 </p:column>
+
+                 <p:column>
+                     <br/>
+                     <p:outputPanel id="statuses" style="width: calc( 100% - 10px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
+                         <h:outputText value="#{ff:upper(msg.status)}" style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
+
+                            <i class="fa fa-angle-down" style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
+                             onclick="PF('stateSelectCheckboxWV').show(); event.stopImmediatePropagation();" />
+                     </p:outputPanel>
+                 </p:column>
+
+
+                 <p:column rendered="false">
+                     <br/>
+                     <p:inputText value="#{bean.searchCreateUser}" placeholder="#{msg.requestCreateUser}"
+                                  style="width: 92%;"/>
+                 </p:column>
+
+                 <p:column>
+                     <p:commandButton value="#{ff:upper(msg.search)}"
+                         style="width: 100%;" styleClass="search-btn" id="searchButton"
+                         onclick="checkDates(); filterTableFromPanel();"
+                         action="#{bean.prepareToModify}"
+                         update=":form:table,searchPanel,editAndPrintDialog" />
+                 </p:column>
+                 <p:column>
+                      <p:commandButton rendered="#{bean.showPrintButton}" value="#{msg.requestPrintExcel}"
+                                      styleClass="search-btn" style="width: 30%; margin-right: 3px;"
+                                      id="printExcelButton" oncomplete="PF('createTotalCosthDocumentDialogWV').show()"/>
+                     <p:commandButton rendered="#{bean.showPrintButton}" value="#{msg.requestEditAndPrint}"
+                                      styleClass="search-btn" style="width: calc( 70% - 3px);"
+                                      id="editAndPrintButton" oncomplete="PF('editAndPrintDialogWV').show();"
+                                      process="searchPanel"/>
+                 </p:column>
+                 <p:column>
+                     <p:commandButton value="#{ff:upper(msg.requestNew)}" id="btn_new"
+                         styleClass="btn-green search-btn"
+                         style="width: 100%;"
+                         disabled="#{!bean.canCreate}" action="#{bean.createNewRequest}" />
+                 </p:column>
+                 <p:column>
+                     <p:commandButton value="#{ff:upper(msg.requestNewMultiple)}"
+                         id="btn_new_multipe" styleClass="btn-green search-btn"
+                         style="width: 100%;"
+                         disabled="#{!bean.canCreate}"
+                         action="#{bean.createNewMultipleRequest}" />
+                 </p:column>
+             </p:panelGrid> -->
         </p:outputPanel>
 
         <p:overlayPanel id="stateSelectCheckboxPanel" my="left top" at="right bottom"
@@ -562,7 +563,7 @@
                         listener="#{bean.selectStateForFilter}"
                         update="stateSelectCheckboxPanelDataTable"/>
                 <p:column style="width:18px">
-                 	<f:facet name="header">
+                    <f:facet name="header">
                         <p:selectBooleanCheckbox value="#{bean.selectedAllStatesOnPanel}">
                             <p:ajax update="stateSelectCheckboxPanelDataTable" event="change"/>
                         </p:selectBooleanCheckbox>
@@ -577,7 +578,7 @@
             </p:dataTable>
         </p:overlayPanel>
 
-         <p:overlayPanel id="serviceSelectCheckboxPanel" my="left top" at="right bottom"
+        <p:overlayPanel id="serviceSelectCheckboxPanel" my="left top" at="right bottom"
                         widgetVar="serviceSelectCheckboxWV" for="services" dynamic="true" style="width:400px;">
             <p:dataTable id="serviceSelectCheckboxPanelDataTable" var="service"
                          value="#{bean.serviceWrappers}" selectionMode="single"
@@ -586,7 +587,7 @@
                         listener="#{bean.selectServiceForFilter}"
                         update="serviceSelectCheckboxPanelDataTable searchPanel"/>
                 <p:column style="width:18px">
-                 	<f:facet name="header">
+                    <f:facet name="header">
                         <p:selectBooleanCheckbox value="#{bean.selectedAllServicesOnPanel}">
                             <p:ajax update="serviceSelectCheckboxPanelDataTable" event="change"/>
                         </p:selectBooleanCheckbox>
@@ -601,7 +602,7 @@
             </p:dataTable>
         </p:overlayPanel>
 
-         <p:overlayPanel id="requestTypeSelectCheckboxPanel" my="left top" at="right bottom"
+        <p:overlayPanel id="requestTypeSelectCheckboxPanel" my="left top" at="right bottom"
                         widgetVar="requestTypeSelectCheckboxWV" for="requestTypes" dynamic="true" style="width:300px;">
             <p:dataTable id="requestTypeSelectCheckboxPanelDataTable" var="requestType"
                          value="#{bean.requestTypeWrappers}" selectionMode="single"
@@ -610,7 +611,7 @@
                         listener="#{bean.selectRequestTypeForFilter}"
                         update="requestTypeSelectCheckboxPanelDataTable"/>
                 <p:column style="width:18px">
-                 	<f:facet name="header">
+                    <f:facet name="header">
                         <p:selectBooleanCheckbox value="#{bean.selectedAllRequestTypesOnPanel}">
                             <p:ajax update="requestTypeSelectCheckboxPanelDataTable" event="change"/>
                         </p:selectBooleanCheckbox>
@@ -634,11 +635,11 @@
                      currentPageReportTemplate="Pagina {currentPage} di {totalPages}"
                      rowsPerPageTemplate="10,20,50" widgetVar="tableWV" styleClass="request-table">
 
-			<!--  <p:column headerText="#{msg.requestListUrgent}" styleClass="action_midle_column" >
-            	<h:outputText id="urgent" rendered="#{item.urgent}"
-					style="color: red; font-weight: bold; font-size: 19px;" value="S" />
+            <!--  <p:column headerText="#{msg.requestListUrgent}" styleClass="action_midle_column" >
+                <h:outputText id="urgent" rendered="#{item.urgent}"
+                    style="color: red; font-weight: bold; font-size: 19px;" value="S" />
             </p:column>
-			 -->
+             -->
             <p:column headerText="#{ff:upper(msg.requestListDate)}" sortBy="#{item.createDate}" style="width: 7vw;min-width: 163px;text-align: center;">
                 <p:outputPanel style="margin-left: 10px;text-align: left;max-height: 80px;">
                     <h:outputText value="#{item.createDate}" converter="dateTimeConverter" style="color:#003871;font-weight: bold !important;"/>
@@ -647,7 +648,7 @@
                     <br/>
                     <br/>
                     <h:outputText value="#{not empty item.stateDescription ? ff:upper(item.stateDescription) : ''}"
-                        styleClass="#{item.stateDescription eq 'Inserita'
+                                  styleClass="#{item.stateDescription eq 'Inserita'
                         ? 'status-icon status-green' : (item.stateDescription eq 'In lavorazione' ? 'status-icon status-yellow' :(item.stateDescription eq 'Da inviare' ? 'status-icon status-navy' : (item.stateDescription eq 'Sospesa' ? 'status-icon status-magenta' : (item.stateDescription eq 'Evasa' ? 'status-icon status-red':''))))}"/>
                     <br/>
                     <h:outputText rendered="#{item.urgent}" styleClass="vertical-txt" value="#{ff:upper(msg.requestListUrgent)}" />
@@ -660,22 +661,22 @@
                 <h:outputText value="#{item.clientName}"/>
                 <br/>
                 <p:graphicImage id="info" url="/resources/images/eye_icon.png"
-                                        style="width :22% ;"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
+                                style="width :22% ;"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
 
-				<p:tooltip for="info" styleClass="custom-design-tooltip">
-					<h:outputText value="#{ff:upper(msg.requestManagers)}" style="font-weight:bold;color:#003871;"/>
-					<br />
-					<h:outputText value="#{item.haveManagers()}" escape="false" rendered="#{not empty item.haveManagers()}"/>
-					<br />
-					<h:outputText value="#{ff:upper(msg.requestTrustees)}" style="font-weight:bold;color:#003871;" />
-					<br />
-					<h:outputText value="#{item.getClientNameProfessional(item.fiduciaryId)}" escape="false"
-							rendered="#{not empty item.fiduciaryId}" style="color:#003871;"/>
-				</p:tooltip>
-			</p:column>
+                <p:tooltip for="info" styleClass="custom-design-tooltip">
+                    <h:outputText value="#{ff:upper(msg.requestManagers)}" style="font-weight:bold;color:#003871;"/>
+                    <br />
+                    <h:outputText value="#{item.haveManagers()}" escape="false" rendered="#{not empty item.haveManagers()}"/>
+                    <br />
+                    <h:outputText value="#{ff:upper(msg.requestTrustees)}" style="font-weight:bold;color:#003871;" />
+                    <br />
+                    <h:outputText value="#{item.getClientNameProfessional(item.fiduciaryId)}" escape="false"
+                                  rendered="#{not empty item.fiduciaryId}" style="color:#003871;"/>
+                </p:tooltip>
+            </p:column>
 
             <p:column headerText="#{ff:upper(msg.requestListServiceCap)}" styleClass="min_padding_margin" style="width: 15.55vw;min-width: 213px;">
-            	<p:outputPanel style="margin-left: 20px;text-align: left;">
+                <p:outputPanel style="margin-left: 20px;text-align: left;">
                     <p:outputPanel id="servicesColumn"
                                    rendered="#{item.serviceName eq null}"
                                    style="background-color: transparent;width: inherit;"/>
@@ -691,32 +692,32 @@
                     <h:outputText id="service" value="#{item.serviceName}" rendered="#{item.serviceName ne null}"/>
                     <br/>
                     <p:graphicImage id="multipleservice" url="/resources/images/eye_icon.png"
-                                        style="width :10% ;"  rendered="#{not empty item.multipleServices}" />
-					<p:tooltip for="multipleservice" styleClass="custom-design-tooltip" rendered="#{not empty item.multipleServices}">
-						<ui:repeat var="ele" value="#{item.multipleServices}" varStatus="service">
-							<h:outputText value="#{ele}" escape="false" style="color:#003871;margin-left: 24px;"/>
-							<br />
-						</ui:repeat>
-					</p:tooltip>
+                                    style="width :10% ;"  rendered="#{not empty item.multipleServices}" />
+                    <p:tooltip for="multipleservice" styleClass="custom-design-tooltip" rendered="#{not empty item.multipleServices}">
+                        <ui:repeat var="ele" value="#{item.multipleServices}" varStatus="service">
+                            <h:outputText value="#{ele}" escape="false" style="color:#003871;margin-left: 24px;"/>
+                            <br />
+                        </ui:repeat>
+                    </p:tooltip>
                 </p:outputPanel>
 
-			</p:column>
+            </p:column>
 
 
             <p:column rendered="false" style="width: 100px;min-width: 100px;" headerText="#{ff:upper(msg.requestLastBusinessName)}" sortBy="#{item.name}">
-            	<p:commandLink value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId ne null}" action="#{bean.openRequestSubject}" style="cursor: pointer;">
-            		<f:setPropertyActionListener value="#{item.subjectId}" target="#{bean.entityEditId}"/>
-            	</p:commandLink>
+                <p:commandLink value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId ne null}" action="#{bean.openRequestSubject}" style="cursor: pointer;">
+                    <f:setPropertyActionListener value="#{item.subjectId}" target="#{bean.entityEditId}"/>
+                </p:commandLink>
                 <h:outputText value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId eq null}"/>
             </p:column>
 
             <p:column headerText="#{ff:upper(msg.requestNameFiscalCodeVATNumber)}"  style="width: 13.1vw;min-width: 180px;"
                       sortBy="#{item.code}">
                 <p:commandLink value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId ne null}" action="#{bean.openRequestSubject}" style="cursor: pointer;">
-            		<f:setPropertyActionListener value="#{item.subjectId}" target="#{bean.entityEditId}"/>
-            	</p:commandLink>
+                    <f:setPropertyActionListener value="#{item.subjectId}" target="#{bean.entityEditId}"/>
+                </p:commandLink>
                 <h:outputText value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId eq null}"/>
-                 <br/>
+                <br/>
                 <h:outputText value="#{item.code}" style="color:#003871"/>
             </p:column>
             <p:column headerText="#{ff:upper(msg.requestListCorservatoryName)}" style="width: 9vw;min-width: 159px;">
@@ -742,32 +743,32 @@
             <p:column style="width: 6vw;min-width: 99px;" headerText="#{ff:upper(msg.requestListOpenMail)}">
                 <p:outputPanel style="display: flex;">
                     <p:commandButton id="mailBtn" styleClass="mail-icon" action="#{bean.openRequestMail}"
-                    	style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
+                                     style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
                                      rendered="#{not empty item.mailId}">
                         <f:setPropertyActionListener value="#{item.mailId}" target="#{bean.entityEditId}"/>
                     </p:commandButton>
                     <p:tooltip for="mailBtn" value="#{item.mailSubject}"/>
 
                     <h:outputText id="externalUserIcon" rendered="#{item.external and not item.haveAllegatiDocuments}"
-                    		style="margin: 0 auto;" styleClass="#{item.isInserted ? 'user-filled-icon' : 'user-icon'}" />
+                                  style="margin: 0 auto;" styleClass="#{item.isInserted ? 'user-filled-icon' : 'user-icon'}" />
                     <p:tooltip for="externalUserIcon" value="#{item.createUserFullName}" escape="false"/>
 
                     <p:outputPanel rendered="#{item.external and item.haveAllegatiDocuments}" style="display: flex;margin-left: calc( 50% - 15px );">
                         <p:commandButton id="externalUserIconA"  styleClass="#{item.isInserted ? 'user-filled-icon' : 'user-icon'}" action="#{bean.loadAllegatiDocuments}" update="requestDocs"
-                        		style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
-                                	oncomplete="PF('documentDialog').show();">
+                                         style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
+                                         oncomplete="PF('documentDialog').show();">
                             <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                         </p:commandButton>
                         <p:tooltip for="externalUserIconA" value="#{item.createUserFullName}" escape="false"/>
-                         <h:outputText value="A"  style="width: 19px;height: 20px;background-color: #003871;border-radius: 50%;color: white;display: block;margin-top: -10px;margin-left: -6px;text-align: center;" />
+                        <h:outputText value="A"  style="width: 19px;height: 20px;background-color: #003871;border-radius: 50%;color: white;display: block;margin-top: -10px;margin-left: -6px;text-align: center;" />
                     </p:outputPanel>
 
 
-                      <h:outputText value="G"	id="internalUserIcon" rendered="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments}"
-                    	style="min-width: 21px;height: 20px;border: 2px solid;border-radius: 50%;margin-right: 2px;margin: 0 auto;text-align: center;" />
+                    <h:outputText value="G"	id="internalUserIcon" rendered="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments}"
+                                  style="min-width: 21px;height: 20px;border: 2px solid;border-radius: 50%;margin-right: 2px;margin: 0 auto;text-align: center;" />
                     <p:tooltip for="internalUserIcon" value="#{item.createUserFullName}" escape="false"/>
 
-                     <p:outputPanel style="display: flex;#{empty item.mailId ? 'margin-left: 38%;' : ''}" rendered="#{not item.external and empty item.mailId and item.haveAllegatiDocuments}">
+                    <p:outputPanel style="display: flex;#{empty item.mailId ? 'margin-left: 38%;' : ''}" rendered="#{not item.external and empty item.mailId and item.haveAllegatiDocuments}">
                         <p:commandButton id="internalUserIconA" value="G" action="#{bean.loadAllegatiDocuments}" update="requestDocs" styleClass="g-btn" style="background-color: transparent !important;display: block;width: 24px;height: 24px;border: 2px solid;border-radius: 50%;color: #003871;margin: 0 auto;cursor: pointer;"
                                          oncomplete="PF('documentDialog').show();">
                             <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
@@ -781,14 +782,14 @@
             </p:column>
 
             <p:column styleClass=" action_midle_column" headerText="#{ff:upper(msg.requestListDocuments)}" style="width: 4vw;min-width: 81px;">
-                 <p:outputPanel style="display: flex;" rendered="#{item.haveDocuments}">
+                <p:outputPanel style="display: flex;" rendered="#{item.haveDocuments}">
                     <p:outputPanel style="display: flex;">
                         <p:commandButton styleClass="attachment-icon" action="#{bean.loadRequestDocuments}" update="requestDocs"
-                        		style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
-                                	oncomplete="PF('documentDialog').show();">
+                                         style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
+                                         oncomplete="PF('documentDialog').show();">
                             <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                         </p:commandButton>
-                         <h:outputText value="#{item.documentsCount}" style="width: 19px;height: 20px;background-color: #003871;border-radius: 50%;color: white;display: block;margin-top: -10px;margin-left: -6px;text-align: center;" />
+                        <h:outputText value="#{item.documentsCount}" style="width: 19px;height: 20px;background-color: #003871;border-radius: 50%;color: white;display: block;margin-top: -10px;margin-left: -6px;text-align: center;" />
                     </p:outputPanel>
                 </p:outputPanel>
             </p:column>
@@ -803,7 +804,7 @@
             <p:column exportable="false" styleClass="action_midle_column" headerText="#{ff:upper(msg.requestListManage)}"
                       rendered="#{!bean.getCurrentUser().isExternal()}" style="width: 63px;">
 
-                 <p:commandButton id="gestisci-btn" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
+                <p:commandButton id="gestisci-btn" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
                                  disabled="#{!bean.canEdit}" action="#{bean.manageRequest}">
                     <f:setPropertyActionListener value="#{item.id}"
                                                  target="#{bean.entityEditId}"/>
@@ -824,34 +825,34 @@
                 </p:commandButton>
 
 
-				<p:commandLink id="actionPnl" global="false" immediate="true"
-					readonly="true">
-					<i class="fa fa-angle-down" style="font-size: x-large;"
-						onmouseover="document.getElementById('table:#{rowId}:actionPnl').focus();" />
-				</p:commandLink>
-				<p:tooltip for="actionPnl" hideEvent="blur" showEvent="focus" styleClass="action-tooltip-grid">
-					<p:panelGrid layout="grid" id="actionGrid" columns="1"
-						style="text-align:left;">
+                <p:commandLink id="actionPnl" global="false" immediate="true"
+                               readonly="true">
+                    <i class="fa fa-angle-down" style="font-size: x-large;"
+                       onmouseover="document.getElementById('table:#{rowId}:actionPnl').focus();" />
+                </p:commandLink>
+                <p:tooltip for="actionPnl" hideEvent="blur" showEvent="focus" styleClass="action-tooltip-grid">
+                    <p:panelGrid layout="grid" id="actionGrid" columns="1"
+                                 style="text-align:left;">
 
-					 <p:commandButton value="#{ff:upper(msg.requestListManage)}" class="action-btn" onclick="document.getElementById('table:#{rowId}:gestisci-btn').click()"
+                        <p:commandButton value="#{ff:upper(msg.requestListManage)}" class="action-btn" onclick="document.getElementById('table:#{rowId}:gestisci-btn').click()"
                                          disabled="#{!bean.canEdit}">
-						</p:commandButton>
-					   <p:commandButton value="#{ff:upper(msg.headerDatabase)}" onclick="document.getElementById('table:#{rowId}:banca-btn').click()"
+                        </p:commandButton>
+                        <p:commandButton value="#{ff:upper(msg.headerDatabase)}" onclick="document.getElementById('table:#{rowId}:banca-btn').click()"
                                          rendered="#{item.subjectId ne null}" class="action-btn">
-						</p:commandButton>
-						 <p:commandButton value="#{msg.pdf}" rendered="#{!bean.getCurrentUser().isExternal()}" class="action-btn" onclick="document.getElementById('table:#{rowId}:pdf-btn').click()"
+                        </p:commandButton>
+                        <p:commandButton value="#{msg.pdf}" rendered="#{!bean.getCurrentUser().isExternal()}" class="action-btn" onclick="document.getElementById('table:#{rowId}:pdf-btn').click()"
                                          update="@form">
-						</p:commandButton>
-						<p:commandButton value="#{ff:upper(msg.roleCanDelete)}" class="action-btn" onclick="document.getElementById('table:#{rowId}:elimina-btn').click()"
-                                        disabled="#{!bean.canDelete}">
-						</p:commandButton>
-					</p:panelGrid>
-				</p:tooltip>
-			</p:column>
+                        </p:commandButton>
+                        <p:commandButton value="#{ff:upper(msg.roleCanDelete)}" class="action-btn" onclick="document.getElementById('table:#{rowId}:elimina-btn').click()"
+                                         disabled="#{!bean.canDelete}">
+                        </p:commandButton>
+                    </p:panelGrid>
+                </p:tooltip>
+            </p:column>
 
         </p:dataTable>
 
- 		<p:overlayPanel id="userSelectCheckboxPanel" my="left top" at="left bottom"
+        <p:overlayPanel id="userSelectCheckboxPanel" my="left top" at="left bottom"
                         widgetVar="userSelectCheckboxWV" for="table:userSelectCheckboxShow"
                         onHide="filterTableFromPanel();" dynamic="true" style="width:300px">
             <p:dataTable id="userSelectCheckboxPanelDataTable" var="state"
