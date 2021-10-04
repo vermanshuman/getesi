@@ -194,6 +194,7 @@
             	$("#fiduciario_label").text("#{ff:upper(msg.mailTrust)}");
             	$("#office_label").text("#{msg.subjectViewFormalityConservatoryCap}");
             	$("#filterExpiration_input").val("");
+            	resetTableData();
             	return true;
             }
         </script>
@@ -364,7 +365,8 @@
           	</div>
       	</div>
 				
-				
+		<p:remoteCommand name="resetTableData"
+                             action="#{bean.onLoad}" update=":form:table"/>		
         <p:outputPanel id="searchPanel" style="display:none;" >
                 <p:commandButton icon="fa fa-fw fa-file-pdf-o"  rendered="false"
                                  action="#{bean.downloadPdfFile}" ajax="false" update="@form">
