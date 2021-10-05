@@ -116,7 +116,7 @@
             }
 
             .ui-datatable tbody td, .ui-datatable tfoot td {
-                border-width: 0 2px 1px 0 !important;
+                border-width: 0 1px 1px 0 !important;
             }
 
             body .ui-datatable thead th {
@@ -208,6 +208,14 @@
             .layout-footer {
                 border-top: 1px solid #c9cdd2;
             }
+            
+            .ui-datatable tbody.ui-datatable-data {
+    			border-left: 1px solid #c9cdd2;
+			}
+			
+			body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-rpp-options {
+    			margin: 0;
+    		}
         </style>
 
         <p:remoteCommand name="updateSearchPanel" update=":form:searchPanel"/>
@@ -220,7 +228,7 @@
             <div class="p-grid">
                 <div class="p-col-12 p-md-12">
                     <div class="card">
-                        <div class="p-grid">
+                        <div class="p-grid" style="margin-right: -28px !important; margin-left: -28px !important;">
                             <div class="p-col-3" style="padding-top: 0px;padding-bottom: 0px;">
                                 <div class="p-formgroup-inline">
                                     <div class="p-field" style="margin-bottom: 0px;">
@@ -287,7 +295,7 @@
                 </div>
             </div>
 
-            <p:panel id="table_div">
+            <p:panel id="table_div" style="margin-left: -20px; margin-right: -20px;">
                 <ui:fragment id="searchPanel">
                     <div class="button_group">
                         <p:remoteCommand name="filterTableFromPanel" action="#{bean.filterTableFromPanel}"
@@ -341,7 +349,7 @@
 
                         <p:commandButton ajax="true" icon="fa fa-trash-o" oncomplete="editFormat(false);"
                                          action="#{bean.filterLetterByOwner}"
-                                         styleClass="#{bean.mailManagerButtonSelectedId==3?'selected-button p-mr-2 p-mb-2':'cyan-blue-btn p-mr-2 p-mb-2'}"
+                                         styleClass="#{bean.mailManagerButtonSelectedId==3?'selected-button p-mb-2':'cyan-blue-btn p-mb-2'}"
                                          update="form" id="mail_item_3" style="float: right"
                                          value="#{bean.getMailManagerSTORAGE()}">
                             <f:setPropertyActionListener value="3" target="#{bean.mailManagerButtonSelectedId}"/>
@@ -406,7 +414,7 @@
                                             </span>
                                         </div>
                                     </f:facet>
-                                    <p:column style="width: 20px !important;" selectionMode="multiple">
+                                    <p:column style="width: 20px !important;" styleClass="min_padding_margin icon_column" selectionMode="multiple">
                                         <f:facet name="header">
                                             <p:selectBooleanCheckbox id="checkTop" async="true" widgetVar="selectTopAllWV"
                                                                      onchange="selectAllRowTopTableWV()"/>
