@@ -62,7 +62,7 @@
             <span> #{msg.reference}</span>
             <p:inputTextarea id="referenceShow" value="#{bean.referencePractice}" style="width: 100%"/>
             <p:outputPanel>
-                <p:commandButton value="#{msg.save}" process="referenceAreaShow" style="background-color: #57c279!important;"
+                <p:commandButton value="#{msg.save}" process="referenceAreaShow" style="background-color: #57c279!important; margin-right:5px;"
                                  action="#{bean.saveReference(false)}" update="enterPracticeReferenceDialog @form" oncomplete="setTimeout(function() { $('#validationMessages').html(''); }, 2000);">
                     <f:setPropertyActionListener value="#{true}" target="#{bean.confirmButtonIsClicked}"/>
                 </p:commandButton>
