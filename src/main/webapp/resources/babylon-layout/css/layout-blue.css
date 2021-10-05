@@ -166,7 +166,7 @@ a {
   position: fixed;
   height: 60px;
   top: 0;
-  left: 250px;
+  left: 245px;
   right: 0;
   z-index: 997;
   padding: 8px 25px;
@@ -196,7 +196,7 @@ a {
   width: 44px;
   height: 44px;
   line-height: 44px;
-  text-align: center;
+  /* text-align: center; */
   color: #ffffff;
   -moz-border-radius: 50%;
   -webkit-border-radius: 50%;
@@ -649,7 +649,7 @@ a {
 }
 .layout-wrapper .layout-menu-container .layout-menu li a .layout-menuitem-text {
   user-select: none;
-  font-weight: 700;
+  /* font-weight: 700; */
   vertical-align: middle;
 }
 .layout-wrapper .layout-menu-container .layout-menu li a .layout-submenu-toggler {
@@ -873,7 +873,7 @@ a {
 
 @media screen and (min-width: 992px) {
   .layout-wrapper.layout-static .layout-menu-container {
-    width: 250px;
+    width: 245px;
     left: 0;
     -moz-transition: left 0.3s;
     -o-transition: left 0.3s;
