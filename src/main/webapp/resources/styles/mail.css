@@ -16,7 +16,8 @@
 }
 
 .ui-button.grey-button {
-    background-color: #788fa7 !important;
+    /* background-color: #788fa7 !important; */
+    background-color: #5EA2CC !important;
 }
 
 .ui-button.red-button {
