@@ -39,7 +39,7 @@
             }
 
             .estate-table th, .estate-table td, .simple-table-layout th, .simple-table-layout td {
-                font-size: 17px !important;
+                font-size: 14px !important;
                 border: #c9cdd2 !important;
             }
 
@@ -86,6 +86,43 @@
 			.estateTabTable tr td {
 			    padding-left: 5px !important;
 			}
+			
+			body .ui-widget, body .ui-widget .ui-widget {
+			    font-family: "Open Sans","Helvetica Neue",sans-serif !important;
+			    text-decoration: none !important;
+			}
+			
+			body .ui-datatable .ui-datatable-data > tr {
+			    color: #5f666c;
+			}
+			
+			body .ui-panelgrid .ui-panelgrid-cell {
+		    	color: #5f666c;
+		    }
+    
+		    .estate-table td, .simple-table-layout td {
+		    	color: #5f666c;
+		    	font-weight: normal;
+			}
+
+			.card h3 {
+			    font-size: 20px;
+			    font-weight: 400;
+			}
+
+			th {
+    			font-weight: bold !important;
+			}
+
+			body .ui-datatable thead th .ui-column-title {
+			    font-weight: bold;
+			    vertical-align: middle;
+			}
+
+			fieldset div {
+			    font-size: 14px;
+			}
+
         </style>
         <p:remoteCommand name="removeFileCommand" update="form"/>
         <div align="center">
