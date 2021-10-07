@@ -13,6 +13,7 @@
     <ui:define name="body">
         <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/login.css"
               media="all" rel="stylesheet" type="text/css"/>
+        <link href="//db.onlinewebfonts.com/c/07f11191189aaade84abfff8ebd07022?family=ControllerW01-Three" rel="stylesheet" type="text/css"/>
         <h:outputStylesheet name="css/primeicons.css" library="babylon-layout" />
         <h:form id="form" prependId="false">
             <p:growl id="messages" showDetail="true" autoUpdate="false"
@@ -26,7 +27,7 @@
                         <p:graphicImage url="/resources/images/getesi-trans.png"
                                         style="margin-left:auto;margin-right:auto;display:block;"/>
                         <p:outputLabel value="#{msg.welcomeHeaderLogin}"
-                                       style="padding: 30px;line-height: 30px; text-align: center;"/>
+                                       style="padding: 5px;line-height: 30px; text-align: center; font-family: ControllerW01-Three;"/>
                         <h:panelGrid columns="1" cellpadding="15">
                             <p:inputText autocomplete="off" id="j_username" value="#{loginBean.username}"
                                          styleClass="fixweight"
