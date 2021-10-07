@@ -15,7 +15,130 @@
     </ui:define>
 
     <ui:define name="content">
-        <div class="ui-g">
+		<style>
+			body .ui-widget, body .ui-widget .ui-widget {
+				font-family: "Open Sans", "Helvetica Neue", sans-serif !important;
+				text-decoration: none !important;
+				font-size: 14px !important;
+				font-weight: normal !important;
+			}
+			
+			body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
+				background-color: #ebf5fa !important;
+			}
+			
+			.ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td,
+				.ui-datatable tfoot th {
+				border: 1px solid #c9cdd2 !important;
+			}
+			
+			.ui-datatable tbody td, .ui-datatable tfoot td {
+				border-width: 0 1px 1px 0 !important;
+			}
+			
+			body .ui-datatable thead th {
+				background-color: #f8f9fa !important;
+				color: #495057 !important;
+				padding: 1rem 1rem !important;
+			}
+			
+			body .ui-datatable .ui-datatable-data tr td {
+				padding: 6px 6px !important;
+				color: #5f666c !important;
+			}
+			
+			body .ui-datatable thead th.ui-state-active {
+				color: #2196F3 !important;
+			}
+			
+			body .ui-datatable .ui-datatable-data>tr:hover {
+				background: #e9ecef !important;
+			}
+			
+			body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page,
+				body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev,
+				body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last
+				{
+				color: #6c757d !important;
+			}
+			
+			body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active
+				{
+				background: #2196F3 !important;
+				color: #ffffff !important;
+			}
+			
+			.ui-datatable-gridlines.td {
+				border-width: 1px !important;
+			}
+			
+			body .ui-datatable .ui-datatable-header {
+				border-top: 2px solid #c9cdd2 !important;
+			}
+			
+			.ui-datatable-header {
+				padding-top: 5px !important;
+				padding-bottom: 5px !important;
+			}
+			
+			body .ui-datatable .ui-paginator.ui-paginator-top {
+				background-color: #2f8ee5 !important;
+				color: #ffffff !important;
+			}
+			
+			body .ui-datatable .ui-paginator.ui-paginator-bottom {
+				background-color: #2f8ee5 !important;
+				color: #ffffff !important;
+			}
+			
+			body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page,
+				body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev,
+				body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last
+				{
+				color: #FFFFFF !important;
+			}
+			
+			body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active
+				{
+				background: #FFF !important;
+				color: #000000 !important;
+			}
+			
+			.ui-datatable tbody.ui-datatable-data {
+				border-left: 1px solid #c9cdd2;
+			}
+			
+			body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-rpp-options
+				{
+				margin: 0;
+			}
+			
+			.card {
+				border: none !important;
+				padding-bottom: 0px !important;
+				margin-bottom: 0px !important;
+				padding-top: 0px !important;
+			}
+			
+			.layout-footer {
+				border-top: 1px solid #c9cdd2;
+			}
+			
+			.layout-wrapper .layout-main .layout-content {
+				padding: 0;
+			}
+			
+			.ui-g-12 {
+				padding: 0;
+			}
+			
+			.red-btn {
+				background: red !important;
+				background-color: red !important;
+				color: #FFFFFF !important;
+			}
+		</style>
+		<div class="ui-g">
             <div class="ui-g-12">
                 <div class="card card-w-title">
                     <p:outputPanel autoUpdate="true"
@@ -73,8 +196,7 @@
 
                                     <p:column rendered="#{empty showDelete? true : showDelete}"
                                               styleClass="action_column" exportable="false">
-                                        <p:commandButton icon="ui-icon pi pi-times"
-                                                         style="background-color: red;border: none !important;"
+                                        <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"
                                                          oncomplete="PF('dlg2').show()"
                                                          disabled="#{!bean.canDelete || (item.id==sessionBean.currentUser.id and bean.userEntityPage)}">
                                             <f:setPropertyActionListener value="#{item.id}"
@@ -84,7 +206,7 @@
 
                                     <p:column rendered="#{empty showMyDelete ? false : showMyDelete}"
                                               styleClass="action_column" exportable="false">
-                                        <p:commandButton icon="ui-icon pi pi-times"
+                                        <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"
                                                          oncomplete="PF('dlg2').show()"
                                                          disabled="#{!bean.getCanDelete(item) ||
                                                          (item.id==sessionBean.currentUser.id
