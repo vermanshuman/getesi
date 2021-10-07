@@ -66,10 +66,10 @@
                                  action="#{bean.saveReference(false)}" update="enterPracticeReferenceDialog @form" oncomplete="setTimeout(function() { $('#validationMessages').html(''); }, 2000);">
                     <f:setPropertyActionListener value="#{true}" target="#{bean.confirmButtonIsClicked}"/>
                 </p:commandButton>
-                <p:commandButton value="#{msg.mailManagerStart}" process="referenceAreaShow"
+                <!-- <p:commandButton value="#{msg.mailManagerStart}" process="referenceAreaShow"
                                  action="#{bean.checkFieldsBeforeProcessManagedStateCheck}" update="fieldsNotSetDialog">
                     <f:setPropertyActionListener value="#{true}" target="#{bean.confirmButtonIsClicked}"/>
-                </p:commandButton>
+                </p:commandButton> -->
             </p:outputPanel>
         </p:panelGrid>
         <br/><br/>
