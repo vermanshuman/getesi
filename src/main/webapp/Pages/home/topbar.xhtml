@@ -3,11 +3,13 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui">
-	<style>
-		.layout-menu-button-mode {
-			text-align: center;
-		}
-	</style>
+
+    <style>
+        .layout-menu-button-mode {
+            text-align: center;
+        }
+    </style>
+
     <div class="layout-topbar">
         <h:link id="toplogolink" outcome="/dashboard" styleClass="layout-topbar-logo">
             <p:graphicImage name="images/#{guestPreferences.darkLogo ? 'logo-black.png' : 'logo-white.png'}"

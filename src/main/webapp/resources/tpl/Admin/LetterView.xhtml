@@ -17,13 +17,13 @@
 
         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" id="referenceAreaShow">
 
-			<h:outputText value="#{msg.clientType}:"/>
-			<p:selectOneMenu id="clientType" value="#{bean.clientTypeId}"
-				styleClass="select-width" label="#{msg.clientType}">
-				<f:selectItems value="#{bean.clientTypes}" />
-				<p:ajax event="change" listener="#{bean.initOfficesList}" update="client_not_manger_or_fiduciary_id client_fiduciary_id mail_ofice_id managers client_invoice_id"/>
-			</p:selectOneMenu>
-			<h:outputText value="#{msg.client}:"/>
+            <h:outputText value="#{msg.clientType}:"/>
+            <p:selectOneMenu id="clientType" value="#{bean.clientTypeId}"
+                             styleClass="select-width" label="#{msg.clientType}">
+                <f:selectItems value="#{bean.clientTypes}" />
+                <p:ajax event="change" listener="#{bean.initOfficesList}" update="client_not_manger_or_fiduciary_id client_fiduciary_id mail_ofice_id managers client_invoice_id"/>
+            </p:selectOneMenu>
+            <h:outputText value="#{msg.client}:"/>
             <p:selectOneMenu id="client_not_manger_or_fiduciary_id"
                              value="#{bean.selectedNotManagerOrFiduciaryClientId}"
                              styleClass="input-width-mmv">

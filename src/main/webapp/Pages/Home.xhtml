@@ -13,17 +13,16 @@
 
         <h:outputScript name="chartjs/chart.js" library="chart"/>
         <h:form id="dashboardform">
-        	<style>
-        		h1{
-        			margin: 0px;
-        		}
-        		
-        		fieldset {
-				    min-height: 118px;
-				    border: 0;
-				}
-				
-        	</style>
+            <style>
+                h1{
+                    margin: 0px;
+                }
+
+                fieldset {
+                    min-height: 118px;
+                    border: 0;
+                }
+            </style>
             <script type="text/javascript">
                 // <![CDATA[
                 var ctx;
@@ -280,9 +279,9 @@
                     <div>
                         <fieldset>
                             <legend>FRASE DEL GIORNO</legend>
-                            <div align="center" style="font-size: 26px; font-style: italic; padding-top: 10px; padding-bottom: 10px; margin-top: -0.5rem;" 
-                            		class="box p-shadow-7">
-                                <i class="fa fa-fw fa-quote-left " style="margin-right: 1%"/>
+                            <div align="center" style="font-size: 26px; font-style: italic; padding-top: 10px; padding-bottom: 10px; margin-top: -0.5rem;"
+                                 class="box p-shadow-7">
+                            <i class="fa fa-fw fa-quote-left " style="margin-right: 1%"/>
                                 <h:panelGroup rendered="#{homeBean.phrase ne null}">
                                     <span>#{homeBean.phrase.split(",")[0]},</span><br/>
                                     <span>#{homeBean.phrase.split(",")[1]}</span>
@@ -297,9 +296,9 @@
                         <fieldset>
                             <legend>#{ff:upper(msg.forecastCity)} #{homeBean.currentDayString}</legend>
                             <div align="center" style="font-size: 26px; font-style: italic" class="box p-shadow-7">
-                            	<h:panelGroup rendered="true">
-                                	<ui:include src="/Pages/home/WeatherBlock.xhtml"/>
-                            	</h:panelGroup>
+                                <h:panelGroup rendered="true">
+                                    <ui:include src="/Pages/home/WeatherBlock.xhtml"/>
+                                </h:panelGroup>
                             </div>
                         </fieldset>
                     </div>

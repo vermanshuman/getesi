@@ -47,81 +47,81 @@
                 color: #A7A8AB;
                 font-weight: 600;
             }
-            
-			body .ui-fileupload .ui-fileupload-buttonbar {
-			    border: none !important; 
-			    background: none !important; 
-			    padding: 0 !important; 
-			    margin-top: 8px !important;
-			}
-			
-			body .ui-widget-header {
-			    background-color: #FFFFFF !important;
-			}
-			
-			body .ui-fileupload .ui-fileupload-content {
-			    border: none !important;
-			}
-			    
-			body .ui-fieldset .ui-fieldset-legend {
-			    background-color: #788FA7 !important;
-			}
-			
-			body .ui-fieldset .ui-fieldset-legend {
-			    border: 1px solid #dee2e6 !important;
-			    color: #FFFFFF !important;
-			    padding: .6em 1em !important;
-			    font-weight: normal !important;
-			    border-radius: 4px !important;
-			    user-select: none !important;
-			    font-size: 14px !important;
-			    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
-			}
-			
-			.red-btn {
-				background-color: red !important;
-				border: none !important;
-			}
-			
-			.estateTabTable tr td {
-			    padding-left: 5px !important;
-			}
-			
-			body .ui-widget, body .ui-widget .ui-widget {
-			    font-family: "Open Sans","Helvetica Neue",sans-serif !important;
-			    text-decoration: none !important;
-			}
-			
-			body .ui-datatable .ui-datatable-data > tr {
-			    color: #5f666c;
-			}
-			
-			body .ui-panelgrid .ui-panelgrid-cell {
-		    	color: #5f666c;
-		    }
-    
-		    .estate-table td, .simple-table-layout td {
-		    	color: #5f666c;
-		    	font-weight: normal;
-			}
 
-			.card h3 {
-			    font-size: 20px;
-			    font-weight: 400;
-			}
+            body .ui-fileupload .ui-fileupload-buttonbar {
+                border: none !important;
+                background: none !important;
+                padding: 0 !important;
+                margin-top: 8px !important;
+            }
 
-			th {
-    			font-weight: bold !important;
-			}
+            body .ui-widget-header {
+                background-color: #FFFFFF !important;
+            }
 
-			body .ui-datatable thead th .ui-column-title {
-			    font-weight: bold;
-			    vertical-align: middle;
-			}
+            body .ui-fileupload .ui-fileupload-content {
+                border: none !important;
+            }
 
-			fieldset div {
-			    font-size: 14px;
-			}
+            body .ui-fieldset .ui-fieldset-legend {
+                background-color: #788FA7 !important;
+            }
+
+            body .ui-fieldset .ui-fieldset-legend {
+                border: 1px solid #dee2e6 !important;
+                color: #FFFFFF !important;
+                padding: .6em 1em !important;
+                font-weight: normal !important;
+                border-radius: 4px !important;
+                user-select: none !important;
+                font-size: 14px !important;
+                transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+            }
+
+            .red-btn {
+                background-color: red !important;
+                border: none !important;
+            }
+
+            .estateTabTable tr td {
+                padding-left: 5px !important;
+            }
+
+            body .ui-widget, body .ui-widget .ui-widget {
+                font-family: "Open Sans","Helvetica Neue",sans-serif !important;
+                text-decoration: none !important;
+            }
+
+            body .ui-datatable .ui-datatable-data > tr {
+                color: #5f666c;
+            }
+
+            body .ui-panelgrid .ui-panelgrid-cell {
+                color: #5f666c;
+            }
+
+            .estate-table td, .simple-table-layout td {
+                color: #5f666c;
+                font-weight: normal;
+            }
+
+            .card h3 {
+                font-size: 20px;
+                font-weight: 400;
+            }
+
+            th {
+                font-weight: bold !important;
+            }
+
+            body .ui-datatable thead th .ui-column-title {
+                font-weight: bold;
+                vertical-align: middle;
+            }
+
+            fieldset div {
+                font-size: 14px;
+            }
 
         </style>
         <p:remoteCommand name="removeFileCommand" update="form"/>
@@ -204,12 +204,12 @@
                 <p:columnGroup type="header">
                     <p:row>
                         <p:column rowspan="2" colspan="2" headerText="N." styleClass="action_large_column" style="width: 7%;" />
-                        <p:column colspan="5" headerText="DATI IDENTIFICATIVI" style="width: 25%;"/>
-                        <p:column colspan="4" headerText="DATI DI CLASSAMENTO" style="width: 25%;"/>
-                        <p:column colspan="5" headerText="ALTRE INFORMAZIONI" style="width: 43%;"/>
+                        <p:column colspan="5" headerText="DATI IDENTIFICATIVI" style="width: 30%;"/>
+                        <p:column colspan="4" headerText="DATI DI CLASSAMENTO" style="width: 30%;"/>
+                        <p:column colspan="5" headerText="ALTRE INFORMAZIONI" style="width: 34%;"/>
                     </p:row>
                     <p:row>
-                        <p:column width="30" headerText="Scheda"/>
+                        <p:column width="50" headerText="Scheda"/>
                         <p:column headerText="Sezione"/>
                         <p:column headerText="Foglio"/>
                         <p:column headerText="Particella"/>
@@ -316,10 +316,10 @@
                          rowStyleClass="#{item.used?'user-row':''}">
                 <p:columnGroup type="header">
                     <p:row>
-                        <p:column rowspan="3" colspan="2" headerText="N." styleClass="action_column" style="width: 8%;" />
+                        <p:column rowspan="3" colspan="2" headerText="N." styleClass="action_column" style="width: 7%;" />
                         <p:column colspan="4" headerText="DATI IDENTIFICATIVI" style="width: 20%;"/>
                         <p:column colspan="6" headerText="DATI DI CLASSAMENTO" style="width: 37%;"/>
-                        <p:column colspan="5" headerText="ALTRE INFORMAZIONI" style="width: 37%;" />
+                        <p:column colspan="5" headerText="ALTRE INFORMAZIONI" style="width: 38%;" />
                     </p:row>
                     <p:row>
                         <p:column rowspan="2" headerText="Scheda"/>

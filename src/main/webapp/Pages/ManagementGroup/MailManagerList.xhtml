@@ -208,22 +208,20 @@
             .layout-footer {
                 border-top: 1px solid #c9cdd2;
             }
-            
+
             .ui-datatable tbody.ui-datatable-data {
-    			border-left: 1px solid #c9cdd2;
-			}
-			
-			body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-rpp-options {
-    			margin: 0;
-    		}
-    		
-    		body .ui-widget, body .ui-widget .ui-widget {
-    			font-family: "Open Sans","Helvetica Neue",sans-serif !important;
-    			text-decoration: none !important;
-    			font-size: 14px !important;
-    			font-weight: normal !important;
-			}
-			
+                border-left: 1px solid #c9cdd2;
+            }
+
+            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-rpp-options {
+                margin: 0;
+            }
+            body .ui-widget, body .ui-widget .ui-widget {
+                font-family: "Open Sans","Helvetica Neue",sans-serif !important;
+                text-decoration: none !important;
+                font-size: 14px !important;
+                font-weight: normal !important;
+            }
         </style>
 
         <p:remoteCommand name="updateSearchPanel" update=":form:searchPanel"/>
@@ -233,10 +231,10 @@
                          action="#{bean.globalSearch}"  update=":form:table"/>
         <p:poll interval="30" listener="#{bean.executePoll}"/>
         <div id="list_panel">
-            <div class="p-grid">
+            <div class="p-grid" style="margin-right: -28px !important; margin-left: -28px !important;">
                 <div class="p-col-12 p-md-12">
                     <div class="card">
-                        <div class="p-grid" style="margin-right: -28px !important; margin-left: -28px !important;">
+                        <div class="p-grid">
                             <div class="p-col-3" style="padding-top: 0px;padding-bottom: 0px;">
                                 <div class="p-formgroup-inline">
                                     <div class="p-field" style="margin-bottom: 0px;">

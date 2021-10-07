@@ -196,7 +196,7 @@ a {
   width: 44px;
   height: 44px;
   line-height: 44px;
-  /* text-align: center; */
+  /*text-align: center;*/
   color: #ffffff;
   -moz-border-radius: 50%;
   -webkit-border-radius: 50%;
@@ -649,7 +649,7 @@ a {
 }
 .layout-wrapper .layout-menu-container .layout-menu li a .layout-menuitem-text {
   user-select: none;
-  /* font-weight: 700; */
+  /*font-weight: 700;*/
   vertical-align: middle;
 }
 .layout-wrapper .layout-menu-container .layout-menu li a .layout-submenu-toggler {

@@ -50,12 +50,13 @@
                 display: none !important;
             }
         </style>
-        <div class="layout-menu-logo menu-shadow" >
-            <p:graphicImage name="logo.png" library="images" />
-        </div>
+        <h:panelGroup id="logoBlock" layout="block" styleClass="layout-menu-logo menu-shadow">
+            <p:graphicImage rendered="#{sessionBean.overLayMode}" name="getesi-trans.png" library="images" style="width: 100px;margin-top: 2px;" />
+            <p:graphicImage rendered="#{not sessionBean.overLayMode}" name="logo.png" library="images" />
+        </h:panelGroup>
 
         <div class="layout-menu-wrapper menu-background">
-        <div class="menu-scroll-content">
+            <div class="menu-scroll-content">
                 <h:form id="menuform">
                     <script>
                         //var isOverlayMode = '#{sessionBean.overLayMode}';
@@ -141,7 +142,7 @@
                     </script>
                     <p:remoteCommand name="umc" action="#{sessionBean.updateMailCount()}" update="@widgetVar(babylonMenuWidget)"/>
                     <p:remoteCommand name="urc" action="#{sessionBean.updateNumberUnclosedRequests()}" update="@widgetVar(babylonMenuWidget)"/>
-                    <p:remoteCommand name="uplm" action="#{sessionBean.updateOverLayMode()}" update="@([id$=overLayModeData])"/>
+                    <p:remoteCommand name="uplm" action="#{sessionBean.updateOverLayMode()}" update="@([id$=overLayModeData]) logoBlock"/>
                     <ui:fragment id="menuProfile" rendered="#{guestPreferences.profileMode == 'inline' ? true : false}">
 
                         <div class="layout-profile">
