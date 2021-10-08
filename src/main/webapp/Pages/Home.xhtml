@@ -279,7 +279,7 @@
                     <div>
                         <fieldset>
                             <legend>FRASE DEL GIORNO</legend>
-                            <div align="center" style="font-size: 26px; font-style: italic; padding-top: 10px; padding-bottom: 10px; margin-top: -0.5rem;"
+                            <div align="center" style="font-size: 26px; font-style: italic; padding-top: 10px; padding-bottom: 10px; margin-top: -0.25rem;"
                                  class="box p-shadow-7">
                             <i class="fa fa-fw fa-quote-left " style="margin-right: 1%"/>
                                 <h:panelGroup rendered="#{homeBean.phrase ne null}">
@@ -295,7 +295,7 @@
                     <div>
                         <fieldset>
                             <legend>#{ff:upper(msg.forecastCity)} #{homeBean.currentDayString}</legend>
-                            <div align="center" style="font-size: 26px; font-style: italic" class="box p-shadow-7">
+                            <div align="center" style="font-size: 26px; font-style: italic; margin-top: 0.25rem;" class="box p-shadow-7">
                                 <h:panelGroup rendered="true">
                                     <ui:include src="/Pages/home/WeatherBlock.xhtml"/>
                                 </h:panelGroup>

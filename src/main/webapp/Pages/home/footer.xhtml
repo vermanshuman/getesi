@@ -18,13 +18,15 @@
     <div class="p-grid">
         <div class="p-col-6">
             <h:outputLink value="#{msg.footerPageLeftLink}" target="_blank">#{msg.footerPageLeft}</h:outputLink>
-            <div style="margin-top: 5px;">
-                <hr class="red" />
-                <hr class="blue"/>
-            </div>
         </div>
         <div class="p-col-6 footer-icons footer-text-right">
             <span>#{msg.footerPageCopyright} | #{projectMsg.version}</span>
+        </div>
+        <div class="p-col-12">
+        	<div style="margin-top: -8px;">
+                <hr class="red" />
+                <hr class="blue"/>
+            </div>
         </div>
     </div>
 </ui:composition>
