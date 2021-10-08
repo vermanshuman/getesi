@@ -4,6 +4,26 @@
                 xmlns:pe="http://primefaces.org/ui/extensions"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core">
+    <style>
+    	.without-header thead {
+			display: none;
+		}
+		
+		.background-lightorange-td .ui-editable-column {
+    		background: #fed8b1 !important;
+		}
+		.ui-cell-editor .background-lightorange-td {
+    		background: #fed8b1 !important;
+		}
+		.background-lightblue-td .ui-panelgrid-cell {
+    		background: #d0d9e6 !important;
+    		height: 30px;
+		}
+		
+		body .ui-datatable .ui-datatable-data tr td {
+    		padding: 6px 12px !important;
+		}
+    </style>
     <script type="text/javascript">
         function check_numbers_if_should(symbolsAreAllowed, myfield, int, float) {
             if (!symbolsAreAllowed) {
@@ -54,10 +74,10 @@
     </div>
     <p:dataTable value="#{bean.estateSituations}" styleClass="simple-table" var="item" id="tableProcedure"
                  rowIndexVar="index" widgetVar="tableProcedureWV">
-        <p:column style="width: 20%; vertical-align: top;" headerText="#{msg.formality}">
+        <p:column style="width: 30%; vertical-align: top;" headerText="#{msg.formality}">
             <p:dataTable rendered="#{not empty item.estateFormalityList}" value="#{item.estateFormalityList}"
                          var="weakForm" styleClass="without-header cadastral_table" editable="true" editMode="cell">
-                <p:column style="text-align: center">
+                <p:column style="width: 15%; text-align: center">
                     <p:cellEditor>
                         <f:facet name="output">
                             <h:outputText value="#{weakForm.numRG}/#{weakForm.numRP}"/>
@@ -71,7 +91,7 @@
                         </f:facet>
                     </p:cellEditor>
                 </p:column>
-                <p:column style="width: 20%; text-align: center">
+                <p:column style="width: 10%; text-align: center">
                     <p:cellEditor>
                         <f:facet name="output">
                             <h:outputText value="#{weakForm.estateFormalityType.toString()}"/>
@@ -83,7 +103,7 @@
                         </f:facet>
                     </p:cellEditor>
                 </p:column>
-                <p:column style="padding: 2px; text-align: center">
+                <p:column style="width: 30%; padding: 2px; text-align: center">
                     <p:cellEditor>
                         <f:facet name="output">
                             <h:outputText value="#{weakForm.description}"/>
@@ -93,7 +113,7 @@
                         </f:facet>
                     </p:cellEditor>
                 </p:column>
-                <p:column style="width: 34px;padding: 2px;">
+                <p:column style="width: 10%;padding: 2px;">
                     <p:commandButton icon="fa fa-comment" oncomplete="PF('commentEditDlg').show();"
                                      update=":form:commentArea" action="#{bean.prepareComment}">
                         <f:setPropertyActionListener value="SELECTED_ESTATE_FORMALITY" target="#{bean.currentComment}"/>
@@ -102,10 +122,10 @@
                 </p:column>
             </p:dataTable>
         </p:column>
-        <p:column style="width: 80%; vertical-align: top;" headerText="#{msg.estateLocation}">
+        <p:column style="width: 70%; vertical-align: top;" headerText="#{msg.estateLocation}">
             <p:dataTable rendered="#{not empty item.propertyList}" value="#{item.propertyList}" var="estate"
                          editable="true" editMode="cell" styleClass="without-header cadastral_table">
-                <p:column style="text-align: center">
+                <p:column style="text-align: center; width: 15%">
                     <p:cellEditor>
                         <f:facet name="output">
                             <h:outputText value="#{estate.getCategoryType()}"/>
@@ -118,7 +138,7 @@
                         </f:facet>
                     </p:cellEditor>
                 </p:column>
-                <p:column style="text-align: center">
+                <p:column style="text-align: center; width: 15%">
                     <p:cellEditor>
                         <f:facet name="output">
                             <h:outputText value="#{estate.address}"/>
@@ -130,7 +150,7 @@
                         </f:facet>
                     </p:cellEditor>
                 </p:column>
-                <p:column style="text-align: center; width: 35%">
+                <p:column style="text-align: center; width: 40%">
                     <p:dataTable value="#{estate.cadastralData}" var="exam" rendered="#{not empty estate.cadastralData}"
                                  styleClass="without-header cadastral_table" editable="true" editMode="cell">
                         <p:column style="text-align: center">
@@ -182,7 +202,7 @@
                                          update="tableProcedure" style="margin-top: 1%;" oncomplete="updateTemplate();" rendered="#{estate.calculateOmiValue}"/>
                     </p:panelGrid>
                 </p:column>
-                <p:column style="text-align: center; width: 20%">
+                <p:column style="text-align: center; width: 17%">
                     <p:outputPanel styleClass="visible-cell-editor-value">
                         <h:outputText value="#{msg.estateLocationOMI}"/>
                         <p:dataTable value="#{estate.lastOmi}" var="omi" editable="true" editMode="cell" styleClass="background-lightorange-td">
@@ -254,7 +274,7 @@
                         <h:outputText value="#{estate.calculatedCommercial}" style="color: #5f666c;"/>
                     </p:panelGrid>
                 </p:column>
-                <p:column style="width: 34px;padding: 2px;">
+                <p:column style="width: 30px;padding: 2px;">
                     <p:commandButton icon="fa fa-comment" oncomplete="PF('commentEditDlg').show();"
                                      rendered="#{empty bean.examRequest.distraintFormality}"
                                      update=":form:commentArea" action="#{bean.prepareComment}">
@@ -263,7 +283,7 @@
                     </p:commandButton>
                     <p:rowToggler rendered="#{not empty bean.examRequest.distraintFormality}"/>
                 </p:column>
-                <p:column style="width: 34px;padding: 2px;">
+                <p:column style="width: 30px;padding: 2px;">
                     <p:commandButton icon="fa fa-bars" onclick="PF('relationshipDlg').show();"
                                      update=":form:relationshipArea, :form:relationshipTable"
                                      action="#{bean.prepareRelationships}" onerror="console.log(arguments)">
@@ -776,7 +796,7 @@
     <p:outputPanel deferred="true" deferredMode="visible">
         <p:dataTable value="#{bean.otherEstateSituations}" styleClass="simple-table" var="item" id="tableNotSelected"
                      rowIndexVar="index" widgetVar="tableProcedureNotSelectedWV">
-            <p:column style="width: 40%; vertical-align: top;" headerText="#{msg.estateFormalityNotSelect}">
+            <p:column style="width: 50%; vertical-align: top;" headerText="#{msg.estateFormalityNotSelect}">
                 <p:dataTable rendered="#{not empty item.estateFormalityList}" value="#{item.estateFormalityList}"
                              var="weakForm" styleClass="without-header cadastral_table" editable="true" editMode="cell">
                     <p:column style="text-align: center">
@@ -815,7 +835,7 @@
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
-                    <p:column style="width: 34px;padding: 2px;">
+                    <p:column style="width: 10%;padding: 2px;">
                         <p:commandButton icon="fa fa-comment" oncomplete="PF('commentEditDlg').show();"
                                          update=":form:commentArea" action="#{bean.prepareComment}">
                             <f:setPropertyActionListener value="NOT_SELECTED_ESTATE_FORMALITY"

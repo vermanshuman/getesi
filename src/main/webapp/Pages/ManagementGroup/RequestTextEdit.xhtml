@@ -233,7 +233,54 @@
 			    max-width: 1200px !important; 
 			    max-height: 700px !important;
 			    margin-bottom: 5px !important;
-		}
+			}
+			.margin-left{
+				margin-left: 20px !important;
+			}
+			
+			.btn-green {
+				background-color: #57c279!important;
+				padding-left:0 !important;
+				width: 122px;
+			}
+			
+			.ui-c{
+				padding-left:0 !important;
+			}
+			
+			body .ui-button.ui-button-text-icon-left .ui-button-text {
+			    padding: 0.5rem 1.0rem 0.5rem 2.5rem;
+			}
+			
+			.ui-button .ui-button-text {
+			    display: block;
+			    line-height: normal;
+			    padding-left: 15px !important;
+    		}
+    
+    		body .ui-widget, body .ui-widget .ui-widget {
+                font-family: "Open Sans","Helvetica Neue",sans-serif !important;
+                text-decoration: none !important;
+                font-size: 14px !important;
+                font-weight: normal !important;
+            }
+            
+            body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
+    			background-color: white !important;
+			}
+			
+			.simple-table tbody tr {
+    			border-color: #5f666c !important;
+    			text-align: center;
+			}
+
+			body .ui-datatable .ui-datatable-data > tr > td {
+			    border: 1px solid #c9cdd2;
+			}
+
+			body .ui-panel .ui-panel-content {
+    			border: none;
+    		}
         </style>
 
         <h:form id="form" prependId="false" enctype="multipart/form-data"
@@ -246,12 +293,15 @@
                                style="align-content: center; width: 100%; padding-bottom: 0; border: 1px solid;">
                     <p:panelGrid columns="6" style="align-content: center; " styleClass="ui-panelgrid-blank form-group"
                                  layout="grid">
-                        <span>#{msg.requestPrintTemplate}:</span>
+                        <div style="margin-top: 8px;">
+                        	<span>#{msg.requestPrintTemplate}:</span>
+                        </div>
                         <p:selectOneMenu id="template" value="#{bean.selectedTemplateId}"
                                          label="#{msg.requestPrintTemplate}">
                             <f:selectItems value="#{bean.templates}"/>
                         </p:selectOneMenu>
-                        <p:commandButton action="#{bean.updateTemplate}" value="#{msg.apply}" update=":edit_text_section @widgetVar(typeError)">
+                        <p:commandButton action="#{bean.updateTemplate}" value="#{msg.apply}" update=":edit_text_section @widgetVar(typeError)"
+                        		styleClass="margin-left">
                             <f:setPropertyActionListener value="true" target="#{bean.calledByApplicaButton}"/>
                         </p:commandButton>
 
@@ -287,7 +337,7 @@
                             <p:column>
                                 <p:outputPanel id="edit_text_section">
                                     <pe:ckEditor id="body" value="#{bean.editText}"
-                                                 styleClass="for_editor" width="1215"
+                                                 styleClass="for_editor" width="1200"
                                                  contentsCss="#{facesContext.externalContext.requestContextPath}/resources/javascript/CKEditorStyles.css"
                                                  customConfig="#{facesContext.externalContext.requestContextPath}/resources/javascript/configCKEditor.js"
                                                  widgetVar="ckEditorWV">
@@ -302,16 +352,16 @@
                                 <p:panelGrid id="btn_line" styleClass="ui-panelgrid-blank form-group buttonPane1"
                                              columns="1">
                                     <p:commandButton value="#{msg.requestPrintPrintPdf}" action="#{bean.print}"
-                                                     widgetVar="printButton"
+                                                     widgetVar="printButton" style="width:122px;"
                                                      onclick="PF('printButton').disable();"
                                                      oncomplete="PF('printButton').enable();"/>
 
-                                    <p:commandButton action="#{bean.compareNumberActsBeforeExtraCost}" value="#{msg.requestCost}"
-                                                     styleClass="#{bean.examRequest.costButtonConfirmClicked ? '':'btn-green'}"
+                                    <p:commandButton action="#{bean.compareNumberActsBeforeExtraCost}" value="#{msg.requestCost}" style="width:122px;"
+                                                     styleClass="#{bean.examRequest.costButtonConfirmClicked ? '':'btn-green'}" 
                                                      update="btn_line, requestExtraCostDialog"/>
 
                                     <p:commandButton action="#{bean.checkRelatedEstateFormalities}" value="#{msg.save}"
-                                                     update="btn_line checkEstateFormalitySalesDialog"
+                                                     update="btn_line checkEstateFormalitySalesDialog" id="saveButton"
                                                      styleClass="#{bean.entity.bodySaved ? '':'btn-green'}"
                                                      rendered="#{bean.examRequest.confirmExtraCostsPressed}"
                                                      oncomplete="#{save_oncomplete}" icon="ui-icon-disk"/>
@@ -324,12 +374,12 @@
                                                      onclick="PF('executeRequest').disable();"
                                                      oncomplete="PF('executeRequest').enable();"/>
 
-                                    <p:commandButton action="#{bean.openMailManagerEditor(true)}" value="#{msg.sendEmail}"
+                                    <p:commandButton action="#{bean.openMailManagerEditor(true)}" value="#{msg.sendEmail}" 
                                                      update="btn_line" rendered="#{!bean.createdByExternalUser and bean.examRequest.confirmExtraCostsPressed}"
 
                                                      styleClass="#{bean.entity.emailOpened? '':'btn-green'}"/>
 
-                                    <p:commandButton action="#{bean.goBack}" value="#{msg.cancel}"
+                                    <p:commandButton action="#{bean.goBack}" value="#{msg.cancel}" style="width:122px;"
                                                      icon="ui-icon-circle-close"/>
                                 </p:panelGrid>
                             </p:column>
