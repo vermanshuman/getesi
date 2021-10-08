@@ -75,7 +75,7 @@
                              disabled="#{!bean.entity.canEdit}"/>
 
         </div>
-        <div class="p-col-2" style="text-align:right;">
+        <div class="p-col-3" style="text-align:right;">
             <p:commandButton icon="fa fa-pencil-square" actionListener="#{bean.checkFieldsBeforeProcessManagedStateCheck}"
                              value="#{msg.mailManagerStart}" styleClass="ui-button-success"/>
             <p:commandButton update=":form" style="background-color: #F3362B !important;" value="#{msg.close}" styleClass="grey-button"
@@ -90,7 +90,7 @@
 	            </span>
             </ui:fragment>
         </div>
-        <div class="p-col-2" style="margin-top: -10px; text-align:right;">
+        <div class="p-col-3" style="margin-top: -10px; text-align:right;">
             <p:commandButton
                     rendered="#{bean.canDeleteMail and bean.actual}"
                     styleClass="ui-button-danger"
