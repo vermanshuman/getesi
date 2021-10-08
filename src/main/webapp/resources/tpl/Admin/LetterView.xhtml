@@ -7,13 +7,38 @@
                 xmlns:p="http://primefaces.org/ui">
     <link href="#{facesContext.externalContext.requestContextPath}/resources/chart/css/demo.css"
           media="all" rel="stylesheet" type="text/css"/>
+    <style>
+    	.simple-table thead th {
+    		border: 1px solid #5f666c !important;
+		}
+
+		body .ui-datatable thead th {
+    		border-color: #5f666c !important;
+		}
+
+		body .ui-datatable .ui-datatable-data > tr > td {
+   			padding: 1rem 1rem;
+    		border: 1px solid #5f666c !important;
+    		text-align: center;
+    	}
+    
+    	body .ui-datatable .ui-datatable-header {
+    		background: #f8f9fa;
+    		border-width: 1px 0 0 0;
+    		border-style: solid;
+    		border-color: #5f666c;
+    		border-radius: 0;
+    	}
+
+    </style>
+    
     <p:panel id="button_panel" toggleable="true"
              style="overflow-y: auto; overflow-x: hidden; word-wrap: break-word; white-space: normal; border: 0;z-index: 1000">
         <ui:include src="/resources/tpl/Admin/Include/LetterLine.xhtml"/>
     </p:panel>
 
     <p:panel id="letter_panel" toggleable="true"
-             style="overflow-y: auto; overflow-x: hidden; word-wrap: break-word; white-space: normal; margin-top: 0; position: relative; top: 68px; border: 0; margin-bottom: 68px;">
+             style="overflow-y: auto; overflow-x: hidden; word-wrap: break-word; white-space: normal; margin-top: 0; position: relative; top: 25px; border: 0; margin-bottom: 68px;">
 
         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" id="referenceAreaShow">
 
@@ -66,17 +91,17 @@
                                  action="#{bean.saveReference(false)}" update="enterPracticeReferenceDialog @form" oncomplete="setTimeout(function() { $('#validationMessages').html(''); }, 2000);">
                     <f:setPropertyActionListener value="#{true}" target="#{bean.confirmButtonIsClicked}"/>
                 </p:commandButton>
-                <!-- <p:commandButton value="#{msg.mailManagerStart}" process="referenceAreaShow"
+                <p:commandButton value="#{msg.mailManagerStart}" process="referenceAreaShow" style="background-color: #000066 !important;"
                                  action="#{bean.checkFieldsBeforeProcessManagedStateCheck}" update="fieldsNotSetDialog">
                     <f:setPropertyActionListener value="#{true}" target="#{bean.confirmButtonIsClicked}"/>
-                </p:commandButton> -->
+                </p:commandButton>
             </p:outputPanel>
         </p:panelGrid>
         <br/><br/>
         <div class="p-grid table-demo">
             <div class="p-col-12">
                 <div class="card">
-                    <p:dataTable widgetVar="validRequestsDT" var="item" value="#{bean.entity.validRequests}" reflow="true">
+                    <p:dataTable widgetVar="validRequestsDT" var="item" value="#{bean.entity.validRequests}" reflow="true" styleClass="simple-table">
                         <f:facet name="header">
                             <div class="customers-table-header">
                                 <span style="font-weight: bold"></span>

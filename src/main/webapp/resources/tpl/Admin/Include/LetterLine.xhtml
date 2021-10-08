@@ -14,15 +14,17 @@
         }
 
         body .ui-button.ui-button-warning, body .ui-splitbutton.ui-button-warning > .ui-button {
-            background: #fb6e51;
-            color: #FFFFFF;
+            background:  #ffff66;
+            color: #000000;
             border: 1px solid #fb6e51;
+            width: 75px;
         }
 
         body .ui-button.ui-button-danger, body .ui-splitbutton.ui-button-danger > .ui-button {
             background: #fb6e51;
             color: #FFFFFF;
             border: 1px solid #fb6e51;
+            margin-left:3px;
         }
 
         .ui-button-success {
@@ -70,18 +72,22 @@
                              oncomplete="PF('mailManagerViewRequestsDlg').show();"/>
 
 
-            <p:commandButton icon="ui-icon fa fa-pencil" update=":form" styleClass="right-side"
+           <!--  <p:commandButton icon="ui-icon fa fa-pencil" update=":form" styleClass="right-side"
                              action="#{bean.editEntity}"
-                             disabled="#{!bean.entity.canEdit}"/>
+                             disabled="#{!bean.entity.canEdit}"/> -->
+           <p:commandButton rendered="#{bean.canDeleteMail and bean.actual}" styleClass="ui-button-danger"
+                    action="#{bean.cancelMail}" icon="pi pi-trash" />
 
         </div>
         <div class="p-col-3" style="text-align:right;">
-            <p:commandButton icon="fa fa-pencil-square" actionListener="#{bean.checkFieldsBeforeProcessManagedStateCheck}"
-                             value="#{msg.mailManagerStart}" styleClass="ui-button-success"/>
+            <!-- <p:commandButton icon="fa fa-pencil-square" actionListener="#{bean.checkFieldsBeforeProcessManagedStateCheck}"
+                             value="#{msg.mailManagerStart}" styleClass="ui-button-success"/> -->
+            <p:commandButton icon="pi pi-print" update="form:print_panel" 
+                             styleClass="ui-button-warning" action="#{bean.generateMailPdf}" oncomplete="printIframe();"/>
             <p:commandButton update=":form" style="background-color: #F3362B !important;" value="#{msg.close}" styleClass="grey-button"
                              actionListener="#{bean.goTable}"/>
         </div>
-        <div class="p-col-9" style="margin-top: -10px;">
+        <div class="p-col-12" style="margin-top: -10px;">
             <ui:fragment rendered="#{bean.entity.received and bean.relatedToClient}">
 	            <span style="border: 2px solid #788fa7 !important;padding: 5px 8px 8px 4px; border-radius: 2px;display: inline-block;">
 	                <i class="fa fa-check-circle-o" style="color: green; margin-right: 5px; margin-left: 5px;"/>
@@ -90,15 +96,6 @@
 	            </span>
             </ui:fragment>
         </div>
-        <div class="p-col-3" style="margin-top: -10px; text-align:right;">
-            <p:commandButton
-                    rendered="#{bean.canDeleteMail and bean.actual}"
-                    styleClass="ui-button-danger"
-                    action="#{bean.cancelMail}"
-                    icon="pi pi-trash" />
-            <p:commandButton icon="pi pi-print"
-                             update="form:print_panel"
-                             styleClass="ui-button-warning" action="#{bean.generateMailPdf}" oncomplete="printIframe();"/>
-        </div>
+        
     </div>
 </ui:composition>
