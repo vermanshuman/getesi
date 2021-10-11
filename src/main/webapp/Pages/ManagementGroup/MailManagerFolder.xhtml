@@ -10,15 +10,40 @@
     <ui:param name="entity_name" value="#{msg.mailManagerFolder}"/>
     <ui:param name="showEdit" value="false"/>
     <ui:param name="showDelete" value="false"/>
-
+	
     <ui:define name="edit_fields">
-        <p:panelGrid columns="2" columnClasses="ui-grid-col-2, ui-grid-col-10"
-                     styleClass="ui-panelgrid-blank form-group" layout="grid" style="width: 40%">
-            <h:outputText value="#{msg.name}"/>
+    	<style>
+    		#list_panel .card {
+    			padding-left: 0px !important;
+    			padding-right: 0px !important;
+    		}
+    	</style>
+        <p:panelGrid columns="2" columnClasses="ui-grid-col-2, ui-grid-col-10" 
+                     styleClass="ui-panelgrid-blank form-group" layout="grid" style="width: 40%; padding:0px;">
+            <h:outputText value="#{msg.name}" style="margin-top:20px;"/>
             <p:inputText value="#{bean.entity.name}" styleClass="input-width" id="name" label="#{msg.name}"/>
         </p:panelGrid>
     </ui:define>
     <ui:define name="search_body">
+    	<style>
+			.card {
+   				 padding-bottom: 15px !important;
+    		}
+    
+    		.ui-grid-col-2 {
+    			margin-top: 8px;
+			}
+
+			.red-btn {
+                background: red !important;
+                background-color: red !important;
+                color: #FFFFFF !important;
+            }
+            
+            body .ui-selectonemenu {
+    			vertical-align: middle;
+    		}
+	</style>
         <script>
             function checkDates() {
                 var dateFrom = $('#filterDateFrom_input').val();
@@ -40,28 +65,28 @@
         <p:remoteCommand name="filterTableFromPanel" action="#{bean.filterTableFromPanel}"
                          update=":form:table"/>
         <p:panel id="searchPanel" styleClass="searchContent">
-            <p:calendar id="filterDateFrom" readonlyInput="false" showOn="button"
+            <p:calendar id="filterDateFrom" readonlyInput="false" showOn="button" style="margin-right:10px;"
                         onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
                         styleClass="search_group" pattern="dd/MM/yyyy" mask="true"
                         locale="it" navigator="true" popupIconOnly="true"
                         onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
                         value="#{bean.dateFrom}" placeholder="#{msg.mailManagerDateFrom}"/>
 
-            <p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
+            <p:calendar id="filterDateTo" readonlyInput="false" showOn="button" style="margin-right:10px;"
                         onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
                         styleClass="search_group" pattern="dd/MM/yyyy" mask="true"
                         locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateTo}"
                         onblur="check_date(this)" value="#{bean.dateTo}"/>
-
-            <p:selectOneMenu value="#{bean.selectedSearchStateId}" style="margin-right: 15px!important;">
+			
+            <p:selectOneMenu value="#{bean.selectedSearchStateId}" style="margin-right:10px;">
                 <f:selectItems value="#{bean.searchStates}"/>
             </p:selectOneMenu>
-
+            
             <p:inputText value="#{bean.filterAll}"
                          placeholder="#{msg.mailManagerEmailFrom}/#{msg.mailManagerEmailTo}/#{msg.mailManagerEmailSubject}/#{msg.mailManagerEmailBody}/#{msg.mailManagerEmailFile}"
-                         style="width: 30%" styleClass="search_group"/>
+                         style="width: 30%; margin-right:10px;" styleClass="search_group"/>
 
-            <p:commandButton value="#{msg.search}" id="searchButton" onclick="checkDates(); filterTableFromPanel();"
+            <p:commandButton value="#{msg.search}" id="searchButton" onclick="checkDates(); filterTableFromPanel();" style="margin-right:10px;"
                              update=":form:table,searchPanel" styleClass="grey-btn"/>
         </p:panel>
 		<ui:include src="../Dialogs/ConfirmMoveMailDialog.xhtml">
@@ -75,14 +100,14 @@
             <p:rowToggler/>
         </p:column>
         <p:column styleClass="action_column" exportable="false">
-            <p:commandButton icon="ui-icon ui-icon-pencil" disabled="#{!bean.canEdit or item.defaultFolder}"
+            <p:commandButton icon="ui-icon pi pi-pencil" disabled="#{!bean.canEdit or item.defaultFolder}"
                              update=":form"
                              action="#{bean.editEntity}">
                 <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
             </p:commandButton>
         </p:column>
         <p:column styleClass="action_column" exportable="false">
-            <p:commandButton icon="ui-icon ui-icon-close" oncomplete="PF('dlg2').show()"
+            <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn" oncomplete="PF('dlg2').show()"
                              disabled="#{!bean.canDelete || item.defaultFolder}">
                 <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityDeleteId}"/>
             </p:commandButton>
