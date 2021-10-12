@@ -26,19 +26,13 @@
                 color: #ffffff;
             }
 
-            /* body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem {
-                background: #788FA7 !important;
-            } */
-
             body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem a {
                 color: #6c757d;
             }
 
             body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem.ui-state-active {
                 background: #FFFFFF !important;
-               /*  border-color: #2196F3 !important; */
                 border-bottom: 2px solid #2196F3 !important;
-                /* border-style: solid; */
             }
 
             body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem.ui-state-active a {
@@ -66,7 +60,7 @@
 			    align-items: center;
 			    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
 			}
-
+			
 			body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem {
 				border: none;
 			}
@@ -79,12 +73,52 @@
     			background: #ffffff !important;
     			border-bottom: 2px solid #dee2e6 !important;
     		}
+    		
+    		body .ui-inputfield {
+    			font-size: 14px !important;
+    			border: 1px solid #a8acb1;
+    		}
+    		
+    		body .ui-selectonemenu {
+    			border: 1px solid #a8acb1;
+    		}
+    		
+    		body .ui-radiobutton .ui-radiobutton-box {
+    			border: 1px solid #a8acb1;
+    		}
+    		
+    		body .ui-selectonemenu.ui-state-hover {
+    			border: 1px solid #5f666c !important;
+    		}
+    		
+    		body .ui-inputfield.ui-state-hover {
+    			border: 1px solid #5f666c;
+			}
+			
+			body .ui-selectcheckboxmenu {
+    			border: 1px solid #a8acb1;
+    		}
+    		
+			body .ui-panel .ui-panel-content {
+    			border: 1px solid #c9cdd2;
+    		}
+    		
         </style>
-
+		<script>
+			function next(activeMenu, totalTabs) {
+				var nextMenu = activeMenu + 1;
+				PrimeFaces.ab({s:"pageTabMenu",u:"form",g:false,pa:[{name:"pageTabMenu_menuid",value:nextMenu.toString()}],f:"form"});return false;
+			}
+			
+			function previous(activeMenu, totalTabs) {
+				var previousMenu = activeMenu - 1;
+				PrimeFaces.ab({s:"pageTabMenu",u:"form",g:false,pa:[{name:"pageTabMenu_menuid",value:previousMenu.toString()}],f:"form"});return false;
+			}
+		</script>
         <p:remoteCommand name="updateSubjects" update="form"/>
         
         <p:tabMenu activeIndex="#{bean.activeMenuTabNum}" model="#{bean.topMenuModel}" style="background-color:#FFFFFF !important;"
-        	id="pageTabMenu" />
+        	id="pageTabMenu"  />
         <ui:fragment rendered="#{bean.multipleCreate and bean.activeMenuTabNum==0}">
             <div class="ui-g">
                 <div class="ui-g-12" style="padding: 1%; background: transparent">
@@ -225,7 +259,7 @@
             <div class="ui-g">
                 <div class="ui-g-12" id="request-btns" style="margin-top:2%">
                     <p:commandButton style="float: right" action="#{bean.validateMultipleRequest}" value="#{msg.save.toUpperCase()}"
-                                     icon="fa fa-floppy-o" styleClass="green-request-btn" iconPos="right" update="saveMultipleRequest"
+                                     icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="right" update="saveMultipleRequest"
                                      rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1}"/>
                     <div style="clear: both"></div>
                 </div>
@@ -360,8 +394,22 @@
                                  action="#{bean.generatePdf}" rendered="#{!bean.entity.isNew}"/>
             </div>
         </ui:fragment>
+      	<ui:fragment id="buttonFragment">      
+            <div class="ui-g">
+				<div class="ui-g-12">
+					<div class="ui-g-6" style="text-align:left;">
+						<p:commandButton id="previousButton" value="#{msg.previous}" rendered="#{bean.activeMenuTabNum != 0}" update="@form :buttonFragment" 
+							onclick="previous(#{bean.activeMenuTabNum}, #{bean.topMenuModel.getElements().size()-1});"/>
+	                </div>
+					<div class="ui-g-6" style="text-align:right;">
+						<p:commandButton id="nextButton" value="#{msg.next}" rendered="#{bean.activeMenuTabNum != bean.topMenuModel.getElements().size()-1}" update="@form :buttonFragment" 
+							onclick="next(#{bean.activeMenuTabNum}, #{bean.topMenuModel.getElements().size()-1});"/>
+					</div>
+				</div>
+			</div>
+        </ui:fragment>
     </ui:define>
-
+    
     <ui:define name="standard_validation_body">
         <p:fragment>
             <p:dialog id="createSubjectDlg" widgetVar="createSubjectDlgWV" modal="true" draggable="false" width="1500"
@@ -526,7 +574,7 @@
                     </p:column>
                 </p:panelGrid>
                 <div class="btn_line">
-                    <p:commandButton value="#{msg.save}"
+                    <p:commandButton value="#{msg.save}" styleClass="ui-button-success"
                                      action="#{bean.saveSubjectToList}" update="subjectDialogPanel, messages"/>
                     <p:commandButton value="#{msg.cancel}" process="@this"
                                      oncomplete="PF('createSubjectDlgWV').hide();"/>
