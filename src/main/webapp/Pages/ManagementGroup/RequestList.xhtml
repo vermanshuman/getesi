@@ -57,11 +57,11 @@
                 border-width: 0 0 1px 0;
             }
 
-            .btn-green {
+            /* .btn-green {
                 background: #689F38 !important;
                 color: #ffffff !important;
                 border: 1px solid #689F38 !important;
-            }
+            } */
 
             body .ui-button.ui-button-warn, body .ui-splitbutton.ui-button-warn > .ui-button {
                 background: #ff8b00;
@@ -164,6 +164,14 @@
                 border-color: #4D759D !important;
                 color: #5f666c !important;
             }
+            
+            #searchLastName {
+            	width: 300px;
+            }
+            
+            #searchFiscalCode {
+            	width: 200px;
+            }
         </style>
         <script>
             var doChange = true;
@@ -203,31 +211,29 @@
             <div class="p-col-12 p-md-12">
                 <div class="">
                     <div class="p-grid">
-                        <div class="p-col-8">
+                        <div class="p-col-6">
                             <div class="p-formgroup-inline">
                                 <div class="p-field">
                                     <p:commandButton value="#{ff:upper(msg.requestNew)}" id="btn_new"
-                                                     styleClass="btn-green search-btn" style="margin-left:20px;"
+                                                     styleClass="ui-button-success search-btn" style="margin-left:20px;"
                                                      disabled="#{!bean.canCreate}" action="#{bean.createNewRequest}" />
                                 </div>
                                 <div class="p-field">
                                     <p:commandButton value="#{ff:upper(msg.requestNewMultiple)}"
-                                                     id="btn_new_multipe" styleClass="btn-green search-btn"
+                                                     id="btn_new_multipe" styleClass="ui-button-success	search-btn"
                                                      disabled="#{!bean.canCreate}"
                                                      action="#{bean.createNewMultipleRequest}" />
                                 </div>
                             </div>
                         </div>
-                        <div class="p-col-4">
+                        <div class="p-col-6">
                             <div class="p-formgroup-inline alignEnd">
 
                                 <div class="p-field">
-                                    <p:inputText value="#{bean.searchLastName}" placeholder="#{ff:upper(msg.requestEditSubjectListName)}"
-                                                 style=""/>
+                                    <p:inputText value="#{bean.searchLastName}" placeholder="#{ff:upper(msg.requestEditSubjectListName)}" id="searchLastName" />
                                 </div>
                                 <div class="p-field">
-                                    <p:inputText value="#{bean.searchFiscalCode}" placeholder="#{ff:upper(msg.requestFiscalCodeCap)}"
-                                                 style=""/>
+                                    <p:inputText value="#{bean.searchFiscalCode}" placeholder="#{ff:upper(msg.requestFiscalCodeCap)}" id="searchFiscalCode" />
                                 </div>
 
                                 <div class="p-field">
@@ -246,54 +252,7 @@
                                         <div class="p-col-12" style="text-align: center;">
                                             <h2>Filtra per</h2>
                                         </div>
-                                        <div class="p-col-12">
-                                            <div style="">
-                                                <h:outputText style="color: #003871;"
-                                                              value="#{ff:upper(msg.requestListDateOfInput)}:" />
-                                            </div>
-                                        </div>
-                                        <div class="p-col-6">
-                                            <p:calendar id="filterDateFrom" readonlyInput="false"
-                                                        showOn="button"
-                                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
-                                                        pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
-                                                        popupIconOnly="true"
-                                                        onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
-                                                        value="#{bean.dateFrom}"
-                                                        placeholder="#{msg.mailManagerDateFromReqlist}" />
-                                            <div id="hyphen"></div>
-                                        </div>
-                                        <div class="p-col-6">
-                                            <p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
-                                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
-                                                        pattern="dd/MM/yyyy" mask="true"
-                                                        locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateToReqlist}"
-                                                        onblur="check_date(this)" value="#{bean.dateTo}" />
-                                        </div>
-                                        <div class="p-col-12">
-                                            <div style="">
-                                                <h:outputText style="color: #003871;"
-                                                              value="#{ff:upper(msg.requestListDateOfEvasion)}:" />
-                                            </div>
-                                        </div>
-                                        <div class="p-col-6">
-                                            <p:calendar id="filterDateFromEvasione" readonlyInput="false"
-                                                        showOn="button"
-                                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
-                                                        pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
-                                                        popupIconOnly="true"
-                                                        onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
-                                                        value="#{bean.dateFromEvasion}"
-                                                        placeholder="#{msg.mailManagerDateFromReqlist}" />
-                                        </div>
-                                        <div class="p-col-6">
-                                            <p:calendar id="filterDateToEvasione" readonlyInput="false"
-                                                        showOn="button"
-                                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
-                                                        pattern="dd/MM/yyyy" mask="true"
-                                                        locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateToReqlist}"
-                                                        onblur="check_date(this)" value="#{bean.dateToEvasion}" />
-                                        </div>
+                                        
                                         <div class="p-col-6">
                                             <p:selectOneMenu id="client" value="#{bean.selectedClientId}"
                                                              label="#{msg.requestClient}" style="width: calc( 100% - 5px);">
@@ -350,6 +309,54 @@
                                                         pattern="dd/MM/yyyy" mask="true"
                                                         locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.expirationDateCap}"
                                                         value="#{bean.dateExpiration}"/>
+                                        </div>
+                                        <div class="p-col-12">
+                                            <div style="">
+                                                <h:outputText style="color: #003871;"
+                                                              value="#{ff:upper(msg.requestListDateOfInput)}:" />
+                                            </div>
+                                        </div>
+                                        <div class="p-col-6">
+                                            <p:calendar id="filterDateFrom" readonlyInput="false"
+                                                        showOn="button"
+                                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+                                                        pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
+                                                        popupIconOnly="true"
+                                                        onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+                                                        value="#{bean.dateFrom}"
+                                                        placeholder="#{msg.mailManagerDateFromReqlist}" />
+                                            <div id="hyphen"></div>
+                                        </div>
+                                        <div class="p-col-6">
+                                            <p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
+                                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                                                        pattern="dd/MM/yyyy" mask="true"
+                                                        locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateToReqlist}"
+                                                        onblur="check_date(this)" value="#{bean.dateTo}" />
+                                        </div>
+                                        <div class="p-col-12">
+                                            <div style="">
+                                                <h:outputText style="color: #003871;"
+                                                              value="#{ff:upper(msg.requestListDateOfEvasion)}:" />
+                                            </div>
+                                        </div>
+                                        <div class="p-col-6">
+                                            <p:calendar id="filterDateFromEvasione" readonlyInput="false"
+                                                        showOn="button"
+                                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+                                                        pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
+                                                        popupIconOnly="true"
+                                                        onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+                                                        value="#{bean.dateFromEvasion}"
+                                                        placeholder="#{msg.mailManagerDateFromReqlist}" />
+                                        </div>
+                                        <div class="p-col-6">
+                                            <p:calendar id="filterDateToEvasione" readonlyInput="false"
+                                                        showOn="button"
+                                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                                                        pattern="dd/MM/yyyy" mask="true"
+                                                        locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateToReqlist}"
+                                                        onblur="check_date(this)" value="#{bean.dateToEvasion}" />
                                         </div>
                                         <div class="p-col-12 search-panel-btns" style="text-align: center;">
                                             <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}"  update="settingPanel searchPanel" oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').toggle();"/>
