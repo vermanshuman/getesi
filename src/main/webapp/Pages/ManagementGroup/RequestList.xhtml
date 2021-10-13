@@ -57,12 +57,6 @@
                 border-width: 0 0 1px 0;
             }
 
-            /* .btn-green {
-                background: #689F38 !important;
-                color: #ffffff !important;
-                border: 1px solid #689F38 !important;
-            } */
-
             body .ui-button.ui-button-warn, body .ui-splitbutton.ui-button-warn > .ui-button {
                 background: #ff8b00;
                 color: #FFFFFF;
@@ -164,13 +158,17 @@
                 border-color: #4D759D !important;
                 color: #5f666c !important;
             }
-            
+
             #searchLastName {
-            	width: 300px;
+                width: 300px;
             }
-            
+
             #searchFiscalCode {
-            	width: 200px;
+                width: 200px;
+            }
+
+            .new-button {
+                background: #009900 !important;
             }
         </style>
         <script>
@@ -215,12 +213,12 @@
                             <div class="p-formgroup-inline">
                                 <div class="p-field">
                                     <p:commandButton value="#{ff:upper(msg.requestNew)}" id="btn_new"
-                                                     styleClass="ui-button-success search-btn" style="margin-left:20px;"
+                                                     styleClass="ui-button-success search-btn new-button" style="margin-left:20px;"
                                                      disabled="#{!bean.canCreate}" action="#{bean.createNewRequest}" />
                                 </div>
                                 <div class="p-field">
                                     <p:commandButton value="#{ff:upper(msg.requestNewMultiple)}"
-                                                     id="btn_new_multipe" styleClass="ui-button-success	search-btn"
+                                                     id="btn_new_multipe" styleClass="ui-button-success	search-btn new-button"
                                                      disabled="#{!bean.canCreate}"
                                                      action="#{bean.createNewMultipleRequest}" />
                                 </div>
@@ -252,7 +250,7 @@
                                         <div class="p-col-12" style="text-align: center;">
                                             <h2>Filtra per</h2>
                                         </div>
-                                        
+
                                         <div class="p-col-6">
                                             <p:selectOneMenu id="client" value="#{bean.selectedClientId}"
                                                              label="#{msg.requestClient}" style="width: calc( 100% - 5px);">

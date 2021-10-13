@@ -44,81 +44,81 @@
                 text-decoration: none !important;
                 font-size: 14px;
             }
-            
+
             body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem {
-			    list-style: none;
-			    white-space: nowrap;
-			    display: inline-block;
-			    vertical-align: top;
-			    float: none;
-			    background: #ffffff !important;
-			    margin: 0;
-			    cursor: pointer;
-			    display: -ms-flexbox;
-			    display: flex;
-			    -ms-flex-align: center;
-			    align-items: center;
-			    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
-			}
-			
-			body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem {
-				border: none;
-			}
+                list-style: none;
+                white-space: nowrap;
+                display: inline-block;
+                vertical-align: top;
+                float: none;
+                background: #ffffff !important;
+                margin: 0;
+                cursor: pointer;
+                display: -ms-flexbox;
+                display: flex;
+                -ms-flex-align: center;
+                align-items: center;
+                transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+            }
 
-			body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem.ui-state-hover {
-				border-bottom: 2px solid gray !important;
-			}
+            body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem {
+                border: none;
+            }
 
-			body .ui-tabmenu .ui-tabmenu-nav {
-    			background: #ffffff !important;
-    			border-bottom: 2px solid #dee2e6 !important;
-    		}
-    		
-    		body .ui-inputfield {
-    			font-size: 14px !important;
-    			border: 1px solid #a8acb1;
-    		}
-    		
-    		body .ui-selectonemenu {
-    			border: 1px solid #a8acb1;
-    		}
-    		
-    		body .ui-radiobutton .ui-radiobutton-box {
-    			border: 1px solid #a8acb1;
-    		}
-    		
-    		body .ui-selectonemenu.ui-state-hover {
-    			border: 1px solid #5f666c !important;
-    		}
-    		
-    		body .ui-inputfield.ui-state-hover {
-    			border: 1px solid #5f666c;
-			}
-			
-			body .ui-selectcheckboxmenu {
-    			border: 1px solid #a8acb1;
-    		}
-    		
-			body .ui-panel .ui-panel-content {
-    			border: 1px solid #c9cdd2;
-    		}
-    		
+            body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem.ui-state-hover {
+                border-bottom: 2px solid gray !important;
+            }
+
+            body .ui-tabmenu .ui-tabmenu-nav {
+                background: #ffffff !important;
+                border-bottom: 2px solid #dee2e6 !important;
+            }
+
+            body .ui-inputfield {
+                font-size: 14px !important;
+                border: 1px solid #a8acb1;
+            }
+
+            body .ui-selectonemenu {
+                border: 1px solid #a8acb1;
+            }
+
+            body .ui-radiobutton .ui-radiobutton-box {
+                border: 1px solid #a8acb1;
+            }
+
+            body .ui-selectonemenu.ui-state-hover {
+                border: 1px solid #5f666c !important;
+            }
+
+            body .ui-inputfield.ui-state-hover {
+                border: 1px solid #5f666c;
+            }
+
+            body .ui-selectcheckboxmenu {
+                border: 1px solid #a8acb1;
+            }
+
+            body .ui-panel .ui-panel-content {
+                border: 1px solid #c9cdd2;
+            }
+
         </style>
-		<script>
-			function next(activeMenu, totalTabs) {
-				var nextMenu = activeMenu + 1;
-				PrimeFaces.ab({s:"pageTabMenu",u:"form",g:false,pa:[{name:"pageTabMenu_menuid",value:nextMenu.toString()}],f:"form"});return false;
-			}
-			
-			function previous(activeMenu, totalTabs) {
-				var previousMenu = activeMenu - 1;
-				PrimeFaces.ab({s:"pageTabMenu",u:"form",g:false,pa:[{name:"pageTabMenu_menuid",value:previousMenu.toString()}],f:"form"});return false;
-			}
-		</script>
+        <script>
+            function next(activeMenu, totalTabs) {
+                var nextMenu = activeMenu + 1;
+                PrimeFaces.ab({s:"pageTabMenu",u:"form",g:false,pa:[{name:"pageTabMenu_menuid",value:nextMenu.toString()}],f:"form"});return false;
+            }
+
+            function previous(activeMenu, totalTabs) {
+                var previousMenu = activeMenu - 1;
+                PrimeFaces.ab({s:"pageTabMenu",u:"form",g:false,pa:[{name:"pageTabMenu_menuid",value:previousMenu.toString()}],f:"form"});return false;
+            }
+        </script>
         <p:remoteCommand name="updateSubjects" update="form"/>
-        
+
         <p:tabMenu activeIndex="#{bean.activeMenuTabNum}" model="#{bean.topMenuModel}" style="background-color:#FFFFFF !important;"
-        	id="pageTabMenu"  />
+                   id="pageTabMenu"  />
         <ui:fragment rendered="#{bean.multipleCreate and bean.activeMenuTabNum==0}">
             <div class="ui-g">
                 <div class="ui-g-12" style="padding: 1%; background: transparent">
@@ -167,13 +167,13 @@
                                        itemLabel="#{con.label}"/>
                         <p:ajax process="gestore"/>
                     </p:selectCheckboxMenu>
-                    
-                     <span> #{msg.requestNotary}</span><br/>
-                     <p:selectOneMenu id="requestNotary" styleClass="select-width"
+
+                    <span> #{msg.requestNotary}</span><br/>
+                    <p:selectOneMenu id="requestNotary" styleClass="select-width"
                                      value="#{bean.selectedNotaryId}"
                                      label="#{msg.requestNotary}">
                         <f:selectItems value="#{bean.notaryList}"/>
-                     </p:selectOneMenu>
+                    </p:selectOneMenu>
 
 
 
@@ -254,7 +254,7 @@
                                  styleClass="grey-btn"/>
             </p:panel>
         </ui:fragment>
-         
+
         <ui:fragment>
             <div class="ui-g">
                 <div class="ui-g-12" id="request-btns" style="margin-top:2%">
@@ -265,7 +265,7 @@
                 </div>
             </div>
         </ui:fragment>
-        
+
         <p:dialog id="changeUserDlg" widgetVar="changeUserDlgWV" modal="true"
                   resizable="false" draggable="false" effect="SLIDE"
                   header="#{msg.requestUserChangeDlg}">
@@ -394,29 +394,29 @@
                                  action="#{bean.generatePdf}" rendered="#{!bean.entity.isNew}"/>
             </div>
         </ui:fragment>
-      	<ui:fragment id="buttonFragment">      
+        <ui:fragment id="buttonFragment">
             <div class="ui-g">
-				<div class="ui-g-12">
-					<div class="ui-g-6" style="text-align:left;">
-						<p:commandButton id="previousButton" value="#{msg.previous}" rendered="#{bean.activeMenuTabNum != 0}" update="@form :buttonFragment" 
-							onclick="previous(#{bean.activeMenuTabNum}, #{bean.topMenuModel.getElements().size()-1});"/>
-	                </div>
-					<div class="ui-g-6" style="text-align:right;">
-						<p:commandButton id="nextButton" value="#{msg.next}" rendered="#{bean.activeMenuTabNum != bean.topMenuModel.getElements().size()-1}" update="@form :buttonFragment" 
-							onclick="next(#{bean.activeMenuTabNum}, #{bean.topMenuModel.getElements().size()-1});"/>
-					</div>
-				</div>
-			</div>
+                <div class="ui-g-12">
+                    <div class="ui-g-6" style="text-align:left;">
+                        <p:commandButton id="previousButton" value="#{msg.previous}" rendered="#{bean.activeMenuTabNum != 0}" update="@form :buttonFragment"
+                                         onclick="previous(#{bean.activeMenuTabNum}, #{bean.topMenuModel.getElements().size()-1});" icon="fa fa-arrow-left"/>
+                    </div>
+                    <div class="ui-g-6" style="text-align:right;">
+                        <p:commandButton id="nextButton" value="#{msg.next}" rendered="#{bean.activeMenuTabNum != bean.topMenuModel.getElements().size()-1}" update="@form :buttonFragment"
+                                         onclick="next(#{bean.activeMenuTabNum}, #{bean.topMenuModel.getElements().size()-1});"  icon="fa fa-arrow-right"/>
+                    </div>
+                </div>
+            </div>
         </ui:fragment>
     </ui:define>
-    
+
     <ui:define name="standard_validation_body">
         <p:fragment>
             <p:dialog id="createSubjectDlg" widgetVar="createSubjectDlgWV" modal="true" draggable="false" width="1500"
                       height="350">
                 <script type="text/javascript">
                     function filterCity(itemLabel, filterValue) {
-                    debugger;
+                        debugger;
                         let strArray = itemLabel.split(" ");
                         return strArray[1].startsWith(filterValue);
                     }
@@ -516,13 +516,13 @@
                             <p:ajax update="subjectCreateFiscalCode"/>
                         </p:inputText>
                         <p:message for="@previous" display="icon"/>
-                         <br/>
-                         <p:commandButton action="#{bean.subjectWrapper.restoreFiscalCode}"
-                                 update="subjectDialogPanel, messages,restoreRequestSubjectTable" style="margin-top: 3px" process="@this"
-                                 value="#{msg.databaseListSubjectFiscalCodeRestore}" immediate="true"/>
+                        <br/>
+                        <p:commandButton action="#{bean.subjectWrapper.restoreFiscalCode}"
+                                         update="subjectDialogPanel, messages,restoreRequestSubjectTable" style="margin-top: 3px" process="@this"
+                                         value="#{msg.databaseListSubjectFiscalCodeRestore}" immediate="true"/>
                     </p:column>
 
-					<p:column rendered="#{bean.subjectWrapper.typeId eq 2}">
+                    <p:column rendered="#{bean.subjectWrapper.typeId eq 2}">
                         <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_OLD_IVA}"/><br/>
                         <p:inputText id="subjectCreateOldNumberVat" value="#{bean.subjectWrapper.oldNumberVAT}"
                                      required="#{bean.subjectWrapper.typeId==2 and empty bean.subjectWrapper.fiscalCode}"
@@ -555,22 +555,22 @@
                                              process="@(#subjectDialogPanel :not(#subjectCreateFiscalCode))"
                                              update="subjectDialogPanel" style="margin-top: 3px"
                                              value="#{msg.databaseListSubjectFiscalCodeGenerate}"/>
-                           <p:commandButton action="#{bean.subjectWrapper.restoreFiscalCode}"
-                                 update="subjectDialogPanel, messages" style="margin-top: 3px" process="@this"
-                                 value="#{msg.databaseListSubjectFiscalCodeRestore}" immediate="true"/>
+                            <p:commandButton action="#{bean.subjectWrapper.restoreFiscalCode}"
+                                             update="subjectDialogPanel, messages" style="margin-top: 3px" process="@this"
+                                             value="#{msg.databaseListSubjectFiscalCodeRestore}" immediate="true"/>
                         </p:outputPanel>
                     </p:column>
-                    
-                   	<p:column rendered="#{not empty bean.subjectWrapper.typeId}">
+
+                    <p:column rendered="#{not empty bean.subjectWrapper.typeId}">
                         <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_TIPO_RELAZIONE}"/><br/>
-						<p:selectOneMenu id="sectionCType" style="width: 92%"
-							value="#{bean.subjectWrapper.sectionCType}"
-							label="#{enums.documentGenerationTagsSUBJECT_MASTERY_TIPO_RELAZIONE}">
-							<f:selectItem itemValue="" itemLabel="- Non selezionato -" />
-							<f:selectItem itemValue="A favore" itemLabel="A favore" />
-							<f:selectItem itemValue="Contro" itemLabel="Contro" />
-						</p:selectOneMenu>
-						<p:message for="@previous" display="icon"/>
+                        <p:selectOneMenu id="sectionCType" style="width: 92%"
+                                         value="#{bean.subjectWrapper.sectionCType}"
+                                         label="#{enums.documentGenerationTagsSUBJECT_MASTERY_TIPO_RELAZIONE}">
+                            <f:selectItem itemValue="" itemLabel="- Non selezionato -" />
+                            <f:selectItem itemValue="A favore" itemLabel="A favore" />
+                            <f:selectItem itemValue="Contro" itemLabel="Contro" />
+                        </p:selectOneMenu>
+                        <p:message for="@previous" display="icon"/>
                     </p:column>
                 </p:panelGrid>
                 <div class="btn_line">
@@ -581,68 +581,68 @@
                 </div>
             </p:dialog>
 
-			<p:dialog widgetVar="subjectRestoreDlg" modal="true"
-				draggable="false" position="center center" width="1500">
-				<p:scrollPanel mode="native" id="restoreRequestSubjectTableScrollBar" style="width: 100%; min-height: 300px; max-height: 600px;">
-					<p:dataTable value="#{bean.subjectWrapper.subjectsToRestore}"
-						var="subject"
-						selection="#{bean.subjectWrapper.selectedSubjectToRestore}"
-						rowKey="#{subject.id}" id="restoreRequestSubjectTable">
-						<p:column selectionMode="single"
-							style="width:16px;text-align:center" />
-						<p:column
-							headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_SOCIAL_REGION}"
-							rendered="#{bean.subjectWrapper.typeId eq 2}">
-							<h:outputText value="#{subject.businessName}" />
-						</p:column>
-						<p:column
-							headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_IVA}"
-							rendered="#{bean.subjectWrapper.typeId eq 2}">
-							<h:outputText value="#{subject.numberVAT}" />
-						</p:column>
-						<p:column
-							headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_SURNAME}"
-							rendered="#{bean.subjectWrapper.typeId eq 1}">
-							<h:outputText value="#{subject.surname}" />
-						</p:column>
-						<p:column
-							headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_NAME}"
-							rendered="#{bean.subjectWrapper.typeId eq 1}">
-							<h:outputText value="#{subject.name}" />
-						</p:column>
-						<p:column
-							headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_SEX_TYPE}"
-							rendered="#{bean.subjectWrapper.typeId eq 1}">
-							<h:outputText
-								value="#{subject.sexType ne null ? subject.sexType.toString() : ''}" />
-						</p:column>
-						<p:column
-							headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_BIRTHDAY}"
-							rendered="#{bean.subjectWrapper.typeId eq 1}">
-							<h:outputText value="#{subject.birthDate}"
-								converter="dateTimeConverter" />
-						</p:column>
-						<p:column
-							headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_FISCAL_CODE}">
-							<h:outputText value="#{subject.fiscalCode}" />
-						</p:column>
-						<p:column
-							headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_PROVINCE}">
-							<h:outputText value="#{subject.birthProvince}" />
-						</p:column>
-						<p:column
-							headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_COMUNE}">
-							<h:outputText value="#{subject.birthCity}" />
-						</p:column>
-						<f:facet name="footer">
-							<p:commandButton update="subjectDialogPanel" value="#{msg.ok}"
-								process="restoreRequestSubjectTable"
-								oncomplete="PF('subjectRestoreDlg').hide()"
-								action="#{bean.subjectWrapper.selectRestoredSubject}" />
-						</f:facet>
-					</p:dataTable>
-				</p:scrollPanel>
-			</p:dialog>
-		</p:fragment>
+            <p:dialog widgetVar="subjectRestoreDlg" modal="true"
+                      draggable="false" position="center center" width="1500">
+                <p:scrollPanel mode="native" id="restoreRequestSubjectTableScrollBar" style="width: 100%; min-height: 300px; max-height: 600px;">
+                    <p:dataTable value="#{bean.subjectWrapper.subjectsToRestore}"
+                                 var="subject"
+                                 selection="#{bean.subjectWrapper.selectedSubjectToRestore}"
+                                 rowKey="#{subject.id}" id="restoreRequestSubjectTable">
+                        <p:column selectionMode="single"
+                                  style="width:16px;text-align:center" />
+                        <p:column
+                                headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_SOCIAL_REGION}"
+                                rendered="#{bean.subjectWrapper.typeId eq 2}">
+                            <h:outputText value="#{subject.businessName}" />
+                        </p:column>
+                        <p:column
+                                headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_IVA}"
+                                rendered="#{bean.subjectWrapper.typeId eq 2}">
+                            <h:outputText value="#{subject.numberVAT}" />
+                        </p:column>
+                        <p:column
+                                headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_SURNAME}"
+                                rendered="#{bean.subjectWrapper.typeId eq 1}">
+                            <h:outputText value="#{subject.surname}" />
+                        </p:column>
+                        <p:column
+                                headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_NAME}"
+                                rendered="#{bean.subjectWrapper.typeId eq 1}">
+                            <h:outputText value="#{subject.name}" />
+                        </p:column>
+                        <p:column
+                                headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_SEX_TYPE}"
+                                rendered="#{bean.subjectWrapper.typeId eq 1}">
+                            <h:outputText
+                                    value="#{subject.sexType ne null ? subject.sexType.toString() : ''}" />
+                        </p:column>
+                        <p:column
+                                headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_BIRTHDAY}"
+                                rendered="#{bean.subjectWrapper.typeId eq 1}">
+                            <h:outputText value="#{subject.birthDate}"
+                                          converter="dateTimeConverter" />
+                        </p:column>
+                        <p:column
+                                headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_FISCAL_CODE}">
+                            <h:outputText value="#{subject.fiscalCode}" />
+                        </p:column>
+                        <p:column
+                                headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_PROVINCE}">
+                            <h:outputText value="#{subject.birthProvince}" />
+                        </p:column>
+                        <p:column
+                                headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_COMUNE}">
+                            <h:outputText value="#{subject.birthCity}" />
+                        </p:column>
+                        <f:facet name="footer">
+                            <p:commandButton update="subjectDialogPanel" value="#{msg.ok}"
+                                             process="restoreRequestSubjectTable"
+                                             oncomplete="PF('subjectRestoreDlg').hide()"
+                                             action="#{bean.subjectWrapper.selectRestoredSubject}" />
+                        </f:facet>
+                    </p:dataTable>
+                </p:scrollPanel>
+            </p:dialog>
+        </p:fragment>
     </ui:define>
 </ui:composition>

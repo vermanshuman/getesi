@@ -57,7 +57,7 @@
             function onInitCkEditor(key) {
                 const ck = CKEDITOR.instances[key];
                 removeAllTooltips('#bodyPanel');
-          /*      ck.ui.editor.toolbar[8].items[0].onClick(125);*/
+                /*      ck.ui.editor.toolbar[8].items[0].onClick(125);*/
                 ck.ui.editor.toolbar[8].items[0].onClick(#{bean.pdfZoomValue});
 
                 ck.ui.editor.on('resize', function () {
@@ -229,58 +229,58 @@
                 height: 100%;
                 padding-top: 2%;
             }
-            .ui-dialog-content{ 
-			    max-width: 1200px !important; 
-			    max-height: 700px !important;
-			    margin-bottom: 5px !important;
-			}
-			.margin-left{
-				margin-left: 20px !important;
-			}
-			
-			.btn-green {
-				background-color: #57c279!important;
-				padding-left:0 !important;
-				width: 122px;
-			}
-			
-			.ui-c{
-				padding-left:0 !important;
-			}
-			
-			body .ui-button.ui-button-text-icon-left .ui-button-text {
-			    padding: 0.5rem 1.0rem 0.5rem 2.5rem;
-			}
-			
-			.ui-button .ui-button-text {
-			    display: block;
-			    line-height: normal;
-			    padding-left: 15px !important;
-    		}
-    
-    		body .ui-widget, body .ui-widget .ui-widget {
+            .ui-dialog-content{
+                max-width: 1200px !important;
+                max-height: 700px !important;
+                margin-bottom: 5px !important;
+            }
+            .margin-left{
+                margin-left: 20px !important;
+            }
+
+            .btn-green {
+                background-color: #57c279!important;
+                padding-left:0 !important;
+                width: 122px;
+            }
+
+            .ui-c{
+                padding-left:0 !important;
+            }
+
+            body .ui-button.ui-button-text-icon-left .ui-button-text {
+                padding: 0.5rem 1.0rem 0.5rem 2.5rem;
+            }
+
+            .ui-button .ui-button-text {
+                display: block;
+                line-height: normal;
+                padding-left: 15px !important;
+            }
+
+            body .ui-widget, body .ui-widget .ui-widget {
                 font-family: "Open Sans","Helvetica Neue",sans-serif !important;
                 text-decoration: none !important;
                 font-size: 14px !important;
                 font-weight: normal !important;
             }
-            
+
             body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
-    			background-color: white !important;
-			}
-			
-			.simple-table tbody tr {
-    			border-color: #5f666c !important;
-    			text-align: center;
-			}
+                background-color: white !important;
+            }
 
-			body .ui-datatable .ui-datatable-data > tr > td {
-			    border: 1px solid #c9cdd2;
-			}
+            .simple-table tbody tr {
+                border-color: #5f666c !important;
+                text-align: center;
+            }
 
-			body .ui-panel .ui-panel-content {
-    			border: none;
-    		}
+            body .ui-datatable .ui-datatable-data > tr > td {
+                border: 1px solid #c9cdd2;
+            }
+
+            body .ui-panel .ui-panel-content {
+                border: none;
+            }
         </style>
 
         <h:form id="form" prependId="false" enctype="multipart/form-data"
@@ -294,14 +294,14 @@
                     <p:panelGrid columns="6" style="align-content: center; " styleClass="ui-panelgrid-blank form-group"
                                  layout="grid">
                         <div style="margin-top: 8px;">
-                        	<span>#{msg.requestPrintTemplate}:</span>
+                            <span>#{msg.requestPrintTemplate}:</span>
                         </div>
                         <p:selectOneMenu id="template" value="#{bean.selectedTemplateId}"
                                          label="#{msg.requestPrintTemplate}">
                             <f:selectItems value="#{bean.templates}"/>
                         </p:selectOneMenu>
                         <p:commandButton action="#{bean.updateTemplate}" value="#{msg.apply}" update=":edit_text_section @widgetVar(typeError)"
-                        		styleClass="margin-left">
+                                         styleClass="margin-left">
                             <f:setPropertyActionListener value="true" target="#{bean.calledByApplicaButton}"/>
                         </p:commandButton>
 
@@ -357,7 +357,7 @@
                                                      oncomplete="PF('printButton').enable();"/>
 
                                     <p:commandButton action="#{bean.compareNumberActsBeforeExtraCost}" value="#{msg.requestCost}" style="width:122px;"
-                                                     styleClass="#{bean.examRequest.costButtonConfirmClicked ? '':'btn-green'}" 
+                                                     styleClass="#{bean.examRequest.costButtonConfirmClicked ? '':'btn-green'}"
                                                      update="btn_line, requestExtraCostDialog"/>
 
                                     <p:commandButton action="#{bean.checkRelatedEstateFormalities}" value="#{msg.save}"
@@ -374,7 +374,7 @@
                                                      onclick="PF('executeRequest').disable();"
                                                      oncomplete="PF('executeRequest').enable();"/>
 
-                                    <p:commandButton action="#{bean.openMailManagerEditor(true)}" value="#{msg.sendEmail}" 
+                                    <p:commandButton action="#{bean.openMailManagerEditor(true)}" value="#{msg.sendEmail}"
                                                      update="btn_line" rendered="#{!bean.createdByExternalUser and bean.examRequest.confirmExtraCostsPressed}"
 
                                                      styleClass="#{bean.entity.emailOpened? '':'btn-green'}"/>
@@ -387,7 +387,7 @@
                     </div>
                 </div>
             </p:panel>
- 			<p:dialog widgetVar="categoryNotPresentWV" modal="true" draggable="false"
+            <p:dialog widgetVar="categoryNotPresentWV" modal="true" draggable="false"
                       position="center center">
                 <div class="ui-corner-all">
                     <span >#{val.cadastralNoPresent}</span>
@@ -507,16 +507,16 @@
                 <div class="ui-messages-error ui-corner-all">
                     <span class="ui-messages-error-summary">#{val.requestTextEditEndDateErrorMessage}</span><br/>
                 </div>
-				<div class="btn_line">
-					<p:commandButton value="#{msg.save}" action="#{bean.pageSave}"
-						onclick="toggleDateCheck();"
-						oncomplete="PF('endDateErrorMessageWV').hide();"
-						update=":form:btn_line" />
-				</div>
-			</p:dialog>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.save}" action="#{bean.pageSave}"
+                                     onclick="toggleDateCheck();"
+                                     oncomplete="PF('endDateErrorMessageWV').hide();"
+                                     update=":form:btn_line" />
+                </div>
+            </p:dialog>
 
-			<p:remoteCommand name="toggleDateCheck" action="#{bean.checkDate}"/>
-                                     
+            <p:remoteCommand name="toggleDateCheck" action="#{bean.checkDate}"/>
+
             <p:dialog widgetVar="requestsStillBeingWorkedOnDialogWV" modal="true" draggable="false"
                       position="center center">
                 <div class="ui-corner-all">
@@ -563,7 +563,7 @@
                 <h:outputText escape="false" value="#{bean.numberActDifference}"/>
                 <br/><br/>
                 <p:inputText value="#{bean.requestNumberActUpdate}"
-                               onkeypress="return numbers_only(this, event, 9, 0)" onkeyup="check_numbers(this, 9, 0);"/>
+                             onkeypress="return numbers_only(this, event, 9, 0)" onkeyup="check_numbers(this, 9, 0);"/>
                 <p:commandButton value="#{msg.confirm}"
                                  action="#{bean.viewExtraCost}" styleClass="green-button, right-side"
                                  oncomplete="PF('requestNumberActGreaterThenClientNumberAct').hide();"
