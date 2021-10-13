@@ -14,9 +14,9 @@
         }
 
         body .ui-button.ui-button-warning, body .ui-splitbutton.ui-button-warning > .ui-button {
-            background:  #ffff66;
+            background: #fed820;
             color: #000000;
-            border: 1px solid #fb6e51;
+            border: 1px solid #fed820;
             width: 75px;
         }
 
@@ -30,6 +30,15 @@
         .ui-button-success {
             background: #57c279!important;
         }
+        
+        body .ui-button.ui-button-icon-only .ui-icon {
+		    position: absolute;
+		    top: 50%;
+		    left: 50%;
+		    margin-top: -6px;
+		    margin-left: -7px;
+		    font-size: 14px !important;
+		}
 
     </style>
     <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/mail.css"
@@ -84,7 +93,7 @@
                              value="#{msg.mailManagerStart}" styleClass="ui-button-success"/> -->
             <p:commandButton icon="pi pi-print" update="form:print_panel"
                              styleClass="ui-button-warning" action="#{bean.generateMailPdf}" oncomplete="printIframe();"/>
-            <p:commandButton update=":form" style="background-color: #F3362B !important;" value="#{msg.close}" styleClass="grey-button"
+            <p:commandButton update=":form" style="background-color: #F3362B !important; margin-left: 2px;" value="#{msg.close}" styleClass="grey-button"
                              actionListener="#{bean.goTable}"/>
         </div>
         <div class="p-col-12" style="margin-top: -10px;">
