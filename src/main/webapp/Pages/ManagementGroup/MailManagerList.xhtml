@@ -76,6 +76,15 @@
                     PF('tableWV').unselectAllRows()
                 }
             }
+            
+            $(document).click(function (event) {
+            	var sourceElementId = event.currentTarget.activeElement.id;
+                if(sourceElementId != 'settingButton') {
+                	$('#settingPanel_content').hide();
+                } else {
+                	$('#settingPanel_content').show();
+                }
+            });
         </script>
         <style>
 
@@ -222,6 +231,53 @@
                 font-size: 14px !important;
                 font-weight: normal !important;
             }
+            
+            body .ui-selectcheckboxmenu-panel {
+			    padding: 0;
+			    background: #ffffff;
+			    color: #495057;
+			    box-shadow: 0px 11px 15px -7px rgb(0 0 0 / 20%), 0px 24px 38px 3px rgb(0 0 0 / 14%), 0px 9px 46px 8px rgb(0 0 0 / 12%);
+			    border-radius: 4px;
+			    border: 12px solid rgba(48, 91, 135, 0.6) !important;
+			}
+
+			.ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item label {
+			    color: #295887;
+			    font-weight: 600;
+			}
+			
+			.ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item {
+			    border: 1px solid;
+			}
+			
+			.ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item .ui-chkbox .ui-chkbox-box {
+			    border: 2px solid #4D759D;
+				border-radius: 5px;
+			    background-color: transparent;
+			} 
+			.ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item .ui-chkbox .ui-chkbox-box.ui-state-hover {
+			    border: 2px solid #4D759D;
+			}
+			
+			body .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-items {
+			    padding: 0 0;
+			}
+			
+			body .ui-chkbox .ui-chkbox-box.ui-state-active {
+			    border-color: #4D759D;
+			    color: #5f666c !important;
+			    background-color: transparent !important;
+			}
+			
+			body .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-header{
+				border: 1px solid;
+			}
+			
+			body .ui-state-highlight {
+			    background-color: #2f8ee5 !important;
+			    color: #ffffff !important;
+			}
+
         </style>
 
         <p:remoteCommand name="updateSearchPanel" update=":form:searchPanel"/>

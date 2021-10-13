@@ -90,7 +90,7 @@ td.ui-panelgrid-cell {
     position: absolute;
     z-index: 1;
     margin-top: 38px;
-    max-width: 550px;
+    max-width: 560px;
     right: 33px;
     border: 1px solid #547ac4;
 }
@@ -110,8 +110,6 @@ td.ui-panelgrid-cell {
 
 #manageReestablishBtn {
     margin-right: 20px;
-    background: #fff;
-    color: gray;
     box-shadow: 0px 1px 5px 0px;
     border: none !important;
 }
