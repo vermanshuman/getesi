@@ -19,10 +19,11 @@
 
             body .ui-button {
                 margin-right: 3px !important;
+                background: #3582b8;
             }
 
             body .ui-widget-header {
-                background-color: #788FA7 !important;
+                background-color: #2f8ee5 !important;
                 color: #ffffff;
             }
 
@@ -101,6 +102,10 @@
 
             body .ui-panel .ui-panel-content {
                 border: 1px solid #c9cdd2;
+            }
+            
+            .nav-button {
+            	background-color: #000066 !important;
             }
 
         </style>
@@ -399,11 +404,11 @@
                 <div class="ui-g-12">
                     <div class="ui-g-6" style="text-align:left;">
                         <p:commandButton id="previousButton" value="#{msg.previous}" rendered="#{bean.activeMenuTabNum != 0}" update="@form :buttonFragment"
-                                         onclick="previous(#{bean.activeMenuTabNum}, #{bean.topMenuModel.getElements().size()-1});" icon="fa fa-arrow-left"/>
+                                         onclick="previous(#{bean.activeMenuTabNum}, #{bean.topMenuModel.getElements().size()-1});" icon="fa fa-arrow-left" styleClass="nav-button"/>
                     </div>
                     <div class="ui-g-6" style="text-align:right;">
                         <p:commandButton id="nextButton" value="#{msg.next}" rendered="#{bean.activeMenuTabNum != bean.topMenuModel.getElements().size()-1}" update="@form :buttonFragment"
-                                         onclick="next(#{bean.activeMenuTabNum}, #{bean.topMenuModel.getElements().size()-1});"  icon="fa fa-arrow-right"/>
+                                         onclick="next(#{bean.activeMenuTabNum}, #{bean.topMenuModel.getElements().size()-1});"  icon="fa fa-arrow-right" styleClass="nav-button"/>
                     </div>
                 </div>
             </div>
