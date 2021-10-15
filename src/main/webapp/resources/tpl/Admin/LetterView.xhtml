@@ -86,12 +86,12 @@
             <p:inputText id="cdrShow" value="#{bean.cdr}"  style="width: 100%"/>
             <span> #{msg.reference}</span>
             <p:inputTextarea id="referenceShow" value="#{bean.referencePractice}" style="width: 100%"/>
-            <p:outputPanel>
+            <p:outputPanel style="margin-top: 2mm;">
                 <p:commandButton value="#{msg.save}" process="referenceAreaShow" style="background-color: #57c279!important; margin-right:5px;"
                                  action="#{bean.saveReference(false)}" update="enterPracticeReferenceDialog @form" oncomplete="setTimeout(function() { $('#validationMessages').html(''); }, 2000);">
                     <f:setPropertyActionListener value="#{true}" target="#{bean.confirmButtonIsClicked}"/>
                 </p:commandButton>
-                <p:commandButton value="#{msg.mailManagerStart}" process="referenceAreaShow" style="background-color: #000066 !important;"
+                <p:commandButton value="#{msg.mailManagerStart}" process="referenceAreaShow" style="background-color: #000066 !important;margin-left: 1cm;"
                                  action="#{bean.checkFieldsBeforeProcessManagedStateCheck}" update="fieldsNotSetDialog">
                     <f:setPropertyActionListener value="#{true}" target="#{bean.confirmButtonIsClicked}"/>
                 </p:commandButton>

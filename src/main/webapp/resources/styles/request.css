@@ -1,6 +1,7 @@
 #table table {
 	margin-top: 20px;
 	padding-left: 13px;
+	width: calc(100% - 13px);
 }
 
 .ui-datatable thead th {
