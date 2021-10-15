@@ -203,25 +203,25 @@
                          rowsPerPageTemplate="20,50,100">
                 <p:columnGroup type="header">
                     <p:row>
-                        <p:column rowspan="2" colspan="2" headerText="N." styleClass="action_large_column" style="width: 7%;" />
-                        <p:column colspan="5" headerText="DATI IDENTIFICATIVI" style="width: 30%;"/>
-                        <p:column colspan="4" headerText="DATI DI CLASSAMENTO" style="width: 30%;"/>
-                        <p:column colspan="5" headerText="ALTRE INFORMAZIONI" style="width: 34%;"/>
+                        <p:column rowspan="2" colspan="2" headerText="N." style="width: 8%; text-align: center !important;"/>
+                        <p:column colspan="5" headerText="DATI IDENTIFICATIVI" style="width: 25%"/>
+                        <p:column colspan="4" headerText="DATI DI CLASSAMENTO" style="width: 25%"/>
+                        <p:column colspan="5" headerText="ALTRE INFORMAZIONI"/>
                     </p:row>
                     <p:row>
-                        <p:column width="50" headerText="Scheda"/>
-                        <p:column headerText="Sezione"/>
-                        <p:column headerText="Foglio"/>
-                        <p:column headerText="Particella"/>
-                        <p:column headerText="Sub"/>
+                        <p:column headerText="Scheda" style=""/>
+                        <p:column headerText="Sezione" styleClass="col-small-padding"/>
+                        <p:column headerText="Foglio" styleClass="col-small-padding"/>
+                        <p:column headerText="Particella" styleClass="col-small-padding"/>
+                        <p:column headerText="Sub" styleClass="col-small-padding"/>
 
-                        <p:column headerText="Cat"/>
+                        <p:column headerText="Cat" styleClass="col-small-padding"/>
                         <p:column headerText="Consistenza"/>
                         <p:column headerText="Superficie Catastale (MQ)"/>
                         <p:column headerText="Rendita (€)"/>
-                        <p:column headerText="Indirizzo" style="width: 20%;"/>
-                        <p:column headerText="Comune" style="width: 15%;"/>
-                        <p:column headerText="Relazione" style="width: 20%;"/>
+                        <p:column headerText="Indirizzo" />
+                        <p:column headerText="Comune" />
+                        <p:column headerText="Relazione"/>
                         <p:column headerText="Preg." styleClass="action_column"/>
                         <p:column headerText="Pres." styleClass="action_column"/>
                     </p:row>
@@ -238,7 +238,7 @@
                         <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                     </p:commandButton>
                 </p:column>
-                <p:column style="width: 50px">
+                <p:column>
                     <h:outputText value="#{item.schedas} / #{item.dataSchedas}" rendered="#{not empty item.schedas}"/>
                 </p:column>
                 <p:column>
@@ -259,7 +259,7 @@
                         <br/>
                     </p:repeat>
                 </p:column>
-                <p:column>
+                <p:column width="100">
                     <p:repeat var="str" value="#{item.subList}">
                         <h:outputText value="#{str}"/>
                         <br/>

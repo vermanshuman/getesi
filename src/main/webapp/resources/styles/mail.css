@@ -89,7 +89,7 @@ td.ui-panelgrid-cell {
 #settingPanel {
     position: absolute;
     z-index: 1;
-    margin-top: 38px;
+    margin-top: 10px;
     max-width: 560px;
     right: 33px;
     border: 1px solid #547ac4;

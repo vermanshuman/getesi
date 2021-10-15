@@ -75,9 +75,19 @@
                     PF('selectTopAllWV').uncheck();
                     PF('tableWV').unselectAllRows()
                 }
-            }
-            
+            };
+
+            $(document).click(function (e) {
+                if ($(e.target).closest(".settingsBlock").length
+                    === 0) {
+                    $('#settingPanel_content').hide();
+                }else {
+                    $('#settingPanel_content').show();
+                }
+            });
+
         </script>
+
         <style>
 
             body .ui-panel .ui-panel-content {
@@ -113,7 +123,7 @@
             }
 
             .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
-                border: 1px solid #c9cdd2 !important;
+                border: 1px solid #808080 !important;
             }
 
             .ui-datatable tbody td, .ui-datatable tfoot td {
@@ -211,7 +221,7 @@
             }
 
             .ui-datatable tbody.ui-datatable-data {
-                border-left: 1px solid #c9cdd2;
+                border-left: 1px solid #808080;
             }
 
             body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-rpp-options {
@@ -223,60 +233,60 @@
                 font-size: 14px !important;
                 font-weight: normal !important;
             }
-            
-            body .ui-selectcheckboxmenu-panel {
-			    padding: 0;
-			    background: #ffffff;
-			    color: #495057;
-			    box-shadow: 0px 11px 15px -7px rgb(0 0 0 / 20%), 0px 24px 38px 3px rgb(0 0 0 / 14%), 0px 9px 46px 8px rgb(0 0 0 / 12%);
-			    border-radius: 4px;
-			    border: 12px solid rgba(48, 91, 135, 0.6) !important;
-			}
 
-			.ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item label {
-			    color: #295887;
-			    font-weight: 600;
-			}
-			
-			.ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item {
-			    border: 1px solid;
-			}
-			
-			.ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item .ui-chkbox .ui-chkbox-box {
-			    border: 2px solid #4D759D;
-				border-radius: 5px;
-			    background-color: transparent;
-			} 
-			.ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item .ui-chkbox .ui-chkbox-box.ui-state-hover {
-			    border: 2px solid #4D759D;
-			}
-			
-			body .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-items {
-			    padding: 0 0;
-			}
-			
-			body .ui-chkbox .ui-chkbox-box.ui-state-active {
-			    border-color: #4D759D;
-			    color: #5f666c !important;
-			    background-color: transparent !important;
-			}
-			
-			body .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-header{
-				border: 1px solid;
-			}
-			
-			body .ui-state-highlight {
-			    background-color: #2f8ee5 !important;
-			    color: #ffffff !important;
-			}
-			
-			#filterDateFrom_input {
-				width: 160px;
-			}
-			
-			#filterDateTo_input {
-				width: 160px;
-			}
+            body .ui-selectcheckboxmenu-panel {
+                padding: 0;
+                background: #ffffff;
+                color: #495057;
+                box-shadow: 0px 11px 15px -7px rgb(0 0 0 / 20%), 0px 24px 38px 3px rgb(0 0 0 / 14%), 0px 9px 46px 8px rgb(0 0 0 / 12%);
+                border-radius: 4px;
+                border: 12px solid rgba(48, 91, 135, 0.6) !important;
+            }
+
+            .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item label {
+                color: #295887;
+                font-weight: 600;
+            }
+
+            .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item {
+                border: 1px solid;
+            }
+
+            .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item .ui-chkbox .ui-chkbox-box {
+                border: 2px solid #4D759D;
+                border-radius: 5px;
+                background-color: transparent;
+            }
+            .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item .ui-chkbox .ui-chkbox-box.ui-state-hover {
+                border: 2px solid #4D759D;
+            }
+
+            body .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-items {
+                padding: 0 0;
+            }
+
+            body .ui-chkbox .ui-chkbox-box.ui-state-active {
+                border-color: #4D759D;
+                color: #5f666c !important;
+                background-color: transparent !important;
+            }
+
+            body .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-header{
+                border: 1px solid;
+            }
+
+            body .ui-state-highlight {
+                background-color: #2f8ee5 !important;
+                color: #ffffff !important;
+            }
+
+            #filterDateFrom_input {
+                width: 160px;
+            }
+
+            #filterDateTo_input {
+                width: 160px;
+            }
 
         </style>
 
@@ -291,7 +301,7 @@
                 <div class="p-col-12 p-md-12">
                     <div class="card">
                         <div class="p-grid">
-                            <div class="p-col-3" style="padding-top: 0px;padding-bottom: 0px;">
+                            <div class="p-col-2" style="padding-top: 0px;padding-bottom: 0px;">
                                 <div class="p-formgroup-inline">
                                     <div class="p-field" style="margin-bottom: 0px;">
                                         <p:commandButton value="&nbsp;#{msg.mailManagerNewMail}"
@@ -299,57 +309,62 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="p-col-9" style="padding-top: 0px;padding-bottom: 0px;">
+                            <div class="p-col-10" style="padding-top: 0px;padding-bottom: 0px;">
                                 <div class="p-formgroup-inline alignEnd">
                                     <div class="p-field">
                                         <p:inputText value="#{bean.filterEmail}"
-                                                     placeholder="#{msg.mailManagerEmailFrom}/#{msg.mailManagerEmailTo}"/>
+                                                     placeholder="#{msg.mailManagerEmailFrom}/#{msg.mailManagerEmailTo}" style=" width: 300px !important;"/>
                                     </div>
                                     <div class="p-field">
-                                        <p:inputText id="filterEmailSubject" value="#{bean.filterEmailSubject}" placeholder="#{msg.mailManagerEmailSubject}"/>
+                                        <p:inputText id="filterEmailSubject" value="#{bean.filterEmailSubject}" placeholder="#{msg.mailManagerEmailSubject}"
+                                                     style=" width: 300px !important;"/>
                                     </div>
                                     <div class="p-field">
-                                        <p:inputText id="filterEmailBody" value="#{bean.filterEmailBody}" placeholder="#{msg.mailManagerEmailBody}"/>
+                                        <p:inputText id="filterEmailBody" value="#{bean.filterEmailBody}" placeholder="#{msg.mailManagerEmailBody}"
+                                                     style=" width: 300px !important;"/>
                                     </div>
                                     <div class="p-field">
                                         <p:commandButton id="cercaButton" onclick="checkDates(); filterTableFromPanel();"
                                                          update="searchPanel" icon="ui-icon ui-icon-search pi pi-search" styleClass="searchPanelButton"/>
                                     </div>
-                                    <p:commandButton id="settingButton" onclick="PF('panelSetting').toggle()" type="button"
-                                                     icon="ui-icon ui-icon-search pi pi-sliders-h" styleClass="searchPanelButton"/>
-                                    <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" collapsed="true">
-                                        <div class="p-grid">
-                                            <div class="p-col-12" style="text-align: center;">
-                                                <h2>Filtra per</h2>
+
+                                      <div class="settingsBlock">
+                                        <p:commandButton id="settingButton" onclick="PF('panelSetting').toggle()" type="button"
+                                                         icon="ui-icon ui-icon-search pi pi-sliders-h" styleClass="searchPanelButton"/>
+                                        <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" collapsed="true" styleClass="panelSetting">
+                                            <div class="p-grid">
+                                                <div class="p-col-12" style="text-align: center;">
+                                                    <h2>Filtra per</h2>
+                                                </div>
+                                                <div class="p-col-12">
+                                                    Data:
+                                                    <p:calendar id="filterDateFrom" readonlyInput="false" showOn="button"
+                                                                onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+                                                                pattern="dd/MM/yyyy" mask="true" style="margin-right: 10px;"
+                                                                locale="it" navigator="true" popupIconOnly="true"
+                                                                onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+                                                                value="#{bean.dateFrom}" placeholder="#{msg.mailManagerDateFrom}" />
+                                                    <div id="hyphen"></div>
+                                                    <p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
+                                                                onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                                                                pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateTo}"
+                                                                onblur="check_date(this)" value="#{bean.dateTo}" />
+                                                </div>
+                                                <div class="p-col-12">
+                                                    <p:selectCheckboxMenu value="#{bean.selectedSearchStateIds}"
+                                                                          label="#{msg.mailManagerStates}"
+                                                                          style="margin-right: 15px!important;width: 40%;">
+                                                        <f:selectItems value="#{bean.searchStates}"/>
+                                                    </p:selectCheckboxMenu>
+                                                </div>
+                                                <div class="p-col-12" style="text-align: center;">
+                                                    <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFiltraPanel}" update="settingPanel" oncomplete="PF('panelSetting').toggle()"/>
+                                                    <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #009900;" id="searchButton"
+                                                                     onclick="checkDates(); filterTableFromPanel();" update="searchPanel" oncomplete="PF('panelSetting').toggle()"/>
+                                                </div>
                                             </div>
-                                            <div class="p-col-12">
-                                                Data:
-                                                <p:calendar id="filterDateFrom" readonlyInput="false" showOn="button"
-                                                            onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
-                                                            pattern="dd/MM/yyyy" mask="true" style="margin-right: 10px;"
-                                                            locale="it" navigator="true" popupIconOnly="true"
-                                                            onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
-                                                            value="#{bean.dateFrom}" placeholder="#{msg.mailManagerDateFrom}" />
-                                                <div id="hyphen"></div>
-                                                <p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
-                                                            onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
-                                                            pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateTo}"
-                                                            onblur="check_date(this)" value="#{bean.dateTo}" />
-                                            </div>
-                                            <div class="p-col-12">
-                                                <p:selectCheckboxMenu value="#{bean.selectedSearchStateIds}"
-                                                                      label="#{msg.mailManagerStates}"
-                                                                      style="margin-right: 15px!important;width: 40%;">
-                                                    <f:selectItems value="#{bean.searchStates}"/>
-                                                </p:selectCheckboxMenu>
-                                            </div>
-                                            <div class="p-col-12" style="text-align: center;">
-                                                <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFiltraPanel}" update="settingPanel" oncomplete="PF('panelSetting').toggle()"/>
-                                                <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #009900;" id="searchButton"
-                                                                 onclick="checkDates(); filterTableFromPanel();" update="searchPanel" oncomplete="PF('panelSetting').toggle()"/>
-                                            </div>
-                                        </div>
-                                    </p:panel>
+                                        </p:panel>
+                                                 </div>     
                                 </div>
                             </div>
                         </div>
@@ -489,7 +504,7 @@
 
                                     <p:column styleClass="min_padding_margin icon_column" exportable="false"
                                               style="width: 20px !important;">
-                                    <f:facet name="header">
+                                        <f:facet name="header">
                                             <span class="fa fa-paperclip"/>
                                         </f:facet>
                                         <p:outputPanel rendered="#{item.files}">
@@ -520,7 +535,7 @@
 
                                     <p:column headerText="#{msg.mailManagerEmailFrom}" id="emailFrom" field="emailFrom" filterable="false"
                                               sortBy="#{item.emailFrom}" style="display : #{bean.needShowEmailFrom ? '' : 'none'}; width: 400px;">
-                                    <h:outputText value="#{item.emailFromStr[0]}" id="email_from"/>
+                                        <h:outputText value="#{item.emailFromStr[0]}" id="email_from"/>
                                         <p:tooltip for="email_from" value="#{item.emailFromStr[1]}"/>
                                     </p:column>
 

@@ -408,10 +408,6 @@ body .ui-paginator .ui-paginator-pages .ui-paginator-page {
     color: #ffffff !important;
 }
 
-body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
-    background-color: #f0f3f5 !important;
-}
-
 body .top-bar-cal.ui-widget-content {
     background-color: #ffffff;
     border: 1px solid #c9cdd2 !important;
@@ -428,8 +424,8 @@ body .ui-datatable thead th.ui-state-hover {
 
 body .ui-datatable thead th {
     background-color: #ffffff !important;
-    padding: 8px 14px !important;
-    border-color: #c9cdd2 !important;
+    padding: 8px 2px !important;
+    border-color: #808080 !important;
     color: #5f666c !important;
 }
 
