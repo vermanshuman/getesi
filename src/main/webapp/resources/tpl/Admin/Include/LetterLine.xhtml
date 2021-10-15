@@ -93,7 +93,7 @@
                              value="#{msg.mailManagerStart}" styleClass="ui-button-success"/> -->
             <p:commandButton icon="pi pi-print" update="form:print_panel"
                              styleClass="ui-button-warning" action="#{bean.generateMailPdf}" oncomplete="printIframe();" value="Stampa" style="margin-right: 1cm;width: auto;"/>
-            <p:commandButton update=":form" style="background-color: #F3362B !important; margin-left: 2px;" value="#{msg.close}" styleClass="grey-button"
+            <p:commandButton update=":form" style="background-color: #F3362B !important;margin-left: 2px;width: 110px;" value="#{msg.close}" styleClass="grey-button"
                              actionListener="#{bean.goTable}"/>
         </div>
         <div class="p-col-12" style="margin-top: -10px;">

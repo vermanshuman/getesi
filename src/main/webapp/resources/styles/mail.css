@@ -158,3 +158,15 @@ td.ui-panelgrid-cell {
 .layout-wrapper .layout-menu-container .layout-menu li ul li a {
     text-decoration: none !important;
 }
+
+.w-100 {
+    width: 100%;
+}
+
+.td-w-403 td:nth-child(2) {
+    width: 403px;
+}
+
+.td-w-403 td:nth-child(1) {
+    width: 188px;
+}
