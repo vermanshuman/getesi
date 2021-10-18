@@ -424,7 +424,7 @@ body .ui-datatable thead th.ui-state-hover {
 
 body .ui-datatable thead th {
     background-color: #ffffff !important;
-    padding: 8px 2px !important;
+    padding: 8px 2px;
     border-color: #808080 !important;
     color: #5f666c !important;
 }
