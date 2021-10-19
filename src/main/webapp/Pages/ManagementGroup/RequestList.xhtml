@@ -134,9 +134,9 @@
                 background-color: white;
             }
 
-            #stateSelectCheckboxPanel {
-                left: 1420px !important;
-            }
+            /*#stateSelectCheckboxPanel {*/
+            /*    left: 1420px !important;*/
+            /*}*/
 
             #requestTypeSelectCheckboxPanel {
                 left: 1170px !important;
@@ -170,10 +170,24 @@
             .new-button {
                 background: #009900 !important;
             }
-            
+            #table_paginator_top :first-child {
+                margin-top: 6px !important;
+            }
+
+            body .ui-paginator .ui-paginator-pages {
+                margin-top: -6px !important;
+            }
+
+            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-rpp-options {
+                margin: 6px;
+            }
+            .ui-g-12 {
+                padding: 0;
+            }
+
             .ui-button {
-			    margin-right: 5px !important;
-			}
+                margin-right: 5px !important;
+            }
         </style>
         <script>
             var doChange = true;
@@ -604,7 +618,7 @@
         </p:outputPanel>
 
         <p:overlayPanel id="stateSelectCheckboxPanel" my="left top" at="right bottom"
-                        widgetVar="stateSelectCheckboxWV" for="statuses" dynamic="true" style="width:200px">
+                        widgetVar="stateSelectCheckboxWV" for="statuses" dynamic="true" style="width:200px;left: 1650px !important;" styleClass="settingsBlock">
 
             <p:dataTable id="stateSelectCheckboxPanelDataTable" var="state"
                          value="#{bean.stateWrappers}" selectionMode="single"

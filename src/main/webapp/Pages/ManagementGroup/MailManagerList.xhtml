@@ -78,8 +78,7 @@
             };
 
             $(document).click(function (e) {
-                if ($(e.target).closest(".settingsBlock").length
-                    === 0) {
+                if ($(e.target).closest(".settingsBlock").length === 0) {
                     $('#settingPanel_content').hide();
                 }else {
                     $('#settingPanel_content').show();
@@ -123,7 +122,7 @@
             }
 
             .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
-                border: 1px solid #c9cdd2 !important; 
+                border: 1px solid #c9cdd2 !important;
             }
 
             .ui-datatable tbody td, .ui-datatable tfoot td {
@@ -287,15 +286,14 @@
             #filterDateTo_input {
                 width: 160px;
             }
-            
             body .ui-datatable thead th {
-			    border-color: #c9cdd2 !important;
-			}
-			
-			body .ui-inputfield {
-			    border: 1px solid #a8acb1;
-			}
-			
+                border-color: #c9cdd2 !important;
+            }
+
+            body .ui-inputfield {
+                border: 1px solid #a8acb1;
+            }
+
         </style>
 
         <p:remoteCommand name="updateSearchPanel" update=":form:searchPanel"/>
@@ -361,7 +359,7 @@
                                                 <div class="p-col-12">
                                                     <p:selectCheckboxMenu value="#{bean.selectedSearchStateIds}"
                                                                           label="#{msg.mailManagerStates}"
-                                                                          style="margin-right: 15px!important;width: 40%;">
+                                                                          style="margin-right: 15px!important;width: 40%;" styleClass="statesmenu">
                                                         <f:selectItems value="#{bean.searchStates}"/>
                                                     </p:selectCheckboxMenu>
                                                 </div>
