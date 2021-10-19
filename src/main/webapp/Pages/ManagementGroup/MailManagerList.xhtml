@@ -123,7 +123,7 @@
             }
 
             .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
-                border: 1px solid #808080 !important;
+                border: 1px solid #c9cdd2 !important; 
             }
 
             .ui-datatable tbody td, .ui-datatable tfoot td {
@@ -221,7 +221,7 @@
             }
 
             .ui-datatable tbody.ui-datatable-data {
-                border-left: 1px solid #808080;
+                border-left: 1px solid #c9cdd2;
             }
 
             body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-rpp-options {
@@ -287,7 +287,15 @@
             #filterDateTo_input {
                 width: 160px;
             }
-
+            
+            body .ui-datatable thead th {
+			    border-color: #c9cdd2 !important;
+			}
+			
+			body .ui-inputfield {
+			    border: 1px solid #a8acb1;
+			}
+			
         </style>
 
         <p:remoteCommand name="updateSearchPanel" update=":form:searchPanel"/>
