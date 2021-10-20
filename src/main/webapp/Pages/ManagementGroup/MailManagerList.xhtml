@@ -77,14 +77,6 @@
                 }
             };
 
-            $(document).click(function (e) {
-                if ($(e.target).closest(".settingsBlock").length === 0) {
-                    $('#settingPanel_content').hide();
-                }else {
-                    $('#settingPanel_content').show();
-                }
-            });
-
         </script>
 
         <style>
@@ -335,9 +327,27 @@
                                     </div>
 
                                       <div class="settingsBlock">
-                                        <p:commandButton id="settingButton" onclick="PF('panelSetting').toggle()" type="button"
+                                        <p:commandButton id="settingButton" onclick="togglePanel();" type="button"
                                                          icon="ui-icon ui-icon-search pi pi-sliders-h" styleClass="searchPanelButton"/>
-                                        <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" collapsed="true" styleClass="panelSetting">
+                                        <script type="text/javascript">
+                                            // <![CDATA[
+                                            $("body").click(function(e){
+                                                var target = $(e.target);
+                                                if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('.ui-selectcheckboxmenu-panel').length) {
+                                                    PF('panelSetting').getJQ().hide();
+                                                }
+                                            });
+                                            function togglePanel() {
+                                                PF('panelSetting').getJQ().toggle();
+                                            }
+                                            jQuery(document).ready(function() {
+                                                setTimeout(function (){
+                                                    PF('panelSetting').getJQ().hide();
+                                                }, 100);
+                                            });
+                                            // ]]>
+                                        </script>
+                                        <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" styleClass="panelSetting">
                                             <div class="p-grid">
                                                 <div class="p-col-12" style="text-align: center;">
                                                     <h2>Filtra per</h2>
@@ -364,9 +374,9 @@
                                                     </p:selectCheckboxMenu>
                                                 </div>
                                                 <div class="p-col-12" style="text-align: center;">
-                                                    <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFiltraPanel}" update="settingPanel" oncomplete="PF('panelSetting').toggle()"/>
+                                                    <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFiltraPanel}" update="settingPanel" oncomplete="PF('panelSetting').getJQ().hide()"/>
                                                     <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #009900;" id="searchButton"
-                                                                     onclick="checkDates(); filterTableFromPanel();" update="searchPanel" oncomplete="PF('panelSetting').toggle()"/>
+                                                                     onclick="checkDates(); filterTableFromPanel();" update="searchPanel" oncomplete="PF('panelSetting').getJQ().hide()"/>
                                                 </div>
                                             </div>
                                         </p:panel>
