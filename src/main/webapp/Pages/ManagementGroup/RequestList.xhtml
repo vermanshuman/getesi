@@ -221,14 +221,6 @@
                 resetTableData();
                 return true;
             }
-            $(document).click(function (e) {
-                if ($(e.target).closest(".settingsBlock").length
-                    === 0) {
-                    $('#settingPanel_content').hide();
-                }else {
-                    $('#settingPanel_content').show();
-                }
-            });
         </script>
 
         <div class="p-grid">
@@ -268,13 +260,32 @@
                                             update=":form:table,searchPanel,editAndPrintDialog" />
                                 </div>
                                 <div class="settingsBlock">
-                                    <p:commandButton id="settingButton" onclick="PF('panelSetting').toggle();"
+                                    <p:commandButton id="settingButton" onclick="togglePanel();"
                                                      type="button"
                                                      styleClass="ui-button-warning-icon"
                                                      icon="ui-icon ui-icon-search pi pi-sliders-h"/>
-
+                                    <script type="text/javascript">
+                                        // <![CDATA[
+                                        $("body").click(function(e){
+                                            var target = $(e.target);
+                                            if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('#client_panel').length
+                                                && !target.parents('#requestTypeSelectCheckboxPanel').length && !target.parents('#manager_panel').length && !target.parents('#office_panel').length
+                                                && !target.parents('#stateSelectCheckboxPanel').length && !target.parents('#serviceSelectCheckboxPanel').length && !target.parents('#fiduciario_panel').length) {
+                                                PF('panelSetting').getJQ().hide();
+                                            }
+                                        });
+                                        function togglePanel() {
+                                            PF('panelSetting').getJQ().toggle();
+                                        }
+                                        jQuery(document).ready(function() {
+                                            setTimeout(function (){
+                                                PF('panelSetting').getJQ().hide();
+                                            }, 100);
+                                        });
+                                        // ]]>
+                                    </script>
                                     <p:panel id="settingPanel" widgetVar="panelSetting" closable="true"
-                                             toggleable="true" collapsed="true">
+                                             toggleable="true">
                                         <div class="p-grid">
                                             <div class="p-col-12" style="text-align: center;">
                                                 <h2>Filtra per</h2>
@@ -411,13 +422,13 @@
                                                 <p:commandButton id="manageReestablishBtn"
                                                                  value="#{ff:upper(msg.mailManageReestablish)}"
                                                                  update="settingPanel searchPanel"
-                                                                 oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').toggle();"/>
+                                                                 oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').getJQ().hide();"/>
                                                 <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}"
                                                                  style="background: #009900; margin-left:3px;"
                                                                  id="searchButton12345"
                                                                  onclick="checkDates(); filterTableFromPanel();"
                                                                  update="searchPanel"
-                                                                 oncomplete="PF('panelSetting').toggle()"/>
+                                                                 oncomplete="PF('panelSetting').getJQ().hide();"/>
                                             </div>
                                         </div>
                                     </p:panel>
