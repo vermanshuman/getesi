@@ -188,6 +188,10 @@
             .ui-button {
                 margin-right: 5px !important;
             }
+
+            .al-cen-fx div {
+                justify-content: center;
+            }
         </style>
         <script>
             var doChange = true;
@@ -735,8 +739,8 @@
             <p:column style="width: 6.3vw;min-width: 130px;" headerText="#{ff:upper(msg.requestListClient)}">
                 <h:outputText value="#{item.clientName}"/>
                 <br/>
-                <p:graphicImage id="info" url="/resources/images/eye_icon.png"
-                                style="width :22% ;"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
+                <p:graphicImage id="info" url="/resources/images/info.png"
+                                style="width :31% ;"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
 
                 <p:tooltip for="info" styleClass="custom-design-tooltip">
                     <h:outputText value="#{ff:upper(msg.requestManagers)}" style="font-weight:bold;color:#003871;"/>
@@ -766,8 +770,8 @@
                     </p:outputPanel>
                     <h:outputText id="service" value="#{item.serviceName}" rendered="#{item.serviceName ne null}"/>
                     <br/>
-                    <p:graphicImage id="multipleservice" url="/resources/images/eye_icon.png"
-                                    style="width :10% ;"  rendered="#{not empty item.multipleServices}" />
+                    <p:graphicImage id="multipleservice" url="/resources/images/info.png"
+                                    style="width :13%;margin-top: -10px;"  rendered="#{not empty item.multipleServices}" />
                     <p:tooltip for="multipleservice" styleClass="custom-design-tooltip" rendered="#{not empty item.multipleServices}">
                         <ui:repeat var="ele" value="#{item.multipleServices}" varStatus="service">
                             <h:outputText value="#{ele}" escape="false" style="color:#003871;margin-left: 24px;"/>
@@ -795,7 +799,7 @@
                 <br/>
                 <h:outputText value="#{item.code}" style="color:#003871"/>
             </p:column>
-            <p:column headerText="#{ff:upper(msg.requestListCorservatoryName)}" style="width: 9vw;min-width: 159px;">
+            <p:column headerText="#{ff:upper(msg.requestListCorservatoryName)}" style="width: 9vw;min-width: 159px;text-align: center;">
                 <h:outputText value="#{item.aggregationLandCharRegNameOrCity}"/>
             </p:column>
             <p:column styleClass="min_padding_margin" rendered="#{!bean.getCurrentUser().isExternal()}" style="width: 8.3vw;min-width: 177px;">
@@ -856,7 +860,7 @@
                 </p:outputPanel>
             </p:column>
 
-            <p:column styleClass=" action_midle_column" headerText="#{ff:upper(msg.requestListDocuments)}" style="width: 4vw;min-width: 81px;">
+            <p:column styleClass=" action_midle_column al-cen-fx" headerText="#{ff:upper(msg.requestListDocuments)}" style="width: 4vw;min-width: 81px;">
                 <p:outputPanel style="display: flex;" rendered="#{item.haveDocuments}">
                     <p:outputPanel style="display: flex;">
                         <p:commandButton styleClass="attachment-icon" action="#{bean.loadRequestDocuments}" update="requestDocs"
