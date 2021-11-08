@@ -11,9 +11,11 @@
 
         .background-lightorange-td .ui-editable-column {
             background: #fed8b1 !important;
+            height: 30px;
         }
         .ui-cell-editor .background-lightorange-td {
             background: #fed8b1 !important;
+            height: 30px;
         }
         .background-lightblue-td .ui-panelgrid-cell {
             background: #d0d9e6 !important;
@@ -23,6 +25,17 @@
         body .ui-datatable .ui-datatable-data tr td {
             padding: 6px 12px !important;
         }
+        body .ui-datatable thead th {
+            padding: 8px 14px !important;
+        }
+
+        .red-btn {
+            background: red !important;
+            background-color: red !important;
+            color: #FFFFFF !important;
+        }
+
+
     </style>
     <script type="text/javascript">
         function check_numbers_if_should(symbolsAreAllowed, myfield, int, float) {
@@ -623,7 +636,7 @@
             <p:column style="width: 80%; vertical-align: top;" headerText="#{msg.estateLocation}">
                 <p:dataTable rendered="#{not empty salesitem.propertyList}" value="#{salesitem.propertyList}" var="salesestate"
                              editable="true" editMode="cell" styleClass="without-header cadastral_table">
-                    <p:column style="text-align: center">
+                    <p:column style="text-align: center; width:17%;">
                         <p:cellEditor>
                             <f:facet name="output">
                                 <h:outputText value="#{salesestate.getCategoryType()}"/>
@@ -636,7 +649,7 @@
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
-                    <p:column style="text-align: center">
+                    <p:column style="text-align: center; width:17%;">
                         <p:cellEditor>
                             <f:facet name="output">
                                 <h:outputText value="#{salesestate.address}"/>
@@ -861,7 +874,7 @@
                             </f:facet>
                         </p:cellEditor>
                     </p:column>
-                    <p:column style="text-align: center">
+                    <p:column style="text-align: center;">
                         <p:cellEditor>
                             <f:facet name="output">
                                 <h:outputText value="#{estate.address}"/>
@@ -1011,13 +1024,13 @@
                 <h:outputText value="#{item.comment}" escape="false"/>
             </p:column>
             <p:column styleClass="action_column min_padding_margin" exportable="false">
-                <p:commandButton icon="ui-icon ui-icon-pencil" update=":form:commentArea"
+                <p:commandButton icon="pi pi-pencil" update=":form:commentArea"
                                  oncomplete="PF('commentEditDlg').show();" action="#{bean.editComment(item)}">
                     <f:setPropertyActionListener value="REQUEST" target="#{bean.currentComment}"/>
                 </p:commandButton>
             </p:column>
             <p:column styleClass="action_column">
-                <p:commandButton update="commentTable" icon="fa fa-remove" action="#{bean.deleteComment(item)}"/>
+                <p:commandButton update="commentTable" icon="pi pi-times" styleClass="red-btn" action="#{bean.deleteComment(item)}"/>
             </p:column>
         </p:dataTable>
 

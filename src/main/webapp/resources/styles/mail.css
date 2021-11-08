@@ -32,7 +32,7 @@
 .button-panel-one {
     background-color: #EFF3F5;
     padding: 7px;
-    width: 99%;
+    width: 100%;
     text-align: -webkit-left;
     margin-bottom: 7px;
 }
@@ -169,4 +169,11 @@ td.ui-panelgrid-cell {
 
 .td-w-403 td:nth-child(1) {
     width: 188px;
+}
+
+.ui-button.print-button {
+    background: #fed820;
+    color: #000000;
+    border: 1px solid #fed820;
+    margin-right: 10px;
 }

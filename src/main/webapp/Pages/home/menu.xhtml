@@ -50,96 +50,103 @@
                 display: none !important;
             }
         </style>
+        <script type="text/javascript">
+
+            var isOverlayMode =  $('input[id*="overLayModeData"]').attr('value');
+            $(document).ready(function() {
+                umc();
+                urc();
+
+                changeMenuMode((isOverlayMode === true || isOverlayMode === "true") ? 'layout-overlay layout-overlay-active'  : 'layout-slim' );
+                //changeSectionTheme('light', 'layout-menu');
+                document.querySelector(".layout-menu-button-mode i").addEventListener("click", () => {
+                    changeMenuOverlay();
+                });
+
+
+                function changeMenuOverlay() {
+                    var currentMode =  $('input[id*="overLayModeData"]').attr('value');
+                    isOverlayMode = !currentMode;
+                    if(currentMode === false || currentMode === "false"){
+                        isOverlayMode = true;
+                    }else {
+                        isOverlayMode = false;
+                    }
+                    $('input[name="overLayModeData"]').val(isOverlayMode);
+                    uplm([{name: 'overlay_mode', value: isOverlayMode}]);
+                    changeMenuMode((isOverlayMode === true || isOverlayMode === "true") ?  'layout-overlay layout-overlay-active' :  'layout-slim');
+                }
+
+                function changeMenuMode(menuMode) {
+                    if(menuMode == "layout-overlay layout-overlay-active")
+                        menuMode = 'layout-slim';
+                    else if(menuMode == 'layout-slim')
+                        menuMode = 'layout-static layout-static-active';
+                    else if(menuMode == 'layout-static layout-static-active')
+                        menuMode = 'layout-slim';
+                    var wrapper = $(document.body).children('.layout-wrapper');
+
+                    switch (menuMode) {
+                        case 'layout-static layout-static-active':
+                            wrapper.addClass('layout-static layout-static-active').removeClass('layout-overlay layout-slim layout-horizontal ');
+                            this.clearLayoutState();
+                            break;
+
+                        case 'layout-overlay':
+                            wrapper.addClass('layout-overlay').removeClass('layout-static layout-slim layout-horizontal  layout-static-active');
+                            this.clearLayoutState();
+                            break;
+
+                        case 'layout-horizontal':
+                            wrapper.addClass('layout-horizontal').removeClass('layout-static layout-overlay  layout-slim  layout-static-active');
+                            this.clearLayoutState();
+                            break;
+
+                        case 'layout-slim':
+                            wrapper.addClass('layout-slim').removeClass('layout-static layout-overlay layout-horizontal layout-static-active');
+                            this.clearLayoutState();
+                            break;
+
+                        default:
+                            wrapper.addClass('layout-static').removeClass('layout-overlay layout-slim layout-horizontal ');
+                            this.clearLayoutState();
+                            break;
+                    }
+                };
+
+                function changeSectionTheme(theme, section) {
+                    var wrapperElement = $('.layout-wrapper');
+
+                    var styleClass = wrapperElement.attr('class');
+                    var tokens = styleClass.split(' ');
+                    var sectionClass;
+                    for (var i = 0; i &lt; tokens.length; i++) {
+                        if (tokens[i].indexOf(section + '-') > -1) {
+                            sectionClass = tokens[i];
+                            break;
+                        }
+                    }
+
+                    wrapperElement.attr('class', styleClass.replace(sectionClass, section + '-' + theme));
+                };
+            });
+
+            function clearLayoutState () {
+                var menu = PF('babylonMenuWidget');
+
+                if (menu) {
+                    menu.clearLayoutState();
+                }
+            }
+        </script>
         <h:panelGroup id="logoBlock" layout="block" styleClass="layout-menu-logo menu-shadow">
-            <p:graphicImage rendered="#{sessionBean.overLayMode}" name="getesi-trans.png" library="images" style="width: 100px;margin-top: 2px;" />
-            <p:graphicImage rendered="#{not sessionBean.overLayMode}" name="logo.png" library="images" />
+            <p:graphicImage rendered="#{sessionBean.overLayMode}" name="logo.png" library="images"  />
+            <p:graphicImage rendered="#{not sessionBean.overLayMode}" name="getesi-trans.png" library="images" style="width: 100px;margin-top: 2px;"/>
         </h:panelGroup>
 
         <div class="layout-menu-wrapper menu-background">
             <div class="menu-scroll-content">
                 <h:form id="menuform">
-                    <script>
-                        //var isOverlayMode = '#{sessionBean.overLayMode}';
-                        var isOverlayMode =  $('input[id*="overLayModeData"]').attr('value');
-                        $( document ).ready(function() {
-                            umc();
-                            urc();
-
-                            changeMenuMode((isOverlayMode === true || isOverlayMode === "true") ? 'layout-overlay layout-overlay-active' : 'layout-slim');
-                            //changeSectionTheme('light', 'layout-menu');
-                            document.querySelector(".layout-menu-button-mode i").addEventListener("click", () => {
-                                changeMenuOverlay();
-                            });
-                        });
-
-                        function changeMenuOverlay() {
-                            var currentMode =  $('input[id*="overLayModeData"]').attr('value');
-                            isOverlayMode = !currentMode;
-                            if(currentMode === false || currentMode === "false"){
-                                isOverlayMode = true;
-                            }else {
-                                isOverlayMode = false;
-                            }
-                            $('input[name="overLayModeData"]').val(isOverlayMode);
-                            uplm([{name: 'overlay_mode', value: isOverlayMode}]);
-                            changeMenuMode((isOverlayMode === true || isOverlayMode === "true") ? 'layout-overlay layout-overlay-active' : 'layout-slim');
-                        }
-
-                        function changeMenuMode(menuMode) {
-                            console.log(isOverlayMode, "menu mode" , menuMode);
-                            var wrapper = $(document.body).children('.layout-wrapper');
-                            switch (menuMode) {
-                                case 'layout-static layout-static-active':
-                                    wrapper.addClass('layout-static layout-static-active').removeClass('layout-overlay layout-slim layout-horizontal ');
-                                    this.clearLayoutState();
-                                    break;
-
-                                case 'layout-overlay':
-                                    wrapper.addClass('layout-overlay').removeClass('layout-static layout-slim layout-horizontal  layout-static-active');
-                                    this.clearLayoutState();
-                                    break;
-
-                                case 'layout-horizontal':
-                                    wrapper.addClass('layout-horizontal').removeClass('layout-static layout-overlay  layout-slim  layout-static-active');
-                                    this.clearLayoutState();
-                                    break;
-
-                                case 'layout-slim':
-                                    wrapper.addClass('layout-slim').removeClass('layout-static layout-overlay layout-horizontal layout-static-active');
-                                    this.clearLayoutState();
-                                    break;
-
-                                default:
-                                    wrapper.addClass('layout-static').removeClass('layout-overlay layout-slim layout-horizontal ');
-                                    this.clearLayoutState();
-                                    break;
-                            }
-                        };
-
-                        function changeSectionTheme(theme, section) {
-                            var wrapperElement = $('.layout-wrapper');
-
-                            var styleClass = wrapperElement.attr('class');
-                            var tokens = styleClass.split(' ');
-                            var sectionClass;
-                            for (var i = 0; i &lt; tokens.length; i++) {
-                                if (tokens[i].indexOf(section + '-') > -1) {
-                                    sectionClass = tokens[i];
-                                    break;
-                                }
-                            }
-
-                            wrapperElement.attr('class', styleClass.replace(sectionClass, section + '-' + theme));
-                        };
-
-                        function clearLayoutState () {
-                            var menu = PF('babylonMenuWidget');
-
-                            if (menu) {
-                                menu.clearLayoutState();
-                            }
-                        }
-                    </script>
                     <p:remoteCommand name="umc" action="#{sessionBean.updateMailCount()}" update="@widgetVar(babylonMenuWidget)"/>
                     <p:remoteCommand name="urc" action="#{sessionBean.updateNumberUnclosedRequests()}" update="@widgetVar(babylonMenuWidget)"/>
                     <p:remoteCommand name="uplm" action="#{sessionBean.updateOverLayMode()}" update="@([id$=overLayModeData]) logoBlock"/>

@@ -142,7 +142,7 @@ body .custom-design-tooltip .ui-tooltip-arrow {
 	color: #FFFCFC !important;
 	background-color: #FF0000 !important;
 	border-radius: 3px !important;
-	min-width: 92px;
+	min-width: 93px;
 	height: 13.4px;
 	text-align: center;
 }
@@ -172,7 +172,8 @@ body .ui-tooltip-text .ui-button .ui-button-text {
 .ui-tooltip .ui-panelgrid-content {
 	background-color: #6688AA;
 	border-radius: 7px;
-	opacity: 0.8;
+	border: 1px solid #547ac4;
+	opacity: 1.0;
 }
 
 .action-tooltip-grid .ui-tooltip-text {
@@ -388,7 +389,8 @@ body .ui-datatable .ui-datatable-data tr.ui-state-highlight {
 }
 
 #table {
-	background-color: #D9E0E7;
+	/*background-color: #D9E0E7;*/
+	background-color: #f1f0f1
 }
 
 #table_data tr {

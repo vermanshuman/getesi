@@ -327,28 +327,28 @@
                                     </div>
 
                                       <div class="settingsBlock">
-                                        <p:commandButton id="settingButton" onclick="togglePanel();" type="button"
+                                          <p:commandButton id="settingButton" onclick="togglePanel();" type="button"
                                                          icon="ui-icon ui-icon-search pi pi-sliders-h" styleClass="searchPanelButton"/>
-                                        <script type="text/javascript">
-                                            // <![CDATA[
-                                            $("body").click(function(e){
-                                                var target = $(e.target);
-                                                if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('.ui-selectcheckboxmenu-panel').length) {
-                                                    PF('panelSetting').getJQ().hide();
-                                                }
-                                            });
-                                            function togglePanel() {
-                                                PF('panelSetting').getJQ().toggle();
-                                            }
-                                            jQuery(document).ready(function() {
-                                                setTimeout(function (){
-                                                    PF('panelSetting').getJQ().hide();
-                                                }, 100);
-                                            });
-                                            // ]]>
-                                        </script>
-                                        <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" styleClass="panelSetting">
-                                            <div class="p-grid">
+                                          <script type="text/javascript">
+                                              // <![CDATA[
+                                              $("body").click(function(e){
+                                                  var target = $(e.target);
+                                                  if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('.ui-selectcheckboxmenu-panel').length) {
+                                                      PF('panelSetting').getJQ().hide();
+                                                  }
+                                              });
+                                              function togglePanel() {
+                                                  PF('panelSetting').getJQ().toggle();
+                                              }
+                                              jQuery(document).ready(function() {
+                                                  setTimeout(function (){
+                                                      PF('panelSetting').getJQ().hide();
+                                                  }, 100);
+                                              });
+                                              // ]]>
+                                          </script>
+                                          <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" styleClass="panelSetting">
+                                          <div class="p-grid">
                                                 <div class="p-col-12" style="text-align: center;">
                                                     <h2>Filtra per</h2>
                                                 </div>

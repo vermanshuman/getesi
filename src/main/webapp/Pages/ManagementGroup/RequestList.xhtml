@@ -161,15 +161,24 @@
 
             #searchLastName {
                 width: 300px;
+                border: 1px solid #a8acb1 !important;
+                background: #ffffff !important;
             }
 
             #searchFiscalCode {
                 width: 200px;
+                border: 1px solid #a8acb1 !important;
+                background: #ffffff !important;
             }
 
             .new-button {
                 background: #009900 !important;
             }
+
+            .new-button-multiple {
+                background: #009900 !important;
+            }
+
             #table_paginator_top :first-child {
                 margin-top: 6px !important;
             }
@@ -189,6 +198,29 @@
                 margin-right: 5px !important;
             }
 
+            body .ui-datatable thead th {
+                background-color: #D9E0E7 !important;
+                color: #000000 !important;
+            }
+            #table_paginator_top :first-child {
+                margin-top: 6px !important;
+            }
+
+            #table_paginator_bottom :first-child {
+                margin-top: 6px !important;
+            }
+
+            body .ui-paginator .ui-paginator-pages {
+                margin-top: -6px !important;
+            }
+
+            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-rpp-options {
+                margin: 6px;
+            }
+
+            .ui-g-12 {
+                padding: 0;
+            }
             .al-cen-fx div {
                 justify-content: center;
             }
@@ -240,7 +272,7 @@
                                 </div>
                                 <div class="p-field">
                                     <p:commandButton value="#{ff:upper(msg.requestNewMultiple)}"
-                                                     id="btn_new_multipe" styleClass="ui-button-success	search-btn new-button"
+                                                     id="btn_new_multipe" styleClass="ui-button-success	search-btn new-button-multiple"
                                                      disabled="#{!bean.canCreate}"
                                                      action="#{bean.createNewMultipleRequest}" />
                                 </div>
@@ -268,6 +300,7 @@
                                                      type="button"
                                                      styleClass="ui-button-warning-icon"
                                                      icon="ui-icon ui-icon-search pi pi-sliders-h"/>
+
                                     <script type="text/javascript">
                                         // <![CDATA[
                                         $("body").click(function(e){
@@ -288,6 +321,7 @@
                                         });
                                         // ]]>
                                     </script>
+
                                     <p:panel id="settingPanel" widgetVar="panelSetting" closable="true"
                                              toggleable="true">
                                         <div class="p-grid">
@@ -736,12 +770,11 @@
             </p:column>
 
 
-            <p:column style="width: 6.3vw;min-width: 130px;" headerText="#{ff:upper(msg.requestListClient)}">
+            <p:column style="width: 9vw;min-width: 159px;" headerText="#{ff:upper(msg.requestListClient)}">
                 <h:outputText value="#{item.clientName}"/>
                 <br/>
                 <p:graphicImage id="info" url="/resources/images/info.png"
-                                style="width :31% ;"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
-
+                                style="width :26% ;"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
                 <p:tooltip for="info" styleClass="custom-design-tooltip">
                     <h:outputText value="#{ff:upper(msg.requestManagers)}" style="font-weight:bold;color:#003871;"/>
                     <br />
@@ -754,7 +787,7 @@
                 </p:tooltip>
             </p:column>
 
-            <p:column headerText="#{ff:upper(msg.requestListServiceCap)}" styleClass="min_padding_margin" style="width: 15.55vw;min-width: 213px;">
+            <p:column headerText="#{ff:upper(msg.requestListServiceCap)}" styleClass="min_padding_margin" style="width: 13.1vw;min-width: 180px;">
                 <p:outputPanel style="margin-left: 20px;text-align: left;">
                     <p:outputPanel id="servicesColumn"
                                    rendered="#{item.serviceName eq null}"
@@ -771,7 +804,7 @@
                     <h:outputText id="service" value="#{item.serviceName}" rendered="#{item.serviceName ne null}"/>
                     <br/>
                     <p:graphicImage id="multipleservice" url="/resources/images/info.png"
-                                    style="width :15%;margin-top: -14px;margin-left: -12px;"  rendered="#{not empty item.multipleServices}" />
+                                    style="width :20%;margin-top: -14px;margin-left: -5px;"  rendered="#{not empty item.multipleServices}" />
                     <p:tooltip for="multipleservice" styleClass="custom-design-tooltip" rendered="#{not empty item.multipleServices}">
                         <ui:repeat var="ele" value="#{item.multipleServices}" varStatus="service">
                             <h:outputText value="#{ele}" escape="false" style="color:#003871;margin-left: 24px;"/>
@@ -814,12 +847,12 @@
                 <h:outputText value="#{item.userName}"/>
             </p:column>
 
-            <p:column style="width: 6vw;min-width: 125px;" headerText="#{ff:upper(msg.expirationDateCap)}" sortBy="#{item.expirationDate}"
+            <p:column style="width: 6vw;min-width: 125px;text-align: center;" headerText="#{ff:upper(msg.expirationDateCap)}" sortBy="#{item.expirationDate}"
                       rendered="#{!bean.getCurrentUser().isExternal()}">
                 <h:outputText value="#{item.expirationDate}" converter="dateTimeConverter"/>
             </p:column>
 
-            <p:column style="width: 6vw;min-width: 99px;" headerText="#{ff:upper(msg.requestListOpenMail)}">
+            <p:column style="width: 4vw;min-width: 81px;" headerText="#{ff:upper(msg.requestListOpenMail)}">
                 <p:outputPanel style="display: flex;">
                     <p:commandButton id="mailBtn" styleClass="mail-icon" action="#{bean.openRequestMail}"
                                      style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
@@ -881,7 +914,7 @@
                 </p:column>
             </ui:remove>
             <p:column exportable="false" styleClass="action_midle_column" headerText="#{ff:upper(msg.requestListManage)}"
-                      rendered="#{!bean.getCurrentUser().isExternal()}" style="width: 63px;">
+                      rendered="#{!bean.getCurrentUser().isExternal()}" style="width: 6vw;min-width: 99px;">
 
                 <p:commandButton id="gestisci-btn" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
                                  disabled="#{!bean.canEdit}" action="#{bean.manageRequest}">

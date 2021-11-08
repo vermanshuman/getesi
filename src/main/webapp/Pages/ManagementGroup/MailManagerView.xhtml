@@ -98,12 +98,18 @@
             body .ui-inputfield {
                 border: 1px solid #a8acb1;
             }
+            body .ui-dialog .ui-dialog-titlebar {
+                border-bottom: 1px solid #57c279;
+            }
 
-            #fieldsNotSetDialog, #chooseSingleOrMultipleRequestCreate {
+            .confirm-button {
+                background-color: #57c279 !important;
+            }
+            #fieldsNotSetDialog {
                 border: 1px solid #57c279;
             }
 
-            #fieldsNotSetDialog .ui-dialog-titlebar, #chooseSingleOrMultipleRequestCreate .ui-dialog-titlebar {
+            #fieldsNotSetDialog .ui-dialog-titlebar {
                 border-bottom: 1px solid #57c279;
             }
         </style>
@@ -211,7 +217,7 @@
             </div>
         </p:dialog>
 
-        <p:dialog id="chooseSingleOrMultipleRequestCreate" widgetVar="chooseSingleOrMultipleRequestCreateWV" modal="true" width="300">
+        <p:dialog id="chooseSingleOrMultipleRequestCreate" widgetVar="chooseSingleOrMultipleRequestCreateWV" modal="true" >
             <h3>#{msg.mailManagerViewSingleOrMultipleRequest}:</h3>
             <p:outputPanel style="justify-content: center; display: flex">
                 <p:selectOneRadio value="#{bean.multipleCreateRedirect}" unselectable="false">
@@ -221,7 +227,7 @@
             </p:outputPanel>
             <br/>
             <div class="btn_line">
-                <p:commandButton value="#{msg.confirm}" update="@form"
+                <p:commandButton value="#{msg.confirm}" update="@form" styleClass="confirm-button"
                                  action="#{bean.saveReference(true)}" oncomplete="PF('chooseSingleOrMultiplerequestCreateWV').hide();"/>
             </div>
         </p:dialog>

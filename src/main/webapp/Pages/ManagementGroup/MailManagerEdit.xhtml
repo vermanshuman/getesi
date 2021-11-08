@@ -11,6 +11,13 @@
     <ui:define name="form_body">
         <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/mail.css"
               media="all" rel="stylesheet" type="text/css"/>
+        <style>
+            body .ui-widget-header {
+                background-color: #FFFFFF !important;
+                color: #ffffff !important;
+            }
+        </style>
+
         <script type="text/javascript">
             var closeTab = false;
             var isSend = false;
@@ -320,7 +327,7 @@
                                   label="#{msg.mailManagerChooseAttachedFiles}" update="tableFiles"/>
                 </f:facet>
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="fa fa-fw fa-times"
+                    <p:commandButton icon="pi pi-times" style="background-color: #F3362B !important;"
                                      update=":form:tableFiles" action="#{bean.deleteFile}">
                         <f:setPropertyActionListener value="#{file.id}"
                                                      target="#{bean.deleteFileId}"/>
