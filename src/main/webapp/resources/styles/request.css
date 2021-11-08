@@ -137,12 +137,12 @@ body .custom-design-tooltip .ui-tooltip-arrow {
 	-ms-transform: rotate(-90deg);
 	-o-transform: rotate(-90deg);
 	position: absolute;
-	margin-left: -75px;
-	margin-top: -42px;
+	margin-left: -74px;
+	margin-top: -34px;
 	color: #FFFCFC !important;
 	background-color: #FF0000 !important;
 	border-radius: 3px !important;
-	min-width: 93px;
+	min-width: 92px;
 	height: 13.4px;
 	text-align: center;
 }

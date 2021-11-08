@@ -771,7 +771,7 @@
                     <h:outputText id="service" value="#{item.serviceName}" rendered="#{item.serviceName ne null}"/>
                     <br/>
                     <p:graphicImage id="multipleservice" url="/resources/images/info.png"
-                                    style="width :13%;margin-top: -10px;"  rendered="#{not empty item.multipleServices}" />
+                                    style="width :15%;margin-top: -14px;margin-left: -12px;"  rendered="#{not empty item.multipleServices}" />
                     <p:tooltip for="multipleservice" styleClass="custom-design-tooltip" rendered="#{not empty item.multipleServices}">
                         <ui:repeat var="ele" value="#{item.multipleServices}" varStatus="service">
                             <h:outputText value="#{ele}" escape="false" style="color:#003871;margin-left: 24px;"/>
