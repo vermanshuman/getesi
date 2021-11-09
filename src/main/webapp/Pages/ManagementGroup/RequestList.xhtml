@@ -770,11 +770,11 @@
             </p:column>
 
 
-            <p:column style="width: 9vw;min-width: 159px;" headerText="#{ff:upper(msg.requestListClient)}">
+            <p:column style="width: 9vw;min-width: 159px;position: relative" headerText="#{ff:upper(msg.requestListClient)}">
                 <h:outputText value="#{item.clientName}"/>
                 <br/>
                 <p:graphicImage id="info" url="/resources/images/info.png"
-                                style="width :26% ;"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
+                                style="height :28px;margin-left: -10px;bottom: 2px;position: absolute;"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
                 <p:tooltip for="info" styleClass="custom-design-tooltip">
                     <h:outputText value="#{ff:upper(msg.requestManagers)}" style="font-weight:bold;color:#003871;"/>
                     <br />
@@ -804,7 +804,7 @@
                     <h:outputText id="service" value="#{item.serviceName}" rendered="#{item.serviceName ne null}"/>
                     <br/>
                     <p:graphicImage id="multipleservice" url="/resources/images/info.png"
-                                    style="width :20%;margin-top: -14px;margin-left: -5px;"  rendered="#{not empty item.multipleServices}" />
+                                    style="height :28px;margin-top: -9px;margin-left: -29px;position: absolute;"  rendered="#{not empty item.multipleServices}" />
                     <p:tooltip for="multipleservice" styleClass="custom-design-tooltip" rendered="#{not empty item.multipleServices}">
                         <ui:repeat var="ele" value="#{item.multipleServices}" varStatus="service">
                             <h:outputText value="#{ele}" escape="false" style="color:#003871;margin-left: 24px;"/>
