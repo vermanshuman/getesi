@@ -193,7 +193,7 @@
 
                     <pb:menu widgetVar="babylonMenuWidget">
 
-                        <p:submenu id="principali" label="Principali" icon="pi pi-home">
+<!--                        <p:submenu id="principali" label="Principali" icon="pi pi-home">-->
                             <p:menuitem id="homePage" styleClass="main" value="#{msg.home}" icon="topbar-icon fa fa-fw fa-home" outcome="/Pages/Home.jsf"/>
                             <p:menuitem id="mailManager" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/MailManagerList.jsf')}" value="#{msg.headerMailManager}#{sessionBean.mailCounts gt 0 ? ' ('.concat(sessionBean.mailCounts).concat(')') : ''}" icon="topbar-icon fa fa-fw  fa-envelope-o" outcome="/Pages/ManagementGroup/MailManagerList.jsf"/>
                             <p:menuitem id="requestList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/RequestList.jsf')}" value="#{msg.headerRequestList}#{sessionBean.requestCounts gt 0 ? ' ('.concat(sessionBean.requestCounts).concat(')') : ''}" icon="topbar-icon fa fa-fw fa-list"
@@ -204,9 +204,9 @@
                                         action="#{sessionBean.getDatabaseListPage()}" actionListener="#{sessionBean.cleanFiltersOnDatabaseListSubjectTable()}"/>
                             <p:menuitem id="reportList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/ReportList.jsf')}" value="#{msg.headerReportList}" icon="topbar-icon fa fa-fw fa-area-chart" outcome="/Pages/ManagementGroup/ReportList.jsf"/>
                             <p:menuitem id="billing"  value="#{msg.headerBilling}" icon="topbar-icon fa fa-fw fa-calculator"/>
-                        </p:submenu>
-                        <p:submenu id="utility" label="#{msg.utility}" icon="pi pi-align-left">
-                            <p:submenu id="amministrazione" label="#{msg.menuConfiguration}" icon="pi pi-align-left">
+<!--                        </p:submenu>-->
+<!--                        <p:submenu id="utility" label="#{msg.utility}" icon="pi pi-align-left">-->
+<!--                            <p:submenu id="amministrazione" label="#{msg.menuConfiguration}" icon="pi pi-align-left">-->
                                 <p:menuitem id="utenti" value="#{msg.user_list}" icon="fa fa-fw fa-users" outcome="/Pages/Configuration/UserList.jsf" />
                                 <p:menuitem id="ruoli" value="#{msg.role_list}" icon="fa fa-fw fa-user-plus" outcome="/Pages/Configuration/RoleList.jsf" />
                                 <p:menuitem id="configurazione" value="#{msg.application_settings}" icon="fa fa-fw fa-wrench" outcome="/Pages/Configuration/ApplicationSettings.jsf" />
@@ -224,8 +224,8 @@
                                 <p:menuitem id="documentiValutazioniOMI" value="#{msg.omi_valuation_documents}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/OMIValuationDocuments.jsf" />
                                 <p:menuitem id="datiAziendali" value="#{msg.dati_aziendali}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/DatiAziendali.jsf" />
                                 <p:menuitem id="codiciConservatorie" value="#{msg.codici_conservatorie}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/CodiciConservatorie.jsf" />
-                            </p:submenu>
-                            <p:submenu id="configurazioni" label="#{msg.menuConfigurationArea}" icon="pi pi-align-left">
+<!--                            </p:submenu>-->
+<!--                            <p:submenu id="configurazioni" label="#{msg.menuConfigurationArea}" icon="pi pi-align-left">-->
                                 <p:menuitem id="aggregatiDiConservatorie" value="#{msg.aggregation_land_charges_registry_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/AggregationLandChargesRegistryList.jsf" />
                                 <p:menuitem id="categorieCatastali" value="#{msg.cadastral_category_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CadastralCategoryList.jsf" />
                                 <p:menuitem id="cliente" value="#{msg.client_list}" icon="fa fa-fw fa-user" outcome="/Pages/ConfigurationArea/ClientList.jsf" />
@@ -255,8 +255,8 @@
                                 <p:menuitem id="toponomastica" value="#{msg.cadastral_topology}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CadastralTopology.jsf" />
                                 <p:menuitem id="tribunali" value="#{msg.court_list}" icon="fa fa-fw fa-legal" outcome="/Pages/Dictionaries/CourtList.jsf" />
                                 <p:menuitem id="caloriOMITerreni" value="#{msg.land_omi_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ConfigurationArea/LandOmiList.jsf" />
-                            </p:submenu>
-                        </p:submenu>
+<!--                            </p:submenu>-->
+<!--                        </p:submenu>-->
                     </pb:menu>
 
                     <p:poll interval="#{sessionBean.getTimeToRefresh()}" listener="#{sessionBean.updateMailCount()}"

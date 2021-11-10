@@ -85,12 +85,13 @@ public class SubjectXMLWrapper extends BaseXMLWrapper<Subject> {
         }
 
         if (!ValidationHelper.isNullOrEmpty(getCityCode())) {
-            City city = ConnectionManager.get(City.class,
-                    Restrictions.eq("cfis", getCityCode()), session);
+            List<City> cities  = ConnectionManager.load(City.class, new Criterion[]{
+                    Restrictions.eq("cfis", getCityCode())
+            }, session);
 
-            if (city != null) {
-                subject.setBirthCity(city);
-                subject.setBirthProvince(city.getProvince());
+            if (cities != null && cities.size() > 0) {
+                subject.setBirthCity(cities.get(0));
+                subject.setBirthProvince(cities.get(0).getProvince());
             }
         }
 
