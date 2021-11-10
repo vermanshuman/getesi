@@ -55,11 +55,29 @@
             .layout-menu-wrapper::-webkit-scrollbar {
                 display: none;
             }
+            .menu-tooltip {
+                position: fixed;
+                margin-left: 42px;
+                background-color: #ccc;
+                opacity: 0.7;
+                z-index: 1000;
+                display: none;
+            }
         </style>
         <script type="text/javascript">
 
             var isOverlayMode =  $('input[id*="overLayModeData"]').attr('value');
             $(document).ready(function() {
+                setTimeout(function() {
+                    console.log('test...');
+                    $('#menuform\\:menu li').mouseover(function(e) {
+                        var id = e.currentTarget.id.split(":")[1];
+                        $('.'+id).show();
+                    }).mouseout(function(e) {
+                        var id = e.currentTarget.id.split(":")[1];
+                        $('.'+id).hide();
+                    });
+                }, 2000);
                 umc();
                 urc();
 
@@ -196,8 +214,14 @@
                             </ul>
                         </div>
                     </ui:fragment>
-
-                    <pb:menu widgetVar="babylonMenuWidget">
+                    <span class="menu-tooltip homePage" style="margin-top: 22px;">#{msg.home}</span>
+                    <span class="menu-tooltip mailManager" style="margin-top: 79px;">#{msg.headerMailManager}#{sessionBean.mailCounts gt 0 ? ' ('.concat(sessionBean.mailCounts).concat(')') : ''}</span>
+                    <span class="menu-tooltip requestList" style="margin-top: 136px;">#{msg.headerRequestList}#{sessionBean.requestCounts gt 0 ? ' ('.concat(sessionBean.requestCounts).concat(')') : ''}</span>
+                    <span class="menu-tooltip notarialCertificationList" style="margin-top: 196px;">Certificazioni#{sessionBean.needShowNumberUnclosedNotarialCertifications ? ' ('.concat(sessionBean.numberUnclosedNotarialCertifications).concat(')') : ''}</span>
+                    <span class="menu-tooltip database" style="margin-top: 255px;">#{msg.headerDatabase}</span>
+                    <span class="menu-tooltip reportList" style="margin-top: 312px;">#{msg.headerReportList}</span>
+                    <span class="menu-tooltip billing" style="margin-top: 370px;">#{msg.headerBilling}</span>
+                    <pb:menu widgetVar="babylonMenuWidget" id="menu">
 
 <!--                        <p:submenu id="principali" label="Principali" icon="pi pi-home">-->
                             <p:menuitem id="homePage" styleClass="main" value="#{msg.home}" icon="topbar-icon fa fa-fw fa-home" outcome="/Pages/Home.jsf"/>
@@ -264,7 +288,9 @@
 <!--                            </p:submenu>-->
 <!--                        </p:submenu>-->
                     </pb:menu>
-
+                    <p:tooltip for="homePage" value="#{msg.home}"/>
+                    <p:tooltip for="mailManager" value="#{msg.headerMailManager}#{sessionBean.mailCounts gt 0 ? ' ('.concat(sessionBean.mailCounts).concat(')') : ''}"/>
+                    <p:tooltip for="requestList" value="#{msg.headerRequestList}#{sessionBean.requestCounts gt 0 ? ' ('.concat(sessionBean.requestCounts).concat(')') : ''}"/>
                     <p:poll interval="#{sessionBean.getTimeToRefresh()}" listener="#{sessionBean.updateMailCount()}"
                             update="@widgetVar(babylonMenuWidget)"/>
                     <p:ajaxStatus style=" margin-top: 8px;"

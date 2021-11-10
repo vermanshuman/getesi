@@ -91,13 +91,12 @@ body .ui-button {
 /* Menu Start */
 .notarialCertificationListIcon {
     display: inline-block;
-    background-size: 77% !important;
+    background-size: 23px !important;
     width: 20px !important;
-    height: 16px;
+    height: 23px;
     margin-left: 2px;
-    margin-right: 2px !important;
     background: url("../images/notarial-cerification-list-logo.png") top left no-repeat;
-    filter: invert(100%) sepia(100%) saturate(100%) hue-rotate(197deg) brightness(103%) contrast(101%) !important;
+    filter: invert(100%) sepia(100%) saturate(100%) hue-rotate(197deg) brightness(0%) contrast(101%) !important;
 }
 /* Menu End */
 
