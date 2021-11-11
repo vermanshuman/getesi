@@ -49,35 +49,11 @@
             .layout-wrapper .layout-topbar .layout-menu-button {
                 display: none !important;
             }
-            .layout-menu-wrapper {
-                overflow: auto !important;
-            }
-            .layout-menu-wrapper::-webkit-scrollbar {
-                display: none;
-            }
-            .menu-tooltip {
-                position: fixed;
-                margin-left: 42px;
-                background-color: #ccc;
-                opacity: 0.7;
-                z-index: 1000;
-                display: none;
-            }
         </style>
         <script type="text/javascript">
 
             var isOverlayMode =  $('input[id*="overLayModeData"]').attr('value');
             $(document).ready(function() {
-                setTimeout(function() {
-                    console.log('test...');
-                    $('#menuform\\:menu li').mouseover(function(e) {
-                        var id = e.currentTarget.id.split(":")[1];
-                        $('.'+id).show();
-                    }).mouseout(function(e) {
-                        var id = e.currentTarget.id.split(":")[1];
-                        $('.'+id).hide();
-                    });
-                }, 2000);
                 umc();
                 urc();
 
@@ -214,29 +190,20 @@
                             </ul>
                         </div>
                     </ui:fragment>
-                    <span class="menu-tooltip homePage" style="margin-top: 22px;">#{msg.home}</span>
-                    <span class="menu-tooltip mailManager" style="margin-top: 79px;">#{msg.headerMailManager}#{sessionBean.mailCounts gt 0 ? ' ('.concat(sessionBean.mailCounts).concat(')') : ''}</span>
-                    <span class="menu-tooltip requestList" style="margin-top: 136px;">#{msg.headerRequestList}#{sessionBean.requestCounts gt 0 ? ' ('.concat(sessionBean.requestCounts).concat(')') : ''}</span>
-                    <span class="menu-tooltip notarialCertificationList" style="margin-top: 196px;">Certificazioni#{sessionBean.needShowNumberUnclosedNotarialCertifications ? ' ('.concat(sessionBean.numberUnclosedNotarialCertifications).concat(')') : ''}</span>
-                    <span class="menu-tooltip database" style="margin-top: 255px;">#{msg.headerDatabase}</span>
-                    <span class="menu-tooltip reportList" style="margin-top: 312px;">#{msg.headerReportList}</span>
-                    <span class="menu-tooltip billing" style="margin-top: 370px;">#{msg.headerBilling}</span>
-                    <pb:menu widgetVar="babylonMenuWidget" id="menu">
 
-<!--                        <p:submenu id="principali" label="Principali" icon="pi pi-home">-->
-                            <p:menuitem id="homePage" styleClass="main" value="#{msg.home}" icon="topbar-icon fa fa-fw fa-home" outcome="/Pages/Home.jsf"/>
-                            <p:menuitem id="mailManager" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/MailManagerList.jsf')}" value="#{msg.headerMailManager}#{sessionBean.mailCounts gt 0 ? ' ('.concat(sessionBean.mailCounts).concat(')') : ''}" icon="topbar-icon fa fa-fw  fa-envelope-o" outcome="/Pages/ManagementGroup/MailManagerList.jsf"/>
-                            <p:menuitem id="requestList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/RequestList.jsf')}" value="#{msg.headerRequestList}#{sessionBean.requestCounts gt 0 ? ' ('.concat(sessionBean.requestCounts).concat(')') : ''}" icon="topbar-icon fa fa-fw fa-list"
-                                        action="#{sessionBean.getRequestListPage()}" actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>
-                            <p:menuitem id="notarialCertificationList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/NotarialCertificationList.jsf')}" value="Certificazioni#{sessionBean.needShowNumberUnclosedNotarialCertifications ? ' ('.concat(sessionBean.numberUnclosedNotarialCertifications).concat(')') : ''}" icon="notarialCertificationListIcon"
-                                        action="#{sessionBean.getNotarialCertificationListPage()}" actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>
-                            <p:menuitem id="database" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/DatabaseList.jsf')}" value="#{msg.headerDatabase}" icon="topbar-icon fa fa-fw fa-file-text-o"
-                                        action="#{sessionBean.getDatabaseListPage()}" actionListener="#{sessionBean.cleanFiltersOnDatabaseListSubjectTable()}"/>
-                            <p:menuitem id="reportList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/ReportList.jsf')}" value="#{msg.headerReportList}" icon="topbar-icon fa fa-fw fa-area-chart" outcome="/Pages/ManagementGroup/ReportList.jsf"/>
-                            <p:menuitem id="billing"  value="#{msg.headerBilling}" icon="topbar-icon fa fa-fw fa-calculator"/>
-<!--                        </p:submenu>-->
-<!--                        <p:submenu id="utility" label="#{msg.utility}" icon="pi pi-align-left">-->
-<!--                            <p:submenu id="amministrazione" label="#{msg.menuConfiguration}" icon="pi pi-align-left">-->
+                    <pb:menu widgetVar="babylonMenuWidget">
+                        <p:menuitem id="homePage" styleClass="main" value="#{msg.home}" icon="topbar-icon fa fa-fw fa-home" outcome="/Pages/Home.jsf"/>
+                        <p:menuitem id="mailManager" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/MailManagerList.jsf')}" value="#{msg.headerMailManager}#{sessionBean.mailCounts gt 0 ? ' ('.concat(sessionBean.mailCounts).concat(')') : ''}" icon="topbar-icon fa fa-fw  fa-envelope-o" outcome="/Pages/ManagementGroup/MailManagerList.jsf"/>
+                        <p:menuitem id="requestList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/RequestList.jsf')}" value="#{msg.headerRequestList}#{sessionBean.requestCounts gt 0 ? ' ('.concat(sessionBean.requestCounts).concat(')') : ''}" icon="topbar-icon fa fa-fw fa-list"
+                                    action="#{sessionBean.getRequestListPage()}" actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>
+                        <p:menuitem id="notarialCertificationList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/NotarialCertificationList.jsf')}" value="Certificazioni#{sessionBean.needShowNumberUnclosedNotarialCertifications ? ' ('.concat(sessionBean.numberUnclosedNotarialCertifications).concat(')') : ''}" icon="notarialCertificationListIcon"
+                                    action="#{sessionBean.getNotarialCertificationListPage()}" actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>
+                        <p:menuitem id="database" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/DatabaseList.jsf')}" value="#{msg.headerDatabase}" icon="topbar-icon fa fa-fw fa-file-text-o"
+                                    action="#{sessionBean.getDatabaseListPage()}" actionListener="#{sessionBean.cleanFiltersOnDatabaseListSubjectTable()}"/>
+                        <p:menuitem id="reportList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/ReportList.jsf')}" value="#{msg.headerReportList}" icon="topbar-icon fa fa-fw fa-area-chart" outcome="/Pages/ManagementGroup/ReportList.jsf"/>
+                        <p:menuitem id="billing"  value="#{msg.headerBilling}" icon="topbar-icon fa fa-fw fa-calculator"/>
+                        <p:submenu id="utility" label="#{msg.utility}" icon="pi pi-align-left">
+                            <p:submenu id="amministrazione" label="#{msg.menuConfiguration}" icon="pi pi-align-left">
                                 <p:menuitem id="utenti" value="#{msg.user_list}" icon="fa fa-fw fa-users" outcome="/Pages/Configuration/UserList.jsf" />
                                 <p:menuitem id="ruoli" value="#{msg.role_list}" icon="fa fa-fw fa-user-plus" outcome="/Pages/Configuration/RoleList.jsf" />
                                 <p:menuitem id="configurazione" value="#{msg.application_settings}" icon="fa fa-fw fa-wrench" outcome="/Pages/Configuration/ApplicationSettings.jsf" />
@@ -254,8 +221,8 @@
                                 <p:menuitem id="documentiValutazioniOMI" value="#{msg.omi_valuation_documents}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/OMIValuationDocuments.jsf" />
                                 <p:menuitem id="datiAziendali" value="#{msg.dati_aziendali}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/DatiAziendali.jsf" />
                                 <p:menuitem id="codiciConservatorie" value="#{msg.codici_conservatorie}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/CodiciConservatorie.jsf" />
-<!--                            </p:submenu>-->
-<!--                            <p:submenu id="configurazioni" label="#{msg.menuConfigurationArea}" icon="pi pi-align-left">-->
+                            </p:submenu>
+                            <p:submenu id="configurazioni" label="#{msg.menuConfigurationArea}" icon="pi pi-align-left">
                                 <p:menuitem id="aggregatiDiConservatorie" value="#{msg.aggregation_land_charges_registry_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/AggregationLandChargesRegistryList.jsf" />
                                 <p:menuitem id="categorieCatastali" value="#{msg.cadastral_category_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CadastralCategoryList.jsf" />
                                 <p:menuitem id="cliente" value="#{msg.client_list}" icon="fa fa-fw fa-user" outcome="/Pages/ConfigurationArea/ClientList.jsf" />
@@ -285,12 +252,10 @@
                                 <p:menuitem id="toponomastica" value="#{msg.cadastral_topology}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CadastralTopology.jsf" />
                                 <p:menuitem id="tribunali" value="#{msg.court_list}" icon="fa fa-fw fa-legal" outcome="/Pages/Dictionaries/CourtList.jsf" />
                                 <p:menuitem id="caloriOMITerreni" value="#{msg.land_omi_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ConfigurationArea/LandOmiList.jsf" />
-<!--                            </p:submenu>-->
-<!--                        </p:submenu>-->
+                            </p:submenu>
+                        </p:submenu>
                     </pb:menu>
-                    <p:tooltip for="homePage" value="#{msg.home}"/>
-                    <p:tooltip for="mailManager" value="#{msg.headerMailManager}#{sessionBean.mailCounts gt 0 ? ' ('.concat(sessionBean.mailCounts).concat(')') : ''}"/>
-                    <p:tooltip for="requestList" value="#{msg.headerRequestList}#{sessionBean.requestCounts gt 0 ? ' ('.concat(sessionBean.requestCounts).concat(')') : ''}"/>
+
                     <p:poll interval="#{sessionBean.getTimeToRefresh()}" listener="#{sessionBean.updateMailCount()}"
                             update="@widgetVar(babylonMenuWidget)"/>
                     <p:ajaxStatus style=" margin-top: 8px;"
