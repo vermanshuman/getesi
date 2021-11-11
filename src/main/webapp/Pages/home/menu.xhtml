@@ -202,57 +202,55 @@
                                     action="#{sessionBean.getDatabaseListPage()}" actionListener="#{sessionBean.cleanFiltersOnDatabaseListSubjectTable()}"/>
                         <p:menuitem id="reportList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/ReportList.jsf')}" value="#{msg.headerReportList}" icon="topbar-icon fa fa-fw fa-area-chart" outcome="/Pages/ManagementGroup/ReportList.jsf"/>
                         <p:menuitem id="billing"  value="#{msg.headerBilling}" icon="topbar-icon fa fa-fw fa-calculator"/>
-                        <p:submenu id="utility" label="#{msg.utility}" icon="pi pi-align-left">
-                            <p:submenu id="amministrazione" label="#{msg.menuConfiguration}" icon="pi pi-align-left">
-                                <p:menuitem id="utenti" value="#{msg.user_list}" icon="fa fa-fw fa-users" outcome="/Pages/Configuration/UserList.jsf" />
-                                <p:menuitem id="ruoli" value="#{msg.role_list}" icon="fa fa-fw fa-user-plus" outcome="/Pages/Configuration/RoleList.jsf" />
-                                <p:menuitem id="configurazione" value="#{msg.application_settings}" icon="fa fa-fw fa-wrench" outcome="/Pages/Configuration/ApplicationSettings.jsf" />
-                                <p:menuitem id="monitoraggio" value="#{msg.monitoring}" icon="fa fa-fw fa-wrench" outcome="/Pages/Configuration/Monitoring.jsf" />
-                                <p:menuitem id="modelliDocumento" value="#{msg.document_template_list}" icon="fa fa-fw fa-folder" outcome="/Pages/Configuration/DocumentTemplateList.jsf" />
-                                <p:menuitem id="gestioneIstanza" value="#{msg.instance_phases_list}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/InstancePhasesList.jsf" />
-                                <p:menuitem id="importCondivisoCatasto" value="#{msg.import_property_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=property" />
-                                <p:menuitem id="importCondivisoElenchi" value="#{msg.import_estate_formality_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=estate_formality"/>
-                                <p:menuitem id="importCondivisoFormalita" value="#{msg.import_formality_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=formality" />
-                                <p:menuitem id="importCondivisoSoggetto" value="#{msg.import_report_formality_subject_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=report_formality_subject" />
-                                <p:menuitem id="importCondivisoVisureRTF" value="#{msg.import_visure_rtf_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=visure_RTF" />
-                                <p:menuitem id="importCondivisoVisureDH" value="#{msg.import_visure_dh_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=visure_DH" />
-                                <p:menuitem id="importCondivisoRequestOLD" value="#{msg.import_request_old_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=request_OLD" />
-                                <p:menuitem id="impostazioniConversioneDocumenti" value="#{msg.document_conversion_settings}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/DocumentConversionSettings.jsf" />
-                                <p:menuitem id="documentiValutazioniOMI" value="#{msg.omi_valuation_documents}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/OMIValuationDocuments.jsf" />
-                                <p:menuitem id="datiAziendali" value="#{msg.dati_aziendali}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/DatiAziendali.jsf" />
-                                <p:menuitem id="codiciConservatorie" value="#{msg.codici_conservatorie}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/CodiciConservatorie.jsf" />
-                            </p:submenu>
-                            <p:submenu id="configurazioni" label="#{msg.menuConfigurationArea}" icon="pi pi-align-left">
-                                <p:menuitem id="aggregatiDiConservatorie" value="#{msg.aggregation_land_charges_registry_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/AggregationLandChargesRegistryList.jsf" />
-                                <p:menuitem id="categorieCatastali" value="#{msg.cadastral_category_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CadastralCategoryList.jsf" />
-                                <p:menuitem id="cliente" value="#{msg.client_list}" icon="fa fa-fw fa-user" outcome="/Pages/ConfigurationArea/ClientList.jsf" />
-                                <p:menuitem id="coltureTerreni" value="#{msg.land_culture_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ConfigurationArea/LandCultureList.jsf" />
-                                <p:menuitem id="comuni" value="#{msg.cities_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CitiesList.jsf" />
-                                <p:menuitem id="configurazioneCosti" value="#{msg.cost_configuration_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CostConfigurationList.jsf" />
-                                <p:menuitem id="conservatorieETavolari" value="#{msg.land_charges_registry_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/LandChargesRegistryList.jsf" />
-                                <p:menuitem id="eventi" value="#{msg.event_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Configuration/EventList.jsf" />
-                                <p:menuitem id="fileValutazioniOMI" value="#{msg.omi_kml_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/OMIKmlList.jsf" />
-                                <p:menuitem id="formatiSezioneD" value="#{msg.section_d_format_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/SectionDFormatList.jsf" />
-                                <p:menuitem id="frasiDelGiorno" value="#{msg.day_phrase}" icon="fa fa-fw fa-quote-right" outcome="/Pages/Dictionaries/DayPhrase.jsf" />
-                                <p:menuitem id="gestioneComunicazioni" value="#{msg.communication_message_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ManagementGroup/CommunicationMessageList.jsf" />
-                                <p:menuitem id="gruppoDati" value="#{msg.data_group_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/DataGroupList.jsf" />
-                                <p:menuitem id="modalitàDiPagamento" value="#{msg.payment_type_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ManagementGroup/PaymentTypeList.jsf" />
-                                <p:menuitem id="modelli" value="#{msg.template_document_model_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/TemplateDocumentModelList.jsf" />
-                                <p:menuitem id="notai" value="#{msg.notary_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/NotaryList.jsf" />
-                                <p:menuitem id="percentualiValoriOMICommerciali" value="#{msg.category_percent_value_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ConfigurationArea/CategoryPercentValueList.jsf" />
-                                <p:menuitem id="referenti" value="#{msg.referent_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/ReferentList.jsf" />
-                                <p:menuitem id="regimeConiugi" value="#{msg.regime_coniugi_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ManagementGroup/PaymentTypeList.jsf" />
-                                <p:menuitem id="schedeInput" value="#{msg.input_card_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Configuration/InputCardList.jsf" />
-                                <p:menuitem id="servizi" value="#{msg.request_type_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/RequestTypeList.jsf" />
-                                <p:menuitem id="struttureEAreeCanche" value="#{msg.structure_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/StructureList.jsf" />
-                                <p:menuitem id="tipologieRichiesta" value="#{msg.service_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/ServiceList.jsf" />
-                                <p:menuitem id="tipologieAtti" value="#{msg.type_act}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/TypeAct.jsf" />
-                                <p:menuitem id="tipologieDiritti" value="#{msg.relationship_types}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/RelationshipTypeList.jsf" />
-                                <p:menuitem id="tipologieFormalità" value="#{msg.type_formality}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/TypeFormality.jsf" />
-                                <p:menuitem id="toponomastica" value="#{msg.cadastral_topology}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CadastralTopology.jsf" />
-                                <p:menuitem id="tribunali" value="#{msg.court_list}" icon="fa fa-fw fa-legal" outcome="/Pages/Dictionaries/CourtList.jsf" />
-                                <p:menuitem id="caloriOMITerreni" value="#{msg.land_omi_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ConfigurationArea/LandOmiList.jsf" />
-                            </p:submenu>
+                        <p:submenu id="amministrazione" label="#{msg.menuConfiguration}" icon="pi pi-align-left">
+                            <p:menuitem id="utenti" value="#{msg.user_list}" icon="fa fa-fw fa-users" outcome="/Pages/Configuration/UserList.jsf" />
+                            <p:menuitem id="ruoli" value="#{msg.role_list}" icon="fa fa-fw fa-user-plus" outcome="/Pages/Configuration/RoleList.jsf" />
+                            <p:menuitem id="configurazione" value="#{msg.application_settings}" icon="fa fa-fw fa-wrench" outcome="/Pages/Configuration/ApplicationSettings.jsf" />
+                            <p:menuitem id="monitoraggio" value="#{msg.monitoring}" icon="fa fa-fw fa-wrench" outcome="/Pages/Configuration/Monitoring.jsf" />
+                            <p:menuitem id="modelliDocumento" value="#{msg.document_template_list}" icon="fa fa-fw fa-folder" outcome="/Pages/Configuration/DocumentTemplateList.jsf" />
+                            <p:menuitem id="gestioneIstanza" value="#{msg.instance_phases_list}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/InstancePhasesList.jsf" />
+                            <p:menuitem id="importCondivisoCatasto" value="#{msg.import_property_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=property" />
+                            <p:menuitem id="importCondivisoElenchi" value="#{msg.import_estate_formality_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=estate_formality"/>
+                            <p:menuitem id="importCondivisoFormalita" value="#{msg.import_formality_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=formality" />
+                            <p:menuitem id="importCondivisoSoggetto" value="#{msg.import_report_formality_subject_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=report_formality_subject" />
+                            <p:menuitem id="importCondivisoVisureRTF" value="#{msg.import_visure_rtf_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=visure_RTF" />
+                            <p:menuitem id="importCondivisoVisureDH" value="#{msg.import_visure_dh_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=visure_DH" />
+                            <p:menuitem id="importCondivisoRequestOLD" value="#{msg.import_request_old_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=request_OLD" />
+                            <p:menuitem id="impostazioniConversioneDocumenti" value="#{msg.document_conversion_settings}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/DocumentConversionSettings.jsf" />
+                            <p:menuitem id="documentiValutazioniOMI" value="#{msg.omi_valuation_documents}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/OMIValuationDocuments.jsf" />
+                            <p:menuitem id="datiAziendali" value="#{msg.dati_aziendali}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/DatiAziendali.jsf" />
+                            <p:menuitem id="codiciConservatorie" value="#{msg.codici_conservatorie}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/CodiciConservatorie.jsf" />
+                        </p:submenu>
+                        <p:submenu id="configurazioni" label="#{msg.menuConfigurationArea}" icon="pi pi-align-left">
+                            <p:menuitem id="aggregatiDiConservatorie" value="#{msg.aggregation_land_charges_registry_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/AggregationLandChargesRegistryList.jsf" />
+                            <p:menuitem id="categorieCatastali" value="#{msg.cadastral_category_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CadastralCategoryList.jsf" />
+                            <p:menuitem id="cliente" value="#{msg.client_list}" icon="fa fa-fw fa-user" outcome="/Pages/ConfigurationArea/ClientList.jsf" />
+                            <p:menuitem id="coltureTerreni" value="#{msg.land_culture_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ConfigurationArea/LandCultureList.jsf" />
+                            <p:menuitem id="comuni" value="#{msg.cities_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CitiesList.jsf" />
+                            <p:menuitem id="configurazioneCosti" value="#{msg.cost_configuration_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CostConfigurationList.jsf" />
+                            <p:menuitem id="conservatorieETavolari" value="#{msg.land_charges_registry_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/LandChargesRegistryList.jsf" />
+                            <p:menuitem id="eventi" value="#{msg.event_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Configuration/EventList.jsf" />
+                            <p:menuitem id="fileValutazioniOMI" value="#{msg.omi_kml_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/OMIKmlList.jsf" />
+                            <p:menuitem id="formatiSezioneD" value="#{msg.section_d_format_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/SectionDFormatList.jsf" />
+                            <p:menuitem id="frasiDelGiorno" value="#{msg.day_phrase}" icon="fa fa-fw fa-quote-right" outcome="/Pages/Dictionaries/DayPhrase.jsf" />
+                            <p:menuitem id="gestioneComunicazioni" value="#{msg.communication_message_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ManagementGroup/CommunicationMessageList.jsf" />
+                            <p:menuitem id="gruppoDati" value="#{msg.data_group_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/DataGroupList.jsf" />
+                            <p:menuitem id="modalitàDiPagamento" value="#{msg.payment_type_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ManagementGroup/PaymentTypeList.jsf" />
+                            <p:menuitem id="modelli" value="#{msg.template_document_model_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/TemplateDocumentModelList.jsf" />
+                            <p:menuitem id="notai" value="#{msg.notary_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/NotaryList.jsf" />
+                            <p:menuitem id="percentualiValoriOMICommerciali" value="#{msg.category_percent_value_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ConfigurationArea/CategoryPercentValueList.jsf" />
+                            <p:menuitem id="referenti" value="#{msg.referent_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/ReferentList.jsf" />
+                            <p:menuitem id="regimeConiugi" value="#{msg.regime_coniugi_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ManagementGroup/PaymentTypeList.jsf" />
+                            <p:menuitem id="schedeInput" value="#{msg.input_card_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Configuration/InputCardList.jsf" />
+                            <p:menuitem id="servizi" value="#{msg.request_type_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/RequestTypeList.jsf" />
+                            <p:menuitem id="struttureEAreeCanche" value="#{msg.structure_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/StructureList.jsf" />
+                            <p:menuitem id="tipologieRichiesta" value="#{msg.service_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/ServiceList.jsf" />
+                            <p:menuitem id="tipologieAtti" value="#{msg.type_act}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/TypeAct.jsf" />
+                            <p:menuitem id="tipologieDiritti" value="#{msg.relationship_types}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/RelationshipTypeList.jsf" />
+                            <p:menuitem id="tipologieFormalità" value="#{msg.type_formality}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/TypeFormality.jsf" />
+                            <p:menuitem id="toponomastica" value="#{msg.cadastral_topology}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CadastralTopology.jsf" />
+                            <p:menuitem id="tribunali" value="#{msg.court_list}" icon="fa fa-fw fa-legal" outcome="/Pages/Dictionaries/CourtList.jsf" />
+                            <p:menuitem id="caloriOMITerreni" value="#{msg.land_omi_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ConfigurationArea/LandOmiList.jsf" />
                         </p:submenu>
                     </pb:menu>
 
