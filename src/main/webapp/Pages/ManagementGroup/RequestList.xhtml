@@ -348,7 +348,7 @@
                                                 </p:selectOneMenu>
                                             </div>
                                             <div class="p-col-6">
-                                                <p:outputPanel id="statuses"
+                                                <p:outputPanel id="statuses" styleClass="#{bean.getStateSelected() gt 0 ? ' select-checkbox' : ''}"
                                                                style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
                                                     <h:outputText value="#{ff:upper(msg.status)}"
                                                                   style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
@@ -358,7 +358,7 @@
                                                 </p:outputPanel>
                                             </div>
                                             <div class="p-col-6">
-                                                <p:outputPanel id="requestTypes"
+                                                <p:outputPanel id="requestTypes" styleClass="#{bean.getRequestTypeSelected() gt 0 ? ' select-checkbox' : ''}"
                                                                style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
                                                     <h:outputText value="#{ff:upper(msg.requestListServiceTypeCap)}"
                                                                   style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
@@ -368,7 +368,7 @@
                                                 </p:outputPanel>
                                             </div>
                                             <div class="p-col-6">
-                                                <p:outputPanel id="services"
+                                                <p:outputPanel id="services" styleClass="#{bean.getServiceSelected() gt 0 ? ' select-checkbox' : ''}"
                                                                style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
                                                     <h:outputText value="#{ff:upper(msg.requestListService)}"
                                                                   style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
@@ -700,10 +700,12 @@
                     <f:facet name="header">
                         <p:selectBooleanCheckbox value="#{bean.selectedAllStatesOnPanel}">
                             <p:ajax update="stateSelectCheckboxPanelDataTable" event="change"/>
+                            <p:ajax event="change" update="statuses"/>
                         </p:selectBooleanCheckbox>
                     </f:facet>
                     <p:selectBooleanCheckbox value="#{state.selected}">
                         <p:ajax update="stateSelectCheckboxPanelDataTable" event="change"/>
+                        <p:ajax event="change" update="statuses"/>
                     </p:selectBooleanCheckbox>
                 </p:column>
                 <p:column>
@@ -724,10 +726,12 @@
                     <f:facet name="header">
                         <p:selectBooleanCheckbox value="#{bean.selectedAllServicesOnPanel}">
                             <p:ajax update="serviceSelectCheckboxPanelDataTable" event="change"/>
+                            <p:ajax event="change" update="services"/>
                         </p:selectBooleanCheckbox>
                     </f:facet>
                     <p:selectBooleanCheckbox value="#{service.selected}">
                         <p:ajax update="serviceSelectCheckboxPanelDataTable searchPanel" event="change" listener="#{bean.selectServiceCheck}"/>
+                        <p:ajax event="change" update="services"/>
                     </p:selectBooleanCheckbox>
                 </p:column>
                 <p:column>
@@ -748,10 +752,12 @@
                     <f:facet name="header">
                         <p:selectBooleanCheckbox value="#{bean.selectedAllRequestTypesOnPanel}">
                             <p:ajax update="requestTypeSelectCheckboxPanelDataTable" event="change"/>
+                            <p:ajax event="change" update="requestTypes"/>
                         </p:selectBooleanCheckbox>
                     </f:facet>
                     <p:selectBooleanCheckbox value="#{requestType.selected}">
                         <p:ajax update="requestTypeSelectCheckboxPanelDataTable" event="change"/>
+                        <p:ajax event="change" update="requestTypes"/>
                     </p:selectBooleanCheckbox>
                 </p:column>
                 <p:column>
