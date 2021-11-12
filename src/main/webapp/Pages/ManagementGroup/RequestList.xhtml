@@ -224,6 +224,12 @@
             .al-cen-fx div {
                 justify-content: center;
             }
+            body .ui-chkbox .ui-chkbox-box .ui-chkbox-icon.ui-icon-check {
+                font-weight: bolder;
+            }
+            .calender-filled input, .select-checkbox, .select-one-menu {
+                border: 1px solid #009900 !important;
+            }
         </style>
         <script>
             var doChange = true;
@@ -330,11 +336,12 @@
                                             <div class="p-col-6">
                                                 <p:selectOneMenu id="client" value="#{bean.selectedClientId}"
                                                                  label="#{msg.requestClient}"
-                                                                 style="width: calc( 100% - 5px);">
+                                                                 style="width: calc( 100% - 5px);" styleClass="#{bean.selectedClientId ne null ? 'select-one-menu' : ''}">
                                                     <f:selectItem itemLabel="#{ff:upper(msg.requestListClient)}"
                                                                   itemValue="#{null}"
                                                                   noSelectionOption="true"/>
                                                     <f:selectItems value="#{bean.clients}"/>
+                                                    <p:ajax event="itemSelect" update="@this"/>
                                                 </p:selectOneMenu>
                                             </div>
                                             <div class="p-col-6">
@@ -369,29 +376,32 @@
                                             </div>
                                             <div class="p-col-6">
                                                 <p:selectOneMenu id="manager" value="#{bean.managerClientFilterid}"
-                                                                 style="width: calc( 100% - 5px);">
+                                                                 style="width: calc( 100% - 5px);" styleClass="#{bean.managerClientFilterid ne null ? 'select-one-menu' : ''}">
                                                     <f:selectItem itemLabel="#{ff:upper(msg.clientManager)}"
                                                                   itemValue="#{null}"
                                                                   noSelectionOption="true"/>
                                                     <f:selectItems value="#{bean.managerClients}"/>
+                                                    <p:ajax event="itemSelect" update="@this"/>
                                                 </p:selectOneMenu>
                                             </div>
                                             <div class="p-col-6">
                                                 <p:selectOneMenu id="fiduciario" value="#{bean.fiduciaryClientFilterId}"
-                                                                 style="width: calc( 100% - 5px);">
+                                                                 style="width: calc( 100% - 5px);" styleClass="#{bean.fiduciaryClientFilterId ne null ? 'select-one-menu' : ''}">
                                                     <f:selectItem itemLabel="#{ff:upper(msg.mailTrust)}"
                                                                   itemValue="#{null}"
                                                                   noSelectionOption="true"/>
                                                     <f:selectItems value="#{bean.fiduciaryClients}"/>
+                                                    <p:ajax event="itemSelect" update="@this"/>
                                                 </p:selectOneMenu>
                                             </div>
                                             <div class="p-col-6">
                                                 <p:selectOneMenu id="office" value="#{bean.aggregationFilterId}"
-                                                                 style="width: calc( 100% - 5px);">
+                                                                 style="width: calc( 100% - 5px);" styleClass="#{bean.aggregationFilterId ne null ? 'select-one-menu' : ''}">
                                                     <f:selectItem itemLabel="#{msg.subjectViewFormalityConservatoryCap}"
                                                                   itemValue="#{null}"
                                                                   noSelectionOption="true"/>
                                                     <f:selectItems value="#{bean.landAggregations}"/>
+                                                    <p:ajax event="itemSelect" update="@this"/>
                                                 </p:selectOneMenu>
                                             </div>
                                             <div class="p-col-6">
@@ -400,7 +410,9 @@
                                                             pattern="dd/MM/yyyy" mask="true"
                                                             locale="it" navigator="true" popupIconOnly="true"
                                                             placeholder="#{msg.expirationDateCap}"
-                                                            value="#{bean.dateExpiration}"/>
+                                                            value="#{bean.dateExpiration}" styleClass="#{bean.dateExpiration ne null ? 'calender-filled' : ''}">
+                                                    <p:ajax event="dateSelect" update="@this" />
+                                                </p:calendar>
                                             </div>
                                             <div class="p-col-12">
                                                 <div style="">
@@ -417,7 +429,9 @@
                                                             popupIconOnly="true"
                                                             onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
                                                             value="#{bean.dateFrom}"
-                                                            placeholder="#{msg.mailManagerDateFromReqlist}"/>
+                                                            placeholder="#{msg.mailManagerDateFromReqlist}" styleClass="#{bean.dateFrom ne null ? 'calender-filled' : ''}">
+                                                    <p:ajax event="dateSelect" update="@this" />
+                                                </p:calendar>
                                                 <div id="hyphen"></div>
                                             </div>
                                             <div class="p-col-6">
@@ -426,7 +440,9 @@
                                                             pattern="dd/MM/yyyy" mask="true"
                                                             locale="it" navigator="true" popupIconOnly="true"
                                                             placeholder="#{msg.mailManagerDateToReqlist}"
-                                                            onblur="check_date(this)" value="#{bean.dateTo}"/>
+                                                            onblur="check_date(this)" value="#{bean.dateTo}" styleClass="#{bean.dateTo ne null ? 'calender-filled' : ''}">
+                                                    <p:ajax event="dateSelect" update="@this" />
+                                                </p:calendar>
                                             </div>
                                             <div class="p-col-12">
                                                 <div style="">
@@ -443,7 +459,9 @@
                                                             popupIconOnly="true"
                                                             onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
                                                             value="#{bean.dateFromEvasion}"
-                                                            placeholder="#{msg.mailManagerDateFromReqlist}"/>
+                                                            placeholder="#{msg.mailManagerDateFromReqlist}" styleClass="#{bean.dateFromEvasion ne null ? 'calender-filled' : ''}">
+                                                    <p:ajax event="dateSelect" update="@this" />
+                                                </p:calendar>
                                             </div>
                                             <div class="p-col-6">
                                                 <p:calendar id="filterDateToEvasione" readonlyInput="false"
@@ -452,7 +470,9 @@
                                                             pattern="dd/MM/yyyy" mask="true"
                                                             locale="it" navigator="true" popupIconOnly="true"
                                                             placeholder="#{msg.mailManagerDateToReqlist}"
-                                                            onblur="check_date(this)" value="#{bean.dateToEvasion}"/>
+                                                            onblur="check_date(this)" value="#{bean.dateToEvasion}" styleClass="#{bean.dateToEvasion ne null ? 'calender-filled' : ''}">
+                                                    <p:ajax event="dateSelect" update="@this" />
+                                                </p:calendar>
                                             </div>
                                             <div class="p-col-12 search-panel-btns" style="text-align: center;">
                                                 <p:commandButton id="manageReestablishBtn"
