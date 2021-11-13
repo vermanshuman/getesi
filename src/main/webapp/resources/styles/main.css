@@ -355,6 +355,26 @@ body .top-bar-cal .ui-widget-header {
     display: block;
 }
 
+.richiesta-da-mail-icon {
+    background-image: url("../images/richiesta-da-mail.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 28px;
+    height: 28px;
+    background-size: 25px;
+    display: block;
+}
+
+.richiesta-da-clienti-icon {
+    background-image: url("../images/richiesta-da-clienti.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 28px;
+    height: 28px;
+    background-size: 25px;
+    display: block;
+}
+
 .user-icon {
     background-image: url("../images/user.png");
     background-repeat: no-repeat;

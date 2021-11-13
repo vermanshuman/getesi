@@ -800,8 +800,8 @@
             <p:column style="width: 9vw;min-width: 159px;position: relative" headerText="#{ff:upper(msg.requestListClient)}">
                 <h:outputText value="#{item.clientName}"/>
                 <br/>
-                <p:graphicImage id="info" url="/resources/images/info.png"
-                                style="height :28px;margin-left: -18px;bottom: 2px;position: absolute;"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
+                <p:graphicImage id="info" url="/resources/images/tooltip.png"
+                                style="height :28px;bottom: 2px;position: absolute;"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
                 <p:tooltip for="info" styleClass="custom-design-tooltip">
                     <h:outputText value="#{ff:upper(msg.requestManagers)}" style="font-weight:bold;color:#003871;"/>
                     <br />
@@ -830,8 +830,8 @@
                     </p:outputPanel>
                     <h:outputText id="service" value="#{item.serviceName}" rendered="#{item.serviceName ne null}"/>
                     <br/>
-                    <p:graphicImage id="multipleservice" url="/resources/images/info.png"
-                                    style="height :28px;margin-top: -9px;margin-left: -38px;position: absolute;"  rendered="#{not empty item.multipleServices}" />
+                    <p:graphicImage id="multipleservice" url="/resources/images/tooltip.png"
+                                    style="height :28px;margin-top: -9px;margin-left: -20px;position: absolute;"  rendered="#{not empty item.multipleServices}" />
                     <p:tooltip for="multipleservice" styleClass="custom-design-tooltip" rendered="#{not empty item.multipleServices}">
                         <ui:repeat var="ele" value="#{item.multipleServices}" varStatus="service">
                             <h:outputText value="#{ele}" escape="false" style="color:#003871;margin-left: 24px;"/>
@@ -880,8 +880,8 @@
             </p:column>
 
             <p:column style="width: 4vw;min-width: 81px;" headerText="#{ff:upper(msg.requestListOpenMail)}">
-                <p:outputPanel style="display: flex;">
-                    <p:commandButton id="mailBtn" styleClass="mail-icon" action="#{bean.openRequestMail}"
+                <p:outputPanel style="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments ? 'text-align: center;' : 'display: flex;'}">
+                    <p:commandButton id="mailBtn" styleClass="richiesta-da-mail-icon" action="#{bean.openRequestMail}"
                                      style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
                                      rendered="#{not empty item.mailId}">
                         <f:setPropertyActionListener value="#{item.mailId}" target="#{bean.entityEditId}"/>
@@ -889,7 +889,7 @@
                     <p:tooltip for="mailBtn" value="#{item.mailSubject}"/>
 
                     <h:outputText id="externalUserIcon" rendered="#{item.external and not item.haveAllegatiDocuments}"
-                                  style="margin: 0 auto;" styleClass="#{item.isInserted ? 'user-filled-icon' : 'user-icon'}" />
+                                  style="margin: 0 auto;" styleClass="#{item.isInserted ? 'richiesta-da-clienti-icon' : 'user-icon'}" />
                     <p:tooltip for="externalUserIcon" value="#{item.createUserFullName}" escape="false"/>
 
                     <p:outputPanel rendered="#{item.external and item.haveAllegatiDocuments}" style="display: flex;margin-left: calc( 50% - 15px );">
@@ -903,8 +903,8 @@
                     </p:outputPanel>
 
 
-                    <h:outputText value="G"	id="internalUserIcon" rendered="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments}"
-                                  style="min-width: 21px;height: 20px;border: 2px solid;border-radius: 50%;margin-right: 2px;margin: 0 auto;text-align: center;" />
+                    <p:graphicImage id="internalUserIcon" url="/resources/images/richiesta-da-operatore-getesi.png"
+                                    style="height :28px;"  rendered="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments}" />
                     <p:tooltip for="internalUserIcon" value="#{item.createUserFullName}" escape="false"/>
 
                     <p:outputPanel style="display: flex;#{empty item.mailId ? 'margin-left: 38%;' : ''}" rendered="#{not item.external and empty item.mailId and item.haveAllegatiDocuments}">
