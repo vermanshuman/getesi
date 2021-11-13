@@ -193,15 +193,15 @@
 
                     <pb:menu widgetVar="babylonMenuWidget">
                         <p:menuitem id="homePage" styleClass="main" value="#{msg.home}" icon="topbar-icon fa fa-fw fa-home" outcome="/Pages/Home.jsf"/>
-                        <p:menuitem id="mailManager" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/MailManagerList.jsf')}" value="#{msg.headerMailManager}#{sessionBean.mailCounts gt 0 ? ' ('.concat(sessionBean.mailCounts).concat(')') : ''}" icon="topbar-icon fa fa-fw  fa-envelope-o" outcome="/Pages/ManagementGroup/MailManagerList.jsf"/>
-                        <p:menuitem id="requestList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/RequestList.jsf')}" value="#{msg.headerRequestList}#{sessionBean.requestCounts gt 0 ? ' ('.concat(sessionBean.requestCounts).concat(')') : ''}" icon="topbar-icon fa fa-fw fa-list"
+                        <p:menuitem id="mailManager" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/MailManagerList.jsf')}" value="#{msg.headerMailManager}#{sessionBean.mailCounts gt 0 ? ' ('.concat(sessionBean.mailCounts).concat(')') : ''}" icon="topbar-icon email-icon" outcome="/Pages/ManagementGroup/MailManagerList.jsf"/>
+                        <p:menuitem id="requestList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/RequestList.jsf')}" value="#{msg.headerRequestList}#{sessionBean.requestCounts gt 0 ? ' ('.concat(sessionBean.requestCounts).concat(')') : ''}" icon="topbar-icon richieste-icon"
                                     action="#{sessionBean.getRequestListPage()}" actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>
-                        <p:menuitem id="notarialCertificationList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/NotarialCertificationList.jsf')}" value="Certificazioni#{sessionBean.needShowNumberUnclosedNotarialCertifications ? ' ('.concat(sessionBean.numberUnclosedNotarialCertifications).concat(')') : ''}" icon="notarialCertificationListIcon"
+                        <p:menuitem id="notarialCertificationList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/NotarialCertificationList.jsf')}" value="Certificazioni#{sessionBean.needShowNumberUnclosedNotarialCertifications ? ' ('.concat(sessionBean.numberUnclosedNotarialCertifications).concat(')') : ''}" icon="esecuzione-immobiliare-icon"
                                     action="#{sessionBean.getNotarialCertificationListPage()}" actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>
-                        <p:menuitem id="database" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/DatabaseList.jsf')}" value="#{msg.headerDatabase}" icon="topbar-icon fa fa-fw fa-file-text-o"
+                        <p:menuitem id="database" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/DatabaseList.jsf')}" value="#{msg.headerDatabase}" icon="topbar-icon banca-bati-icon"
                                     action="#{sessionBean.getDatabaseListPage()}" actionListener="#{sessionBean.cleanFiltersOnDatabaseListSubjectTable()}"/>
-                        <p:menuitem id="reportList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/ReportList.jsf')}" value="#{msg.headerReportList}" icon="topbar-icon fa fa-fw fa-area-chart" outcome="/Pages/ManagementGroup/ReportList.jsf"/>
-                        <p:menuitem id="billing"  value="#{msg.headerBilling}" icon="topbar-icon fa fa-fw fa-calculator"/>
+                        <p:menuitem id="reportList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/ReportList.jsf')}" value="#{msg.headerReportList}" icon="topbar-icon reportistica-icon" outcome="/Pages/ManagementGroup/ReportList.jsf"/>
+                        <p:menuitem id="billing"  value="#{msg.headerBilling}" icon="topbar-icon fatturazione-icon"/>
                         <p:submenu id="amministrazione" label="#{msg.menuConfiguration}" icon="pi pi-align-left">
                             <p:menuitem id="utenti" value="#{msg.user_list}" icon="fa fa-fw fa-users" outcome="/Pages/Configuration/UserList.jsf" />
                             <p:menuitem id="ruoli" value="#{msg.role_list}" icon="fa fa-fw fa-user-plus" outcome="/Pages/Configuration/RoleList.jsf" />

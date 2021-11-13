@@ -292,6 +292,69 @@ body .top-bar-cal .ui-widget-header {
     display: block;
 }
 
+.email-icon {
+    background-image: url("../images/email.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 24px;
+    height: 20px;
+    display: block;
+}
+
+.richieste-icon {
+    background-image: url("../images/richieste.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 20px;
+    height: 20px;
+    display: block;
+}
+
+.banca-bati-icon {
+    background-image: url("../images/banca-bati.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 22px;
+    height: 20px;
+    display: block;
+}
+
+.reportistica-icon {
+    background-image: url("../images/reportistica.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 22px;
+    height: 20px;
+    display: block;
+}
+
+.fatturazione-icon {
+    background-image: url("../images/fatturazione.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 24px;
+    height: 24px;
+    display: block;
+}
+
+.configurazione-icon {
+    background-image: url("../images/configurazione.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 26px;
+    height: 42px;
+    display: block;
+}
+
+.esecuzione-immobiliare-icon {
+    background-image: url("../images/esecuzione-immobiliare.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 22px;
+    height: 22px;
+    display: block;
+}
+
 .user-icon {
     background-image: url("../images/user.png");
     background-repeat: no-repeat;
