@@ -219,6 +219,12 @@
             body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-rpp-options {
                 margin: 0;
             }
+            body .ui-widget, body .ui-widget .ui-widget {
+                font-family: "Open Sans","Helvetica Neue",sans-serif !important;
+                text-decoration: none !important;
+                font-size: 14px !important;
+                /*font-weight: normal !important;*/
+            }
 
             body .ui-selectcheckboxmenu-panel {
                 padding: 0;
@@ -280,11 +286,35 @@
             body .ui-inputfield {
                 border: 1px solid #a8acb1;
             }
+
             body .ui-chkbox .ui-chkbox-box .ui-chkbox-icon.ui-icon-check {
                 font-weight: bolder;
             }
             .calender-filled input, .select-checkbox {
-                border: 1px solid #009900 !important;
+                border: 0.2em  solid #57c279 !important;
+            }
+            body .ui-inputfield.ui-state-focus {
+                box-shadow: 0 0 0 0.2em #57c279 !important;
+            }
+
+            body .ui-selectcheckboxmenu.ui-state-focus:not(.ui-state-error) {
+                box-shadow: 0 0 0 0.2em #57c279 !important;
+            }
+
+            .border_class{
+                border: 0.2em solid #57c279 !important; border-radius: 7px !important;
+            }
+
+            #filterEmailsender.ui-state-focus {
+                box-shadow: 0 0 0 0.2em #a6d5fa !important;
+            }
+
+            #filterEmailSubject.ui-state-focus {
+                box-shadow: 0 0 0 0.2em #a6d5fa !important;
+            }
+
+            #filterEmailBody.ui-state-focus {
+                box-shadow: 0 0 0 0.2em #a6d5fa !important;
             }
         </style>
 
@@ -311,7 +341,7 @@
                             <div class="p-col-10" style="padding-top: 0px;padding-bottom: 0px;">
                                 <div class="p-formgroup-inline alignEnd">
                                     <div class="p-field">
-                                        <p:inputText value="#{bean.filterEmail}"
+                                        <p:inputText value="#{bean.filterEmail}" id="filterEmailsender"
                                                      placeholder="#{msg.mailManagerEmailFrom}/#{msg.mailManagerEmailTo}" style=" width: 300px !important;"/>
                                     </div>
                                     <div class="p-field">
@@ -336,6 +366,12 @@
                                                   var target = $(e.target);
                                                   if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('.ui-selectcheckboxmenu-panel').length) {
                                                       PF('panelSetting').getJQ().hide();
+                                                  }
+                                                  if(target.closest('.ui-selectcheckboxmenu-item').length) {
+                                                      console.log("hello");
+                                                      $("#states").addClass("border_class");
+                                                  } else {
+                                                      $("#states").removeClass("border_class");
                                                   }
                                               });
                                               function togglePanel() {
@@ -370,7 +406,7 @@
                                                     </p:calendar>
                                                 </div>
                                                 <div class="p-col-12">
-                                                    <p:selectCheckboxMenu value="#{bean.selectedSearchStateIds}"
+                                                    <p:selectCheckboxMenu value="#{bean.selectedSearchStateIds}" id="states"
                                                                           label="#{msg.mailManagerStates}"
                                                                           style="margin-right: 15px!important;width: 40%;" styleClass="statesmenu#{bean.selectedSearchStateIds ne null and fn:length(bean.selectedSearchStateIds) gt 0 ? ' select-checkbox' : ''}">
                                                         <f:selectItems value="#{bean.searchStates}"/>

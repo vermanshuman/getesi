@@ -469,17 +469,22 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
                         String encodedString = Base64.getEncoder().encodeToString(fileContent);
                         return "data:image/jpg;base64," + encodedString;
                     } catch (Exception e) {
+                        LogHelper.log(log, e);
                         e.printStackTrace();
                     }
                 }
             }
             return null;
         } else {
-            File initialFile = new File(getCurrentUser().getPhotoPath());
-            byte[] fileContent = FileUtils.readFileToByteArray(initialFile);
-            String encodedString = Base64.getEncoder().encodeToString(fileContent);
-            return "data:image/jpg;base64," + encodedString;
+            if(!ValidationHelper.isNullOrEmpty(getCurrentUser().getPhotoPath())){
+                File initialFile = new File(getCurrentUser().getPhotoPath());
+                byte[] fileContent = FileUtils.readFileToByteArray(initialFile);
+                String encodedString = Base64.getEncoder().encodeToString(fileContent);
+                return "data:image/jpg;base64," + encodedString;
+            }
+
         }
+        return null;
     }
 
     public String getToolTipData() {

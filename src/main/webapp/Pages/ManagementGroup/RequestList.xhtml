@@ -224,14 +224,34 @@
             .al-cen-fx div {
                 justify-content: center;
             }
+            body .ui-widget, body .ui-widget .ui-widget {
+                font-family: "Open Sans","Helvetica Neue",sans-serif;
+                text-decoration: none;
+            }
             body .ui-chkbox .ui-chkbox-box .ui-chkbox-icon.ui-icon-check {
                 font-weight: bolder;
             }
             .calender-filled input, .select-checkbox, .select-one-menu {
                 border: 1px solid #009900 !important;
             }
-            body .ui-widget {
-                font-family: "Open Sans","Helvetica Neue",sans-serif !important;
+            body .ui-inputfield.ui-state-focus {
+                box-shadow: 0 0 0 0.2em #57c279 !important;
+            }
+
+            body .ui-selectonemenu.ui-state-focus:not(.ui-state-error) {
+                box-shadow: 0 0 0 0.2em #57c279 !important;
+            }
+
+            .border_class{
+                border: 0.2em solid #57c279 !important; border-radius: 7px !important;
+            }
+
+            #searchLastName.ui-state-focus {
+                box-shadow: 0 0 0 0.2em #a6d5fa !important;
+            }
+
+            #searchFiscalCode.ui-state-focus {
+                box-shadow: 0 0 0 0.2em #a6d5fa !important;
             }
         </style>
         <script>
@@ -265,6 +285,9 @@
                 $("#filterExpiration_input").val("");
                 resetTableData();
                 return true;
+            }
+            function applyBorder(id) {
+                $("#"+id).addClass("border_class");
             }
         </script>
 
@@ -319,6 +342,23 @@
                                                 && !target.parents('#stateSelectCheckboxPanel').length && !target.parents('#serviceSelectCheckboxPanel').length && !target.parents('#fiduciario_panel').length) {
                                                 PF('panelSetting').getJQ().hide();
                                             }
+                                            if(target.closest('#statuses').length || target.closest('#stateSelectCheckboxPanelDataTable').length) {
+                                                $("#statuses").addClass("border_class");
+                                            } else {
+                                                $("#statuses").removeClass("border_class");
+                                            }
+
+                                            if(target.closest('#requestTypes').length || target.closest('#requestTypeSelectCheckboxPanel').length) {
+                                                $("#requestTypes").addClass("border_class");
+                                            } else {
+                                                $("#requestTypes").removeClass("border_class");
+                                            }
+
+                                            if(target.closest('#services').length || target.closest('#serviceSelectCheckboxPanel').length) {
+                                                $("#services").addClass("border_class");
+                                            } else {
+                                                $("#services").removeClass("border_class");
+                                            }
                                         });
                                         function togglePanel() {
                                             PF('panelSetting').getJQ().toggle();
@@ -354,7 +394,7 @@
                                                                   style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
                                                     <i class="fa fa-angle-down"
                                                        style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
-                                                       onclick="PF('stateSelectCheckboxWV').show(); event.stopImmediatePropagation();"/>
+                                                       onclick="PF('stateSelectCheckboxWV').show(); event.stopImmediatePropagation(); applyBorder('statuses');"/>
                                                 </p:outputPanel>
                                             </div>
                                             <div class="p-col-6">
@@ -364,7 +404,7 @@
                                                                   style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
                                                     <i class="fa fa-angle-down"
                                                        style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
-                                                       onclick="PF('requestTypeSelectCheckboxWV').show(); event.stopImmediatePropagation();"/>
+                                                       onclick="PF('requestTypeSelectCheckboxWV').show(); event.stopImmediatePropagation(); applyBorder('requestTypes');"/>
                                                 </p:outputPanel>
                                             </div>
                                             <div class="p-col-6">
@@ -374,7 +414,7 @@
                                                                   style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
                                                     <i class="fa fa-angle-down"
                                                        style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
-                                                       onclick="PF('serviceSelectCheckboxWV').show(); event.stopImmediatePropagation();"/>
+                                                       onclick="PF('serviceSelectCheckboxWV').show(); event.stopImmediatePropagation(); applyBorder('services');"/>
                                                 </p:outputPanel>
                                             </div>
                                             <div class="p-col-6">
