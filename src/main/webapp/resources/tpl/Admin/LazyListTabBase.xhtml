@@ -6,15 +6,8 @@
       xmlns:p="http://primefaces.org/ui"
 >
 
-<ui:composition template="/resources/tpl/Admin/template.xhtml">
-
-    <ui:define name="viewname">
-        <li>
-            <p:link outcome="#{bean.currentPage.page}">#{page_header}</p:link>
-        </li>
-    </ui:define>
-
-    <ui:define name="content">
+<ui:composition template="/resources/tpl/Admin/Main.xhtml">
+    <ui:define name="body">
         <div class="ui-g">
             <div class="ui-g-12">
                 <div class="card card-w-title" style="#{request.requestURI.contains('MailManagerList') ? 'background-color: transparent' : ''}">

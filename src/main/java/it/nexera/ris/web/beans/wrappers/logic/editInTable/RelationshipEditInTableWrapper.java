@@ -1,5 +1,6 @@
 package it.nexera.ris.web.beans.wrappers.logic.editInTable;
 
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.Regime;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 
@@ -28,6 +29,8 @@ public class RelationshipEditInTableWrapper {
 
     private Subject subject;
 
+   private Regime regime;
+
     public RelationshipEditInTableWrapper(Relationship relationship) {
         this.id = relationship.getId();
         if (!ValidationHelper.isNullOrEmpty(relationship.getQuote())) {
@@ -37,6 +40,14 @@ public class RelationshipEditInTableWrapper {
         }
         this.type = PropertyTypeEnum.getByDescription(relationship.getPropertyType());
         this.subject = relationship.getSubject();
+        if(!ValidationHelper.isNullOrEmpty(relationship.getRegime())){
+            try {
+                this.regime = DaoManager.get(Regime.class, new Criterion[]{
+                        Restrictions.eq("text", relationship.getRegime())});
+
+            } catch (Exception e) {
+            }
+        }
     }
 
     public RelationshipEditInTableWrapper(String quote1, String quote2, PropertyTypeEnum type, Subject subject) {
@@ -45,6 +56,11 @@ public class RelationshipEditInTableWrapper {
         this.type = type;
         this.subject = subject;
         this.edited = true;
+    }
+
+    public RelationshipEditInTableWrapper(String quote1, String quote2, PropertyTypeEnum type, Subject subject, Regime regime) {
+       this(quote1, quote2,type, subject);
+       this.regime = regime;
     }
 
     public void save(Property property) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -63,6 +79,10 @@ public class RelationshipEditInTableWrapper {
                 relationship.setPropertyType(getType().getDescription());
                 relationship.setProperty(property);
                 relationship.setSubject(getSubject());
+                if(!ValidationHelper.isNullOrEmpty(getRegime()))
+                    relationship.setRegime(getRegime().getText());
+                else
+                    relationship.setRegime(null);
                 DaoManager.save(relationship, true);
             } else if (getId() == null && !isToDelete()) {
                 relationship = new Relationship();
@@ -71,6 +91,10 @@ public class RelationshipEditInTableWrapper {
                 relationship.setPropertyType(getType().getDescription());
                 relationship.setProperty(property);
                 relationship.setSubject(getSubject());
+                if(!ValidationHelper.isNullOrEmpty(getRegime()))
+                    relationship.setRegime(getRegime().getText());
+                else
+                    relationship.setRegime(null);
                 DaoManager.save(relationship, true);
             }
         }
@@ -122,5 +146,13 @@ public class RelationshipEditInTableWrapper {
 
     public Subject getSubject() {
         return subject;
+    }
+
+    public Regime getRegime() {
+        return regime;
+    }
+
+    public void setRegime(Regime regime) {
+        this.regime = regime;
     }
 }

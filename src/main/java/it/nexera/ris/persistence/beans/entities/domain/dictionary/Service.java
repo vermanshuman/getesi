@@ -109,6 +109,9 @@ public class Service extends IndexedEntity {
     @Column(name = "sales_development")
     private Boolean salesDevelopment;
 
+    @Column(name = "land_omi")
+    private Boolean landOmi;
+
     @Override
     public String toString() {
         return this.getName();
@@ -318,5 +321,13 @@ public class Service extends IndexedEntity {
 
     public void setSalesDevelopment(Boolean salesDevelopment) {
         this.salesDevelopment = salesDevelopment;
+    }
+
+    public Boolean getLandOmi() {
+        return landOmi;
+    }
+
+    public void setLandOmi(Boolean landOmi) {
+        this.landOmi = landOmi;
     }
 }

@@ -258,7 +258,10 @@ public class Property extends IndexedEntity implements BeforeSave {
     @Transient
     private LandCadastralCulture cadastralCulture;
 
-    @Override
+    @Transient
+    private LandCulture landCulture;
+
+   @Override
     public void beforeSave() {
         if (ValidationHelper.isNullOrEmpty(getEstateSituationListWithoutInit())) {
             return;
@@ -414,6 +417,7 @@ public class Property extends IndexedEntity implements BeforeSave {
             }
 
         } else if (!ValidationHelper.isNullOrEmpty(getCurrentRequest().getSubject())) {
+
             relationships = getRelationships().stream()
                     .filter(r -> RelationshipType.MANUAL_ENTRY.getId().equals(r.getRelationshipTypeId())
                             && r.getSubject().getId().equals(getCurrentRequest().getSubject().getId()))
@@ -426,7 +430,6 @@ public class Property extends IndexedEntity implements BeforeSave {
                         .collect(Collectors.toList());
             }
         }
-
         if (!ValidationHelper.isNullOrEmpty(relationships)) {
             return relationships.stream().map(Relationship::getPropertyReportStr).collect(Collectors.toList());
         } else {
@@ -661,7 +664,8 @@ public class Property extends IndexedEntity implements BeforeSave {
             sb.append(NumberUtils.isParsable(estimateOMIRequestText.replaceAll(",", ".")) ?
                     getCurrentString(estateValueOMI, manageMoneyView(estimateOMIRequestText), true) :
                     getCurrentString(estateValueOMI.replaceAll("&euro;", ""), estimateOMIRequestText, true));
-            sb.append(NumberUtils.isParsable(estimateLastCommercialValueRequestText.replaceAll(",", ".")) ?
+            if(!ValidationHelper.isNullOrEmpty(estimateLastCommercialValueRequestText))
+                sb.append(NumberUtils.isParsable(estimateLastCommercialValueRequestText.replaceAll(",", ".")) ?
                     getCurrentString(estateIndicativeCommercial, manageMoneyView(estimateLastCommercialValueRequestText), true) :
                     getCurrentString(estateIndicativeCommercial.replaceAll("&euro;", ""), estimateLastCommercialValueRequestText, true));
         }
@@ -1523,5 +1527,13 @@ public class Property extends IndexedEntity implements BeforeSave {
             });
         }
         return cadastralCulture;
+    }
+
+    public LandCulture getLandCulture() {
+        return landCulture;
+    }
+
+    public void setLandCulture(LandCulture landCulture) {
+        this.landCulture = landCulture;
     }
 }

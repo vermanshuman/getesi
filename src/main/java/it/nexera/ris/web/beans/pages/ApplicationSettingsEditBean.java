@@ -43,15 +43,14 @@ public class ApplicationSettingsEditBean extends
 
     private ApplicationSettingsValueWrapper settingSessionCheckTimeout;
 
-    // CLOUD
-    
-    private ApplicationSettingsValueWrapper settingCloudApiUid;
-    
-    private ApplicationSettingsValueWrapper settingCloudApiKey;
-    
     private WLGServer mailServerReceive;
 
     private WLGServer mailServerSend;
+
+    // Fattura24 Settings
+    private ApplicationSettingsValueWrapper settingsCloudApiURL;
+
+    private ApplicationSettingsValueWrapper settingsCloudApiKey;
 
     /*
      * (non-Javadoc)
@@ -108,8 +107,12 @@ public class ApplicationSettingsEditBean extends
                 .getByKey(ApplicationSettingsKeys.SESSION_CHECK_TIMEOUT));
         setSettingSessionTimeout(ApplicationSettingsHolder.getInstance()
                 .getByKey(ApplicationSettingsKeys.SESSION_TIMEOUT));
-        
-        
+
+        setSettingsCloudApiKey(ApplicationSettingsHolder.getInstance().getByKey(
+                        ApplicationSettingsKeys.CLOUD_API_KEY));
+
+        setSettingsCloudApiURL(ApplicationSettingsHolder.getInstance().getByKey(
+                ApplicationSettingsKeys.CLOUD_API_URL));
     }
 
     /*
@@ -162,6 +165,12 @@ public class ApplicationSettingsEditBean extends
         ApplicationSettingsHolder.getInstance()
                 .applyNewValue(getSettingSessionTimeout());
 
+        ApplicationSettingsHolder.getInstance()
+                .applyNewValue(getSettingsCloudApiKey());
+
+        ApplicationSettingsHolder.getInstance()
+                .applyNewValue(getSettingsCloudApiURL());
+
         if (!ValidationHelper.isNullOrEmpty(this.getMailServerReceive())
                 && !ValidationHelper
                 .isNullOrEmpty(this.getMailServerReceive().getHost())) {
@@ -210,22 +219,6 @@ public class ApplicationSettingsEditBean extends
         this.settingSessionCheckTimeout = settingSessionCheckTimeout;
     }
 
-    public ApplicationSettingsValueWrapper getSettingCloudApiUid() {
-		return settingCloudApiUid;
-	}
-
-	public void setSettingCloudApiUid(ApplicationSettingsValueWrapper settingCloudApiUid) {
-		this.settingCloudApiUid = settingCloudApiUid;
-	}
-
-	public ApplicationSettingsValueWrapper getCloudApiKey() {
-		return settingCloudApiKey;
-	}
-
-	public void setCloudApiKey(ApplicationSettingsValueWrapper settingCloudApiKey) {
-		this.settingCloudApiKey = settingCloudApiKey;
-	}
-
 	public WLGServer getMailServerReceive() {
         return mailServerReceive;
     }
@@ -242,4 +235,19 @@ public class ApplicationSettingsEditBean extends
         this.mailServerSend = mailServerSend;
     }
 
+    public ApplicationSettingsValueWrapper getSettingsCloudApiURL() {
+        return settingsCloudApiURL;
+    }
+
+    public void setSettingsCloudApiURL(ApplicationSettingsValueWrapper settingsCloudApiURL) {
+        this.settingsCloudApiURL = settingsCloudApiURL;
+    }
+
+    public ApplicationSettingsValueWrapper getSettingsCloudApiKey() {
+        return settingsCloudApiKey;
+    }
+
+    public void setSettingsCloudApiKey(ApplicationSettingsValueWrapper settingsCloudApiKey) {
+        this.settingsCloudApiKey = settingsCloudApiKey;
+    }
 }

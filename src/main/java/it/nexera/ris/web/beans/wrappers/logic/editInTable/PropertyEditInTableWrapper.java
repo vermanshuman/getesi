@@ -84,9 +84,11 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
 
         initOmi(property);
 
-        this.lastCommercial = PropertyEntityHelper.getEstimateLastCommercialValueRequestText(property)
-                .replaceAll(",", ".");
 
+        this.lastCommercial = PropertyEntityHelper.getEstimateLastCommercialValueRequestText(property);
+        if(!ValidationHelper.isNullOrEmpty(this.lastCommercial)){
+            this.lastCommercial = this.lastCommercial.replaceAll(",", ".");
+        }
         if(ValidationHelper.isNullOrEmpty(this.lastCommercial) &&
                 !ValidationHelper.isNullOrEmpty(this.calculatedCommercial)) {
 
@@ -101,22 +103,12 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
         this.estateSituationId = situation.getId();
 
         if(!ValidationHelper.isNullOrEmpty(this.calculatedCommercial)) {
-            if( this.calculatedCommercial.endsWith(".0")) {
-                this.calculatedCommercial =  Optional.ofNullable(this.calculatedCommercial)
-                        .filter(sStr -> sStr.length() != 0)
-                        .map(sStr -> sStr.substring(0, sStr.length() - 2))
-                        .orElse(this.calculatedCommercial);
-            }
+            this.calculatedCommercial = getValueRemoveZeros(this.calculatedCommercial);
             this.calculatedCommercial.replaceAll("\\.", ",");
         }
 
         if(!ValidationHelper.isNullOrEmpty(this.lastCommercial)) {
-            if( this.lastCommercial.endsWith(".0")) {
-                this.lastCommercial =  Optional.ofNullable(this.lastCommercial)
-                        .filter(sStr -> sStr.length() != 0)
-                        .map(sStr -> sStr.substring(0, sStr.length() - 2))
-                        .orElse(this.lastCommercial);
-            }
+            this.lastCommercial = getValueRemoveZeros(this.lastCommercial);
             this.lastCommercial.replaceAll("\\.", ",");
             if(!ValidationHelper.isNullOrEmpty(this.calculatedCommercial)) {
                 String value = this.lastCommercial;
@@ -140,7 +132,7 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
                 && (property.getCategoryCode().startsWith("A") || property.getCategoryCode().startsWith("C"))) {
             try {
                 OMIHelper.CalculatedOmi calculatedOmi = OMIHelper.calculateOMI(property, true);
-                
+
                 if (calculatedOmi.getValue() != 0d) {
                     this.calculatedOmi.setValue(String.valueOf(new BigDecimal(calculatedOmi.getValue())
                             .setScale(2, RoundingMode.HALF_UP).doubleValue()));
@@ -160,41 +152,41 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
                 LogHelper.log(log, e);
             }
         }
-        
-        if(!ValidationHelper.isNullOrEmpty(this.getLastOmi()) && 
-                ValidationHelper.isNullOrEmpty(this.lastOmi.getValue()) && 
+
+        if(!ValidationHelper.isNullOrEmpty(this.getLastOmi()) &&
+                ValidationHelper.isNullOrEmpty(this.lastOmi.getValue()) &&
                 !ValidationHelper.isNullOrEmpty(this.calculatedOmi.getValue())) {
             this.lastOmi.setValue(this.calculatedOmi.getValue());
         }
-        
+
         if(!ValidationHelper.isNullOrEmpty(this.calculatedOmi.getValue())){
             String value = this.calculatedOmi.getValue();
-            if(value.endsWith(".0")) {
-                value = Optional.ofNullable(this.calculatedOmi.getValue())
-                        .filter(sStr -> sStr.length() != 0)
-                        .map(sStr -> sStr.substring(0, sStr.length() - 2))
-                        .orElse(this.calculatedOmi.getValue());
-            }
+            value = getValueRemoveZeros(value);
             value = value.replaceAll("\\.", ",");
             this.calculatedOmi.setValue(value);
         }
-        
+
         if(!ValidationHelper.isNullOrEmpty(this.lastOmi.getValue())){
             String value = this.lastOmi.getValue();
-            if(value.endsWith(".0")) {
-                value = Optional.ofNullable(this.lastOmi.getValue())
-                        .filter(sStr -> sStr.length() != 0)
-                        .map(sStr -> sStr.substring(0, sStr.length() - 2))
-                        .orElse(this.lastOmi.getValue());
-            }
+            value = getValueRemoveZeros(value);
             value = value.replaceAll("\\.", ",");
             if(!ValidationHelper.isNullOrEmpty(this.calculatedOmi.value)) {
                 this.lastOmi.setValue(this.calculatedOmi.getValue());
-               this.calculatedOmi.setValue(value);
+                this.calculatedOmi.setValue(value);
             }else {
-               this.lastOmi.setValue(value);
+                this.lastOmi.setValue(value);
             }
         }
+    }
+
+    protected String getValueRemoveZeros(String value) {
+        if(value!=null && value.endsWith(".0")) {
+            value = Optional.ofNullable(value)
+                    .filter(sStr -> sStr.length() != 0)
+                    .map(sStr -> sStr.substring(0, sStr.length() - 2))
+                    .orElse(value);
+        }
+        return value;
     }
 
     public void prepareRelationship(Subject subject)
@@ -224,7 +216,6 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
             property.setCadastralArea(getCadastralArea());
             property.setRevenue(getRevenue());
             DaoManager.save(property, true);
-           
         }
         if (ValidationHelper.isNullOrEmpty(property.getLastCommercialValue())
                 || !ValidationHelper.isNullOrEmpty(getLastCommercial())
@@ -332,10 +323,28 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
         property.setCadastralArea(getCadastralArea());
         property.setRevenue(getRevenue());
         initOmi(property);
+
+        String calculatedCommercial = getCalculatedCommercial();
+        calculatedCommercial = getValueRemoveZeros(calculatedCommercial);
+        if(!ValidationHelper.isNullOrEmpty(calculatedCommercial)) {
+            setCalculatedCommercial(calculatedCommercial);
+        }else {
+            calculatedCommercial = property.getLastCommercialValue();
+            calculatedCommercial = getValueRemoveZeros(calculatedCommercial);
+            setCalculatedCommercial(calculatedCommercial);
+        }
+
+
+
+        setLastCommercial(calculatedCommercial);
         save();
     }
 
     public void handleRowEditEvent() {
+    }
+
+    public void handleRowEditEvent(Boolean setEdit) {
+        setEdited(true);
     }
 
     @Getter

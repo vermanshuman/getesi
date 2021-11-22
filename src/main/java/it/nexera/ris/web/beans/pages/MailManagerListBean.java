@@ -71,8 +71,6 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
 
     private static final String KEY_KEY_WORD = "KEY_KEY_WORD_SESSION_KEY_NOT_COPY";
 
-    private static final String KEY_EMAIL = "KEY_EMAIL_SESSION_KEY_NOT_COPY";
-
     private static final String KEY_SELECTED_TAB = "KEY_SELECTED_TAB_SESSION_KEY_NOT_COPY";
 
     private static final String KEY_SORT_ORDER = "KEY_SORT_ORDER_SESSION_KEY_NOT_COPY";
@@ -160,13 +158,6 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
     @Setter
     private String filterEmailFile;
 
-    @Getter
-    @Setter
-    private String filterEmail;
-
-    @Getter
-    @Setter
-    private String globalFilter;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -239,11 +230,6 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         value = getSessionValue(KEY_KEY_WORD);
         if (!ValidationHelper.isNullOrEmpty(value)) {
             setFilterAll(value);
-        }
-
-        value = getSessionValue(KEY_EMAIL);
-        if (!ValidationHelper.isNullOrEmpty(value)) {
-            setFilterEmail(value);
         }
         
         value = getSessionValue(KEY_EMAIL_FROM);
@@ -423,7 +409,6 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
 
     @SuppressWarnings("unchecked")
     public void filterTableFromPanel() {
-        setGlobalFilter(null);
         List<Criterion> restrictions = new ArrayList<>();
 
         if (!ValidationHelper.isNullOrEmpty(getDateFrom())) {
@@ -435,55 +420,33 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
             restrictions.add(Restrictions.le("sendDate",
                     DateTimeHelper.getDayEnd(getDateTo())));
         }
-
-        if (!ValidationHelper.isNullOrEmpty(getFilterEmail())
-                || !ValidationHelper.isNullOrEmpty(getFilterAll())) {
-
+        
+        if (!ValidationHelper.isNullOrEmpty(getFilterAll())) {
             List<Long> listId = null;
             try {
                 listId = DaoManager.loadIds(WLGInbox.class, new CriteriaAlias[]{
                         new CriteriaAlias("wlgExports", "we", JoinType.INNER_JOIN)},
-                        new Criterion[]{
-                                Restrictions.ilike("we.destinationPath",
-                                        !ValidationHelper.isNullOrEmpty(getFilterAll())
-                                                ? getFilterAll() : getFilterEmail(), MatchMode.ANYWHERE)});
+                        new Criterion[]{Restrictions.ilike("we.destinationPath", getFilterAll(), MatchMode.ANYWHERE)});
             } catch (Exception e) {
                 LogHelper.log(log, e);
             }
 
             if (!ValidationHelper.isNullOrEmpty(listId)) {
-                if(!ValidationHelper.isNullOrEmpty(getFilterAll())){
-                    restrictions.add(Restrictions.or(
-                            Restrictions.like("emailTo", getFilterAll(), MatchMode.ANYWHERE),
-                            Restrictions.like("emailFrom", getFilterAll(), MatchMode.ANYWHERE),
-                            Restrictions.like("emailSubject", getFilterAll(), MatchMode.ANYWHERE),
-                            Restrictions.like("emailBody", getFilterAll(), MatchMode.ANYWHERE),
-                            Restrictions.in("id", listId)));
-                }else {
-                    restrictions.add(Restrictions.or(
-                            Restrictions.like("emailTo", getFilterEmail(), MatchMode.ANYWHERE),
-                            Restrictions.like("emailFrom", getFilterEmail(), MatchMode.ANYWHERE),
-                            Restrictions.in("id", listId)));
-                }
-            } else {
-                if(!ValidationHelper.isNullOrEmpty(getFilterAll())){
-                    restrictions.add(Restrictions.or(
-                            Restrictions.like("emailTo", getFilterAll(), MatchMode.ANYWHERE),
-                            Restrictions.like("emailFrom", getFilterAll(), MatchMode.ANYWHERE),
+                restrictions.add(Restrictions.or(
+                        Restrictions.like("emailTo", getFilterAll(), MatchMode.ANYWHERE),
+                        Restrictions.like("emailFrom", getFilterAll(), MatchMode.ANYWHERE),
                         Restrictions.like("emailSubject", getFilterAll(), MatchMode.ANYWHERE),
-                        Restrictions.like("emailBody", getFilterAll(), MatchMode.ANYWHERE)
-                            )
-                    );
-                }else {
-                    restrictions.add(Restrictions.or(
-                            Restrictions.like("emailTo", getFilterEmail(), MatchMode.ANYWHERE),
-                            Restrictions.like("emailFrom", getFilterEmail(), MatchMode.ANYWHERE)
-                            )
-                    );
-                }
+                        Restrictions.like("emailBody", getFilterAll(), MatchMode.ANYWHERE),
+                        Restrictions.in("id", listId)));
+            } else {
+                restrictions.add(Restrictions.or(
+                        Restrictions.like("emailTo", getFilterAll(), MatchMode.ANYWHERE),
+                        Restrictions.like("emailFrom", getFilterAll(), MatchMode.ANYWHERE),
+                        Restrictions.like("emailSubject", getFilterAll(), MatchMode.ANYWHERE),
+                        Restrictions.like("emailBody", getFilterAll(), MatchMode.ANYWHERE)));
             }
         }
-
+        
         List<Long> listId = null;
         if (!ValidationHelper.isNullOrEmpty(getFilterEmailFile())) {
             try {
@@ -496,7 +459,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
 
         }
 
-        List<Criterion> restrictionsLike = new ArrayList<>();
+        List<Criterion> restrictionsLike = new ArrayList<Criterion>();
         if(!ValidationHelper.isNullOrEmpty(getFilterEmailFrom())) {
             Criterion r = Restrictions.like("emailFrom", getFilterEmailFrom(), MatchMode.ANYWHERE);
             restrictionsLike.add(r);
@@ -520,7 +483,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         
         if(restrictionsLike.size()>0) {
             if(restrictionsLike.size()>1) {
-                restrictions.add(Restrictions.or(restrictionsLike.toArray(new Criterion[restrictionsLike.size()])));
+                restrictions.add(Restrictions.or((Criterion[])restrictionsLike.toArray(new Criterion[restrictionsLike.size()])));
             }else {
                 restrictions.add(restrictionsLike.get(0));
             }
@@ -857,13 +820,6 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
                 && MailManagerTypes.getById(getMailManagerButtonSelectedId()) == MailManagerTypes.RECEIVED;
     }
 
-    public void clearFiltraPanel() {
-        setDateFrom(null);
-        setDateTo(null);
-        setSelectedSearchStateIds(null);
-        setFilterAll(null);
-    }
-
     public Date getDateFrom() {
         return dateFrom;
     }
@@ -1070,59 +1026,5 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
 
     public void setFilterAll(String filterAll) {
         this.filterAll = filterAll;
-    }
-
-    public void globalSearch() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        if(!ValidationHelper.isNullOrEmpty(this.globalFilter)){
-            List<Long> ids = new ArrayList<>();
-            for (MailManagerStatuses mailManagerStatuses : MailManagerStatuses.values()) {
-                if (mailManagerStatuses.toString().toLowerCase().contains(this.globalFilter.toLowerCase())) {
-                    if(!ids.contains(mailManagerStatuses.getId())){
-                        ids.add(mailManagerStatuses.getId());
-                    }
-                }
-            }
-            Long[] selectedSearchStateIds = ids.toArray(new Long[0]);
-            List<Criterion> restrictions = new ArrayList<>();
-            restrictions.add(Restrictions.like("emailSubject", this.globalFilter, MatchMode.ANYWHERE));
-            if (!ValidationHelper.isNullOrEmpty(selectedSearchStateIds)) {
-                List<MailManagerStatuses> states = MailManagerStatuses.getStates(selectedSearchStateIds);
-                List<Long> idList = new ArrayList<>();
-                try {
-                    idList = DaoManager.loadField(ReadWLGInbox.class, "mailId", Long.class, new Criterion[]{
-                            Restrictions.eq("userId", UserHolder.getInstance().getCurrentUser().getId())
-                    });
-                } catch (Exception e) {
-                    LogHelper.log(log, e);
-                }
-                List<Long> stateIds = MailManagerStatuses.getStatesIds(states);
-                if (states.size() == 1 && states.contains(MailManagerStatuses.READ)) {
-                    restrictions.add(Restrictions.in("id", idList));
-                    restrictions.add(Restrictions.eq("state", MailManagerStatuses.NEW.getId()));
-                }else if (states.size() == 1 && states.contains(MailManagerStatuses.NEW)) {
-                    restrictions.add(Restrictions.not(Restrictions.in("id", idList)));
-                    restrictions.add(Restrictions.eq("state", MailManagerStatuses.NEW.getId()));
-                }else {
-                    restrictions.add(Restrictions.in("state", stateIds));
-                }
-            }
-            Criterion r = Restrictions.or(
-                    Restrictions.like("emailTo", this.globalFilter, MatchMode.ANYWHERE),
-                    Restrictions.like("emailFrom", this.globalFilter, MatchMode.ANYWHERE),
-                    Restrictions.like("emailBody", this.globalFilter, MatchMode.ANYWHERE));
-            restrictions.add(r);
-            List<Criterion> rest = new ArrayList<>();
-            if(restrictions.size() > 0){
-                rest.add(Restrictions.or(restrictions.toArray(new Criterion[restrictions.size()])));
-            }
-            loadList(WLGInboxShort.class,  rest.toArray(new Criterion[0]),
-                    new Order[]{
-                                Order.desc("sendDate")
-                        }, new CriteriaAlias[]{
-                                new CriteriaAlias("folder", "folder", JoinType.LEFT_OUTER_JOIN)
-            });
-        }else {
-            this.filterTableFromPanel();
-        }
     }
 }

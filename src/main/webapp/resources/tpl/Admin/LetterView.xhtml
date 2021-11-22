@@ -5,69 +5,42 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
-    <link href="#{facesContext.externalContext.requestContextPath}/resources/chart/css/demo.css"
-          media="all" rel="stylesheet" type="text/css"/>
-    <style>
-        .simple-table thead th {
-            border: 1px solid #5f666c !important;
-        }
-
-        body .ui-datatable thead th {
-            border-color: #5f666c !important;
-        }
-
-        body .ui-datatable .ui-datatable-data > tr > td {
-            padding: 1rem 1rem;
-            border: 1px solid #5f666c !important;
-            text-align: center;
-        }
-
-        body .ui-datatable .ui-datatable-header {
-            background: #f8f9fa;
-            border-width: 1px 0 0 0;
-            border-style: solid;
-            border-color: #5f666c;
-            border-radius: 0;
-        }
-
-    </style>
-
     <p:panel id="button_panel" toggleable="true"
-             style="overflow-y: auto; overflow-x: hidden; word-wrap: break-word; white-space: normal; border: 0;z-index: 1000">
+             style="overflow-y: auto; overflow-x: hidden; word-wrap: break-word; white-space: normal; border: 0; position: fixed; width: 96.5%; z-index: 1000">
         <ui:include src="/resources/tpl/Admin/Include/LetterLine.xhtml"/>
     </p:panel>
 
     <p:panel id="letter_panel" toggleable="true"
-             style="overflow-y: auto; overflow-x: hidden; word-wrap: break-word; white-space: normal; margin-top: 0; position: relative; top: 25px; border: 0; margin-bottom: 68px;">
+             style="overflow-y: auto; overflow-x: hidden; word-wrap: break-word; white-space: normal; margin-top: 0; position: relative; top: 68px; border: 0; margin-bottom: 68px;">
 
         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" id="referenceAreaShow">
 
-            <h:outputText value="#{msg.clientType}:"/>
-            <p:selectOneMenu id="clientType" value="#{bean.clientTypeId}"
-                             styleClass="select-width w-100" label="#{msg.clientType}">
-                <f:selectItems value="#{bean.clientTypes}" />
-                <p:ajax event="change" listener="#{bean.initOfficesList}" update="client_not_manger_or_fiduciary_id client_fiduciary_id mail_ofice_id managers client_invoice_id"/>
-            </p:selectOneMenu>
-            <h:outputText value="#{msg.client}:"/>
+			<h:outputText value="#{msg.clientType}:"/>
+			<p:selectOneMenu id="clientType" value="#{bean.clientTypeId}"
+				styleClass="select-width" label="#{msg.clientType}">
+				<f:selectItems value="#{bean.clientTypes}" />
+				<p:ajax event="change" listener="#{bean.initOfficesList}" update="client_not_manger_or_fiduciary_id client_fiduciary_id mail_ofice_id managers client_invoice_id"/>
+			</p:selectOneMenu>
+			<h:outputText value="#{msg.client}:"/>
             <p:selectOneMenu id="client_not_manger_or_fiduciary_id"
                              value="#{bean.selectedNotManagerOrFiduciaryClientId}"
-                             styleClass="input-width-mmv w-100">
+                             styleClass="input-width-mmv">
                 <f:selectItems value="#{bean.notManagerOrFiduciaryClients}"/>
                 <p:ajax event="change" listener="#{bean.initOfficesList}" update="client_fiduciary_id mail_ofice_id managers client_invoice_id"/>
             </p:selectOneMenu>
 
             <h:outputText value="#{msg.mailBilling}:"/>
-            <p:selectOneMenu id="client_invoice_id" value="#{bean.selectedClientInvoiceId}" styleClass="input-width-mmv w-100">
+            <p:selectOneMenu id="client_invoice_id" value="#{bean.selectedClientInvoiceId}" styleClass="input-width-mmv">
                 <f:selectItems value="#{bean.invoiceClients}"/>
             </p:selectOneMenu>
 
             <h:outputText value="#{msg.mailTrust}:"/>
-            <p:selectOneMenu id="client_fiduciary_id" value="#{bean.selectedClientFiduciaryId}" styleClass="input-width-mmv w-100">
+            <p:selectOneMenu id="client_fiduciary_id" value="#{bean.selectedClientFiduciaryId}" styleClass="input-width-mmv">
                 <f:selectItems value="#{bean.fiduciaryClientsList}"/>
             </p:selectOneMenu>
 
             <span>#{msg.clientManager}</span>
-            <p:selectCheckboxMenu id="managers" value="#{bean.selectedClientManagers}" styleClass="w-100"
+            <p:selectCheckboxMenu id="managers" value="#{bean.selectedClientManagers}" style="width: 100%"
                                   label="#{enums.documentGenerationTagsMANAGER}"
                                   converter="#{bean.clientSelectItemWrapperConverter}"
                                   multiple="true" filter="true" filterMatchMode="startsWith" >
@@ -77,65 +50,50 @@
             </p:selectCheckboxMenu>
 
             <h:outputText value="#{msg.mailManagerViewOffice}:"/>
-            <p:selectOneMenu id="mail_ofice_id" value="#{bean.selectedOfficeId}" styleClass="input-width-mmv w-100">
+            <p:selectOneMenu id="mail_ofice_id" value="#{bean.selectedOfficeId}" styleClass="input-width-mmv">
                 <f:selectItems value="#{bean.officeList}"/>
             </p:selectOneMenu>
             <span> #{msg.ndgText}</span>
-            <p:inputText id="ndgShow" value="#{bean.ndg}"  styleClass="w-100"/>
+            <p:inputText id="ndgShow" value="#{bean.ndg}"  style="width: 100%"/>
             <span> #{msg.cdrText}</span>
-            <p:inputText id="cdrShow" value="#{bean.cdr}"  styleClass="w-100"/>
+            <p:inputText id="cdrShow" value="#{bean.cdr}"  style="width: 100%"/>
             <span> #{msg.reference}</span>
-            <p:inputTextarea id="referenceShow" value="#{bean.referencePractice}" styleClass="w-100"/>
-            <p:outputPanel style="margin-top: 2mm;position: absolute;">
-                <p:commandButton value="#{msg.save}" process="referenceAreaShow" style="background-color: #57c279!important; margin-right:5px;width: 110px;" icon="fa fa-floppy-o" iconPos="left"
+            <p:inputTextarea id="referenceShow" value="#{bean.referencePractice}" style="width: 100%"/>
+            <p:outputPanel>
+                <p:commandButton value="#{msg.save}" process="referenceAreaShow" style="background-color: #57c279!important;"
                                  action="#{bean.saveReference(false)}" update="enterPracticeReferenceDialog @form" oncomplete="setTimeout(function() { $('#validationMessages').html(''); }, 2000);">
                     <f:setPropertyActionListener value="#{true}" target="#{bean.confirmButtonIsClicked}"/>
                 </p:commandButton>
-                <p:commandButton value="#{msg.mailManagerStart}" process="referenceAreaShow" style="background-color: #000066 !important;margin-left: 1cm;width: 110px;"
+                <p:commandButton value="#{msg.mailManagerStart}" process="referenceAreaShow"
                                  action="#{bean.checkFieldsBeforeProcessManagedStateCheck}" update="fieldsNotSetDialog">
                     <f:setPropertyActionListener value="#{true}" target="#{bean.confirmButtonIsClicked}"/>
                 </p:commandButton>
             </p:outputPanel>
         </p:panelGrid>
         <br/><br/>
-        <div class="p-grid table-demo" style="margin-top: 35px;">
-            <div class="p-col-12">
-                <div class="card">
-                    <p:dataTable widgetVar="validRequestsDT" var="item" value="#{bean.entity.validRequests}" reflow="true" styleClass="simple-table">
-                        <f:facet name="header">
-                            <div class="customers-table-header">
-                                <span style="font-weight: bold"></span>
-
-                                <span class="ui-input-icon-left filter-container">
-                                                    <i class="pi pi-search"/>
-                                                    <p:inputText id="globalFilter" onkeyup="PF('validRequestsDT').filter()" placeholder="Global Search"/>
-                                                </span>
-                            </div>
-                        </f:facet>
-                        <p:column styleClass=" action_column">
-                            <p:commandButton icon="ui-icon pi pi-pencil" update=":form" action="#{bean.gotoEditRequest}">
-                                <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
-                            </p:commandButton>
-                        </p:column>
-                        <p:column headerText="#{msg.databaseListRealEstateSubject}" sortBy="#{item.mailViewSubject}" filterBy="#{item.mailViewSubject}">
-                            <h:outputText value="#{item.mailViewSubject}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.requestListRequestType}" sortBy="#{item.mailViewSubject}" filterBy="#{item.mailViewSubject}">
-                            <h:outputText value="#{item.requestTypeName}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.requestListService}" sortBy="#{item.mailViewSubject}" filterBy="#{item.mailViewSubject}">
-                            <h:outputText value="#{item.service ne null ? item.serviceName : (item.multipleServices ne null ? item.multipleServiceNames : '')}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.requestListCorservatoryName}" sortBy="#{item.mailViewSubject}" filterBy="#{item.mailViewSubject}">
-                            <h:outputText value="#{item.aggregationLandCharRegNameOrCity}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.requestState}" sortBy="#{item.mailViewSubject}" filterBy="#{item.mailViewSubject}">
-                            <h:outputText value="#{item.stateDescription}"/>
-                        </p:column>
-                    </p:dataTable>
-                </div>
-            </div>
-        </div>
+        <p:dataTable value="#{bean.entity.validRequests}" styleClass="simple-table" var="item"
+                     rendered="#{not empty bean.entity.validRequests}">
+            <p:column styleClass=" action_column">
+                <p:commandButton icon="ui-icon ui-icon-pencil" update=":form" action="#{bean.gotoEditRequest}">
+                    <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                </p:commandButton>
+            </p:column>
+            <p:column headerText="#{msg.databaseListRealEstateSubject}">
+                <h:outputText value="#{item.mailViewSubject}"/>
+            </p:column>
+            <p:column headerText="#{msg.requestListRequestType}">
+                <h:outputText value="#{item.requestTypeName}"/>
+            </p:column>
+            <p:column headerText="#{msg.requestListService}">
+                <h:outputText value="#{item.service ne null ? item.serviceName : (item.multipleServices ne null ? item.multipleServiceNames : '')}"/>
+            </p:column>
+            <p:column headerText="#{msg.requestListCorservatoryName}">
+                <h:outputText value="#{item.aggregationLandCharRegNameOrCity}"/>
+            </p:column>
+            <p:column headerText="#{msg.requestState}">
+                <h:outputText value="#{item.stateDescription}"/>
+            </p:column>
+        </p:dataTable>
         <br/><br/>
         <div style="overflow: hidden; width: 0px; height: 0px; margin: 0; padding: 0; display: none">
             <p:fileUpload id="mail_file_upload" fileUploadListener="#{bean.handleFileUpload}"
@@ -233,9 +191,9 @@
         <h:outputText value="#{msg.mailManagerViewFieldsNotSetDialogMessageQuestion}"/>
         <br/>
         <div class="btn_line">
-            <p:commandButton value="#{msg.confirm}" style="margin-right: 1cm;background-color: #57c279!important;"
+            <p:commandButton value="#{msg.confirm}"
                              action="#{bean.processManagedStateCheck}" oncomplete="PF('fieldsNotSetDialogWV').hide();"/>
-            <p:commandButton value="#{msg.cancel}" oncomplete="PF('fieldsNotSetDialogWV').hide();" style="background-color: #F3362B !important;"/>
+            <p:commandButton value="#{msg.cancel}" oncomplete="PF('fieldsNotSetDialogWV').hide();"/>
         </div>
     </p:dialog>
     <p:dialog id="showToBeSentRequest" widgetVar="showToBeSentRequestDlgWV" styleClass="table-center"

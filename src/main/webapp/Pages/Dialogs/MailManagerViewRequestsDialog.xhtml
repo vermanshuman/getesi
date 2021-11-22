@@ -3,7 +3,7 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html">
-    <p:dialog widgetVar="mailManagerViewRequestsDlg" modal="true" width="1200" id="mailManagerViewRequestsDialog">
+    <p:dialog widgetVar="mailManagerViewRequestsDlg" modal="true" width="1200">
 
         <h3>#{msg.mailManagerViewRequestsDialogHeader}</h3>
 
@@ -33,38 +33,9 @@
         </p:panelGrid>
 
 		<div class="btn_line">
-			<p:commandButton value="#{msg.confirm}" update="@form" style="margin-right: 1cm;background-color: #57c279!important;"
+			<p:commandButton value="#{msg.confirm}" update="@form"
 			                 action="#{bean.openNewMailToManager}"/>
-			<p:commandButton value="#{msg.cancel}" oncomplete="PF('mailManagerViewRequestsDlg').hide();" style="background-color: #F3362B !important;"/>
+			<p:commandButton value="#{msg.cancel}" oncomplete="PF('mailManagerViewRequestsDlg').hide();"/>
 		</div>
-		<style>
-			.ui-datatable-scrollable-theadclone {
-                display: none !important;
-            }
-            th.action_column {
-            	width: 30px !important;
-            }
-            td.action_column {
-            	width: 59px !important;
-            }
-            .ui-datatable-scrollable-header th:nth-child(2) {
-				width: 233px !important;
-			}
-			.ui-datatable-scrollable-body td:nth-child(2) {
-				width: 262px !important;
-			}
-			.ui-datatable-scrollable-body td:nth-child(3), .ui-datatable-scrollable-body td:nth-child(4) {
-				width: 203px !important;
-			}
-			.ui-datatable-scrollable-body td:nth-child(5) {
-				width: 204px !important;
-			}
-			#mailManagerViewRequestsDialog {
-                border: 2px solid #57c279;
-            }
-            #mailManagerViewRequestsDialog .ui-dialog-titlebar {
-                border-bottom: none;
-            }
-		</style>
     </p:dialog>
 </ui:composition>

@@ -72,6 +72,17 @@
             </p:dataTable>
         </p:panel>
 
+        <p:dialog widgetVar="duplicateLandOmiDialogWV"
+                  id="duplicateLandOmiDialogid" modal="true" draggable="false"
+                  position="center center">
+            <div class="ui-messages-error ui-corner-all">
+                <span class="ui-messages-error-summary">#{bean.duplicateCityError}</span><br/>
+            </div>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" oncomplete="PF('duplicateLandOmiDialogWV').hide();"/>
+            </div>
+        </p:dialog>
     </ui:define>
+
 
 </ui:composition>

@@ -19,6 +19,7 @@ import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.model.SelectItem;
 
+import it.nexera.ris.persistence.beans.entities.domain.*;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
@@ -47,13 +48,6 @@ import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.common.xml.wrappers.SelectItemWrapper;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
-import it.nexera.ris.persistence.beans.entities.domain.Agency;
-import it.nexera.ris.persistence.beans.entities.domain.Client;
-import it.nexera.ris.persistence.beans.entities.domain.ClientEmail;
-import it.nexera.ris.persistence.beans.entities.domain.ClientInvoiceManageColumn;
-import it.nexera.ris.persistence.beans.entities.domain.Iban;
-import it.nexera.ris.persistence.beans.entities.domain.PriceList;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Area;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Country;
@@ -221,6 +215,11 @@ public class ClientEditBean extends EntityEditPageBean<Client>
     private Long selectedBillingRequestTypeId;
     
     private List<RequestTypeInvoiceColumnWrapper> requestTypeInvoiceColumns;
+
+    private List<SelectItem> paymentTypes;
+
+    private Long paymentTypeId;
+
     /*
      * (non-Javadoc)
      *
@@ -250,6 +249,7 @@ public class ClientEditBean extends EntityEditPageBean<Client>
         if(requestTypeInvoiceColumns == null)
             requestTypeInvoiceColumns = new ArrayList<RequestTypeInvoiceColumnWrapper>();
         this.setClientTypes(ComboboxHelper.fillList(ClientType.class, false));
+        this.setPaymentTypes(ComboboxHelper.fillList(PaymentType.class, false));
         this.setClientTitleTypes(ComboboxHelper.fillList(ClientTitleType.class, false));
 
         setProvinces(ComboboxHelper.fillList(Province.class, Order.asc("description")));
@@ -312,6 +312,10 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                     Restrictions.in("id", getEntity().getBillingRecipientList().stream()
                             .map(Client::getId).collect(Collectors.toList()))
             }));
+        }
+
+        if (!getEntity().isNew() && !ValidationHelper.isNullOrEmpty(getEntity().getPaymentTypeList())) {
+            setPaymentTypeId(getEntity().getPaymentTypeList().get(0).getId());
         }
 
         if (!getEntity().isNew() && !ValidationHelper.isNullOrEmpty(getEntity().getReferentRecipientList())) {
@@ -1084,8 +1088,15 @@ public class ClientEditBean extends EntityEditPageBean<Client>
 			}else {
 			    this.getEntity().setClientName(this.getEntity().getNameOfTheCompany() != null ? this.getEntity().getNameOfTheCompany().toLowerCase() : "");
 			}
-			
-			DaoManager.save(getEntity());
+            if (!ValidationHelper.isNullOrEmpty(getPaymentTypeId())) {
+                getEntity().setPaymentTypeList(DaoManager.load(PaymentType.class, new Criterion[]{
+                        Restrictions.eq("id", getPaymentTypeId())
+                }));
+            } else {
+                getEntity().setPaymentTypeList(null);
+            }
+
+            DaoManager.save(getEntity());
 			this.saveAgencies();
 			this.savePriceList();
 			this.saveClientServiceInfo();
@@ -2126,4 +2137,20 @@ public class ClientEditBean extends EntityEditPageBean<Client>
 	public void setSelectedNonManagerOrFiduciaryClientIds(Long[] selectedNonManagerOrFiduciaryClientIds) {
 		this.selectedNonManagerOrFiduciaryClientIds = selectedNonManagerOrFiduciaryClientIds;
 	}
+
+    public List<SelectItem> getPaymentTypes() {
+        return paymentTypes;
+    }
+
+    public void setPaymentTypes(List<SelectItem> paymentTypes) {
+        this.paymentTypes = paymentTypes;
+    }
+
+    public Long getPaymentTypeId() {
+        return paymentTypeId;
+    }
+
+    public void setPaymentTypeId(Long paymentTypeId) {
+        this.paymentTypeId = paymentTypeId;
+    }
 }

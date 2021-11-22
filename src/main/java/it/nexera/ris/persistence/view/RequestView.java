@@ -1,22 +1,5 @@
 package it.nexera.ris.persistence.view;
 
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.persistence.Column;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.hibernate.HibernateException;
-import org.hibernate.ScrollMode;
-import org.hibernate.annotations.Immutable;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
-
 import it.nexera.ris.common.annotations.View;
 import it.nexera.ris.common.enums.ClientType;
 import it.nexera.ris.common.enums.RequestState;
@@ -28,19 +11,24 @@ import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.IndexedView;
-import it.nexera.ris.persistence.beans.entities.domain.Client;
-import it.nexera.ris.persistence.beans.entities.domain.Document;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
-import it.nexera.ris.persistence.beans.entities.domain.Subject;
-import it.nexera.ris.persistence.beans.entities.domain.User;
-import it.nexera.ris.persistence.beans.entities.domain.WLGInbox;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
+import it.nexera.ris.persistence.beans.entities.domain.*;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
 import it.nexera.ris.persistence.beans.entities.domain.readonly.WLGInboxShort;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.HibernateException;
+import org.hibernate.ScrollMode;
+import org.hibernate.annotations.Immutable;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
+
+import javax.persistence.Column;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @javax.persistence.Entity
 @Immutable

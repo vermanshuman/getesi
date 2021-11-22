@@ -265,6 +265,9 @@ public class Client extends IndexedEntity implements Serializable {
     @Column(name = "regime")
     private Boolean regime;
 
+    @Column(name = "address_SDI")
+    private String addressSDI;
+
     @Override
     public String toString() {
         if (ClientType.PROFESSIONAL.getId().equals(getTypeId())) {
@@ -850,5 +853,13 @@ public class Client extends IndexedEntity implements Serializable {
 
     public void setRegime(Boolean regime) {
         this.regime = regime;
+    }
+
+    public String getAddressSDI() {
+        return addressSDI;
+    }
+
+    public void setAddressSDI(String addressSDI) {
+        this.addressSDI = addressSDI;
     }
 }

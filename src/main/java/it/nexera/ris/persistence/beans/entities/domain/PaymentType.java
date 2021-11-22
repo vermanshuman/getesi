@@ -17,7 +17,16 @@ public class PaymentType extends IndexedEntity implements Serializable {
 	
     @Column(name = "description")
     private String description;
-    
+
+    @Column(name = "beneficiary")
+    private String beneficiary;
+
+    @Column(name = "istitution_name")
+    private String istitutionName;
+
+    @Column(name = "iban")
+    private String iban;
+
     public String toString() {
     	return description;
     }
@@ -36,5 +45,29 @@ public class PaymentType extends IndexedEntity implements Serializable {
 
     public void setDescription(String description) {
     	this.description = description;
+    }
+
+    public String getBeneficiary() {
+        return beneficiary;
+    }
+
+    public void setBeneficiary(String beneficiary) {
+        this.beneficiary = beneficiary;
+    }
+
+    public String getIstitutionName() {
+        return istitutionName;
+    }
+
+    public void setIstitutionName(String istitutionName) {
+        this.istitutionName = istitutionName;
+    }
+
+    public String getIban() {
+        return iban;
+    }
+
+    public void setIban(String iban) {
+        this.iban = iban;
     }
 }

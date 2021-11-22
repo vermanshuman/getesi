@@ -159,7 +159,7 @@
 
 	<context-param>
 		<param-name>primefaces.THEME</param-name>
-		<param-value>babylon-blue</param-value>
+		<param-value>poseidon-blue</param-value>
 	</context-param>
 
 	<context-param>

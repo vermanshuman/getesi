@@ -47,6 +47,9 @@ public class EstateFormality extends IndexedEntity implements BeforeSave {
     @Column(name = "date")
     private Date date;
 
+    @Column(name = "year")
+    private String year;
+
     @Column(name = "num_rp")
     private String numRP;
 
@@ -540,5 +543,13 @@ public class EstateFormality extends IndexedEntity implements BeforeSave {
 
     public void setReferenceYear(Integer referenceYear) {
         this.referenceYear = referenceYear;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
     }
 }

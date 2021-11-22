@@ -89,7 +89,7 @@
                     <p:ajax event="filter" listener="#{bean.onFilterTableSubject}" update="@this"/>
 
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton icon="ui-icon pi pi-pencil" update=":form"
+                        <p:commandButton icon="ui-icon ui-icon-pencil" update=":form"
                                          action="#{bean.editEntity}">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.entityEditId}"/>
@@ -97,7 +97,7 @@
                     </p:column>
 
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton icon="ui-icon pi pi-times" update=":form"
+                        <p:commandButton icon="ui-icon ui-icon-close" update=":form"
                                          oncomplete="PF('dlg2').show()">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.entityDeleteId}"/>
@@ -105,7 +105,7 @@
                     </p:column>
 
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton icon="ui-icon pi pi-search" update=":form"
+                        <p:commandButton icon="ui-icon ui-icon-search" update=":form"
                                          action="#{bean.viewEntity}">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.entityEditId}"/>
@@ -318,7 +318,7 @@
                     </p:column>
 
                     <p:column styleClass="action_column min_padding_margin" exportable="false">
-                        <p:commandButton icon="ui-icon pi pi-pencil" update=":form"
+                        <p:commandButton icon="ui-icon ui-icon-pencil" update=":form"
                                          action="#{bean.editEntityRealEstate}">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.entityEditId}"/>
@@ -326,7 +326,7 @@
                     </p:column>
 
                     <p:column styleClass="action_column min_padding_margin" exportable="false">
-                        <p:commandButton icon="ui-icon pi pi-times" update=":form"
+                        <p:commandButton icon="ui-icon ui-icon-close" update=":form"
                                          oncomplete="PF('dlg3').show()">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.entityDeleteId}"/>
@@ -334,7 +334,7 @@
                     </p:column>
 
                     <p:column styleClass="action_column min_padding_margin" exportable="false">
-                        <p:commandButton icon="ui-icon pi pi-search" update=":form"
+                        <p:commandButton icon="ui-icon ui-icon-search" update=":form"
                                          action="#{bean.viewEntityRealEstate}">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.entityEditId}"/>
@@ -429,20 +429,20 @@
                         </p:column>
                     </p:column>
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton icon="ui-icon pi pi-search" update=":form"
+                        <p:commandButton icon="ui-icon ui-icon-search" update=":form"
                                          action="#{bean.viewFormality}">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.entityEditId}"/>
                         </p:commandButton>
                     </p:column>
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton icon="ui-icon pi pi-pencil" update=":form"
+                        <p:commandButton icon="ui-icon ui-icon-pencil" update=":form"
                                          action="#{bean.editFormality}">
                             <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                         </p:commandButton>
                     </p:column>
                     <p:column styleClass="action_column">
-                        <p:commandButton icon="ui-icon pi pi-times" update=":form"
+                        <p:commandButton icon="ui-icon ui-icon-close" update=":form"
                                          action="#{bean.checkFormalityForcedRequestEstateSituation}">
                             <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                         </p:commandButton>
@@ -534,7 +534,7 @@
                         </p:commandButton>
                     </p:column>
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton icon="ui-icon pi pi-search" update=":form"
+                        <p:commandButton icon="ui-icon ui-icon-search" update=":form"
                                          action="#{bean.viewEstateSituation}">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.entityEditId}"/>
@@ -996,7 +996,7 @@
                 <p:dataTable id="documentsTableId" value="#{bean.documents}" styleClass="without-header" var="itemDoc"
                              scrollable="true" scrollHeight="300">
                     <p:column styleClass="action_column">
-                        <p:commandButton icon="ui-icon pi pi-times" action="#{bean.removeDocument(itemDoc)}"
+                        <p:commandButton icon="ui-icon ui-icon-close" action="#{bean.removeDocument(itemDoc)}"
                                          oncomplete="updateTableDoc()"/>
                     </p:column>
                     <p:column>

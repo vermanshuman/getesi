@@ -24,9 +24,9 @@
         </div>
     </p:dialog>
 
-    <p:dialog widgetVar="editStateDlgWV" width="300" id="editStateDlg"
+    <p:dialog widgetVar="editStateDlgWV" width="300"
               draggable="false" modal="true" resizable="false"
-              header="#{msg.mailManagerEditStateHeader}" style="border: 2px solid #57c279;">
+              header="#{msg.mailManagerEditStateHeader}">
         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid">
             <h:outputText style="font-size: initial; text-align: right" value="#{msg.mailManagerEditStates}:"/>
             <p:selectOneMenu value="#{bean.selectedStateId}">
@@ -35,17 +35,12 @@
         </p:panelGrid>
 
         <div class="btn_line">
-            <p:commandButton value="#{msg.confirm}" style="background-color: #57c279 !important;margin-right: 1cm;width: 100px;"
+            <p:commandButton value="#{msg.confirm}"
                              action="#{bean.changeMailState}"
                              update="form"
                              oncomplete="PF('editStateDlgWV').hide();"/>
-            <p:commandButton value="#{msg.cancel}" style="background-color: #F3362B !important;margin-right: 5px;width: 100px;"
+            <p:commandButton value="#{msg.cancel}"
                              oncomplete="PF('editStateDlgWV').hide();"/>
         </div>
-        <style>
-            #editStateDlg .ui-dialog-titlebar {
-                border-bottom: none;
-            }
-        </style>
     </p:dialog>
 </ui:composition>

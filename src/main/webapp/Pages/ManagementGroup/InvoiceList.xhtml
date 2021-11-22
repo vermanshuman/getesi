@@ -2,7 +2,6 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:ff="http://readytech.com/functions"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:p="http://primefaces.org/ui">
@@ -32,8 +31,8 @@
             ;
         </script>
 
-       <p:outputPanel id="searchPanel">
-        <p:remoteCommand name="updateCalendarTo" update=":form:filterDateTo"/>
+        <p:outputPanel id="searchPanel">
+            <p:remoteCommand name="updateCalendarTo" update=":form:filterDateTo"/>
             <p:remoteCommand name="filterTableFromPanel"
                              action="#{bean.filterTableFromPanel}" update=":form:table"/>
             <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" layout="grid"
@@ -68,23 +67,23 @@
                     </p:selectOneMenu>
                 </p:column>
                 <p:column>
-                	<br/>
-         		   <span> #{msg.invoiceSplitPayment}:<span class="red">*</span>:</span><br/>
-          		   <p:selectBooleanCheckbox value="#{bean.splitPayment}"/>
+                    <br/>
+                    <span> #{msg.invoiceSplitPayment}:<span class="red">*</span>:</span><br/>
+                    <p:selectBooleanCheckbox value="#{bean.splitPayment}"/>
                 </p:column>
                 <p:column>
-                	<br/>
-         		   <span> #{msg.invoiceSent}:<span class="red">*</span>:</span><br/>
-          		   <p:selectBooleanCheckbox value="#{bean.sent}"/>
+                    <br/>
+                    <span> #{msg.invoiceSent}:<span class="red">*</span>:</span><br/>
+                    <p:selectBooleanCheckbox value="#{bean.sent}"/>
                 </p:column>
             </p:panelGrid>
             <p:commandButton value="#{msg.search}" style="float: right;margin-right: 50px;"
                              id="searchButton" onclick="checkDates(); filterTableFromPanel();"
-                             update=":form:table,searchPanel"/>     
-            
+                             update=":form:table,searchPanel"/>
+
             <p:commandButton value="#{msg.invoiceNew}" id="btn_new" styleClass="btn-green"
                              disabled="#{!bean.canCreate}" action="#{bean.createNewInvoice}"/>
-            
+
         </p:outputPanel>
 
         <p:dataTable var="item" id="table"
@@ -94,46 +93,36 @@
                      paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                      rowsPerPageTemplate="10,20,50" widgetVar="tableWV">
 
-            <p:column headerText="#{msg.invoiceCreateDate}" sortBy="#{item.createDate}" style="width: 72px; text-align: center;">
-                <h:outputText value="#{item.createDate}" converter="dateTimeConverter"/>
-                <br/>
-                <h:outputText value="#{item.createDate}" converter="timeConverter"/>
+            <p:column headerText="#{msg.invoiceNumber}" sortBy="#{item.number}" style="width: 72px;">
+                <h:outputText value="#{item.number}"/>
             </p:column>
-	    
-	   <p:column headerText="#{msg.invoiceDate}" sortBy="#{item.date}" style="width: 72px; text-align: center;">
+
+            <p:column headerText="#{msg.invoiceDate}" sortBy="#{item.date}" style="width: 72px; text-align: center;">
                 <h:outputText value="#{item.date}" converter="dateTimeConverter"/>
                 <br/>
                 <h:outputText value="#{item.date}" converter="timeConverter"/>
             </p:column>
 
-            <p:column headerText="#{msg.invoiceClient}" sortBy="#{item.client}">
+            <p:column headerText="#{msg.invoiceClient}" sortBy="#{item.client}" style="width: 120px;">
                 <h:outputText value="#{item.client}"/>
             </p:column>
 
-            <p:column headerText="#{msg.invoiceNote}" styleClass="action_midle_column">
+            <p:column headerText="#{msg.invoiceNotes}" styleClass="action_midle_column" style="width: 240px;">
                 <h:outputText value="#{item.notes}"/>
             </p:column>
 
-           <p:column headerText="#{msg.invoicePaymentType}" styleClass="action_midle_column" sortBy="#{item.paymentType}">
+            <p:column headerText="#{msg.invoicePaymentType}" styleClass="action_midle_column" sortBy="#{item.paymentType}">
                 <h:outputText value="#{item.paymentType}"/>
             </p:column>
 
             <p:column style="width: 100px;" headerText="#{msg.invoiceSplitPayment}" sortBy="#{item.splitPayment}">
                 <h:outputText value="#{item.splitPayment}"/>
             </p:column>
-	    
-	    <p:column style="width: 100px;" headerText="#{msg.invoiceSent}" sortBy="#{item.sent}">
+
+            <p:column style="width: 100px;" headerText="#{msg.invoiceSent}" sortBy="#{item.sent}">
                 <h:outputText value="#{item.sent}"/>
             </p:column>
-            
-            <p:column styleClass="action_midle_column" headerText="#{msg.invoiceSend}">
-            	<p:commandButton oncomplete="PF('confirmSendDialogWV').show();" 
-            		value="#{msg.invoiceSend}">
-            		<f:setPropertyActionListener value="#{item.id}"
-            									 target="#{bean.entityEditId}" />
-            	</p:commandButton>
-            </p:column>
-            
+
             <p:column exportable="false" styleClass="action_midle_column" headerText="#{msg.edit}"
                       rendered="#{!bean.getCurrentUser().isExternal()}">
                 <p:commandButton icon="fa fa-pencil-square-o"
@@ -142,7 +131,18 @@
                                                  target="#{bean.entityEditId}"/>
                 </p:commandButton>
             </p:column>
-            
+
+            <p:column styleClass="action_midle_column" headerText="#{msg.invoiceSend}" style="width: 75px;">
+                <p:commandButton oncomplete="PF('confirmSendDialogWV').show();" rendered="#{!item.apiSentStatus}"
+                                 value="#{msg.invoiceSend}" update=":table">
+                    <f:setPropertyActionListener value="#{item.id}"
+                                                 target="#{bean.entityEditId}" />
+                </p:commandButton>
+                <p:commandButton style="background-color: #00cc52 !important;" rendered="#{item.apiSentStatus}"
+                                 value="#{msg.invoiceSend}">
+                </p:commandButton>
+            </p:column>
+
             <p:column styleClass="action_column">
                 <p:commandButton icon="ui-icon ui-icon-close" update=":form" styleClass="btn-red"
                                  oncomplete="PF('dlg2').show()" disabled="#{!bean.canDelete}">
@@ -164,72 +164,72 @@
         </p:dialog>
 
         <p:dialog id="confirmSendDialog"
-        		 widgetVar="confirmSendDialogWV" modal="true" resizable="false"
+                  widgetVar="confirmSendDialogWV" modal="true" resizable="false"
                   draggable="false" effect="SLIDE">
             #{msg.invoiceSendConfirmation}<br/>
             <br/>
             <div class="btn_line">
                 <p:commandButton value="#{msg.yes}" action="#{bean.sendInvoice}"
-                                 oncomplete="PF('confirmSendDialogWV').hide()" 
+                                 oncomplete="PF('confirmSendDialogWV').hide()"
                                  update=":form,:form:messages"/>
-                <p:commandButton value="#{msg.no}" 
-                				 onclick="PF('confirmSendDialogWV').hide()"/>
+                <p:commandButton value="#{msg.no}"
+                                 onclick="PF('confirmSendDialogWV').hide()"/>
             </div>
         </p:dialog>
-        
-            <p:dialog widgetVar="sendInvoiceErrorDialogWV"  modal="true" draggable="false"
+
+        <p:dialog widgetVar="sendInvoiceErrorDialogWV"  modal="true" draggable="false"
                   position="center center">
             <div class="ui-messages-error ui-corner-all">
                 <span class="ui-messages-error-summary">#{msg.sendInvoiceErrorMsg}</span><br/>
             </div>
-	    <p:commandButton oncomplete="PF('sendInvoiceErrorDialogWV').hide();"
-	     value="#{msg.close}" /> 
-	     </p:dialog>
-	     
-	     <p:dialog widgetVar="editInvoiceErrorDialogWV"  modal="true" draggable="false"
+            <p:commandButton oncomplete="PF('sendInvoiceErrorDialogWV').hide();"
+                             value="#{msg.close}" />
+        </p:dialog>
+
+        <p:dialog widgetVar="editInvoiceErrorDialogWV"  modal="true" draggable="false"
                   position="center center">
             <div class="ui-messages-error ui-corner-all">
                 <span class="ui-messages-error-summary">#{msg.editInvoiceErrorMsg}</span><br/>
             </div>
-	    <p:commandButton oncomplete="PF('editInvoiceErrorDialogWV').hide();"
-	     value="#{msg.close}" /> 
-	     </p:dialog>
-	     
-	     <p:dialog widgetVar="removeInvoiceErrorDialogWV"  modal="true" draggable="false"
+            <p:commandButton oncomplete="PF('editInvoiceErrorDialogWV').hide();"
+                             value="#{msg.close}" />
+        </p:dialog>
+
+        <p:dialog widgetVar="removeInvoiceErrorDialogWV"  modal="true" draggable="false"
                   position="center center">
             <div class="ui-messages-error ui-corner-all">
                 <span class="ui-messages-error-summary">#{msg.removeInvoiceErrorMsg}</span><br/>
             </div>
-	    <p:commandButton oncomplete="PF('removeInvoiceErrorDialogWV').hide();"
-	     value="#{msg.close}" /> 
-	     </p:dialog>
-	     
-	    <p:dialog widgetVar="sendInvoiceOkDialogWV"  modal="true" draggable="false"
+            <p:commandButton oncomplete="PF('removeInvoiceErrorDialogWV').hide();"
+                             value="#{msg.close}" />
+        </p:dialog>
+
+        <p:dialog widgetVar="sendInvoiceOkDialogWV"  modal="true" draggable="false"
                   position="center center">
             <div class="ui-messages-info ui-corner-all">
                 <span class="ui-messages-info-summary">#{msg.sendInvoiceOkMsg}</span><br/>
             </div>
-	    <p:commandButton oncomplete="PF('sendInvoiceOkDialogWV').hide();"
-	     value="#{msg.close}" /> 
-    	</p:dialog>
-    	
-    		    <p:dialog widgetVar="editInvoiceOkDialogWV"  modal="true" draggable="false"
+            <p:commandButton oncomplete="PF('sendInvoiceOkDialogWV').hide();"
+                             value="#{msg.close}" />
+        </p:dialog>
+
+        <p:dialog widgetVar="editInvoiceOkDialogWV"  modal="true" draggable="false"
                   position="center center">
             <div class="ui-messages-info ui-corner-all">
                 <span class="ui-messages-info-summary">#{msg.editInvoiceOkMsg}</span><br/>
             </div>
-	    <p:commandButton oncomplete="PF('editInvoiceOkDialogWV').hide();"
-	     value="#{msg.close}" /> 
-    	</p:dialog>
-    	
-    		    <p:dialog widgetVar="removeInvoiceOkDialogWV"  modal="true" draggable="false"
+            <p:commandButton oncomplete="PF('editInvoiceOkDialogWV').hide();"
+                             value="#{msg.close}" />
+        </p:dialog>
+
+        <p:dialog widgetVar="removeInvoiceOkDialogWV"  modal="true" draggable="false"
                   position="center center">
             <div class="ui-messages-info ui-corner-all">
                 <span class="ui-messages-info-summary">#{msg.removeInvoiceOkMsg}</span><br/>
             </div>
-	    <p:commandButton oncomplete="PF('removeInvoiceOkDialogWV').hide();"
-	     value="#{msg.close}" /> 
-    	</p:dialog>
+            <p:commandButton oncomplete="PF('removeInvoiceOkDialogWV').hide();"
+                             value="#{msg.close}" />
+        </p:dialog>
 
     </ui:define>
 </ui:composition>

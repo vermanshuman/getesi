@@ -26,11 +26,11 @@
                                                          styleClass="input-width" label="#{msg.cadastralTopologyDescription}"/>
                                         </p:panelGrid>
                                         <div>
-                                            <p:commandButton value="#{msg.save}" update=":right_form" styleClass="p-mr-2 p-mb-2"
-                                                             icon="pi pi-save" action="#{left_bean.saveCamelCase}">
+                                            <p:commandButton value="#{msg.save}" update=":right_form"
+                                                             icon="ui-icon-disk" action="#{left_bean.saveCamelCase}">
                                             </p:commandButton>
                                             <p:commandButton value="#{msg.reset}" update="rightEditPanel"
-                                                             icon="pi pi-times-circle" action="#{left_bean.resetCamelCaseFields}">
+                                                             icon="ui-icon-circle-close" action="#{left_bean.resetCamelCaseFields}">
                                             </p:commandButton>
                                         </div>
                                     </div>
@@ -47,7 +47,7 @@
                                               styleClass="action_column"
                                               exportable="false">
 
-                                        <p:commandButton icon="pi pi-pencil"
+                                        <p:commandButton icon="ui-icon ui-icon-pencil"
                                                          disabled="#{!left_bean.canEdit}"
                                                          update=":right_form"
                                                          action="#{left_bean.editNoCamelCaseEntity}" oncomplete="#{additionalEditAction}">
@@ -58,8 +58,7 @@
 
                                     <p:column rendered="#{empty showDelete? true : showDelete}"
                                               styleClass="action_column" exportable="false">
-                                        <p:commandButton icon="pi pi-times"
-                                                         style="background-color: red;border: none !important;"
+                                        <p:commandButton icon="ui-icon ui-icon-close"
                                                          oncomplete="PF('camel_dlg').show()"
                                                          disabled="#{!left_bean.canDelete
                                                          || (item.id==sessionBean.currentUser.id and left_bean.userEntityPage)}">

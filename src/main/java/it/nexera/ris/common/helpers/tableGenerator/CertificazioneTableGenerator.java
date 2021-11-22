@@ -371,12 +371,10 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
 
                 boolean showRegime = false;
                 if(!ValidationHelper.isNullOrEmpty(relationship.getRelationshipTypeId()) &&
-                        relationship .getRelationshipTypeId().equals(RelationshipType.FORMALITY) &&
                         !ValidationHelper.isNullOrEmpty(getRequestClient().getRegime()) &&
                         getRequestClient().getRegime()){
                     showRegime = true;
-                }else if(ValidationHelper.isNullOrEmpty(relationship.getRelationshipTypeId()) ||
-                        !relationship .getRelationshipTypeId().equals(RelationshipType.FORMALITY)){
+                }else if(ValidationHelper.isNullOrEmpty(relationship.getRelationshipTypeId())){
                     showRegime = true;
                 }
                 if(showRegime){
@@ -463,8 +461,14 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                                 es.getReportRelationship() == null ? false : es.getReportRelationship())))
                 .map(EstateSituation::getFormalityList).flatMap(List::stream)
               .filter(x -> x.isExistsByPrejudicialAndСode(true))
-                .sorted(getFormalityComparator()).distinct().collect(Collectors.toList());
-        
+                //.sorted(getCetificaFormalityComparator())
+                .distinct().collect(Collectors.toList());
+
+        formalityList.sort(Comparator.comparing(Formality::getComparedDate)
+                .thenComparing(Formality::getGeneralRegister)
+                .thenComparing(Formality::getParticularRegister)
+                .thenComparing(Formality::getComparedDeathDate));
+
         sb.append(String.format("<br/> <br/> <center> <b> Il sottoscritto dott. %s </b> </center>" +
                         "<center> <b> CERTIFICA </b> </center>" +
                         "<b> CHE %s OGGETTO DELLA PRESENTE RELAZIONE %s DALLE SEGUENTI FORMALITA': </b>" +
@@ -549,11 +553,17 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
             List<Formality> formalities = situationEstateLocation.getFormalityList().stream()
                     .filter(x -> Objects.nonNull(x))
                     .filter(x -> x.isExistsByPrejudicialAndСode(false))
-                    .sorted(getFormalityComparator())
+            //        .sorted(getCetificaFormalityComparator())
                     .peek(f -> f.setShouldReportRelationships(
                             ValidationHelper.isNullOrEmpty(situationEstateLocation.getReportRelationship())
                                     || situationEstateLocation.getReportRelationship()))
                     .collect(Collectors.toList());
+
+            formalities.sort(Comparator.comparing(Formality::getComparedDate)
+                    .thenComparing(Formality::getGeneralRegister)
+                    .thenComparing(Formality::getParticularRegister)
+            .thenComparing(Formality::getComparedDeathDate));
+
             if (!ValidationHelper.isNullOrEmpty(formalities)) {
                 formalitiesFromOtherEstateSituations.addAll(formalities.stream().map(IndexedEntity::getId)
                         .collect(Collectors.toList()));
@@ -1131,16 +1141,15 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                             null, false, null, false,
                             false, true, false));
                     sb.append(", ").append("<i>").append(relationship.getPropertyType());
-                    sb.append(" per ").append(relationship.getQuote());
-
+                    if(!ValidationHelper.isNullOrEmpty(relationship.getQuote())) {
+                        sb.append(" per ").append(relationship.getQuote());
+                    }
                     boolean showRegime = false;
                     if(!ValidationHelper.isNullOrEmpty(relationship.getRelationshipTypeId()) &&
-                            relationship .getRelationshipTypeId().equals(RelationshipType.FORMALITY.getId()) &&
                             !ValidationHelper.isNullOrEmpty(getRequestClient().getRegime()) &&
                             getRequestClient().getRegime()){
                         showRegime = true;
-                    }else if(ValidationHelper.isNullOrEmpty(relationship.getRelationshipTypeId()) ||
-                            !relationship.getRelationshipTypeId().equals(RelationshipType.FORMALITY.getId())){
+                    }else if(ValidationHelper.isNullOrEmpty(relationship.getRelationshipTypeId())){
                         showRegime = true;
                     }
                     if(showRegime) {

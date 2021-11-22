@@ -11,13 +11,6 @@
     <ui:define name="form_body">
         <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/mail.css"
               media="all" rel="stylesheet" type="text/css"/>
-        <style>
-            body .ui-widget-header {
-                background-color: #FFFFFF !important;
-                color: #ffffff !important;
-            }
-        </style>
-
         <script type="text/javascript">
             var closeTab = false;
             var isSend = false;
@@ -253,6 +246,7 @@
             </pe:ckEditor>
         </p:panel>
         <script>
+            var fontUpdated = false;
             function onInitCkEditor() {
                 console.log("start init CKEditor");
                 CKEDITOR.timestamp='17.07.2018';
@@ -267,9 +261,11 @@
                     $("#changeVar").val("change");
                     change = true;
                 });
-                
+
+                CKEDITOR.instances.body.ui.editor.editable().on('keydown', handleClicked)
+
 				CKEDITOR.instances.body.ui.editor.on('key', HandleTabEvent, null, null, 0);
-                
+
                 console.log("init success");
             }
 
@@ -277,7 +273,21 @@
                 var newWidth = parseInt(($("#bodyPanel").width() - 27) / (CKEDITOR.instances.body.ui.editor.toolbar[8].items[0].lastValue / 100), 10);
                 $("#bodyPanel").find(".cke_wysiwyg_frame").contents().find("body").css('width', newWidth + 'px');
             }
-            
+
+            function handleClicked(e) {
+                if(!fontUpdated){
+                    fontUpdated = true;
+                    CKEDITOR.instances.body.ui.editor.toolbar[3].items[0].onClick('Times New Roman');
+                    CKEDITOR.instances.body.ui.editor.toolbar[3].items[0].title = 'Times New Roman';
+                    CKEDITOR.instances.body.ui.editor.toolbar[3].items[0].label = 'Times New Roman';
+                    CKEDITOR.instances.body.ui.editor.toolbar[3].items[1].onClick('16');
+                    CKEDITOR.instances.body.ui.editor.toolbar[3].items[1].title = '16';
+                    CKEDITOR.instances.body.ui.editor.toolbar[3].items[1].label = '16';
+                }
+
+
+            }
+
          // Custom Key Events function
     		function HandleTabEvent(e) {
 				if (e.data.keyCode == 9){
@@ -327,7 +337,7 @@
                                   label="#{msg.mailManagerChooseAttachedFiles}" update="tableFiles"/>
                 </f:facet>
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="pi pi-times" style="background-color: #F3362B !important;"
+                    <p:commandButton icon="fa fa-fw fa-times"
                                      update=":form:tableFiles" action="#{bean.deleteFile}">
                         <f:setPropertyActionListener value="#{file.id}"
                                                      target="#{bean.deleteFileId}"/>

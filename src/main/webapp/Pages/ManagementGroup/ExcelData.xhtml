@@ -8,10 +8,9 @@
 	xmlns:pe="http://primefaces.org/ui/extensions">
 <ui:composition template="/resources/tpl/Admin/EmptyBase.xhtml">
 	<ui:param name="view_title" value="#{msg.editData}" />
-
+	<ui:param name="bean" value="#{excelDataEdit}" />
 
 	<ui:define name="view_body">
-		<ui:param name="bean" value="#{excelDataEdit}" />
 		<p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group">
 			<h:outputText value="#{msg.client}:"/>
             <p:selectOneMenu id="client_not_manger_or_fiduciary_id"
