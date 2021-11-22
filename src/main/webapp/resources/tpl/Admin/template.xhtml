@@ -40,6 +40,7 @@
 <!--                    </div>-->
 <!--                </div> -->
                 <div class="layout-content">
+                    <ui:include src="Include/Menu.xhtml"/>
                     <ui:insert name="content"/>
                 </div>
                 <div class="layout-footer">
@@ -63,6 +64,47 @@
         <h:outputStylesheet name="css/primeicons.css" library="babylon-layout" />
         <h:outputStylesheet name="css/primeflex.min.css" library="babylon-layout" />
         <h:outputStylesheet name="css/layout-blue.css" library="babylon-layout" />
+        <style>
+            div[id*='menuform1:menu_div'] {
+                width: calc(100% - 37px) !important;
+                height: auto !important;
+                background-color: transparent !important;
+                margin-top: 21px;
+                margin-left: -21px;
+            }
+            div[id*='menuform1:menu_div'] ul {
+                display: flex;
+                width: 100%;
+            }
+            div[id*='menuform1:menu_div'] ul li {
+                width: 50%;
+            }
+            div[id*='menuform1:menu_div'] ul li a {
+                color: #FFFFFF !important;
+                background-color: transparent !important;
+                width: 100px;
+            }
+            .last-menu-icon {
+                float: right;
+            }
+            .last-menu-icon .fa-chevron-circle-right {
+                float: right;
+                margin-right: 25px;
+                margin-top: 2px;
+            }
+            .last-menu-icon span {
+                padding-left: 9px;
+            }
+            .first-menu-icon span {
+                padding-left: 3px !important;
+            }
+            .first-menu-icon {
+                padding-left: 5px !important;
+            }
+            .layout-topbar {
+                padding-right: 65px !important;
+            }
+        </style>
     </h:body>
 
 </html>
