@@ -4,7 +4,48 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:pp="http://primefaces.org/poseidon">
 
-    <h:form id="menuform">
+    <h:form id="menuform1">
+        <style>
+            div[id*='menuform1:menu_div'] {
+                width: calc(100% - 37px) !important;
+                height: auto !important;
+                background-color: transparent !important;
+                margin-top: 21px;
+                margin-left: -21px;
+            }
+            div[id*='menuform1:menu_div'] ul {
+                display: flex;
+                width: 100%;
+            }
+            div[id*='menuform1:menu_div'] ul li {
+                width: 50%;
+            }
+            div[id*='menuform1:menu_div'] ul li a {
+                color: #FFFFFF !important;
+                background-color: transparent !important;
+                width: 100px;
+            }
+            .last-menu-icon {
+                float: right;
+            }
+            .last-menu-icon .fa-chevron-circle-right {
+                float: right;
+                margin-right: 25px;
+                margin-top: 2px;
+            }
+            .last-menu-icon span {
+                padding-left: 9px;
+            }
+            .first-menu-icon span {
+                padding-left: 3px !important;
+            }
+            .first-menu-icon {
+                padding-left: 5px !important;
+            }
+            .layout-topbar {
+                padding-right: 65px !important;
+            }
+        </style>
         <p:outputPanel id="menu_div" class="layout-menu-container"  style="#{renderSideMenuTop ? 'top: 0; ' : ''}">
             <div class="nano">
                 <div class="nano-content menu-scroll-content">

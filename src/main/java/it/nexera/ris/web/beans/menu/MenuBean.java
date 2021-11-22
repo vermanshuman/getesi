@@ -63,8 +63,6 @@ public class MenuBean extends PageBean implements Serializable {
         }
 
         addBackBtn();
-        pushSubMenu(firstSubmenu);
-        pushSubMenu(secondSubmenu);
         addForwardBtn();
 
         // sort Configurazioni menu
