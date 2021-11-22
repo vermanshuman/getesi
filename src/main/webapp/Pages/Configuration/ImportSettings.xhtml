@@ -4,8 +4,14 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 template="/resources/tpl/Admin/EditBase.xhtml">
-    <ui:param name="edit_title" value="#{bean.header}"/>
     <ui:param name="bean" value="#{importSettingsBean}"/>
+    <ui:param name="edit_title" value="#{bean.header}"/>
+
+    <ui:define name="viewname">
+        <li>
+            <p:link href="/Pages/Configuration/ImportSettings.jsf?type=#{bean.currentType}">#{bean.header}</p:link>
+        </li>
+    </ui:define>
 
     <ui:define name="edit_body">
         <div align="center">

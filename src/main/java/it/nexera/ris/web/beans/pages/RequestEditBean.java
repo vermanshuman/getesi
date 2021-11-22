@@ -261,8 +261,6 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private String multipleReqMessage;
 
-    private boolean enabled;
-
     @Override
     protected void preLoad() throws PersistenceBeanException {
         if (Boolean.parseBoolean(getRequestParameter(RedirectHelper.MULTIPLE))) {
@@ -2833,17 +2831,5 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void setMultipleReqMessage(String multipleReqMessage) {
         this.multipleReqMessage = multipleReqMessage;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public void enableButtons() {
-        setEnabled(true);
     }
 }

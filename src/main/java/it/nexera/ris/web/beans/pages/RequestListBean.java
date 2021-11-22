@@ -1683,4 +1683,34 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     public void setExpirationDays(Integer expirationDays) {
         this.expirationDays = expirationDays;
     }
+
+    public Integer getRequestTypeSelected() {
+        int selected = 0;
+        for (RequestTypeFilterWrapper requestTypeFilterWrapper : requestTypeWrappers) {
+            if(requestTypeFilterWrapper.getSelected()) {
+                selected++;
+            }
+        }
+        return selected;
+    }
+
+    public Integer getStateSelected() {
+        int selected = 0;
+        for (RequestStateWrapper requestStateWrapper : stateWrappers) {
+            if(requestStateWrapper.getSelected()) {
+                selected++;
+            }
+        }
+        return selected;
+    }
+
+    public Integer getServiceSelected() {
+        int selected = 0;
+        for (ServiceFilterWrapper serviceFilterWrapper : serviceWrappers) {
+            if(serviceFilterWrapper.getSelected()) {
+                selected++;
+            }
+        }
+        return selected;
+    }
 }

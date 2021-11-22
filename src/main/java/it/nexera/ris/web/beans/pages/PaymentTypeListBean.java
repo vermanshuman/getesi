@@ -74,12 +74,6 @@ public class PaymentTypeListBean extends EntityLazyInListEditPageBean<PaymentTyp
         		this.getEntity().getDescription());
         this.getEditedEntity().setCode(
         		this.getEntity().getCode());
-		this.getEditedEntity().setBeneficiary(
-				this.getEntity().getBeneficiary());
-		this.getEditedEntity().setIban(
-				this.getEntity().getIban());
-		this.getEditedEntity().setIstitutionName(
-				this.getEntity().getIstitutionName());
 	}
 
 	@Override

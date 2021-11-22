@@ -544,7 +544,6 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 			setFileOnServer(GeneralFunctionsHelper.saveUploadedFile(event.getFile().getFileName(), null,
 					event.getFile().getContents()));
 			setSubjectFromFile(differentSubject);
-			System.out.println(">>>>>>>>>>>>>>" + differentSubject.getId());
 			executeJS("PF('subjectUploadDialog').show();");
 		}
 	}

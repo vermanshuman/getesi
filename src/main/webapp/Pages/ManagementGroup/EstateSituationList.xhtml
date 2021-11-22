@@ -12,7 +12,7 @@
     <ui:param name="centerPartStyleClass" value="false"/>
     <ui:param name="disableSelection" value="true"/>
     <ui:define name="back_buttons_panel">
-        <p:commandButton id="add_btn" action="#{bean.addEstate}" value="#{msg.estateAddButton}"/>
+        <p:commandButton id="add_btn" action="#{bean.addEstate}" value="#{msg.estateAddButton}" styleClass="p-mr-2 p-mb-2"/>
         <p:commandButton id="cancel_btn" action="#{bean.goBack}" value="#{msg.requestListOpenEdit}"
                          icon="ui-icon-circle-close"/>
         <p:commandButton id="print_btn" action="#{bean.goTextEdit}" value="#{msg.requestManagePrint}"
@@ -88,8 +88,144 @@
             </p:dataTable>
         </p:column>
     </ui:define>
+
     <ui:define name="dialogs_body">
-        <br/>
+        <style>
+            body .ui-fieldset .ui-fieldset-legend {
+                border: 1px solid #c9cdd2;
+                background: #f8f9fa;
+                color: #FFFFFF !important;
+                padding: 1rem;
+                font-weight: 200 !important;
+                border-radius: 4px;
+                user-select: none;
+                transition: background-color 0.2s, color 0.2s, border-color 0.2s,
+                box-shadow 0.2s;
+            }
+
+            legend {
+                font-size: 14px !important;
+            }
+
+            body .ui-fieldset .ui-fieldset-content {
+                padding: 8px 14px;
+            }
+
+            div {
+                display: block;
+            }
+
+            fieldset div {
+                font-size: 14px;
+                text-align: left;
+            }
+
+            .special-upload {
+                width: 210px;
+            }
+
+            body .ui-fileupload .ui-fileupload-buttonbar {
+                padding: 8px 14px;
+            }
+
+            .special-upload .ui-widget-header {
+                background-color: transparent !important;
+                width: 210px;
+            }
+
+            body .ui-fileupload .ui-fileupload-content {
+                border: none;
+                height: 40px;
+            }
+
+            body .ui-fileupload .ui-fileupload-buttonbar {
+                border: none;
+            }
+
+            body .ui-button {
+                color: #ffffff;
+                margin-right: 3px;
+                margin-bottom: 3px;
+                border: none !important;
+            }
+
+            body .ui-icon {
+                color: #ffffff !important;
+                width: 16px;
+                height: 16px;
+                line-height: 16px;
+            }
+
+            .card {
+                padding: 0;
+                border: none;
+            }
+
+            .red-btn {
+                background: red !important;
+                background-color: red !important;
+                color: #FFFFFF !important;
+            }
+
+            .without-header thead {
+                display: none;
+            }
+
+            body .ui-datatable .ui-paginator.ui-paginator-top {
+                background-color: #2f8ee5 !important;
+                color: #ffffff !important;
+            }
+
+            body .ui-datatable .ui-paginator.ui-paginator-bottom {
+                background-color: #2f8ee5 !important;
+                color: #ffffff !important;
+            }
+
+            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page,
+            body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev,
+            body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last {
+                color: #FFFFFF !important;
+            }
+
+            body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+                background: #FFF !important;
+                color: #000000 !important;
+            }
+
+            .layout-wrapper .route-bar {
+                border-bottom: 1px solid #c9cdd2;
+            }
+
+            .layout-footer {
+                border-top: 1px solid #c9cdd2;
+            }
+
+            .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+                border: 1px solid #c9cdd2 !important;
+            }
+
+            body .ui-widget, body .ui-widget .ui-widget {
+                font-family: "Open Sans","Helvetica Neue",sans-serif !important;
+                text-decoration: none !important;
+                font-size: 14px !important;
+            }
+
+            body .ui-datatable .ui-datatable-data > tr {
+                color: #5f666c;
+            }
+            #list_panel {
+                margin-top: 10px;
+            }
+
+            body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-button {
+                background: #009900;
+            }
+            #list_panel {
+                margin-left: 1cm;
+                margin-right: 1cm;
+            }
+        </style>
+        <br/><br/><br/>
         <p:fieldset legend="#{msg.estateSituationListDocuments}">
             <p:fileUpload label="#{msg.upload}" fileUploadListener="#{bean.saveDocumentXML}"
                           multiple="false" mode="advanced" styleClass="special-upload" auto="true"
@@ -108,17 +244,21 @@
                     <p:commandButton icon="fa fa-download" action="#{item.downloadFile}" ajax="false"/>
                 </p:column>
                 <p:column styleClass="action_column">
-                    <p:commandButton icon="ui-icon ui-icon-close" update=":form"
+                    <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn" update=":form"
                                      action="#{bean.deleteEntityDocument}">
                         <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityDeleteId}"/>
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
         </p:fieldset>
-        <ui:fragment><br /></ui:fragment>
+
+        <br/><br/><br/>
+
+
+        <!-- <ui:fragment><br /></ui:fragment> -->
         <p:fieldset legend="#{msg.estateSituationSalesDevelopmentHeader}" rendered="#{bean.salesDevelopmentShowing}">
             <p:commandButton disabled="#{!bean.canCreate}" id="buttonCreateSalesDevelopment"
-                             icon="ui-icon-circle-plus"
+                             icon="ui-icon-circle-plus" styleClass="ui-button-success p-mr-2 p-mb-2"
                              value="#{not empty addButtonTitle ? addButtonTitle : msg.newItem}"
                              update="sales_dev"
                              action="#{bean.addSalesEntity()}"/>
@@ -127,8 +267,8 @@
                              update="sales_dev" onclick="PF('autoCreateSalesDevelopment').disable()"
                              oncomplete="PF('autoCreateSalesDevelopment').enable()"
                              action="#{bean.autoAddEntity()}" widgetVar="autoCreateSalesDevelopment"/>
-            <ui:fragment><br /></ui:fragment>
-            <ui:fragment><br /></ui:fragment>
+            <!--  <ui:fragment><br /></ui:fragment>
+             <ui:fragment><br /></ui:fragment> -->
             <p:dataTable var="item" id="sales_dev" value="#{bean.salesEstateSituationList}"
                          disabledSelection="true" lazy="#{lazyMode}"
                          paginator="true" rowKey="#{item.id}" rows="10"
@@ -137,7 +277,7 @@
                          paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                          rowsPerPageTemplate="10,20,50" widgetVar="salesTableWV">
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon ui-icon-pencil"
+                    <p:commandButton icon="ui-icon pi pi-pencil"
                                      disabled="#{!bean.canEdit}" update=":form"
                                      action="#{bean.editEntity}">
                         <f:setPropertyActionListener value="#{item.id}"
@@ -145,7 +285,7 @@
                     </p:commandButton>
                 </p:column>
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon ui-icon-close"
+                    <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"
                                      oncomplete="PF('salesdlg').show()"
                                      disabled="#{!bean.canDelete || (item.id==sessionBean.currentUser.id and bean.userEntityPage)}">
                         <f:setPropertyActionListener value="#{item.id}"
@@ -224,8 +364,8 @@
             </p:dataTable>
         </p:fieldset>
         <div align="center">
-        <h:outputText value="#{bean.externalRequestFrom}" rendered="#{bean.createdByExternalUser}"
-                      style="font-size: 20px"/>
+            <h:outputText value="#{bean.externalRequestFrom}" rendered="#{bean.createdByExternalUser}"
+                          style="font-size: 20px"/>
         </div>
         <p:outputPanel id="btn_line">
             <div class="btn_line">

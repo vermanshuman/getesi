@@ -1,3 +1,4 @@
+
 package it.nexera.ris.persistence.beans.entities.domain;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
@@ -410,13 +411,6 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     @Column(name= "include_national_cost")
     private Boolean includeNationalCost;
-
-    @Column(name = "regime")
-    private Boolean regime;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "invoice_id")
-    private Invoice invoice;
 
     @Transient
     private Boolean haveRequestReport;
@@ -2024,21 +2018,5 @@ public class Request extends DocumentTagEntity implements BeforeSave {
             return true;
 
         return false;
-    }
-
-    public Boolean getRegime() {
-        return regime;
-    }
-
-    public void setRegime(Boolean regime) {
-        this.regime = regime;
-    }
-
-    public Invoice getInvoice() {
-        return invoice;
-    }
-
-    public void setInvoice(Invoice invoice) {
-        this.invoice = invoice;
     }
 }

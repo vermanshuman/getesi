@@ -28,7 +28,6 @@ import org.apache.commons.lang.WordUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.Formula;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
@@ -138,9 +137,6 @@ public class Subject extends IndexedEntity implements BeforeSave{
     
     @Column(name = "old_number_vat")
     private String oldNumberVAT;
-
-    @Formula(value = "concat(last_name,' ', first_name)")
-    private String completeName;
 
     @Transient
     private Formality tempFormality;
@@ -937,13 +933,5 @@ public class Subject extends IndexedEntity implements BeforeSave{
 
     public void setRequestSubjects(List<RequestSubject> requestSubjects) {
         this.requestSubjects = requestSubjects;
-    }
-
-    public String getCompleteName() {
-        return completeName;
-    }
-
-    public void setCompleteName(String completeName) {
-        this.completeName = completeName;
     }
 }

@@ -1,0 +1,56 @@
+$fontFamily:'cabin',sans-serif !default;
+$fontSize:14px !default;
+$borderRadius:3px !default;
+$transitionDuration:.3s !default;
+$mobileBreakpoint:991px !default;
+$animationDuration:.3s !default;
+$animationTimingFunction:cubic-bezier(.05,.74,.2,.99) !default;
+$letterSpacing:normal !default;
+$tabletBreakpoint:991px !default;
+$phoneBreakpoint:576px !default;
+$textColor:#212121 !default;
+$textSecondaryColor:#727272 !default;
+
+//main
+$bodyBgColor:#f2f2f2 !default;
+$dividerColor:#E0E0E0 !default;
+
+$footerBgColor:#ffffff !default;
+$footerBorderColor:#e8e8e8 !default;
+
+//breadcrumb
+$breadcrumbBgColor:#ffffff !default;
+$breadcrumbBorder: 1px solid #e8e8e8 !default;
+
+//light menu
+$menuBgColor:#ffffff !default;
+$menuBorder: 1px solid #E0E0E0 !default;
+$menuSeparator:1px solid $dividerColor !default;
+$rootMenuitemTextColor:$textSecondaryColor !default;
+$menuitemTextColor:$textSecondaryColor !default;
+$menuitemIconColor:$textSecondaryColor !default;
+$menuitemHoverBgColor:#e0e0e0 !default;
+
+//dark menu
+$darkMenuBgColor:#212121 !default;
+$darkMenuBorder: 1px solid #212121 !default;
+$darkMenuSeparator:1px solid #373737 !default;
+$darkMenuRootMenuitemTextColor:#757575 !default;
+$darkMenuitemTextColor:#BDBDBD !default;
+$darkMenuitemIconColor:#BDBDBD !default;
+$darkMenuitemHoverBgColor:#373737 !default;
+
+//topbar
+$topbarMenuBgColor:#ffffff !default;
+$topbarMenuBorderColor:#e0e0e0 !default;
+$topbarBadgeBgColor:#e0284f !default;
+$topbarBadgeTextColor:#ffffff !default;
+
+//card
+$cardBgColor:#ffffff !default;
+$cardBorder:1px solid #EEEEEE !default;
+
+//tooltip
+$tooltipBgColor:#212121 !default;
+$tooltipTextColor:#ffffff !default;
+

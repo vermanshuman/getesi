@@ -41,11 +41,7 @@ public class Invoice extends IndexedEntity implements Serializable {
 
     @Column(name = "cloud_id")
     private Long cloudId;
-
-	@Column(name = "api_sent_status")
-	private Boolean apiSentStatus = false;
-
-
+    
 	public Long getCloudId() {
 		return cloudId;
 	}
@@ -116,13 +112,5 @@ public class Invoice extends IndexedEntity implements Serializable {
 
 	public void setSent(Boolean sent) {
 		this.sent = sent;
-	}
-
-	public Boolean getApiSentStatus() {
-		return apiSentStatus;
-	}
-
-	public void setApiSentStatus(Boolean apiSentStatus) {
-		this.apiSentStatus = apiSentStatus;
 	}
 }

@@ -8,9 +8,11 @@ import it.nexera.ris.common.helpers.omi.OMIHelper;
 import it.nexera.ris.common.helpers.tableGenerator.CertificazioneTableGenerator;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
-import it.nexera.ris.persistence.beans.entities.Entity;
 import it.nexera.ris.persistence.beans.entities.domain.*;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.CadastralCategory;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.LandChargesRegistry;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.OmiValue;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import it.nexera.ris.persistence.view.FormalityView;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.beans.EntityEditPageBean;
@@ -32,6 +34,9 @@ import org.hibernate.sql.JoinType;
 import org.jsoup.Jsoup;
 import org.primefaces.context.RequestContext;
 import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.menu.DefaultMenuItem;
+import org.primefaces.model.menu.DefaultMenuModel;
+import org.primefaces.model.menu.MenuModel;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -45,6 +50,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.function.Consumer;
@@ -175,19 +181,23 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     @Setter
     private List<Document> requestSaleDocuments;
 
-    @Getter
-    @Setter
-    private boolean showRegime;
+    private boolean multipleCreate;
 
-    @Getter
-    @Setter
-    private List<SelectItem> regimes;
+    private MenuModel topMenuModel;
 
-    @Getter
-    @Setter
-    private Long selectedRegime;
+    private int activeMenuTabNum;
 
-    private PropertyEditInTableWrapper propertyEditInTableWrapper;
+    private List<InputCard> inputCardList;
+
+    private String invoiceNumber;
+
+    private Double invoiceItemAmount;
+
+    private Double invoiceItemVat;
+
+    private Double invoiceTotalCost;
+
+    private List<SelectItem> vatAmounts;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
@@ -223,7 +233,6 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         setEstateFormalityTypes(ComboboxHelper.fillList(EstateFormalityType.class, false));
         setPropertyTypeList(ComboboxHelper.fillList(PropertyTypeEnum.class, false, false));
 
-        setRegimes(ComboboxHelper.fillList(Regime.class, true));
         setCostManipulationHelper(new CostManipulationHelper());
         getCostManipulationHelper().setMortgageTypeList(ComboboxHelper.fillList(MortgageType.class, false, false));
 
@@ -266,6 +275,16 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         setRequestCommentCertification(getExamRequest().getCommentCertification());
 
         updateConservatoryList();
+
+        generateMenuModel();
+        setMaxInvoiceNumber();
+        if(!ValidationHelper.isNullOrEmpty(getExamRequest().getTotalCostDouble()))
+            setInvoiceTotalCost(Double.parseDouble(getExamRequest().getTotalCostDouble()));
+        vatAmounts = new ArrayList<>();
+        vatAmounts.add(new SelectItem(0D, "0%"));
+        vatAmounts.add(new SelectItem(4D, "4%"));
+        vatAmounts.add(new SelectItem(10D, "10%"));
+        vatAmounts.add(new SelectItem(22D, "22%"));
     }
 
     public void onErrorClose() throws PersistenceBeanException {
@@ -302,6 +321,10 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         log.info("before fillRequestDocumentList");
         fillRequestDocumentList();
         log.info("after fillRequestDocumentList");
+        
+        log.info("before fillOtherDocumentList");
+        fillOtherDocumentList();
+        log.info("after fillOtherDocumentList");
 
         log.info("before fillNonSaleDocumentList");
         fillNonSaleDocumentList();
@@ -310,10 +333,6 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         log.info("before fillSaleDocumentList");
         fillRequestDocumentSaleList();
         log.info("after fillSaleDocumentList");
-
-        log.info("before fillOtherDocumentList");
-        fillOtherDocumentList();
-        log.info("after fillOtherDocumentList");
     }
 
     public void executeRequest() throws PersistenceBeanException, IllegalAccessException {
@@ -395,10 +414,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             GeneralFunctionsHelper.saveReport(getEntity().getRequest(), getSelectedTemplateId(),
                     getCurrentUser(), false, getEditText(), fileName, DaoManager.getSession());
             
-            List<Document> documentListToView = EstateSituationHelper.getDocuments(type, getExamRequest(), null);
-            documentListToView.removeIf(d -> !ValidationHelper.isNullOrEmpty(d.getTypeId())
-                    && d.getTypeId().equals(DocumentType.FORMALITY.getId()));
-
+            List<Document> documentListToView = EstateSituationHelper.getDocuments(type, getExamRequest());
             if(!ValidationHelper.isNullOrEmpty(documentListToView)) {
                 for (Document document : documentListToView) {
                     if (Objects.equals(document.getTypeId(), DocumentType.OTHER.getId())
@@ -409,6 +425,9 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                     }
                 }
             }
+            documentListToView.removeIf(d -> !ValidationHelper.isNullOrEmpty(d.getTypeId())
+                    && d.getTypeId().equals(DocumentType.FORMALITY.getId()));
+
             setRequestDocuments(documentListToView);
         }else if(!ValidationHelper.isNullOrEmpty(getEntity().getRequest().getTranscriptionActId())
                 && type == RequestOutputTypes.XML) {
@@ -535,21 +554,28 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             type = RequestOutputTypes.ALL;
         }
 
-        if (type == RequestOutputTypes.ALL || type == RequestOutputTypes.ONLY_EDITOR
-                || type == RequestOutputTypes.ONLY_FILE) {
+        if (type == RequestOutputTypes.ALL || type == RequestOutputTypes.ONLY_EDITOR || type == RequestOutputTypes.ONLY_FILE) {
             String fileName = generatePdfName();
             GeneralFunctionsHelper.saveReport(getEntity().getRequest(), getSelectedTemplateId(),
                     getCurrentUser(), false, getEditText(), fileName, DaoManager.getSession());
 
-            List<Document> documentListToView = EstateSituationHelper.getDocuments(type, getExamRequest(), Boolean.FALSE);
+            List<Document> documentListToView = EstateSituationHelper.getDocumentsNonSale(type, getExamRequest());
             if(!ValidationHelper.isNullOrEmpty(documentListToView)) {
-                documentListToView.removeIf(d -> !ValidationHelper.isNullOrEmpty(d.getTypeId())
-                        && !d.getTypeId().equals(DocumentType.FORMALITY.getId()));
+                for (Document document : documentListToView) {
+
+                    if (Objects.equals(document.getTypeId(), DocumentType.OTHER.getId())
+                            || Objects.equals(document.getTypeId(), DocumentType.REQUEST_REPORT.getId())) {
+                        document.setSelectedForDialogList(true);
+                    } else {
+                        document.setSelectedForDialogList(false);
+                    }
+                }
             }
             if (!ValidationHelper.isNullOrEmpty(getExamRequest().getClient()) &&
-                    !ValidationHelper.isNullOrEmpty(getExamRequest().getClient().getSendFormality()) &&
-                    getExamRequest().getClient().getSendFormality()) {
-                documentListToView.forEach(d -> d.setSelectedForDialogList(true));
+                    !ValidationHelper.isNullOrEmpty(getExamRequest().getClient().getSendFormality())) {
+                if (getExamRequest().getClient().getSendFormality()) {
+                    documentListToView.forEach(d -> { d.setSelectedForDialogList(true);});
+                }
             }
             setRequestNonSaleDocuments(documentListToView);
         }
@@ -591,18 +617,22 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             GeneralFunctionsHelper.saveReport(getEntity().getRequest(), getSelectedTemplateId(),
                     getCurrentUser(), false, getEditText(), fileName, DaoManager.getSession());
 
-            List<Document> documentListToView = EstateSituationHelper.getDocuments(type, getExamRequest(), Boolean.TRUE);
+            List<Document> documentListToView = EstateSituationHelper.getDocumentsSale(type, getExamRequest());
             if(!ValidationHelper.isNullOrEmpty(documentListToView)) {
-                documentListToView.removeIf(d ->
-                        (!ValidationHelper.isNullOrEmpty(d.getTypeId())
-                        && !d.getTypeId().equals(DocumentType.FORMALITY.getId())) ||
-                                (!ValidationHelper.isNullOrEmpty(getRequestNonSaleDocuments())
-                                        && getRequestNonSaleDocuments().contains(d)));
+                for (Document document : documentListToView) {
+                    if (Objects.equals(document.getTypeId(), DocumentType.OTHER.getId())
+                            || Objects.equals(document.getTypeId(), DocumentType.REQUEST_REPORT.getId())) {
+                        document.setSelectedForDialogList(true);
+                    } else {
+                        document.setSelectedForDialogList(false);
+                    }
+                }
             }
             if (!ValidationHelper.isNullOrEmpty(getExamRequest().getClient()) &&
-                    !ValidationHelper.isNullOrEmpty(getExamRequest().getClient().getSendSalesDevelopmentFormality()) &&
-                    getExamRequest().getClient().getSendSalesDevelopmentFormality()) {
-                    documentListToView.forEach(d -> d.setSelectedForDialogList(true));
+                    !ValidationHelper.isNullOrEmpty(getExamRequest().getClient().getSendFormality())) {
+                if (getExamRequest().getClient().getSendSalesDevelopmentFormality()) {
+                    documentListToView.forEach(d -> { d.setSelectedForDialogList(true);});
+                }
             }
             setRequestSaleDocuments(documentListToView);
         }
@@ -619,7 +649,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     }
 
     public void saveRequestDocumentsAndNotify(boolean isConfirmed) throws Exception {
-
+        
         SaveRequestDocumentsHelper.saveRequestDocuments(getExamRequest(), getRequestDocuments(), isConfirmed);
         if(!ValidationHelper.isNullOrEmpty(getOtherDocuments())){
             SaveRequestDocumentsHelper.saveRequestDocuments(getExamRequest(), getOtherDocuments(), isConfirmed);
@@ -627,10 +657,6 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
         if (!ValidationHelper.isNullOrEmpty(getRequestNonSaleDocuments())) {
             SaveRequestDocumentsHelper.saveRequestDocuments(getExamRequest(), getRequestNonSaleDocuments(), isConfirmed);
-        }
-
-        if (!ValidationHelper.isNullOrEmpty(getRequestSaleDocuments())) {
-            SaveRequestDocumentsHelper.saveRequestDocuments(getExamRequest(), getRequestSaleDocuments(), isConfirmed);
         }
 
         if (!ValidationHelper.isNullOrEmpty(getExamRequest().getDistraintFormality())) {
@@ -992,11 +1018,6 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         log.info("Opennig Panello di controlo");
         setExamRequest(DaoManager.get(Request.class, getExamRequest().getId()));
 
-        if(!ValidationHelper.isNullOrEmpty(getExamRequest()) && !ValidationHelper.isNullOrEmpty(getExamRequest().getClient())
-                && (ValidationHelper.isNullOrEmpty(getExamRequest().getClient().getRegime()) || !getExamRequest().getClient().getRegime())){
-            setShowRegime(Boolean.TRUE);
-        }else
-            setShowRegime(Boolean.FALSE);
         final List<EstateSituation> situations = getExamRequest().getSituationEstateLocations().stream()
                 .sorted(new SortByInnerEstateFormalityDate()).collect(Collectors.toList());
 
@@ -1145,10 +1166,6 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         }
         for (SalesEstateSituationEditTableWrapper situation :
                 CollectionUtils.emptyIfNull(getSalesOtherEstateSituations())) {
-            situation.save();
-        }
-        for (SalesEstateSituationEditTableWrapper situation :
-                CollectionUtils.emptyIfNull(getGravamiEstateSituations())) {
             situation.save();
         }
         for (RequestConservatory rc : getRequestConservatoryList()) {
@@ -1536,7 +1553,6 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     }
 
     public void prepareRelationships() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        setSelectedRegime(null);
         switch (getCurrentComment()) {
         case SELECTED_PROPERTY:
             setCurrentProperty(getEstateSituations().stream().map(EstateSituationEditInTableWrapper::getPropertyList)
@@ -1551,10 +1567,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         default:
             break;
         }
-
-        if(!ValidationHelper.isNullOrEmpty(getCurrentProperty()))
-            getCurrentProperty().prepareRelationship(getExamRequest().getSubject());
-
+        getCurrentProperty().prepareRelationship(getExamRequest().getSubject());
         setQuote1(null);
         setQuote2(null);
         setPropertyType(null);
@@ -1566,10 +1579,6 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         this.setQuote1(this.getEditRelationship().getQuote1());
         this.setQuote2(this.getEditRelationship().getQuote2());
         this.setPropertyType(this.getEditRelationship().getType());
-        if(!ValidationHelper.isNullOrEmpty(this.getEditRelationship().getRegime())){
-            this.setSelectedRegime(this.getEditRelationship().getRegime().getId());
-        }else
-            this.setSelectedRegime(null);
     }
 
     public void saveRelationship() {
@@ -1590,14 +1599,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             addRequiredFieldException("form:propertyType");
             return;
         }
-        Regime regime = null;
-        if(!ValidationHelper.isNullOrEmpty(getSelectedRegime())){
-            try {
-                regime = DaoManager.get(Regime.class, getSelectedRegime());
-            } catch (Exception e) {
-                LogHelper.log(log, e);
-            }
-        }
+
         if(!ValidationHelper.isNullOrEmpty(getEditRelationship())) {
             RelationshipEditInTableWrapper relationshipEditInTableWrapper =
                     getCurrentProperty().getRelationshipList().stream()
@@ -1607,13 +1609,11 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             relationshipEditInTableWrapper.setQuote1(getQuote1());
             relationshipEditInTableWrapper.setQuote2(getQuote2());
             relationshipEditInTableWrapper.setType(getPropertyType());
-            relationshipEditInTableWrapper.setRegime(regime);
         }else {
-
             getCurrentProperty().getRelationshipList().add(new RelationshipEditInTableWrapper(
-                    getQuote1(), getQuote2(), getPropertyType(), getExamRequest().getSubject(), regime));
+                    getQuote1(), getQuote2(), getPropertyType(), getExamRequest().getSubject()));
         }
-        setSelectedRegime(null);
+
         setCurrentComment(null);
         setComment(new Comment());
         setSelectedId(null);
@@ -1804,26 +1804,14 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                         .emptyIfNull(getRequestDocuments()).stream()
                         .map(Document::getId)
                         .collect(Collectors.toList());
-
-                getRequestNonSaleDocuments()
-                        .stream()
-                        .map(Document::getId)
-                        .forEach(existingIds::add);
-
-                getRequestSaleDocuments()
-                        .stream()
-                        .map(Document::getId)
-                        .forEach(existingIds::add);
-
+                
                 for(FormalityView formality: formalityPDFList) {
                     if(!ValidationHelper.isNullOrEmpty(formality.getDocumentId()) 
                             && !existingIds.contains(formality.getDocumentId())) {
                         Document otherDoc = DaoManager.get(Document.class, formality.getDocumentId());
                         if(!getOtherDocuments().contains(otherDoc)){
-                            if (Objects.equals(otherDoc.getTypeId(), DocumentType.FORMALITY.getId())){
+                            if (Objects.equals(otherDoc.getTypeId(), DocumentType.FORMALITY.getId()))
                                 getOtherDocuments().add(otherDoc);
-                            }
-
                         }
                     }
                 }
@@ -1864,73 +1852,37 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     public void reCalculateOMI() throws PersistenceBeanException, InstantiationException,
             IllegalAccessException {
-
         for (EstateSituationEditInTableWrapper situation : getEstateSituations()) {
             for (PropertyEditInTableWrapper propertyEditInTableWrapper : situation.getPropertyList()) {
-                if (!ValidationHelper.isNullOrEmpty(propertyEditInTableWrapper.isCalculateOmiValue())
-                        && propertyEditInTableWrapper.isCalculateOmiValue()) {
-
-                    if(!ValidationHelper.isNullOrEmpty(getPropertyEditInTableWrapper().getSelectedCategoryId()) &&
-                            propertyEditInTableWrapper.getSelectedCategoryId().equals(getPropertyEditInTableWrapper().getSelectedCategoryId())){
-                        if(!ValidationHelper.isNullOrEmpty(propertyEditInTableWrapper) &&
-                                !ValidationHelper.isNullOrEmpty(propertyEditInTableWrapper.isCalculateOmiValue())
-                                && propertyEditInTableWrapper.isCalculateOmiValue()){
-                            Property property = DaoManager.get(Property.class, propertyEditInTableWrapper.getId());
-                            if(!ValidationHelper.isNullOrEmpty(property.getCity()) &&
-                                    !ValidationHelper.isNullOrEmpty(property.getCategoryCode())){
-                                String code = OMIHelper.getCode(property.getCategoryCode());
-                                List<OmiValue> omiValues = DaoManager.load(OmiValue.class, new Criterion[]{
-                                        Restrictions.eq("zone", property.getZone()),
-                                        Restrictions.eq("cityCfis", property.getCity().getCfis()),
-                                        Restrictions.eq("categoryCode", Long.parseLong(code))
-                                });
-                                if(ValidationHelper.isNullOrEmpty(omiValues)){
-                                    OmiValue omiValue = new OmiValue();
-                                    omiValue.setCategoryCode(Long.parseLong(OMIHelper.getCode(property.getCategoryCode())));
-                                    omiValue.setCityCfis(property.getCity().getCfis());
-                                    omiValue.setCityDescription(property.getCity().getDescription());
-                                    omiValue.setComprMin(propertyEditInTableWrapper.getMinimumValue());
-                                    omiValue.setComprMax(propertyEditInTableWrapper.getMaximumValue());
-                                    omiValue.setZone(property.getZone());
-                                    omiValue.setState("NORMALE");
-                                    DaoManager.save(omiValue, true);
-                                }
-                                propertyEditInTableWrapper.reCalculateOMI();
-                            }
+                if(!ValidationHelper.isNullOrEmpty(propertyEditInTableWrapper.isCalculateOmiValue())
+                        && propertyEditInTableWrapper.isCalculateOmiValue()){
+                    Property property = DaoManager.get(Property.class, propertyEditInTableWrapper.getId());
+                    if(!ValidationHelper.isNullOrEmpty(property.getCity()) &&
+                        !ValidationHelper.isNullOrEmpty(property.getCategoryCode())){
+                        String code = OMIHelper.getCode(property.getCategoryCode());
+                        List<OmiValue> omiValues = DaoManager.load(OmiValue.class, new Criterion[]{
+                                Restrictions.eq("zone", property.getZone()),
+                                Restrictions.eq("cityCfis", property.getCity().getCfis()),
+                                Restrictions.eq("categoryCode", Long.parseLong(code))
+                        });
+                        if(ValidationHelper.isNullOrEmpty(omiValues)){
+                            OmiValue omiValue = new OmiValue();
+                            omiValue.setCategoryCode(Long.parseLong(OMIHelper.getCode(property.getCategoryCode())));
+                            omiValue.setCityCfis(property.getCity().getCfis());
+                            omiValue.setCityDescription(property.getCity().getDescription());
+                            omiValue.setComprMin(propertyEditInTableWrapper.getMinimumValue());
+                            omiValue.setComprMax(propertyEditInTableWrapper.getMaximumValue());
+                            omiValue.setZone(property.getZone());
+                            omiValue.setState("NORMALE");
+                            DaoManager.save(omiValue, true);
                         }
+                        propertyEditInTableWrapper.reCalculateOMI();
                     }
+
 
                 }
             }
         }
-//        if(!ValidationHelper.isNullOrEmpty(propertyEditInTableWrapper) &&
-//                !ValidationHelper.isNullOrEmpty(propertyEditInTableWrapper.isCalculateOmiValue())
-//                && propertyEditInTableWrapper.isCalculateOmiValue()){
-//            Property property = DaoManager.get(Property.class, propertyEditInTableWrapper.getId());
-//            if(!ValidationHelper.isNullOrEmpty(property.getCity()) &&
-//                    !ValidationHelper.isNullOrEmpty(property.getCategoryCode())){
-//                String code = OMIHelper.getCode(property.getCategoryCode());
-//                List<OmiValue> omiValues = DaoManager.load(OmiValue.class, new Criterion[]{
-//                        Restrictions.eq("zone", property.getZone()),
-//                        Restrictions.eq("cityCfis", property.getCity().getCfis()),
-//                        Restrictions.eq("categoryCode", Long.parseLong(code))
-//                });
-//                if(ValidationHelper.isNullOrEmpty(omiValues)){
-//                    OmiValue omiValue = new OmiValue();
-//                    omiValue.setCategoryCode(Long.parseLong(OMIHelper.getCode(property.getCategoryCode())));
-//                    omiValue.setCityCfis(property.getCity().getCfis());
-//                    omiValue.setCityDescription(property.getCity().getDescription());
-//                    omiValue.setComprMin(propertyEditInTableWrapper.getMinimumValue());
-//                    omiValue.setComprMax(propertyEditInTableWrapper.getMaximumValue());
-//                    omiValue.setZone(property.getZone());
-//                    omiValue.setState("NORMALE");
-//                    DaoManager.save(omiValue, true);
-//                }
-//                propertyEditInTableWrapper.reCalculateOMI();
-//            }
-//
-//
-//        }
     }
 
     public String getEditText() {
@@ -2313,11 +2265,135 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         this.salesOtherEstateSituations = salesOtherEstateSituations;
     }
 
-    public PropertyEditInTableWrapper getPropertyEditInTableWrapper() {
-        return propertyEditInTableWrapper;
+    private void addMenuItem(String value) {
+        DefaultMenuItem menuItem = new DefaultMenuItem(value);
+
+        menuItem.setCommand("#{requestTextEditBean.goToTab(" +
+                getTopMenuModel().getElements().size() + ")}");
+        menuItem.setUpdate("form");
+
+        getTopMenuModel().addElement(menuItem);
     }
 
-    public void setPropertyEditInTableWrapper(PropertyEditInTableWrapper propertyEditInTableWrapper) {
-        this.propertyEditInTableWrapper = propertyEditInTableWrapper;
+
+    private void generateMenuModel() {
+        setTopMenuModel(new DefaultMenuModel());
+        if (isMultipleCreate()) {
+            addMenuItem(ResourcesHelper.getString("requestTextEditDataTab"));
+//            addMenuItem(ResourcesHelper.getString("requestTextEditNoteTab"));
+//            addMenuItem(ResourcesHelper.getString("requestTextEditPaymentsTab"));
+//            addMenuItem(ResourcesHelper.getString("requestTextEditAttachmentsTab"));
+//            addMenuItem(ResourcesHelper.getString("requestTextEditEmailTab"));
+        } else {
+            addMenuItem(ResourcesHelper.getString("requestTextEditDataTab"));
+            if (!ValidationHelper.isNullOrEmpty(getInputCardList())) {
+                getInputCardList()
+                        .forEach(card -> addMenuItem(card.getName().toUpperCase()));
+            }
+//            addMenuItem(ResourcesHelper.getString("requestTextEditNoteTab"));
+//            addMenuItem(ResourcesHelper.getString("requestTextEditPaymentsTab"));
+//            addMenuItem(ResourcesHelper.getString("requestTextEditAttachmentsTab"));
+//            addMenuItem(ResourcesHelper.getString("requestTextEditEmailTab"));
+        }
+    }
+
+    public void setMaxInvoiceNumber() throws HibernateException, IllegalAccessException, PersistenceBeanException {
+        LocalDate currentdate = LocalDate.now();
+        int currentYear = currentdate.getYear();
+
+        Long lastInvoiceNumber = -1l;
+        try {
+            lastInvoiceNumber = (Long) DaoManager.getMax(Invoice.class, "id",
+                    new Criterion[]{});
+        } catch (PersistenceBeanException | IllegalAccessException e) {
+            LogHelper.log(log, e);
+        }
+        String invoiceNumber = (lastInvoiceNumber+1) + "-" + currentYear + "-FE";
+        setInvoiceNumber(invoiceNumber);
+    }
+    public MenuModel getTopMenuModel() {
+        return topMenuModel;
+    }
+
+    public void setTopMenuModel(MenuModel topMenuModel) {
+        this.topMenuModel = topMenuModel;
+    }
+
+    public List<InputCard> getInputCardList() {
+        return inputCardList;
+    }
+
+    public void setInputCardList(List<InputCard> inputCardList) {
+        this.inputCardList = inputCardList;
+    }
+
+    public int getActiveMenuTabNum() {
+        return activeMenuTabNum;
+    }
+
+    public void setActiveMenuTabNum(int activeMenuTabNum) {
+        this.activeMenuTabNum = activeMenuTabNum;
+    }
+
+    public boolean isMultipleCreate() {
+        return multipleCreate;
+    }
+
+    public void setMultipleCreate(boolean multipleCreate) {
+        this.multipleCreate = multipleCreate;
+    }
+
+    public String getInvoiceNumber() {
+        return invoiceNumber;
+    }
+
+    public void setInvoiceNumber(String invoiceNumber) {
+        this.invoiceNumber = invoiceNumber;
+    }
+
+    public Double getInvoiceItemAmount() {
+        return invoiceItemAmount;
+    }
+
+    public void setInvoiceItemAmount(Double invoiceItemAmount) {
+        this.invoiceItemAmount = invoiceItemAmount;
+    }
+
+    public Double getInvoiceItemVat() {
+        return invoiceItemVat;
+    }
+
+    public void setInvoiceItemVat(Double invoiceItemVat) {
+        this.invoiceItemVat = invoiceItemVat;
+    }
+
+    public Double getInvoiceTotalCost() {
+        return invoiceTotalCost;
+    }
+
+    public void setInvoiceTotalCost(Double invoiceTotalCost) {
+        this.invoiceTotalCost = invoiceTotalCost;
+    }
+
+    public List<SelectItem> getVatAmounts() {
+        return vatAmounts;
+    }
+
+    public void setVatAmounts(List<SelectItem> vatAmounts) {
+        this.vatAmounts = vatAmounts;
+    }
+
+    public Double getTotalGrossAmount() {
+
+        System.out.println(getInvoiceItemVat() + ">>>>>>>>>>>>>>> " + getInvoiceItemAmount());
+        Double totalGrossAmount = 0D;
+
+        if(!ValidationHelper.isNullOrEmpty(getInvoiceItemAmount())){
+            totalGrossAmount += getInvoiceItemAmount();
+            if(!ValidationHelper.isNullOrEmpty(getInvoiceItemVat())){
+                totalGrossAmount += (getInvoiceItemAmount() * (getInvoiceItemVat()/100));
+            }
+        }
+        return totalGrossAmount;
     }
 }

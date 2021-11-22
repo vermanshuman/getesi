@@ -22,7 +22,6 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -88,7 +87,8 @@ public class TemplatePdfTableHelper {
             return DateTimeHelper.toString(group);
         } else return "";
     }
-    public static List<String> groupPropertiesByQuoteTypeList(List<Property> propertyList, Subject subject, Request request,
+
+    public static List<String> groupPropertiesByQuoteTypeList(List<Property> propertyList, Subject subject,
                                                               boolean filterRelationship,
                                                               boolean showCadastralIncome,
                                                               boolean showAgriculturalIncome) {
@@ -103,15 +103,9 @@ public class TemplatePdfTableHelper {
         for (Iterator<Map.Entry<List<RelationshipGroupingWrapper>, List<Property>>> iterator = re.entrySet().iterator();
              iterator.hasNext(); ) {
             Map.Entry<List<RelationshipGroupingWrapper>, List<Property>> entry = iterator.next();
-            constructTableText(joiner, iterator, entry, true, showCadastralIncome, showAgriculturalIncome, request);
+            constructTableText(joiner, iterator, entry, true, showCadastralIncome, showAgriculturalIncome);
         }
         return joiner;
-    }
-    public static List<String> groupPropertiesByQuoteTypeList(List<Property> propertyList, Subject subject,
-                                                              boolean filterRelationship,
-                                                              boolean showCadastralIncome,
-                                                              boolean showAgriculturalIncome) {
-       return groupPropertiesByQuoteTypeList(propertyList, subject, null,filterRelationship, showCadastralIncome, showAgriculturalIncome);
     }
 
     public static List<Pair<String, String>> groupPropertiesByQuoteTypeListLikePairs(List<Property> propertyList, Subject subject,
@@ -126,8 +120,7 @@ public class TemplatePdfTableHelper {
                                                                                      List<Subject> presumableSubjects,
                                                                                      boolean filterRelationship, Formality formality,
                                                                                      boolean showCadastralIncome,
-                                                                                     boolean showAgriculturalIncome,
-                                                                                     Boolean addCommercialAndOmi) {
+                                                                                     boolean showAgriculturalIncome, Boolean addCommercialAndOmi) {
         for (Property property : propertyList) {
             if (!ValidationHelper.isNullOrEmpty(property.getCategoryCode())
                     && !RealEstateType.LAND.getShortValue().equals(property.getCategoryCode())) {
@@ -177,26 +170,10 @@ public class TemplatePdfTableHelper {
 
     private static void constructTableText(List<String> joiner, Iterator<Map.Entry<List<RelationshipGroupingWrapper>,
             List<Property>>> iterator, Map.Entry<List<RelationshipGroupingWrapper>, List<Property>> entry, boolean addCommercialAndOmi,
-                                           boolean showCadastralIncome,boolean showAgriculturalIncome) {
-        constructTableText(joiner, iterator, entry, true, showCadastralIncome, showAgriculturalIncome, null);
-    }
-    private static void constructTableText(List<String> joiner, Iterator<Map.Entry<List<RelationshipGroupingWrapper>,
-            List<Property>>> iterator, Map.Entry<List<RelationshipGroupingWrapper>, List<Property>> entry, boolean addCommercialAndOmi,
-            boolean showCadastralIncome,boolean showAgriculturalIncome, Request request) {
-        final AtomicBoolean showRegime = new AtomicBoolean(Boolean.FALSE);
-
-        if(!ValidationHelper.isNullOrEmpty(request) &&
-                ((!ValidationHelper.isNullOrEmpty(request.getClient()) &&
-                !ValidationHelper.isNullOrEmpty(request.getClient().getRegime()) &&
-                request.getClient().getRegime()) || (!ValidationHelper.isNullOrEmpty(request.getRegime()) &&
-                        request.getRegime()))) {
-            showRegime.set(Boolean.TRUE);
-        }
-
+            boolean showCadastralIncome,boolean showAgriculturalIncome) {
         joiner.add(entry.getKey().stream()
                 .map(p -> String.format("DIRITTI PARI A %s %s %s",
-                        p.getQuote(), p.getManagedPropertyType(),
-                        showRegime.get() ? p.getExpectedRegimeFormat() : ""))
+                        p.getQuote(), p.getManagedPropertyType(), p.getExpectedRegimeFormat()))
                 .collect(Collectors.joining("<br/>", "<div align=\"center\"><b>", "</b></div>")));
 
         List<Property> freeProperty = entry.getValue();

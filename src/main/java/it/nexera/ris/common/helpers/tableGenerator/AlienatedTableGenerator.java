@@ -9,7 +9,6 @@ import it.nexera.ris.web.beans.wrappers.PartedPairsByCityWrapper;
 import org.hibernate.HibernateException;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class AlienatedTableGenerator extends InterlayerTableGenerator {
@@ -59,20 +58,14 @@ public class AlienatedTableGenerator extends InterlayerTableGenerator {
                     .filter(es -> ValidationHelper.isNullOrEmpty(es.getSalesDevelopment()) || !es.getSalesDevelopment())
                     .findFirst()
                     .orElse(null);
-            if(!ValidationHelper.isNullOrEmpty(estateSituation) && !ValidationHelper.isNullOrEmpty(estateSituation.getFormalityList())){
-                formalities = new ArrayList<>(estateSituation.getFormalityList());
-                formalities.sort(Comparator.comparing(Formality::getComparedDate)
-                        .thenComparing(Formality::getGeneralRegister)
-                        .thenComparing(Formality::getParticularRegister));
-            }
+            if(!ValidationHelper.isNullOrEmpty(estateSituation))
+                formalities = estateSituation.getFormalityList();
         }
         if (ValidationHelper.isNullOrEmpty(formalities)) {
             return;
         }
         setTagTableList(new ArrayList<>());
         int counter = 1;
-
-
 
         fillPartedPairsByCity(formalities, Boolean.TRUE);
 

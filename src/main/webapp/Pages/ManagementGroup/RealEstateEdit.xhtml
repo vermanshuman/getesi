@@ -9,8 +9,105 @@
     <ui:param name="bean" value="#{realEstateEditBean}"/>
     <ui:param name="edit_title" value="#{msg.databaseListRealEstate}"/>
     <ui:param name="disableSave" value="#{!bean.renderForm}"/>
-    <ui:param name="saveButtonStyle" value="btn-green"/>
+    <ui:param name="saveButtonStyle" value="ui-button-success"/>
     <ui:define name="edit_body">
+        <style>
+            body .ui-fieldset .ui-fieldset-legend {
+                border: 1px solid #dee2e6 !important;
+                color: #FFFFFF !important;
+                padding: .6em 1em !important;
+                font-weight: normal !important;
+                border-radius: 4px !important;
+                user-select: none !important;
+                font-size: 14px !important;
+                transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+            }
+
+            body .ui-fieldset {
+                margin-bottom: 10px;
+            }
+
+            .red-btn {
+                background-color: red !important;
+                border: none !important;
+            }
+
+
+            body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
+                background-color: #ebf5fa !important;
+            }
+
+            .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+                border: 1px solid #c9cdd2 !important;
+            }
+
+            .ui-datatable tbody td, .ui-datatable tfoot td {
+                border-width: 0 2px 1px 0 !important;
+            }
+
+            body .ui-datatable thead th {
+                background-color: #f8f9fa !important;
+                color: #495057 !important;
+                padding: 1rem 1rem !important;
+            }
+
+            body .ui-datatable .ui-datatable-data tr td {
+                padding: 6px 6px !important;
+            }
+
+            body .ui-datatable thead th.ui-state-active {
+                color: #2196F3 !important;
+            }
+
+            body .ui-datatable .ui-datatable-data > tr:hover {
+                background: #e9ecef !important;
+            }
+
+            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page, body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev, body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last {
+                color: #6c757d !important;
+            }
+
+            body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+                background: #2196F3 !important;
+                color: #ffffff !important;
+            }
+
+            body .ui-datatable .ui-paginator.ui-paginator-top {
+                background-color: #2f8ee5 !important;
+                color: #ffffff !important;
+            }
+
+            body .ui-datatable .ui-paginator.ui-paginator-bottom {
+                background-color: #2f8ee5 !important;
+                color: #ffffff !important;
+            }
+
+            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page,
+            body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev,
+            body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last {
+                color: #FFFFFF !important;
+            }
+
+            body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+                background: #FFF !important;
+                color: #000000 !important;
+            }
+
+            fieldset div {
+                font-size: 14px;
+                text-align: left;
+            }
+
+            .ui-datatable tbody td, .ui-datatable tfoot td {
+                border-width: 1px !important;
+            }
+
+            .btn-green {
+                margin-right: 10px !important;
+            }
+
+
+        </style>
         <script type="application/javascript">
             function customFilter(label, filter) {
                 var descr = label.substr(label.indexOf(" ") + 1).toUpperCase();
@@ -136,29 +233,29 @@
                     <p:inputText value="#{bean.entity.interno}" styleClass="input-width"/>
                 </p:column>
             </p:panelGrid>
-			<p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group" layout="grid"
+            <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group" layout="grid"
                          rendered="#{bean.isBuilding}" columnClasses="ui-grid-col-3">
                 <p:column>
-                	<h:outputText value="#{msg.databaseListRealEstateZona}:"/>
+                    <h:outputText value="#{msg.databaseListRealEstateZona}:"/>
                     <p:inputText value="#{bean.entity.zone}" maxlength="300" styleClass="input-width"/>
-                </p:column>                
+                </p:column>
             </p:panelGrid>
-			
+
             <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" layout="grid"
                          rendered="#{!bean.isBuilding}">
-				<p:column>
-					<h:outputText value="#{msg.databaseListRealEstateCategory}:" />
-					<p:selectOneMenu id="tcategory" value="#{bean.categoryId}"
-						styleClass="select-width"
-						label="#{msg.databaseListRealEstateCategory}:">
-						<f:selectItems value="#{bean.categories}" />
-						<p:ajax update="tcategoryDesc" />
-					</p:selectOneMenu>
+                <p:column>
+                    <h:outputText value="#{msg.databaseListRealEstateCategory}:" />
+                    <p:selectOneMenu id="tcategory" value="#{bean.categoryId}"
+                                     styleClass="select-width"
+                                     label="#{msg.databaseListRealEstateCategory}:">
+                        <f:selectItems value="#{bean.categories}" />
+                        <p:ajax update="tcategoryDesc" />
+                    </p:selectOneMenu>
 
-					<h:outputText value="#{msg.estateType}: " />
-					<h:outputText value="#{bean.categoryDescription}" id="tcategoryDesc" />
-				</p:column>
-				<p:column>
+                    <h:outputText value="#{msg.estateType}: " />
+                    <h:outputText value="#{bean.categoryDescription}" id="tcategoryDesc" />
+                </p:column>
+                <p:column>
                     <h:outputText value="#{msg.databaseListRealEstateHectares}:"/>
                     <p:inputText value="#{bean.entity.hectares}" styleClass="input-width" id="hectares"
                                  onkeypress="return tro_num_with_zero_only('#hectares')"/>
@@ -212,7 +309,7 @@
                              rowsPerPageTemplate="10,20,50" widgetVar="tableSubjectsWV">
 
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton icon="ui-icon ui-icon-pencil"
+                        <p:commandButton icon="ui-icon pi pi-pencil"
                                          oncomplete="PF('addSubjectDLGWV').show();"
                                          update=":form:addSubjectPanel" action="#{bean.editRelationship}">
                             <f:setPropertyActionListener value="#{item.id}"
@@ -221,7 +318,7 @@
                     </p:column>
 
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton icon="ui-icon ui-icon-close"
+                        <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"
                                          oncomplete="PF('deleteSubjectDLGWV').show()">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.relationshipDeleteId}"/>
@@ -336,7 +433,7 @@
     </ui:define>
     <ui:define name="additional_buttons">
         <p:commandButton action="#{bean.pageSave}" value="#{msg.saveDuplicate}" disabled="#{!bean.renderForm}"
-                         icon="ui-icon-disk" update=":form, messages" styleClass="btn-green">
+                         icon="ui-icon-disk" update=":form, messages" styleClass="btn-green ui-button-success p-mr-2 p-mb-2">
             <f:setPropertyActionListener value="true" target="#{bean.saveDuplicate}"/>
         </p:commandButton>
     </ui:define>

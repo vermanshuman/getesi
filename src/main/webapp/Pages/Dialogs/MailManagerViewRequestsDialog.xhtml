@@ -34,8 +34,34 @@
 
 		<div class="btn_line">
 			<p:commandButton value="#{msg.confirm}" update="@form"
+							 style="margin-right: 1cm;background-color: #57c279!important;"
 			                 action="#{bean.openNewMailToManager}"/>
-			<p:commandButton value="#{msg.cancel}" oncomplete="PF('mailManagerViewRequestsDlg').hide();"/>
+			<p:commandButton value="#{msg.cancel}" oncomplete="PF('mailManagerViewRequestsDlg').hide();"
+							 style="background-color: #F3362B !important;"/>
 		</div>
-    </p:dialog>
+		<style>
+			.ui-datatable-scrollable-theadclone {
+				display: none !important;
+			}
+			th.action_column {
+				width: 30px !important;
+			}
+			td.action_column {
+				width: 59px !important;
+			}
+			.ui-datatable-scrollable-header th:nth-child(2) {
+				width: 233px !important;
+			}
+			.ui-datatable-scrollable-body td:nth-child(2) {
+				width: 262px !important;
+			}
+			.ui-datatable-scrollable-body td:nth-child(3), .ui-datatable-scrollable-body td:nth-child(4) {
+				width: 203px !important;
+			}
+			.ui-datatable-scrollable-body td:nth-child(5) {
+				width: 204px !important;
+			}
+		</style>
+
+	</p:dialog>
 </ui:composition>

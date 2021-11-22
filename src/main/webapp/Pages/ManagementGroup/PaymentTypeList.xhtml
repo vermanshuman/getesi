@@ -23,20 +23,6 @@
             <p:inputText id="code"
             			value="#{bean.entity.code}"
                          label="#{msg.code}"/>
-            <span>#{msg.beneficiary}:</span>
-            <p:inputText id="beneficiary"
-                         value="#{bean.entity.beneficiary}"
-                         label="#{msg.beneficiary}"/>
-
-            <span>#{msg.istitutionName}:</span>
-            <p:inputText id="istitutionName"
-                         value="#{bean.entity.istitutionName}"
-                         label="#{msg.istitutionName}"/>
-
-            <span>#{msg.iban}:</span>
-            <p:inputText id="iban"
-                         value="#{bean.entity.iban}"
-                         label="#{msg.iban}"/>
         </p:panelGrid>
     </ui:define>
 
@@ -49,20 +35,6 @@
         <p:column sortBy="#{item.code}" filterBy="#{item.code}"
                   headerText="#{msg.code}">
             <h:outputText value="#{item.code}"/>
-        </p:column>
-        <p:column sortBy="#{item.beneficiary}" filterBy="#{item.beneficiary}"
-                  headerText="#{msg.beneficiary}">
-            <h:outputText value="#{item.beneficiary}"/>
-        </p:column>
-
-        <p:column sortBy="#{item.istitutionName}" filterBy="#{item.istitutionName}"
-                  headerText="#{msg.istitutionName}">
-            <h:outputText value="#{item.istitutionName}"/>
-        </p:column>
-
-        <p:column sortBy="#{item.iban}" filterBy="#{item.iban}"
-                  headerText="#{msg.iban}">
-            <h:outputText value="#{item.iban}"/>
         </p:column>
     </ui:define>
 

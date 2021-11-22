@@ -209,6 +209,7 @@
                         <p:column><span>#{msg.clientFax} </span></p:column>
                         <p:column><span>#{msg.clientCell} </span></p:column>
                         <p:column style="padding-right: 20px"><span>#{msg.clientMailPEC} </span></p:column>
+                        <p:column><span>#{msg.clientAddressSDI} </span></p:column>
                     </p:row>
                     <p:row>
                         <p:column>
@@ -236,16 +237,11 @@
                             <h:outputText value="#{bean.entity.mailPEC}" rendered="#{bean.onlyView}"
                                           style="font-weight: bold;"/>
                         </p:column>
-                    </p:row>
-                    <p:row>
-                        <p:column><span>#{msg.clientAddressSDI} </span></p:column>
-                    </p:row>
-                    <p:row>
                         <p:column>
-                            <p:inputText value="#{bean.entity.addressSDI}" maxlength="20" styleClass="input-width"
-                                         rendered="#{!bean.onlyView}"/>
-                            <h:outputText value="#{bean.entity.addressSDI}" rendered="#{bean.onlyView}"
-                                          style="font-weight: bold;"/>
+                                <p:inputText value="#{bean.entity.addressSDI}" maxlength="20" styleClass="input-width"
+                                             rendered="#{!bean.onlyView}"/>
+                                <h:outputText value="#{bean.entity.addressSDI}" rendered="#{bean.onlyView}"
+                                              style="font-weight: bold;"/>
                         </p:column>
                     </p:row>
                 </p:panelGrid>
@@ -264,17 +260,6 @@
                                              rendered="#{!bean.onlyView}">
                                 <f:selectItems value="#{bean.ibans}"/>
                             </p:selectOneMenu></p:column>
-                    </p:row>
-                    <p:row>
-                        <p:column style="padding-right: 20px">
-                            <span>#{msg.invoicePaymentType}: </span><br/>
-                            <p:selectOneMenu id="paymentMode" value="#{bean.paymentTypeId}"
-                                             label="#{msg.invoicePaymentType}"
-                                             rendered="#{!bean.onlyView}">
-                                <f:selectItem itemValue="" itemLabel="- Non selezionato -" />
-                                <f:selectItems value="#{bean.paymentTypes}"/>
-                            </p:selectOneMenu>
-                        </p:column>
                     </p:row>
                 </p:panelGrid>
             </p:tab>
@@ -760,7 +745,7 @@
             	<br/>
             	<span><b>#{msg.clientEditMonthlyBillingData}</b>:</span>
 				<p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
-					
+
 					<span>#{msg.clientBilling}:</span>
 					<p:pickList value="#{bean.invoiceColumns}" var="invoiceColumn"
 						effect="explode" itemValue="#{invoiceColumn.field}"
@@ -779,7 +764,7 @@
 					</p:selectOneMenu>
 					<p:commandButton id="addBtn" icon="fa fa-plus" action="#{bean.addRequestTypeInvoiceColumns}" update="requestTypeName requestTypeInvoices"/>
 				</p:panelGrid>
-				
+
 				<p:outputPanel id="requestTypeInvoices">
 					<ui:repeat value="#{bean.requestTypeInvoiceColumns}" var="sic">
 						<p:row>
@@ -797,7 +782,7 @@
 						<br />
 					</ui:repeat>
 				</p:outputPanel>
-				
+
 
 			</p:tab>
 			 <p:tab id="wizardTabCUSTOMIZATION" title="#{msg.wizardTabCUSTOMIZATION.toUpperCase()}">
@@ -824,7 +809,7 @@
                     <p:selectBooleanCheckbox id="clientRegime" value="#{bean.entity.regime}"/>
                 </p:panelGrid>
 			</p:tab>
-			
+
         </p:tabView>
 	                <p:outputPanel id="nextButton" style="margin-top: 15px; position: relative;">
                     <p:commandButton value="#{msg.save.toUpperCase()}" styleClass="green-button"
@@ -924,8 +909,8 @@
                             <h:outputText value="#{msg.costConfigurationFormalityCostoSuccessive}"/>
                         </p:panelGrid>
                     </p:column>
-                    
-                    
+
+
                     <p:column>
                         <p:outputPanel rendered="#{not bean.priceListDialogOnlyView}">
                             <p:inputText value="#{itemR.price}" rendered="#{!itemR.isFixedOrSalaryCost}"
@@ -983,9 +968,9 @@
                         <h:outputText value="&#8364;"/>
                     </p:column>
                 </p:dataTable>
-                
+
                 <p:panel id="negativeService" rendered="#{bean.selectedService.service.isNegative}"
-                style="margin: auto; " 
+                style="margin: auto; "
                 header ="Costo visura negativa">
                     <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" columnClasses="ui-grid-col-2, ui-grid-col-3"
                      layout="grid">
@@ -1002,8 +987,8 @@
                                       rendered="#{bean.priceListDialogOnlyView}"/>
                     </p:panelGrid>
                 </p:panel>
-                
-                
+
+
                 <div class="btn_line">
                     <p:commandButton value="#{msg.confirm}" process="@(.myclass)"
                                      oncomplete="PF('configurePriceListWV').hide()"/>

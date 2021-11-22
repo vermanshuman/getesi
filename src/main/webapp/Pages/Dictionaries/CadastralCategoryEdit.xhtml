@@ -6,6 +6,7 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/resources/tpl/Admin/EditBase.xhtml">
     <ui:param name="bean" value="#{cadastralCategoryEditBean}"/>
+    <ui:param name="page_header" value="#{msg.categoryPercentValueCategoryCode}"/>
     <ui:param name="edit_title"
               value="#{bean.entity.isNew ? msg.cadastralCategoryNew : msg.cadastralCategoryEdit}"/>
     <ui:param name="showSave" value="#{!bean.onlyView}"/>

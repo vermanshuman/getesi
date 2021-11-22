@@ -1208,8 +1208,7 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
             log.info("Mail is sent");
             if(!ValidationHelper.isNullOrEmpty(getBaseMailId()))
                 getEntity().setRecievedInbox(DaoManager.get(WLGInbox.class, getBaseMailId()));
-            if(!ValidationHelper.isNullOrEmpty(getRequestId())
-                    && (ValidationHelper.isNullOrEmpty(isEvadiRichesta()) || !isEvadiRichesta())){
+            if(!ValidationHelper.isNullOrEmpty(getRequestId())) {
                 Request request = DaoManager.get(Request.class, getRequestId());
                 request.setStateId(RequestState.TO_BE_SENT.getId());
                 DaoManager.save(request, true);

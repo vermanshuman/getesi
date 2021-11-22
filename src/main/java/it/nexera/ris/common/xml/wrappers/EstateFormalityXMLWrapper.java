@@ -64,13 +64,6 @@ public class EstateFormalityXMLWrapper
         estateFormality.setCreateDate(getCreateDate());
         estateFormality.setUpdateDate(getUpdateDate());
         estateFormality.setVersion(getVersion());
-        try {
-            if(!ValidationHelper.isNullOrEmpty(getDate()) && getDate().substring(6,8).compareTo("00") == 0 &&
-                    getDate().substring(4,6).compareTo("00") == 0){
-                estateFormality.setYear(getDate().substring(0,4));
-            }
-        } catch (Exception e) {
-        }
         estateFormality.setDate(DateTimeHelper.fromXMLStringDate(getDate()));
         estateFormality.setTypeAct(ValidationHelper.isNullOrEmpty(getActCode()) ? null
                 : ConnectionManager.get(TypeAct.class, new Criterion[]{

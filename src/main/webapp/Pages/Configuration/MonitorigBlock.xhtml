@@ -32,8 +32,8 @@
         </p:panel>
         <div class="btn_line">
             <p:commandButton value="#{service.running and service.pausingSupported ? (service.paused ? msg.resume : msg.pause) : msg.start}"
-                             widgetVar="#{startBtnWV}" icon="#{service.running and service.pausingSupported ? (service.paused ? 'ui-icon-play' : 'ui-icon-pause') : 'ui-icon-play'}"
-                             action="#{service.startOrPause}" update="outpanel"
+                             widgetVar="#{startBtnWV}" icon="#{service.running and service.pausingSupported ? (service.paused ? 'pi pi-caret-right' : 'pi pi-pause') : 'pi pi-caret-right'}"
+                             action="#{service.startOrPause}" update="outpanel" styleClass="p-mr-2 p-mb-2"
                              disabled="#{service.pausingSupported ? false : (service.running ? true : (empty blockService ? false : blockService))}"
                              onstart="#{empty onstartStartButton ? '' : onstartStartButton }"
                             />
@@ -41,7 +41,7 @@
             <p:commandButton value="#{msg.stop}"
                              widgetVar="#{stopBtnWV}" icon="ui-icon-stop"
                              action="#{service.stop}" update="outpanel"
-                             disabled="#{!service.running}"
+                             disabled="#{!service.running}" styleClass="p-mr-2 p-mb-2"
                              onclick="PF('#{stopBtnWV}').disable();"
                              oncomplete="PF('#{startBtnWV}').enable();"/>
         </div>

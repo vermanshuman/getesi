@@ -19,6 +19,7 @@
     <p:panel id="SUBJECT_MASTERY" style="background: transparent; border: none">
         <p:panelGrid columns="2" style="width: 100%;" styleClass="ui-panelgrid-blank form-group" layout="grid">
             <p:column>
+                <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_PERSON_TYPE}"/><br/>
                 <p:selectOneRadio id="SUBJECT_MASTERY_PERSON_TYPE" value="#{bean.wrapper.selectedPersonId}"
                                   update="SUBJECT_MASTERY">
                     <f:selectItems value="#{bean.wrapper.persons}"/>

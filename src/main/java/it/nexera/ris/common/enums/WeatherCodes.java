@@ -58,7 +58,7 @@ public enum WeatherCodes {
 
     Integer code;
 
-    static final String url = "http://tripad.ru/wikon/%s@2x.png";
+//    static final String url = "http://tripad.ru/wikon/%s@2x.png";
 
     WeatherCodes(Integer code) {
         this.code = code;
@@ -70,12 +70,19 @@ public enum WeatherCodes {
     }
 
     public String getImg() {
-        return String.format(url, code);
+       // return String.format(url, name().toLowerCase());
+        return "/resources/images/weather.png";
     }
 
     public static WeatherCodes getByCode(Integer code) {
         return Arrays.stream(WeatherCodes.values())
                 .filter(weather -> weather.getCode().equals(code))
+                .findFirst().orElse(null);
+    }
+
+    public static WeatherCodes getByString(String code) {
+        return Arrays.stream(WeatherCodes.values())
+                .filter(weather -> weather.name().toLowerCase().equals(code))
                 .findFirst().orElse(null);
     }
 

@@ -667,12 +667,20 @@
             <version>1.10.2</version>
         </dependency>
 
+<!--        <dependency>-->
+<!--            <groupId>poseidon-theme-1.0.0.</groupId>-->
+<!--            <artifactId>poseidon-theme</artifactId>-->
+<!--            <version>1.0.0.</version>-->
+<!--            <scope>system</scope>-->
+<!--            <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/poseidon-theme-1.0.0.jar</systemPath>-->
+<!--        </dependency>-->
+
         <dependency>
-            <groupId>poseidon-theme-1.0.0.</groupId>
-            <artifactId>poseidon-theme</artifactId>
-            <version>1.0.0.</version>
+            <groupId>org.primefaces</groupId>
+            <artifactId>babylon</artifactId>
+            <version>4.0.0</version>
             <scope>system</scope>
-            <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/poseidon-theme-1.0.0.jar</systemPath>
+            <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/babylon-theme-4.0.0.jar</systemPath>
         </dependency>
 
         <dependency>
@@ -775,12 +783,6 @@
             <artifactId>lombok</artifactId>
             <version>1.18.4</version>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.w3c</groupId>
-            <artifactId>dom</artifactId>
-            <version>2.3.0-jaxb-1.0.6</version>
         </dependency>
     </dependencies>
 

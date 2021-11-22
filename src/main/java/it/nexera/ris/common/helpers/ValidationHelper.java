@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -332,32 +331,4 @@ public class ValidationHelper {
         }
         return str;
     }
-
-    public static void main(String[] args) {
-
-        System.out.println(CalcoloCodiceFiscale.getCityFiscalCode("DVLMRP85H52L845J"));
-        String subjectStr = "DI VUOLO MARIA PIA  12/06/1985; Comune VICO EQUENSE (NA)";
-        System.out.println("NOCERA INFERIORE VIA FILIPPO DENTICE D`ACCADIA 49".replaceAll("`", "'"));
-        System.out.println(ValidationHelper.checkCorrectFormatByExpression(PERSON_PATTERN_ALT_COMUNE, subjectStr));
-
-        Pattern pattern = Pattern.compile(PERSON_PATTERN_ALT_COMUNE);
-        Matcher m = pattern.matcher(subjectStr);
-
-        while (m.find()) {
-            System.out.println(m.group(1) + " " + m.group(3));
-        }
-
-    }
-
-    private static final String PERSON_PATTERN = "(([A-ZÀÈÉÌÍÎÒÓÙÚ`]{2,}\\s?){1,3})\\s(([a-zA-ZàèéìíîòóùúÀÈÉÌÍÎÒÓÙÚ`]{3,}\\s?){1," +
-            "3})\\s(nata|nato)\\s(a?|in)\\s?(([A-ZÀÈÉÌÍÎÒÓÙÚ`]{1,}\\s?){1,})\\s\\w*?\\s(\\d*\\/\\d*\\/\\d*)";
-    private static final String LEGAL_PATTERN = "(.+)(\\s*con sede in)\\s(([A-ZÀÈÉÌÍÎÒÓÙÚ`]\\s?)+)";
-
-    private static final String PERSON_PATTERN_ALT_COMUNE = "(([A-Z]{2,}\\s?){1,3})\\s(([a-zA-Z]{3,}\\s?){1,3})\\s(\\d*\\/\\d*\\/\\d*);\\sComune\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
-
-    private static final String PERSON_PATTERN_ALT = "(([A-Z']{2,}\\s?){1,3})\\s(([a-zA-Z]{3,}\\s?){1,"
-            + "3})\\s(\\d*\\/\\d*\\/\\d*)\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
-
-    private static final String PERSON_PATTERN_ALT_NO_DATE = "(([A-Z]{2,}\\s?){1,5});\\sComune\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
-
 }

@@ -145,7 +145,9 @@ public enum PageTypes {
     LAND_OMI_EDIT("/Pages/ConfigurationArea/LandOmiEdit.jsf", true),
 
     LAND_CULTURE_LIST("/Pages/ConfigurationArea/LandCultureList.jsf", true),
-    LAND_CULTURE_EDIT("/Pages/ConfigurationArea/LandCultureEdit.jsf", true);
+    LAND_CULTURE_EDIT("/Pages/ConfigurationArea/LandCultureEdit.jsf", true),
+
+    CALENDAR("/Pages/Configuration/Calendar.jsf");
 
     private String page;
 
