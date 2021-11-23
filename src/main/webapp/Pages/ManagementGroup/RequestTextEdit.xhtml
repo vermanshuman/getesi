@@ -404,8 +404,10 @@
 
                                                      styleClass="#{bean.entity.emailOpened? '':'btn-green'}"/>
 
-                                    <p:commandButton value="#{msg.requestTextEditCreateInvoice}"
-                                                     styleClass="btn-green"
+                                    <p:commandButton value="#{bean.examRequest.stateId == 71 ? msg.requestTextEditSentToSdi : msg.requestTextEditCreateInvoice}"
+                                                     id="createInvoice"
+                                                     styleClass="#{bean.examRequest.stateId == 71 ? '' : 'btn-green'}"
+
                                                      update="btn_line"
                                                      oncomplete="PF('invoiceDialogWV').show();"/>
 
@@ -632,6 +634,15 @@
                                          action="#{bean.updateTemplateWithSubjectSelected}"/>
                     </f:facet>
                 </p:dataTable>
+            </p:dialog>
+
+
+            <p:dialog widgetVar="sendInvoiceErrorDialogWV"  modal="true" draggable="false" position="center center">
+                <div class="ui-messages-error ui-corner-all">
+                    <span class="ui-messages-error-summary">#{msg.sendInvoiceErrorMsg}</span><br/>
+                </div>
+                <p:commandButton oncomplete="PF('sendInvoiceErrorDialogWV').hide();"
+                                 value="#{msg.close}" />
             </p:dialog>
 
             <ui:include src="../Dialogs/RequestDocumentListDialog.xhtml"/>

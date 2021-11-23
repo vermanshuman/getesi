@@ -573,4 +573,7 @@ public class FileHelper extends BaseHelper {
         RedirectHelper.sendRedirect("/File/" + randomFileName, true);
     }
 
+    public static String getFatturaAPITemplatePath() {
+        return getApplicationProperties().getProperty("fatturaAPITemplatePath");
+    }
 }

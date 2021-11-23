@@ -59,7 +59,11 @@ public enum ApplicationSettingsKeys {
     
     CLIENT_CONSERVATIVE_CODE_FILES,
     TABLE_CONSERVATIVE_CODE_FILES,
-    DTD;
+    DTD,
+
+    CLOUD_API_URL,
+    CLOUD_API_KEY
+    ;
 
     boolean needToRefresh;
 

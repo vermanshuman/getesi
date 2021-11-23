@@ -1,5 +1,6 @@
 package it.nexera.ris.persistence.beans.entities.domain;
 
+import it.nexera.ris.common.enums.VatCollectability;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
 
 
@@ -41,7 +42,10 @@ public class Invoice extends IndexedEntity implements Serializable {
 
     @Column(name = "cloud_id")
     private Long cloudId;
-    
+
+	@Column(name = "vat_collectability")
+	private VatCollectability vatCollectability;
+
 	public Long getCloudId() {
 		return cloudId;
 	}
@@ -112,5 +116,13 @@ public class Invoice extends IndexedEntity implements Serializable {
 
 	public void setSent(Boolean sent) {
 		this.sent = sent;
+	}
+
+	public VatCollectability getVatCollectability() {
+		return vatCollectability;
+	}
+
+	public void setVatCollectability(VatCollectability vatCollectability) {
+		this.vatCollectability = vatCollectability;
 	}
 }

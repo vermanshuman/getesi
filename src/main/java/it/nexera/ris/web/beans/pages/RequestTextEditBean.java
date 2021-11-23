@@ -1,5 +1,6 @@
 package it.nexera.ris.web.beans.pages;
 
+import it.nexera.ris.api.FatturaAPI;
 import it.nexera.ris.common.enums.*;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.exceptions.TypeFormalityNotConfigureException;
@@ -199,6 +200,20 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     private List<SelectItem> vatAmounts;
 
+    private List<SelectItem> docTypes;
+
+    private Date competence;
+
+    private List<SelectItem> ums;
+
+    private Long vatCollectabilityId;
+
+    private List<SelectItem> vatCollectabilityList;
+
+    private List<SelectItem> paymentTypes;
+
+    private Long selectedPaymentTypeId;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
     InstantiationException, IllegalAccessException {
@@ -285,6 +300,16 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         vatAmounts.add(new SelectItem(4D, "4%"));
         vatAmounts.add(new SelectItem(10D, "10%"));
         vatAmounts.add(new SelectItem(22D, "22%"));
+
+        docTypes = new ArrayList<SelectItem>();
+        docTypes.add(new SelectItem("FE", "FATTURA"));
+        competence = new Date();
+
+        ums = new ArrayList<SelectItem>();
+        ums.add(new SelectItem("pz", "pz"));
+        setVatCollectabilityList(ComboboxHelper.fillList(VatCollectability.class,
+                false, false));
+        paymentTypes = ComboboxHelper.fillList(PaymentType.class);
     }
 
     public void onErrorClose() throws PersistenceBeanException {
@@ -2311,6 +2336,31 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         String invoiceNumber = (lastInvoiceNumber+1) + "-" + currentYear + "-FE";
         setInvoiceNumber(invoiceNumber);
     }
+
+    public void sendInvoice() {
+        try {
+            System.out.println("getRequestId() :: " + getRequestId());
+            Invoice invoice = new Invoice();
+            invoice.setClient(getExamRequest().getClient());
+            invoice.setPaymentType(DaoManager.get(PaymentType.class, getSelectedPaymentTypeId()));
+            FatturaAPI fatturaAPI = new FatturaAPI();
+            String xmlData = fatturaAPI.getDataForXML(invoice);
+            log.info("XMLDATA: " + xmlData);
+            Boolean apiStatus = fatturaAPI.callFatturaAPI(xmlData);
+            if (apiStatus) {
+                Request request = DaoManager.get(Request.class, new Criterion[]{
+                        Restrictions.eq("id", getRequestId())});
+                request.setStateId(RequestState.SENT_TO_SDI.getId());
+                DaoManager.save(request);
+            } else
+                executeJS("PF('sendInvoiceErrorDialogWV').show();");
+        }catch(Exception e) {
+            e.printStackTrace();
+            LogHelper.log(log, e);
+            executeJS("PF('sendInvoiceErrorDialogWV').show();");
+        }
+    }
+
     public MenuModel getTopMenuModel() {
         return topMenuModel;
     }
@@ -2385,7 +2435,6 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     public Double getTotalGrossAmount() {
 
-        System.out.println(getInvoiceItemVat() + ">>>>>>>>>>>>>>> " + getInvoiceItemAmount());
         Double totalGrossAmount = 0D;
 
         if(!ValidationHelper.isNullOrEmpty(getInvoiceItemAmount())){
@@ -2395,5 +2444,61 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             }
         }
         return totalGrossAmount;
+    }
+
+    public List<SelectItem> getDocTypes() {
+        return docTypes;
+    }
+
+    public void setDocTypes(List<SelectItem> docTypes) {
+        this.docTypes = docTypes;
+    }
+
+    public Date getCompetence() {
+        return competence;
+    }
+
+    public void setCompetence(Date competence) {
+        this.competence = competence;
+    }
+
+    public List<SelectItem> getUms() {
+        return ums;
+    }
+
+    public void setUms(List<SelectItem> ums) {
+        this.ums = ums;
+    }
+
+    public List<SelectItem> getVatCollectabilityList() {
+        return vatCollectabilityList;
+    }
+
+    public void setVatCollectabilityList(List<SelectItem> vatCollectabilityList) {
+        this.vatCollectabilityList = vatCollectabilityList;
+    }
+
+    public Long getVatCollectabilityId() {
+        return vatCollectabilityId;
+    }
+
+    public void setVatCollectabilityId(Long vatCollectabilityId) {
+        this.vatCollectabilityId = vatCollectabilityId;
+    }
+
+    public List<SelectItem> getPaymentTypes() {
+        return paymentTypes;
+    }
+
+    public void setPaymentTypes(List<SelectItem> paymentTypes) {
+        this.paymentTypes = paymentTypes;
+    }
+
+    public Long getSelectedPaymentTypeId() {
+        return selectedPaymentTypeId;
+    }
+
+    public void setSelectedPaymentTypeId(Long selectedPaymentTypeId) {
+        this.selectedPaymentTypeId = selectedPaymentTypeId;
     }
 }

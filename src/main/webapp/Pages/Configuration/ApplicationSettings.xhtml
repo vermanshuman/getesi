@@ -142,16 +142,16 @@
                     </p:panelGrid>
                 </p:fieldset>
                 
-                <p:fieldset legend="#{msg.cloud}">
+                <p:fieldset legend="#{msg.editAppSettingsCloud}">
                     <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
                                  cellpadding="3" cellspacing="0" columnClasses="ui-grid-col-2,ui-grid-col-3"
                                  layout="grid">
                         <span>#{msg.editAppSettingsCloudApiUid}:</span>
                         <p:inputText id="cloudApiUid"
-                                     value="#{bean.settingPasswordPeriodExpiration.value}" />
+                                     value="#{bean.settingsCloudApiURL.value}" />
                         <span>#{msg.editAppSettingsCloudApiKey}:</span>
                         <p:inputText id="cloudApiKey"
-                                     value="#{bean.settingPasswordPeriodExpiration.value}" />
+                                     value="#{bean.settingsCloudApiKey.value}" />
                     </p:panelGrid>
                 </p:fieldset>
                 

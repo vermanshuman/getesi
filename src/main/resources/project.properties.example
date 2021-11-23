@@ -36,3 +36,5 @@ documentSavePathForThirdPartApp=D:\\test\\ris_framework\\Third_Part_App
 thirdPartAppURL=http://Server:8888/pdfxml/pdfconverter.php?
 
 file.deploy.dir=.
+
+fatturaAPITemplatePath=FatturaAPITemplate.vm
