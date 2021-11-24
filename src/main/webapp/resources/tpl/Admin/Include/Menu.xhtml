@@ -50,7 +50,12 @@
                 padding-right: 65px !important;
             }
         </style>
-        <p:outputPanel id="menu_div" class="layout-menu-container"  style="#{renderSideMenuTop ? 'top: 0; ' : ''}">
+        <script>
+            setTimeout( function () {
+               $('.menu_div').css("display", "block");
+            }, 200);
+        </script>
+        <p:outputPanel id="menu_div" class="layout-menu-container menu_div"  style="display:none;#{renderSideMenuTop ? 'top: 0; ' : ''}">
             <div class="nano">
                 <div class="nano-content menu-scroll-content">
                     <pp:menu widgetVar="me"  model="#{menuBean.mainMenuModel}" id="mmm"/>

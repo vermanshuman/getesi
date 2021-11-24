@@ -482,9 +482,15 @@ body .ui-fieldset .ui-fieldset-legend {
     background-color: #000066 !important;
 }
 
-body .ui-state-active, body .ui-state-highlight {
+body .ui-state-active {
     background-color: #2d353c !important;
     color: #ffffff;
+}
+
+body .ui-datepicker-today .ui-state-highlight:not(.ui-state-active) {
+    background-color: transparent !important;
+    color: #495057 !important;
+    font-weight: normal !important;
 }
 
 body .ui-paginator .ui-paginator-pages .ui-paginator-page {
@@ -598,12 +604,6 @@ body .ui-tabs.ui-tabs-top .ui-tabs-nav li a, body .ui-tabs.ui-tabs-bottom .ui-ta
     font-size: 22px;
     font-weight: 400;
 }
-
-body .ui-state-active, body .ui-state-highlight {
-    background-color: #2d353c !important;
-    color: #ffffff !important;
-}
-
 
 .full-width {
     width: 100%;
