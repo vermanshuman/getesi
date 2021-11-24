@@ -929,11 +929,11 @@
                     <p:tooltip for="mailBtn" value="#{item.mailSubject}"/>
 
                     <h:outputText id="externalUserIcon" rendered="#{item.external and not item.haveAllegatiDocuments}"
-                                  style="margin: 0 auto;" styleClass="#{item.isInserted ? 'richiesta-da-clienti-icon' : 'user-icon'}" />
+                                  style="margin: 0 auto;" styleClass="richiesta-da-clienti-icon" />
                     <p:tooltip for="externalUserIcon" value="#{item.createUserFullName}" escape="false"/>
 
                     <p:outputPanel rendered="#{item.external and item.haveAllegatiDocuments}" style="display: flex;margin-left: calc( 50% - 15px );">
-                        <p:commandButton id="externalUserIconA"  styleClass="#{item.isInserted ? 'user-filled-icon' : 'user-icon'}" action="#{bean.loadAllegatiDocuments}" update="requestDocs"
+                        <p:commandButton id="externalUserIconA"  styleClass="richiesta-da-clienti-icon" action="#{bean.loadAllegatiDocuments}" update="requestDocs"
                                          style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
                                          oncomplete="PF('documentDialog').show();">
                             <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>

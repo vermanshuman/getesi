@@ -412,6 +412,10 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     @Column(name= "include_national_cost")
     private Boolean includeNationalCost;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "invoice_id")
+    private Invoice invoice;
+
     @Transient
     private Boolean haveRequestReport;
 
@@ -2018,5 +2022,13 @@ public class Request extends DocumentTagEntity implements BeforeSave {
             return true;
 
         return false;
+    }
+
+    public Invoice getInvoice() {
+        return invoice;
+    }
+
+    public void setInvoice(Invoice invoice) {
+        this.invoice = invoice;
     }
 }

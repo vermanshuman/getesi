@@ -127,7 +127,7 @@
                         <p:outputLabel value="#{msg.requestTextEditData}"/>
                     </div>
                     <div class="p-col-2">
-                        <p:calendar readonlyInput="false"
+                        <p:calendar  value="#{bean.invoiceDate}" disabled="#{bean.invoiceSentStatus}"
                                     showOn="button"
                                     pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
                                     popupIconOnly="true"
@@ -155,7 +155,7 @@
                     </div>
                     <div class="p-col-2">
                         <p:calendar readonlyInput="false" value="#{bean.competence}"
-                                    showOn="button"
+                                    showOn="button" disabled="#{bean.invoiceSentStatus}"
                                     pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
                                     popupIconOnly="true"
                                     onblur="check_date(this)"
@@ -177,7 +177,7 @@
                         <h:outputText value="#{msg.requestTextEditVatCollectability}"/>
                     </div>
                     <div class="p-col-2" style="width: 15% !important; padding-left:0 !important; margin-top: 7px;">
-                        <p:selectOneMenu label="#{msg.requestTextEditVatCollectability}"
+                        <p:selectOneMenu label="#{msg.requestTextEditVatCollectability}" disabled="#{bean.invoiceSentStatus}"
                                          value="#{bean.vatCollectabilityId}" styleClass="select-one-menu">
                             <f:selectItems value="#{bean.vatCollectabilityList}"/>
                         </p:selectOneMenu>
@@ -197,7 +197,7 @@
                         <h:outputText value="#{msg.requestTextEditStamp}"/>
                     </div>
                     <div class="p-col-2">
-                        <p:selectOneMenu label="#{msg.requestTextEditStamp}" styleClass="select-one-menu">
+                        <p:selectOneMenu label="#{msg.requestTextEditStamp}" styleClass="select-one-menu" disabled="#{bean.invoiceSentStatus}">
                         </p:selectOneMenu>
                     </div>
 
@@ -205,19 +205,19 @@
                         <h:outputText value="#{msg.invoicePaymentType}"/>
                     </div>
                     <div class="p-col-2" style="width: 15% !important; padding-left:0 !important;">
-                        <p:selectOneMenu id="paymentType" value="#{bean.selectedPaymentTypeId}"
+                        <p:selectOneMenu id="paymentType" value="#{bean.selectedPaymentTypeId}" disabled="#{bean.invoiceSentStatus}"
                                          label="#{msg.invoicePaymentType}" styleClass="select-width">
                             <f:selectItems value="#{bean.paymentTypes}"/>
                         </p:selectOneMenu>
                     </div>
-
-
+                    <div class="p-col-6">
+                    </div>
 
                     <div class="p-col-1 vertical-center">
                         <h:outputText value="#{msg.requestTextEditCausal}"/>
                     </div>
                     <div class="p-col-8">
-                        <p:inputText/>
+                        <p:inputText value="#{bean.invoiceNote}" disabled="#{bean.invoiceSentStatus}"/>
                     </div>
                     <div class="p-col-3">
                     </div>
@@ -229,12 +229,12 @@
                 <div class="p-grid">
                     <div class="p-col-2">
                         <h:outputText value="#{msg.requestTextEditNetAmount}"></h:outputText>
-                        <p:inputNumber value="#{bean.invoiceTotalCost}"/>
+                        <p:inputNumber value="#{bean.invoiceTotalCost}" disabled="#{bean.invoiceSentStatus}"/>
                     </div>
                     <div class="p-col-1">
                         <h:outputText value="#{msg.requestTextEditQty}"></h:outputText>
-                        <p:inputNumber value="#{bean.invoiceItemAmount}">
-                            <p:ajax event="blur" update="totalGrossAmount"/>
+                        <p:inputNumber id="quantita" value="#{bean.invoiceItemAmount}" label="#{msg.requestTextEditQty}" disabled="#{bean.invoiceSentStatus}">
+                            <p:ajax event="blur" update="totalGrossAmount invoiceTotalAmount invoiceToVAT totalGA"/>
                         </p:inputNumber>
                     </div>
                     <div class="p-col-1">
@@ -250,9 +250,9 @@
                     <div class="p-col-4">
                         <h:outputText value="#{msg.requestTextEditVat}"></h:outputText>
                         <p:selectOneMenu id="invoiceVat" value="#{bean.invoiceItemVat}"
-                                         label="#{msg.invoiceVat}" styleClass="select-one-menu">
+                                         label="#{msg.invoiceVat}" styleClass="select-one-menu" disabled="#{bean.invoiceSentStatus}">
                             <f:selectItems value="#{bean.vatAmounts}"/>
-                            <p:ajax event="change" update="totalGrossAmount"/>
+                            <p:ajax event="change" update="totalGrossAmount invoiceTotalAmount invoiceToVAT totalGA"/>
                         </p:selectOneMenu>
                     </div>
                     <div class="p-col-3">
@@ -265,27 +265,27 @@
                     <div class="p-col-3">
                         <h:outputText value="#{msg.requestTextEditCode}"></h:outputText>
                         <p:outputPanel styleClass="output-panel">
-                            <p:inputText style="border:none; width:90%;"></p:inputText>
+                            <p:inputText style="border:none; width:90%;" disabled="#{bean.invoiceSentStatus}"></p:inputText>
                             <i class="pi pi-search icon"/>
                         </p:outputPanel>
                     </div>
                     <div class="p-col-3">
                         <h:outputText value="#{msg.requestTextEditProduct}"></h:outputText>
                         <p:outputPanel styleClass="output-panel">
-                            <p:inputText style="border:none; width:90%;"></p:inputText>
+                            <p:inputText style="border:none; width:90%;" disabled="#{bean.invoiceSentStatus}"></p:inputText>
                             <i class="pi pi-search icon"/>
                         </p:outputPanel>
                     </div>
                     <div class="p-col-3">
                         <h:outputText value="#{msg.requestTextEditRevenueCenter}"></h:outputText>
-                        <p:selectOneMenu styleClass="select-one-menu"></p:selectOneMenu>
+                        <p:selectOneMenu styleClass="select-one-menu" disabled="#{bean.invoiceSentStatus}"></p:selectOneMenu>
                     </div>
                     <div class="p-col-3">
                         <h:outputText></h:outputText>
                     </div>
 
                     <div class="p-col-9">
-                        <p:inputTextarea></p:inputTextarea>
+                        <p:inputTextarea disabled="#{bean.invoiceSentStatus}"></p:inputTextarea>
                     </div>
                     <div class="p-col-3">
                         <h:outputText value="#{msg.requestTextEditAdditionalLineData}" style="margin-top: 45px;"></h:outputText>
@@ -301,15 +301,16 @@
                         <h:outputText value="#{msg.requestTextEditTotalSkills}"></h:outputText>
                     </div>
                     <div class="p-col-2">
-                        <p:inputText></p:inputText>
+                        <p:inputText id="invoiceTotalAmount" value="#{bean.invoiceItemAmount}" disabled="true"/>
                     </div>
 
                     <div class="p-col-8"></div>
                     <div class="p-col-2 vertical-center" style="padding-left:9%;">
                         <h:outputText value="#{msg.requestTextEditTotalVat}"></h:outputText>
                     </div>
+
                     <div class="p-col-2">
-                        <p:inputText></p:inputText>
+                        <p:inputText id="invoiceToVAT" value="#{bean.totalVat}" disabled="true"/>
                     </div>
 
                     <div class="p-col-8"></div>
@@ -322,7 +323,7 @@
                         <h:outputText value="#{msg.requestTextEditTotalGross}"></h:outputText>
                     </div>
                     <div class="p-col-2">
-                        <p:inputText></p:inputText>
+                        <p:inputText id="totalGA" value="#{bean.totalGrossAmount}" disabled="true"/>
                     </div>
 
                     <div class="p-col-8"></div>
@@ -355,19 +356,22 @@
                     <div class="p-col-9"></div>
                     <div class="p-col-3">
                         <p:commandButton value="#{msg.cancel.toUpperCase()}" oncomplete="PF('invoiceDialogWV').hide()" style="margin-left: 9%;"/>
-                        <p:commandButton action="#{bean.sendInvoice}"  oncomplete="PF('invoiceDialogWV').hide()" update=":createInvoice"
+                        <p:commandButton action="#{bean.sendInvoice}"  update=":createInvoice"
                                          value="#{msg.save.toUpperCase()}" styleClass="btn-green" style="margin-left:5px;"/>
                     </div>
                 </div>
             </ui:fragment>
         </div>
 
+    </p:dialog>
 
-
-
-
-
-
+    <p:dialog widgetVar="invoiceErrorDialogWV"  modal="true" draggable="false"
+              position="center center">
+        <div class="ui-messages-error ui-corner-all">
+            <span class="ui-messages-error-summary">#{msg.invalidDataMsg}</span><br/>
+        </div>
+        <p:commandButton oncomplete="PF('invoiceErrorDialogWV').hide();"
+                         value="#{msg.close}" />
     </p:dialog>
 
 </ui:composition>

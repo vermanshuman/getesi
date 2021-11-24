@@ -8,6 +8,8 @@ import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.Invoice;
 import it.nexera.ris.persistence.beans.entities.domain.InvoiceItem;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
@@ -33,8 +35,10 @@ import java.util.List;
 
 public class FatturaAPI {
 
-    public String getDataForXML(Invoice invoice) throws HibernateException, IllegalAccessException, PersistenceBeanException {
-        List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[] { Restrictions.eq("invoice.id", invoice.getId()) });
+    public transient final Log log = LogFactory.getLog(getClass());
+    public String getDataForXML(Invoice invoice, List<InvoiceItem> invoiceItems) throws HibernateException, IllegalAccessException, PersistenceBeanException {
+        if(invoiceItems == null)
+            invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[] { Restrictions.eq("invoice.id", invoice.getId()) });
         //first, get and initialize an engine
         VelocityEngine velocityEngine = new VelocityEngine();
 
@@ -49,6 +53,10 @@ public class FatturaAPI {
         StringWriter writer = new StringWriter();
         template.merge(context, writer);
         return writer.toString();
+    }
+
+    public String getDataForXML(Invoice invoice) throws HibernateException, IllegalAccessException, PersistenceBeanException {
+        return getDataForXML(invoice, null);
     }
 
     public VelocityContext addDataToVelocityContext(Invoice invoice, List<InvoiceItem> invoiceItems) {
@@ -93,6 +101,7 @@ public class FatturaAPI {
                         ApplicationSettingsKeys.CLOUD_API_KEY).getValue().trim();
         try {
             CloseableHttpResponse response = new APICall().apiCall(xmlSource, apiURL,apiKEY);
+            log.info("Response code : "+ response.getStatusLine().getStatusCode());
             if (response.getStatusLine().getStatusCode() != 200) {
                 return false;
             }
@@ -101,6 +110,7 @@ public class FatturaAPI {
             JAXBContext jaxbContext = JAXBContext.newInstance(FatturaAPIResponse.class);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
             FatturaAPIResponse fatturaAPIResponse = (FatturaAPIResponse) unmarshaller.unmarshal(sr);
+            log.info("Return code : "+ fatturaAPIResponse.getReturnCode());
             if(fatturaAPIResponse.getReturnCode() == 0) {
                 return true;
             }
@@ -112,15 +122,19 @@ public class FatturaAPI {
 
     public Double getTotalAmount(List<InvoiceItem> invoiceItems) {
         Double totalAmount = 0D;
-        for(InvoiceItem item : invoiceItems)
-            totalAmount += item.getAmount();
+        for(InvoiceItem item : invoiceItems){
+            if(!ValidationHelper.isNullOrEmpty(item.getAmount()))
+                totalAmount += item.getAmount();
+        }
+
         return totalAmount;
     }
 
     public Double getTotalVat(List<InvoiceItem> invoiceItems) {
         Double totalVat = 0D;
         for(InvoiceItem item : invoiceItems)
-            totalVat += item.getVatAmount();
+            if(!ValidationHelper.isNullOrEmpty(item.getVatAmount()))
+                totalVat += item.getVatAmount();
         return totalVat;
     }
 

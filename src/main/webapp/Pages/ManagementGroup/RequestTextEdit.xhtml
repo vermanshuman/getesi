@@ -404,10 +404,9 @@
 
                                                      styleClass="#{bean.entity.emailOpened? '':'btn-green'}"/>
 
-                                    <p:commandButton value="#{bean.examRequest.stateId == 71 ? msg.requestTextEditSentToSdi : msg.requestTextEditCreateInvoice}"
+                                    <p:commandButton value="#{bean.examRequest.stateId == 7 ? msg.requestTextEditSentToSdi : msg.requestTextEditCreateInvoice}"
                                                      id="createInvoice"
-                                                     styleClass="#{bean.examRequest.stateId == 71 ? '' : 'btn-green'}"
-
+                                                     styleClass="#{bean.examRequest.stateId == 7 ? '' : 'btn-green'}"
                                                      update="btn_line"
                                                      oncomplete="PF('invoiceDialogWV').show();"/>
 

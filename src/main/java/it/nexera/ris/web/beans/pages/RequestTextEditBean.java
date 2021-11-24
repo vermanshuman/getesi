@@ -214,6 +214,12 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     private Long selectedPaymentTypeId;
 
+    private Date invoiceDate;
+
+    private boolean invoiceSentStatus;
+
+    private String invoiceNote;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
     InstantiationException, IllegalAccessException {
@@ -310,6 +316,25 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         setVatCollectabilityList(ComboboxHelper.fillList(VatCollectability.class,
                 false, false));
         paymentTypes = ComboboxHelper.fillList(PaymentType.class);
+        if(!ValidationHelper.isNullOrEmpty(getExamRequest())
+                && !ValidationHelper.isNullOrEmpty(getExamRequest().getInvoice())){
+            Invoice invoice = DaoManager.get(Invoice.class, getExamRequest().getInvoice().getId());
+            String year = DateTimeHelper.toFormatedString(invoice.getDate(), DateTimeHelper.getXmlSecondDatePattertYear());
+            setInvoiceNumber(invoice.getId() + "-" + year + "-FE");
+            setInvoiceDate(invoice.getDate());
+            setInvoiceNote(invoice.getNotes());
+            if(!ValidationHelper.isNullOrEmpty(invoice.getVatCollectability()))
+                setVatCollectabilityId(invoice.getVatCollectability().getId());
+            setSelectedPaymentTypeId(invoice.getPaymentType().getId());
+            List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
+            for(InvoiceItem invoiceItem : invoiceItems) {
+                setInvoiceItemAmount(invoiceItem.getAmount());
+                setInvoiceItemVat(invoiceItem.getVat());
+            }
+        }
+        if(getExamRequest().getStateId().equals(RequestState.SENT_TO_SDI.getId()))
+            setInvoiceSentStatus(true);
+
     }
 
     public void onErrorClose() throws PersistenceBeanException {
@@ -2338,20 +2363,59 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     }
 
     public void sendInvoice() {
+        cleanValidation();
+
+        if(ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId())){
+            addRequiredFieldException("form:paymentType");
+            setValidationFailed(true);
+        }
+
+        if(ValidationHelper.isNullOrEmpty(getInvoiceItemAmount())){
+            addRequiredFieldException("form:quantita");
+            setValidationFailed(true);
+        }
+
+        if(ValidationHelper.isNullOrEmpty(getInvoiceItemVat())){
+            addRequiredFieldException("form:invoiceVat");
+            setValidationFailed(true);
+        }
+
+        if (getValidationFailed()){
+            executeJS("PF('invoiceErrorDialogWV').show();");
+            return;
+        }
+
         try {
-            System.out.println("getRequestId() :: " + getRequestId());
             Invoice invoice = new Invoice();
             invoice.setClient(getExamRequest().getClient());
-            invoice.setPaymentType(DaoManager.get(PaymentType.class, getSelectedPaymentTypeId()));
+            invoice.setDate(getInvoiceDate());
+            if(!ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId()))
+                invoice.setPaymentType(DaoManager.get(PaymentType.class, getSelectedPaymentTypeId()));
+
+            if(!ValidationHelper.isNullOrEmpty(getVatCollectabilityId()))
+                invoice.setVatCollectability(VatCollectability.getById(getVatCollectabilityId()));
+            invoice.setNotes(getInvoiceNote());
+            InvoiceItem invoiceItem = new InvoiceItem();
+            if(!ValidationHelper.isNullOrEmpty(getExamRequest())
+                    && !ValidationHelper.isNullOrEmpty(getExamRequest().getSubject())){
+                invoiceItem.setSubject(getExamRequest().getSubject().toString());
+                invoiceItem.setAmount(getInvoiceItemAmount());
+                invoiceItem.setVat(getInvoiceItemVat());
+            }
+            List<InvoiceItem> invoiceItems = new ArrayList<>();
+            invoiceItems.add(invoiceItem);
             FatturaAPI fatturaAPI = new FatturaAPI();
-            String xmlData = fatturaAPI.getDataForXML(invoice);
+            String xmlData = fatturaAPI.getDataForXML(invoice, invoiceItems);
             log.info("XMLDATA: " + xmlData);
             Boolean apiStatus = fatturaAPI.callFatturaAPI(xmlData);
             if (apiStatus) {
-                Request request = DaoManager.get(Request.class, new Criterion[]{
-                        Restrictions.eq("id", getRequestId())});
-                request.setStateId(RequestState.SENT_TO_SDI.getId());
-                DaoManager.save(request);
+                getExamRequest().setStateId(RequestState.SENT_TO_SDI.getId());
+                getExamRequest().setInvoice(invoice);
+                DaoManager.save(invoice, true);
+                invoiceItem.setInvoice(invoice);
+                DaoManager.save(invoiceItem,true);
+                DaoManager.save(getExamRequest(), true);
+                executeJS("PF('invoiceDialogWV').hide();");
             } else
                 executeJS("PF('sendInvoiceErrorDialogWV').show();");
         }catch(Exception e) {
@@ -2500,5 +2564,38 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     public void setSelectedPaymentTypeId(Long selectedPaymentTypeId) {
         this.selectedPaymentTypeId = selectedPaymentTypeId;
+    }
+
+    public Double getTotalVat() {
+        Double totalVat = 0D;
+        if(!ValidationHelper.isNullOrEmpty(getInvoiceItemAmount()) &&
+                !ValidationHelper.isNullOrEmpty(getInvoiceItemVat()) && getInvoiceItemVat() > 0)
+            totalVat += getInvoiceItemAmount() * (getInvoiceItemVat()/100);
+
+        return totalVat;
+    }
+
+    public Date getInvoiceDate() {
+        return invoiceDate;
+    }
+
+    public void setInvoiceDate(Date invoiceDate) {
+        this.invoiceDate = invoiceDate;
+    }
+
+    public boolean isInvoiceSentStatus() {
+        return invoiceSentStatus;
+    }
+
+    public void setInvoiceSentStatus(boolean invoiceSentStatus) {
+        this.invoiceSentStatus = invoiceSentStatus;
+    }
+
+    public String getInvoiceNote() {
+        return invoiceNote;
+    }
+
+    public void setInvoiceNote(String invoiceNote) {
+        this.invoiceNote = invoiceNote;
     }
 }

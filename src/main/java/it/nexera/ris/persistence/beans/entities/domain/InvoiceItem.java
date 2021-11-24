@@ -1,5 +1,6 @@
 package it.nexera.ris.persistence.beans.entities.domain;
 
+import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
 
 
@@ -69,7 +70,11 @@ public class InvoiceItem extends IndexedEntity implements Serializable {
 	}	
 
 	public Double getVatAmount() {
-		return getAmount() * (getVat() / 100);
+		if(!ValidationHelper.isNullOrEmpty(getAmount()) && !ValidationHelper.isNullOrEmpty(getVat()) &&
+				getVat() > 0){
+			return getAmount() * (getVat() / 100);
+		}
+		return 0.0D;
 	}
 	
 	public Double getGrossAmount() {
