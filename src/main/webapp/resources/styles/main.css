@@ -484,7 +484,7 @@ body .ui-fieldset .ui-fieldset-legend {
 
 body .ui-state-active {
     background-color: #2d353c !important;
-    color: #ffffff;
+    color: #ffffff !important;
 }
 
 body .ui-datepicker-today .ui-state-highlight:not(.ui-state-active) {

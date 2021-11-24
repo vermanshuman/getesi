@@ -308,14 +308,6 @@ body .ui-tooltip-text .ui-button .ui-button-text {
 	border-right-color: white;
 }
 
-body .ui-state-highlight {
-	background-color: inherit !important;
-}
-
-body .ui-state-highlight {
-	color: inherit !important;
-}
-
 body .ui-datatable .ui-datatable-data tr.ui-state-highlight {
 	border-color: inherit !important;
 }
@@ -418,11 +410,6 @@ body .ui-datatable .ui-datatable-data tr.ui-state-highlight {
 
 .ui-paginator-current {
 	float: right;
-}
-
-body .ui-state-active {
-	background-color: #ffffff !important;
-	border-radius: 15px;
 }
 
 .ui-paginator-first, .ui-paginator-prev, .ui-paginator-next, .ui-paginator-last {
