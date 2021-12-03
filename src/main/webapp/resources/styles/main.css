@@ -292,6 +292,15 @@ body .top-bar-cal .ui-widget-header {
     display: block;
 }
 
+.home-icon {
+    background-image: url("../images/home.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 24px;
+    height: 20px;
+    display: block;
+}
+
 .email-icon {
     background-image: url("../images/email.png");
     background-repeat: no-repeat;

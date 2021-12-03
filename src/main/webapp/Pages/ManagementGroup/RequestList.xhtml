@@ -518,16 +518,16 @@
                                                 </p:calendar>
                                             </div>
                                             <div class="p-col-12 search-panel-btns" style="text-align: center;">
-                                                <p:commandButton id="manageReestablishBtn"
-                                                                 value="#{ff:upper(msg.mailManageReestablish)}"
-                                                                 update="settingPanel searchPanel"
-                                                                 oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').getJQ().hide();"/>
                                                 <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}"
-                                                                 style="background: #009900; margin-left:3px;"
+                                                                 style="background: #009900;"
                                                                  id="searchButton12345"
                                                                  onclick="checkDates(); filterTableFromPanel();"
                                                                  update="searchPanel"
                                                                  oncomplete="PF('panelSetting').getJQ().hide();"/>
+                                                <p:commandButton id="manageReestablishBtn" style="width: auto;"
+                                                                 value="#{ff:upper(msg.mailManageReestablish)}"
+                                                                 update="settingPanel searchPanel"
+                                                                 oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').getJQ().hide();"/>
                                             </div>
                                         </div>
                                     </p:panel>

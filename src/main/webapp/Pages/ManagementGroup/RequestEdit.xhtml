@@ -109,6 +109,14 @@
             body .ui-button.ui-button-success {
                 background: #57c279 !important;
             }
+            #changeUserDlg {
+                border: 2px solid #57c279;
+            }
+            #changeUserDlg .ui-dialog-titlebar {
+                border-bottom: none;
+                background: #f8f9fa !important;
+                color: #000;
+            }
         </style>
         <script>
             function next(activeMenu, totalTabs) {
@@ -382,18 +390,18 @@
                                      update="@form"
                                      rendered="#{!bean.performEdit and bean.canEdit and !bean.entity.isNew}"/>
                 </ui:remove>
-                <p:commandButton value="#{msg.requestSuspend}"
+               <!-- <p:commandButton value="#{msg.requestSuspend}"
                                  rendered="#{!bean.entity.isNew and !bean.isSuspend and bean.canSuspendRequest}"
                                  oncomplete="PF('suspendDialogWV').show();"/>
                 <p:commandButton value="#{msg.requestUnSuspend}"
                                  rendered="#{!bean.entity.isNew and bean.isSuspend and bean.canSuspendRequest}"
-                                 oncomplete="PF('unsuspendDialogWV').show();"/>
+                                 oncomplete="PF('unsuspendDialogWV').show();"/>-->
                 <p:commandButton value="#{msg.requestReactivate}"
                                  rendered="#{!bean.entity.isNew and bean.isSuspend}"
                                  oncomplete="PF('reactivateDialogWV').show();"/>
-                <p:commandButton value="#{msg.requestPrint}" ajax="false"
+               <!-- <p:commandButton value="#{msg.requestPrint}" ajax="false"
                                  update="@form" action="#{bean.printPDF}"
-                                 rendered="#{!bean.entity.isNew}"/>
+                                 rendered="#{!bean.entity.isNew}"/>-->
                 <p:commandButton value="#{msg.requestManageEstateLocation}"
                                  action="#{bean.openEstateLocation}" rendered="#{!bean.entity.isNew}"/>
                 <p:commandButton value="#{msg.requestManagePrint}"

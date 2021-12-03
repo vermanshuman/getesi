@@ -124,6 +124,16 @@
                 width: 210px;
             }
 
+            .special-upload .ui-fileupload-choose {
+                background: #fed820;
+                color: #000000;
+                margin-left: -27px;
+            }
+
+            .special-upload .ui-icon-plusthick {
+                color: #000000 !important;
+            }
+
             body .ui-fileupload .ui-fileupload-buttonbar {
                 padding: 8px 14px;
             }
@@ -227,6 +237,9 @@
             div[id*='menuform1:menu_div'] {
                 margin-left: -4px;
             }
+            .btn-green {
+                background-color: #57c279!important;
+            }
         </style>
         <br/><br/><br/>
         <p:fieldset legend="#{msg.estateSituationListDocuments}">
@@ -260,7 +273,7 @@
 
         <!-- <ui:fragment><br /></ui:fragment> -->
         <p:fieldset legend="#{msg.estateSituationSalesDevelopmentHeader}" rendered="#{bean.salesDevelopmentShowing}">
-            <p:commandButton disabled="#{!bean.canCreate}" id="buttonCreateSalesDevelopment"
+            <p:commandButton disabled="#{!bean.canCreate}" id="buttonCreateSalesDevelopment" style="margin-left: -13px;"
                              icon="ui-icon-circle-plus" styleClass="ui-button-success p-mr-2 p-mb-2"
                              value="#{not empty addButtonTitle ? addButtonTitle : msg.newItem}"
                              update="sales_dev"
