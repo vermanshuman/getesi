@@ -541,7 +541,8 @@
 
 
         <p:remoteCommand name="resetTableData"
-                         action="#{bean.onLoad}" update=":form:table"/>
+                         action="#{bean.reset}" update=":form:table :form:settingPanel :form:stateSelectCheckboxPanelDataTable :form:requestTypeSelectCheckboxPanelDataTable
+                             :form:serviceSelectCheckboxPanelDataTable"/>
         <p:outputPanel id="searchPanel" style="display:none;" >
             <p:commandButton icon="fa fa-fw fa-file-pdf-o"  rendered="false"
                              action="#{bean.downloadPdfFile}" ajax="false" update="@form">

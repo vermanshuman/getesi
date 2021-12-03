@@ -148,12 +148,12 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     private String requestCommentCertification;
 
-        private Long previousStateId;
+    private Long previousStateId;
 
     private Boolean dateConfimed;
 
     private Boolean hideExtraCost = Boolean.FALSE;
-    
+
     private List<Document> otherDocuments;
 
    private List<String> estateFormalitySalesMessage;
@@ -219,6 +219,8 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     private boolean invoiceSentStatus;
 
     private String invoiceNote;
+
+    private String documentType;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
@@ -307,8 +309,9 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         vatAmounts.add(new SelectItem(10D, "10%"));
         vatAmounts.add(new SelectItem(22D, "22%"));
 
-        docTypes = new ArrayList<SelectItem>();
+        docTypes = new ArrayList<>();
         docTypes.add(new SelectItem("FE", "FATTURA"));
+        setDocumentType("FE");
         competence = new Date();
 
         ums = new ArrayList<SelectItem>();
@@ -316,6 +319,9 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         setVatCollectabilityList(ComboboxHelper.fillList(VatCollectability.class,
                 false, false));
         paymentTypes = ComboboxHelper.fillList(PaymentType.class);
+        if(ValidationHelper.isNullOrEmpty(getInvoiceItemAmount())){
+            setInvoiceItemAmount(1.0D);
+        }
         if(!ValidationHelper.isNullOrEmpty(getExamRequest())
                 && !ValidationHelper.isNullOrEmpty(getExamRequest().getInvoice())){
             Invoice invoice = DaoManager.get(Invoice.class, getExamRequest().getInvoice().getId());
@@ -371,7 +377,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         log.info("before fillRequestDocumentList");
         fillRequestDocumentList();
         log.info("after fillRequestDocumentList");
-        
+
         log.info("before fillOtherDocumentList");
         fillOtherDocumentList();
         log.info("after fillOtherDocumentList");
@@ -430,7 +436,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         RequestOutputTypes type = null;
         if (!ValidationHelper.isNullOrEmpty(getExamRequest().getService())) {
             type = getExamRequest().getService().getRequestOutputType();
-        }else if(!ValidationHelper.isNullOrEmpty(getExamRequest().getMultipleServices())) { 
+        }else if(!ValidationHelper.isNullOrEmpty(getExamRequest().getMultipleServices())) {
             boolean isOnlyFile = Boolean.FALSE;
             boolean isOnlyEditor = Boolean.FALSE;
             boolean isAll = Boolean.FALSE;
@@ -463,7 +469,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             String fileName = generatePdfName();
             GeneralFunctionsHelper.saveReport(getEntity().getRequest(), getSelectedTemplateId(),
                     getCurrentUser(), false, getEditText(), fileName, DaoManager.getSession());
-            
+
             List<Document> documentListToView = EstateSituationHelper.getDocuments(type, getExamRequest());
             if(!ValidationHelper.isNullOrEmpty(documentListToView)) {
                 for (Document document : documentListToView) {
@@ -481,7 +487,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             setRequestDocuments(documentListToView);
         }else if(!ValidationHelper.isNullOrEmpty(getEntity().getRequest().getTranscriptionActId())
                 && type == RequestOutputTypes.XML) {
-            
+
             String fileName = generateXMLFileName();
             List<Formality> forcedFormalities =  getEntity().getRequest().getFormalityForcedList();
             for(Formality forcedFormality : forcedFormalities) {
@@ -489,7 +495,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                     String pdfBody = FormalityHelper.getPdfBody(getEntity().getRequest().getTranscriptionActId());
                     Document requestDocument = GeneralFunctionsHelper.saveReport(getEntity().getRequest(), getSelectedTemplateId(),
                             getCurrentUser(), false, pdfBody, fileName, DaoManager.getSession(), DocumentType.FORMALITY.getId());
-                    
+
                     if (!Hibernate.isInitialized(requestDocument.getFormality())) {
                         requestDocument.setFormality(DaoManager.load(Formality.class, new Criterion[]{
                                 Restrictions.eq("document.id", requestDocument.getId())
@@ -499,7 +505,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                     DaoManager.save(forcedFormality,true);
                 }
             }
-            org.jsoup.nodes.Document doc = Jsoup.parse(getEditText(), "UTF-8"); 
+            org.jsoup.nodes.Document doc = Jsoup.parse(getEditText(), "UTF-8");
             try {
                 String content = doc.text().trim().replaceAll("[^\\x00-\\x7F]", "");
 
@@ -533,7 +539,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                         xmlDocument = documentList.get(0);
                     }
 
-                    if (xmlDocument == null) 
+                    if (xmlDocument == null)
                         xmlDocument = new Document();
 
                     xmlDocument.setTitle(fileName);
@@ -541,9 +547,9 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                     xmlDocument.setTypeId(DocumentType.REQUEST_REPORT.getId());
                     xmlDocument.setDate(new Date());
                     xmlDocument.setRequest(getEntity().getRequest());
-                    
+
                     DaoManager.save(xmlDocument,true);
-                    
+
                     DaoManager.refresh(getEntity().getRequest().getTranscriptionActId());
                     getEntity().getRequest().getTranscriptionActId().setDocument(xmlDocument);
                     DaoManager.save(getEntity().getRequest().getTranscriptionActId(),true);
@@ -565,7 +571,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                 }
               DaoManager.save(getExamRequest(), true);
             }
-            
+
             List<Criterion> restrictions = new ArrayList<>();
             restrictions.add(Restrictions.eq("request.id", getExamRequest().getId()));
             List<Document> documentList = DaoManager.load(Document.class, restrictions.toArray(new Criterion[0]));
@@ -699,7 +705,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     }
 
     public void saveRequestDocumentsAndNotify(boolean isConfirmed) throws Exception {
-        
+
         SaveRequestDocumentsHelper.saveRequestDocuments(getExamRequest(), getRequestDocuments(), isConfirmed);
         if(!ValidationHelper.isNullOrEmpty(getOtherDocuments())){
             SaveRequestDocumentsHelper.saveRequestDocuments(getExamRequest(), getOtherDocuments(), isConfirmed);
@@ -864,7 +870,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
         log.info("end updateTemplate RequestTextEditBean");
     }
-    
+
     public void updateCost() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         getExamRequest().setIncludeNationalCost(getCostManipulationHelper().getIncludeNationalCost());
         Long modalIdOfTemplate = 0L;
@@ -904,10 +910,10 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             if (!isEndDateCorrectForDistraintFormality()) {
                 executeJS("PF('endDateErrorMessageWV').show();");
                 return;
-            }    
+            }
         }
 
-        if (ValidationHelper.isNullOrEmpty(getExamRequest().getDistraintFormality()) 
+        if (ValidationHelper.isNullOrEmpty(getExamRequest().getDistraintFormality())
                 && !ValidationHelper.isNullOrEmpty(getExamRequest().getAggregationLandChargesRegistry())
                 && ValidationHelper.isNullOrEmpty(getRequestConservatoryList().stream()
                         .filter(x -> x.getConservatoryDate() != null)
@@ -1391,14 +1397,14 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                         Long.valueOf(getEstateSituationId()));
                 if(!ValidationHelper.isNullOrEmpty(situationProperty))
                     datafromProperty.getSituationProperties().removeIf(x -> x.getId().equals(situationProperty.getId()));
-                
+
             }
-          
+
             DaoManager.remove(datafromProperty, true);
             datafromPropertyList.remove(datafromProperty);
         } catch (Exception e) {
             LogHelper.log(log, e);
-        } 
+        }
     }
 
     public void changeComment() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
@@ -1479,16 +1485,16 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
              updateTemplate();
         }else {
             if(!ValidationHelper.isNullOrEmpty(getExamRequest().getClient()) &&
-                    !ValidationHelper.isNullOrEmpty(getExamRequest().getClient().getCostOutput()) && 
+                    !ValidationHelper.isNullOrEmpty(getExamRequest().getClient().getCostOutput()) &&
                     getExamRequest().getClient().getCostOutput()){
-                executeJS("PF('reloadPageDialogWV').show()");   
+                executeJS("PF('reloadPageDialogWV').show()");
             }
         }
-        
+
         //  getCostManipulationHelper().saveRequestExtraCost(getExamRequest());
        // updateTemplate();
     }
-    
+
     public void reloadPage() throws IllegalAccessException, InstantiationException, PersistenceBeanException {
         updateTemplate();
     }
@@ -1787,23 +1793,23 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                 buffer.append(getEntity().getRequest().getTranscriptionActId().getReclamePropertyService());
             }
         }
-        
+
         return buffer.toString();
     }
 
     public void updateNationalCost() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
-       
+
         Request request = DaoManager.get(Request.class, new Criterion[]{
                 Restrictions.eq("id", getRequestId())});
-        
-        if(!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry()) && 
+
+        if(!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry()) &&
                 !ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getNational()) &&
                 request.getAggregationLandChargesRegistry().getNational()) {
 
             getCostManipulationHelper().setIncludeNationalCost(false);
             executeJS("PF('includeNationalCost2DialogWV').show();");
             return;
-        
+
         }
         if(!ValidationHelper.isNullOrEmpty(getCostManipulationHelper().getIncludeNationalCost())
                 && getCostManipulationHelper().getIncludeNationalCost()) {
@@ -1820,12 +1826,12 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                     return;
                 }
             }
-            
+
             if(!ValidationHelper.isNullOrEmpty(request) && !ValidationHelper.isNullOrEmpty(request.getService())
                     && !ValidationHelper.isNullOrEmpty(request.getService().getNationalPrice())) {
                 getCostManipulationHelper().setExtraCostOther(request.getService().getNationalPrice().toString());
-                getCostManipulationHelper().setExtraCostOtherNote(ResourcesHelper.getString("requestServiceNationalPriceNote"));    
-                getCostManipulationHelper().addExtraCost("NAZIONALEPOSITIVA", getRequestId());    
+                getCostManipulationHelper().setExtraCostOtherNote(ResourcesHelper.getString("requestServiceNationalPriceNote"));
+                getCostManipulationHelper().addExtraCost("NAZIONALEPOSITIVA", getRequestId());
             }
         }else {
             if(!ValidationHelper.isNullOrEmpty(getCostManipulationHelper().getRequestExtraCosts())) {
@@ -1834,12 +1840,12 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                         .filter(ec -> ec.getType().equals(ExtraCostType.NAZIONALEPOSITIVA))
                         .findFirst();
                 if(nationalExtraCost.isPresent()) {
-                    deleteExtraCost(nationalExtraCost.get());    
+                    deleteExtraCost(nationalExtraCost.get());
                 }
             }
         }
     }
-    
+
     private void fillOtherDocumentList()  {
         List<FormalityView> formalityPDFList = null;
         setOtherDocuments(new ArrayList<>());
@@ -1854,9 +1860,9 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                         .emptyIfNull(getRequestDocuments()).stream()
                         .map(Document::getId)
                         .collect(Collectors.toList());
-                
+
                 for(FormalityView formality: formalityPDFList) {
-                    if(!ValidationHelper.isNullOrEmpty(formality.getDocumentId()) 
+                    if(!ValidationHelper.isNullOrEmpty(formality.getDocumentId())
                             && !existingIds.contains(formality.getDocumentId())) {
                         Document otherDoc = DaoManager.get(Document.class, formality.getDocumentId());
                         if(!getOtherDocuments().contains(otherDoc)){
@@ -2278,7 +2284,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     public void setDateConfimed(Boolean dateConfimed) {
         this.dateConfimed = dateConfimed;
     }
-    
+
     public Boolean getHideExtraCost() {
         return hideExtraCost;
     }
@@ -2387,8 +2393,10 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
         try {
             Invoice invoice = new Invoice();
+            invoice.setDocumentType(getDocumentType());
             invoice.setClient(getExamRequest().getClient());
             invoice.setDate(getInvoiceDate());
+            invoice.setInvoiceNumber(getInvoiceNumber());
             if(!ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId()))
                 invoice.setPaymentType(DaoManager.get(PaymentType.class, getSelectedPaymentTypeId()));
 
@@ -2407,7 +2415,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             FatturaAPI fatturaAPI = new FatturaAPI();
             String xmlData = fatturaAPI.getDataForXML(invoice, invoiceItems);
             log.info("XMLDATA: " + xmlData);
-            Boolean apiStatus = fatturaAPI.callFatturaAPI(xmlData);
+            Boolean apiStatus = fatturaAPI.callFatturaAPI(xmlData, log);
             if (apiStatus) {
                 getExamRequest().setStateId(RequestState.SENT_TO_SDI.getId());
                 getExamRequest().setInvoice(invoice);
@@ -2481,7 +2489,14 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         this.invoiceItemVat = invoiceItemVat;
     }
 
-    public Double getInvoiceTotalCost() {
+    public Double getInvoiceTotalCost() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+        if(!ValidationHelper.isNullOrEmpty(getExamRequest())){
+            Request invoiceRequest = DaoManager.get(Request.class, getExamRequest().getId());
+            if(!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
+                    !ValidationHelper.isNullOrEmpty(invoiceRequest.getTotalCostDouble())){
+                setInvoiceTotalCost(Double.parseDouble(invoiceRequest.getTotalCostDouble()));
+            }
+        }
         return invoiceTotalCost;
     }
 
@@ -2597,5 +2612,13 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     public void setInvoiceNote(String invoiceNote) {
         this.invoiceNote = invoiceNote;
+    }
+
+    public String getDocumentType() {
+        return documentType;
+    }
+
+    public void setDocumentType(String documentType) {
+        this.documentType = documentType;
     }
 }

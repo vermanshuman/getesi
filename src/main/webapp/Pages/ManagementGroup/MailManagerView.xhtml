@@ -98,10 +98,6 @@
             body .ui-inputfield {
                 border: 1px solid #a8acb1;
             }
-            body .ui-dialog .ui-dialog-titlebar {
-                border-bottom: 1px solid #57c279;
-            }
-
             .confirm-button {
                 background-color: #57c279 !important;
             }
@@ -117,6 +113,11 @@
             }
             div[id*='menuform1:menu_div'] {
                 margin-left: -4px;
+            }
+            .btn-green {
+                background-color: #57c279!important;
+                padding-left: 0 !important;
+                width: 122px;
             }
         </style>
         <ui:include src="/resources/tpl/Admin/LetterView.xhtml"/>
@@ -237,7 +238,17 @@
                                  action="#{bean.saveReference(true)}" oncomplete="PF('chooseSingleOrMultiplerequestCreateWV').hide();"/>
             </div>
         </p:dialog>
+
+        <p:dialog widgetVar="sendInvoiceErrorDialogWV"  modal="true" draggable="false" position="center center">
+            <div class="ui-messages-error ui-corner-all">
+                <span class="ui-messages-error-summary">#{msg.sendInvoiceErrorMsg}</span><br/>
+            </div>
+            <p:commandButton oncomplete="PF('sendInvoiceErrorDialogWV').hide();"
+                             value="#{msg.close}" />
+        </p:dialog>
+
         <ui:include src="../ConfigurationArea/ClientCreate.xhtml"/>
         <ui:include src="../Dialogs/MailManagerViewRequestsDialog.xhtml"/>
+        <ui:include src="../Dialogs/InvoiceDialog.xhtml"/>
     </ui:define>
 </ui:composition>

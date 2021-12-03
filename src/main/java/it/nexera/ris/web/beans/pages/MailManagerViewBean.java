@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,7 +27,11 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 
+import it.nexera.ris.api.FatturaAPI;
+import it.nexera.ris.common.enums.*;
+import it.nexera.ris.persistence.beans.entities.domain.*;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.collections4.CollectionUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
@@ -37,13 +42,6 @@ import org.hibernate.sql.JoinType;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 
-import it.nexera.ris.common.enums.ApplicationSettingsKeys;
-import it.nexera.ris.common.enums.ClientType;
-import it.nexera.ris.common.enums.EmailType;
-import it.nexera.ris.common.enums.MailEditType;
-import it.nexera.ris.common.enums.MailManagerStatuses;
-import it.nexera.ris.common.enums.MailManagerTypes;
-import it.nexera.ris.common.enums.PageTypes;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.ComboboxHelper;
 import it.nexera.ris.common.helpers.DateTimeHelper;
@@ -64,17 +62,6 @@ import it.nexera.ris.common.xml.wrappers.SelectItemWrapper;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.Dictionary;
-import it.nexera.ris.persistence.beans.entities.domain.Client;
-import it.nexera.ris.persistence.beans.entities.domain.ClientEmail;
-import it.nexera.ris.persistence.beans.entities.domain.Document;
-import it.nexera.ris.persistence.beans.entities.domain.ReadWLGInbox;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
-import it.nexera.ris.persistence.beans.entities.domain.RequestFormality;
-import it.nexera.ris.persistence.beans.entities.domain.User;
-import it.nexera.ris.persistence.beans.entities.domain.WLGExport;
-import it.nexera.ris.persistence.beans.entities.domain.WLGFolder;
-import it.nexera.ris.persistence.beans.entities.domain.WLGInbox;
-import it.nexera.ris.persistence.beans.entities.domain.WLGServer;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
 import it.nexera.ris.persistence.view.ClientView;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
@@ -83,6 +70,9 @@ import it.nexera.ris.web.beans.base.AccessBean;
 import it.nexera.ris.web.beans.wrappers.logic.FileWrapper;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.model.menu.DefaultMenuItem;
+import org.primefaces.model.menu.DefaultMenuModel;
+import org.primefaces.model.menu.MenuModel;
 
 @Setter
 @Getter
@@ -135,7 +125,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private String referencePractice;
 
     private String ndg;
-    
+
     private String cdr;
 
     private List<SelectItemWrapper<Client>> clientManagers;
@@ -166,9 +156,53 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private String fieldsNotSetDialogMessage;
 
     private Long clientTypeId;
-    
+
     private List<SelectItem> clientTypes;
-    
+
+    // Fields for Invoice Dialog
+
+    private Request examRequest;
+
+    private boolean multipleCreate;
+
+    private MenuModel topMenuModel;
+
+    private int activeMenuTabNum;
+
+    private List<InputCard> inputCardList;
+
+    private String invoiceNumber;
+
+    private Double invoiceItemAmount;
+
+    private Double invoiceItemVat;
+
+    private Double invoiceTotalCost;
+
+    private List<SelectItem> vatAmounts;
+
+    private List<SelectItem> docTypes;
+
+    private Date competence;
+
+    private List<SelectItem> ums;
+
+    private Long vatCollectabilityId;
+
+    private List<SelectItem> vatCollectabilityList;
+
+    private List<SelectItem> paymentTypes;
+
+    private Long selectedPaymentTypeId;
+
+    private Date invoiceDate;
+
+    private boolean invoiceSentStatus;
+
+    private String invoiceNote;
+
+    private List<Request> invoiceRequests;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
         setOnlyView(Boolean.parseBoolean(getRequestParameter(RedirectHelper.ONLY_VIEW)));
@@ -178,7 +212,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             setTablePage(Long.parseLong(tablePage));
         }
         this.setClientTypes(ComboboxHelper.fillList(ClientType.class, Boolean.TRUE));
-        
+
         loadAttachedFiles();
         checkRelatedToClient();
         if (getEntity().getRequestedReadConfirm() != null && getEntity().getRequestedReadConfirm()
@@ -211,7 +245,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
         if (!ValidationHelper.isNullOrEmpty(document) || !ValidationHelper.isNullOrEmpty(getEntity().getRequests())
                 || (!ValidationHelper.isNullOrEmpty(getEntity().getRecievedInbox()) &&
-                        !ValidationHelper.isNullOrEmpty(getEntity().getRecievedInbox().getRequests()))) {
+                !ValidationHelper.isNullOrEmpty(getEntity().getRecievedInbox().getRequests()))) {
             setGeneratePdf(true);
         }
 
@@ -222,7 +256,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         if (!ValidationHelper.isNullOrEmpty(getEntity().getNdg())) {
             setNdg(getEntity().getNdg());
         }
-        
+
         if (!ValidationHelper.isNullOrEmpty(getEntity().getCdr())) {
             setCdr(getEntity().getCdr());
         }
@@ -230,7 +264,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         if (!ValidationHelper.isNullOrEmpty(getEntity().getClient()) && !ValidationHelper.isNullOrEmpty(getEntity().getClient().getTypeId())) {
             setClientTypeId(getEntity().getClient().getTypeId());
         }
-        
+
         updateComboboxes();
 
         checkRelatedClientFields();
@@ -264,6 +298,71 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
         setNewClientButtonClicked(false);
         getEntity().reloadRequests();
+
+
+        // Changes for invoice
+        generateMenuModel();
+        setMaxInvoiceNumber();
+
+        List<Request> requestList =
+                getEntity().getRequests()
+                        .stream()
+                        .filter(x -> !ValidationHelper.isNullOrEmpty(x.getStateId()) &&
+                                RequestState.EVADED.getId().equals(x.getStateId())).collect(Collectors.toList());
+
+        setInvoiceRequests(requestList);
+        Double invoiceTotalCost = 0.0D;
+        if (!ValidationHelper.isNullOrEmpty(requestList)) {
+            Request examRequest = DaoManager.get(Request.class, new CriteriaAlias[]{
+                    new CriteriaAlias("client", "c", JoinType.LEFT_OUTER_JOIN),
+                    new CriteriaAlias("c.addressCityId", "ac", JoinType.LEFT_OUTER_JOIN),
+                    new CriteriaAlias("c.addressProvinceId", "ap", JoinType.LEFT_OUTER_JOIN),
+            }, new Criterion[]{
+                    Restrictions.eq("id", getInvoiceRequests().get(0).getId())
+            });
+            setExamRequest(examRequest);
+
+            invoiceTotalCost = requestList
+                    .stream()
+                    .filter(r -> !ValidationHelper.isNullOrEmpty(r.getTotalCost()))
+                    .mapToDouble(r -> Double.parseDouble(r.getTotalCostDouble())).sum();
+        }
+        setInvoiceTotalCost(invoiceTotalCost);
+        vatAmounts = new ArrayList<>();
+        vatAmounts.add(new SelectItem(0D, "0%"));
+        vatAmounts.add(new SelectItem(4D, "4%"));
+        vatAmounts.add(new SelectItem(10D, "10%"));
+        vatAmounts.add(new SelectItem(22D, "22%"));
+
+        docTypes = new ArrayList<>();
+        docTypes.add(new SelectItem("FE", "FATTURA"));
+        competence = new Date();
+
+        ums = new ArrayList<>();
+        ums.add(new SelectItem("pz", "pz"));
+        setVatCollectabilityList(ComboboxHelper.fillList(VatCollectability.class,
+                false, false));
+        paymentTypes = ComboboxHelper.fillList(PaymentType.class);
+
+        if(!ValidationHelper.isNullOrEmpty(getExamRequest())
+                && !ValidationHelper.isNullOrEmpty(getExamRequest().getInvoice())){
+            Invoice invoice = DaoManager.get(Invoice.class, getExamRequest().getInvoice().getId());
+            String year = DateTimeHelper.toFormatedString(invoice.getDate(), DateTimeHelper.getXmlSecondDatePattertYear());
+            setInvoiceNumber(invoice.getId() + "-" + year + "-FE");
+            setInvoiceDate(invoice.getDate());
+            setInvoiceNote(invoice.getNotes());
+            if(!ValidationHelper.isNullOrEmpty(invoice.getVatCollectability()))
+                setVatCollectabilityId(invoice.getVatCollectability().getId());
+            setSelectedPaymentTypeId(invoice.getPaymentType().getId());
+            List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
+            for(InvoiceItem invoiceItem : invoiceItems) {
+                setInvoiceItemAmount(invoiceItem.getAmount());
+                setInvoiceItemVat(invoiceItem.getVat());
+            }
+        }
+        if(!ValidationHelper.isNullOrEmpty(getExamRequest()) &&
+                getExamRequest().getStateId().equals(RequestState.SENT_TO_SDI.getId()))
+            setInvoiceSentStatus(true);
     }
 
     public void initOfficesList() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -271,41 +370,41 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
                         Restrictions.isNull("deleted"))})
                 .stream().sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList());
-        
-        
-         if(!ValidationHelper.isNullOrEmpty(getClientTypeId())) {
-             List<Client> notManagerOrFiduciaryClients = clientList.stream()
-                     .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
-                     .collect(Collectors.toList());
-             
-             setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(notManagerOrFiduciaryClients.stream()
-                     .filter(c -> (c.getTypeId().equals(getClientTypeId())))
-                     .collect(Collectors.toList()), true));
-         }else {
-             setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(clientList.stream()
-                     .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
-                     .collect(Collectors.toList()), true));
-         }
-         
+
+
+        if(!ValidationHelper.isNullOrEmpty(getClientTypeId())) {
+            List<Client> notManagerOrFiduciaryClients = clientList.stream()
+                    .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
+                    .collect(Collectors.toList());
+
+            setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(notManagerOrFiduciaryClients.stream()
+                    .filter(c -> (c.getTypeId().equals(getClientTypeId())))
+                    .collect(Collectors.toList()), true));
+        }else {
+            setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(clientList.stream()
+                    .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
+                    .collect(Collectors.toList()), true));
+        }
+
         if (getSelectedNotManagerOrFiduciaryClientId() != null) {
 //        	setClientManagers(ComboboxHelper.fillWrapperList(
 //        			clientList.stream()
-//        			.filter(c -> (c.getManager() != null 
-//        			&& c.getManager())  &&  (c.getClient() != null 
+//        			.filter(c -> (c.getManager() != null
+//        			&& c.getManager())  &&  (c.getClient() != null
 //        			&& c.getClient().getId().equals(getSelectedNotManagerOrFiduciaryClientId())))
 //        			.collect(Collectors.toList())
 //        			));
-        	 
-        	 setClientManagers(ComboboxHelper.fillWrapperList( emptyIfNull(clientList)
-               	  .stream()
-            	  .filter(c -> emptyIfNull(c.getReferenceClients()).stream()
-            			  .anyMatch(rc-> rc.getId().equals(getSelectedNotManagerOrFiduciaryClientId())))
-            	  .collect(Collectors.toList())));
-             
+
+            setClientManagers(ComboboxHelper.fillWrapperList( emptyIfNull(clientList)
+                    .stream()
+                    .filter(c -> emptyIfNull(c.getReferenceClients()).stream()
+                            .anyMatch(rc-> rc.getId().equals(getSelectedNotManagerOrFiduciaryClientId())))
+                    .collect(Collectors.toList())));
+
             setFiduciaryClientsList(ComboboxHelper.fillList(clientList.stream()
                     .filter(c -> emptyIfNull(c.getReferenceClients()).stream()
                             .anyMatch(rc-> rc.getId().equals(getSelectedNotManagerOrFiduciaryClientId())))
-                      .filter(c -> (c.getFiduciary() != null && c.getFiduciary()))
+                    .filter(c -> (c.getFiduciary() != null && c.getFiduciary()))
                     .collect(Collectors.toList()), true));
 
             List<Office> offices = DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()).getOffices();
@@ -323,8 +422,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 }
                 invoiceClients.addAll(client.getBillingRecipientList());
             }
-            setInvoiceClients(ComboboxHelper.fillList(invoiceClients.stream() 
-                    .filter(distinctByKey(c -> c.getId())) 
+            setInvoiceClients(ComboboxHelper.fillList(invoiceClients.stream()
+                    .filter(distinctByKey(c -> c.getId()))
                     .collect(Collectors.toList()), true));
         } else {
             setOfficeList(ComboboxHelper.fillList(Office.class, Order.asc("description")));
@@ -380,7 +479,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 .stream().sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList());
 
         List<Client> invoiceClients = new ArrayList<Client>();
-        
+
         for(Client client : clientList) {
             if(!client.getId().equals(getSelectedNotManagerOrFiduciaryClientId())) {
                 continue;
@@ -394,12 +493,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
         setFiduciaryClientsList(ComboboxHelper.fillList(clientList.stream()
                 .filter(c -> c.getFiduciary() != null && c.getFiduciary()).collect(Collectors.toList()), true));
-        
+
         if(!ValidationHelper.isNullOrEmpty(getClientTypeId())) {
             List<Client> notManagerOrFiduciaryClients = clientList.stream()
                     .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
                     .collect(Collectors.toList());
-            
+
             setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(notManagerOrFiduciaryClients.stream()
                     .filter(c -> (c.getTypeId().equals(getClientTypeId())))
                     .collect(Collectors.toList()), true));
@@ -408,7 +507,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
                     .collect(Collectors.toList()), true));
         }
-                
+
         if (!ValidationHelper.isNullOrEmpty(getSelectedNotManagerOrFiduciaryClientId())) {
             SelectItemHelper.addItemToListIfItIsNotInIt(getNotManagerOrFiduciaryClients(), getEntity().getClient());
         }
@@ -418,23 +517,23 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         if (!ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
             SelectItemHelper.addItemToListIfItIsNotInIt(getInvoiceClients(), getEntity().getClientFiduciary());
         }
-      
+
         if (getSelectedNotManagerOrFiduciaryClientId() != null) {
-        	 
-        	setClientManagers(ComboboxHelper.fillWrapperList( emptyIfNull(clientList)
-                  	  .stream()
-               	  .filter(c -> emptyIfNull(c.getReferenceClients()).stream()
-               			  .anyMatch(rc-> rc.getId().equals(getSelectedNotManagerOrFiduciaryClientId())))
-               	  .collect(Collectors.toList())));
-        	 
+
+            setClientManagers(ComboboxHelper.fillWrapperList( emptyIfNull(clientList)
+                    .stream()
+                    .filter(c -> emptyIfNull(c.getReferenceClients()).stream()
+                            .anyMatch(rc-> rc.getId().equals(getSelectedNotManagerOrFiduciaryClientId())))
+                    .collect(Collectors.toList())));
+
 //            setClientManagers(ComboboxHelper.fillWrapperList(clientList.stream()
 //                    .filter(c -> (c.getManager() != null && c.getManager()) || (c.getId().equals(getSelectedNotManagerOrFiduciaryClientId())))
 //                    .collect(Collectors.toList())));
         }else {
             setClientManagers(ComboboxHelper.fillWrapperList(clientList.stream()
-                    .filter(c -> c.getManager() != null && c.getManager()).collect(Collectors.toList())));  
+                    .filter(c -> c.getManager() != null && c.getManager()).collect(Collectors.toList())));
         }
-        
+
 
 
 //        if (!ValidationHelper.isNullOrEmpty(getSelectedClientId())) {
@@ -831,8 +930,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     }
 
     public void processManagedStateCheck() {
-            setConfirmButtonIsClicked(Boolean.TRUE);
-          executeJS("PF('chooseSingleOrMultipleRequestCreateWV').show();");
+        setConfirmButtonIsClicked(Boolean.TRUE);
+        executeJS("PF('chooseSingleOrMultipleRequestCreateWV').show();");
 //        if (ValidationHelper.isNullOrEmpty(getEntity().getRequests())) {
 //            executeJS("PF('enterPracticeReferenceWV').show();");
 //        } else {
@@ -872,7 +971,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 }
             }
             RedirectHelper.goToMailEditRequestToSent(getEntity().getRequests().get(0).getId(),
-                        getEntity().getId(), MailEditType.REQUEST_REPLY_ALL);
+                    getEntity().getId(), MailEditType.REQUEST_REPLY_ALL);
         } catch (Exception e) {
             LogHelper.log(log, e);
         }
@@ -941,7 +1040,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             processManagedState(true);
         }
     }
-    
+
     public void openNewMailToManager() throws PersistenceBeanException, IllegalAccessException {
         List<Long> selectedIds = null;
         if(!ValidationHelper.isNullOrEmpty(getEntity().getValidRequests())){
@@ -951,12 +1050,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
         if (!ValidationHelper.isNullOrEmpty(getEntity())) {
             if(!ValidationHelper.isNullOrEmpty(selectedIds)){
-                 SessionHelper.put("selectedIds", selectedIds);
+                SessionHelper.put("selectedIds", selectedIds);
             }
             RedirectHelper.goToMailEdit(getEntity().getId(), MailEditType.SEND_TO_MANAGER);
         }
-     }
-    
+    }
+
     public void forwardMail() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
         RedirectHelper.goToMailEdit(getEntity().getId(), MailEditType.FORWARD);
     }
@@ -987,9 +1086,140 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         changeStatusNewClientButton();
         prepareClients();
     }
-    
+
     public void editExcelData() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
         RedirectHelper.goTo(PageTypes.EXCEL_DATA,getEntity().getId() );
+    }
+
+
+    private void generateMenuModel() {
+        setTopMenuModel(new DefaultMenuModel());
+        if (isMultipleCreate()) {
+            addMenuItem(ResourcesHelper.getString("requestTextEditDataTab"));
+        } else {
+            addMenuItem(ResourcesHelper.getString("requestTextEditDataTab"));
+            if (!ValidationHelper.isNullOrEmpty(getInputCardList())) {
+                getInputCardList()
+                        .forEach(card -> addMenuItem(card.getName().toUpperCase()));
+            }
+        }
+    }
+
+    private void addMenuItem(String value) {
+        DefaultMenuItem menuItem = new DefaultMenuItem(value);
+
+        menuItem.setCommand("#{mailManagerViewBean.goToTab(" +
+                getTopMenuModel().getElements().size() + ")}");
+        menuItem.setUpdate("form");
+
+        getTopMenuModel().addElement(menuItem);
+    }
+
+    public void setMaxInvoiceNumber() throws HibernateException {
+        LocalDate currentdate = LocalDate.now();
+        int currentYear = currentdate.getYear();
+
+        Long lastInvoiceNumber = -1l;
+        try {
+            lastInvoiceNumber = (Long) DaoManager.getMax(Invoice.class, "id",
+                    new Criterion[]{});
+        } catch (PersistenceBeanException | IllegalAccessException e) {
+            LogHelper.log(log, e);
+        }
+        String invoiceNumber = (lastInvoiceNumber+1) + "-" + currentYear + "-FE";
+        setInvoiceNumber(invoiceNumber);
+    }
+
+    public Double getTotalGrossAmount() {
+        Double totalGrossAmount = 0D;
+        if(!ValidationHelper.isNullOrEmpty(getInvoiceItemAmount())){
+            totalGrossAmount += getInvoiceItemAmount();
+            if(!ValidationHelper.isNullOrEmpty(getInvoiceItemVat())){
+                totalGrossAmount += (getInvoiceItemAmount() * (getInvoiceItemVat()/100));
+            }
+        }
+        return totalGrossAmount;
+    }
+
+    public Double getTotalVat() {
+        Double totalVat = 0D;
+        if(!ValidationHelper.isNullOrEmpty(getInvoiceItemAmount()) &&
+                !ValidationHelper.isNullOrEmpty(getInvoiceItemVat()) && getInvoiceItemVat() > 0)
+            totalVat += getInvoiceItemAmount() * (getInvoiceItemVat()/100);
+        return totalVat;
+    }
+
+    public void sendInvoice() {
+        cleanValidation();
+        if(ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId())){
+            addRequiredFieldException("form:paymentType");
+            setValidationFailed(true);
+        }
+
+        if(ValidationHelper.isNullOrEmpty(getInvoiceItemAmount())){
+            addRequiredFieldException("form:quantita");
+            setValidationFailed(true);
+        }
+
+        if(ValidationHelper.isNullOrEmpty(getInvoiceItemVat())){
+            addRequiredFieldException("form:invoiceVat");
+            setValidationFailed(true);
+        }
+
+        if (getValidationFailed()){
+            executeJS("PF('invoiceErrorDialogWV').show();");
+            return;
+        }
+
+        try {
+            Invoice invoice = new Invoice();
+            invoice.setClient(getExamRequest().getClient());
+            invoice.setDate(getInvoiceDate());
+            if(!ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId()))
+                invoice.setPaymentType(DaoManager.get(PaymentType.class, getSelectedPaymentTypeId()));
+
+            if(!ValidationHelper.isNullOrEmpty(getVatCollectabilityId()))
+                invoice.setVatCollectability(VatCollectability.getById(getVatCollectabilityId()));
+            invoice.setNotes(getInvoiceNote());
+            InvoiceItem invoiceItem = new InvoiceItem();
+            if(!ValidationHelper.isNullOrEmpty(getExamRequest())
+                    && !ValidationHelper.isNullOrEmpty(getExamRequest().getSubject())){
+                invoiceItem.setSubject(getExamRequest().getSubject().toString());
+                invoiceItem.setAmount(getInvoiceItemAmount());
+                invoiceItem.setVat(getInvoiceItemVat());
+            }
+            List<InvoiceItem> invoiceItems = new ArrayList<>();
+            invoiceItems.add(invoiceItem);
+            FatturaAPI fatturaAPI = new FatturaAPI();
+            String xmlData = fatturaAPI.getDataForXML(invoice, invoiceItems);
+            log.info("Mailmanager XMLDATA: " + xmlData);
+            Boolean apiStatus = fatturaAPI.callFatturaAPI(xmlData, log);
+            if (apiStatus) {
+
+                DaoManager.save(invoice, true);
+                invoiceItem.setInvoice(invoice);
+                DaoManager.save(invoiceItem,true);
+                CollectionUtils.emptyIfNull(getInvoiceRequests())
+                        .stream()
+                        .forEach(r -> {
+                            try {
+                                r.setStateId(RequestState.SENT_TO_SDI.getId());
+                                r.setInvoice(invoice);
+                                DaoManager.save(r, true);
+                            } catch (PersistenceBeanException e) {
+                                log.error("error in saving request after sending invoice ", e);
+                            }
+                        });
+
+                setInvoiceSentStatus(true);
+                executeJS("PF('invoiceDialogWV').hide();");
+            } else
+                executeJS("PF('sendInvoiceErrorDialogWV').show();");
+        }catch(Exception e) {
+            e.printStackTrace();
+            LogHelper.log(log, e);
+            executeJS("PF('sendInvoiceErrorDialogWV').show();");
+        }
     }
 
     public Long getClientTypeId() {
@@ -1007,9 +1237,16 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     public void setClientTypes(List<SelectItem> clientTypes) {
         this.clientTypes = clientTypes;
     }
-    
+
     public void assosiateCancel() {
-    	RedirectHelper.goTo(PageTypes.MAIL_MANAGER_VIEW, getEntityId());
+        RedirectHelper.goTo(PageTypes.MAIL_MANAGER_VIEW, getEntityId());
     }
 
+    public List<Request> getInvoiceRequests() {
+        return invoiceRequests;
+    }
+
+    public void setInvoiceRequests(List<Request> invoiceRequests) {
+        this.invoiceRequests = invoiceRequests;
+    }
 }

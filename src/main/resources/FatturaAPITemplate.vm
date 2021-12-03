@@ -12,7 +12,9 @@
         <CustomerVatCode>$customerVatCode</CustomerVatCode>
         <CustomerCellPhone>$customerCellPhone</CustomerCellPhone>
         <CustomerEmail>$customerEmail</CustomerEmail>
-        <Object></Object>
+        <Number>$numero</Number>
+        <Date>$invoiceDate</Date>
+        <Object>$invoiceNote</Object>
         <FeCustomerPec>$feCustomerPec</FeCustomerPec>
         <FeDestinationCode>$feDestinationCode</FeDestinationCode>
         <FePaymentCode>$fePaymentCode</FePaymentCode>

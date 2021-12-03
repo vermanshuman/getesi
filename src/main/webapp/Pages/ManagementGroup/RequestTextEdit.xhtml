@@ -407,7 +407,7 @@
                                     <p:commandButton value="#{bean.examRequest.stateId == 7 ? msg.requestTextEditSentToSdi : msg.requestTextEditCreateInvoice}"
                                                      id="createInvoice"
                                                      styleClass="#{bean.examRequest.stateId == 7 ? '' : 'btn-green'}"
-                                                     update="btn_line"
+                                                     update="btn_line :form:invoiceTotalCost"
                                                      oncomplete="PF('invoiceDialogWV').show();"/>
 
                                     <p:commandButton action="#{bean.goBack}" value="#{msg.cancel}" style="width:122px;"

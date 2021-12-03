@@ -1713,4 +1713,17 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         }
         return selected;
     }
+
+    public void reset() throws PersistenceBeanException, IOException, InstantiationException, IllegalAccessException {
+        setSelectedClientId(null);
+        setManagerClientFilterid(null);
+        setFiduciaryClientFilterId(null);
+        setAggregationFilterId(null);
+        setStateWrappers(new ArrayList<>());
+        setUserWrappers(new ArrayList<>());
+        setServiceWrappers(new ArrayList<>());
+        setRequestTypeWrappers(new ArrayList<>());
+        this.onLoad();
+    }
+
 }

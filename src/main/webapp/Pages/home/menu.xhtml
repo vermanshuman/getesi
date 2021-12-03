@@ -212,7 +212,8 @@
                         <p:menuitem id="reportList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/ReportList.jsf')}" value="#{msg.headerReportList}" icon="topbar-icon reportistica-icon" outcome="/Pages/ManagementGroup/ReportList.jsf"/>
                         <p:menuitem id="billing"  value="#{msg.headerBilling}" icon="topbar-icon fatturazione-icon"/>
                         <p:submenu id="amministrazione" label="#{msg.menuConfiguration}" icon="pi pi-align-left">
-                            <p:menuitem id="utenti" value="#{msg.user_list}" icon="fa fa-fw fa-users" outcome="/Pages/Configuration/UserList.jsf" />
+                            <p:menuitem id="utenti" value="#{msg.user_list}" icon="fa fa-fw fa-users" outcome="/Pages/Configuration/UserList.jsf"
+                                        rendered="#{sessionBean.canViewPageUrl('/Pages/Configuration/UserList.jsf')}" />
                             <p:menuitem id="ruoli" value="#{msg.role_list}" icon="fa fa-fw fa-user-plus" outcome="/Pages/Configuration/RoleList.jsf" />
                             <p:menuitem id="configurazione" value="#{msg.application_settings}" icon="fa fa-fw fa-wrench" outcome="/Pages/Configuration/ApplicationSettings.jsf" />
                             <p:menuitem id="monitoraggio" value="#{msg.monitoring}" icon="fa fa-fw fa-wrench" outcome="/Pages/Configuration/Monitoring.jsf" />
@@ -231,7 +232,7 @@
                             <p:menuitem id="codiciConservatorie" value="#{msg.codici_conservatorie}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/CodiciConservatorie.jsf" />
                         </p:submenu>
                         <p:submenu id="configurazioni" label="#{msg.menuConfigurationArea}" icon="configurazione-icon">
-                            <p:menuitem id="aggregatiDiConservatorie" value="#{msg.aggregation_land_charges_registry_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/AggregationLandChargesRegistryList.jsf" />
+                            <p:menuitem id="aggregatiDiConservatorie" value="#{msg.aggregation_land_charges_registry_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/AggregationLandChargesRegistryList.jsf" rendered=""/>
                             <p:menuitem id="categorieCatastali" value="#{msg.cadastral_category_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CadastralCategoryList.jsf" />
                             <p:menuitem id="cliente" value="#{msg.client_list}" icon="fa fa-fw fa-user" outcome="/Pages/ConfigurationArea/ClientList.jsf" />
                             <p:menuitem id="coltureTerreni" value="#{msg.land_culture_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ConfigurationArea/LandCultureList.jsf" />
@@ -245,6 +246,8 @@
                             <p:menuitem id="gestioneComunicazioni" value="#{msg.communication_message_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ManagementGroup/CommunicationMessageList.jsf" />
                             <p:menuitem id="gruppoDati" value="#{msg.data_group_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/DataGroupList.jsf" />
                             <p:menuitem id="modalitàDiPagamento" value="#{msg.payment_type_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ManagementGroup/PaymentTypeList.jsf" />
+                            <p:menuitem id="invoice" value="#{msg.reportListInvoices}" icon="fa fa-fw fa-bars" outcome="/Pages/ManagementGroup/InvoiceList.jsf"
+                                        rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/InvoiceList.jsf')}"/>
                             <p:menuitem id="modelli" value="#{msg.template_document_model_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/TemplateDocumentModelList.jsf" />
                             <p:menuitem id="notai" value="#{msg.notary_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/NotaryList.jsf" />
                             <p:menuitem id="percentualiValoriOMICommerciali" value="#{msg.category_percent_value_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ConfigurationArea/CategoryPercentValueList.jsf" />
@@ -258,6 +261,7 @@
                             <p:menuitem id="tipologieDiritti" value="#{msg.relationship_types}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/RelationshipTypeList.jsf" />
                             <p:menuitem id="tipologieFormalità" value="#{msg.type_formality}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/TypeFormality.jsf" />
                             <p:menuitem id="toponomastica" value="#{msg.cadastral_topology}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CadastralTopology.jsf" />
+                            <p:menuitem id="iban" value="#{msg.requestType}" icon="fa fa-fw fa-bars" outcome="/Pages/ManagementGroup/IbanList.jsf" />
                             <p:menuitem id="tribunali" value="#{msg.court_list}" icon="fa fa-fw fa-legal" outcome="/Pages/Dictionaries/CourtList.jsf" />
                             <p:menuitem id="caloriOMITerreni" value="#{msg.land_omi_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ConfigurationArea/LandOmiList.jsf" />
                         </p:submenu>

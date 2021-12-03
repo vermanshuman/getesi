@@ -412,13 +412,14 @@ body .ui-datatable .ui-datatable-data tr.ui-state-highlight {
 	float: right;
 }
 
+
 .ui-paginator-first, .ui-paginator-prev, .ui-paginator-next, .ui-paginator-last {
 	color: #ffffff !important;
 }
 
 .ui-paginator .ui-paginator-page {
 	padding: 2px 8px;
-}
+}o08la
 
 .ui-paginator .ui-paginator-rpp-options {
 	background-color: #ffffff;
