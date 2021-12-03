@@ -14,7 +14,7 @@
     <ui:define name="back_buttons_panel">
         <p:commandButton id="add_btn" action="#{bean.addEstate}" value="#{msg.estateAddButton}" styleClass="p-mr-2 p-mb-2"/>
         <p:commandButton id="cancel_btn" action="#{bean.goBack}" value="#{msg.requestListOpenEdit}"
-                         icon="ui-icon-circle-close"/>
+                         icon="pi pi-times-circle"/>
         <p:commandButton id="print_btn" action="#{bean.goTextEdit}" value="#{msg.requestManagePrint}"
                          style="float: right"/>
     </ui:define>
@@ -274,12 +274,12 @@
         <!-- <ui:fragment><br /></ui:fragment> -->
         <p:fieldset legend="#{msg.estateSituationSalesDevelopmentHeader}" rendered="#{bean.salesDevelopmentShowing}">
             <p:commandButton disabled="#{!bean.canCreate}" id="buttonCreateSalesDevelopment" style="margin-left: -13px;"
-                             icon="ui-icon-circle-plus" styleClass="ui-button-success p-mr-2 p-mb-2"
+                             icon="pi pi-plus-circle" styleClass="ui-button-success p-mr-2 p-mb-2"
                              value="#{not empty addButtonTitle ? addButtonTitle : msg.newItem}"
                              update="sales_dev"
                              action="#{bean.addSalesEntity()}"/>
             <p:commandButton disabled="#{!bean.canCreate}" id="autoCreateSalesDevelopment"
-                             icon="ui-icon-circle-plus" value="#{msg.estateSituationSalesDevelopmentAutoCreate}"
+                             icon="pi pi-plus-circle" value="#{msg.estateSituationSalesDevelopmentAutoCreate}"
                              update="sales_dev" onclick="PF('autoCreateSalesDevelopment').disable()"
                              oncomplete="PF('autoCreateSalesDevelopment').enable()"
                              action="#{bean.autoAddEntity()}" widgetVar="autoCreateSalesDevelopment"/>

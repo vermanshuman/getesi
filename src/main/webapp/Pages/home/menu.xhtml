@@ -211,6 +211,7 @@
                                     action="#{sessionBean.getDatabaseListPage()}" actionListener="#{sessionBean.cleanFiltersOnDatabaseListSubjectTable()}"/>
                         <p:menuitem id="reportList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/ReportList.jsf')}" value="#{msg.headerReportList}" icon="topbar-icon reportistica-icon" outcome="/Pages/ManagementGroup/ReportList.jsf"/>
                         <p:menuitem id="billing"  value="#{msg.headerBilling}" icon="topbar-icon fatturazione-icon"/>
+                        <p:menuitem id="contactPage" styleClass="main" value="#{msg.home}" icon="topbar-icon contact-icon"/>
                         <p:submenu id="amministrazione" label="#{msg.menuConfiguration}" icon="pi pi-align-left">
                             <p:menuitem id="utenti" value="#{msg.user_list}" icon="fa fa-fw fa-users" outcome="/Pages/Configuration/UserList.jsf"
                                         rendered="#{sessionBean.canViewPageUrl('/Pages/Configuration/UserList.jsf')}" />
