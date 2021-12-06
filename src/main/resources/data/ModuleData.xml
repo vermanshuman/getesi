@@ -219,6 +219,13 @@
 		<isTemplate>true</isTemplate>
 	</data_entry>
 	<data_entry>
+		<code>BL</code>
+		<name>permissionBilling</name>
+		<parent entity_field="code">GENERAL</parent>
+		<position>2</position>
+		<isTemplate>true</isTemplate>
+	</data_entry>
+	<data_entry>
 		<code>RFRNTL</code>
 		<name>permissionReferent</name>
 		<parent entity_field="code">DICTIONARY</parent>

@@ -74,16 +74,12 @@ input {
 	min-height: 28px;
 }
 
-/* .ui-calendar:not(#currentDay) .ui-datepicker-trigger {
+.ui-calendar:not(#currentDay) .ui-datepicker-trigger {
 	color: #003871 !important;;
 }
 
 body .ui-calendar:not(#currentDay) .ui-button {
 	background-color: transparent !important;
-	margin-left: -37px;
-} */
-
-body .ui-calendar:not(#currentDay) .ui-button {
 	margin-left: -37px;
 }
 
@@ -467,9 +463,4 @@ body a {
 
 .search-panel-btns button {
 	width: 98px;
-}
-
-.ui-datepicker .ui-datepicker-header {
-	background: #ffffff !important;
-    color: #495057 !important;
 }

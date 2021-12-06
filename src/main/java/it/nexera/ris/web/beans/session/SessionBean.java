@@ -310,10 +310,8 @@ public class SessionBean implements Serializable {
     public void setOverLayMode(Boolean overLayMode) {
         this.overLayMode = overLayMode;
     }
-    
+
     public void getBillingListPage() {
         RedirectHelper.goTo(PageTypes.BILLING_LIST);
     }
-
-
 }

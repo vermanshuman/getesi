@@ -87,17 +87,17 @@
         }
     </style>
 
-    <p:dialog widgetVar="invoiceDialogWV" modal="true" width="1150" draggable="false"  
-    		header="#{msg.requestTextEditElectronicSalesInvoice} (n. #{bean.invoiceNumber})">
+    <p:dialog widgetVar="invoiceDialogWV" modal="true" width="1150" draggable="false"
+              header="#{msg.requestTextEditElectronicSalesInvoice} (n. #{bean.invoiceNumber})">
         <div style="margin-top:20px; overflow-x:hidden; overflow-y:auto; height: 600px;">
-            <p:tabMenu activeIndex="#{bean.activeMenuTabNum}" model="#{bean.topMenuModel}" style="background-color:#FFFFFF !important;" id="pageTabMenu"  />
+        <p:tabMenu activeIndex="#{bean.activeMenuTabNum}" model="#{bean.topMenuModel}" style="background-color:#FFFFFF !important;" id="pageTabMenu"  />
             <ui:fragment>
                 <div class="p-grid" style="margin-right:20px;">
-                    <div class="p-col-1 vertical-center" >
+                    <div class="p-col-1 vertical-center">
                         <p:outputLabel value="#{msg.requestTextEditNumber}"/>
                     </div>
                     <div class="p-col-2">
-                        <p:inputText value="#{bean.invoiceNumber}" disabled="true"/>
+                        <p:inputText value="#{bean.invoiceNumber}"/>
                     </div>
                     <div class="p-col-1 vertical-center">
                         <h:outputText value="#{msg.requestTextEditClient}"/>
@@ -110,7 +110,9 @@
                         <h:outputText value="#{msg.requestTextEditDocType}"/>
                     </div>
                     <div class="p-col-2">
-                        <p:selectOneMenu label="#{msg.requestTextEditDocType}" styleClass="select-one-menu" disabled="true" >
+                        <p:selectOneMenu  value="#{bean.documentType}"
+                                label="#{msg.requestTextEditDocType}" styleClass="select-one-menu"
+                                          disabled="true" >
                             <f:selectItems value="#{bean.docTypes}"/>
                         </p:selectOneMenu>
                     </div>
@@ -230,7 +232,7 @@
                 <div class="p-grid" style="margin-right:20px;">
                     <div class="p-col-2">
                         <h:outputText value="#{msg.requestTextEditNetAmount}"></h:outputText>
-                        <p:inputNumber value="#{bean.invoiceTotalCost}" disabled="#{bean.invoiceSentStatus}"/>
+                        <p:inputNumber id="invoiceTotalCost" value="#{bean.invoiceTotalCost}" disabled="#{bean.invoiceSentStatus}"/>
                     </div>
                     <div class="p-col-1">
                         <h:outputText value="#{msg.requestTextEditQty}"></h:outputText>
@@ -258,7 +260,7 @@
                     </div>
                     <div class="p-col-3">
                         <h:outputText value="#{msg.requestTextEditTotalLine}"></h:outputText>
-                        <p:inputText id="totalGrossAmount" value="#{bean.totalGrossAmount}" disabled="true"/>
+                        <p:inputText id="totalGrossAmount" value="#{bean.invoiceTotalCost}" disabled="true"/>
                         <p:selectBooleanCheckbox style="margin-top: 5px;"></p:selectBooleanCheckbox>
                         <h:outputText style="margin-top: 5px;" value="#{msg.requestTextEditNotImpIncome}"></h:outputText>
                     </div>
@@ -302,7 +304,7 @@
                         <h:outputText value="#{msg.requestTextEditTotalSkills}"></h:outputText>
                     </div>
                     <div class="p-col-2">
-                        <p:inputText id="invoiceTotalAmount" value="#{bean.invoiceItemAmount}" disabled="true"/>
+                        <p:inputText id="invoiceTotalAmount" value="#{bean.invoiceTotalCost}" disabled="true"/>
                     </div>
 
                     <div class="p-col-8"></div>
@@ -357,7 +359,7 @@
                     <div class="p-col-9"></div>
                     <div class="p-col-3">
                         <p:commandButton value="#{msg.cancel.toUpperCase()}" oncomplete="PF('invoiceDialogWV').hide()" style="margin-left: 9%;"/>
-                        <p:commandButton action="#{bean.sendInvoice}"  update=":createInvoice :btn_line"
+                        <p:commandButton action="#{bean.sendInvoice}"  update=":createInvoice :btn_line @widgetVar(sendInvoiceErrorDialogWV)"
                                          value="#{msg.save.toUpperCase()}" styleClass="btn-green" style="margin-left:5px;"/>
                     </div>
                 </div>

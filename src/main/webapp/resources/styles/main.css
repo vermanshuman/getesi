@@ -292,6 +292,47 @@ body .top-bar-cal .ui-widget-header {
     display: block;
 }
 
+.home-icon {
+    background-image: url("../images/home.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 24px;
+    height: 20px;
+    display: block;
+}
+
+.contact-icon {
+    background-image: url("../images/contacts.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 28px;
+    height: 20px;
+    display: block;
+}
+
+.go-back-icon {
+    background-image: url("../images/go-back.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 24px;
+    height: 20px;
+    width: 20px;
+    display: block;
+    margin-top: -4px;
+}
+
+.go-forward-icon {
+    background-image: url("../images/go-forward.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 24px;
+    height: 20px;
+    width: 20px;
+    display: block;
+    margin-top: -4px;
+    margin-left: 55px;
+}
+
 .email-icon {
     background-image: url("../images/email.png");
     background-repeat: no-repeat;

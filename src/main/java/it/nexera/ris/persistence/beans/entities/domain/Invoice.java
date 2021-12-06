@@ -46,6 +46,12 @@ public class Invoice extends IndexedEntity implements Serializable {
 	@Column(name = "vat_collectability")
 	private VatCollectability vatCollectability;
 
+	@Transient
+	private String documentType;
+
+	@Column(name = "invoice_number")
+	private String invoiceNumber;
+
 	public Long getCloudId() {
 		return cloudId;
 	}
@@ -124,5 +130,21 @@ public class Invoice extends IndexedEntity implements Serializable {
 
 	public void setVatCollectability(VatCollectability vatCollectability) {
 		this.vatCollectability = vatCollectability;
+	}
+
+	public String getDocumentType() {
+		return documentType;
+	}
+
+	public void setDocumentType(String documentType) {
+		this.documentType = documentType;
+	}
+
+	public String getInvoiceNumber() {
+		return invoiceNumber;
+	}
+
+	public void setInvoiceNumber(String invoiceNumber) {
+		this.invoiceNumber = invoiceNumber;
 	}
 }

@@ -305,7 +305,10 @@
             #cke_body {
                 width: 67vw !important;
             }
-
+            body .ui-button.ui-button-warning {
+                background: #fed820;
+                color: #000000;
+            }
         </style>
 
         <h:form id="form" prependId="false" enctype="multipart/form-data"
@@ -326,13 +329,13 @@
                             <f:selectItems value="#{bean.templates}"/>
                         </p:selectOneMenu>
                         <p:commandButton action="#{bean.updateTemplate}" value="#{msg.apply}" update=":edit_text_section @widgetVar(typeError)"
-                                         styleClass="margin-left">
+                                         styleClass="margin-left" style="background-color: #57c279 !important;">
                             <f:setPropertyActionListener value="true" target="#{bean.calledByApplicaButton}"/>
                         </p:commandButton>
 
                         <p:column/><p:column/>
-                        <p:commandButton value="#{msg.requestPrintSelectRequest}" type="button"
-                                         onclick="PF('dlg1').show();" style="float: right"/>
+                        <!--<p:commandButton value="#{msg.requestPrintSelectRequest}" type="button"
+                                         onclick="PF('dlg1').show();" style="float: right"/>-->
                     </p:panelGrid>
                 </p:outputPanel>
                 <div id="bodyPanel">
@@ -346,9 +349,9 @@
                                     <p:selectBooleanButton id="switch" offLabel="" onLabel=""
                                                            styleClass="selectBool" onchange="fullscreen();"
                                                            offIcon="fa fa-fw fa-bars" onIcon="fa fa-bars"/>
-                                    <p:commandButton value="#{msg.requestListOpenProcedure}"
+                                    <!--<p:commandButton value="#{msg.requestListOpenProcedure}"
                                                      action="#{bean.openTableProcedure}"
-                                                     update="estateTab"/>
+                                                     update="estateTab"/>-->
                                     <p:commandButton value="#{msg.requestListOpenEdit}" action="#{bean.manageRequest}"/>
                                 </p:panelGrid>
                             </p:column>
@@ -376,9 +379,9 @@
                             <p:column>
                                 <p:panelGrid id="btn_line" styleClass="ui-panelgrid-blank form-group buttonPane1"
                                              columns="1">
-                                    <p:commandButton value="#{msg.requestPrintPrintPdf}" action="#{bean.print}"
-                                                     widgetVar="printButton" style="width:122px;"
-                                                     onclick="PF('printButton').disable();"
+                                    <p:commandButton icon="pi pi-print" value="#{msg.requestPrintPrintPdf}" action="#{bean.print}"
+                                                     widgetVar="printButton" style="margin-right: 1cm;width:122px;"
+                                                     onclick="PF('printButton').disable();" styleClass="ui-button-warning"
                                                      oncomplete="PF('printButton').enable();"/>
 
                                     <p:commandButton action="#{bean.compareNumberActsBeforeExtraCost}" value="#{msg.requestCost}" style="width:122px;"
@@ -407,11 +410,11 @@
                                     <p:commandButton value="#{bean.examRequest.stateId == 7 ? msg.requestTextEditSentToSdi : msg.requestTextEditCreateInvoice}"
                                                      id="createInvoice"
                                                      styleClass="#{bean.examRequest.stateId == 7 ? '' : 'btn-green'}"
-                                                     update="btn_line"
+                                                     update="btn_line :form:invoiceTotalCost"
                                                      oncomplete="PF('invoiceDialogWV').show();"/>
 
-                                    <p:commandButton action="#{bean.goBack}" value="#{msg.cancel}" style="width:122px;"
-                                                     icon="ui-icon-circle-close"/>
+                                   <!-- <p:commandButton action="#{bean.goBack}" value="#{msg.cancel}" style="width:122px;"
+                                                     icon="ui-icon-circle-close"/>-->
                                 </p:panelGrid>
                             </p:column>
                         </p:panelGrid>
@@ -636,9 +639,10 @@
             </p:dialog>
 
 
-            <p:dialog widgetVar="sendInvoiceErrorDialogWV"  modal="true" draggable="false" position="center center">
+            <p:dialog widgetVar="sendInvoiceErrorDialogWV"  modal="true" draggable="false"
+                      position="center center">
                 <div class="ui-messages-error ui-corner-all">
-                    <span class="ui-messages-error-summary">#{msg.sendInvoiceErrorMsg}</span><br/>
+                    <span class="ui-messages-error-summary">#{bean.apiError}</span><br/>
                 </div>
                 <p:commandButton oncomplete="PF('sendInvoiceErrorDialogWV').hide();"
                                  value="#{msg.close}" />

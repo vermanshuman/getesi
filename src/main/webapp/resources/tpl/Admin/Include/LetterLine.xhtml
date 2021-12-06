@@ -49,11 +49,11 @@
           media="all" rel="stylesheet" type="text/css"/>
     <div class="button-panel-space p-grid">
         <div class="p-col-9">
-        <p:outputPanel id="btn_line"> 
-        	<p:commandButton title="#{msg.mailManagerSendInvoice}" rendered="#{bean.sendInvoice}"
-                             value="#{msg.mailManagerSendInvoice}" styleClass="grey-button"
-                             action="#{bean.newInvoiceMail}" update=":form"/>
-            <p:commandButton icon="fa fa-reply-all" title="#{msg.mailManagerReplyToAll}"
+            <p:outputPanel id="btn_line">
+                <p:commandButton title="#{msg.mailManagerSendInvoice}" rendered="#{bean.sendInvoice}"
+                                 value="#{msg.mailManagerSendInvoice}" styleClass="grey-button"
+                                 action="#{bean.newInvoiceMail}" update=":form"/>
+                <p:commandButton icon="fa fa-reply-all" title="#{msg.mailManagerReplyToAll}"
                              value="#{msg.mailManagerReplyToAll}" styleClass="grey-button"
                              action="#{bean.replyToAllMail}" update=":form"/>
             <p:commandButton icon="fa fa-arrow-right" title="#{msg.mailManagerForward}"
@@ -88,9 +88,10 @@
                              value="#{msg.mailManagerSendRequestToManager}"
                              oncomplete="PF('mailManagerViewRequestsDlg').show();"/>
 
+
             <p:commandButton style="margin-left: 2px;"
                              value="#{msg.requestTextEditCreateInvoice}" rendered="#{not bean.invoiceSentStatus and bean.invoiceRequests.size() != 0}"
-                             id="createInvoice" styleClass="grey-button" 
+                             id="createInvoice" styleClass="grey-button"
                              oncomplete="PF('invoiceDialogWV').show();"/>
 
             <!--  <p:commandButton icon="ui-icon fa fa-pencil" update=":form" styleClass="right-side"
@@ -98,7 +99,7 @@
                               disabled="#{!bean.entity.canEdit}"/> -->
             <p:commandButton rendered="#{bean.canDeleteMail and bean.actual}" styleClass="ui-button-danger"
                              action="#{bean.cancelMail}" icon="pi pi-trash" />
-		 </p:outputPanel> 
+            </p:outputPanel>
         </div>
         <div class="p-col-3" style="text-align:right;">
             <!-- <p:commandButton icon="fa fa-pencil-square" actionListener="#{bean.checkFieldsBeforeProcessManagedStateCheck}"

@@ -311,10 +311,6 @@
             #filterEmailBody.ui-state-focus {
                 box-shadow: 0 0 0 0.2em #a6d5fa !important;
             }
-            
-            .ui-datepicker .ui-datepicker-header {
-				background: #ffffff !important;
-			}
         </style>
 
         <p:remoteCommand name="updateSearchPanel" update=":form:searchPanel"/>
@@ -413,9 +409,9 @@
                                                     </p:selectCheckboxMenu>
                                                 </div>
                                                 <div class="p-col-12" style="text-align: center;">
-                                                    <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFiltraPanel}" update="settingPanel" oncomplete="PF('panelSetting').getJQ().hide()"/>
-                                                    <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #009900;" id="searchButton"
+                                                    <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #009900;margin-right: 20px;" id="searchButton"
                                                                      onclick="checkDates(); filterTableFromPanel();" update="searchPanel" oncomplete="PF('panelSetting').getJQ().hide()"/>
+                                                    <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFiltraPanel}" update="settingPanel" oncomplete="PF('panelSetting').getJQ().hide()"/>
                                                 </div>
                                             </div>
                                         </p:panel>

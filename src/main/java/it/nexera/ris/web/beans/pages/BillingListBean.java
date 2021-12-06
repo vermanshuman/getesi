@@ -272,26 +272,22 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
                 || !ValidationHelper.isNullOrEmpty(getSearchCreateUser())) {
             setSelectedAllStatesOnPanel(true);
         }
-        
+        getStateWrappers().add(new RequestStateWrapper(true , RequestState.EVADED));
+        getStateWrappers().add(new RequestStateWrapper(true , RequestState.INVOICED));
+        getStateWrappers().add(new RequestStateWrapper(true , RequestState.SENT_TO_SDI));
+
         Long dueRequestTypeId =(Long)SessionHelper.get("dueRequestTypeId");
-        
+
         if(!ValidationHelper.isNullOrEmpty(dueRequestTypeId)) {
             SessionHelper.removeObject("dueRequestTypeId");
             List<RequestType> requestTypes = DaoManager.load(RequestType.class, new Criterion[]{Restrictions.isNotNull("name")});
             if (!ValidationHelper.isNullOrEmpty(requestTypes)) {
-                Collections.sort(requestTypes, new Comparator<RequestType>() {
-                    @Override
-                    public int compare(final RequestType object1, final RequestType object2) {
-                        return object1.toString().toUpperCase().compareTo(object2.toString().toUpperCase());
-                    }
-                });
+                Collections.sort(requestTypes, Comparator.comparing(object -> object.toString().toUpperCase()));
                 requestTypes.forEach(r -> {
                     getRequestTypeWrappers().add(new RequestTypeFilterWrapper(r.getId().equals(dueRequestTypeId),r));
                 });
             }
-            for(RequestState rs: RequestState.values()) {
-                getStateWrappers().add(new RequestStateWrapper(!RequestState.EVADED.equals(rs) , rs));
-            }
+
             Integer expirationDays = (Integer)SessionHelper.get("expirationDays");
             if(!ValidationHelper.isNullOrEmpty(expirationDays)) {
                 SessionHelper.removeObject("expirationDays");
@@ -299,18 +295,9 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
             }
         }else {
             setExpirationDays(null);
-             Arrays.asList(RequestState.values()).forEach(st -> getStateWrappers()
-                .add(new RequestStateWrapper(PageTypes.REPORT_LIST.equals(getCurrentPage())
-                        ? RequestState.EVADED.equals(st) : st.isNeedShow(), st)));
-             
             List<RequestType> requestTypes = DaoManager.load(RequestType.class, new Criterion[]{Restrictions.isNotNull("name")});
             if (!ValidationHelper.isNullOrEmpty(requestTypes)) {
-                Collections.sort(requestTypes, new Comparator<RequestType>() {
-                    @Override
-                    public int compare(final RequestType object1, final RequestType object2) {
-                        return object1.toString().toUpperCase().compareTo(object2.toString().toUpperCase());
-                    }
-                });
+                Collections.sort(requestTypes, Comparator.comparing(object -> object.toString().toUpperCase()));
                 requestTypes.forEach(r -> getRequestTypeWrappers().add(new RequestTypeFilterWrapper(r)));
             }
 
@@ -920,14 +907,6 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
         }
     }
 
-    public void createNewRequest() {
-        RedirectHelper.goTo(PageTypes.REQUEST_EDIT);
-    }
-
-    public void createNewMultipleRequest() {
-        RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT);
-    }
-
     public void manageRequest() {
 
         SessionHelper.put("searchLastName", getSearchLastName());
@@ -938,6 +917,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public void filterTableFromPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+
         List<Criterion> restrictions = RequestHelper.filterTableFromPanel(getDateFrom(), getDateTo(), getDateFromEvasion(),
                 getDateToEvasion(), getSelectedClientId(), getRequestTypeWrappers(), getStateWrappers(), getUserWrappers(),
                 getServiceWrappers(), getSelectedUserType(),getAggregationFilterId(), getSelectedServiceType());
@@ -1006,18 +986,11 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
         }
         
         setFilterRestrictions(restrictions);
-        loadList(RequestView.class, new Criterion[] {Restrictions.or(
-        		Restrictions.eq("stateId", RequestState.SENT_TO_SDI.getId()),
-        		Restrictions.eq("stateId", RequestState.EVADED.getId()))},
+        loadList(RequestView.class, restrictions.toArray(new Criterion[0]),
                 new Order[]{Order.desc("createDate")});
-        
-        List<RequestView> requestList = DaoManager.load(RequestView.class, new Criterion[] {Restrictions.or(
-        		Restrictions.eq("stateId", RequestState.SENT_TO_SDI.getId()),
-        		Restrictions.eq("stateId", RequestState.EVADED.getId()))});
-        
-        List<Long> cityIds = new ArrayList<Long>();
-        
-        
+        List<RequestView> requestList = DaoManager.load(RequestView.class, restrictions.toArray(new Criterion[0]));
+        List<Long> cityIds = new ArrayList<>();
+
         for(RequestView request : requestList) {
             if(!ValidationHelper.isNullOrEmpty(request.getCityId()) && !cityIds.contains(request.getCityId())) {
                 cityIds.add(request.getCityId());

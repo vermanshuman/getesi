@@ -62,8 +62,9 @@ public class InvoiceListBean extends EntityLazyListPageBean<Invoice>
     private Long selectedPaymentTypeId;
     private Boolean splitPayment;
     private Boolean sent;
+	private String apiError;
 
-    public List<SelectItem> getClients() {
+	public List<SelectItem> getClients() {
 		return clients;
 	}
 
@@ -125,6 +126,14 @@ public class InvoiceListBean extends EntityLazyListPageBean<Invoice>
 
 	public void setSent(Boolean sent) {
 		this.sent = sent;
+	}
+
+	public String getApiError() {
+		return apiError;
+	}
+
+	public void setApiError(String apiError) {
+		this.apiError = apiError;
 	}
 
 	/* (non-Javadoc)

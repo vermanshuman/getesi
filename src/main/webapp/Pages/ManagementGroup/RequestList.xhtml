@@ -518,16 +518,16 @@
                                                 </p:calendar>
                                             </div>
                                             <div class="p-col-12 search-panel-btns" style="text-align: center;">
-                                                <p:commandButton id="manageReestablishBtn" action="#{bean.reset}"
-                                                                 value="#{ff:upper(msg.mailManageReestablish)}"
-                                                                 update="settingPanel searchPanel"
-                                                                 oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').getJQ().hide();"/>
                                                 <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}"
-                                                                 style="background: #009900; margin-left:3px;"
+                                                                 style="background: #009900;"
                                                                  id="searchButton12345"
                                                                  onclick="checkDates(); filterTableFromPanel();"
                                                                  update="searchPanel"
                                                                  oncomplete="PF('panelSetting').getJQ().hide();"/>
+                                                <p:commandButton id="manageReestablishBtn" style="width: auto;"
+                                                                 value="#{ff:upper(msg.mailManageReestablish)}"
+                                                                 update="settingPanel searchPanel"
+                                                                 oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').getJQ().hide();"/>
                                             </div>
                                         </div>
                                     </p:panel>
@@ -541,7 +541,8 @@
 
 
         <p:remoteCommand name="resetTableData"
-                         action="#{bean.onLoad}" update=":form:table"/>
+                         action="#{bean.reset}" update=":form:table :form:settingPanel :form:stateSelectCheckboxPanelDataTable :form:requestTypeSelectCheckboxPanelDataTable
+                             :form:serviceSelectCheckboxPanelDataTable"/>
         <p:outputPanel id="searchPanel" style="display:none;" >
             <p:commandButton icon="fa fa-fw fa-file-pdf-o"  rendered="false"
                              action="#{bean.downloadPdfFile}" ajax="false" update="@form">
