@@ -1,0 +1,378 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html">
+
+    <style>
+        body .ui-widget-header {
+            background-color: #FFFFFF !important;
+            color: #000000 !important;
+        }
+
+        body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem a {
+            color: #6c757d;
+        }
+
+        body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem.ui-state-active {
+            background: #FFFFFF !important;
+            border-bottom: 2px solid #2196F3 !important;
+        }
+
+        body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem.ui-state-active a {
+            color: #2196F3 !important;
+        }
+
+        body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem {
+            list-style: none;
+            white-space: nowrap;
+            display: inline-block;
+            vertical-align: top;
+            float: none;
+            background: #ffffff !important;
+            margin: 0;
+            cursor: pointer;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-align: center;
+            align-items: center;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s,
+            box-shadow 0.2s;
+        }
+
+        body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem {
+            border: none;
+        }
+
+        body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem.ui-state-hover {
+            border-bottom: 2px solid gray !important;
+        }
+
+        body .ui-tabmenu .ui-tabmenu-nav {
+            background: #ffffff !important;
+            border-bottom: 2px solid #dee2e6 !important;
+        }
+
+        .p-grid{
+            margin-top:10px;
+        }
+
+        .ui-inputfield {
+            width: 100%;
+        }
+
+        .select-one-menu {
+            width: 100%;
+        }
+
+        .vertical-center {
+            line-height: 30px;
+        }
+
+        .hasDatepicker {
+            width: 75% !important;
+        }
+
+        .output-panel {
+            width: 100%;
+            border: 1px solid #ced4da;
+            border-radius: 4px !important;
+            min-height: 32px;
+        }
+
+        .icon {
+            float: right;
+            margin-right: 10px;
+            margin-top: 9px;
+        }
+    </style>
+
+    <p:dialog widgetVar="invoiceDialogWV" modal="true" width="1150" draggable="false"  
+    		header="#{msg.requestTextEditElectronicSalesInvoice} (n. #{bean.invoiceNumber})">
+        <div style="margin-top:20px; overflow-x:hidden; overflow-y:auto; height: 600px;">
+            <p:tabMenu activeIndex="#{bean.activeMenuTabNum}" model="#{bean.topMenuModel}" style="background-color:#FFFFFF !important;" id="pageTabMenu"  />
+            <ui:fragment>
+                <div class="p-grid" style="margin-right:20px;">
+                    <div class="p-col-1 vertical-center" >
+                        <p:outputLabel value="#{msg.requestTextEditNumber}"/>
+                    </div>
+                    <div class="p-col-2">
+                        <p:inputText value="#{bean.invoiceNumber}" disabled="true"/>
+                    </div>
+                    <div class="p-col-1 vertical-center">
+                        <h:outputText value="#{msg.requestTextEditClient}"/>
+                    </div>
+                    <div class="p-col-8">
+                        <p:inputText value="#{bean.examRequest.client}" disabled="true"/>
+                    </div>
+
+                    <div class="p-col-1 vertical-center">
+                        <h:outputText value="#{msg.requestTextEditDocType}"/>
+                    </div>
+                    <div class="p-col-2">
+                        <p:selectOneMenu label="#{msg.requestTextEditDocType}" styleClass="select-one-menu" disabled="true" >
+                            <f:selectItems value="#{bean.docTypes}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="p-col-1 vertical-center">
+                        <h:outputText value="#{msg.requestTextEditStreetAddress}"/>
+                    </div>
+                    <div class="p-col-7">
+                        <p:inputText value="#{bean.examRequest.client ne null ? bean.examRequest.client.addressStreet : ''}" disabled="true"/>
+                    </div>
+                    <div class="p-col-1">
+                        <p:inputText value="#{bean.examRequest.client ne null ? bean.examRequest.client.addressPostalCode : ''}" disabled="true"/>
+                    </div>
+
+                    <div class="p-col-1 vertical-center" >
+                        <p:outputLabel value="#{msg.requestTextEditData}"/>
+                    </div>
+                    <div class="p-col-2">
+                        <p:calendar  value="#{bean.invoiceDate}" disabled="#{bean.invoiceSentStatus}"
+                                    showOn="button"
+                                    pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
+                                    popupIconOnly="true"
+                                    onblur="check_date(this)"
+                                    styleClass="calender-filled">
+                            <p:ajax event="dateSelect" update="@this" />
+                        </p:calendar>
+                    </div>
+                    <div class="p-col-1 vertical-center">
+                        <h:outputText value=""/>
+                    </div>
+                    <div class="p-col-4">
+                            <p:inputText value="#{(bean.examRequest.client ne null and bean.examRequest.client.addressCityId ne null)
+                            ? bean.examRequest.client.addressCityId : ''}" disabled="true"/>
+                    </div>
+                    <div class="p-col-3">
+                        <p:inputText value="#{(bean.examRequest.client ne null and bean.examRequest.client.addressProvinceId ne null)
+                            ? bean.examRequest.client.addressProvinceId : ''}" disabled="true"/>
+                    </div>
+                    <div class="p-col-1">
+                    </div>
+
+                    <div class="p-col-1 vertical-center" >
+                        <p:outputLabel value="#{msg.requestTextEditCompetence}"/>
+                    </div>
+                    <div class="p-col-2">
+                        <p:calendar readonlyInput="false" value="#{bean.competence}"
+                                    showOn="button" disabled="#{bean.invoiceSentStatus}"
+                                    pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
+                                    popupIconOnly="true"
+                                    onblur="check_date(this)"
+                                    styleClass="calender-filled">
+                            <p:ajax event="dateSelect" update="@this" />
+                        </p:calendar>
+                    </div>
+                    <div class="p-col-1 vertical-center">
+                        <h:outputText value="#{msg.requestTextEditVatCF}"/>
+                    </div>
+                    <div class="p-col-4">
+                        <p:inputText value="#{bean.examRequest.client ne null ? bean.examRequest.client.numberVAT : ''}" disabled="true"/>
+                    </div>
+                    <div class="p-col-4">
+                        <p:inputText value="#{bean.examRequest.client ne null ? bean.examRequest.client.fiscalCode : ''}" disabled="true"/>
+                    </div>
+
+                    <div class="p-col-1 vertical-center" style="padding-left:0 !important; padding-right:0 !important; margin-left: 7px; margin-top: 7px;">
+                        <h:outputText value="#{msg.requestTextEditVatCollectability}"/>
+                    </div>
+                    <div class="p-col-2" style="width: 15% !important; padding-left:0 !important; margin-top: 7px;">
+                        <p:selectOneMenu label="#{msg.requestTextEditVatCollectability}" disabled="#{bean.invoiceSentStatus}"
+                                         value="#{bean.vatCollectabilityId}" styleClass="select-one-menu">
+                            <f:selectItems value="#{bean.vatCollectabilityList}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="p-col-1 vertical-center" style="padding-left:0 !important; margin-left: 18px; margin-top: 7px;">
+                        <h:outputText value="#{msg.requestTextEditSdlAddress}"/>
+                    </div>
+                    <div class="p-col-4" style="width: 32% !important; padding-left:0 !important; margin-top: 7px;">
+                        <p:inputText value="#{bean.examRequest.client ne null ? bean.examRequest.client.addressSDI : ''}" disabled="true"/>
+                    </div>
+                    <div class="p-col-4" style="margin-left:5px; margin-top: 7px;">
+                        <p:inputText value="#{bean.examRequest.client ne null ? bean.examRequest.client.mailPEC : ''}" disabled="true"/>
+                    </div>
+
+
+                    <div class="p-col-1 vertical-center">
+                        <h:outputText value="#{msg.requestTextEditStamp}"/>
+                    </div>
+                    <div class="p-col-2">
+                        <p:selectOneMenu label="#{msg.requestTextEditStamp}" styleClass="select-one-menu" disabled="#{bean.invoiceSentStatus}">
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div class="p-col-1 vertical-center" style="padding-left:0 !important;">
+                        <h:outputText value="#{msg.invoicePaymentType}"/>
+                    </div>
+                    <div class="p-col-2" style="width: 15% !important; padding-left:0 !important;">
+                        <p:selectOneMenu id="paymentType" value="#{bean.selectedPaymentTypeId}" disabled="#{bean.invoiceSentStatus}"
+                                         label="#{msg.invoicePaymentType}" styleClass="select-width">
+                            <f:selectItems value="#{bean.paymentTypes}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="p-col-6">
+                    </div>
+
+                    <div class="p-col-1 vertical-center">
+                        <h:outputText value="#{msg.requestTextEditCausal}"/>
+                    </div>
+                    <div class="p-col-8">
+                        <p:inputText value="#{bean.invoiceNote}" disabled="#{bean.invoiceSentStatus}"/>
+                    </div>
+                    <div class="p-col-3">
+                    </div>
+                </div>
+
+                <h3>#{msg.requestTextEditGoodsServices}</h3>
+                <hr/>
+
+                <div class="p-grid" style="margin-right:20px;">
+                    <div class="p-col-2">
+                        <h:outputText value="#{msg.requestTextEditNetAmount}"></h:outputText>
+                        <p:inputNumber value="#{bean.invoiceTotalCost}" disabled="#{bean.invoiceSentStatus}"/>
+                    </div>
+                    <div class="p-col-1">
+                        <h:outputText value="#{msg.requestTextEditQty}"></h:outputText>
+                        <p:inputNumber id="quantita" value="#{bean.invoiceItemAmount}" label="#{msg.requestTextEditQty}" disabled="#{bean.invoiceSentStatus}">
+                            <p:ajax event="blur" update="totalGrossAmount invoiceTotalAmount invoiceToVAT totalGA"/>
+                        </p:inputNumber>
+                    </div>
+                    <div class="p-col-1">
+                        <h:outputText value="#{msg.requestTextEditUM}"></h:outputText>
+                        <p:selectOneMenu styleClass="select-one-menu" disabled="true">
+                            <f:selectItems value="#{bean.ums}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="p-col-1">
+                        <h:outputText value="#{msg.requestTextEditDiscount}"></h:outputText>
+                        <p:inputText></p:inputText>
+                    </div>
+                    <div class="p-col-4">
+                        <h:outputText value="#{msg.requestTextEditVat}"></h:outputText>
+                        <p:selectOneMenu id="invoiceVat" value="#{bean.invoiceItemVat}"
+                                         label="#{msg.invoiceVat}" styleClass="select-one-menu" disabled="#{bean.invoiceSentStatus}">
+                            <f:selectItems value="#{bean.vatAmounts}"/>
+                            <p:ajax event="change" update="totalGrossAmount invoiceTotalAmount invoiceToVAT totalGA"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="p-col-3">
+                        <h:outputText value="#{msg.requestTextEditTotalLine}"></h:outputText>
+                        <p:inputText id="totalGrossAmount" value="#{bean.totalGrossAmount}" disabled="true"/>
+                        <p:selectBooleanCheckbox style="margin-top: 5px;"></p:selectBooleanCheckbox>
+                        <h:outputText style="margin-top: 5px;" value="#{msg.requestTextEditNotImpIncome}"></h:outputText>
+                    </div>
+
+                    <div class="p-col-3">
+                        <h:outputText value="#{msg.requestTextEditCode}"></h:outputText>
+                        <p:outputPanel styleClass="output-panel">
+                            <p:inputText style="border:none; width:90%;" disabled="#{bean.invoiceSentStatus}"></p:inputText>
+                            <i class="pi pi-search icon"/>
+                        </p:outputPanel>
+                    </div>
+                    <div class="p-col-3">
+                        <h:outputText value="#{msg.requestTextEditProduct}"></h:outputText>
+                        <p:outputPanel styleClass="output-panel">
+                            <p:inputText style="border:none; width:90%;" disabled="#{bean.invoiceSentStatus}"></p:inputText>
+                            <i class="pi pi-search icon"/>
+                        </p:outputPanel>
+                    </div>
+                    <div class="p-col-3">
+                        <h:outputText value="#{msg.requestTextEditRevenueCenter}"></h:outputText>
+                        <p:selectOneMenu styleClass="select-one-menu" disabled="#{bean.invoiceSentStatus}"></p:selectOneMenu>
+                    </div>
+                    <div class="p-col-3">
+                        <h:outputText></h:outputText>
+                    </div>
+
+                    <div class="p-col-9">
+                        <p:inputTextarea disabled="#{bean.invoiceSentStatus}"></p:inputTextarea>
+                    </div>
+                    <div class="p-col-3">
+                        <h:outputText value="#{msg.requestTextEditAdditionalLineData}" style="margin-top: 45px;"></h:outputText>
+                    </div>
+                </div>
+
+                <h3>#{msg.requestTextEditCountsSummary}</h3>
+                <hr/>
+
+                <div class="p-grid" style="margin-right:20px;">
+                    <div class="p-col-8" ></div>
+                    <div class="p-col-2 vertical-center" style="padding-left:4%;">
+                        <h:outputText value="#{msg.requestTextEditTotalSkills}"></h:outputText>
+                    </div>
+                    <div class="p-col-2">
+                        <p:inputText id="invoiceTotalAmount" value="#{bean.invoiceItemAmount}" disabled="true"/>
+                    </div>
+
+                    <div class="p-col-8"></div>
+                    <div class="p-col-2 vertical-center" style="padding-left:9%;">
+                        <h:outputText value="#{msg.requestTextEditTotalVat}"></h:outputText>
+                    </div>
+
+                    <div class="p-col-2">
+                        <p:inputText id="invoiceToVAT" value="#{bean.totalVat}" disabled="true"/>
+                    </div>
+
+                    <div class="p-col-8"></div>
+                    <div class="p-col-4">
+                        <hr/>
+                    </div>
+
+                    <div class="p-col-8"></div>
+                    <div class="p-col-2 vertical-center" style="padding-left:8%;">
+                        <h:outputText value="#{msg.requestTextEditTotalGross}"></h:outputText>
+                    </div>
+                    <div class="p-col-2">
+                        <p:inputText id="totalGA" value="#{bean.totalGrossAmount}" disabled="true"/>
+                    </div>
+
+                    <div class="p-col-8"></div>
+                    <div class="p-col-4">
+                        <hr/>
+                    </div>
+
+                    <div class="p-col-8"></div>
+                    <div class="p-col-2 vertical-center" style="padding-left:4%;">
+                        <h:outputText value="#{msg.requestTextEditAmountDue}"></h:outputText>
+                    </div>
+                    <div class="p-col-2">
+                        <p:inputText></p:inputText>
+                    </div>
+
+                    <div class="p-col-10"></div>
+                    <div class="p-col-2 vertical-center">
+                        <h:outputText value="#{msg.requestTextEditShowAllFields}"></h:outputText>
+                    </div>
+
+                    <div class="p-col-10"></div>
+                    <div class="p-col-2 vertical-center">
+                        <h:outputText value="#{msg.requestTextEditUpdateTheCounts}"></h:outputText>
+                    </div>
+                </div>
+
+                <hr/>
+
+                <div class="p-grid" style="margin-right:20px;">
+                    <div class="p-col-9"></div>
+                    <div class="p-col-3">
+                        <p:commandButton value="#{msg.cancel.toUpperCase()}" oncomplete="PF('invoiceDialogWV').hide()" style="margin-left: 9%;"/>
+                        <p:commandButton action="#{bean.sendInvoice}"  update=":createInvoice :btn_line"
+                                         value="#{msg.save.toUpperCase()}" styleClass="btn-green" style="margin-left:5px;"/>
+                    </div>
+                </div>
+            </ui:fragment>
+        </div>
+
+    </p:dialog>
+
+    <p:dialog widgetVar="invoiceErrorDialogWV"  modal="true" draggable="false"
+              position="center center">
+        <div class="ui-messages-error ui-corner-all">
+            <span class="ui-messages-error-summary">#{msg.invalidDataMsg}</span><br/>
+        </div>
+        <p:commandButton oncomplete="PF('invoiceErrorDialogWV').hide();"
+                         value="#{msg.close}" />
+    </p:dialog>
+
+</ui:composition>

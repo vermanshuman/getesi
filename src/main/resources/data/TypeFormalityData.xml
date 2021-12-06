@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE something>
+<type_formality>
+    <data_entry>
+        <code>176</code>
+        <description>CONCESSIONE A GARANZIA DI MUTUO</description>
+        <textInVisura>IPOTECA VOLONTARIA A GARANZIA DI MUTUO FONDIARIO</textInVisura>
+    </data_entry>
+    <data_entry>
+        <code>281</code>
+        <description>DECRETO INIGUNTIVO</description>
+        <textInVisura>IPOTECA GIUDIZIALE - DECRETO INGIUNTIVO</textInVisura>
+    </data_entry>
+    <data_entry>
+        <code>168</code>
+        <description>CONCESSIONE A GARANZIA DI MUTUO</description>
+        <textInVisura>IPOTECA VOLONTARIA A GARANZIA DI MUTUO</textInVisura>
+    </data_entry>
+    <data_entry>
+        <code>500</code>
+        <description>DECLARATORIA USUCAPIONE</description>
+        <textInVisura>DOMANDA GIUDIZIALE - DECLARATORIA USUCAPIONE</textInVisura>
+    </data_entry>
+    <data_entry>
+        <code>300</code>
+        <description>IPOTECA LEGALE AI SENSI ART.77 DPR 602/73 MONDIFICATO DAL D.LGS 4699 E DAL DLGS 193/01
+        </description>
+        <textInVisura>IPOTECA LEGALE EX ART. 77 DPR 602/1973</textInVisura>
+    </data_entry>
+    <data_entry>
+        <code>726</code>
+        <description>VERBALE DI PIGNORAMENTE IMMOBILI</description>
+        <textInVisura>VERBALE DI PIGNORAMENTO IMMOBILI</textInVisura>
+    </data_entry>
+    <data_entry>
+        <code>8726</code>
+        <description>VERBALE DI PIGNORAMENTE IMMOBILI</description>
+        <textInVisura>VERBALE DI PIGNORAMENTO IMMOBILI</textInVisura>
+    </data_entry>
+    <data_entry>
+        <code>9726</code>
+        <description>VERBALE DI PIGNORAMENTE IMMOBILI</description>
+        <textInVisura>VERBALE DI PIGNORAMENTO IMMOBILI</textInVisura>
+    </data_entry>
+    <data_entry>
+        <code>161</code>
+        <description>CONCESSIONE A GARANZIA DI APERTURA DI CREDITO</description>
+        <textInVisura>IPOTECA VOLONTARIA A GARANZIA DI APERTURA DI CREDITO</textInVisura>
+    </data_entry>
+    <data_entry>
+        <code>100</code>
+        <description>CONTRATTO PRELIMINARE DI VENDITA</description>
+        <textInVisura>PRELIMINARE DI VENDITA</textInVisura>
+    </data_entry>
+    <data_entry>
+        <code>162</code>
+        <description>CONCESSIONE A GARANZIA DI CAMBIALI</description>
+        <textInVisura>IPOTECA VOLONTARIA A GARANZIA DI CAMBIALI</textInVisura>
+    </data_entry>
+</type_formality>

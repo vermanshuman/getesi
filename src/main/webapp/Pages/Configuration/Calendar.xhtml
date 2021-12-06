@@ -1,0 +1,126 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+                template="/resources/tpl/Admin/template.xhtml">
+
+    <ui:param name="bean" value="#{calendarBean}"/>
+    <ui:param name="displayControlPanel" value="false"/>
+    <ui:define name="title">Calendar</ui:define>
+
+
+    <ui:define name="viewname">
+        <style>
+            .layout-main {
+                background-color: #f2f2f2 !important;
+            }
+            .fc .fc-button-group > * {
+                background-color: #2196F3 !important;
+                border: 1px solid #2196F3 !important;
+            }
+            .fc-toolbar button {
+                padding: .6em 1.2em !important;
+                height: 2.5em;
+                margin-left: 5px !important;
+            }
+            body .ui-widget-header {
+                background: #f8f9fa !important;
+                color: #495057 !important;
+            }
+            .fc td.fc-today {
+                background-color: #a6d5fa!important;
+                color: #000 !important;
+                opacity: 1;
+            }
+            body .ui-button.ui-state-active {
+                background: #0b7ad1 !important;
+                border-color: #0b7ad1 !important;
+            }
+            .fa-angle-left:before {
+                font-size: 18px;
+            }
+            .fa-angle-right:before {
+                font-size: 18px;
+            }
+            body .ui-datepicker .ui-datepicker-calendar td.ui-datepicker-today a {
+                background: transparent !important;
+                color: #0b7ad1 !important;
+            }
+            body .ui-datepicker .ui-datepicker-calendar td a.ui-state-active {
+                background: #2196F3 !important;
+                color: #fff !important;
+            }
+        </style>
+        <script>
+            $(document).ready(function() {
+                setTimeout(() => {
+                    $(".fc-prev-button").addClass("fa fa-angle-left");
+                    $(".fc-next-button").addClass("fa fa-angle-right");
+                }, 200);
+            });
+        </script>
+
+        <li>Pages</li>
+        <span>/ </span>
+        <li>
+            <p:link outcome="/calendar">Calendar</p:link>
+        </li>
+    </ui:define>
+
+    <ui:param name="viewname" value="CALENDAR" />
+
+    <ui:define name="content">
+        <h:form>
+            <div class="p-grid">
+                <div class="p-col-12">
+                    <div class="card">
+                        <p:growl id="messages" showDetail="true" />
+                        <h5>Calendar</h5>
+                        <p:schedule id="schedule" value="#{bean.eventModel}" widgetVar="myschedule" >
+                            <p:ajax event="dateSelect" listener="#{bean.onDateSelect}" update="eventDetails" oncomplete="PF('eventDialog').show();" />
+                            <p:ajax event="eventSelect" listener="#{bean.onEventSelect}" update="eventDetails" oncomplete="PF('eventDialog').show();" />
+                            <p:ajax event="eventMove" listener="#{bean.onEventMove}" update="messages" />
+                            <p:ajax event="eventResize" listener="#{bean.onEventResize}" update="messages" />
+                        </p:schedule>
+
+                        <p:dialog widgetVar="eventDialog" header="Event Details" showEffect="fade" width="350" responsive="true">
+                            <p:outputPanel id="eventDetails" styleClass="ui-fluid">
+                                <div class="p-field">
+                                    <p:outputLabel for="title" value="Title" />
+                                    <p:inputText id="title" value="#{bean.event.title}" required="true" />
+                                </div>
+                                <div class="p-field">
+                                    <p:outputLabel for="from" value="From" /><br/>
+                                    <p:calendar id="from"
+                                                showOn="button"
+                                                pattern="dd/MM/yyyy hh:mm:ss" mask="true" locale="it" navigator="true"
+                                                popupIconOnly="true"
+                                                value="#{calendarBean.event.startDate}"/>
+                                </div>
+                                <div class="p-field">
+                                    <p:outputLabel for="to" value="To" /><br/>
+                                    <p:calendar id="to"
+                                                showOn="button"
+                                                pattern="dd/MM/yyyy hh:mm:ss" mask="true" locale="it" navigator="true"
+                                                popupIconOnly="true"
+                                                value="#{calendarBean.event.endDate}"/>
+                                </div>
+                                <div class="p-field-checkbox">
+                                    <p:selectBooleanCheckbox id="allDay" value="#{bean.event.allDay}" />
+                                    <p:outputLabel for="allDay" value="All Day" />
+                                </div>
+                            </p:outputPanel>
+                            <f:facet name="footer">
+                                <p:commandButton id="addButton" value="Save" action="#{bean.addEvent}" icon="pi pi-check" oncomplete="PF('myschedule').update();PF('eventDialog').hide();" />
+                                <p:commandButton type="reset" value="Reset" styleClass="ui-button-secondary" icon="pi pi-refresh" />
+                            </f:facet>
+                        </p:dialog>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

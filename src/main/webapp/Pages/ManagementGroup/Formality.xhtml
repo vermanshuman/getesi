@@ -1,0 +1,369 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                template="/resources/tpl/Admin/EditBase.xhtml">
+    <ui:param name="showSave" value="false"/>
+    <ui:param name="renderSideMenu" value="true"/>
+    <ui:param name="showCancel" value="false"/>
+    <ui:param name="bean" value="#{formalityBean}"/>
+    <ui:define name="edit_body">
+        <style type="text/css">
+            .ui-datagrid-no-border .ui-datagrid-content {
+                border: none;
+            }
+
+            .to-bottom-text td.ui-panelgrid-cell {
+                vertical-align: bottom !important;
+            }
+        </style>
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group to-bottom-text">
+            <h:outputText style="font-size: 20px" value="#{msg.formalityTitle}"/>
+            <h:outputText style="font-size: 20px" value="#{bean.entity.conservatoryStr}"/>
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+
+                <h:outputText style="font-size: 16px"
+                              value="#{msg.formalityNote} #{bean.entity.type}"
+                              rendered="#{empty bean.entity.sectionA.annotationType}"/>
+                <h:outputText style="font-size: 16px"
+                              value="#{msg.formalityRequestNote}"
+                              rendered="#{not empty bean.entity.sectionA.annotationType}"/>
+
+                <h:outputText value=""/>
+
+                <h:outputText value="#{msg.formalityGeneralRegister}"/>
+                <h:outputText value="#{bean.entity.generalRegister}"/>
+
+                <h:outputText value="#{msg.formalitySpecialRegister}"/>
+                <h:outputText value="#{bean.entity.particularRegister}"/>
+
+            </p:panelGrid>
+            <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group">
+
+                <h:outputText value="#{msg.formalityPresentation}"/>
+                <span>#{bean.entity.numberPresentation} del</span>
+                <h:outputText value="#{bean.entity.presentationDate}" converter="dateTimeConverter"/>
+
+            </p:panelGrid>
+        </p:panelGrid>
+        <p:fieldset legend="#{msg.formalitySectionA}">
+            <p:dataGrid styleClass="ui-datagrid-no-border" value="#{bean.entity.sectionA}" var="secA">
+                <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+                    <h:outputText style="font-size: 20px"
+                                  value="#{not empty secA.titleDescription ? msg.formalityDataRelation : msg.emptyField}"/>
+                    <h:outputText value=""/>
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
+                                 rendered="#{ not empty secA.titleDescription}">
+
+                        <h:outputText value="#{msg.formalityDescription}"/>
+                        <h:outputText value="#{secA.titleDescription}"/>
+
+                        <h:outputText value="#{msg.formalityDate}"/>
+                        <h:outputText value="#{secA.titleDate}" converter="dateTimeConverter"/>
+
+                        <h:outputText value="#{msg.formalityNotary}" rendered="#{not empty secA.publicOfficialNotary}"/>
+                        <h:outputText value="#{secA.publicOfficialNotary}"
+                                      rendered="#{not empty secA.publicOfficialNotary}"/>
+
+                        <h:outputText value="#{msg.formalityPublicOfficial}"
+                                      rendered="#{empty secA.publicOfficialNotary}"/>
+                        <h:outputText value="#{secA.publicOfficial}" rendered="#{empty secA.publicOfficialNotary}"/>
+
+                        <h:outputText value="#{msg.formalitySeat}"/>
+                        <h:outputText value="#{secA.seat}"/>
+                    </p:panelGrid>
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
+                                 rendered="#{not empty secA.titleDescription}">
+
+                        <h:outputText value="#{msg.formalityDirectoryNumber}"/>
+                        <h:outputText value="#{secA.numberDirectory}"/>
+
+                        <h:outputText value="#{msg.formalityFiscalCode}"/>
+                        <h:outputText value="#{secA.fiscalCode}"/>
+
+                    </p:panelGrid>
+                    <h:outputText style="font-size: 20px"
+                                  value="#{not empty secA.annotationType ? msg.formalityAnnotationDate : msg.emptyField}"/>
+                    <h:outputText value=""/>
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
+                                 rendered="#{not empty secA.annotationType}">
+
+                        <h:outputText value="#{msg.annotationType}"/>
+                        <h:outputText value="#{secA.annotationType}"/>
+
+                        <h:outputText value="#{msg.annotationDescription}"/>
+                        <h:outputText value="#{secA.annotationDescription}"/>
+
+                        <h:outputText value="#{msg.annotationProperties}"/>
+                        <h:outputText value="#{secA.annotationProperties}"/>
+
+                    </p:panelGrid>
+                    <h:outputText value="" rendered="#{not empty secA.annotationType}"/>
+                </p:panelGrid>
+                <h:outputText style="font-size: 20px" value="#{msg.formalityDataPrivilege}"
+                              rendered="#{not empty secA.mortgageSpecies and empty secA.annotationType}"/>
+                <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
+                             rendered="#{not empty secA.mortgageSpecies and empty secA.annotationType}">
+
+                    <h:outputText value="#{msg.formalityTypePrivilege}"/>
+                    <h:outputText value="#{secA.mortgageSpecies}"/>
+
+                    <h:outputText value="#{msg.formalityDerivedFrom}"/>
+                    <h:outputText value="#{secA.derivedFrom}"/>
+
+                    <h:outputText value="#{msg.formalityDeathDesc}" rendered="#{not empty secA.deathDate}"/>
+                    <ui:fragment rendered="#{not empty secA.deathDate}">
+                        <span>#{msg.formalityDeathDate}</span>
+                        <h:outputText value="#{secA.deathDate}" converter="dateTimeConverter"/>
+                    </ui:fragment>
+
+                    <h:outputText value="#{msg.formalityCapital}"/>
+                    <h:outputText value="#{secA.capital}"/>
+
+                    <h:outputText value="#{msg.formalityTotal}"/>
+                    <h:outputText value="#{secA.total}"/>
+
+                    <h:outputText value="#{msg.formalityDuration}" rendered="#{not empty secA.duration}"/>
+                    <h:outputText value="#{secA.duration}" rendered="#{not empty secA.duration}"/>
+
+                </p:panelGrid>
+                <h:outputText style="font-size: 20px" value="#{msg.formalityDataConvention}"
+                              rendered="#{empty secA.mortgageSpecies and empty secA.annotationType}"/>
+                <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
+                             rendered="#{empty secA.mortgageSpecies and empty secA.annotationType}">
+
+                    <h:outputText value="#{msg.formalityTypeConvention}"/>
+                    <h:outputText value="#{secA.conventionSpecies}"/>
+
+                    <h:outputText value="#{msg.formalityTypeConventionDesc}"/>
+                    <h:outputText value="#{secA.conventionDescription}"/>
+
+                    <h:outputText value="#{msg.formalityDeathDesc}" rendered="#{not empty secA.deathDate}"/>
+                    <ui:fragment rendered="#{not empty secA.deathDate}">
+                        <span>#{msg.formalityDeathDate}</span>
+                        <h:outputText value="#{secA.deathDate}" converter="dateTimeConverter"/>
+                    </ui:fragment>
+                </p:panelGrid>
+
+                <h:outputText style="font-size: 20px" value="#{msg.formalityOtherData}"
+                              rendered="#{not empty secA.otherData or not empty secA.otherParticularRegister or not empty secA.applicant}"/>
+                <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group"
+                             rendered="#{not empty secA.otherData or not empty secA.otherParticularRegister or not empty secA.applicant}">
+                    <p:row rendered="#{secA.otherTypeFormality ne null}">
+                        <p:column class="ui-g-6"><h:outputText value="#{msg.formalityReferenceFormalities}"/></p:column>
+                        <p:column class="ui-g-6"><h:outputText value="#{secA.otherTypeFormality}"/></p:column>
+                    </p:row>
+                    <p:row rendered="#{secA.otherParticularRegister ne null}">
+                        <p:column class="ui-g-6"><h:outputText
+                                value="#{msg.formalityReferenceFormalitiesNumber}"/></p:column>
+                        <p:column class="ui-g-6"><h:outputText value="#{secA.otherParticularRegister}"/></p:column>
+                    </p:row>
+                    <p:row rendered="#{secA.otherData ne null}">
+                        <p:column class="ui-g-6"><h:outputText
+                                value="#{msg.formalityReferenceFormalitiesOfThe}"/></p:column>
+                        <p:column class="ui-g-6">
+                            <h:outputText value="#{secA.otherData}" converter="dateTimeConverter"/>
+                        </p:column>
+                    </p:row>
+              
+                    <p:row rendered="#{secA.applicant ne null}">
+                        <p:column class="ui-g-6"><h:outputText value="#{msg.formalityApplicant}"/></p:column>
+                        <p:column class="ui-g-6"><h:outputText value="#{secA.applicant}"/></p:column>
+                    </p:row>
+                    
+                    <p:row rendered="#{secA.fiscalCodeAppliant ne null}">
+                        <p:column class="ui-g-6"><h:outputText value="#{msg.formalityFiscalCode}"/></p:column>
+                        <p:column class="ui-g-6"><h:outputText value="#{secA.fiscalCodeAppliant}"/></p:column>
+                    </p:row>
+                    
+                    <p:row rendered="#{secA.addressAppliant ne null}">
+                        <p:column class="ui-g-6"><h:outputText value="#{msg.formalityAddress}"/></p:column>
+                        <p:column class="ui-g-6"><h:outputText value="#{secA.addressAppliant}"/></p:column>
+                    </p:row>
+                </p:panelGrid>
+            </p:dataGrid>
+        </p:fieldset>
+        <br/>
+        <p:fieldset legend="#{msg.formalitySectionB}" rendered="#{not empty bean.entity.sectionB}">
+            <p:dataGrid columns="1" styleClass="ui-datagrid-no-border" value="#{bean.entity.sectionBMap}" var="sec"
+                        emptyMessage="">
+                <h:outputText style="font-size: 20px" value="#{msg.formalitySectionBMapKey} #{sec.key}"/>
+                <br/><br/>
+                <p:dataGrid columns="1" styleClass="ui-datagrid-no-border" value="#{sec.value}" var="prop"
+                            emptyMessage="">
+                    <p:panelGrid styleClass="ui-panelgrid-blank form-group" style="width: 60%">
+                        <p:row>
+                            <p:column class="ui-g-1"><h:outputText value="#{prop.numberInFormalityGroup}"/></p:column>
+                            <p:column styleClass="ui-g-1">#{msg.formalityCity}</p:column>
+                            <p:column styleClass="ui-g-10">#{prop.city}</p:column>
+                        </p:row>
+                        <ui:repeat value="#{prop.cadastralData}" var="data">
+                            <p:row rendered="#{(empty data.scheda and empty data.dataScheda)}">
+                                <p:column class="ui-g-1"></p:column>
+                                <p:column styleClass="ui-g-2">#{msg.formalitySection} #{data.section}</p:column>
+                                <p:column styleClass="ui-g-2">#{msg.formalitySheet} #{data.sheet}</p:column>
+                                <p:column styleClass="ui-g-2">#{msg.formalityParticle} #{data.particle}</p:column>
+                                <p:column styleClass="ui-g-2">#{msg.formalitySub} #{data.sub}</p:column>
+                            </p:row>
+                            <p:row rendered="#{(not empty data.scheda and not empty data.dataScheda)}">
+                                <p:column class="ui-g-1"></p:column>
+                                <p:column styleClass="ui-g-2">#{msg.formalityScheda} #{data.scheda}</p:column>
+                                <p:column styleClass="ui-g-2">#{msg.formalityDataScheda} #{data.dataScheda}</p:column>
+                            </p:row>
+                        </ui:repeat>
+                        <p:row>
+                            <p:column class="ui-g-1"></p:column>
+                            <p:column styleClass="ui-g-1">#{msg.formalityLandRegistry}</p:column>
+                            <p:column styleClass="ui-g-3">#{prop.landRegistry}</p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column class="ui-g-1"></p:column>
+                            <p:column styleClass="ui-g-1">#{msg.formalityAddress}</p:column>
+                            <p:column styleClass="ui-g-3">#{prop.address}</p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column class="ui-g-1"></p:column>
+                            <p:column styleClass="ui-g-1">#{msg.databaseListRealEstateFloor}</p:column>
+                            <p:column styleClass="ui-g-1">#{prop.floor}</p:column>
+                            <p:column styleClass="ui-g-1">#{msg.databaseListRealEstateInterno}</p:column>
+                            <p:column styleClass="ui-g-1">#{prop.interno}</p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column class="ui-g-1"></p:column>
+                            <p:column styleClass="ui-g-1">#{msg.formalityPropertyCategory}</p:column>
+                            <p:column styleClass="ui-g-3">#{prop.categoryStr}</p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column class="ui-g-1"></p:column>
+                            <p:column styleClass="ui-g-1">#{msg.formalityConsistency}</p:column>
+                            <p:column styleClass="ui-g-3">#{prop.rightConsistency}</p:column>
+                        </p:row>
+                    </p:panelGrid>
+                    <p:panelGrid styleClass="ui-panelgrid-blank form-group" style="width: 60%"
+                                 rendered="#{not empty prop.oldPropertiesToView}">
+                        <ui:repeat value="#{prop.oldPropertiesToView}" var="data">
+                        <p:row>
+                            <p:column class="ui-g-1"></p:column>
+                            <p:column class="ui-g-10">#{msg.formalityOldProperty}</p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column class="ui-g-1"></p:column>
+                            <p:column styleClass="ui-g-1">#{msg.formalityProvince}</p:column>
+                            <p:column styleClass="ui-g-10">#{prop.province}</p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column class="ui-g-1"></p:column>
+                            <p:column styleClass="ui-g-1">#{msg.formalityCity}</p:column>
+                            <p:column styleClass="ui-g-10">#{prop.city}</p:column>
+                        </p:row>
+
+                            <ui:repeat value="#{data.cadastralData}" var="cadastralData">
+                                <p:row>
+                                    <p:column class="ui-g-1"></p:column>
+                                    <p:column styleClass="ui-g-2">#{msg.formalitySection} #{cadastralData.section}</p:column>
+                                    <p:column styleClass="ui-g-2">#{msg.formalitySheet} #{cadastralData.sheet}</p:column>
+                                    <p:column styleClass="ui-g-2">#{msg.formalityParticle} #{cadastralData.particle}</p:column>
+                                    <p:column styleClass="ui-g-2">#{msg.formalitySub} #{cadastralData.sub}</p:column>
+                                </p:row>
+                            </ui:repeat>
+                        </ui:repeat>
+                    </p:panelGrid>
+                    <br/>
+                </p:dataGrid>
+                <br/><br/>
+            </p:dataGrid>
+        </p:fieldset>
+        <br/>
+        <p:fieldset legend="#{msg.formalitySectionC}" rendered="#{not empty bean.sectionC}">
+            <p:dataGrid columns="1" styleClass="ui-datagrid-no-border" value="#{bean.sectionCEntries}" var="cEntry">
+                <h:outputText style="font-size: 20px" value="#{cEntry.key}" rendered="#{not empty cEntry.value}"/>
+                <p:dataGrid columns="1" styleClass="ui-datagrid-no-border" value="#{cEntry.value}" var="sub"
+                            rendered="#{not empty cEntry.value}">
+                    <p:panelGrid styleClass="ui-panelgrid-blank form-group" style="width: 50%"
+                                 rendered="#{not sub.typeIsPhysicalPerson}">
+                        <p:row>
+                            <p:column class="ui-g-1"><h:outputText value="#{sub.numberInFormalityGroup}"/></p:column>
+                            <p:column class="ui-g-5"><h:outputText value="#{msg.formalityCompanyName}"/></p:column>
+                            <p:column class="ui-g-6"><h:outputText value="#{sub.businessName}"/></p:column>
+                        </p:row>
+                        <p:row rendered="#{not sub.nameBirthCity eq ''}">
+                            <p:column class="ui-g-1"></p:column>
+                            <p:column class="ui-g-5"><h:outputText value="#{msg.formalitySeat}"/></p:column>
+                            <p:column class="ui-g-6"><h:outputText value="#{sub.nameBirthCity}"/></p:column>
+                        </p:row>
+                        <p:row rendered="#{sub.typeId eq 2 and (not empty sub.birthCity.description)}">
+                            <p:column class="ui-g-1"></p:column>
+                            <p:column class="ui-g-5"><h:outputText value="#{msg.formalitySedeCode}"/></p:column>
+                            <p:column class="ui-g-6"><h:outputText
+                                    value="#{sub.birthCity.description} (#{sub.birthProvince.code})"/></p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column class="ui-g-1"></p:column>
+                            <p:column class="ui-g-5"><h:outputText value="#{msg.formalityFiscalCode}"/></p:column>
+                            <p:column class="ui-g-6"><h:outputText value="#{sub.numberVAT}"/></p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column class="ui-g-1"></p:column>
+                            <p:column class="ui-g-6"><h:outputText value="#{sub.getBargainingUnitStr(cEntry.key)}"
+                                                                   escape="false"/></p:column>
+                        </p:row>
+                    </p:panelGrid>
+                    <p:panelGrid styleClass="ui-panelgrid-blank form-group" style="width: 50%"
+                                 rendered="#{sub.typeIsPhysicalPerson}">
+                        <p:row>
+                            <p:column class="ui-g-1"><h:outputText value="#{sub.numberInFormalityGroup}"/></p:column>
+                            <p:column class="ui-g-2"><h:outputText value="#{msg.formalitySurname}"/></p:column>
+                            <p:column class="ui-g-3"><h:outputText value="#{sub.surname}"/></p:column>
+                            <p:column class="ui-g-2"><h:outputText value="#{msg.formalityName}"/></p:column>
+                            <p:column class="ui-g-3"><h:outputText value="#{sub.name}"/></p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column class="ui-g-1"></p:column>
+                            <p:column class="ui-g-2"><h:outputText value="#{msg.formalityBorn}"/></p:column>
+                            <p:column class="ui-g-3"><h:outputText value="#{sub.birthDate}"
+                                                                   converter="dateTimeConverter"/></p:column>
+                            <p:column class="ui-g-2"><h:outputText value="#{msg.formalityBornIn}"/></p:column>
+                            <p:column class="ui-g-3"> <h:outputText value="#{sub.nameBirthCity}"/></p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column class="ui-g-1"></p:column>
+                            <p:column class="ui-g-2"><h:outputText value="#{msg.formalitySex}"/></p:column>
+                            <p:column class="ui-g-3"><h:outputText value="#{sub.sexType.shortValue}"/></p:column>
+                            <p:column class="ui-g-2"><h:outputText value="#{msg.formalityFiscalCode}"/></p:column>
+                            <p:column class="ui-g-3"><h:outputText value="#{sub.fiscalCode}"/></p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column class="ui-g-1"></p:column>
+                            <p:column class="ui-g-11"><h:outputText value="#{sub.getBargainingUnitStr(cEntry.key)}"
+                                                                    escape="false"/></p:column>
+                        </p:row>
+                    </p:panelGrid>
+                </p:dataGrid>
+            </p:dataGrid>
+        </p:fieldset>
+        <br/>
+        <p:fieldset legend="#{msg.formalitySectionD}" rendered="#{not empty bean.entity.sectionD}">
+            <p:dataGrid columns="1" styleClass="ui-datagrid-no-border" value="#{bean.entity.sectionD}" var="secD"
+                        emptyMessage="">
+                <h:outputText value="#{secD.additionalInformation}"/>
+            </p:dataGrid>
+        </p:fieldset>
+    </ui:define>
+    <ui:define name="additional_buttons">
+        <p:commandButton value="#{msg.edit}"
+                         update="@form" action="#{bean.onEdit}"
+                         icon="ui-icon ui-icon-pencil"/>
+         <p:commandButton id="backBtn" action="#{bean.goCancel}" style="margin-top: 3%"
+                         value="#{msg.goBack}" rendered="#{bean.showButtons}"
+                         icon="fa fa-chevron-circle-left"/>
+		<p:commandButton action="#{bean.goTextEdit}"
+			value="#{msg.requestPrintRequestEvent}"
+			rendered="#{bean.showButtons}" />
+		<p:commandButton action="#{bean.downloadFormalityPdf}" 
+			value="#{msg.pdf}" 
+			rendered="#{bean.showButtons}" ajax="false"/>
+	</ui:define>
+    
+</ui:composition>

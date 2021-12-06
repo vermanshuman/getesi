@@ -1,0 +1,32 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+    <style>
+        hr{
+            margin: 0;
+        }
+        hr.red {
+            border-top: 5px solid #ee1d25;
+        }
+        hr.blue {
+            border-top: 5px solid #013873;
+            margin-top: -1px;
+        }
+    </style>
+
+    <div class="p-grid">
+        <div class="p-col-6">
+            <h:outputLink value="#{msg.footerPageLeftLink}" target="_blank">#{msg.footerPageLeft}</h:outputLink>
+        </div>
+        <div class="p-col-6 footer-icons footer-text-right">
+            <span>#{msg.footerPageCopyright} | #{projectMsg.version}</span>
+        </div>
+        <div class="p-col-12">
+            <div style="margin-top: -8px;">
+                <hr class="red" />
+                <hr class="blue"/>
+            </div>
+        </div>
+    </div>
+</ui:composition>

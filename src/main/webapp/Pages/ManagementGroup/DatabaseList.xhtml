@@ -1,0 +1,1160 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ff="http://readytech.com/functions">
+<ui:composition template="/resources/tpl/Admin/LazyListTabBase.xhtml">
+    <ui:param name="bean" value="#{databaseListBean}"/>
+    <ui:param name="renderTitle" value="false"/>>
+    <ui:param name="renderMenu" value="false"/>
+    <ui:param name="centerPartStyleClass" value="false"/>
+    <ui:define name="list_body">
+    	<style type="text/css">
+            .customFilter span:nth-child(2) {
+                 display: none !important;
+            }
+
+            .to-bottom-text td.ui-panelgrid-cell {
+                vertical-align: bottom !important;
+            }
+        </style>
+      <script>
+    
+        function delay(callback, ms) {
+            var timer = 0;
+            return function() {
+            var context = this, args = arguments;
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+             callback.apply(context, args);
+            }, ms || 0);
+           };
+        }
+      	function popupConfirm() {
+          var overwrite = confirm("É consigliabile inserire una visura con estensione .rtf\nContinuare con l'upload del file?");
+          if (!overwrite) clearUploadedFile();
+        }
+      </script>
+        <p:tabView dynamic="true" cache="true" id="tabs" activeIndex="#{bean.activeTabIndex}">
+            <p:ajax event="tabChange" listener="#{bean.onTabChange}"/>
+            <p:tab title="#{msg.databaseListSubjects}">
+                <p:outputPanel id="searchPanel">
+                  <p:remoteCommand name="filterTableSubject"
+                                     update="tabs:tableSubject"
+                                     action="#{bean.filterSubjectTable}"/>
+                    <p:panelGrid columns="6"
+						columnClasses="ui-g-12 ui-md-2,ui-g-12 ui-md-2,ui-g-12 ui-md-2,ui-g-12 ui-md-2,ui-g-12 ui-md-2,ui-g-12 ui-md-2"
+						styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
+							<h:outputText value="#{msg.lastname}:" />
+							<h:outputText value="#{msg.name}:" />
+							<h:outputText value="#{msg.databaseListSubjectBusinessName}:" />
+							<h:outputText value="#{msg.databaseListSubjectCity}:" />
+							<h:outputText value="#{msg.databaseListSubjectBirthDate}:" />
+							<h:outputText value="#{msg.databaseListSubjectFiscalCodeVAT}:"/>
+							<h:outputText/>
+					</p:panelGrid>
+					 <p:panelGrid columns="6"
+						columnClasses="ui-g-12 ui-md-2,ui-g-12 ui-md-2,ui-g-12 ui-md-2,ui-g-12 ui-md-2,ui-g-12 ui-md-2,ui-g-12 ui-md-2"
+						styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
+							<p:inputText value="#{bean.cogNome}" />
+							<p:inputText value="#{bean.nome}" />
+							<p:inputText value="#{bean.subjectBusinessName}" />
+							<p:inputText value="#{bean.subjectBirthPlace}" />
+							<p:calendar value="#{bean.subjectBirthDate}" styleClass="calendar-width"
+                                        pattern="dd/MM/yyyy" mask="true"/>
+							<p:inputText value="#{bean.subjectFiscalCodeVAT}"/>
+							
+					</p:panelGrid>
+                    <p:panelGrid columns="6"
+						columnClasses="ui-g-12 ui-md-1,ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-2,ui-g-12 ui-md-2,ui-g-12 ui-md-1"
+						styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
+                        <p:commandButton value="#{msg.newItem}"
+                                         action="#{bean.createNewSubject}"/>
+                        <h:outputText/>
+                        <h:outputText/>
+                        <h:outputText/>
+                        <h:outputText/>
+                        <p:commandButton value="#{msg.databaseListRealEstateSearch}" onclick="filterTableSubject();" />
+                    </p:panelGrid>
+                </p:outputPanel>
+	            <p:dataTable var="item" id="tableSubject"
+                             emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyModel}"
+                             rowKey="#{item.id}" rows="10" lazy="true" paginator="true"
+                             paginatorAlwaysVisible="true" rowIndexVar="rowId"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,20,50" widgetVar="tableWV">
+                    <p:ajax event="filter" listener="#{bean.onFilterTableSubject}" update="@this"/>
+
+                    <p:column styleClass="action_column" exportable="false">
+                        <p:commandButton icon="ui-icon pi pi-pencil" update=":form"
+                                         action="#{bean.editEntity}">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.entityEditId}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                    <p:column styleClass="action_column" exportable="false">
+                        <p:commandButton icon="ui-icon pi pi-times" update=":form"
+                                         oncomplete="PF('dlg2').show()">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.entityDeleteId}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                    <p:column styleClass="action_column" exportable="false">
+                        <p:commandButton icon="ui-icon pi pi-search" update=":form"
+                                         action="#{bean.viewEntity}">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.entityEditId}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                    <p:column headerText="#{msg.lastname}" sortBy="#{item.surname}">
+                        <h:outputText value="#{ff:upper(item.surname)}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.name}" sortBy="#{item.name}">
+                        <h:outputText value="#{ff:upper(item.name)}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListSubjectBusinessName}" 
+                    	sortBy="#{item.businessName}">
+                        <h:outputText value="#{item.businessName}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListSubjectCity}" filterBy="#{item.birthCity.description}"
+                              filterMatchMode="contains" filterFunction="#{bean.standardContainsFilterForStringColumn}"
+                              sortBy="#{item.birthCity.description}">
+                        <h:outputText value="#{item.nameBirthCity}"/>
+                    </p:column>
+
+					<p:column headerText="#{msg.databaseListSubjectBirthDate}" sortBy="#{item.birthDate}" width="14%;">
+                        <f:facet name="header">
+                            <h:outputText value="#{msg.databaseListSubjectBirthDate}" />
+                            <p:calendar id="filterBirthDate" readonlyInput="false" popupIconOnly="true"
+                                        pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" showOn="button"
+                                        placeholder="#{msg.expirationDate}" value="#{bean.filterBirthDate}">
+                                <p:ajax event="dateSelect" listener="#{bean.filterByDate}" update="tableSubject"/>
+                                <p:ajax event="change" listener="#{bean.filterByDate}" update="tableSubject"/>
+                            </p:calendar>
+                        </f:facet>
+
+                        <h:outputText value="#{item.birthDate}"
+                                      converter="dateTimeConverter"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListSubjectSex}">
+                        <h:outputText value="#{item.sexType}" converter="enumConverter"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListSubjectFiscalCodeVAT}"
+                              sortBy="#{item.fiscalCode}">
+                        <h:outputText value="#{item.fiscalCodeVATNamber}"/>
+                    </p:column>
+
+                </p:dataTable>
+            </p:tab>
+            <p:tab title="#{msg.databaseListRealEstate}">
+                <p:outputPanel id="searchPanelRealEstate">
+                    <p:remoteCommand name="filterTableFromPanel"
+                                     action="#{bean.filterTableFromPanel}"
+                                     update=":form:tabs:tableRealEstate"/>
+                     <p:panelGrid columns="3"
+						columnClasses="ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3"
+						styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
+							<h:outputText value="#{msg.requestProvince}:" />
+							<h:outputText value="#{msg.requestCity}:" />
+							<h:outputText value="#{enums.propertyWrapperTypeCADASTRE}:" />
+					</p:panelGrid>
+                    <p:panelGrid columns="3" columnClasses="ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3"
+						styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
+                        <p:selectOneMenu value="#{bean.provinceFilterId}">
+                            <f:selectItems value="#{bean.provinces}"/>
+                            <p:ajax event="change"
+                                    update="selectedCity"
+                                    listener="#{bean.onChangeProvince}"/>
+                        </p:selectOneMenu>
+
+                        <p:selectOneMenu value="#{bean.cityFilterId}" id="selectedCity">
+                            <f:selectItems value="#{bean.cities}"/>
+                            <p:ajax event="change"
+                                    listener="#{bean.onChangeCity}"/>
+                        </p:selectOneMenu>
+
+                        <p:selectOneMenu value="#{bean.cadastreFilter}">
+                            <f:selectItems value="#{bean.cadastreTypes}"/>
+                            <p:ajax event="change"/>
+                        </p:selectOneMenu>
+
+                    </p:panelGrid>
+                    
+                    <p:panelGrid columns="4"
+						columnClasses="ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3"
+						styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
+							<h:outputText value="#{msg.databaseListRealEstateSection}:"/>
+							<h:outputText value="#{msg.databaseListRealEstateSheet}:"/>
+							<h:outputText value="#{msg.databaseListRealEstateParticle}:"/>
+							<h:outputText value="#{msg.databaseListRealEstateSub}:"/>
+					</p:panelGrid>
+					
+                    <p:panelGrid columns="4" columnClasses="ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3"
+						styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
+                        
+                        <p:inputText value="#{bean.sectionFilter}"/>
+                        <p:inputText value="#{bean.sheetFilter}"/>
+                        <p:inputText value="#{bean.particleFilter}"/>
+                        <p:inputText value="#{bean.subFilter}"/>
+                        
+                    </p:panelGrid>
+                    
+                    <p:panelGrid columns="2" columnClasses="ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3"
+						styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
+						<p:commandButton value="#{msg.databaseListRealEstateSearch}"
+                                         id="searchButton" onclick="filterTableFromPanel();"/>
+                        <p:commandButton value="#{msg.newItem}"
+                                         action="#{bean.createNewRealEstate}"/>
+					</p:panelGrid>	
+                </p:outputPanel>
+                <p:dataTable var="item" id="tableRealEstate"
+                             emptyMessage="#{msg.noRecordsFound}"
+                             value="#{bean.lazyRealEstateModel}" rowKey="#{item.id}" rows="10"
+                             lazy="true" paginator="true" paginatorAlwaysVisible="true"
+                             rowIndexVar="rowId" styleClass="no_break_header"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,20,50" widgetVar="tableRealEstateWV"
+                             rowStyleClass="#{item.matchByFields ? 'not-display':''}">
+
+                    <p:column headerText="#{msg.databaseListRealEstateProvince}"
+                              sortBy="#{item.province.description}"
+                              filterBy="#{item.province.description}" filterMatchMode="contains"
+                              styleClass="min_padding_margin"
+                              style="width: 8.5%">
+                        <h:outputText value="#{item.province.description}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListRealEstateCity}"
+                              sortBy="#{item.city.description}"
+                              filterBy="#{item.city.description}" filterMatchMode="contains"
+                              styleClass="min_padding_margin" style="width: 9%">
+                        <h:outputText value="#{item.city.description}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListRealEstateType}" styleClass="min_padding_margin"
+                              style="width: 8%">
+                        <h:outputText value="#{item.realEstateType}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListRealEstateSection}" styleClass="min_padding_margin">
+                        <p:dataGrid value="#{item.sectionList}" columns="1" var="exam"
+                                    rendered="#{not empty item.sectionList}"
+                                    styleClass="cadastral_table">
+                            <p:column>
+                                <h:outputText value="#{exam}"
+                                              style="font-size: 1.1em; font-weight:bold;"/>
+                            </p:column>
+                        </p:dataGrid>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListRealEstateSheet}" styleClass="min_padding_margin">
+                        <p:dataGrid value="#{item.sheetList}" columns="1" var="exam"
+                                    rendered="#{not empty item.sheetList}"
+                                    styleClass="cadastral_table">
+                            <p:column>
+                                <h:outputText value="#{exam}"
+                                              style="font-size: 1.1em; font-weight:bold;"/>
+                            </p:column>
+                        </p:dataGrid>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListRealEstateParticle}" styleClass="min_padding_margin"
+                              style="width: 7.12%;">
+                        <p:dataGrid value="#{item.particleList}" columns="1" var="exam"
+                                    rendered="#{not empty item.particleList}"
+                                    styleClass="cadastral_table">
+                            <p:column>
+                                <h:outputText value="#{exam}"
+                                              style="font-size: 1.1em; font-weight:bold;"/>
+                            </p:column>
+                        </p:dataGrid>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListRealEstateSub}" styleClass="min_padding_margin">
+                        <p:dataGrid value="#{item.subList}" columns="1" var="exam"
+                                    rendered="#{not empty item.subList}" styleClass="cadastral_table">
+                            <p:column>
+                                <h:outputText value="#{exam}"
+                                              style="font-size: 1.1em; font-weight:bold;"/>
+                            </p:column>
+                        </p:dataGrid>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListRealEstateCategory}" styleClass="min_padding_margin">
+                        <h:outputText value="#{item.category}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListRealEstateConsistency}"
+                              filterBy="#{item.consistency}" sortBy="#{item.consistency}"
+                              styleClass="min_padding_margin" style="width: 9.8%; max-width: 90px;">
+                        <h:outputText value="#{item.consistency}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListRealEstateCadastralArea}"
+                              filterBy="#{item.cadastralArea}" sortBy="#{item.cadastralArea}"
+                              styleClass="min_padding_margin"
+                              style="width: 8.3%; max-width: 67px;">
+                        <h:outputText value="#{item.cadastralArea}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListRealEstateRevenue}"
+                              filterBy="#{item.revenue}" sortBy="#{item.revenue}" styleClass="min_padding_margin">
+                        <h:outputText value="#{item.revenue}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListRealEstatePrejudicial}" styleClass="min_padding_margin">
+                        <h:outputText value="#{item.prejudicial}"/>
+                    </p:column>
+
+                    <p:column styleClass="action_column min_padding_margin" exportable="false">
+                        <p:commandButton icon="ui-icon pi pi-pencil" update=":form"
+                                         action="#{bean.editEntityRealEstate}">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.entityEditId}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                    <p:column styleClass="action_column min_padding_margin" exportable="false">
+                        <p:commandButton icon="ui-icon pi pi-times" update=":form"
+                                         oncomplete="PF('dlg3').show()">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.entityDeleteId}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                    <p:column styleClass="action_column min_padding_margin" exportable="false">
+                        <p:commandButton icon="ui-icon pi pi-search" update=":form"
+                                         action="#{bean.viewEntityRealEstate}">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.entityEditId}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                </p:dataTable>
+            </p:tab>
+            <p:tab title="#{msg.formality}">
+                <p:outputPanel id="searchPanelFormality">
+                    <p:remoteCommand name="filterTableFormality"
+                                     update="tabs:tableFormality"
+                                     action="#{bean.filterFormalityTable}"/>
+                    <p:panelGrid columns="4"
+						columnClasses="ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3"
+						styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
+							<h:outputText value="#{msg.subjectViewFormalityConservatory}:" />
+							<h:outputText value="#{msg.estateFormalityTypeNatural}:" />
+							<h:outputText value="#{msg.subjectViewFormalityRegisterG}:" />
+							<h:outputText value="#{msg.subjectViewFormalityRegisterP}:" />
+					</p:panelGrid>
+					 <p:panelGrid columns="4"
+						columnClasses="ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3"
+						styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
+							<p:selectOneMenu value="#{bean.conservatoryFilterId}">
+								<f:selectItems value="#{bean.conservatories}" />
+							</p:selectOneMenu>
+							<p:selectOneMenu  value="#{bean.annotationDescription}" style="width: 100%">
+                    			<f:selectItems value="#{bean.codeAndDescription}"/>
+                			</p:selectOneMenu>
+							<p:inputText value="#{bean.generalRegisterFilter}" />
+							<p:inputText value="#{bean.particularRegisterFilter}" />
+					</p:panelGrid>
+					<p:panelGrid columns="4"
+						columnClasses="ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3"
+						styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
+							<h:outputText value="#{msg.subjectViewFormalityAnno}:" />
+							<h:outputText/>
+							<h:outputText/>
+							<h:outputText/>
+					</p:panelGrid>
+					 <p:panelGrid columns="6"
+						columnClasses="ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-1,ui-g-12 ui-md-1,ui-g-12 ui-md-1"
+						styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
+							<p:inputText value="#{bean.presentationDateFilter}"/>
+							<h:outputText/>
+							<h:outputText/>
+							<h:outputText/>
+							<h:outputText/>
+							<p:commandButton value="#{msg.databaseListRealEstateSearch}"
+							onclick="filterTableFormality();" />
+					</p:panelGrid>
+                    <p:panelGrid styleClass="ui-panelgrid-blank form-group">
+                        <p:commandButton value="#{msg.formalityEnter}" action="#{bean.createNewFormality}"/>
+                        <br/> <br/>
+                    </p:panelGrid>
+                </p:outputPanel>
+
+                <p:dataTable var="item" id="tableFormality"
+                             emptyMessage="#{msg.noRecordsFound}"
+                             value="#{bean.lazyFormalityModel}" rowKey="#{item.id}" rows="10"
+                             lazy="true" paginator="true" paginatorAlwaysVisible="true"
+                             rowIndexVar="rowId" styleClass="no_break_header"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,20,50" widgetVar="tableRealEstateWV">
+                    <p:column headerText="#{msg.subjectViewFormalityConservatory}">
+                        <h:outputText value="#{item.conservatoryName}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.estateFormalityTypeAct}">
+                        <h:outputText value="#{item.type}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.estateFormalityTypeNatural}">
+                        <h:outputText value="#{item.naturaAtto}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.subjectViewFormalityRegisterG}" style="width: 60px;">
+                        <h:outputText value="#{item.generalRegister}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.subjectViewFormalityRegisterP}" style="width: 60px;">
+                        <h:outputText value="#{item.particularRegister}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.subjectViewFormalityDate}" style="width: 100px;">
+                        <h:outputText value="#{item.presentationDate}" converter="dateTimeConverter"/>
+                    </p:column>
+                    <p:column headerText="#{msg.status}" style="width: 60px;">
+                        <h:outputText value="#{item.statusStr}"/>
+                    </p:column>
+                    <p:column styleClass="action_column">
+                        <p:column headerText="#{msg.pdf}" styleClass="action_column">
+                            <p:commandButton icon="fa fa-file-pdf-o" action="#{bean.downloadFormalityPdf}" ajax="false">
+                                <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:column>
+                    <p:column styleClass="action_column" exportable="false">
+                        <p:commandButton icon="ui-icon pi pi-search" update=":form"
+                                         action="#{bean.viewFormality}">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.entityEditId}"/>
+                        </p:commandButton>
+                    </p:column>
+                    <p:column styleClass="action_column" exportable="false">
+                        <p:commandButton icon="ui-icon pi pi-pencil" update=":form"
+                                         action="#{bean.editFormality}">
+                            <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                        </p:commandButton>
+                    </p:column>
+                    <p:column styleClass="action_column">
+                        <p:commandButton icon="ui-icon pi pi-times" update=":form"
+                                         action="#{bean.checkFormalityForcedRequestEstateSituation}">
+                            <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:tab>
+            <p:tab title="#{msg.databaseListRequest}">
+                <p:outputPanel id="searchPanelRequest">
+                    <p:remoteCommand name="filterTableRequest"
+                                     update="tabs:tableRequest"
+                                     action="#{bean.filterRequestTable}"/>
+                    <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid">
+                        <p:column>
+                            <h:outputText value="#{msg.subjectViewFormalityConservatory}:"/>
+                            <p:selectOneMenu value="#{bean.aggregationFilterId}" styleClass="select-width">
+                                <f:selectItems value="#{bean.landAggregations}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:panelGrid>
+                    <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid">
+                     	<p:column>
+                            <h:outputText value="#{msg.requestLastName}:"/>
+                            <p:inputText value="#{bean.lastNameFilter}" styleClass="input-width"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{msg.requestFirstName}:"/>
+                            <p:inputText value="#{bean.firstNameFilter}" styleClass="input-width"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{msg.requestBirthDate}:"/>
+                            <p:calendar value="#{bean.birthDateFilter}" styleClass="calendar-width"
+                                        pattern="dd/MM/yyyy" mask="true"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{msg.requestFiscalCode}:"/>
+                            <p:inputText value="#{bean.fiscalCodeFiler}" styleClass="input-width"/>
+                        </p:column>
+                    </p:panelGrid>
+                    <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid">
+                        <p:column>
+                            <h:outputText value="#{msg.requestBusinessName}:"/>
+                            <p:inputText value="#{bean.businessNameFilter}" styleClass="input-width"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{msg.clientVATNumber}:"/>
+                            <p:inputText value="#{bean.numberVatFilter}" styleClass="input-width"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{msg.requestFiscalCode}:"/>
+                            <p:inputText value="#{bean.legalFiscalCodeFilter}" styleClass="input-width"/>
+                        </p:column>
+                        <p:column>
+                            <br/>
+                            <p:commandButton value="#{msg.databaseListRealEstateSearch}"
+                                             onclick="filterTableRequest();"/>
+                        </p:column>
+
+                    </p:panelGrid>
+                </p:outputPanel>
+                <p:dataTable var="item" id="tableRequest"
+                             emptyMessage="#{msg.noRecordsFound}"
+                             value="#{bean.lazyRequestModel}" rowKey="#{item.id}" rows="10"
+                             lazy="true" paginator="true" paginatorAlwaysVisible="true"
+                             rowIndexVar="rowId" styleClass="no_break_header"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,20,50" widgetVar="tableRealEstateWV">
+                    <p:column headerText="#{msg.subjectViewFormalityConservatory}">
+                        <h:outputText value="#{item.aggregationLandChargesRegistry.name}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.requestLastBusinessName2}">
+                        <h:outputText value="#{item.subject.fullName}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.requestBirthDate}">
+                        <h:outputText value="#{item.subject.birthDate}" converter="dateTimeConverter"/>
+                    </p:column>
+                    <p:column headerText="#{msg.requestFiscalCodeVATNamber}">
+                        <h:outputText value="#{item.fiscalCodeVATNamber}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.requestUpdateDate}">
+                        <h:outputText value="#{item.requestUpdateDate}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.formality}">
+                        <h:outputText value="#{item.sumOfEstateFormalities}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.pdf}" styleClass="action_column">
+                        <p:commandButton icon="fa fa-file-pdf-o" action="#{bean.downloadRequestPdf}" ajax="false"
+                                         rendered="#{item.haveRequestReport}">
+                            <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                        </p:commandButton>
+                    </p:column>
+                    <p:column styleClass="action_column" exportable="false">
+                        <p:commandButton icon="ui-icon pi pi-search" update=":form"
+                                         action="#{bean.viewEstateSituation}">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.entityEditId}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:tab>
+
+            <p:tab title="#{msg.databaseListReportFormalitySubject}">
+                <p:outputPanel id="searchPanelReportFormalitySubject">
+                    <p:remoteCommand name="filterTableReportFormalitySubject"
+                                     update="tabs:rfsTable"
+                                     action="#{bean.filterReportFormalitySubjectTable}"/>
+                    <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid">
+                        <p:column>
+                            <h:outputText value="#{msg.reportFormalitySubjectConservatorship}:"/>
+                            <p:selectOneMenu value="#{bean.rfsConservatorshipFilterId}" styleClass="select-width">
+                                <f:selectItems value="#{bean.conservatories}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:panelGrid>
+
+                    <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid">
+                        <p:column>
+
+
+                            <h:outputText value="#{msg.reportFormalitySubjectFirstName}:"/>
+                            <p:inputText value="#{bean.rfsFirstNameFilter}" styleClass="input-width"/>
+                            <br/>
+
+                            <h:outputText value="#{msg.reportFormalitySubjectBusinessName}:"/>
+                            <p:inputText value="#{bean.rfsBusinessNameFilter}" styleClass="input-width"/>
+                            <br/>
+
+
+                            <h:outputText value="#{msg.reportFormalitySubjectNumber}:"/>
+                            <p:inputText value="#{bean.rfsNumberFilter}" styleClass="input-width"/>
+                            <br/>
+
+
+                        </p:column>
+
+                        <p:column>
+                            <h:outputText value="#{msg.reportFormalitySubjectLastName}:"/>
+                            <p:inputText value="#{bean.rfsLastNameFilter}" styleClass="input-width"/>
+                            <br/>
+
+                            <h:outputText value="#{msg.reportFormalitySubjectDate}:"/>
+                            <p:calendar value="#{bean.rfsDateFilter}" styleClass="calendar-width"
+                                        pattern="dd/MM/yyyy" mask="true"/>
+                            <br/>
+
+                            <br/>
+                            <p:commandButton value="#{msg.databaseListReportFormalitySubjectSearch}"
+                                             onclick="filterTableReportFormalitySubject();"/>
+                        </p:column>
+
+                        <p:column>
+                            <h:outputText value="#{msg.reportFormalitySubjectBirthDate}:"/>
+                            <p:calendar value="#{bean.rfsBirthDateFilter}" styleClass="calendar-width"
+                                        pattern="dd/MM/yyyy" mask="true"/>
+                            <br/>
+
+                            <h:outputText value="#{msg.reportFormalitySubjectVatNumber}:"/>
+                            <p:inputText value="#{bean.rfsVatNumberFilter}" styleClass="input-width"/>
+                            <br/>
+
+
+                        </p:column>
+
+                        <p:column>
+                            <h:outputText value="#{msg.reportFormalitySubjectFiscalCode}:"/>
+                            <p:inputText value="#{bean.rfsFiscalCodeFilter}" styleClass="input-width"/>
+                            <br/>
+
+                            <h:outputText value="#{msg.reportFormalitySubjectTypeFormality}:"/>
+                            <p:inputText value="#{bean.rfsTypeFormalityFilterId}" styleClass="input-width"
+                                         converter="longConverter"/>
+                            <br/>
+                        </p:column>
+
+                    </p:panelGrid>
+                </p:outputPanel>
+
+                <p:dataTable var="item" id="rfsTable"
+                             emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyReportFormalitySubjectModel}"
+                             rowKey="#{item.id}" rows="10" lazy="true" paginator="true"
+                             paginatorAlwaysVisible="true" rowIndexVar="rowId"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,20,50" widgetVar="rfsTableWV">
+
+                    <p:column headerText="#{msg.reportFormalitySubjectConservatorship}">
+                        <h:outputText value="#{item.landChargesRegistryName}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.reportFormalitySubjectName}">
+                        <h:outputText value="#{item.fullName}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.reportFormalitySubjectBirthDate}">
+                        <h:outputText value="#{item.birthDate}"
+                                      converter="dateTimeConverter"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.reportFormalitySubjectFiscalCode}">
+                        <h:outputText value="#{item.subjectFiscalCode}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.reportFormalitySubjectTypeFormality}">
+                  		<h:outputText value="#{item.typeFormality}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.reportFormalitySubjectDate}">
+                        <h:outputText value="#{item.date}" converter="dateTimeConverter"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.reportFormalitySubjectNumber}">
+                        <h:outputText value="#{item.number}"/>
+                    </p:column>
+
+                </p:dataTable>
+
+            </p:tab>
+            <p:tab title="#{msg.databaseListTextInspection}">
+                <p:outputPanel id="searchPanelVisureRTF">
+                    <p:remoteCommand name="filterTableVisureRTF"
+                                     update="tabs:tableVisureRTF"
+                                     action="#{bean.filterTableVisureRTF}"/>
+                    <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid">
+                        <p:column>
+                            <h:outputText value="#{msg.subjectViewFormalityConservatory}:"/>
+                            <p:selectOneMenu value="#{bean.conservatoryFilterIdVisureRTF}" styleClass="select-width">
+                                <f:selectItems value="#{bean.conservatories}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:panelGrid>
+                    <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid">
+                        <p:column>
+                            <h:outputText value="#{msg.requestLastName}:"/>
+                            <p:inputText value="#{bean.lastNameFilterVisureRTF}" styleClass="input-width"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{msg.requestFirstName}:"/>
+                            <p:inputText value="#{bean.firstNameFilterVisureRTF}" styleClass="input-width"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{msg.requestBirthDate}:"/>
+                            <p:calendar value="#{bean.birthDateFilterVisureRTF}" styleClass="calendar-width"
+                                        pattern="dd/MM/yyyy" mask="true"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{msg.requestFiscalCode}:"/>
+                            <p:inputText value="#{bean.fiscalCodeFilerVisureRTF}" styleClass="input-width"/>
+                        </p:column>
+                    </p:panelGrid>
+                    <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid">
+                        <p:column>
+                            <h:outputText value="#{msg.requestBusinessName}:"/>
+                            <p:inputText value="#{bean.businessNameFilterVisureRTF}" styleClass="input-width"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{msg.clientVATNumber}:"/>
+                            <p:inputText value="#{bean.numberVatFilterVisureRTF}" styleClass="input-width"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{msg.requestFiscalCode}:"/>
+                            <p:inputText value="#{bean.legalFiscalCodeFilterVisureRTF}" styleClass="input-width"/>
+                        </p:column>
+                        <p:column>
+                            <br/>
+                            <p:commandButton value="#{msg.databaseListRealEstateSearch}"
+                                             onclick="filterTableVisureRTF();"/>
+                        </p:column>
+
+                    </p:panelGrid>
+                </p:outputPanel>
+                <p:dataTable var="item" id="tableVisureRTF"
+                             emptyMessage="#{msg.noRecordsFound}"
+                             value="#{bean.lazyVisureRTFModel}" rowKey="#{item.id}" rows="10"
+                             lazy="true" paginator="true" paginatorAlwaysVisible="true"
+                             rowIndexVar="rowId" styleClass="no_break_header"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,20,50" widgetVar="tableVisureRTFWV">
+                    <p:column headerText="#{msg.subjectViewFormalityConservatory}" styleClass="special-toggler">
+                        <h:outputText value="#{item.landChargesRegistry}"/>
+                        <p:rowToggler rendered="#{item.showToggler}" expandLabel="#{msg.visureRTFToggler}"
+                                      collapseLabel="#{msg.visureRTFToggler}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.requestLastBusinessName2}">
+                        <h:outputText value="#{item.fullName}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.requestBirthDate}">
+                        <h:outputText value="#{item.birthDate}" converter="dateTimeConverter"/>
+                    </p:column>
+                    <p:column headerText="#{msg.requestFiscalCodeVATNamber}">
+                        <h:outputText value="#{item.fiscalCodeVat}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.databaseListTextInspectionUpdateDate}">
+                        <h:outputText value="#{item.updateDateString}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.formality}">
+                        <h:outputText value="#{item.numFormality}"/>
+                    </p:column>
+                    <p:column styleClass="action_column" headerText="#{msg.requestFile}">
+                        <p:commandButton icon="fa fa-download"
+                                         action="#{bean.downloadVisureRTF}" ajax="false" update="@form">
+                            <f:setPropertyActionListener value="#{item}"
+                                                         target="#{bean.downloadVisureRTF}"/>
+                        </p:commandButton>
+                    </p:column>
+                    <p:column styleClass="action_column" headerText="#{msg.pdf}">
+                        <p:commandButton icon="fa fa-download"
+                                         action="#{bean.downloadVisureRTFasPDF}" ajax="false" update="@form">
+                            <f:setPropertyActionListener value="#{item}"
+                                                         target="#{bean.downloadVisureRTF}"/>
+                        </p:commandButton>
+                    </p:column>
+                    
+                    <p:column headerText="#{msg.databaseListUploadFile}" style="text-align: center;">
+                        <p:commandButton value="#{msg.databaseListUploadFile}" styleClass="grey-button"
+                                         action="#{bean.cleanVisureFields}"
+                                         oncomplete="PF('attachVisureFileWV').show();">
+                            <f:setPropertyActionListener value="#{item}"
+                                                         target="#{bean.uploadVisureRTF}"/>
+                        </p:commandButton>
+                    </p:column>
+                    <p:rowExpansion>
+                        <div align="center">
+                            <p:dataTable value="#{item.uploadedVisureRTFList}" var="visure" style="width: 40%;"
+                                         styleClass="no_datatable_header">
+                                <p:column>
+                                    <h:outputText value="#{visure.visureName}" escape="false"
+                                                  style="padding-right: 10px;"/>
+                                </p:column>
+                                <p:column styleClass="action_column">
+                                    <p:commandButton icon="fa fa-file-word-o" action="#{bean.downloadVisureUploadPdf}"
+                                                     ajax="false" rendered="#{visure.RTFExtension}">
+                                        <f:setPropertyActionListener value="#{visure.id}"
+                                                                     target="#{bean.entityVisureUploadId}"/>
+                                    </p:commandButton>
+                                </p:column>
+                                <p:column styleClass="action_column">
+                                    <p:commandButton icon="fa fa-file-pdf-o"
+                                                     action="#{bean.downloadVisureUploadRTFasPDF}" ajax="false"
+                                                     update="@form"
+                                                     rendered="#{visure.RTFExtension}">
+                                        <f:setPropertyActionListener value="#{item}"
+                                                                     target="#{bean.downloadVisureUploadedRTF}"/>
+                                        <f:setPropertyActionListener value="#{visure.id}"
+                                                                     target="#{bean.entityVisureUploadId}"/>
+                                    </p:commandButton>
+
+                                    <p:commandButton icon="fa fa-file-pdf-o" action="#{bean.downloadVisureUploadPdf}"
+                                                     ajax="false"
+                                                     rendered="#{!visure.RTFExtension}">
+                                        <f:setPropertyActionListener value="#{visure.id}"
+                                                                     target="#{bean.entityVisureUploadId}"/>
+                                    </p:commandButton>
+                                </p:column>
+                                <p:column style="width: 79px">
+                                    <p:commandButton value="#{msg.edit}" action="#{bean.prepareVisureToUpdate}"
+                                                     oncomplete="PF('attachVisureFileWV').show()">
+                                        <f:setPropertyActionListener value="#{visure.id}"
+                                                                     target="#{bean.entityVisureUploadId}"/>
+                                        <f:setPropertyActionListener value="#{item}" target="#{bean.uploadVisureRTF}"/>
+                                    </p:commandButton>
+                                </p:column>
+                            </p:dataTable>
+                        </div>
+                    </p:rowExpansion>
+                </p:dataTable>
+            </p:tab>
+            <p:tab title="#{msg.databaseListImportFile}">
+                <p:outputPanel id="searchPanelDocument">
+                    <div>
+                        <p:commandButton value="#{msg.databaseListDocumentAdd}" styleClass="standard_button"
+                                         action="#{bean.setReportShouldBeGenerated(true)}"
+                                         id="addDocumentBtn" oncomplete="PF('documentAddDlgWV').show();" process="@this"/>
+                        <p:commandButton value="#{msg.databaseListOpenReport}" styleClass="right-side"
+                                         id="openReport" actionListener="#{bean.downloadExistingReport}" ajax="false">
+                            <p:fileDownload value="#{bean.reportFile}"/>
+                        </p:commandButton>
+                    </div>
+                    <span>
+                        <p:commandButton styleClass="standard_button" value="#{msg.databaseListFolderAdd}"
+                                         id="addFolderBtn" oncomplete="PF('folderAddDlgWV').show(); clearAndUpdateDialogData()"/>
+                    </span>
+                </p:outputPanel>
+                <p:remoteCommand name="updateTableDocument" update="tableDocument, openReport"/>
+                <p:dataTable var="item" id="tableDocument"
+                             emptyMessage="#{msg.noRecordsFound}"
+                             value="#{bean.lazyDocumentModel}" rowKey="#{item.id}" rows="10"
+                             lazy="true" paginator="true" paginatorAlwaysVisible="true"
+                             rowIndexVar="rowId"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,20,50" widgetVar="tableDocumentWV">
+
+                    <p:column headerText="#{msg.databaseListDocumentTypes}">
+                        <h:outputText value="#{item.typeDescription}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListDocumentTitle}">
+                        <h:outputText value="#{item.title}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListDocumentPath}">
+                        <h:outputText value="#{item.path}"/>
+                    </p:column>
+
+                    <p:column
+                            headerText="#{msg.databaseListDocumentCreateUserFullName}">
+                        <h:outputText value="#{item.createUserFullName}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListDocumentCreateDate}">
+                        <h:outputText value="#{item.createDate}"
+                                      converter="dateTimeConverter"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListDocumentDate}">
+                        <h:outputText value="#{item.date}" converter="dateTimeConverter"/>
+                    </p:column>
+
+                    <p:column styleClass="action_column">
+                        <p:commandButton icon="fa fa-fw fa-file-pdf-o"
+                                         rendered="#{item.canGeneratePDF}" action="#{bean.showPDF}"
+                                         ajax="false" update="@form">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.downloadFileId}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                    <p:column styleClass="action_column">
+                        <p:commandButton icon="ui-icon ui-icon-plusthick" ajax="false" update="@form">
+                        </p:commandButton>
+                    </p:column>
+
+                    <p:column styleClass="action_column">
+                        <p:commandButton icon="fa fa-download"
+                                         action="#{bean.downloadFile}" ajax="false" update="@form">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.downloadFileId}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+
+            </p:tab>
+            <p:tab title="#{msg.databaseListReportImport}">
+                <p:dataTable value="#{bean.importedFiles}" var="file" id="reportFileTable"
+                             emptyMessage="#{msg.noRecordsFound}" rows="10" paginator="true"
+                             paginatorAlwaysVisible="true"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,20,50">
+                    <p:column headerText="#{msg.databaseListReportImportFileName}">
+                        <h:outputText value="#{file.fileName}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.databaseListReportImportFileCreateDate}">
+                        <h:outputText value="#{file.createDate}" converter="dateTimeConverter"/>
+                    </p:column>
+                    <p:column styleClass="action_column">
+                        <p:commandButton icon="fa fa-download" ajax="false">
+                            <p:fileDownload value="#{bean.downloadReport(file)}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:tab>
+        </p:tabView>
+		<p:remoteCommand name="updateFileName" update="uplaodedFileName"/>
+		<p:remoteCommand name="clearUploadedFile" actionListener="#{bean.clearUploadedFile}" 
+		update="uplaodedFileName, visureUpload"/>
+
+        <p:dialog id="attachVisureFile" widgetVar="attachVisureFileWV" draggable="false" modal="true" resizable="false">
+            <h:panelGrid id="addParamsPanel" columns="2">
+
+                <h:outputText value="#{msg.subjectViewVisureRTFNumFormality}"/>
+                <p:inputText value="#{bean.uploadVisureRTFNumFormality}"/>
+
+                <h:outputText value="#{msg.subjectViewVisureRTFUpdateDate}"/>
+                <p:calendar id="visureFileDate" pattern="dd/MM/yyyy" mask="true"
+                			mindate="#{bean.getMaxAge()}" maxdate="#{bean.getMinAge()}"
+                			yearRange="#{bean.yearRange}"
+                            locale="it" navigator="true" popupIconOnly="true"
+                            value="#{bean.uploadVisureRTFUpdateDate}"/>
+            </h:panelGrid>
+            <p:fileUpload mode="advanced" value="#{bean.documentForUploadVisureRTF}" skinSimple="true"
+            			  id="visureUpload"
+            			  fileUploadListener="#{bean.handleUpload}"
+            			  auto="true"
+            			  oncomplete="updateFileName()"
+                          label="#{msg.mailManagerChooseAttachedFiles}"
+                          uploadLabel="#{msg.mailManagerUploadAttachedFiles}"
+                          cancelLabel="#{msg.mailManagerCancelAttachedFiles}"/>
+            			<h:outputText id="uplaodedFileName" value="#{bean.visureFileName}"/> 
+            
+            <div class="btn_line">
+                <p:commandButton value="#{msg.save}" ajax="false"
+                                 action="#{bean.saveVisureFile}" update="@form"
+                                 oncomplete="PF('attachVisureFileWV').hide();"/>
+                <p:commandButton value="#{msg.cancel}" ajax="false" update="@form"
+                 				action="#{bean.cancelVisureFile}"
+                                 oncomplete="PF('attachVisureFileWV').hide();"/>
+            </div>
+
+        </p:dialog>
+
+        <p:dialog header="#{msg.deleteConfirmationHeader}" widgetVar="dlg2"
+                  modal="true" resizable="false" effect="SLIDE">
+            #{msg.deleteConfirmation}<br/>
+            <br/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.yes}" action="#{bean.deleteEntity}"
+                                 oncomplete="PF('dlg2').hide()" update="tabs:tableSubject,:form:messages"/>
+                <p:commandButton value="#{msg.no}" onclick="PF('dlg2').hide()"/>
+            </div>
+        </p:dialog>
+
+        <p:dialog header="#{msg.deleteConfirmationHeader}" widgetVar="dlg3"
+                  modal="true" resizable="false" effect="SLIDE">
+            #{msg.deleteConfirmation}<br/>
+            <br/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.yes}"
+                                 action="#{bean.deleteEntityRealEstate}"
+                                 oncomplete="PF('dlg3').hide()"
+                                 update="tabs:tableRealEstate,:form:messages"/>
+                <p:commandButton value="#{msg.no}" onclick="PF('dlg3').hide()"/>
+            </div>
+        </p:dialog>
+
+        <p:remoteCommand name="updateFakeButton" update="fakeSaveButton"/>
+        <p:remoteCommand name="clearAndUpdateDialogData" action="#{bean.clearDocumentData}"
+                         update="documentType, documentTitle, documentDate, documentAddDlg"/>
+        <p:dialog header="#{msg.databaseListDocumentAddDlg}" modal="true"
+                  width="600"
+                  id="documentAddDlg" resizable="false" draggable="false"
+                  dynamic="true" widgetVar="documentAddDlgWV" onHide="clearAndUpdateDialogData()">
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+                <h:outputText value="#{msg.databaseListDocumentTypes}:"/>
+                <p:selectOneMenu value="#{bean.selectedTypeDocumentId}" id="documentType">
+                    <p:ajax event="change" update="documentTitle"/>
+                    <f:selectItems value="#{bean.documentTypes}"/>
+                </p:selectOneMenu>
+
+                <h:outputText value="#{msg.databaseListDocumentTitle}:"/>
+                <p:inputText value="#{bean.documentTitle}" id="documentTitle"
+                             disabled="#{bean.needDisableDocumentTitle}"/>
+
+                <h:outputText value="#{msg.databaseListGenerateFilesReport}:"/>
+                <p:selectBooleanCheckbox value="#{bean.reportShouldBeGenerated}" onchange="updateFakeButton()"/>
+
+                <h:outputText value="#{msg.databaseListDocumentDocument}:"/>
+                <p:fileUpload multiple="true" fileUploadListener="#{bean.handleFileUpload}"
+                              auto="true" mode="advanced" oncomplete="updateTableDoc();"
+                              label="#{msg.mailManagerChooseAttachedFiles}" skinSimple="true"
+                              uploadLabel="#{msg.mailManagerUploadAttachedFiles}"
+                              cancelLabel="#{msg.mailManagerCancelAttachedFiles}" update="saveButton"/>
+
+                <h:outputText/>
+                <p:dataTable id="documentsTableId" value="#{bean.documents}" styleClass="without-header" var="itemDoc"
+                             scrollable="true" scrollHeight="300">
+                    <p:column styleClass="action_column">
+                        <p:commandButton icon="ui-icon pi pi-times" action="#{bean.removeDocument(itemDoc)}"
+                                         oncomplete="updateTableDoc()"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{itemDoc.fileName}"/>
+                    </p:column>
+                </p:dataTable>
+
+                <h:outputText value="#{msg.databaseListDocumentDate}:"/>
+                <p:calendar id="documentDate" pattern="dd/MM/yyyy" mask="true"
+                            locale="it" navigator="true" popupIconOnly="true"
+                            value="#{bean.documentDate}"/>
+            </p:panelGrid>
+            <p:remoteCommand name="updateTableDoc" update="documentsTableId"/>
+            <div class="btn_line">
+
+                <p:commandButton value="#{msg.save}" action="#{bean.saveFile}" id="saveButton"
+                                 disabled="#{bean.documents == null}" update="tabs:reportFileTable"
+                                 oncomplete="PF('documentAddDlgWV').hide();updateTableDocument();"
+                                 onsuccess="document.getElementById('fakeSaveButton').click();"/>
+                <p:commandButton id="fakeSaveButton" ajax="false" styleClass="non_displayed_button"
+                                 disabled="#{!bean.reportShouldBeGenerated}">
+                    <p:fileDownload value="#{bean.reportFile}"/>
+                </p:commandButton>
+
+                <p:commandButton value="#{msg.cancel}" ajax="true"
+                                 action="#{bean.clearDocumentData}"
+                                 oncomplete="PF('documentAddDlgWV').hide();"/>
+            </div>
+
+        </p:dialog>
+        <p:remoteCommand value="#{bean.saveFolder}" name="getfolder"/>
+        <p:dialog header="#{msg.databaseListDocumentAddDlg}" modal="true"
+                  id="folderAddDlg" resizable="false" draggable="false"
+                  dynamic="true" widgetVar="folderAddDlgWV">
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" id="folderAddPanel">
+                <h:outputText value="#{msg.databaseListDocumentTypes}:"/>
+                <p:selectOneMenu value="#{bean.selectedTypeId}" id="folderType">
+                    <p:ajax event="change" update="documentTitle"/>
+                    <f:selectItems value="#{bean.documentTypes}"/>
+                </p:selectOneMenu>
+
+                <h:outputText value="#{msg.databaseListDocumentDocument}:"/>
+                <p:inputText value="#{bean.pathToFolder}" label="#{msg.databaseListDocumentDocument}"
+                             id="path_to_folder"/>
+            </p:panelGrid>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.save}" action="#{bean.saveFolder}" update="folderAddPanel, messages"/>
+                <p:commandButton value="#{msg.cancel}" action="#{bean.cancelSaveFolder}" update="form"
+                                 oncomplete="PF('folderAddDlgWV').hide();"/>
+            </div>
+
+        </p:dialog>
+
+        <p:dialog widgetVar="templates" resizable="false"
+                  header="#{msg.docTemplates}" modal="true">
+            <p:selectOneMenu value="#{bean.selectedTemplateId}"
+                             style="width:150px;">
+                <f:selectItems value="#{bean.templates}"/>
+            </p:selectOneMenu>
+
+            <div class="btn_line">
+                <p:commandButton value="#{msg.ok}" ajax="false"
+                                 actionListener="#{bean.generate}" onclick="PF('templates').hide()"
+                                 update=":form:messages"/>
+                <p:commandButton value="#{msg.cancel}"
+                                 onclick="PF('templates').hide()"/>
+            </div>
+        </p:dialog>
+
+        <p:dialog widgetVar="xmlMultiSubjectsDlgWV" resizable="false"
+                  draggable="false" modal="true">
+
+            <p:panel header="#{bean.currentDocumentWrapper.dialogHeader}"
+                     id="xmlMultiSubjectPanel">
+                <p:dataTable var="item" id="xmlMultiSubjectTable"
+                             emptyMessage="#{msg.noRecordsFound}"
+                             value="#{bean.currentDocumentWrapper.subjects}"
+                             rowKey="#{item.tempId}" rows="10" paginator="true"
+                             paginatorAlwaysVisible="true" rowIndexVar="rowId"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,20,50" widgetVar="xmlMultiSubjectTableWV"
+                             selection="#{bean.currentDocumentWrapper.selectedSubject}">
+
+                    <p:column selectionMode="single"
+                              style="width:16px;text-align:center"/>
+
+                    <p:column headerText="#{msg.lastname}">
+                        <h:outputText value="#{item.surname}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.name}">
+                        <h:outputText value="#{item.name}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListSubjectBirthDate}">
+                        <h:outputText value="#{item.birthDate}"
+                                      converter="dateTimeConverter"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListSubjectSex}">
+                        <h:outputText value="#{item.sexType}" converter="enumConverter"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListSubjectFiscalCodeVAT}">
+                        <h:outputText value="#{item.fiscalCode}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListSubjectCity}">
+                        <h:outputText value="#{item.birthCity}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.databaseListSubjectProvince}">
+                        <h:outputText value="#{item.birthProvince}"/>
+                    </p:column>
+                </p:dataTable>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.save}" oncomplete="PF('createPDFReportWV').show();"
+                                     action="#{bean.handleSpecialMultiSubjectFlow}"
+                                     onclick="PF('xmlMultiSubjectsDlgWV').hide();"
+                                     update=":form:xmlMultiSubjectPanel"/>
+                    <p:commandButton value="#{msg.cancel}"
+                                     action="#{bean.chooseNextSubject}"
+                                     update=":form:xmlMultiSubjectPanel"
+                                     onclick="PF('xmlMultiSubjectsDlgWV').hide();"/>
+                </div>
+            </p:panel>
+        </p:dialog>
+
+        <p:dialog widgetVar="createPDFReportWV" id="createPDFReport" closable="false"
+                  modal="true" resizable="false" effect="SLIDE" draggable="false">
+            #{msg.databaseListGenerateReport}
+            <br/>
+            <br/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.yes}" action="#{bean.loadPDFReport}"
+                                 onclick="PF('createPDFReportWV').hide()" ajax="false"/>
+                <p:commandButton value="#{msg.no}" action="#{bean.clearDocumentsForReportList}"
+                                 onclick="PF('createPDFReportWV').hide()" />
+            </div>
+        </p:dialog>
+
+        <p:dialog widgetVar="formalityRequestForcedEstateSituationWV" modal="true" width="1200">
+            <h:outputText value="#{msg.formalityForcedRequestOrEstateSituationExistDialog}"/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" update="@form"
+                                 action="#{bean.deleteFormality}" styleClass="green-button"
+                                 oncomplete="PF('formalityRequestForcedEstateSituationWV').hide();"/>
+                <p:commandButton value="#{msg.cancel}" styleClass="red-button"
+                                 oncomplete="PF('formalityRequestForcedEstateSituationWV').hide();"/>
+            </div>
+        </p:dialog>
+         <p:dialog widgetVar="vecchiDatiWV" modal="true" width="700">
+            <h:outputText value="#{msg.databaseListvecchiDatiDialog}"/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.yes}" oncomplete="PF('vecchiDatiWV').hide();"/>
+            </div>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>
+</html>

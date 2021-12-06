@@ -1,0 +1,69 @@
+<!DOCTYPE  html [
+        <!ENTITY nbsp "&#160;">
+        ]>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      lang="en">
+
+    <h:head>
+        <f:facet name="first">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+            <meta name="apple-mobile-web-app-capable" content="yes" />
+        </f:facet>
+        <link rel="icon" href="#{facesContext.externalContext.requestContextPath}/resources/images/favicon.ico"/>
+        <title><h:outputText value="#{msg.title}"/></title>
+        <h:outputScript name="js/prism.js" library="babylon-layout" />
+        <h:outputScript name="js/layout.js" library="babylon-layout" />
+        <script type="text/javascript"
+                src="#{facesContext.externalContext.requestContextPath}/resources/javascript/javascript_helper.js"/>
+        <ui:insert name="head"/>
+        <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/main.css"
+              media="all" rel="stylesheet" type="text/css"/>
+    </h:head>
+
+    <h:body styleClass="outlined">
+        <div class="layout-wrapper layout-static layout-menu-dark layout-slim #{guestPreferences.orientationRTL ? 'layout-rtl' : null}" >
+            <ui:include src="/Pages/home/topbar.xhtml"/>
+            <ui:include src="/Pages/home/menu.xhtml"/>
+
+            <div class="layout-main">
+<!--                <div class="route-bar">-->
+<!--                    <div class="route-bar-breadcrumb">-->
+<!--                        <i class="pi pi-home"/>-->
+<!--                        <span>/ </span>-->
+<!--                        <ui:insert name="viewname" />-->
+<!--                    </div>-->
+<!--                </div> -->
+                <div class="layout-content">
+                    <ui:include src="Include/Menu.xhtml"/>
+                    <ui:insert name="content"/>
+                </div>
+                <div class="layout-footer">
+                    <ui:include src="/Pages/home/footer.xhtml"/>
+                </div>
+            </div>
+
+            <p:ajaxStatus styleClass="layout-ajax-loader">
+                <f:facet name="start">
+                    <i class="pi pi-spin pi-spinner layout-ajax-loader-icon" aria-hidden="true"/>
+                </f:facet>
+
+                <f:facet name="complete">
+                    <h:outputText value="" />
+                </f:facet>
+            </p:ajaxStatus>
+
+            <div class="layout-mask"></div>
+        </div>
+
+        <h:outputStylesheet name="css/primeicons.css" library="babylon-layout" />
+        <h:outputStylesheet name="css/primeflex.min.css" library="babylon-layout" />
+        <h:outputStylesheet name="css/layout-blue.css" library="babylon-layout" />
+    </h:body>
+
+</html>

@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+>
+<ui:composition template="/resources/tpl/Admin/LazyListBase.xhtml">
+    <ui:param name="displayControlPanel" value="false"></ui:param>
+
+    <ui:define name="in_list_edit_body">
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <div class="card card-w-title">
+                    <p:panel header="#{bean.panelTitle} #{entity_name}"
+                             rendered="#{bean.canCreateInBean}" id="editPanel">
+                        <ui:include src="/resources/tpl/common/ValidationMessages.xhtml"/>
+                        <div align="center">
+                            <ui:insert name="edit_fields"></ui:insert>
+                            <div class="button-top-margin">
+                                <p:commandButton value="#{msg.save}" update=":form, messages"
+                                                 icon="pi pi-save" action="#{bean.pageSave}" styleClass="p-mr-2 p-mb-2">
+                                </p:commandButton>
+                                <p:commandButton value="#{msg.reset}" update="editPanel"
+                                                 icon="pi pi-times-circle" action="#{bean.resetFields}" styleClass="p-mr-2 p-mb-2">
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:panel>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
+</html>

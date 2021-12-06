@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/resources/tpl/Admin/ViewBase.xhtml">
+	<ui:param name="bean" value="#{dueRequestsViewBean}" />
+	<ui:param name="view_title"
+		value="#{bean.days>0?msg.dueRequestView15Title:msg.dueRequestView0Title}" />
+	<ui:define name="view_body">
+		<style>
+.requestbox {
+	width: 55rem;
+	height: 4vh;
+}
+
+.requestbox a {
+	color: black;
+	margin-left: 50px;
+}
+
+.requestbox span {
+	margin-right: 20px;
+}
+
+.requestPanel tr {
+	box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.5);
+}
+</style>
+		<div>
+			<ui:repeat var="item" value="#{bean.dueRequests}">
+				<p:panel style="border: thin;" styleClass="requestPanel">
+					<p:panelGrid columns="1" columnClasses="requestbox">
+						<h:panelGroup>
+							<p:commandLink
+								action="#{bean.selectRequestType(item.requestTypeId)}"
+								value="#{item.requestTypeName}" style="float: left;" />
+							<h:outputText value="#{item.requestCount}" style="float: right" />
+						</h:panelGroup>
+					</p:panelGrid>
+				</p:panel>
+			</ui:repeat>
+		</div>
+	</ui:define>
+</ui:composition>

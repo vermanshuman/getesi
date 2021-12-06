@@ -1,0 +1,177 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui">
+
+
+    <h:form id="header_form_panel">
+
+		<script>
+		$( document ).ready(function() {
+		    console.log( "ready1111!" );
+		    umc();
+		    urc();
+		});
+
+		 
+		</script>
+		<p:remoteCommand name="umc" action="#{sessionBean.updateMailCount()}" update="mailManager, mailManagerSpan"/>
+		<p:remoteCommand name="urc" action="#{sessionBean.updateNumberUnclosedRequests()}" update="requestList, numberUnclosedRequestsSpan"/>
+        <ui:fragment rendered="#{!empty sessionBean.currentUser}">
+            <div>
+                <div class="topbar clearfix">
+                    <div class="topbar-left">
+                        <div id="logo"/>
+                    </div>
+
+                    <div class="topbar-right">
+
+                        <a id="topbar-menu-button" href="#">
+                            <i class="fa fa-bars"/>
+                        </a>
+
+                        <ul class="topbar-items">
+                            <li><h:outputLink
+                                    value="#{facesContext.externalContext.requestContextPath}/j_spring_security_logout"
+                                    id="logout_btn">
+                                <i class="topbar-icon fa fa-fw fa-sign-out"/>
+                            </h:outputLink>
+                                <p:tooltip id="toolTipFade1" for="logout_btn" value="#{msg.logout}" position="bottom"/>
+                            </li>
+                            <li>
+                                <h:outputLink rendered="#{empty sessionBean.currentUser.photo}"
+                                              value="#{facesContext.externalContext.requestContextPath}/Pages/Configuration/UserProfileView.jsf"
+                                              id="user">
+                                    <i class="topbar-icon fa fa-fw fa-user-circle"/>
+                                </h:outputLink>
+                                <p:tooltip id="toolTipFade2" for="user" value="#{sessionBean.currentUser.fullname}"
+                                           position="bottom"/>
+                                <h:outputLink rendered="#{not empty sessionBean.currentUser.photo}"
+                                              value="#{facesContext.externalContext.requestContextPath}/Pages/Configuration/UserProfileView.jsf"
+                                              id="userPhoto">
+                                    <p:graphicImage value="#{sessionBean.currentUser.photo}" width="35"/>
+                                </h:outputLink>
+                                <p:tooltip id="toolTipFade2Photo" for="userPhoto"
+                                           value="#{sessionBean.currentUser.fullname}"
+                                           position="bottom"/>
+                            </li>
+                            <ui:fragment rendered="#{sessionBean.canViewPage('APPLICATION_SETTINGS')}">
+                                <li>
+                                    <h:outputLink
+                                            value="#{facesContext.externalContext.requestContextPath}/configuration/application_settings_edit/"
+                                            id="settings">
+                                        <i class="topbar-icon fa fa-fw fa-cog"/>
+                                    </h:outputLink>
+                                    <p:tooltip id="toolTipSettings" for="settings" value="#{msg.headerSettings}"
+                                               position="bottom"/>
+                                </li>
+                            </ui:fragment>
+
+                            <li>
+                                <h:outputLink id="billing">
+                                    <i class="topbar-icon fa fa-fw fa-calculator"/>
+                                </h:outputLink>
+                                <p:tooltip id="toolTipBilling" for="billing" value="#{msg.headerBilling}"
+                                           position="bottom"/>
+                            </li>
+
+                            <ui:fragment
+                                    rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/ReportList.jsf')}">
+                                <li>
+                                    <h:outputLink  value="#{facesContext.externalContext.requestContextPath}/Pages/ManagementGroup/ReportList.jsf"
+                                                   id="reportList">
+                                        <i class="topbar-icon fa fa-fw fa-area-chart"/>
+                                    </h:outputLink>
+                                    <p:tooltip id="toolTipReportList" for="reportList" value="#{msg.headerReportList}"
+                                               position="bottom"/>
+                                </li>
+                            </ui:fragment>
+
+                            <ui:fragment
+                                    rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/DatabaseList.jsf')}">
+                                <li>
+                                    <h:commandLink
+                                            action="#{sessionBean.getDatabaseListPage()}" actionListener="#{sessionBean.cleanFiltersOnDatabaseListSubjectTable()}"
+                                            id="database">
+                                        <i class="topbar-icon fa fa-fw fa-file-text-o"/>
+                                    </h:commandLink>
+                                    <p:tooltip id="toolTipDatabase" for="database" value="#{msg.headerDatabase}"
+                                               position="bottom"/>
+                                </li>
+                            </ui:fragment>
+                            <ui:fragment
+                                    rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/NotarialCertificationList.jsf')}">
+                                <li>
+                                    <h:commandLink
+                                            action="#{sessionBean.getNotarialCertificationListPage()}"
+                                            actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"
+                                            id="notarialCertificationList">
+                                        <div id="notarial_certification_list_logo"/>
+                                        <ui:fragment
+                                                rendered="#{sessionBean.needShowNumberUnclosedNotarialCertifications}"
+                                                id="numberUnclosedNotarialCertificationsSpan">
+                                            <span class="topbar-badge animated rubberBand noratialCertificationList">
+                                                #{sessionBean.numberUnclosedNotarialCertifications}
+                                            </span>
+                                        </ui:fragment>
+                                    </h:commandLink>
+                                    <p:tooltip id="toolTipNotarialCertificationList" for="notarialCertificationList"
+                                               value="#{msg.headerNotarialCertificationList}"
+                                               position="bottom"/>
+                                </li>
+                            </ui:fragment>
+                            <ui:fragment
+                                    rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/RequestList.jsf')}">
+                                <li>
+                                    <h:commandLink
+                                           action="#{sessionBean.getRequestListPage()}" actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"
+                                            id="requestList">
+                                        <i class="topbar-icon fa fa-fw fa-list"/>
+                                        <ui:fragment rendered="#{sessionBean.requestCounts gt 0}" id="numberUnclosedRequestsSpan">
+                                            <span class="topbar-badge animated rubberBand">#{sessionBean.requestCounts}</span>
+                                        </ui:fragment>
+                                    </h:commandLink>
+                                    <p:tooltip id="toolTipRequestList" for="requestList"
+                                               value="#{msg.headerRequestList}"
+                                               position="bottom"/>
+                                </li>
+                            </ui:fragment>
+                            <ui:fragment
+                                    rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/MailManagerList.jsf')}">
+                                <li>
+                                    <h:outputLink id="mailManager"
+                                                  value="#{facesContext.externalContext.requestContextPath}/Pages/ManagementGroup/MailManagerList.jsf">
+                                        <i class="topbar-icon fa fa-fw  fa-envelope-o"/>
+                                        <ui:fragment rendered="#{sessionBean.mailCounts gt 0}" id="mailManagerSpan">
+                                            <span class="topbar-badge animated rubberBand">#{sessionBean.mailCounts}</span>
+                                        </ui:fragment>
+                                    </h:outputLink>
+                                    <p:tooltip id="toolTipMailManager" for="mailManager"
+                                               value="#{msg.headerMailManager}" position="bottom"/>
+                                </li>
+                            </ui:fragment>
+                            <li>
+                                <h:outputLink
+                                        value="#{facesContext.externalContext.requestContextPath}/Pages/Home.jsf"
+                                        id="homePage">
+                                    <i class="topbar-icon fa fa-fw fa-home"/>
+                                </h:outputLink>
+                                <p:tooltip id="toolTipHomePage" for="homePage" value="#{msg.home}" position="bottom"/>
+                            </li>
+                        </ul>
+                        <p:poll interval="#{sessionBean.getTimeToRefresh()}" listener="#{sessionBean.updateMailCount()}" 
+                        	update="mailManager, mailManagerSpan"/>
+                        <p:ajaxStatus style=" margin-top: 8px;"
+                                      onsuccess="fixExpandRow(); fixCalendarInput();">
+                            <f:facet name="complete">
+                                <h:outputText value=""/>
+                            </f:facet>
+                        </p:ajaxStatus>
+                        <div class="clear" style="float: none;"/>
+                    </div>
+                </div>
+            </div>
+        </ui:fragment>
+    </h:form>
+</ui:composition>
