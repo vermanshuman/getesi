@@ -224,6 +224,8 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     private String documentType;
 
     private String apiError;
+    
+    private Double invoiceNetAmount;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
@@ -337,7 +339,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             setSelectedPaymentTypeId(invoice.getPaymentType().getId());
             List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
             for(InvoiceItem invoiceItem : invoiceItems) {
-                setInvoiceItemAmount(invoiceItem.getAmount());
+                setInvoiceNetAmount(invoiceItem.getAmount());
                 setInvoiceItemVat(invoiceItem.getVat());
             }
         }
@@ -2410,7 +2412,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             if(!ValidationHelper.isNullOrEmpty(getExamRequest())
                     && !ValidationHelper.isNullOrEmpty(getExamRequest().getSubject())){
                 invoiceItem.setSubject(getExamRequest().getSubject().toString());
-                invoiceItem.setAmount(getInvoiceItemAmount());
+                invoiceItem.setAmount(getInvoiceNetAmount());
                 invoiceItem.setVat(getInvoiceItemVat());
             }
             List<InvoiceItem> invoiceItems = new ArrayList<>();
@@ -2644,4 +2646,14 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     public void setApiError(String apiError) {
         this.apiError = apiError;
     }
+
+	public Double getInvoiceNetAmount() {
+		return invoiceNetAmount;
+	}
+
+	public void setInvoiceNetAmount(Double invoiceNetAmount) {
+		this.invoiceNetAmount = invoiceNetAmount;
+	}
+    
+    
 }

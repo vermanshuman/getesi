@@ -209,6 +209,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private String apiError;
 
     private boolean sendInvoice;
+    
+    private Double invoiceNetAmount;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
@@ -363,7 +365,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             setSelectedPaymentTypeId(invoice.getPaymentType().getId());
             List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
             for(InvoiceItem invoiceItem : invoiceItems) {
-                setInvoiceItemAmount(invoiceItem.getAmount());
+                setInvoiceNetAmount(invoiceItem.getAmount());
                 setInvoiceItemVat(invoiceItem.getVat());
             }
         }
@@ -1201,7 +1203,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             if(!ValidationHelper.isNullOrEmpty(getExamRequest())
                     && !ValidationHelper.isNullOrEmpty(getExamRequest().getSubject())){
                 invoiceItem.setSubject(getExamRequest().getSubject().toString());
-                invoiceItem.setAmount(getInvoiceItemAmount());
+                invoiceItem.setAmount(getInvoiceNetAmount());
                 invoiceItem.setVat(getInvoiceItemVat());
             }
             List<InvoiceItem> invoiceItems = new ArrayList<>();
