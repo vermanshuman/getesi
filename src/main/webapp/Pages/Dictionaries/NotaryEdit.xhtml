@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core"
+                template="/resources/tpl/Admin/EditBase.xhtml">
+    <ui:param name="bean" value="#{notaryEditBean}"/>
+    <ui:param name="edit_title" value="#{bean.entity.isNew ? msg.notaryNew : msg.notaryEdit}"/>
+    <ui:param name="showSave" value="#{!bean.onlyView and not bean.fromClient}"/>
+    <ui:param name="notShowMenu" value="#{bean.fromClient}"/>
+    <ui:param name="showCancel" value="#{not bean.fromClient}"/>
+    <ui:param name="renderHeaderMenu" value="#{not bean.fromClient}"/>
+    <ui:param name="renderFooterMenu" value="#{not bean.fromClient}"/>
+    <ui:param name="renderSideMenu" value="#{not bean.fromClient}"/>
+    <ui:param name="customCancelMsg" value="#{bean.onlyView ? msg.close : msg.cancel}"/>
+
+    <ui:define name="edit_body">
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                     columnClasses="ui-grid-col-1, ui-grid-col-2">
+
+            <span><span class="red">*</span>#{msg.searchName}:</span>
+            <p:inputText value="#{bean.entity.name}" id="name" rendered="#{!bean.onlyView}"
+                         onkeypress="numbers_letters_only('#name');" styleClass="input-width"/>
+            <h:outputText value="#{bean.entity.name}" rendered="#{bean.onlyView}"/>
+
+            <span><span class="red">*</span>#{msg.city}:</span>
+            <p:inputText value="#{bean.entity.city}" id="city" rendered="#{!bean.onlyView}"
+                         onkeypress="numbers_letters_only('#city');" styleClass="input-width"/>
+            <h:outputText value="#{bean.entity.city}" rendered="#{bean.onlyView}"/>
+
+            <span>#{msg.notaryOfficeAddress}:</span>
+            <p:inputText value="#{bean.entity.officeAddress}" rendered="#{!bean.onlyView}" styleClass="input-width"/>
+            <h:outputText value="#{bean.entity.officeAddress}" rendered="#{bean.onlyView}"/>
+
+            <span>#{msg.notaryInscriptions}:</span>
+            <p:inputText value="#{bean.entity.inscriptions}"
+             id="email" rendered="#{!bean.onlyView}" styleClass="input-width"/>
+            <h:outputText value="#{bean.entity.inscriptions}"
+             rendered="#{bean.onlyView}"/>
+
+        </p:panelGrid>
+    </ui:define>
+
+    <ui:define name="additional_buttons">
+        <p:commandButton value="#{msg.edit}" rendered="#{bean.onlyView and not bean.fromClient}" update=":form"
+                         action="#{bean.editEntity}" icon="ui-icon ui-icon-pencil"/>
+        <p:commandButton value="#{msg.save}" rendered="#{bean.fromClient}" update=":form"
+                         action="#{bean.saveFromDialog}" icon="ui-icon ui-icon-disk"/>
+        <p:commandButton action="#{bean.closeDialog}" rendered="#{bean.fromClient}" value="#{msg.cancel}"
+                         icon="ui-icon-circle-close"/>
+    </ui:define>
+</ui:composition>

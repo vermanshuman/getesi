@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ff="http://readytech.com/functions">
+
+<ui:composition template="/resources/tpl/Admin/LazyListBase.xhtml">
+    <ui:param name="bean" value="#{landOmiListBean}"/>
+    <ui:param name="list_title" value="#{msg.omiLandValueTitle}"/>
+    <ui:param name="entity_name" value="#{msg.omiLandValueTitle}"/>
+    <ui:define name="search_body">
+        <p:remoteCommand name="filterTableFromPanel" action="#{bean.filterTableFromPanel}"
+                         update=":form:table"/>
+        <p:panel id="searchPanel" styleClass="landOmiSearchContent">
+            <h:outputText value="#{ff:upper(msg.omiLandValueProvince)}:" />
+            <br />
+            <p:selectOneMenu id="province" value="#{bean.selectedProvinceId}"
+                             label="#{msg.omiLandValueProvince}"
+                             filter="true" filterMatchMode="startsWith">
+                <f:selectItems value="#{bean.provinces}"/>
+                <p:ajax update="searchPanel"/>
+            </p:selectOneMenu>
+
+            <p:inputText value="#{bean.filterCityDescription}" id="cityDesc" placeholder="#{msg.omiSearchCityDescription}"
+                         style="width: 10%;margin-left: 15px!important;" styleClass="search_group"/>
+
+            <p:inputText value="#{bean.filterCityCfis}"  id="cityCfis" placeholder="#{msg.omiSearchCityCfis}"
+                         style="width: 10%;margin-left: 15px!important;" styleClass="search_group"/>
+
+            <p:commandButton value="#{msg.search}" id="searchButton" update="searchPanel" onclick="filterTableFromPanel();"  styleClass="grey-btn"/>
+        </p:panel>
+    </ui:define>
+    <ui:define name="columns">
+        <p:column sortBy="#{item.province}"
+                  filterBy="#{item.province.description}">
+            <f:facet name="header">
+                <h:outputText
+                        value="#{msg.omiLandValueProvince.toUpperCase()}" />
+            </f:facet>
+            <h:outputText value="#{item.province}" />
+        </p:column>
+
+        <p:column>
+            <f:facet name="header">
+                <h:outputText value="#{msg.omiLandValueYear.toUpperCase()}" />
+            </f:facet>
+            <h:outputText value="#{item.year}" />
+        </p:column>
+
+        <p:column>
+            <f:facet name="header">
+                <h:outputText value="#{msg.omiLandValueCity.toUpperCase()}" />
+            </f:facet>
+            <ui:repeat value="#{item.cities}" var="omiCity">
+                <h:outputText value="#{omiCity.description}" />
+                <h:outputText value="&lt;br /&gt;" escape="false" />
+            </ui:repeat>
+        </p:column>
+
+
+        <p:column styleClass="action_column" exportable="false">
+            <p:commandButton disabled="#{!bean.canDelete}"
+                             style="background-color: Transparent!important;"
+                             icon="ui-icon-myCancel" oncomplete="PF('dlg2').show()">
+                <f:setPropertyActionListener value="#{item.id}"
+                                             target="#{bean.entityDeleteId}" />
+            </p:commandButton>
+        </p:column>
+
+        <p:column styleClass="action_column" exportable="false">
+            <p:commandButton icon="ui-icon-myEdit" update=":form"
+                             style="background-color: Transparent!important;"
+                             action="#{bean.editEntity}" disabled="#{!bean.canEdit}">
+                <f:setPropertyActionListener value="#{item.id}"
+                                             target="#{bean.entityEditId}" />
+            </p:commandButton>
+        </p:column>
+    </ui:define>
+</ui:composition>
+</html>

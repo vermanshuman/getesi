@@ -1,0 +1,26 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html">
+
+    <div class="footer" id="footer" style="margin: 0">
+        <div class="card clearfix" style="margin: 0">
+
+            <span class="footer-text-left">
+                <h:outputLink value="#{msg.footerPageLeftLink}" target="_blank">#{msg.footerPageLeft}</h:outputLink>
+            </span>
+            <span class="footer-text-right"><span>#{msg.footerPageCopyright} | #{projectMsg.version}</span>
+                <!--<a href="#">#{msg.footerPageCopyright}</a> | <a-->
+                <!--href="#">#{msg.footerPagePolicy}</a>-->
+            </span>
+
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            fixExpandRow();
+            fixCalendarInput();
+            fixImageUpload();
+        });
+    </script>
+</ui:composition>

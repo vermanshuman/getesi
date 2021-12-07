@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <p:dialog widgetVar="moveDlgWV"
+              draggable="false" modal="true" resizable="false"
+              header="#{msg.mailManagerMoveMailHeader}">
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+            <h:outputText value="#{msg.mailManagerMailType}:"/>
+            <p:selectOneMenu value="#{bean.selectedTypeId}">
+                <f:selectItems value="#{bean.mailTypes}"/>
+            </p:selectOneMenu>
+        </p:panelGrid>
+        <div class="btn_line">
+            <p:commandButton value="#{msg.confirm}"
+                             action="#{bean.changeMailType}" update=" form"
+							 actionListener="#{bean.goTable}"
+                             oncomplete="PF('moveDlgWV').hide();"/>
+            <p:commandButton value="#{msg.cancel}"
+                             oncomplete="PF('moveDlgWV').hide();"/>
+        </div>
+    </p:dialog>
+
+    <p:dialog widgetVar="editStateDlgWV" width="300"
+              draggable="false" modal="true" resizable="false"
+              header="#{msg.mailManagerEditStateHeader}">
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid">
+            <h:outputText style="font-size: initial; text-align: right" value="#{msg.mailManagerEditStates}:"/>
+            <p:selectOneMenu value="#{bean.selectedStateId}">
+                <f:selectItems value="#{bean.availableStates}"/>
+            </p:selectOneMenu>
+        </p:panelGrid>
+
+        <div class="btn_line">
+            <p:commandButton value="#{msg.confirm}"
+                             action="#{bean.changeMailState}"
+                             update="form"
+                             oncomplete="PF('editStateDlgWV').hide();"/>
+            <p:commandButton value="#{msg.cancel}"
+                             oncomplete="PF('editStateDlgWV').hide();"/>
+        </div>
+    </p:dialog>
+</ui:composition>

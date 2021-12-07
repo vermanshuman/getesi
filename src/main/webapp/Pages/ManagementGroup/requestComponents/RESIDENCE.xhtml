@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <span>#{enums.documentGenerationTagsRESIDENCE}<span class="red"
+                                                        style="#{item.field.isRequired()?'':'display:none;'}">*</span></span>
+    <p:panel id="RESIDENCE" style="background: transparent; border: none">
+        <p:panelGrid id="physicalRenderResidence" columns="4"
+                     style="width: 100%;" styleClass="ui-panelgrid-blank form-group" layout="grid">
+            <p:column>
+                <h:outputText value="#{enums.documentGenerationTagsRESIDENCE_PROVINCE}"/><br/>
+                <p:selectOneMenu id="RESIDENCE_PROVINCE" styleClass="select-width" update="provinceResidenceRenderer"
+                                 value="#{bean.wrapper.selectedResidenceProvinceId}">
+                    <f:selectItems value="#{bean.wrapper.provinces}"/>
+                    <p:ajax listener="#{bean.onChangeResidenceProvince}" update="RESIDENCE"/>
+                </p:selectOneMenu>
+            </p:column>
+
+            <p:column rendered="#{not empty bean.wrapper.selectedResidenceProvinceId
+                   and bean.wrapper.selectedResidenceProvinceId eq -1}">
+                <h:outputText value="#{enums.documentGenerationTagsRESIDENCE_NATIONS}"/><br/>
+                <p:selectOneMenu id="RESIDENCE_NATIONS" value="#{bean.wrapper.selectedResidenceNationId}"
+                                 styleClass="select-width">
+                    <f:selectItems value="#{bean.wrapper.nations}"/>
+                </p:selectOneMenu>
+            </p:column>
+            <p:column rendered="#{not empty bean.wrapper.selectedResidenceProvinceId
+                    and bean.wrapper.selectedResidenceProvinceId ne -1}">
+                <h:outputText value="#{enums.documentGenerationTagsRESIDENCE_COMUNE}"/><br/>
+                <p:selectOneMenu id="RESIDENCE_COMUNE" value="#{bean.wrapper.selectedResidenceCityId}"
+                                 styleClass="select-width">
+                    <f:selectItems value="#{bean.wrapper.residenceCities}"/>
+                </p:selectOneMenu>
+            </p:column>
+            <p:column>
+                <h:outputText value="#{enums.documentGenerationTagsRESIDENCE_ADDRESS}"/><br/>
+                <p:inputText id="RESIDENCE_ADDRESS" value="#{bean.residence.address}" styleClass="input-width"/>
+            </p:column>
+
+            <p:column>
+                <h:outputText value="#{enums.documentGenerationTagsRESIDENCE_CAP}"/><br/>
+                <p:inputText id="RESIDENCE_CAP" value="#{bean.residence.cap}" styleClass="input-width"/>
+            </p:column>
+        </p:panelGrid>
+    </p:panel>
+
+</ui:composition>

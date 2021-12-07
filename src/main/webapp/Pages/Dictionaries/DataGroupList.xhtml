@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/resources/tpl/Admin/LazyListBase.xhtml">
+    <ui:param name="list_title" value="#{msg.dataGroupList}"/>
+    <ui:param name="bean" value="#{dataGroupListBean}"/>
+    <ui:param name="addButtonTitle" value="#{msg.dataGroupNew}"/>
+    <ui:param name="excludeColumnsInternal" value="0,1,2"/>
+
+    <ui:define name="columns">
+        <p:column sortBy="#{item.name}" filterBy="#{item.name}"
+                  filterMatchMode="contains" headerText="#{msg.dataGroupListName}">
+            <h:outputText value="#{item.name}"/>
+        </p:column>
+
+        <p:column sortBy="#{item.description}" filterBy="#{item.description}"
+                  filterMatchMode="contains" headerText="#{msg.dataGroupListDescription}">
+            <h:outputText value="#{item.description}"/>
+        </p:column>
+    </ui:define>
+</ui:composition>
+</html>

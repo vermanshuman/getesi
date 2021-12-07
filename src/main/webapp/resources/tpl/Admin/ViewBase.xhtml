@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+>
+<ui:composition template="/resources/tpl/Admin/Main.xhtml">
+    <ui:define name="body">
+        <ui:insert name="scripts"></ui:insert>
+        <ui:insert name="common"></ui:insert>
+        <div class="content">
+            <h:form id="form" prependId="false" enctype="multipart/form-data">
+                <div class="ui-g">
+                    <div class="ui-g-12">
+                        <div class="card card-w-title">
+                            <p:panel header="#{view_title}">
+                                <p:messages id="validationMessages"/>
+                                <ui:insert name="view_body"></ui:insert>
+                                <div align="center" style="margin-top: 0.5%;">
+                                    <ui:insert name="view_buttons"></ui:insert>
+                                    <p:commandButton action="#{bean.goBack}" value="#{msg.goBack}"
+                                                     disabled="#{empty goBackDisabled ? false : goBackDisabled}"
+                                                     rendered="#{empty goBackRendered ? true : goBackRendered}"
+                                                     icon="fa fa-angle-left" immediate="true"/>
+                                    <ui:insert name="next_buttons"></ui:insert>
+                                </div>
+                            </p:panel>
+                            <p:growl id="messages" showDetail="true" autoUpdate="false"
+                                     globalOnly="true"/>
+                        </div>
+                    </div>
+                </div>
+            </h:form>
+            <h:form prependId="false" enctype="multipart/form-data" id="standardValidationForm">
+                <ui:insert name="standard_validation_body"/>
+            </h:form>
+            <ui:insert name="applet_body"></ui:insert>
+        </div>
+
+    </ui:define>
+</ui:composition>
+</html>

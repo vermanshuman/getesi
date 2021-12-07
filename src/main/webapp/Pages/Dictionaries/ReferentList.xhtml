@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/resources/tpl/Admin/LazyListBase.xhtml">
+    <ui:param name="list_title" value="#{msg.referentList}"/>
+    <ui:param name="bean" value="#{referentListBean}"/>
+    <ui:param name="excludeColumnsInternal" value="0,1,2"/>
+
+    <ui:define name="columns">
+        <p:column styleClass="action_column">
+            <p:commandButton icon="ui-icon ui-icon-search" update=":form"
+                             action="#{bean.viewEntity}" disabled="#{!bean.canView}">
+                <f:setPropertyActionListener value="#{item.id}"
+                                             target="#{bean.entityEditId}"/>
+            </p:commandButton>
+        </p:column>
+
+        <p:column sortBy="#{item.surname}" filterBy="#{item.surname}"
+                  filterMatchMode="contains" headerText="#{msg.searchSurname}">
+            <h:outputText value="#{item.surname}"/>
+        </p:column>
+
+        <p:column sortBy="#{item.name}" filterBy="#{item.name}"
+                  filterMatchMode="contains" headerText="#{msg.searchName}">
+            <h:outputText value="#{item.name}"/>
+        </p:column>
+
+        <p:column headerText="#{msg.searchRole}">
+            <h:outputText value="#{item.type}" converter="enumConverter"/>
+        </p:column>
+
+        <p:column sortBy="#{item.phone}" filterBy="#{item.phone}"
+                  filterMatchMode="contains" headerText="#{msg.userPhone}">
+            <h:outputText value="#{item.phone}"/>
+        </p:column>
+
+        <p:column sortBy="#{item.email}" filterBy="#{item.email}"
+                  filterMatchMode="contains" headerText="#{msg.referentEmail}">
+            <h:outputText value="#{item.email}"/>
+        </p:column>
+
+        <p:column  headerText="#{msg.client}">
+            <h:outputText value="#{item.clientName}"/>
+        </p:column>
+    </ui:define>
+</ui:composition>
+</html>
