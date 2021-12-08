@@ -346,12 +346,12 @@
                         <p:panelGrid styleClass="ui-panelgrid-blank form-group verical-top" columns="4">
                             <p:column>
                                 <p:panelGrid styleClass="ui-panelgrid-blank form-group buttonPanel" columns="1">
-                                    <p:selectBooleanButton id="switch" offLabel="" onLabel=""
-                                                           styleClass="selectBool" onchange="fullscreen();"
-                                                           offIcon="fa fa-fw fa-bars" onIcon="fa fa-bars"/>
-                                    <!--<p:commandButton value="#{msg.requestListOpenProcedure}"
+<!--                                    <p:selectBooleanButton id="switch" offLabel="" onLabel=""-->
+<!--                                                           styleClass="selectBool" onchange="fullscreen();"-->
+<!--                                                           offIcon="fa fa-fw fa-bars" onIcon="fa fa-bars"/>-->
+                                    <p:commandButton value="#{msg.requestListOpenProcedure}"
                                                      action="#{bean.openTableProcedure}"
-                                                     update="estateTab"/>-->
+                                                     update="estateTab"/>
                                     <p:commandButton value="#{msg.requestListOpenEdit}" action="#{bean.manageRequest}"/>
                                 </p:panelGrid>
                             </p:column>
@@ -410,7 +410,7 @@
                                     <p:commandButton value="#{bean.examRequest.stateId == 7 ? msg.requestTextEditSentToSdi : msg.requestTextEditCreateInvoice}"
                                                      id="createInvoice"
                                                      styleClass="#{bean.examRequest.stateId == 7 ? '' : 'btn-green'}"
-                                                     update="btn_line :form:invoiceTotalCost"
+                                                     update="btn_line :form:invoiceTotalCost" rendered="#{bean.billinRequest}"
                                                      oncomplete="PF('invoiceDialogWV').show();"/>
 
                                    <!-- <p:commandButton action="#{bean.goBack}" value="#{msg.cancel}" style="width:122px;"

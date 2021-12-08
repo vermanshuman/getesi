@@ -29,6 +29,9 @@ public class InvoiceItem extends IndexedEntity implements Serializable {
 	@Column(name = "vat")
 	private Double vat;
 
+	@Transient
+	private Double invoiceTotalCost;
+
 	public Invoice getInvoice() {
 		return invoice;
 	}
@@ -79,5 +82,13 @@ public class InvoiceItem extends IndexedEntity implements Serializable {
 	
 	public Double getGrossAmount() {
 		return getAmount() + getVatAmount();
+	}
+
+	public Double getInvoiceTotalCost() {
+		return invoiceTotalCost;
+	}
+
+	public void setInvoiceTotalCost(Double invoiceTotalCost) {
+		this.invoiceTotalCost = invoiceTotalCost;
 	}
 }

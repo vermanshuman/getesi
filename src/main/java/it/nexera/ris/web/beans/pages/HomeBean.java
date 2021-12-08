@@ -154,6 +154,7 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
 
         List<MixChartDataWrapper> dataSets = new ArrayList<>();
         List<Integer> data = new ArrayList<>();
+        Map<RequestType, Integer> dataMapping = new HashMap<>();
         Collections.shuffle(colors);
         List<List<String>> tooltips = new ArrayList<>();
         List<Long> stateIds = new ArrayList<>();
@@ -216,16 +217,22 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
                 tooltips.add(tooltip);
             Integer requestCount = requests.size();
             if (requestCount > 0) {
-                chartXAxisData.add(requestType.getName());
-                data.add(requestCount);
+                dataMapping.put(requestType, requestCount);
             }
-
         }
 
-//        List<String> missingRequestTypes  = allRequestTypes.stream()
-//                .filter(e -> !chartXAxisData.contains(e))
-//                .collect(Collectors.toList());
-//
+        chartXAxisData.addAll(dataMapping.entrySet()
+                .stream()
+                .sorted(Comparator.comparing(Map.Entry::getValue))
+                .map(e -> e.getKey().getName())
+                .collect(Collectors.toList()));
+
+        data.addAll(dataMapping.entrySet()
+                .stream()
+                .sorted(Comparator.comparing(Map.Entry::getValue))
+                .map(e -> e.getValue())
+                .collect(Collectors.toList()));
+
         if (data.size() > 0) {
             List<String> borderColors = new ArrayList<>();
             List<String> backgroundColors = new ArrayList<>();

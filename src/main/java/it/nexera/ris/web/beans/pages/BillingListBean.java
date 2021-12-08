@@ -920,7 +920,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
 
         List<Criterion> restrictions = RequestHelper.filterTableFromPanel(getDateFrom(), getDateTo(), getDateFromEvasion(),
                 getDateToEvasion(), getSelectedClientId(), getRequestTypeWrappers(), getStateWrappers(), getUserWrappers(),
-                getServiceWrappers(), getSelectedUserType(),getAggregationFilterId(), getSelectedServiceType());
+                getServiceWrappers(), getSelectedUserType(),getAggregationFilterId(), getSelectedServiceType(),Boolean.TRUE);
 
         if (!ValidationHelper.isNullOrEmpty(getSearchLastName())) {
             restrictions.add(
@@ -988,7 +988,9 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
         setFilterRestrictions(restrictions);
         loadList(RequestView.class, restrictions.toArray(new Criterion[0]),
                 new Order[]{Order.desc("createDate")});
-        List<RequestView> requestList = DaoManager.load(RequestView.class, restrictions.toArray(new Criterion[0]));
+        List<RequestView> requestList = DaoManager.load(RequestView.class,
+                restrictions.toArray(new Criterion[0]));
+
         List<Long> cityIds = new ArrayList<>();
 
         for(RequestView request : requestList) {

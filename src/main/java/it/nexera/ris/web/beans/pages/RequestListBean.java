@@ -939,7 +939,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     public void filterTableFromPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         List<Criterion> restrictions = RequestHelper.filterTableFromPanel(getDateFrom(), getDateTo(), getDateFromEvasion(),
                 getDateToEvasion(), getSelectedClientId(), getRequestTypeWrappers(), getStateWrappers(), getUserWrappers(),
-                getServiceWrappers(), getSelectedUserType(),getAggregationFilterId(), getSelectedServiceType());
+                getServiceWrappers(), getSelectedUserType(),getAggregationFilterId(), getSelectedServiceType(), Boolean.FALSE);
 
         if (!ValidationHelper.isNullOrEmpty(getSearchLastName())) {
             restrictions.add(
