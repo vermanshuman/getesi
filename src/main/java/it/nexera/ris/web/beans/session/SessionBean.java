@@ -311,5 +311,7 @@ public class SessionBean implements Serializable {
         this.overLayMode = overLayMode;
     }
 
-
+    public void getBillingListPage() {
+        RedirectHelper.goTo(PageTypes.BILLING_LIST);
+    }
 }

@@ -292,9 +292,10 @@
             </p:panelGrid>
             <div class="btn_line">
                 <p:commandButton value="#{msg.yes}" action="#{bean.changeUser}"
-                                 update="@form" oncomplete="PF('changeUserDlgWV').hide();"/>
+                                 update="@form" oncomplete="PF('changeUserDlgWV').hide();"
+                                    style="background-color: #57c279!important;"/>
                 <p:commandButton value="#{msg.no}"
-                                 oncomplete="PF('changeUserDlgWV').hide();"/>
+                                 oncomplete="PF('changeUserDlgWV').hide();" style="background-color: #F3362B !important;"/>
             </div>
         </p:dialog>
 

@@ -210,8 +210,11 @@
                         <p:menuitem id="database" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/DatabaseList.jsf')}" value="#{msg.headerDatabase}" icon="topbar-icon banca-bati-icon"
                                     action="#{sessionBean.getDatabaseListPage()}" actionListener="#{sessionBean.cleanFiltersOnDatabaseListSubjectTable()}"/>
                         <p:menuitem id="reportList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/ReportList.jsf')}" value="#{msg.headerReportList}" icon="topbar-icon reportistica-icon" outcome="/Pages/ManagementGroup/ReportList.jsf"/>
-                        <p:menuitem id="billing"  value="#{msg.headerBilling}" icon="topbar-icon fatturazione-icon"/>
-                        <p:menuitem id="contactPage" styleClass="main" value="#{msg.home}" icon="topbar-icon contact-icon"/>
+                        <p:menuitem id="billing"
+                                    value="#{msg.headerBilling}#{sessionBean.requestCounts gt 0 ? ' ('.concat(sessionBean.requestCounts).concat(')') : ''}" icon="topbar-icon fatturazione-icon"
+                                    action="#{sessionBean.getBillingListPage()}"
+                                    actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>
+                        <p:menuitem id="contactPage" styleClass="main" value="#{msg.headerContact}" icon="topbar-icon contact-icon"/>
                         <p:submenu id="amministrazione" label="#{msg.menuConfiguration}" icon="pi pi-align-left">
                             <p:menuitem id="utenti" value="#{msg.user_list}" icon="fa fa-fw fa-users" outcome="/Pages/Configuration/UserList.jsf"
                                         rendered="#{sessionBean.canViewPageUrl('/Pages/Configuration/UserList.jsf')}" />

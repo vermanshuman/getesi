@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import it.nexera.ris.persistence.beans.entities.domain.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
@@ -28,12 +29,6 @@ import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.IndexedView;
-import it.nexera.ris.persistence.beans.entities.domain.Client;
-import it.nexera.ris.persistence.beans.entities.domain.Document;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
-import it.nexera.ris.persistence.beans.entities.domain.Subject;
-import it.nexera.ris.persistence.beans.entities.domain.User;
-import it.nexera.ris.persistence.beans.entities.domain.WLGInbox;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
@@ -100,6 +95,7 @@ public class RequestView extends IndexedView {
             + "subject.birth_date birth_date, "
             + "subject.type_id type_id, "
             + "request.province_id province_id, "
+            + "request.invoice_id invoice_id, "
             //+ "wlg_inbox.client_fiduciary_id fiduciary_id, "
            // + "inbox_manager.client_id manager_id, "
             + "section_c.section_c_type section_c_type, "
@@ -242,8 +238,11 @@ public class RequestView extends IndexedView {
 
     @Column(name = "distraint_act_id")
     private Long distraintFormalityId;
-    
-//    @Column(name = "fiduciary_id")
+
+    @Column(name = "invoice_id")
+    private Long invoiceId;
+
+    //    @Column(name = "fiduciary_id")
 //    private Long fiduciaryId;
 //    
 //    @Column(name = "manager_id")
@@ -927,6 +926,17 @@ public class RequestView extends IndexedView {
         return documentsCount;
     }
 
+    public String getInvoiceNumber() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+
+        if(!ValidationHelper.isNullOrEmpty(getInvoiceId())){
+            Invoice invoice = DaoManager.get(Invoice.class,getInvoiceId());
+            if(!ValidationHelper.isNullOrEmpty(invoice))
+                return invoice.getInvoiceNumber();
+        }
+       return "";
+    }
+
+
     public void setDocumentsCount(int documentsCount) {
         this.documentsCount = documentsCount;
     }
@@ -937,5 +947,13 @@ public class RequestView extends IndexedView {
 
     public void setReverseName(String reverseName) {
         this.reverseName = reverseName;
+    }
+
+    public Long getInvoiceId() {
+        return invoiceId;
+    }
+
+    public void setInvoiceId(Long invoiceId) {
+        this.invoiceId = invoiceId;
     }
 }

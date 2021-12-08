@@ -28,6 +28,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 
 import it.nexera.ris.api.FatturaAPI;
+import it.nexera.ris.api.FatturaAPIResponse;
 import it.nexera.ris.common.enums.*;
 import it.nexera.ris.persistence.beans.entities.domain.*;
 import org.apache.commons.codec.binary.Base64;
@@ -136,6 +137,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
     private boolean createClient;
 
+    private String documentType;
+
     @ManagedProperty(value = "#{clientCreateBean}")
     private ClientCreate clientCreateBean;
 
@@ -202,6 +205,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private String invoiceNote;
 
     private List<Request> invoiceRequests;
+
+    private String apiError;
+
+    private boolean sendInvoice;
+    
+    private Double invoiceNetAmount;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
@@ -356,13 +365,21 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             setSelectedPaymentTypeId(invoice.getPaymentType().getId());
             List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
             for(InvoiceItem invoiceItem : invoiceItems) {
-                setInvoiceItemAmount(invoiceItem.getAmount());
+                setInvoiceNetAmount(invoiceItem.getAmount());
                 setInvoiceItemVat(invoiceItem.getVat());
             }
         }
         if(!ValidationHelper.isNullOrEmpty(getExamRequest()) &&
                 getExamRequest().getStateId().equals(RequestState.SENT_TO_SDI.getId()))
             setInvoiceSentStatus(true);
+
+        List<Request> requestListSentToSdi =
+                getEntity().getRequests()
+                        .stream()
+                        .filter(x -> !ValidationHelper.isNullOrEmpty(x.getStateId()) &&
+                                RequestState.SENT_TO_SDI.getId().equals(x.getStateId())).collect(Collectors.toList());
+        if(!requestListSentToSdi.isEmpty())
+            setSendInvoice(true);
     }
 
     public void initOfficesList() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -1130,22 +1147,23 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         setInvoiceNumber(invoiceNumber);
     }
 
-    public Double getTotalGrossAmount() {
+    public Double getTotalGrossAmount() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         Double totalGrossAmount = 0D;
-        if(!ValidationHelper.isNullOrEmpty(getInvoiceItemAmount())){
-            totalGrossAmount += getInvoiceItemAmount();
+        if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost())){
+            totalGrossAmount += getInvoiceTotalCost();
             if(!ValidationHelper.isNullOrEmpty(getInvoiceItemVat())){
-                totalGrossAmount += (getInvoiceItemAmount() * (getInvoiceItemVat()/100));
+                totalGrossAmount += (getInvoiceTotalCost() * (getInvoiceItemVat()/100));
             }
         }
         return totalGrossAmount;
     }
 
-    public Double getTotalVat() {
+    public Double getTotalVat() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         Double totalVat = 0D;
-        if(!ValidationHelper.isNullOrEmpty(getInvoiceItemAmount()) &&
+        if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost()) &&
                 !ValidationHelper.isNullOrEmpty(getInvoiceItemVat()) && getInvoiceItemVat() > 0)
-            totalVat += getInvoiceItemAmount() * (getInvoiceItemVat()/100);
+            totalVat += getInvoiceTotalCost() * (getInvoiceItemVat()/100);
+
         return totalVat;
     }
 
@@ -1185,7 +1203,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             if(!ValidationHelper.isNullOrEmpty(getExamRequest())
                     && !ValidationHelper.isNullOrEmpty(getExamRequest().getSubject())){
                 invoiceItem.setSubject(getExamRequest().getSubject().toString());
-                invoiceItem.setAmount(getInvoiceItemAmount());
+                invoiceItem.setAmount(getInvoiceNetAmount());
                 invoiceItem.setVat(getInvoiceItemVat());
             }
             List<InvoiceItem> invoiceItems = new ArrayList<>();
@@ -1193,9 +1211,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             FatturaAPI fatturaAPI = new FatturaAPI();
             String xmlData = fatturaAPI.getDataForXML(invoice, invoiceItems);
             log.info("Mailmanager XMLDATA: " + xmlData);
-            Boolean apiStatus = fatturaAPI.callFatturaAPI(xmlData, log);
-            if (apiStatus) {
+            FatturaAPIResponse fatturaAPIResponse = fatturaAPI.callFatturaAPI(xmlData, log);
 
+            if (fatturaAPIResponse != null && fatturaAPIResponse.getReturnCode() != -1) {
                 DaoManager.save(invoice, true);
                 invoiceItem.setInvoice(invoice);
                 DaoManager.save(invoiceItem,true);
@@ -1213,8 +1231,19 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
                 setInvoiceSentStatus(true);
                 executeJS("PF('invoiceDialogWV').hide();");
-            } else
+            } else {
+                setApiError(ResourcesHelper.getString("sendInvoiceErrorMsg"));
+                if(fatturaAPIResponse != null
+                        && !ValidationHelper.isNullOrEmpty(fatturaAPIResponse.getDescription())){
+
+                    if(fatturaAPIResponse.getDescription().contains("already exists")) {
+                        setApiError(ResourcesHelper.getString("sendInvoiceDuplicateMsg"));
+                    }else
+                        setApiError(fatturaAPIResponse.getDescription());
+                }
                 executeJS("PF('sendInvoiceErrorDialogWV').show();");
+            }
+
         }catch(Exception e) {
             e.printStackTrace();
             LogHelper.log(log, e);
@@ -1248,5 +1277,31 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
     public void setInvoiceRequests(List<Request> invoiceRequests) {
         this.invoiceRequests = invoiceRequests;
+    }
+
+    public String getDocumentType() {
+        return documentType;
+    }
+
+    public void setDocumentType(String documentType) {
+        this.documentType = documentType;
+    }
+
+    public Double getInvoiceTotalCost() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+        if(!ValidationHelper.isNullOrEmpty(getExamRequest())){
+            Request invoiceRequest = DaoManager.get(Request.class, getExamRequest().getId());
+            if(!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
+                    !ValidationHelper.isNullOrEmpty(invoiceRequest.getTotalCostDouble())){
+                setInvoiceTotalCost(Double.parseDouble(invoiceRequest.getTotalCostDouble()));
+            }
+        }
+        return invoiceTotalCost;
+    }
+
+
+    public void newInvoiceMail() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+        if (!ValidationHelper.isNullOrEmpty(getEntity())) {
+            RedirectHelper.goToMailEdit(getEntity().getId(), MailEditType.SEND_INVOICE);
+        }
     }
 }

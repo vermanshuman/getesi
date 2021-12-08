@@ -1,6 +1,7 @@
 package it.nexera.ris.web.beans.pages;
 
 import it.nexera.ris.api.FatturaAPI;
+import it.nexera.ris.api.FatturaAPIResponse;
 import it.nexera.ris.common.enums.*;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.exceptions.TypeFormalityNotConfigureException;
@@ -222,6 +223,10 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     private String documentType;
 
+    private String apiError;
+    
+    private Double invoiceNetAmount;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
     InstantiationException, IllegalAccessException {
@@ -334,7 +339,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             setSelectedPaymentTypeId(invoice.getPaymentType().getId());
             List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
             for(InvoiceItem invoiceItem : invoiceItems) {
-                setInvoiceItemAmount(invoiceItem.getAmount());
+                setInvoiceNetAmount(invoiceItem.getAmount());
                 setInvoiceItemVat(invoiceItem.getVat());
             }
         }
@@ -2407,7 +2412,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             if(!ValidationHelper.isNullOrEmpty(getExamRequest())
                     && !ValidationHelper.isNullOrEmpty(getExamRequest().getSubject())){
                 invoiceItem.setSubject(getExamRequest().getSubject().toString());
-                invoiceItem.setAmount(getInvoiceItemAmount());
+                invoiceItem.setAmount(getInvoiceNetAmount());
                 invoiceItem.setVat(getInvoiceItemVat());
             }
             List<InvoiceItem> invoiceItems = new ArrayList<>();
@@ -2415,8 +2420,9 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             FatturaAPI fatturaAPI = new FatturaAPI();
             String xmlData = fatturaAPI.getDataForXML(invoice, invoiceItems);
             log.info("XMLDATA: " + xmlData);
-            Boolean apiStatus = fatturaAPI.callFatturaAPI(xmlData, log);
-            if (apiStatus) {
+            FatturaAPIResponse fatturaAPIResponse = fatturaAPI.callFatturaAPI(xmlData, log);
+            log.info("API Call Done : " + fatturaAPIResponse.getDescription() + " " + "Response Code: " + fatturaAPIResponse.getReturnCode());
+            if (fatturaAPIResponse != null && fatturaAPIResponse.getReturnCode() != -1) {
                 getExamRequest().setStateId(RequestState.SENT_TO_SDI.getId());
                 getExamRequest().setInvoice(invoice);
                 DaoManager.save(invoice, true);
@@ -2424,8 +2430,19 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                 DaoManager.save(invoiceItem,true);
                 DaoManager.save(getExamRequest(), true);
                 executeJS("PF('invoiceDialogWV').hide();");
-            } else
+            } else {
+                setApiError(ResourcesHelper.getString("sendInvoiceErrorMsg"));
+                if (fatturaAPIResponse != null
+                        && !ValidationHelper.isNullOrEmpty(fatturaAPIResponse.getDescription())) {
+
+                    if (fatturaAPIResponse.getDescription().contains("already exists")) {
+                        setApiError(ResourcesHelper.getString("sendInvoiceDuplicateMsg"));
+                    } else
+                        setApiError(fatturaAPIResponse.getDescription());
+                }
                 executeJS("PF('sendInvoiceErrorDialogWV').show();");
+            }
+
         }catch(Exception e) {
             e.printStackTrace();
             LogHelper.log(log, e);
@@ -2512,14 +2529,14 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         this.vatAmounts = vatAmounts;
     }
 
-    public Double getTotalGrossAmount() {
+    public Double getTotalGrossAmount() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
 
         Double totalGrossAmount = 0D;
 
-        if(!ValidationHelper.isNullOrEmpty(getInvoiceItemAmount())){
-            totalGrossAmount += getInvoiceItemAmount();
+        if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost())){
+            totalGrossAmount += getInvoiceTotalCost();
             if(!ValidationHelper.isNullOrEmpty(getInvoiceItemVat())){
-                totalGrossAmount += (getInvoiceItemAmount() * (getInvoiceItemVat()/100));
+                totalGrossAmount += (getInvoiceTotalCost() * (getInvoiceItemVat()/100));
             }
         }
         return totalGrossAmount;
@@ -2581,11 +2598,11 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         this.selectedPaymentTypeId = selectedPaymentTypeId;
     }
 
-    public Double getTotalVat() {
+    public Double getTotalVat() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         Double totalVat = 0D;
-        if(!ValidationHelper.isNullOrEmpty(getInvoiceItemAmount()) &&
+        if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost()) &&
                 !ValidationHelper.isNullOrEmpty(getInvoiceItemVat()) && getInvoiceItemVat() > 0)
-            totalVat += getInvoiceItemAmount() * (getInvoiceItemVat()/100);
+            totalVat += getInvoiceTotalCost() * (getInvoiceItemVat()/100);
 
         return totalVat;
     }
@@ -2621,4 +2638,22 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     public void setDocumentType(String documentType) {
         this.documentType = documentType;
     }
+
+    public String getApiError() {
+        return apiError;
+    }
+
+    public void setApiError(String apiError) {
+        this.apiError = apiError;
+    }
+
+	public Double getInvoiceNetAmount() {
+		return invoiceNetAmount;
+	}
+
+	public void setInvoiceNetAmount(Double invoiceNetAmount) {
+		this.invoiceNetAmount = invoiceNetAmount;
+	}
+    
+    
 }

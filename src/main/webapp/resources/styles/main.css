@@ -250,7 +250,7 @@ body .top-bar-cal .ui-widget-header {
 }
 
 .camerale-icon-3x {
-    background-image: url("../images/servizio_camerale.png");
+    background-image: url("../images/servizi-comunali.png");
     background-repeat: no-repeat;
     background-position: 50%;
     width: 36px;
@@ -261,7 +261,7 @@ body .top-bar-cal .ui-widget-header {
 }
 
 .immobiliare-icon-3x {
-    background-image: url("../images/servizio_immobiliare.png");
+    background-image: url("../images/servizi-immobiliari.png");
     background-repeat: no-repeat;
     background-position: 50%;
     width: 36px;
@@ -272,7 +272,7 @@ body .top-bar-cal .ui-widget-header {
 }
 
 .investigativo-icon-3x {
-    background-image: url("../images/servizio_investigativo.png");
+    background-image: url("../images/servizi-investigativi.png");
     background-repeat: no-repeat;
     background-position: 50%;
     width: 36px;
@@ -280,6 +280,36 @@ body .top-bar-cal .ui-widget-header {
     margin: 0 auto;
     display: block;
     background-size: cover;
+}
+
+.fa.fa-diamond.fa-3x {
+    background-image: url("../images/servizi-catastali.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 36px;
+    height: 40px;
+    margin: 0 auto;
+    display: block;
+    background-size: cover;
+}
+
+.fa-diamond:before {
+    display: none;
+}
+
+.fa.fa-gavel.fa-3x {
+    background-image: url("../images/servizi-legali.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 36px;
+    height: 40px;
+    margin: 0 auto;
+    display: block;
+    background-size: cover;
+}
+
+.fa-gavel:before {
+    display: none;
 }
 
 .mail-icon {
@@ -314,22 +344,22 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/go-back.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 24px;
-    height: 20px;
+    background-size: 21px;
+    height: 21px;
     width: 20px;
     display: block;
-    margin-top: -4px;
+    margin-top: -6px;
 }
 
 .go-forward-icon {
     background-image: url("../images/go-forward.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 24px;
-    height: 20px;
+    background-size: 21px;
+    height: 21px;
     width: 20px;
     display: block;
-    margin-top: -4px;
+    margin-top: -6px;
     margin-left: 55px;
 }
 

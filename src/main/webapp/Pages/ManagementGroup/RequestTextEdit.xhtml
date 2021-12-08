@@ -639,9 +639,10 @@
             </p:dialog>
 
 
-            <p:dialog widgetVar="sendInvoiceErrorDialogWV"  modal="true" draggable="false" position="center center">
+            <p:dialog widgetVar="sendInvoiceErrorDialogWV"  modal="true" draggable="false"
+                      position="center center">
                 <div class="ui-messages-error ui-corner-all">
-                    <span class="ui-messages-error-summary">#{msg.sendInvoiceErrorMsg}</span><br/>
+                    <span class="ui-messages-error-summary">#{bean.apiError}</span><br/>
                 </div>
                 <p:commandButton oncomplete="PF('sendInvoiceErrorDialogWV').hide();"
                                  value="#{msg.close}" />

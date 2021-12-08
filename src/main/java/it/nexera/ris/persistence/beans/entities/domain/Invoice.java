@@ -49,7 +49,7 @@ public class Invoice extends IndexedEntity implements Serializable {
 	@Transient
 	private String documentType;
 
-	@Transient
+	@Column(name = "invoice_number")
 	private String invoiceNumber;
 
 	public Long getCloudId() {

@@ -96,7 +96,8 @@ public class MenuBean extends PageBean implements Serializable {
         boolean isESVPage = this.getContext().getViewRoot().getViewId().contains("EstateSituationView");
 
         DefaultMenuItem item = new DefaultMenuItem();
-        item.setValue(ResourcesHelper.getString("menuBackBtn"));
+        // item.setValue(ResourcesHelper.getString("menuBackBtn"));
+        item.setValue(" ");
         item.setIcon("go-back-icon");
         item.setIconPos("left");
         item.setStyleClass("first-menu-icon");
@@ -111,7 +112,7 @@ public class MenuBean extends PageBean implements Serializable {
 
     private void addForwardBtn() {
         DefaultMenuItem item = new DefaultMenuItem();
-        item.setValue(ResourcesHelper.getString("menuForwardBtn"));
+        item.setValue(" ");
         item.setIcon("go-forward-icon");
         item.setIconPos("right");
         item.setStyleClass("last-menu-icon");

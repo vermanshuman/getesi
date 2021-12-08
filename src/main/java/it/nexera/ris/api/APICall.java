@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.http.Consts;
+import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -16,6 +17,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 
 public class APICall {
 
@@ -32,12 +34,10 @@ public class APICall {
         httpPost.setEntity(entity);
         httpPost.setHeader("Content-type", "application/x-www-form-urlencoded");
         httpPost.setHeader("apiKey", apiKey);
-        CloseableHttpResponse response = null;
-
         log.info("Hitting API");
-        response = client.execute(httpPost);
+        CloseableHttpResponse response = client.execute(httpPost);
         log.info("Response received :: status code :: " + response.getStatusLine().getStatusCode());
-        log.info("Response received :: status description :: " + response.getStatusLine().getReasonPhrase());
+        log.info("Response Description received :: status description :: " + response.getStatusLine().getReasonPhrase());
 
         return response;
     }

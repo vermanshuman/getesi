@@ -7,7 +7,7 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition template="/resources/tpl/Admin/LazyListTabBase.xhtml">
-    <ui:param name="bean" value="#{requestListBean}"/>
+    <ui:param name="bean" value="#{billingListBean}"/>
     <ui:param name="renderTitle" value="false"/>
     <ui:param name="renderMenu" value="false"/>
     <ui:param name="centerPartStyleClass" value="false"/>
@@ -298,15 +298,15 @@
                         <div class="p-col-6">
                             <div class="p-formgroup-inline">
                                 <div class="p-field">
-                                    <p:commandButton value="#{ff:upper(msg.requestNew)}" id="btn_new"
+                                    <!-- <p:commandButton value="#{ff:upper(msg.requestNew)}" id="btn_new"
                                                      styleClass="ui-button-success search-btn new-button" style="margin-left:20px;"
-                                                     disabled="#{!bean.canCreate}" action="#{bean.createNewRequest}" />
+                                                     disabled="#{!bean.canCreate}" action="#{bean.createNewRequest}" /> -->
                                 </div>
                                 <div class="p-field">
-                                    <p:commandButton value="#{ff:upper(msg.requestNewMultiple)}"
+                                    <!-- <p:commandButton value="#{ff:upper(msg.requestNewMultiple)}"
                                                      id="btn_new_multipe" styleClass="ui-button-success	search-btn new-button-multiple"
                                                      disabled="#{!bean.canCreate}"
-                                                     action="#{bean.createNewMultipleRequest}" />
+                                                     action="#{bean.createNewMultipleRequest}" /> -->
                                 </div>
                             </div>
                         </div>
@@ -518,16 +518,16 @@
                                                 </p:calendar>
                                             </div>
                                             <div class="p-col-12 search-panel-btns" style="text-align: center;">
+                                                <p:commandButton id="manageReestablishBtn" action="#{bean.reset}"
+                                                                 value="#{ff:upper(msg.mailManageReestablish)}"
+                                                                 update="settingPanel searchPanel"
+                                                                 oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').getJQ().hide();"/>
                                                 <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}"
-                                                                 style="background: #009900;"
+                                                                 style="background: #009900; margin-left:3px;"
                                                                  id="searchButton12345"
                                                                  onclick="checkDates(); filterTableFromPanel();"
                                                                  update="searchPanel"
                                                                  oncomplete="PF('panelSetting').getJQ().hide();"/>
-                                                <p:commandButton id="manageReestablishBtn" style="width: auto;"
-                                                                 value="#{ff:upper(msg.mailManageReestablish)}"
-                                                                 update="settingPanel searchPanel"
-                                                                 oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').getJQ().hide();"/>
                                             </div>
                                         </div>
                                     </p:panel>
@@ -541,8 +541,7 @@
 
 
         <p:remoteCommand name="resetTableData"
-                         action="#{bean.reset}" update=":form:table :form:settingPanel :form:stateSelectCheckboxPanelDataTable :form:requestTypeSelectCheckboxPanelDataTable
-                             :form:serviceSelectCheckboxPanelDataTable"/>
+                         action="#{bean.onLoad}" update=":form:table"/>
         <p:outputPanel id="searchPanel" style="display:none;" >
             <p:commandButton icon="fa fa-fw fa-file-pdf-o"  rendered="false"
                              action="#{bean.downloadPdfFile}" ajax="false" update="@form">
@@ -553,179 +552,6 @@
             <p:remoteCommand name="updateCalendarTo" update=":form:filterDateTo"/>
             <p:remoteCommand name="filterTableFromPanel"
                              action="#{bean.filterTableFromPanel}" update=":form:table"/>
-            <!--   <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid" style="margin-bottom: 20px;"
-                          columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2">
-                 <p:column>
-                     <h:outputText style="color: #003871;"
-                         value="#{ff:upper(msg.requestListDateOfInput)}:" />
-                     <br />
-                     <p:calendar id="filterDateFrom" readonlyInput="false"
-                         showOn="button"
-                         onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
-                         pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
-                         popupIconOnly="true"
-                         onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
-                         value="#{bean.dateFrom}"
-                         placeholder="#{msg.mailManagerDateFromReqlist}" />
-                 </p:column>
-                 <p:column>
-                     <h:outputText value="" />
-                     <br />
-                     <p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
-                         onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
-                         pattern="dd/MM/yyyy" mask="true"
-                         locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateToReqlist}"
-                         onblur="check_date(this)" value="#{bean.dateTo}" />
-                 </p:column>
-
-                 <p:column>
-                    <h:outputText value=""/>
-                     <p:selectOneMenu id="client" value="#{bean.selectedClientId}"
-                                      label="#{msg.requestClient}" style="width: calc( 100% - 27px);margin-top: 18px;">
-                         <f:selectItem itemLabel="#{ff:upper(msg.requestListClient)}" itemValue="#{null}"
-                                       noSelectionOption="true" />
-                         <f:selectItems value="#{bean.clients}"/>
-                     </p:selectOneMenu>
-                 </p:column>
-
-                  <p:column>
-                     <br/>
-                     <p:outputPanel id="requestTypes" style="width: calc( 100% - 10px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
-                         <h:outputText value="#{ff:upper(msg.requestListServiceTypeCap)}" style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
-                            <i class="fa fa-angle-down" style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
-                             onclick="PF('requestTypeSelectCheckboxWV').show(); event.stopImmediatePropagation();" />
-                     </p:outputPanel>
-                 </p:column>
-
-                 <p:column>
-                     <br/>
-                     <p:outputPanel id="services" style="width: calc( 100% - 10px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
-                         <h:outputText value="#{ff:upper(msg.requestListService)}" style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
-                            <i class="fa fa-angle-down" style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
-                             onclick="PF('serviceSelectCheckboxWV').show(); event.stopImmediatePropagation();" />
-                     </p:outputPanel>
-                 </p:column>
-
-                  <p:column>
-                    <h:outputText value=" "/>
-                     <p:selectOneMenu id="office" value="#{bean.aggregationFilterId}"  style="width: calc( 100% - 27px);margin-top: 18px;">
-                         <f:selectItem itemLabel="#{msg.subjectViewFormalityConservatoryCap}" itemValue="#{null}"
-                                       noSelectionOption="true" />
-                         <f:selectItems value="#{bean.landAggregations}"/>
-                     </p:selectOneMenu>
-                 </p:column>
-
-                 <p:column>
-                     <h:outputText style="color: #003871;"
-                         value="#{ff:upper(msg.requestListDateOfEvasion)}:" />
-                     <br />
-                     <p:calendar id="filterDateFromEvasione" readonlyInput="false"
-                         showOn="button"
-                         onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
-                         pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
-                         popupIconOnly="true"
-                         onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
-                         value="#{bean.dateFromEvasion}"
-                         placeholder="#{msg.mailManagerDateFromReqlist}" />
-                 </p:column>
-                 <p:column>
-                     <h:outputText value="" />
-                     <br />
-
-                     <p:calendar id="filterDateToEvasione" readonlyInput="false"
-                         showOn="button"
-                         onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
-                         pattern="dd/MM/yyyy" mask="true"
-                         locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateToReqlist}"
-                         onblur="check_date(this)" value="#{bean.dateToEvasion}" />
-                 </p:column>
-
-                 <p:column>
-                     <br/>
-                     <p:inputText value="#{bean.searchLastName}" placeholder="#{ff:upper(msg.requestEditSubjectListName)}"
-                                  style="width: calc( 100% - 10px);"/>
-                 </p:column>
-
-                 <p:column>
-                     <br/>
-                     <p:inputText value="#{bean.searchFiscalCode}" placeholder="#{ff:upper(msg.requestFiscalCodeCap)}"
-                                  style="width: calc( 100% - 10px);"/>
-                 </p:column>
-
-                 <p:column>
-                       <h:outputText value=""/>
-                     <p:selectOneMenu value="#{bean.managerClientFilterid}"  style="width: calc( 100% - 27px);margin-top: 18px;">
-                         <f:selectItem itemLabel="#{ff:upper(msg.clientManager)}" itemValue="#{null}"
-                                       noSelectionOption="true" />
-                         <f:selectItems value="#{bean.managerClients}"/>
-                     </p:selectOneMenu>
-                 </p:column>
-
-                 <p:column>
-                     <h:outputText value=""/>
-                     <p:selectOneMenu value="#{bean.fiduciaryClientFilterId}" style="width: calc( 100% - 27px);margin-top: 18px;">
-                         <f:selectItem itemLabel="#{ff:upper(msg.mailTrust)}" itemValue="#{null}"
-                                       noSelectionOption="true" />
-                         <f:selectItems value="#{bean.fiduciaryClients}"/>
-                     </p:selectOneMenu>
-                 </p:column>
-
-                 <p:column>
-                     <br/>
-                     <p:calendar id="filterExpiration" readonlyInput="false" showOn="button"
-                                 onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
-                                 pattern="dd/MM/yyyy" mask="true"
-                                 locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.expirationDateCap}"
-                                 value="#{bean.dateExpiration}"/>
-                 </p:column>
-
-                 <p:column>
-                     <br/>
-                     <p:outputPanel id="statuses" style="width: calc( 100% - 10px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
-                         <h:outputText value="#{ff:upper(msg.status)}" style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
-
-                            <i class="fa fa-angle-down" style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
-                             onclick="PF('stateSelectCheckboxWV').show(); event.stopImmediatePropagation();" />
-                     </p:outputPanel>
-                 </p:column>
-
-
-                 <p:column rendered="false">
-                     <br/>
-                     <p:inputText value="#{bean.searchCreateUser}" placeholder="#{msg.requestCreateUser}"
-                                  style="width: 92%;"/>
-                 </p:column>
-
-                 <p:column>
-                     <p:commandButton value="#{ff:upper(msg.search)}"
-                         style="width: 100%;" styleClass="search-btn" id="searchButton"
-                         onclick="checkDates(); filterTableFromPanel();"
-                         action="#{bean.prepareToModify}"
-                         update=":form:table,searchPanel,editAndPrintDialog" />
-                 </p:column>
-                 <p:column>
-                      <p:commandButton rendered="#{bean.showPrintButton}" value="#{msg.requestPrintExcel}"
-                                      styleClass="search-btn" style="width: 30%; margin-right: 3px;"
-                                      id="printExcelButton" oncomplete="PF('createTotalCosthDocumentDialogWV').show()"/>
-                     <p:commandButton rendered="#{bean.showPrintButton}" value="#{msg.requestEditAndPrint}"
-                                      styleClass="search-btn" style="width: calc( 70% - 3px);"
-                                      id="editAndPrintButton" oncomplete="PF('editAndPrintDialogWV').show();"
-                                      process="searchPanel"/>
-                 </p:column>
-                 <p:column>
-                     <p:commandButton value="#{ff:upper(msg.requestNew)}" id="btn_new"
-                         styleClass="btn-green search-btn"
-                         style="width: 100%;"
-                         disabled="#{!bean.canCreate}" action="#{bean.createNewRequest}" />
-                 </p:column>
-                 <p:column>
-                     <p:commandButton value="#{ff:upper(msg.requestNewMultiple)}"
-                         id="btn_new_multipe" styleClass="btn-green search-btn"
-                         style="width: 100%;"
-                         disabled="#{!bean.canCreate}"
-                         action="#{bean.createNewMultipleRequest}" />
-                 </p:column>
-             </p:panelGrid> -->
         </p:outputPanel>
 
         <p:overlayPanel id="stateSelectCheckboxPanel" my="left top" at="right bottom"
@@ -839,12 +665,10 @@
 
 
             <p:column style="width: 9vw;min-width: 159px;position: relative" headerText="#{ff:upper(msg.requestListClient)}">
-                <p:outputPanel>
-                    <h:outputText value="#{item.clientName}"/>
-                </p:outputPanel>
+                <h:outputText value="#{item.clientName}"/>
                 <br/>
                 <p:graphicImage id="info" url="/resources/images/tooltip.png"
-                                style="height :25px;bottom: 5px;position: absolute;"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
+                                style="height :25px;bottom: 2px;position: absolute;"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
                 <p:tooltip for="info" styleClass="custom-design-tooltip">
                     <h:outputText value="#{ff:upper(msg.requestManagers)}" style="font-weight:bold;color:#003871;"/>
                     <br />
@@ -917,9 +741,8 @@
                 <h:outputText value="#{item.userName}"/>
             </p:column>
 
-            <p:column style="width: 6vw;min-width: 125px;text-align: center;" headerText="#{ff:upper(msg.expirationDateCap)}" sortBy="#{item.expirationDate}"
-                      rendered="#{!bean.getCurrentUser().isExternal()}">
-                <h:outputText value="#{item.expirationDate}" converter="dateTimeConverter"/>
+            <p:column style="width: 6vw;min-width: 125px;text-align: center;" headerText="#{ff:upper(msg.invoiceNumber)}" sortBy="#{item.invoiceNumber}">
+                <h:outputText value="#{item.invoiceNumber}"/>
             </p:column>
 
             <p:column style="width: 4vw;min-width: 81px;" headerText="#{ff:upper(msg.requestListOpenMail)}">
@@ -1012,21 +835,21 @@
                     <i class="fa fa-angle-down" style="font-size: x-large;"
                        onmouseover="document.getElementById('table:#{rowId}:actionPnl').focus();" />
                 </p:commandLink>
-                <p:tooltip for="actionPnl" hideEvent="blur" showEvent="focus" styleClass="">
-                    <p:panelGrid layout="grid" id="actionGrid" columns="1" 
+                <p:tooltip for="actionPnl" hideEvent="blur" showEvent="focus" styleClass="action-tooltip-grid">
+                    <p:panelGrid layout="grid" id="actionGrid" columns="1"
                                  style="text-align:left;">
 
                         <p:commandButton value="#{ff:upper(msg.requestListManage)}" class="action-btn" onclick="document.getElementById('table:#{rowId}:gestisci-btn').click()"
-                                         disabled="#{!bean.canEdit}" style="margin-bottom:-14px !important;">
+                                         disabled="#{!bean.canEdit}">
                         </p:commandButton>
                         <p:commandButton value="#{ff:upper(msg.headerDatabase)}" onclick="document.getElementById('table:#{rowId}:banca-btn').click()"
-                                         rendered="#{item.subjectId ne null}" class="action-btn" style="margin-top:-14px !important; margin-bottom:-14px !important;">
+                                         rendered="#{item.subjectId ne null}" class="action-btn">
                         </p:commandButton>
                         <p:commandButton value="#{msg.pdf}" rendered="#{!bean.getCurrentUser().isExternal()}" class="action-btn" onclick="document.getElementById('table:#{rowId}:pdf-btn').click()"
-                                         update="@form" style="margin-top:-14px !important; margin-bottom:-14px !important;">
+                                         update="@form">
                         </p:commandButton>
                         <p:commandButton value="#{ff:upper(msg.roleCanDelete)}" class="action-btn" onclick="document.getElementById('table:#{rowId}:elimina-btn').click()"
-                                         disabled="#{!bean.canDelete}" style="margin-top:-14px !important;">
+                                         disabled="#{!bean.canDelete}">
                         </p:commandButton>
                     </p:panelGrid>
                 </p:tooltip>
@@ -1042,7 +865,7 @@
                          selection="#{bean.selectedUserForFilter}" rowKey="#{state.value}">
 
                 <p:ajax event="rowSelect"
-                        listener="#{requestListBean.selectUserForFilter}"
+                        listener="#{bean.selectUserForFilter}"
                         update="userSelectCheckboxPanelDataTable"/>
 
                 <p:column style="width:18px">

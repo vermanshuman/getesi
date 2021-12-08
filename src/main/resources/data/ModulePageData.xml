@@ -118,6 +118,10 @@
 		<module_code entity_field="code">RL</module_code>
 	</data_entry>
 	<data_entry>
+		<page_type>BILLING_LIST</page_type>
+		<module_code entity_field="code">BL</module_code>
+	</data_entry>
+	<data_entry>
 		<page_type>CADASTRAL_CATEGORY_LIST</page_type>
 		<module_code entity_field="code">CCL</module_code>
 	</data_entry>

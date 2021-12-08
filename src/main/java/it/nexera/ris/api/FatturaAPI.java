@@ -98,32 +98,31 @@ public class FatturaAPI {
         return context;
     }
 
-    public Boolean callFatturaAPI(String xmlSource, Log log) {
+    public FatturaAPIResponse callFatturaAPI(String xmlSource, Log log) {
         String apiURL =
                 ApplicationSettingsHolder.getInstance().getByKey(
                         ApplicationSettingsKeys.CLOUD_API_URL).getValue().trim();
         String apiKEY =
                 ApplicationSettingsHolder.getInstance().getByKey(
                         ApplicationSettingsKeys.CLOUD_API_KEY).getValue().trim();
+
+        FatturaAPIResponse fatturaAPIResponse;
         try {
             CloseableHttpResponse response = new APICall().apiCall(xmlSource, apiURL,apiKEY, log);
             log.info("Response code : "+ response.getStatusLine().getStatusCode());
             if (response.getStatusLine().getStatusCode() != 200) {
-                return false;
+                return null;
             }
             String responseString = EntityUtils.toString(response.getEntity(), "UTF-8");
             StringReader sr = new StringReader(responseString);
             JAXBContext jaxbContext = JAXBContext.newInstance(FatturaAPIResponse.class);
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-            FatturaAPIResponse fatturaAPIResponse = (FatturaAPIResponse) unmarshaller.unmarshal(sr);
+            fatturaAPIResponse = (FatturaAPIResponse) unmarshaller.unmarshal(sr);
             log.info("Return code : "+ fatturaAPIResponse.getReturnCode());
-            if(fatturaAPIResponse.getReturnCode() == 0) {
-                return true;
-            }
         }catch(Exception e){
-            return false;
+            return null;
         }
-        return false;
+        return fatturaAPIResponse;
     }
 
     public Double getTotalAmount(List<InvoiceItem> invoiceItems) {
