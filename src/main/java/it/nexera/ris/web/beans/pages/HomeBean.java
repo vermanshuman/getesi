@@ -146,19 +146,20 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
         chartWrapper.setType("bar");
         List<RequestType> requestTypes = DaoManager.load(RequestType.class, new Criterion[]{Restrictions.isNotNull("name")});
         // List<String> allRequestTypes = requestTypes.stream().map(RequestType::getName).distinct().collect(Collectors.toList());
-        List<String> chartXAxisData = new ArrayList<>();
+        LinkedList<String> chartXAxisData = new LinkedList<>();
 
         chartWrapper.setXLabel(ResourcesHelper.getString("requestListService"));
         chartWrapper.setYLabel(ResourcesHelper.getString("permissionRequest"));
 
 
         List<MixChartDataWrapper> dataSets = new ArrayList<>();
-        List<Integer> data = new ArrayList<>();
+        LinkedList<Integer> data = new LinkedList<>();
         Collections.shuffle(colors);
-        List<List<String>> tooltips = new ArrayList<>();
+        LinkedList<List<String>> tooltips = new LinkedList<>();
         List<Long> stateIds = new ArrayList<>();
         stateIds.add(RequestState.INSERTED.getId());
         stateIds.add(RequestState.IN_WORK.getId());
+        LinkedList<BarGraph> barGraphs = new LinkedList<>();
         for (RequestType requestType : requestTypes) {
             List<String> tooltip = new ArrayList<>();
             List<Criterion> restrictions = new ArrayList<>();
@@ -211,17 +212,25 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
 
                 tooltip.add(sb.toString());
             }
-
-            if (!ValidationHelper.isNullOrEmpty(tooltip))
-                tooltips.add(tooltip);
+            BarGraph barGraph = new BarGraph();
+            if (!ValidationHelper.isNullOrEmpty(tooltip)) {
+                barGraph.setTooltip(tooltip);
+            }
+            
             Integer requestCount = requests.size();
             if (requestCount > 0) {
-                chartXAxisData.add(requestType.getName());
-                data.add(requestCount);
+                barGraph.setChartXAxisData(requestType.getName());
+                barGraph.setData(requestCount);
+                barGraphs.add(barGraph);
             }
-
         }
 
+        Collections.sort(barGraphs, Comparator.comparingInt(BarGraph::getData).reversed());
+        for(BarGraph barGraph : barGraphs) {
+        	tooltips.add(barGraph.getTooltip());
+        	chartXAxisData.add(barGraph.getChartXAxisData());
+        	data.add(barGraph.getData());
+        }
 //        List<String> missingRequestTypes  = allRequestTypes.stream()
 //                .filter(e -> !chartXAxisData.contains(e))
 //                .collect(Collectors.toList());
