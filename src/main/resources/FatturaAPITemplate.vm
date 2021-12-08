@@ -29,7 +29,7 @@
             #foreach($invoiceItem in $invoiceItems)<Row>
                 <Description>$invoiceItem.description</Description>
                 <Qty>1</Qty>
-                <Price>$invoiceItem.amount</Price>
+                <Price>$invoiceItem.invoiceTotalCost</Price>
                 <VatCode>$invoiceItem.vat</VatCode>
                 <VatDescription>$invoiceItem.vat%</VatDescription>
             </Row>

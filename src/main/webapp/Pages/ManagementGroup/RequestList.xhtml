@@ -1010,21 +1010,21 @@
                     <i class="fa fa-angle-down" style="font-size: x-large;"
                        onmouseover="document.getElementById('table:#{rowId}:actionPnl').focus();" />
                 </p:commandLink>
-                <p:tooltip for="actionPnl" hideEvent="blur" showEvent="focus" styleClass="">
-                    <p:panelGrid layout="grid" id="actionGrid" columns="1" 
+                <p:tooltip for="actionPnl" hideEvent="blur" showEvent="focus" styleClass="action-tooltip-grid">
+                    <p:panelGrid layout="grid" id="actionGrid" columns="1"
                                  style="text-align:left;">
 
                         <p:commandButton value="#{ff:upper(msg.requestListManage)}" class="action-btn" onclick="document.getElementById('table:#{rowId}:gestisci-btn').click()"
-                                         disabled="#{!bean.canEdit}" style="margin-bottom:-14px !important;">
+                                         disabled="#{!bean.canEdit}">
                         </p:commandButton>
                         <p:commandButton value="#{ff:upper(msg.headerDatabase)}" onclick="document.getElementById('table:#{rowId}:banca-btn').click()"
-                                         rendered="#{item.subjectId ne null}" class="action-btn" style="margin-top:-14px !important; margin-bottom:-14px !important;">
+                                         rendered="#{item.subjectId ne null}" class="action-btn">
                         </p:commandButton>
                         <p:commandButton value="#{msg.pdf}" rendered="#{!bean.getCurrentUser().isExternal()}" class="action-btn" onclick="document.getElementById('table:#{rowId}:pdf-btn').click()"
-                                         update="@form" style="margin-top:-14px !important; margin-bottom:-14px !important;">
+                                         update="@form">
                         </p:commandButton>
                         <p:commandButton value="#{ff:upper(msg.roleCanDelete)}" class="action-btn" onclick="document.getElementById('table:#{rowId}:elimina-btn').click()"
-                                         disabled="#{!bean.canDelete}" style="margin-top:-14px !important;">
+                                         disabled="#{!bean.canDelete}">
                         </p:commandButton>
                     </p:panelGrid>
                 </p:tooltip>

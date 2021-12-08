@@ -260,7 +260,5 @@ public class VisureManageHelper {
         
         FileUtils.deleteDirectory(new File(tempDir));
     }
-
-
 }
 

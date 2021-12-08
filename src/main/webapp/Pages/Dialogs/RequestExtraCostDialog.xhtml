@@ -125,7 +125,7 @@
             <p:commandButton value="#{msg.confirm}" update="@form" style="background-color: #57c279 !important;margin-right: 0.5rem !important;"
                              action="#{bean.saveRequestExtraCost}" oncomplete="PF('requestExtraCostDlg').hide();"/>
 
-            <p:commandButton value="#{msg.cancel}" oncomplete="PF('requestExtraCostDlg').hide();" style="background-color: #F3362B !important;margin-right: 0.5rem"/>
+            <p:commandButton value="#{msg.cancel}" oncomplete="PF('requestExtraCostDlg').hide();" style="background-color: #F3362B !important;margin-right: 0.5rem"/><p:commandButton value="#{msg.cancel}" oncomplete="PF('requestExtraCostDlg').hide();"/>
         </div>
          <p:dialog id="includeNationalCostDialog" header="Note!" widgetVar="includeNationalCostDialogWV"
 	              height="100px">

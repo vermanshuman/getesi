@@ -385,4 +385,7 @@ public class PrintPDFHelper extends BaseHelper {
                 + "</span></span>";
     }
 
+    public static String getTemplateForInvoice(String fileName) {
+        return readWorkingListFile(fileName, "Invoice");
+    }
 }
