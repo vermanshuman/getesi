@@ -191,6 +191,10 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     private List<RequestState> selectedStates;
 
+    private List<RequestType> selectedRequestTypes;
+
+    private List<Service> selectedServices;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
@@ -1741,5 +1745,33 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             }
         }
         return selected;
+    }
+
+    public List<RequestType> getSelectedRequestTypes() {
+        List<RequestType> selected = new ArrayList<>();
+        for (RequestTypeFilterWrapper requestTypeFilterWrapper : requestTypeWrappers) {
+            if(requestTypeFilterWrapper.getSelected()) {
+                selected.add(requestTypeFilterWrapper.getRequestType());
+            }
+        }
+        return selected;
+    }
+
+    public void setSelectedRequestTypes(List<RequestType> selectedRequestTypes) {
+        this.selectedRequestTypes = selectedRequestTypes;
+    }
+
+    public List<Service> getSelectedServices() {
+        List<Service> selected = new ArrayList<>();
+        for (ServiceFilterWrapper serviceFilterWrapper : serviceWrappers) {
+            if(serviceFilterWrapper.getSelected()) {
+                selected.add(serviceFilterWrapper.getService());
+            }
+        }
+        return selected;
+    }
+
+    public void setSelectedServices(List<Service> selectedServices) {
+        this.selectedServices = selectedServices;
     }
 }
