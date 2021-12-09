@@ -253,6 +253,10 @@
             #searchFiscalCode.ui-state-focus {
                 box-shadow: 0 0 0 0.2em #a6d5fa !important;
             }
+
+            #statuses_panel {
+                display: none !important;
+            }
         </style>
         <script>
             var doChange = true;
@@ -388,14 +392,19 @@
                                                 </p:selectOneMenu>
                                             </div>
                                             <div class="p-col-6">
-                                                <p:outputPanel id="statuses" styleClass="#{bean.getStateSelected() gt 0 ? ' select-checkbox' : ''}"
+                                               <!-- <p:outputPanel id="statuses" styleClass="#{bean.getStateSelected() gt 0 ? ' select-checkbox' : ''}"
                                                                style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
                                                     <h:outputText value="#{ff:upper(msg.status)}"
                                                                   style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
                                                     <i class="fa fa-angle-down"
                                                        style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
                                                        onclick="PF('stateSelectCheckboxWV').show(); event.stopImmediatePropagation(); applyBorder('statuses');"/>
-                                                </p:outputPanel>
+                                                </p:outputPanel>-->
+                                                <p:selectCheckboxMenu id="statuses" style="width: 100%" multiple="true" label="" value="#{bean.selectedStates}"
+                                                                      onclick="PF('stateSelectCheckboxWV').show();applyBorder('statuses');" styleClass="#{bean.getStateSelected() gt 0 ? ' select-checkbox' : ''}">
+                                                    <f:selectItems value="#{bean.stateWrappers}" var="state" itemValue="#{state}"
+                                                                   itemLabel="#{state.value}"/>
+                                                </p:selectCheckboxMenu>
                                             </div>
                                             <div class="p-col-6">
                                                 <p:outputPanel id="requestTypes" styleClass="#{bean.getRequestTypeSelected() gt 0 ? ' select-checkbox' : ''}"

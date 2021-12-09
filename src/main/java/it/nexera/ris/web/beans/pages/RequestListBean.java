@@ -20,6 +20,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 
+import it.nexera.ris.common.xml.wrappers.ConservatoriaSelectItem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
@@ -187,6 +188,8 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     private List<SelectItem> cities;
     
     private Integer expirationDays;
+
+    private List<RequestState> selectedStates;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -1726,4 +1729,17 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         this.onLoad();
     }
 
+    public void setSelectedStates(List<RequestState> selectedStates) {
+        this.selectedStates = selectedStates;
+    }
+
+    public List<RequestState> getSelectedStates() {
+        List<RequestState> selected = new ArrayList<>();
+        for (RequestStateWrapper requestStateWrapper : stateWrappers) {
+            if(requestStateWrapper.getSelected()) {
+                selected.add(requestStateWrapper.getState());
+            }
+        }
+        return selected;
+    }
 }
