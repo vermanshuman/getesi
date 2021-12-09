@@ -50,6 +50,7 @@ public enum PageTypes {
     TEMPLATE_DOCUMENT_MODEL_LIST("/Pages/Dictionaries/TemplateDocumentModelList.jsf", true),
 
     REQUEST_TYPE_LIST("/Pages/Dictionaries/RequestTypeList.jsf", true),
+    FOREIGN_STATES_LIST("/Pages/Dictionaries/ForeignStatesList.jsf", true),
 
     STRUCTURE_LIST("/Pages/Dictionaries/StructureList.jsf", true),
 

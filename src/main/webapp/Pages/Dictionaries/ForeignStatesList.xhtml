@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core">
+<ui:composition template="/resources/tpl/Admin/LazyInListEditBase.xhtml">
+    <ui:param name="list_title" value="#{msg.foreignState}"/>
+    <ui:param name="bean" value="#{foreignStatesListBean}"/>
+    <ui:param name="entity_name" value="#{msg.foreignState}"/>
+    <ui:param name="disableSelection" value="true"/>
+    <ui:param name="additionalEditAction" value="window.scrollTo(0,0);"/>
+
+    <ui:define name="edit_fields">
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+
+            <span><span class="red">*</span> #{msg.code}:</span>
+            <p:inputText id="name" maxlength="50" value="#{bean.entity.code}"
+                         label="#{msg.code}" onkeypress="numbers_letters_only('#name');"/>
+
+            <span>#{msg.description}:</span>
+            <p:inputText id="description" maxlength="100"
+                         value="#{bean.entity.description}" label="#{msg.description}"
+                         onkeypress="numbers_letters_only('#description');"/>
+		</p:panelGrid>
+    </ui:define>
+
+    <ui:define name="columns">
+
+        <p:column sortBy="#{item.code}" filterBy="#{item.code}"
+                  headerText="#{msg.code}">
+            <h:outputText value="#{item.code}"/>
+        </p:column>
+
+        <p:column sortBy="#{item.description}" filterBy="#{item.description}"
+                  headerText="#{msg.description}">
+            <h:outputText value="#{item.description}"/>
+        </p:column>
+    </ui:define>
+
+</ui:composition>
+</html>
