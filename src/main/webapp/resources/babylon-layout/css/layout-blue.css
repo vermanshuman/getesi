@@ -4734,3 +4734,7 @@ html {
 .layout-dashboard .user-card .user-card-content .user-detail ul li .project-progressbar {
   width: calc(70% - 100px);
 }
+
+.ui-datatable .ui-column-filter {
+    width: 100% !important;
+}
