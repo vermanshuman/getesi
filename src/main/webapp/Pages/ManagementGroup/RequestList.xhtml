@@ -172,11 +172,11 @@
             }
 
             .new-button {
-                background: #009900 !important;
+                background: #00CC52 !important;
             }
 
             .new-button-multiple {
-                background: #009900 !important;
+                background: #00CC52 !important;
             }
 
             #table_paginator_top :first-child {
@@ -257,6 +257,9 @@
             #statuses_panel, #requestTypes_panel, #services_panel {
                 display: none !important;
             }
+            .placeholder {
+                display: block;
+            }
         </style>
         <script>
             var doChange = true;
@@ -294,10 +297,20 @@
                 $("#"+id).addClass("border_class");
             }
             function applyClickListener(id, wv) {
+               // setPlaceholder(id);
                 $("#"+id).click(function() {
                     PF(wv).show();
                 });
             }
+           /* // <![CDATA[
+            function setPlaceholder(id) {
+                const childrens = $("#"+id+" .ui-selectcheckboxmenu-multiple-container").children().length;
+                console.log(childrens);
+                if(childrens==0) {
+                    $("#" + id + " .ui-selectcheckboxmenu-multiple-container").append("<label class=\"placeholder\">Text.</label>");
+                }
+            }
+            // ]]>*/
         </script>
 
         <div class="p-grid">
@@ -543,7 +556,7 @@
                                             </div>
                                             <div class="p-col-12 search-panel-btns" style="text-align: center;">
                                                 <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}"
-                                                                 style="background: #009900;"
+                                                                 style="background: #00CC52;"
                                                                  id="searchButton12345"
                                                                  onclick="checkDates(); filterTableFromPanel();"
                                                                  update="searchPanel"

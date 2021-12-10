@@ -742,6 +742,10 @@ select-width {
     width: auto;
 }
 
+body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-button {
+    background: #00CC52 !important;
+}
+
 /*@media screen and (max-width: 991px) {
     .layout-wrapper .layout-menu-container {
         width: 300px;
