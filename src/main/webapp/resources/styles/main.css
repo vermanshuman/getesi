@@ -209,9 +209,10 @@ body .top-bar-cal .ui-widget-header {
 }
 
 .camerale-icon {
-    background-image: url("../images/servizio_camerale.png");
+    background-image: url("../images/servizi-comunali.png");
     background-repeat: no-repeat;
     background-position: 50%;
+    background-size: 25px;
     width: 25px;
     height: 25px;
     margin: 0 auto;
@@ -219,9 +220,10 @@ body .top-bar-cal .ui-widget-header {
 }
 
 .immobiliare-icon {
-    background-image: url("../images/servizio_immobiliare.png");
+    background-image: url("../images/servizi-immobiliari.png");
     background-repeat: no-repeat;
     background-position: 50%;
+    background-size: 25px;
     width: 25px;
     height: 25px;
     margin: 0 auto;
@@ -229,9 +231,10 @@ body .top-bar-cal .ui-widget-header {
 }
 
 .investigativo-icon {
-    background-image: url("../images/servizio_investigativo.png");
+    background-image: url("../images/servizi-investigativi.png");
     background-repeat: no-repeat;
     background-position: 50%;
+    background-size: 25px;
     width: 25px;
     height: 25px;
     margin: 0 auto;
@@ -293,6 +296,17 @@ body .top-bar-cal .ui-widget-header {
     background-size: cover;
 }
 
+.fa.fa-diamond {
+    background-image: url("../images/servizi-catastali.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 25px;
+    width: 25px;
+    height: 25px;
+    margin: 0 auto;
+    display: inline-block;
+}
+
 .fa-diamond:before {
     display: none;
 }
@@ -306,6 +320,17 @@ body .top-bar-cal .ui-widget-header {
     margin: 0 auto;
     display: block;
     background-size: cover;
+}
+
+.fa.fa-gavel {
+    background-image: url("../images/servizi-legali.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 25px;
+    width: 25px;
+    height: 25px;
+    margin: 0 auto;
+    display: inline-block;
 }
 
 .fa-gavel:before {
