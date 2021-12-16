@@ -239,7 +239,7 @@
             }
 
             .btn-green {
-                background-color: #57c279!important;
+                background-color: #00CC52!important;
                 padding-left:0 !important;
                 width: 122px;
             }
@@ -329,7 +329,7 @@
                             <f:selectItems value="#{bean.templates}"/>
                         </p:selectOneMenu>
                         <p:commandButton action="#{bean.updateTemplate}" value="#{msg.apply}" update=":edit_text_section @widgetVar(typeError)"
-                                         styleClass="margin-left" style="background-color: #57c279 !important;">
+                                         styleClass="margin-left" style="background-color: #00CC52 !important;">
                             <f:setPropertyActionListener value="true" target="#{bean.calledByApplicaButton}"/>
                         </p:commandButton>
 
@@ -410,7 +410,7 @@
                                     <p:commandButton value="#{bean.examRequest.stateId == 7 ? msg.requestTextEditSentToSdi : msg.requestTextEditCreateInvoice}"
                                                      id="createInvoice"
                                                      styleClass="#{bean.examRequest.stateId == 7 ? '' : 'btn-green'}"
-                                                     update="btn_line :form:invoiceTotalCost"
+                                                     update="btn_line :form:invoiceTotalCost" rendered="#{bean.billinRequest}"
                                                      oncomplete="PF('invoiceDialogWV').show();"/>
 
                                    <!-- <p:commandButton action="#{bean.goBack}" value="#{msg.cancel}" style="width:122px;"

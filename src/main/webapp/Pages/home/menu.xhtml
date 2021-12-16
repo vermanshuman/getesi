@@ -213,6 +213,7 @@
                         <p:menuitem id="billing"
                                     value="#{msg.headerBilling}#{sessionBean.requestCounts gt 0 ? ' ('.concat(sessionBean.requestCounts).concat(')') : ''}" icon="topbar-icon fatturazione-icon"
                                     action="#{sessionBean.getBillingListPage()}"
+                                    rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/BillingList.jsf')}"
                                     actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>
                         <p:menuitem id="contactPage" styleClass="main" value="#{msg.headerContact}" icon="topbar-icon contact-icon"/>
                         <p:submenu id="amministrazione" label="#{msg.menuConfiguration}" icon="pi pi-align-left">
@@ -259,6 +260,7 @@
                             <p:menuitem id="regimeConiugi" value="#{msg.regime_coniugi_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ManagementGroup/PaymentTypeList.jsf" />
                             <p:menuitem id="schedeInput" value="#{msg.input_card_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Configuration/InputCardList.jsf" />
                             <p:menuitem id="servizi" value="#{msg.request_type_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/RequestTypeList.jsf" />
+                            <p:menuitem id="foreignState" value="#{msg.foreign_states_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/ForeignStatesList.jsf" />
                             <p:menuitem id="struttureEAreeCanche" value="#{msg.structure_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/StructureList.jsf" />
                             <p:menuitem id="tipologieRichiesta" value="#{msg.service_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/ServiceList.jsf" />
                             <p:menuitem id="tipologieAtti" value="#{msg.type_act}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/TypeAct.jsf" />

@@ -128,7 +128,7 @@ public class RequestHelper {
             List<RequestStateWrapper> stateWrappers,
             List<UserFilterWrapper> userWrappers,
             List<ServiceFilterWrapper> serviceWrappers,
-            String selectedUserType, Long aggregationFilterId, Long selectedService) {
+            String selectedUserType, Long aggregationFilterId, Long selectedService, Boolean isBilling) {
         List<Criterion> restrictions = new ArrayList<>();
 
         restrictions.add(
@@ -161,11 +161,11 @@ public class RequestHelper {
         }
 
         if (!ValidationHelper.isNullOrEmpty(stateWrappers)
-                && !getSelectedAllStatesOnPanel(stateWrappers)) {
+                && (isBilling || !getSelectedAllStatesOnPanel(stateWrappers))) {
             List<Long> stateIds = new ArrayList<>();
 
-            stateWrappers.stream().filter(RequestStateWrapper::getSelected).forEach(state -> stateIds.add(state.getId()));
 
+            stateWrappers.stream().filter(RequestStateWrapper::getSelected).forEach(state -> stateIds.add(state.getId()));
             if (!ValidationHelper.isNullOrEmpty(stateIds)) {
                 restrictions.add(Restrictions.in("stateId", stateIds));
             }

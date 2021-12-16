@@ -172,11 +172,11 @@
             }
 
             .new-button {
-                background: #009900 !important;
+                background: #00CC52 !important;
             }
 
             .new-button-multiple {
-                background: #009900 !important;
+                background: #00CC52 !important;
             }
 
             #table_paginator_top :first-child {
@@ -253,6 +253,18 @@
             #searchFiscalCode.ui-state-focus {
                 box-shadow: 0 0 0 0.2em #a6d5fa !important;
             }
+
+            .actionPnl-tooltip {
+                text-align:center; width:140px; background-color: #6688AA !important;border-radius: 7px !important; border: 1px solid #FFFFFF; opacity: 0.8;
+            }
+
+            .actionPnl-panel {
+                text-align:center; background-color: #6688AA !important; margin-left:-5px; margin-right: -5px; border-radius: 7px !important;
+            }
+
+            #statuses_panel, #requestTypes_panel, #services_panel {
+                display: none !important;
+            }
         </style>
         <script>
             var doChange = true;
@@ -288,6 +300,11 @@
             }
             function applyBorder(id) {
                 $("#"+id).addClass("border_class");
+            }
+            function applyClickListener(id, wv) {
+                $("#"+id).click(function() {
+                    PF(wv).show();
+                });
             }
         </script>
 
@@ -375,7 +392,18 @@
                                             <div class="p-col-12" style="text-align: center;">
                                                 <h2>Filtra per</h2>
                                             </div>
-
+                                            <div class="p-col-6">
+                                                <div style="">
+                                                    <h:outputText style="color: #003871;"
+                                                                  value=""/>
+                                                </div>
+                                            </div>
+                                            <div class="p-col-6">
+                                                <div style="">
+                                                    <h:outputText style="color: #003871;"
+                                                                  value="#{ff:upper(msg.status)}:"/>
+                                                </div>
+                                            </div>
                                             <div class="p-col-6">
                                                 <p:selectOneMenu id="client" value="#{bean.selectedClientId}"
                                                                  label="#{msg.requestClient}"
@@ -387,35 +415,63 @@
                                                     <p:ajax event="itemSelect" update="@this"/>
                                                 </p:selectOneMenu>
                                             </div>
+
                                             <div class="p-col-6">
-                                                <p:outputPanel id="statuses" styleClass="#{bean.getStateSelected() gt 0 ? ' select-checkbox' : ''}"
-                                                               style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
-                                                    <h:outputText value="#{ff:upper(msg.status)}"
-                                                                  style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
-                                                    <i class="fa fa-angle-down"
-                                                       style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
-                                                       onclick="PF('stateSelectCheckboxWV').show(); event.stopImmediatePropagation(); applyBorder('statuses');"/>
-                                                </p:outputPanel>
+<!--                                                <p:outputPanel id="statuses" styleClass="#{bean.getStateSelected() gt 0 ? ' select-checkbox' : ''}"-->
+<!--                                                               style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">-->
+<!--                                                    <h:outputText value="#{ff:upper(msg.status)}"-->
+<!--                                                                  style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>-->
+<!--                                                    <i class="fa fa-angle-down"-->
+<!--                                                       style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"-->
+<!--                                                       onclick="PF('stateSelectCheckboxWV').show(); event.stopImmediatePropagation(); applyBorder('statuses');"/>-->
+<!--                                                </p:outputPanel>-->
+                                                <p:selectCheckboxMenu id="statuses" style="width: 100%;min-height: 38px;" multiple="true" label="" value="#{bean.selectedStates}"
+                                                                      onclick="PF('stateSelectCheckboxWV').show();applyBorder('statuses');" styleClass="#{bean.getStateSelected() gt 0 ? ' select-checkbox' : ''}">
+                                                    <f:selectItems value="#{bean.stateWrappers}" var="state" itemValue="#{state}"
+                                                                   itemLabel="#{state.value}"/>
+                                                </p:selectCheckboxMenu>
                                             </div>
                                             <div class="p-col-6">
-                                                <p:outputPanel id="requestTypes" styleClass="#{bean.getRequestTypeSelected() gt 0 ? ' select-checkbox' : ''}"
-                                                               style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
-                                                    <h:outputText value="#{ff:upper(msg.requestListServiceTypeCap)}"
-                                                                  style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
-                                                    <i class="fa fa-angle-down"
-                                                       style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
-                                                       onclick="PF('requestTypeSelectCheckboxWV').show(); event.stopImmediatePropagation(); applyBorder('requestTypes');"/>
-                                                </p:outputPanel>
+                                                <div style="">
+                                                    <h:outputText style="color: #003871;"
+                                                                  value="#{ff:upper(msg.requestType)}:"/>
+                                                </div>
                                             </div>
                                             <div class="p-col-6">
-                                                <p:outputPanel id="services" styleClass="#{bean.getServiceSelected() gt 0 ? ' select-checkbox' : ''}"
-                                                               style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
-                                                    <h:outputText value="#{ff:upper(msg.requestListService)}"
-                                                                  style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
-                                                    <i class="fa fa-angle-down"
-                                                       style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
-                                                       onclick="PF('serviceSelectCheckboxWV').show(); event.stopImmediatePropagation(); applyBorder('services');"/>
-                                                </p:outputPanel>
+                                                <div style="">
+                                                    <h:outputText style="color: #003871;"
+                                                                  value="#{ff:upper(msg.requestService)}:"/>
+                                                </div>
+                                            </div>
+                                            <div class="p-col-6">
+<!--                                                <p:outputPanel id="requestTypes" styleClass="#{bean.getRequestTypeSelected() gt 0 ? ' select-checkbox' : ''}"-->
+<!--                                                               style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">-->
+<!--                                                    <h:outputText value="#{ff:upper(msg.requestListServiceTypeCap)}"-->
+<!--                                                                  style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>-->
+<!--                                                    <i class="fa fa-angle-down"-->
+<!--                                                       style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"-->
+<!--                                                       onclick="PF('requestTypeSelectCheckboxWV').show(); event.stopImmediatePropagation(); applyBorder('requestTypes');"/>-->
+<!--                                                </p:outputPanel>-->
+                                                <p:selectCheckboxMenu id="requestTypes" style="width: 100%;min-height: 38px;" multiple="true" label="#{msg.requestType}" value="#{bean.selectedRequestTypes}"
+                                                                      onclick="PF('requestTypeSelectCheckboxWV').show();applyBorder('requestTypes');" styleClass="#{bean.getRequestTypeSelected() gt 0 ? ' select-checkbox' : ''}">
+                                                    <f:selectItems value="#{bean.requestTypeWrappers}" var="requestType" itemValue="#{requestType}"
+                                                                   itemLabel="#{requestType.value}"/>
+                                                </p:selectCheckboxMenu>
+                                            </div>
+                                            <div class="p-col-6">
+<!--                                                <p:outputPanel id="services" styleClass="#{bean.getServiceSelected() gt 0 ? ' select-checkbox' : ''}"-->
+<!--                                                               style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">-->
+<!--                                                    <h:outputText value="#{ff:upper(msg.requestListService)}"-->
+<!--                                                                  style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>-->
+<!--                                                    <i class="fa fa-angle-down"-->
+<!--                                                       style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"-->
+<!--                                                       onclick="PF('serviceSelectCheckboxWV').show(); event.stopImmediatePropagation(); applyBorder('services');"/>-->
+<!--                                                </p:outputPanel>-->
+                                                <p:selectCheckboxMenu id="services" style="width: 100%;min-height: 38px;" multiple="true" label="" value="#{bean.selectedServices}"
+                                                                      onclick="PF('serviceSelectCheckboxWV').show();applyBorder('services');" styleClass="#{bean.getServiceSelected() gt 0 ? ' select-checkbox' : ''}">
+                                                    <f:selectItems value="#{bean.serviceWrappers}" var="service" itemValue="#{service}"
+                                                                   itemLabel="#{service.value}"/>
+                                                </p:selectCheckboxMenu>
                                             </div>
                                             <div class="p-col-6">
                                                 <p:selectOneMenu id="manager" value="#{bean.managerClientFilterid}"
@@ -519,7 +575,7 @@
                                             </div>
                                             <div class="p-col-12 search-panel-btns" style="text-align: center;">
                                                 <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}"
-                                                                 style="background: #009900;"
+                                                                 style="background: #00CC52;"
                                                                  id="searchButton12345"
                                                                  onclick="checkDates(); filterTableFromPanel();"
                                                                  update="searchPanel"
@@ -741,12 +797,12 @@
                     <f:facet name="header">
                         <p:selectBooleanCheckbox value="#{bean.selectedAllStatesOnPanel}">
                             <p:ajax update="stateSelectCheckboxPanelDataTable" event="change"/>
-                            <p:ajax event="change" update="statuses"/>
+                            <p:ajax event="change" update="statuses" oncomplete="applyClickListener('statuses', 'stateSelectCheckboxWV');"/>
                         </p:selectBooleanCheckbox>
                     </f:facet>
                     <p:selectBooleanCheckbox value="#{state.selected}">
                         <p:ajax update="stateSelectCheckboxPanelDataTable" event="change"/>
-                        <p:ajax event="change" update="statuses"/>
+                        <p:ajax event="change" update="statuses" oncomplete="applyClickListener('statuses', 'stateSelectCheckboxWV');"/>
                     </p:selectBooleanCheckbox>
                 </p:column>
                 <p:column>
@@ -767,12 +823,12 @@
                     <f:facet name="header">
                         <p:selectBooleanCheckbox value="#{bean.selectedAllServicesOnPanel}">
                             <p:ajax update="serviceSelectCheckboxPanelDataTable" event="change"/>
-                            <p:ajax event="change" update="services"/>
+                            <p:ajax event="change" update="services" oncomplete="applyClickListener('services', 'serviceSelectCheckboxWV');"/>
                         </p:selectBooleanCheckbox>
                     </f:facet>
                     <p:selectBooleanCheckbox value="#{service.selected}">
                         <p:ajax update="serviceSelectCheckboxPanelDataTable searchPanel" event="change" listener="#{bean.selectServiceCheck}"/>
-                        <p:ajax event="change" update="services"/>
+                        <p:ajax event="change" update="services" oncomplete="applyClickListener('services', 'serviceSelectCheckboxWV');"/>
                     </p:selectBooleanCheckbox>
                 </p:column>
                 <p:column>
@@ -793,12 +849,12 @@
                     <f:facet name="header">
                         <p:selectBooleanCheckbox value="#{bean.selectedAllRequestTypesOnPanel}">
                             <p:ajax update="requestTypeSelectCheckboxPanelDataTable" event="change"/>
-                            <p:ajax event="change" update="requestTypes"/>
+                            <p:ajax event="change" update="requestTypes" oncomplete="applyClickListener('requestTypes', 'requestTypeSelectCheckboxWV');"/>
                         </p:selectBooleanCheckbox>
                     </f:facet>
                     <p:selectBooleanCheckbox value="#{requestType.selected}">
                         <p:ajax update="requestTypeSelectCheckboxPanelDataTable" event="change"/>
-                        <p:ajax event="change" update="requestTypes"/>
+                        <p:ajax event="change" update="requestTypes" oncomplete="applyClickListener('requestTypes', 'requestTypeSelectCheckboxWV');"/>`
                     </p:selectBooleanCheckbox>
                 </p:column>
                 <p:column>
@@ -830,7 +886,7 @@
                     <br/>
                     <h:outputText value="#{not empty item.stateDescription ? ff:upper(item.stateDescription) : ''}"
                                   styleClass="#{item.stateDescription eq 'Inserita'
-                        ? 'status-icon status-green' : (item.stateDescription eq 'In lavorazione' ? 'status-icon status-yellow' :(item.stateDescription eq 'Da inviare' ? 'status-icon status-navy' : (item.stateDescription eq 'Sospesa' ? 'status-icon status-magenta' : (item.stateDescription eq 'Evasa' ? 'status-icon status-red':''))))}"/>
+                        ? 'status-icon status-green' : (item.stateDescription eq 'In lavorazione' ? 'status-icon status-yellow' :(item.stateDescription eq 'Da inviare' ? 'status-icon status-navy' : (item.stateDescription eq 'Sospesa' ? 'status-icon status-magenta' : (item.stateDescription eq 'Evasa' ? 'status-icon status-red': (item.stateDescription eq 'Inviata allo SDI' ? 'status-icon status-cyan': '')))))}"/>
                     <br/>
                     <h:outputText rendered="#{item.urgent}" styleClass="vertical-txt" value="#{ff:upper(msg.requestListUrgent)}" />
                     <br/>
@@ -839,10 +895,12 @@
 
 
             <p:column style="width: 9vw;min-width: 159px;position: relative" headerText="#{ff:upper(msg.requestListClient)}">
-                <h:outputText value="#{item.clientName}"/>
+                <p:outputPanel>
+                    <h:outputText value="#{item.clientName}"/>
+                </p:outputPanel>
                 <br/>
                 <p:graphicImage id="info" url="/resources/images/tooltip.png"
-                                style="height :25px;bottom: 2px;position: absolute;"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
+                                style="height :25px;bottom: 5px;position: absolute;"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
                 <p:tooltip for="info" styleClass="custom-design-tooltip">
                     <h:outputText value="#{ff:upper(msg.requestManagers)}" style="font-weight:bold;color:#003871;"/>
                     <br />
@@ -1010,23 +1068,22 @@
                     <i class="fa fa-angle-down" style="font-size: x-large;"
                        onmouseover="document.getElementById('table:#{rowId}:actionPnl').focus();" />
                 </p:commandLink>
-                <p:tooltip for="actionPnl" hideEvent="blur" showEvent="focus" styleClass="action-tooltip-grid">
-                    <p:panelGrid layout="grid" id="actionGrid" columns="1"
-                                 style="text-align:left;">
+                <p:tooltip for="actionPnl" hideEvent="blur" showEvent="focus" styleClass="actionPnl-tooltip">
+                    <p:outputPanel id="actionGrid" styleClass="actionPnl-panel">
 
                         <p:commandButton value="#{ff:upper(msg.requestListManage)}" class="action-btn" onclick="document.getElementById('table:#{rowId}:gestisci-btn').click()"
-                                         disabled="#{!bean.canEdit}">
+                                         disabled="#{!bean.canEdit}" style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;">
                         </p:commandButton>
                         <p:commandButton value="#{ff:upper(msg.headerDatabase)}" onclick="document.getElementById('table:#{rowId}:banca-btn').click()"
-                                         rendered="#{item.subjectId ne null}" class="action-btn">
+                                         rendered="#{item.subjectId ne null}" class="action-btn" style="width:120px; margin-left: 5px; margin-right: 5px; margin-bottom:8px;">
                         </p:commandButton>
                         <p:commandButton value="#{msg.pdf}" rendered="#{!bean.getCurrentUser().isExternal()}" class="action-btn" onclick="document.getElementById('table:#{rowId}:pdf-btn').click()"
-                                         update="@form">
+                                         update="@form" style="width:120px; margin-left: 5px; margin-right: 5px; margin-bottom:8px;">
                         </p:commandButton>
                         <p:commandButton value="#{ff:upper(msg.roleCanDelete)}" class="action-btn" onclick="document.getElementById('table:#{rowId}:elimina-btn').click()"
-                                         disabled="#{!bean.canDelete}">
+                                         disabled="#{!bean.canDelete}" style="width:120px; margin-left: 5px; margin-right: 5px; margin-bottom:5px;">
                         </p:commandButton>
-                    </p:panelGrid>
+                    </p:outputPanel>
                 </p:tooltip>
             </p:column>
 

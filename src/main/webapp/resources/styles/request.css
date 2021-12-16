@@ -35,6 +35,10 @@
 	border: 2px solid #FF0000;
 	color: #FF0000;
 }
+.status-cyan {
+	border: 2px solid #339999;
+	color: #339999;
+}
 
 .status-icon {
 	height: 24px;
@@ -137,14 +141,15 @@ body .custom-design-tooltip .ui-tooltip-arrow {
 	-ms-transform: rotate(-90deg);
 	-o-transform: rotate(-90deg);
 	position: absolute;
-	margin-left: -74px;
-	margin-top: -34px;
+	margin-left: -73px;
+	margin-top: -3.6em;
 	color: #FFFCFC !important;
 	background-color: #FF0000 !important;
 	border-radius: 3px !important;
-	min-width: 93px;
-	height: 13.4px;
+	min-width: 89px;
+	height: 14px;
 	text-align: center;
+	padding-top: 0.4px;
 }
 
 .action-btn {
@@ -421,11 +426,11 @@ body .ui-datatable .ui-datatable-data tr.ui-state-highlight {
 	padding: 2px 8px;
 }o08la
 
-.ui-paginator .ui-paginator-rpp-options {
-	background-color: #ffffff;
-	border: none;
-	border-radius: 5px;
-}
+ .ui-paginator .ui-paginator-rpp-options {
+	 background-color: #ffffff;
+	 border: none;
+	 border-radius: 5px;
+ }
 
 body a {
 	color: #003871 !important;

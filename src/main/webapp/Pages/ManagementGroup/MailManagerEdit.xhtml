@@ -15,8 +15,25 @@
             body .ui-widget-header {
                 background-color: #FFFFFF !important;
                 color: #ffffff !important;
+                font-size: 15px;
+            }
+            
+            body .ui-inputfield {
+            	border: 1px solid #a8acb1;
+            	font-size: 15px;
+            }
+            
+            body .ui-selectonemenu {
+            	border: 1px solid #a8acb1;
             }
 
+            body .ui-autocomplete-panel .ui-autocomplete-items .ui-autocomplete-item.ui-autocomplete-row > td {
+                padding: 0.5rem 0.5rem !important;
+            }
+            body .ui-autocomplete-panel .ui-autocomplete-items .ui-autocomplete-item.ui-autocomplete-row {
+                font-size: 19px !important;
+                border-color: #A7A8AB;
+            }
         </style>
 
         <script type="text/javascript">
@@ -105,7 +122,19 @@
                     change = false;
                     $("#changeVar").val("change");
                 });
+                $( "#mailTo .ui-autocomplete-multiple-container .ui-autocomplete-input-token input" ).focusout(function() {
+                    emailHeightAdjust();
+                }).focus(function() {
+                    $( "#mailTo .ui-autocomplete-multiple-container" ).css("height", "auto");
+                });
+                emailHeightAdjust();
             });
+            function emailHeightAdjust() {
+                var noOfEmail = $( "#mailTo .ui-autocomplete-multiple-container li" ).length - 1;
+                if(noOfEmail != 0 &amp;&amp; noOfEmail%2==0) {
+                    $( "#mailTo .ui-autocomplete-multiple-container" ).css("height", (((noOfEmail/2)*38)+'px'));
+                }
+            }
         </script>
 
         <p:remoteCommand name="onRedirect" action="#{bean.confirmRedirect(false)}" oncomplete="setCloseTab();"/>
@@ -132,7 +161,7 @@
                                         completeMethod="#{bean.completeDestinations}"
                                         var="dest" itemLabel="#{dest}" itemValue="#{dest}" id="mailTo"
                                         inputStyle="width: 100%;"
-                                        style="width: 100%;" styleClass="autocomplete_width" maxResults="6"
+                                        style="width: 100%;" maxResults="6"
                                         multiple="true"
                                         onkeydown="return lockValue(event);" immediate="false">
                             <p:column>
@@ -156,7 +185,7 @@
                         <h:outputText value="#{msg.mailManagerEditMailCopy}:" style="font-weight: bold;"/>
                     </p:column>
                     <p:column colspan="8">
-                        <p:autoComplete value="#{bean.sendCC}" multiple="true" styleClass="autocomplete_width"
+                        <p:autoComplete value="#{bean.sendCC}" multiple="true" 
                                         completeMethod="#{bean.completeMailCC}" immediate="false"
                                         var="dest" itemLabel="#{dest}" itemValue="#{dest}" id="mailCC"
                                         inputStyle="width: 100%;" style="width: 100%" maxResults="6">
@@ -175,7 +204,7 @@
                         <h:outputText value="#{msg.mailManagerEditMailBlindCopy}:" style="font-weight: bold;"/>
                     </p:column>
                     <p:column colspan="8">
-                        <p:autoComplete value="#{bean.sendBCC}" multiple="true" styleClass="autocomplete_width"
+                        <p:autoComplete value="#{bean.sendBCC}" multiple="true" 
                                         completeMethod="#{bean.completeMailBCC}" immediate="false"
                                         var="dest" itemLabel="#{dest}" itemValue="#{dest}" id="mailBCC"
                                         inputStyle="width: 100%;" style="width: 100%" maxResults="6">

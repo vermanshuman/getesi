@@ -188,6 +188,12 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     
     private Integer expirationDays;
 
+    private List<RequestState> selectedStates;
+
+    private List<RequestType> selectedRequestTypes;
+
+    private List<Service> selectedServices;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
@@ -939,7 +945,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     public void filterTableFromPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         List<Criterion> restrictions = RequestHelper.filterTableFromPanel(getDateFrom(), getDateTo(), getDateFromEvasion(),
                 getDateToEvasion(), getSelectedClientId(), getRequestTypeWrappers(), getStateWrappers(), getUserWrappers(),
-                getServiceWrappers(), getSelectedUserType(),getAggregationFilterId(), getSelectedServiceType());
+                getServiceWrappers(), getSelectedUserType(),getAggregationFilterId(), getSelectedServiceType(), Boolean.FALSE);
 
         if (!ValidationHelper.isNullOrEmpty(getSearchLastName())) {
             restrictions.add(
@@ -1726,4 +1732,45 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         this.onLoad();
     }
 
+    public void setSelectedStates(List<RequestState> selectedStates) {
+        this.selectedStates = selectedStates;
+    }
+
+    public List<RequestState> getSelectedStates() {
+        List<RequestState> selected = new ArrayList<>();
+        for (RequestStateWrapper requestStateWrapper : stateWrappers) {
+            if(requestStateWrapper.getSelected()) {
+                selected.add(requestStateWrapper.getState());
+            }
+        }
+        return selected;
+    }
+
+    public List<RequestType> getSelectedRequestTypes() {
+        List<RequestType> selected = new ArrayList<>();
+        for (RequestTypeFilterWrapper requestTypeFilterWrapper : requestTypeWrappers) {
+            if(requestTypeFilterWrapper.getSelected()) {
+                selected.add(requestTypeFilterWrapper.getRequestType());
+            }
+        }
+        return selected;
+    }
+
+    public void setSelectedRequestTypes(List<RequestType> selectedRequestTypes) {
+        this.selectedRequestTypes = selectedRequestTypes;
+    }
+
+    public List<Service> getSelectedServices() {
+        List<Service> selected = new ArrayList<>();
+        for (ServiceFilterWrapper serviceFilterWrapper : serviceWrappers) {
+            if(serviceFilterWrapper.getSelected()) {
+                selected.add(serviceFilterWrapper.getService());
+            }
+        }
+        return selected;
+    }
+
+    public void setSelectedServices(List<Service> selectedServices) {
+        this.selectedServices = selectedServices;
+    }
 }

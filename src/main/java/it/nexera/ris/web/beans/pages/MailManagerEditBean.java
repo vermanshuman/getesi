@@ -190,7 +190,7 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
             InstantiationException, IllegalAccessException, IOException {
-        setInvoiceRequests(getEntity().getRequests());
+        //setInvoiceRequests(getEntity().getRequests());
         setCopiedImages(new LinkedList<>());
         setBaseMailId(getEntityId());
         startEdit();
@@ -200,8 +200,7 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
        if(getMailType().equals(MailEditType.SEND_TO_MANAGER)){
             attachFornitoriExcel();
         }else if(getMailType().equals(MailEditType.SEND_INVOICE)){
-           if(!ValidationHelper.isNullOrEmpty(getInvoiceRequests()))
-            attachInvoiceExcel();
+           attachInvoiceData();
         }else {
            fillAttachedFiles();
        }
@@ -1531,9 +1530,25 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
         addAttachedFile(excelFornitori);
     }
 
-    private void attachInvoiceExcel() throws HibernateException, PersistenceBeanException{
+    private void attachInvoiceData() throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
 
-        byte [] baos = getXlsBytes();
+        String refrequest = "";
+        WLGInbox baseMail = DaoManager.get(WLGInbox.class, getBaseMailId());
+        if(!ValidationHelper.isNullOrEmpty(baseMail)){
+            if(!ValidationHelper.isNullOrEmpty(baseMail)
+                    && !ValidationHelper.isNullOrEmpty(baseMail.getRequests())){
+                setInvoiceRequests(baseMail.getRequests()
+                .stream()
+                .filter(r -> !ValidationHelper.isNullOrEmpty(r.getStateId()) &&
+                        r.getStateId().equals(RequestState.SENT_TO_SDI.getId()))
+                .collect(Collectors.toList()));
+            }
+            refrequest = baseMail.getReferenceRequest();
+        }
+        if(ValidationHelper.isNullOrEmpty(getInvoiceRequests()))
+                return;
+        Request invoiceRequest = getInvoiceRequests().get(0);
+        byte [] baos = getXlsBytes(refrequest, invoiceRequest);
         if(!ValidationHelper.isNullOrEmpty(baos)){
             excelInvoice = new WLGExport();
             Date currentDate = new Date();
@@ -1557,16 +1572,32 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
         }
 
         try {
-            Request invoiceRequest = getInvoiceRequests().get(0);
+
             String templatePath  = (new File(FileHelper.getRealPath(),
                     "resources" + File.separator + "layouts" + File.separator
                             + "Invoice" + File.separator + "InvoiceDocumentTemplate.docx")
                     .getAbsolutePath());
-            List<InvoiceItem> items =
-                    DaoManager.load(InvoiceItem.class,
-                            new Criterion[]{
-                                    Restrictions.eq("invoice.id", invoiceRequest.getInvoice().getId())
-                            });
+
+            Double imponibile = 0.0;
+            Double totalIva = 0.0;
+            Double ivaPercentage = 0.0;
+
+            if(!ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice())){
+                List<InvoiceItem> items =
+                        DaoManager.load(InvoiceItem.class,
+                                new Criterion[]{
+                                        Restrictions.eq("invoice.id", invoiceRequest.getInvoice().getId())
+                                });
+                for(InvoiceItem item : items) {
+                    if(item.getAmount() != null){
+                        imponibile = imponibile + item.getAmount();
+                        if(item.getVat() != null){
+                            ivaPercentage = item.getVat();
+                            totalIva = totalIva + ((item.getVat()*item.getAmount())/100);
+                        }
+                    }
+                }
+            }
             Date currentDate = new Date();
             String fileName = "Richieste_Invoice_"+DateTimeHelper.toFileDateWithMinutes(currentDate);
 
@@ -1574,23 +1605,9 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
             tempDir  += File.separator + UUID.randomUUID();
             FileUtils.forceMkdir(new File(tempDir));
             String tempDoc = tempDir +  File.separator +  fileName +".docx";
-            Double imponibile = 0.0;
-            Double totalIva = 0.0;
-            Double ivaPercentage = 0.0;
-            for(InvoiceItem item : items) {
-                if(item.getAmount() != null){
-                    imponibile = imponibile + item.getAmount();
-                    if(item.getVat() != null){
-                        ivaPercentage = item.getVat();
-                        totalIva = totalIva + ((item.getVat()*item.getAmount())/100);
-                    }
-                }
-            }
-            String refrequest = "";
-            WLGInbox baseMail = DaoManager.get(WLGInbox.class, getBaseMailId());
-            if(!ValidationHelper.isNullOrEmpty(baseMail)){
-                refrequest = baseMail.getReferenceRequest();
-            }
+
+
+
             try (XWPFDocument doc = new XWPFDocument(
                     Files.newInputStream(Paths.get(templatePath)))) {
                 for (XWPFParagraph p : doc.getParagraphs()) {
@@ -1691,7 +1708,7 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
          LogHelper.log(log,e);
         }
     }
-    private byte[] getXlsBytes() {
+    private byte[] getXlsBytes(String refrequest, Request invoiceRequest) {
         byte[] excelFile = null;
         try {
 
@@ -1709,10 +1726,14 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
                 document.setReportNumber(SaveRequestDocumentsHelper.getLastInvoiceNumber() + 1);
             }
             excelDataWrapper.setReportn(document.getReportNumber());
-            excelDataWrapper.setReferenceRequest(getEntity().getReferenceRequest());
-            excelDataWrapper.setFatturan(document.getInvoiceNumber());
-            excelDataWrapper.setData((document == null || document.getInvoiceDate() == null ?
-                    DateTimeHelper.getNow(): document.getInvoiceDate()));
+            excelDataWrapper.setReferenceRequest(refrequest);
+
+            if(!ValidationHelper.isNullOrEmpty(invoiceRequest)
+                    && !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice())){
+                excelDataWrapper.setInvoiceNumber(invoiceRequest.getInvoice().getInvoiceNumber());
+                excelDataWrapper.setData((invoiceRequest.getInvoice().getDate() == null ?
+                        DateTimeHelper.getNow(): invoiceRequest.getInvoice().getDate()));
+            }
 
             if (!ValidationHelper.isNullOrEmpty(getEntity().getClientInvoice())) {
                 excelDataWrapper.setClientInvoice(DaoManager.get(Client.class, getEntity().getClientInvoice().getId()));
@@ -1729,12 +1750,8 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
             if (!ValidationHelper.isNullOrEmpty(getEntity().getOffice())) {
                 excelDataWrapper.setOffice(getEntity().getOffice().getDescription());
             }
-            List<Request> requestListSentToSdi =
-                    getInvoiceRequests()
-                            .stream()
-                            .filter(x -> !ValidationHelper.isNullOrEmpty(x.getStateId()) &&
-                                    RequestState.SENT_TO_SDI.getId().equals(x.getStateId())).collect(Collectors.toList());
-            List<Request> filteredRequests  = emptyIfNull(requestListSentToSdi).stream().filter(r->r.isDeletedRequest()).collect(Collectors.toList());
+
+            List<Request> filteredRequests  = emptyIfNull(getInvoiceRequests()).stream().filter(r->r.isDeletedRequest()).collect(Collectors.toList());
             excelFile = new CreateExcelRequestsReportHelper(true).convertMailUserDataToExcel(filteredRequests, document,excelDataWrapper);
         } catch (Exception e) {
             LogHelper.log(log, e);

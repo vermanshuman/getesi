@@ -163,7 +163,7 @@ $infoButtonTextActiveColor:$infoButtonTextColor !default;
 $infoButtonActiveBorderColor:scale-color($infoButtonBg, $lightness: -20%) !default;
 $infoButtonFocusShadow:0 0 0 0.2rem scale-color($infoButtonBg, $lightness: 60%) !default;
 
-$successButtonBg:#689F38 !default;
+$successButtonBg:#00CC52 !default;
 $successButtonTextColor:#ffffff !default;
 $successButtonBorder:1px solid $successButtonBg !default;
 $successButtonHoverBg:scale-color($successButtonBg, $lightness: -10%) !default;

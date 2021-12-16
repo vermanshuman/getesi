@@ -18,6 +18,7 @@ import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import it.nexera.ris.persistence.view.FormalityView;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.beans.EntityEditPageBean;
+import it.nexera.ris.web.beans.base.AccessBean;
 import it.nexera.ris.web.beans.wrappers.logic.RelationshipGroupingWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.TemplateEntity;
 import it.nexera.ris.web.beans.wrappers.logic.editInTable.*;
@@ -225,6 +226,8 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     private String apiError;
 
+    private Boolean billinRequest;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
     InstantiationException, IllegalAccessException {
@@ -343,6 +346,8 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         }
         if(getExamRequest().getStateId().equals(RequestState.SENT_TO_SDI.getId()))
             setInvoiceSentStatus(true);
+
+        setBillinRequest(AccessBean.canViewPage(PageTypes.BILLING_LIST));
 
     }
 
@@ -2644,5 +2649,14 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     public void setApiError(String apiError) {
         this.apiError = apiError;
+    }
+
+
+    public Boolean getBillinRequest() {
+        return billinRequest;
+    }
+
+    public void setBillinRequest(Boolean billinRequest) {
+        this.billinRequest = billinRequest;
     }
 }
