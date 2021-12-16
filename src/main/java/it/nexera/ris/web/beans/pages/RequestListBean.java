@@ -41,6 +41,7 @@ import it.nexera.ris.common.helpers.DateTimeHelper;
 import it.nexera.ris.common.helpers.EstateSituationHelper;
 import it.nexera.ris.common.helpers.FileHelper;
 import it.nexera.ris.common.helpers.GeneralFunctionsHelper;
+import it.nexera.ris.common.helpers.HttpSessionHelper;
 import it.nexera.ris.common.helpers.LogHelper;
 import it.nexera.ris.common.helpers.MessageHelper;
 import it.nexera.ris.common.helpers.PrintPDFHelper;
@@ -313,6 +314,16 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                 requestTypes.forEach(r -> getRequestTypeWrappers().add(new RequestTypeFilterWrapper(r)));
             }
 
+        }
+        String filterStateBy = getSessionValue("REQUEST_LIST_FILTER_BY");
+        if(!ValidationHelper.isNullOrEmpty(filterStateBy)){
+            getStateWrappers().forEach(r -> { 
+                if (r.getState().equals(RequestState.valueOf(filterStateBy))){
+                    r.setSelected(Boolean.TRUE);
+                    }else{
+                    r.setSelected(Boolean.FALSE);
+                         } 
+            });
         }
         filterTableFromPanel();
     }
@@ -1726,4 +1737,16 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         this.onLoad();
     }
 
+    private String getSessionValue(String key) {
+        String result = null;
+        if (!ValidationHelper.isNullOrEmpty((String) SessionHelper.get(key))) {
+            result = (String) SessionHelper.get(key);
+            SessionHelper.removeObject(key);
+            HttpSessionHelper.put(key, null);
+        } else if (!ValidationHelper.isNullOrEmpty((String) HttpSessionHelper.get(key))) {
+            result = (String) HttpSessionHelper.get(key);
+            HttpSessionHelper.put(key, null);
+        }
+        return result;
+    }
 }

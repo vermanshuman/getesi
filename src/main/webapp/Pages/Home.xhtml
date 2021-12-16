@@ -217,6 +217,7 @@
                      </p:commandLink>
                     </div>
                     <div class="p-col-12 p-lg-6 p-xl-3" style="display: #{homeBean.nextSlide ? 'none' : ''}">
+                        <p:commandLink action="#{homeBean.openRequestList()}" style="text-decoration: none" >
                         <div class="overview-box views" style="background-color: #5EA2CC;">
                             <i class="overview-icon fa fa-fw fa-list" style="color:white;"/>
                             <span class="overview-title">Pratiche nuove</span>
@@ -227,6 +228,7 @@
                             <div class="overview-subinfo">
                             </div>
                         </div>
+                      </p:commandLink>
                     </div>
                     <div class="p-col-12 p-lg-6 p-xl-3">
                         <div class="overview-box checkin">

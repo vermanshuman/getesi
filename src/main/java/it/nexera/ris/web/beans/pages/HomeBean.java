@@ -507,6 +507,12 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
         
     }
     
+    public void openRequestList() {
+        setSessionValue("REQUEST_LIST_FILTER_BY",RequestState.INSERTED.name());
+        RedirectHelper.goTo(PageTypes.REQUEST_LIST);
+        
+    }
+    
     private void setSessionValue(String key, String value) {
         SessionHelper.put(key, value);
         HttpSessionHelper.put(key, value);
