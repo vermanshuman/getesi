@@ -12,7 +12,8 @@ public enum RequestState {
     INVOICED(4l, false),
     SUSPENDED(5l, false),
     TO_BE_SENT(6l, true),
-    SENT_TO_SDI(7l, false);
+    SENT_TO_SDI(7l, false),
+    FATTURATA(8l,true);
 
     private Long id;
 
