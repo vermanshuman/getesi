@@ -656,7 +656,7 @@
                     <br/>
                     <h:outputText value="#{not empty item.stateDescription ? ff:upper(item.stateDescription) : ''}"
                                   styleClass="#{item.stateDescription eq 'Inserita'
-                        ? 'status-icon status-green' : (item.stateDescription eq 'In lavorazione' ? 'status-icon status-yellow' :(item.stateDescription eq 'Da inviare' ? 'status-icon status-navy' : (item.stateDescription eq 'Sospesa' ? 'status-icon status-magenta' : (item.stateDescription eq 'Evasa' ? 'status-icon status-red': (item.stateDescription eq 'Inviata allo SDI' ? 'status-icon status-blue':'')))))}"/>
+                         ? 'status-icon status-green' : (item.stateDescription eq 'In lavorazione' ? 'status-icon status-yellow' :(item.stateDescription eq 'Da inviare' ? 'status-icon status-navy' : (item.stateDescription eq 'Sospesa' ? 'status-icon status-magenta' : (item.stateDescription eq 'Evasa' ? 'status-icon status-red': (item.stateDescription eq 'Inviata allo SDI' ? 'status-icon status-cyan': '')))))}"/>
                     <br/>
                     <h:outputText rendered="#{item.urgent}" styleClass="vertical-txt" value="#{ff:upper(msg.requestListUrgent)}" />
                     <br/>

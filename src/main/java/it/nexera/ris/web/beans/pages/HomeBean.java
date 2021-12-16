@@ -223,13 +223,13 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
 
         chartXAxisData.addAll(dataMapping.entrySet()
                 .stream()
-                .sorted(Comparator.comparing(Map.Entry::getValue))
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .map(e -> e.getKey().getName())
                 .collect(Collectors.toList()));
 
         data.addAll(dataMapping.entrySet()
                 .stream()
-                .sorted(Comparator.comparing(Map.Entry::getValue))
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .map(e -> e.getValue())
                 .collect(Collectors.toList()));
 

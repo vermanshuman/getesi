@@ -35,8 +35,7 @@
 	border: 2px solid #FF0000;
 	color: #FF0000;
 }
-
-.status-blue {
+.status-cyan {
 	border: 2px solid #339999;
 	color: #339999;
 }
@@ -143,7 +142,7 @@ body .custom-design-tooltip .ui-tooltip-arrow {
 	-o-transform: rotate(-90deg);
 	position: absolute;
 	margin-left: -73px;
-	margin-top: -2.9em;
+	margin-top: -3.6em;
 	color: #FFFCFC !important;
 	background-color: #FF0000 !important;
 	border-radius: 3px !important;

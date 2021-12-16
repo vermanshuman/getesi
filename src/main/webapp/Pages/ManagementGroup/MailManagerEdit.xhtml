@@ -26,6 +26,7 @@
             body .ui-selectonemenu {
             	border: 1px solid #a8acb1;
             }
+
             body .ui-autocomplete-panel .ui-autocomplete-items .ui-autocomplete-item.ui-autocomplete-row > td {
                 padding: 0.5rem 0.5rem !important;
             }
@@ -130,7 +131,7 @@
             });
             function emailHeightAdjust() {
                 var noOfEmail = $( "#mailTo .ui-autocomplete-multiple-container li" ).length - 1;
-                if(noOfEmail%2==0) {
+                if(noOfEmail != 0 &amp;&amp; noOfEmail%2==0) {
                     $( "#mailTo .ui-autocomplete-multiple-container" ).css("height", (((noOfEmail/2)*38)+'px'));
                 }
             }

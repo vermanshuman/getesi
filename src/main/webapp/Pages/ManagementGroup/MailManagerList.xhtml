@@ -401,8 +401,10 @@
                                                     </p:calendar>
                                                 </div>
                                                 <div class="p-col-12">
+                                                    <span style="margin-bottom: 5px">#{msg.status}:</span>
                                                     <p:selectCheckboxMenu value="#{bean.selectedSearchStateIds}" id="states"
-                                                                          label="#{msg.mailManagerStates}"
+                                                                          label="#{msg.mailManagerStates}"  multiple="true"
+                                                                          filter="true" filterMatchMode="startsWith"
                                                                           style="margin-right: 15px!important;width: 40%;" styleClass="statesmenu#{bean.selectedSearchStateIds ne null and fn:length(bean.selectedSearchStateIds) gt 0 ? ' select-checkbox' : ''}">
                                                         <f:selectItems value="#{bean.searchStates}"/>
                                                         <p:ajax event="change" update="@this"/>
