@@ -202,7 +202,7 @@
                 <h:panelGroup id="slides" layout="block" styleClass="p-grid">
                     
                     <div class="p-col-12 p-lg-6 p-xl-3" style="display: #{homeBean.nextSlide ? 'none' : ''}">
-                        <p:commandLink action="#{homeBean.openMailList()}"  >
+                        <p:commandLink action="#{homeBean.openMailList()}" style="text-decoration: none" >
                         <div class="overview-box sales" style="background-color: #FF9966;">
                             <i class="overview-icon topbar-icon fa fa-fw fa-envelope-o" style="color:white;"/>
                             <span class="overview-title">#{msg.numberUnreadEmails}</span>
