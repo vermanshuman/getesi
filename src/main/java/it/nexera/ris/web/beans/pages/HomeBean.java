@@ -500,4 +500,15 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
         System.out.println(">>>>>>>>>>>>>>");
         return "";
     }
+    public void openMailList() {
+        String value = Arrays.toString(new Long[]{MailManagerStatuses.NEW.getId()});
+        setSessionValue("KEY_MAIL_TYPE_SESSION_KEY_NOT_COPY",value);
+        RedirectHelper.goTo(PageTypes.MAIL_MANAGER_LIST);
+        
+    }
+    
+    private void setSessionValue(String key, String value) {
+        SessionHelper.put(key, value);
+        HttpSessionHelper.put(key, value);
+    }
 }
