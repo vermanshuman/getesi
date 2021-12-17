@@ -11,11 +11,11 @@
               draggable="false" onHide="tableUpdateAfterDialogClose()">
         <h:outputText value="#{msg.requestTotalDocument}"/>
         <div class="btn_line">
-            <p:commandButton value="#{msg.ok}"
+            <p:commandButton value="#{msg.submit}" styleClass="btn-green"
                              oncomplete="document.getElementById('fakeButtonExcelDownload').click(); PF('createTotalCosthDocumentDialogWV').hide();">
                 <f:setPropertyActionListener value="#{true}" target="#{bean.createTotalCostSumDocumentRecord}"/>
             </p:commandButton>
-            <p:commandButton value="#{msg.cancel}"
+            <p:commandButton value="#{msg.cancel}" styleClass="btn-red"
                              oncomplete="document.getElementById('fakeButtonExcelDownload').click(); PF('createTotalCosthDocumentDialogWV').hide();">
                 <f:setPropertyActionListener value="#{false}" target="#{bean.createTotalCostSumDocumentRecord}"/>
             </p:commandButton>
