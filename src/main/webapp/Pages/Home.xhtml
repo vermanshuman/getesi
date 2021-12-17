@@ -200,7 +200,6 @@
             </script>
             <div class="layout-dashboard" style="max-width: 98%;">
                 <h:panelGroup id="slides" layout="block" styleClass="p-grid">
-                    
                     <div class="p-col-12 p-lg-6 p-xl-3" style="display: #{homeBean.nextSlide ? 'none' : ''}">
                         <p:commandLink action="#{homeBean.openMailList()}" style="text-decoration: none" >
                         <div class="overview-box sales" style="background-color: #FF9966;">
@@ -213,11 +212,10 @@
                             <div class="overview-subinfo">
                             </div>
                         </div>
-                            
-                     </p:commandLink>
+                        </p:commandLink>
                     </div>
                     <div class="p-col-12 p-lg-6 p-xl-3" style="display: #{homeBean.nextSlide ? 'none' : ''}">
-                        <p:commandLink action="#{homeBean.openRequestList()}" style="text-decoration: none" >
+                        <p:commandLink action="#{homeBean.openRequestList(1)}" style="text-decoration: none" >
                         <div class="overview-box views" style="background-color: #5EA2CC;">
                             <i class="overview-icon fa fa-fw fa-list" style="color:white;"/>
                             <span class="overview-title">Pratiche nuove</span>
@@ -228,9 +226,10 @@
                             <div class="overview-subinfo">
                             </div>
                         </div>
-                      </p:commandLink>
+                        </p:commandLink>
                     </div>
                     <div class="p-col-12 p-lg-6 p-xl-3">
+                        <p:commandLink action="#{homeBean.openRequestList(2)}" style="text-decoration: none" >
                         <div class="overview-box checkin">
                             <i class="overview-icon pi pi-pencil"/>
                             <span class="overview-title">#{msg.numberTotalRequests}</span>
@@ -241,6 +240,7 @@
                             <div class="overview-subinfo">
                             </div>
                         </div>
+                        </p:commandLink>
                     </div>
                     <div class="p-col-12 p-lg-6 p-xl-3">
                         <div class="overview-box checkin" style="background-color: #DF6161;">

@@ -51,7 +51,6 @@ public enum PageTypes {
 
     REQUEST_TYPE_LIST("/Pages/Dictionaries/RequestTypeList.jsf", true),
     FOREIGN_STATES_LIST("/Pages/Dictionaries/ForeignStatesList.jsf", true),
-
     STRUCTURE_LIST("/Pages/Dictionaries/StructureList.jsf", true),
 
     COST_CONFIGURATION_LIST("/Pages/Dictionaries/CostConfigurationList.jsf", true),
@@ -149,7 +148,8 @@ public enum PageTypes {
     LAND_CULTURE_LIST("/Pages/ConfigurationArea/LandCultureList.jsf", true),
     LAND_CULTURE_EDIT("/Pages/ConfigurationArea/LandCultureEdit.jsf", true),
 
-    CALENDAR("/Pages/Configuration/Calendar.jsf");
+    CALENDAR("/Pages/Configuration/Calendar.jsf"),
+    FOREIGN_STATES("/Pages/Configuration/ForeignStates.jsf");
 
     private String page;
 

@@ -172,11 +172,11 @@
             }
 
             .new-button {
-                background: #009900 !important;
+                background: #00CC52 !important;
             }
 
             .new-button-multiple {
-                background: #009900 !important;
+                background: #00CC52 !important;
             }
 
             #table_paginator_top :first-child {
@@ -523,7 +523,7 @@
                                                                  update="settingPanel searchPanel"
                                                                  oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').getJQ().hide();"/>
                                                 <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}"
-                                                                 style="background: #009900; margin-left:3px;"
+                                                                 style="background: #00CC52; margin-left:3px;"
                                                                  id="searchButton12345"
                                                                  onclick="checkDates(); filterTableFromPanel();"
                                                                  update="searchPanel"
@@ -656,7 +656,7 @@
                     <br/>
                     <h:outputText value="#{not empty item.stateDescription ? ff:upper(item.stateDescription) : ''}"
                                   styleClass="#{item.stateDescription eq 'Inserita'
-                        ? 'status-icon status-green' : (item.stateDescription eq 'In lavorazione' ? 'status-icon status-yellow' :(item.stateDescription eq 'Da inviare' ? 'status-icon status-navy' : (item.stateDescription eq 'Sospesa' ? 'status-icon status-magenta' : (item.stateDescription eq 'Evasa' ? 'status-icon status-red': (item.stateDescription eq 'Inviata allo SDI' ? 'status-icon status-cyan': '')))))}"/>
+                         ? 'status-icon status-green' : (item.stateDescription eq 'In lavorazione' ? 'status-icon status-yellow' :(item.stateDescription eq 'Da inviare' ? 'status-icon status-navy' : (item.stateDescription eq 'Sospesa' ? 'status-icon status-magenta' : (item.stateDescription eq 'Evasa' ? 'status-icon status-red': (item.stateDescription eq 'Inviata allo SDI' ? 'status-icon status-cyan': (item.stateDescription eq 'Fatturata' ? 'status-icon state-blue': ''))))))}"/>
                     <br/>
                     <h:outputText rendered="#{item.urgent}" styleClass="vertical-txt" value="#{ff:upper(msg.requestListUrgent)}" />
                     <br/>

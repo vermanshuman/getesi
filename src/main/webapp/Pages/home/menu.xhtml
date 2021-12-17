@@ -213,6 +213,7 @@
                         <p:menuitem id="billing"
                                     value="#{msg.headerBilling}#{sessionBean.requestCounts gt 0 ? ' ('.concat(sessionBean.requestCounts).concat(')') : ''}" icon="topbar-icon fatturazione-icon"
                                     action="#{sessionBean.getBillingListPage()}"
+                                    rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/BillingList.jsf')}"
                                     actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>
                         <p:menuitem id="contactPage" styleClass="main" value="#{msg.headerContact}" icon="topbar-icon contact-icon"/>
                         <p:submenu id="amministrazione" label="#{msg.menuConfiguration}" icon="pi pi-align-left">

@@ -27,6 +27,13 @@
             	border: 1px solid #a8acb1;
             }
 
+            body .ui-autocomplete-panel .ui-autocomplete-items .ui-autocomplete-item.ui-autocomplete-row > td {
+                padding: 0.5rem 0.5rem !important;
+            }
+            body .ui-autocomplete-panel .ui-autocomplete-items .ui-autocomplete-item.ui-autocomplete-row {
+                font-size: 19px !important;
+                border-color: #A7A8AB;
+            }
         </style>
 
         <script type="text/javascript">
@@ -115,7 +122,19 @@
                     change = false;
                     $("#changeVar").val("change");
                 });
+                $( "#mailTo .ui-autocomplete-multiple-container .ui-autocomplete-input-token input" ).focusout(function() {
+                    emailHeightAdjust();
+                }).focus(function() {
+                    $( "#mailTo .ui-autocomplete-multiple-container" ).css("height", "auto");
+                });
+                emailHeightAdjust();
             });
+            function emailHeightAdjust() {
+                var noOfEmail = $( "#mailTo .ui-autocomplete-multiple-container li" ).length - 1;
+                if(noOfEmail != 0 &amp;&amp; noOfEmail%2==0) {
+                    $( "#mailTo .ui-autocomplete-multiple-container" ).css("height", (((noOfEmail/2)*38)+'px'));
+                }
+            }
         </script>
 
         <p:remoteCommand name="onRedirect" action="#{bean.confirmRedirect(false)}" oncomplete="setCloseTab();"/>

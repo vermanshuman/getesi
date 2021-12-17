@@ -86,7 +86,7 @@
                 border: none !important;
             }
             .mail-button {
-                background: #009900 !important;
+                background: #00CC52 !important;
             }
 
             .searchPanelButton {
@@ -401,15 +401,17 @@
                                                     </p:calendar>
                                                 </div>
                                                 <div class="p-col-12">
+                                                    <span style="margin-bottom: 5px">#{msg.status}:</span>
                                                     <p:selectCheckboxMenu value="#{bean.selectedSearchStateIds}" id="states"
-                                                                          label="#{msg.mailManagerStates}"
+                                                                          label="#{msg.mailManagerStates}"  multiple="true"
+                                                                          filter="true" filterMatchMode="startsWith"
                                                                           style="margin-right: 15px!important;width: 40%;" styleClass="statesmenu#{bean.selectedSearchStateIds ne null and fn:length(bean.selectedSearchStateIds) gt 0 ? ' select-checkbox' : ''}">
                                                         <f:selectItems value="#{bean.searchStates}"/>
                                                         <p:ajax event="change" update="@this"/>
                                                     </p:selectCheckboxMenu>
                                                 </div>
                                                 <div class="p-col-12" style="text-align: center;">
-                                                    <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #009900;margin-right: 20px;" id="searchButton"
+                                                    <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #00CC52;margin-right: 20px;" id="searchButton"
                                                                      onclick="checkDates(); filterTableFromPanel();" update="searchPanel" oncomplete="PF('panelSetting').getJQ().hide()"/>
                                                     <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFiltraPanel}" update="settingPanel" oncomplete="PF('panelSetting').getJQ().hide()"/>
                                                 </div>

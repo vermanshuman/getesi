@@ -209,8 +209,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private String apiError;
 
     private boolean sendInvoice;
-    
-    private Double invoiceNetAmount;
+
+    private Boolean billinRequest;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
@@ -365,7 +365,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             setSelectedPaymentTypeId(invoice.getPaymentType().getId());
             List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
             for(InvoiceItem invoiceItem : invoiceItems) {
-                setInvoiceNetAmount(invoiceItem.getAmount());
+                setInvoiceItemAmount(invoiceItem.getAmount());
                 setInvoiceItemVat(invoiceItem.getVat());
             }
         }
@@ -380,6 +380,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                                 RequestState.SENT_TO_SDI.getId().equals(x.getStateId())).collect(Collectors.toList());
         if(!requestListSentToSdi.isEmpty())
             setSendInvoice(true);
+        setBillinRequest(AccessBean.canViewPage(PageTypes.BILLING_LIST));
     }
 
     public void initOfficesList() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -1203,8 +1204,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             if(!ValidationHelper.isNullOrEmpty(getExamRequest())
                     && !ValidationHelper.isNullOrEmpty(getExamRequest().getSubject())){
                 invoiceItem.setSubject(getExamRequest().getSubject().toString());
-                invoiceItem.setAmount(getInvoiceNetAmount());
+                invoiceItem.setAmount(getInvoiceItemAmount());
                 invoiceItem.setVat(getInvoiceItemVat());
+                invoiceItem.setInvoiceTotalCost(getInvoiceTotalCost());
             }
             List<InvoiceItem> invoiceItems = new ArrayList<>();
             invoiceItems.add(invoiceItem);
@@ -1288,13 +1290,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     }
 
     public Double getInvoiceTotalCost() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
-        if(!ValidationHelper.isNullOrEmpty(getExamRequest())){
-            Request invoiceRequest = DaoManager.get(Request.class, getExamRequest().getId());
-            if(!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
-                    !ValidationHelper.isNullOrEmpty(invoiceRequest.getTotalCostDouble())){
-                setInvoiceTotalCost(Double.parseDouble(invoiceRequest.getTotalCostDouble()));
-            }
-        }
         return invoiceTotalCost;
     }
 

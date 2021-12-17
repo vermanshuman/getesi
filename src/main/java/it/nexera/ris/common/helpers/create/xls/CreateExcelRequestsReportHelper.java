@@ -1154,7 +1154,11 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
         String trust = "";
         String ndg = excelDataWrapper.getNdg() != null ? excelDataWrapper.getNdg() : "";
         String reportn = excelDataWrapper.getReportn() != null ? String.valueOf(excelDataWrapper.getReportn()) : "";
-        String fatturaN = excelDataWrapper.getFatturan() != null ? String.valueOf(excelDataWrapper.getFatturan()) : "";
+        String fatturaN = "";
+        if(!ValidationHelper.isNullOrEmpty(excelDataWrapper.getInvoiceNumber()))
+            fatturaN = excelDataWrapper.getInvoiceNumber();
+        else
+            fatturaN = excelDataWrapper.getFatturan() != null ? String.valueOf(excelDataWrapper.getFatturan()) : "";
         String data = excelDataWrapper.getData() != null ? DateTimeHelper.toFormatedString(excelDataWrapper.getData(), DateTimeHelper.getDatePattern()) : "";
         //String fatturaDiRiferimento = excelDataWrapper.getFatturaDiRiferimento() != null ? excelDataWrapper.getFatturaDiRiferimento() : "";
         
