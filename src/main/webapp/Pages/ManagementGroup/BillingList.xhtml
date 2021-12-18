@@ -542,15 +542,15 @@
                             <p:outputPanel id="btn_line">
                                 <div class="p-field">
                                     <p:commandButton value="#{msg.requestPrintExcel}"  rendered="#{bean.showPrintButton}"
-                                                     styleClass="search-btn" style="width: 30%;"
+                                                     styleClass="search-btn" style="width: 15%;"
                                                      id="printExcelButton" oncomplete="PF('createTotalCosthDocumentDialogWV').show()"/>
                                     <p:commandButton rendered="#{bean.showPrintButton}" value="#{msg.requestEditAndPrint}"
-                                                     styleClass="search-btn"
+                                                     styleClass="search-btn" style="width: 35%;margin-left: 5px; "
                                                      id="editAndPrintButton" oncomplete="PF('editAndPrintDialogWV').show();"
                                                      process="btn_line"/>
-                                    <p:commandButton style="margin-left: 2px;" rendered="#{bean.showPrintButton}"
+                                    <p:commandButton style="width: 45%;float: right;" rendered="#{bean.showPrintButton}"
                                                      value="#{msg.requestTextEditCreateInvoice}"
-                                                     id="createInvoice" styleClass="grey-button"
+                                                     id="createInvoice" styleClass="search-btn" 
                                                      action="#{bean.setMaxInvoiceNumber()}" update="@widgetVar(invoiceDialogWV)"
                                                      oncomplete="PF('invoiceDialogWV').show();"/>
                                 </div>
