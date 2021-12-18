@@ -6,22 +6,22 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
-    <p:dialog widgetVar="createTotalCosthDocumentDialogWV" id="createTotalCosthDocumentDialog" modal="true"
-              resizable="false"
-              draggable="false" onHide="tableUpdateAfterDialogClose()">
-        <h:outputText value="#{msg.requestTotalDocument}"/>
-        <div class="btn_line">
-            <p:commandButton value="#{msg.submit}" styleClass="btn-green"
-                             oncomplete="document.getElementById('fakeButtonExcelDownload').click(); PF('createTotalCosthDocumentDialogWV').hide();">
-                <f:setPropertyActionListener value="#{true}" target="#{bean.createTotalCostSumDocumentRecord}"/>
-            </p:commandButton>
-            <p:commandButton value="#{msg.cancel}" styleClass="btn-red"
-                             oncomplete="document.getElementById('fakeButtonExcelDownload').click(); PF('createTotalCosthDocumentDialogWV').hide();">
-                <f:setPropertyActionListener value="#{false}" target="#{bean.createTotalCostSumDocumentRecord}"/>
-            </p:commandButton>
-            <p:commandButton id="fakeButtonExcelDownload" process="searchPanel"
-                             styleClass="non_displayed_button" ajax="false" action="#{bean.loadRequestsExcel}"/>
-        </div>
-    </p:dialog>
-    <p:remoteCommand name="tableUpdateAfterDialogClose" oncomplete="filterTableFromPanel()"/>
+<p:dialog widgetVar="createTotalCosthDocumentDialogWV" id="createTotalCosthDocumentDialog" modal="true"
+          resizable="false"
+          draggable="false" onHide="tableUpdateAfterDialogClose()">
+    <h:outputText value="#{msg.requestTotalDocument}"/>
+    <div class="btn_line">
+        <p:commandButton value="#{msg.submit}" styleClass="btn-green"
+                         oncomplete="document.getElementById('fakeButtonExcelDownload').click(); PF('createTotalCosthDocumentDialogWV').hide();">
+            <f:setPropertyActionListener value="#{true}" target="#{bean.createTotalCostSumDocumentRecord}"/>
+        </p:commandButton>
+        <p:commandButton value="#{msg.cancel}" styleClass="btn-red"
+                         oncomplete="document.getElementById('fakeButtonExcelDownload').click(); PF('createTotalCosthDocumentDialogWV').hide();">
+            <f:setPropertyActionListener value="#{false}" target="#{bean.createTotalCostSumDocumentRecord}"/>
+        </p:commandButton>
+        <p:commandButton id="fakeButtonExcelDownload" process="searchPanel"
+                         styleClass="non_displayed_button" ajax="false" action="#{bean.loadRequestsExcel}"/>
+    </div>
+</p:dialog>
+<p:remoteCommand name="tableUpdateAfterDialogClose" oncomplete="filterTableFromPanel()"/>
 </html>

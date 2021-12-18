@@ -524,15 +524,37 @@
                                                                  oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').getJQ().hide();"/>
                                                 <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}"
                                                                  style="background: #00CC52; margin-left:3px;"
-                                                                 id="searchButton12345"
+                                                                 id="searchButtonFilter"
+                                                                 action="#{bean.prepareToModify}"
                                                                  onclick="checkDates(); filterTableFromPanel();"
-                                                                 update="searchPanel"
+                                                                 update="searchPanel btn_line editAndPrintDialog"
                                                                  oncomplete="PF('panelSetting').getJQ().hide();"/>
                                             </div>
                                         </div>
                                     </p:panel>
                                 </div>
                             </div>
+                        </div>
+                        <div class="p-col-6">
+                        </div>
+                        <div class="p-col-2"></div>
+                        <div class="p-col-4">
+                            <p:outputPanel id="btn_line">
+                                <div class="p-field">
+                                    <p:commandButton value="#{msg.requestPrintExcel}"  rendered="#{bean.showPrintButton}"
+                                                     styleClass="search-btn" style="width: 30%;"
+                                                     id="printExcelButton" oncomplete="PF('createTotalCosthDocumentDialogWV').show()"/>
+                                    <p:commandButton rendered="#{bean.showPrintButton}" value="#{msg.requestEditAndPrint}"
+                                                     styleClass="search-btn"
+                                                     id="editAndPrintButton" oncomplete="PF('editAndPrintDialogWV').show();"
+                                                     process="btn_line"/>
+                                    <p:commandButton style="margin-left: 2px;" rendered="#{bean.showPrintButton}"
+                                                     value="#{msg.requestTextEditCreateInvoice}"
+                                                     id="createInvoice" styleClass="grey-button"
+                                                     action="#{bean.setMaxInvoiceNumber()}" update="@widgetVar(invoiceDialogWV)"
+                                                     oncomplete="PF('invoiceDialogWV').show();"/>
+                                </div>
+                            </p:outputPanel>
                         </div>
                     </div>
                 </div>
@@ -541,7 +563,7 @@
 
 
         <p:remoteCommand name="resetTableData"
-                         action="#{bean.onLoad}" update=":form:table"/>
+                         action="#{bean.onLoad}" update=":form:table :form:btn_line"/>
         <p:outputPanel id="searchPanel" style="display:none;" >
             <p:commandButton icon="fa fa-fw fa-file-pdf-o"  rendered="false"
                              action="#{bean.downloadPdfFile}" ajax="false" update="@form">
@@ -958,6 +980,7 @@
         </p:dialog>
 
         <ui:include src="../Dialogs/TotalCostDocumentDialog.xhtml"/>
+        <ui:include src="../Dialogs/InvoiceDialog.xhtml"/>
     </ui:define>
 </ui:composition>
 </html>

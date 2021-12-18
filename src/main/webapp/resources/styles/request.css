@@ -480,11 +480,11 @@ body a {
 }
 
 .ui-dialog .ui-dialog-titlebar{
-    padding: 3px !important;
+	padding: 3px !important;
 }
 .btn-red {
-    background-color: #F3362B !important;
+	background-color: #F3362B !important;
 }
 .btn-green {
-    background-color: #00cc52 !important;
+	background-color: #00cc52 !important;
 }
