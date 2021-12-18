@@ -61,7 +61,7 @@
             width: 100%;
         }
 
-        .select-one-menu {
+        .select-one-menu-width {
             width: 100%;
         }
 
@@ -85,6 +85,9 @@
             margin-right: 10px;
             margin-top: 9px;
         }
+        .highlight-input{
+            
+        }
     </style>
 
     <p:dialog widgetVar="invoiceDialogWV" modal="true" width="1150" draggable="false"
@@ -103,15 +106,15 @@
                         <h:outputText value="#{msg.requestTextEditClient}"/>
                     </div>
                     <div class="p-col-8">
-                        <p:inputText value="#{bean.examRequest.client}" disabled="true"/>
+                        <p:inputText value="#{bean.examRequest.client}" disabled="true" />
                     </div>
 
                     <div class="p-col-1 vertical-center">
                         <h:outputText value="#{msg.requestTextEditDocType}"/>
                     </div>
                     <div class="p-col-2">
-                        <p:selectOneMenu  value="#{bean.documentType}"
-                                label="#{msg.requestTextEditDocType}" styleClass="select-one-menu"
+                        <p:selectOneMenu  value="#{bean.documentType}"         
+                                label="#{msg.requestTextEditDocType}" styleClass="select-one-menu'}"
                                           disabled="true" >
                             <f:selectItems value="#{bean.docTypes}"/>
                         </p:selectOneMenu>
@@ -135,7 +138,7 @@
                                     pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
                                     popupIconOnly="true"
                                     onblur="check_date(this)"
-                                    styleClass="calender-filled">
+                                    styleClass="#{bean.invoiceDate ne null ? 'calender-filled' : ''}" >
                             <p:ajax event="dateSelect" update="@this" />
                         </p:calendar>
                     </div>
@@ -162,7 +165,7 @@
                                     pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
                                     popupIconOnly="true"
                                     onblur="check_date(this)"
-                                    styleClass="calender-filled">
+                                    styleClass="#{bean.competence ne null ? 'calender-filled' : ''}">
                             <p:ajax event="dateSelect" update="@this" />
                         </p:calendar>
                     </div>
@@ -181,7 +184,7 @@
                     </div>
                     <div class="p-col-2" style="width: 15% !important; padding-left:0 !important; margin-top: 7px;">
                         <p:selectOneMenu label="#{msg.requestTextEditVatCollectability}" disabled="#{bean.invoiceSentStatus}"
-                                         value="#{bean.vatCollectabilityId}" styleClass="select-one-menu">
+                                         value="#{bean.vatCollectabilityId}" styleClass="#{bean.vatCollectabilityId ne null ? 'select-one-menu' : 'select-one-menu-width'}">
                             <f:selectItems value="#{bean.vatCollectabilityList}"/>
                         </p:selectOneMenu>
                     </div>
@@ -200,7 +203,7 @@
                         <h:outputText value="#{msg.requestTextEditStamp}"/>
                     </div>
                     <div class="p-col-2">
-                        <p:selectOneMenu label="#{msg.requestTextEditStamp}" styleClass="select-one-menu" disabled="#{bean.invoiceSentStatus}">
+                        <p:selectOneMenu label="#{msg.requestTextEditStamp}" styleClass="select-one-menu-width" disabled="#{bean.invoiceSentStatus}">
                         </p:selectOneMenu>
                     </div>
 
@@ -242,7 +245,7 @@
                     </div>
                     <div class="p-col-1">
                         <h:outputText value="#{msg.requestTextEditUM}"></h:outputText>
-                        <p:selectOneMenu styleClass="select-one-menu" disabled="true">
+                        <p:selectOneMenu styleClass="select-one-menu-width" disabled="true">
                             <f:selectItems value="#{bean.ums}"/>
                         </p:selectOneMenu>
                     </div>
@@ -253,7 +256,7 @@
                     <div class="p-col-4">
                         <h:outputText value="#{msg.requestTextEditVat}"></h:outputText>
                         <p:selectOneMenu id="invoiceVat" value="#{bean.invoiceItemVat}"
-                                         label="#{msg.invoiceVat}" styleClass="select-one-menu" disabled="#{bean.invoiceSentStatus}">
+                                         label="#{msg.invoiceVat}" styleClass="#{bean.invoiceItemVat ne null ? 'select-one-menu' : 'select-one-menu-width'}" disabled="#{bean.invoiceSentStatus}">
                             <f:selectItems value="#{bean.vatAmounts}"/>
                             <p:ajax event="change" update="totalGrossAmount invoiceTotalAmount invoiceToVAT totalGA"/>
                         </p:selectOneMenu>
@@ -281,7 +284,7 @@
                     </div>
                     <div class="p-col-3">
                         <h:outputText value="#{msg.requestTextEditRevenueCenter}"></h:outputText>
-                        <p:selectOneMenu styleClass="select-one-menu" disabled="#{bean.invoiceSentStatus}"></p:selectOneMenu>
+                        <p:selectOneMenu styleClass="select-one-menu-width" disabled="#{bean.invoiceSentStatus}"></p:selectOneMenu>
                     </div>
                     <div class="p-col-3">
                         <h:outputText></h:outputText>
