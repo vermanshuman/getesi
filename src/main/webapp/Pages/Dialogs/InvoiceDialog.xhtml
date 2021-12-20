@@ -85,17 +85,48 @@
             margin-right: 10px;
             margin-top: 9px;
         }
-        .highlight-input{
-            
+         
+        .invoiceDialog > .p-grid > div > input {
+            background-color: #FFFFFF !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 7px !important;
+            min-height: 28px;
         }
+
+        .invoiceDialog > .p-grid > div > .ui-selectonemenu {
+            background-color: #FFFFFF !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 7px !important;
+        }
+        .invoiceDialog > .p-grid > div > .ui-outputpanel > input{
+            background-color: #FFFFFF !important;
+            border: none !important;
+            border-radius: 7px !important;
+            min-height: 28px;
+        }
+        .invoiceDialog > .p-grid > div > div > .ui-selectonemenu-label {
+            background-color: #FFFFFF !important; 
+            border-radius: 7px !important;
+            color: #003871;
+            margin-top: 4px;
+            margin-bottom: 4px;
+        }
+
+        .invoiceDialog > .p-grid > div > span > input {
+            background-color: #FFFFFF !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 7px !important;
+            min-height: 28px;
+        }
+
     </style>
 
     <p:dialog widgetVar="invoiceDialogWV" modal="true" width="1150" draggable="false"
               header="#{msg.requestTextEditElectronicSalesInvoice} (n. #{bean.invoiceNumber})">
-        <div style="margin-top:20px; overflow-x:hidden; overflow-y:auto; height: 600px;">
+        <div style="margin-top:20px; overflow-x:hidden; overflow-y:auto; height: 600px;" class="invoiceDialog">
         <p:tabMenu activeIndex="#{bean.activeMenuTabNum}" model="#{bean.topMenuModel}" style="background-color:#FFFFFF !important;" id="pageTabMenu"  />
             <ui:fragment>
-                <div class="p-grid" style="margin-right:20px;">
+                <div class="p-grid invoiceDialog" style="margin-right:20px;">
                     <div class="p-col-1 vertical-center">
                         <p:outputLabel value="#{msg.requestTextEditNumber}"/>
                     </div>
