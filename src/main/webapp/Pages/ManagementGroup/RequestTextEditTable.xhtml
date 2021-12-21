@@ -34,7 +34,10 @@
             background-color: red !important;
             color: #FFFFFF !important;
         }
-
+        #commentDialog{
+            left: calc(50% - 500px) !important;
+            top: calc(50% - 200px) !important;
+        }
 
     </style>
     <script type="text/javascript">
@@ -1057,8 +1060,8 @@
         <br/>
         <div align="center">
             <p:commandButton value="#{msg.yes}" action="#{bean.changeComment}" update=":form:estateTab"
-                             oncomplete="PF('commentEditDlg').hide()"/>
-            <p:commandButton value="#{msg.no}" onclick="PF('commentEditDlg').hide()"/>
+                             oncomplete="PF('commentEditDlg').hide()" styleClass="ui-button-success"style="margin-right: 3px;"/>
+            <p:commandButton value="#{msg.no}" onclick="PF('commentEditDlg').hide()" styleClass="ui-button-danger"/>
         </div>
     </p:dialog>
 
