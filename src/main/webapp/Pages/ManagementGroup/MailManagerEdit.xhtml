@@ -37,6 +37,13 @@
             #mailTo_panel,#mailCC_panel,#mailBCC_panel{
                 width: auto !important;
             }
+            .ui-datatable-scrollable-theadclone > tr > th{
+                border : none !important;
+            }
+            #confirmRedirect{
+                border: 2px solid #57c279 !important;
+                
+            }
         </style>
 
         <script type="text/javascript">
@@ -401,7 +408,7 @@
             <div class="btn_line">
                 <p:commandButton value="#{msg.yes.toUpperCase()}"
                                  action="#{bean.confirmRedirect(true)}"
-                                 styleClass="green-button"
+                                 styleClass="green-button" style="margin-right: 0.5cm;"
                                  oncomplete="PF('confirmRedirect').hide();"/>
                 <p:commandButton value="#{msg.no.toUpperCase()}"
                                  action="#{bean.confirmRedirect(false)}"
