@@ -44,6 +44,15 @@
                 border: 2px solid #57c279 !important;
                 
             }
+            #attachFielDlg{
+                width:50% !important;
+                left: calc(25% - 0px) ;
+                border: 2px solid #57c279 !important;
+            }
+            #tableFiles > .ui-datatable-tablewrapper > table > tbody > tr > td {
+                border-color: #808080 !important;
+            }
+            
         </style>
 
         <script type="text/javascript">
@@ -359,7 +368,7 @@
             <h:outputText value="#{msg.mailManagerEditMailAttachedFiles}:"
                           style="font-weight: bold;"/>
 
-            <p:dataTable emptyMessage="#{msg.noRecordsFound}" var="file" scrollable="true"
+            <p:dataTable emptyMessage="#{msg.noRecordsFound}" var="file"
                          value="#{bean.attachedFiles}" id="tableFiles">
                 <f:facet name="header">
                     <p:fileUpload fileUploadListener="#{bean.handleFileUpload}"

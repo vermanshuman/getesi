@@ -534,14 +534,12 @@
                                             listener="#{mailManagerListBean.rowDblSelectListener}"/>
                                     <f:facet name="header">
                                         <div class="customers-table-header">
-                                            <span style="font-weight: bold"></span>
-
-                                            <span class="ui-input-icon-left filter-container">
-                                                <i class="pi pi-search"/>
+                                            <div class="ui-inputgroup ui-input-icon-left filter-container" >
+                                                <p:commandButton value="Search" action="#{bean.globalSearch}"  update=":form:table"/>
                                                 <p:inputText id="globalFilter" value="#{bean.globalFilter}" placeholder="Global Search">
-                                                       <p:ajax event="keyup" delay="500" listener="#{bean.globalSearch}"  update=":form:table"/>
-                                                </p:inputText>
-                                            </span>
+                                                    <p:ajax event="keyup" delay="500" listener="#{bean.globalSearch}"  update=":form:table"/>
+                                                </p:inputText>   
+                                            </div>
                                         </div>
                                     </f:facet>
                                     <p:column style="width: 20px !important;" styleClass="min_padding_margin icon_column" selectionMode="multiple">
