@@ -44,31 +44,61 @@
                 </p:panelGrid>
             </c:if>
             <c:if test="#{!bean.costManipulationHelper.isEditable()}">
-                <h3>#{msg.estateSituationEditClientName}    <h:outputText value="#{bean.examRequest.clientName}"/></h3>
-                <h3>#{msg.estateSituationEditRequestType}   <h:outputText value="#{bean.examRequest.serviceName}"/></h3>
-                <h3>#{msg.requestTextEditNumberFormalities} <h:outputText value="#{bean.costManipulationHelper.numberActOrSumOfEstateFormalitiesAndOtherTemp}"/></h3>
-                 <c:if test="#{bean.examRequest.showAuthorizedQuote()}">
-                	<h3>#{msg.requestTextEditAuthorizedEstimate}
-		            	<p:selectBooleanCheckbox id="authorizedEstimate" value="#{bean.examRequest.authorizedQuote}"/>
-		            </h3>
-		        </c:if>          
-                <h3>#{msg.requestTextEditNumberSummaryList} <h:outputText value="#{bean.examRequest.numberOfGroupsByDocumentOfEstateFormality}"/></h3>
-                <h3>#{msg.requestTextEditMortgageExpenses}  <h:outputText value="#{bean.costManipulationHelper.costEstateFormalityTemp}"/></h3>
-                <h3>#{msg.requestTextEditLandRegistryFees}  <h:outputText value="#{bean.costManipulationHelper.costCadastralTemp}"/></h3>
-                <h3>#{msg.requestTextEditCompensation}      <h:outputText value="#{bean.costManipulationHelper.costPayTemp}"/></h3>
-                <h3>#{msg.requestTaxableCost}             <h:outputText id="requestTaxableCost" value="#{bean.costManipulationHelper.taxableCostTemp}"/> </h3>
-                 <h3>#{msg.requestIncludeNationalCost} 
-                     <p:selectBooleanCheckbox id="includeNationalCost" value="#{bean.costManipulationHelper.includeNationalCost}">
-                          <p:ajax listener="#{bean.updateNationalCost()}" update="@this requestExtraCostTable includeNationalCostDialog"/>
-                     </p:selectBooleanCheckbox>
-                 </h3> 
-                <h3>#{msg.requestExtraCostInit}             <h:outputText id="requestExtraCostInit" value="#{bean.costManipulationHelper.initCostTemp}"/> </h3>
+                <div class="p-field p-grid">
+                    <span class="p-col-fixed" >#{msg.estateSituationEditClientName}</span>   <h:outputText value="#{bean.examRequest.clientName}"/>
+                </div>
+                <div class="p-field p-grid">
+                    <span class="p-col-fixed ">#{msg.estateSituationEditRequestType} </span>  <h:outputText value="#{bean.examRequest.serviceName}"/>
+                </div>
+                <div class="p-field p-grid">
+                    <span class="p-col-fixed ">#{msg.requestTextEditNumberFormalities} </span> <h:outputText value="#{bean.costManipulationHelper.numberActOrSumOfEstateFormalitiesAndOtherTemp}"/>
+                </div>
+
+                <c:if test="#{bean.examRequest.showAuthorizedQuote()}">
+                    <div class="p-field p-grid">
+                        #{msg.requestTextEditAuthorizedEstimate}
+                        <p:selectBooleanCheckbox id="authorizedEstimate" value="#{bean.examRequest.authorizedQuote}"/>
+                    </div>        
+                </c:if>          
+
+                <div class="p-field p-grid">      
+                    <span class="p-col-fixed ">#{msg.requestTextEditNumberSummaryList}</span> <h:outputText value="#{bean.examRequest.numberOfGroupsByDocumentOfEstateFormality}"/>
+                </div>
+                <div class="p-field p-grid">
+                    <span class="p-col-fixed ">#{msg.requestTextEditMortgageExpenses} </span> <h:outputText value="#{bean.costManipulationHelper.costEstateFormalityTemp}"/>
+                </div>
+                <div class="p-field p-grid">
+                    <span class="p-col-fixed ">#{msg.requestTextEditLandRegistryFees} </span> 
+                    <h:outputText value="#{bean.costManipulationHelper.costCadastralTemp}"/>
+                </div>
+                <div class="p-field p-grid">
+                    <span class="p-col-fixed ">#{msg.requestTextEditCompensation}</span>    
+                    <h:outputText value="#{bean.costManipulationHelper.costPayTemp}"/>
+                </div>
+                <div class="p-field p-grid">
+                    <span class="p-col-fixed ">#{msg.requestTaxableCost}        </span>    
+                    <h:outputText id="requestTaxableCost" value="#{bean.costManipulationHelper.taxableCostTemp}"/> 
+                </div>
+                <div class="p-field p-grid">
+                    <span class="p-col-fixed ">#{msg.requestIncludeNationalCost} </span>
+                    <p:selectBooleanCheckbox id="includeNationalCost" value="#{bean.costManipulationHelper.includeNationalCost}">
+                        <p:ajax listener="#{bean.updateNationalCost()}" update="@this requestExtraCostTable includeNationalCostDialog"/>
+                    </p:selectBooleanCheckbox>
+                </div>
+                <div class="p-field p-grid">
+                    <span class="p-col-fixed ">#{msg.requestExtraCostInit}  </span> 
+                    <h:outputText  id="requestExtraCostInit" value="#{bean.costManipulationHelper.initCostTemp}"/>
+                </div>
                 <c:if test="#{bean.hideExtraCost ne null and bean.hideExtraCost}">
-                	<h3>#{msg.requestCostNote} <h:outputText value="#{bean.costNote}"/></h3>  
+                    <div class="p-field p-grid">
+                        <span class="p-col-fixed ">#{msg.requestCostNote} </span> <h:outputText value="#{bean.costNote}"/>
+                    </div>
                 </c:if>
                 <c:if test="#{bean.hideExtraCost eq null or not bean.hideExtraCost}">
-                	<h3>#{msg.requestExtraCost}</h3>
-            	</c:if>
+                    <div class="p-field p-grid">
+                        <span class="p-col-fixed ">#{msg.requestExtraCost}</span>
+                    </div>
+                </c:if>
             </c:if>
         </div>
 
