@@ -61,7 +61,7 @@
             width: 100%;
         }
 
-        .select-one-menu {
+        .select-one-menu-width {
             width: 100%;
         }
 
@@ -85,14 +85,49 @@
             margin-right: 10px;
             margin-top: 9px;
         }
+
+        .invoiceDialog > .p-grid > div > input {
+            background-color: #FFFFFF !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 7px !important;
+            min-height: 28px;
+        }
+
+        .invoiceDialog > .p-grid > div > .ui-selectonemenu {
+            background-color: #FFFFFF !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 7px !important;
+        }
+        .invoiceDialog > .p-grid > div > .ui-outputpanel > input{
+            background-color: #FFFFFF !important;
+            border: none !important;
+            border-radius: 7px !important;
+            min-height: 28px;
+        }
+        .invoiceDialog > .p-grid > div > div > .ui-selectonemenu-label {
+            background-color: #FFFFFF !important;
+            border-radius: 7px !important;
+            color: #003871;
+            margin-top: 4px;
+            margin-bottom: 4px;
+        }
+
+        .invoiceDialog > .p-grid > div > span > input {
+            background-color: #FFFFFF !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 7px !important;
+            min-height: 28px;
+        }
+
+
     </style>
 
     <p:dialog widgetVar="invoiceDialogWV" modal="true" width="1150" draggable="false"
               header="#{msg.requestTextEditElectronicSalesInvoice} (n. #{bean.invoiceNumber})">
-        <div style="margin-top:20px; overflow-x:hidden; overflow-y:auto; height: 600px;">
+        <div style="margin-top:20px; overflow-x:hidden; overflow-y:auto; height: 600px;" class="invoiceDialog">
         <p:tabMenu activeIndex="#{bean.activeMenuTabNum}" model="#{bean.topMenuModel}" style="background-color:#FFFFFF !important;" id="pageTabMenu"  />
             <ui:fragment>
-                <div class="p-grid" style="margin-right:20px;">
+                <div class="p-grid invoiceDialog" style="margin-right:20px;">
                     <div class="p-col-1 vertical-center">
                         <p:outputLabel value="#{msg.requestTextEditNumber}"/>
                     </div>
@@ -111,7 +146,7 @@
                     </div>
                     <div class="p-col-2">
                         <p:selectOneMenu  value="#{bean.documentType}"
-                                label="#{msg.requestTextEditDocType}" styleClass="select-one-menu"
+                                          label="#{msg.requestTextEditDocType}" styleClass="select-one-menu'}"
                                           disabled="true" >
                             <f:selectItems value="#{bean.docTypes}"/>
                         </p:selectOneMenu>
@@ -135,7 +170,7 @@
                                     pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
                                     popupIconOnly="true"
                                     onblur="check_date(this)"
-                                    styleClass="calender-filled">
+                                     styleClass="#{bean.invoiceDate ne null ? 'calender-filled' : ''}" >
                             <p:ajax event="dateSelect" update="@this" />
                         </p:calendar>
                     </div>
@@ -162,7 +197,7 @@
                                     pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
                                     popupIconOnly="true"
                                     onblur="check_date(this)"
-                                    styleClass="calender-filled">
+                                    styleClass="#{bean.competence ne null ? 'calender-filled' : ''}">
                             <p:ajax event="dateSelect" update="@this" />
                         </p:calendar>
                     </div>
@@ -181,7 +216,7 @@
                     </div>
                     <div class="p-col-2" style="width: 15% !important; padding-left:0 !important; margin-top: 7px;">
                         <p:selectOneMenu label="#{msg.requestTextEditVatCollectability}" disabled="#{bean.invoiceSentStatus}"
-                                         value="#{bean.vatCollectabilityId}" styleClass="select-one-menu">
+                                         value="#{bean.vatCollectabilityId}" styleClass="#{bean.vatCollectabilityId ne null ? 'select-one-menu' : 'select-one-menu-width'}">
                             <f:selectItems value="#{bean.vatCollectabilityList}"/>
                         </p:selectOneMenu>
                     </div>
@@ -200,7 +235,7 @@
                         <h:outputText value="#{msg.requestTextEditStamp}"/>
                     </div>
                     <div class="p-col-2">
-                        <p:selectOneMenu label="#{msg.requestTextEditStamp}" styleClass="select-one-menu" disabled="#{bean.invoiceSentStatus}">
+                        <p:selectOneMenu label="#{msg.requestTextEditStamp}" styleClass="select-one-menu-width" disabled="#{bean.invoiceSentStatus}">
                         </p:selectOneMenu>
                     </div>
 
@@ -209,7 +244,8 @@
                     </div>
                     <div class="p-col-2" style="width: 15% !important; padding-left:0 !important;">
                         <p:selectOneMenu id="paymentType" value="#{bean.selectedPaymentTypeId}" disabled="#{bean.invoiceSentStatus}"
-                                         label="#{msg.invoicePaymentType}" styleClass="select-width">
+                                         label="#{msg.invoicePaymentType}"
+                                         styleClass="#{bean.selectedPaymentTypeId ne null ? 'select-one-menu' : 'select-one-menu-width'}">>
                             <f:selectItems value="#{bean.paymentTypes}"/>
                         </p:selectOneMenu>
                     </div>
@@ -232,7 +268,9 @@
                 <div class="p-grid" style="margin-right:20px;">
                     <div class="p-col-2">
                         <h:outputText value="#{msg.requestTextEditNetAmount}"></h:outputText>
-                        <p:inputNumber id="invoiceTotalCost" value="#{bean.invoiceTotalCost}" disabled="#{bean.invoiceSentStatus}"/>
+                        <p:inputNumber id="invoiceTotalCost" value="#{bean.invoiceTotalCost}" disabled="#{bean.invoiceSentStatus}">
+                            <p:ajax event="blur" update="totalGrossAmount invoiceTotalAmount invoiceToVAT totalGA"/>
+                        </p:inputNumber>
                     </div>
                     <div class="p-col-1">
                         <h:outputText value="#{msg.requestTextEditQty}"></h:outputText>
@@ -242,7 +280,7 @@
                     </div>
                     <div class="p-col-1">
                         <h:outputText value="#{msg.requestTextEditUM}"></h:outputText>
-                        <p:selectOneMenu styleClass="select-one-menu" disabled="true">
+                        <p:selectOneMenu styleClass="select-one-menu-width" disabled="true">
                             <f:selectItems value="#{bean.ums}"/>
                         </p:selectOneMenu>
                     </div>
@@ -253,7 +291,7 @@
                     <div class="p-col-4">
                         <h:outputText value="#{msg.requestTextEditVat}"></h:outputText>
                         <p:selectOneMenu id="invoiceVat" value="#{bean.invoiceItemVat}"
-                                         label="#{msg.invoiceVat}" styleClass="select-one-menu" disabled="#{bean.invoiceSentStatus}">
+                        label="#{msg.invoiceVat}" styleClass="#{bean.invoiceItemVat ne null ? 'select-one-menu' : 'select-one-menu-width'}" disabled="#{bean.invoiceSentStatus}">
                             <f:selectItems value="#{bean.vatAmounts}"/>
                             <p:ajax event="change" update="totalGrossAmount invoiceTotalAmount invoiceToVAT totalGA"/>
                         </p:selectOneMenu>
@@ -281,7 +319,7 @@
                     </div>
                     <div class="p-col-3">
                         <h:outputText value="#{msg.requestTextEditRevenueCenter}"></h:outputText>
-                        <p:selectOneMenu styleClass="select-one-menu" disabled="#{bean.invoiceSentStatus}"></p:selectOneMenu>
+                        <p:selectOneMenu styleClass="select-one-menu-width" disabled="#{bean.invoiceSentStatus}"></p:selectOneMenu>
                     </div>
                     <div class="p-col-3">
                         <h:outputText></h:outputText>
@@ -304,7 +342,9 @@
                         <h:outputText value="#{msg.requestTextEditTotalSkills}"></h:outputText>
                     </div>
                     <div class="p-col-2">
-                        <p:inputText id="invoiceTotalAmount" value="#{bean.invoiceTotalCost}" disabled="true"/>
+                        <p:inputText id="invoiceTotalAmount" value="#{bean.invoiceTotalCost}" disabled="true">
+                            <f:convertNumber minFractionDigits="2" />
+                        </p:inputText>
                     </div>
 
                     <div class="p-col-8"></div>
@@ -313,7 +353,9 @@
                     </div>
 
                     <div class="p-col-2">
-                        <p:inputText id="invoiceToVAT" value="#{bean.totalVat}" disabled="true"/>
+                        <p:inputText id="invoiceToVAT" value="#{bean.totalVat}" disabled="true">
+                            <f:convertNumber minFractionDigits="2" />
+                        </p:inputText>
                     </div>
 
                     <div class="p-col-8"></div>
@@ -326,7 +368,9 @@
                         <h:outputText value="#{msg.requestTextEditTotalGross}"></h:outputText>
                     </div>
                     <div class="p-col-2">
-                        <p:inputText id="totalGA" value="#{bean.totalGrossAmount}" disabled="true"/>
+                        <p:inputText id="totalGA" value="#{bean.totalGrossAmount}" disabled="true">
+                            <f:convertNumber minFractionDigits="2" />
+                        </p:inputText>
                     </div>
 
                     <div class="p-col-8"></div>

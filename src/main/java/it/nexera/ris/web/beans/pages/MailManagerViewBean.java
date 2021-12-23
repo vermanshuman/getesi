@@ -345,6 +345,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
         docTypes = new ArrayList<>();
         docTypes.add(new SelectItem("FE", "FATTURA"));
+        setDocumentType("FE");
         competence = new Date();
 
         ums = new ArrayList<>();
@@ -1194,6 +1195,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             Invoice invoice = new Invoice();
             invoice.setClient(getExamRequest().getClient());
             invoice.setDate(getInvoiceDate());
+            invoice.setDocumentType(getDocumentType());
             if(!ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId()))
                 invoice.setPaymentType(DaoManager.get(PaymentType.class, getSelectedPaymentTypeId()));
 

@@ -1533,6 +1533,7 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
     private void attachInvoiceData() throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
 
         String refrequest = "";
+        String ndg = "";
         WLGInbox baseMail = DaoManager.get(WLGInbox.class, getBaseMailId());
         if(!ValidationHelper.isNullOrEmpty(baseMail)){
             if(!ValidationHelper.isNullOrEmpty(baseMail)
@@ -1544,6 +1545,7 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
                 .collect(Collectors.toList()));
             }
             refrequest = baseMail.getReferenceRequest();
+            ndg = baseMail.getNdg();
         }
         if(ValidationHelper.isNullOrEmpty(getInvoiceRequests()))
                 return;
@@ -1678,6 +1680,9 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
                                 r.setText(text, 0);
                             }else if (text != null && text.contains("refrequest")) {
                                 text = text.replace("refrequest",refrequest);
+                                r.setText(text, 0);
+                            }else if (text != null && text.contains("inboxndg")) {
+                                text = text.replace("inboxndg",ndg);
                                 r.setText(text, 0);
                             }
                         }

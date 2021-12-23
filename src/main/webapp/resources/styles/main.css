@@ -746,6 +746,10 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
     background: #00CC52 !important;
 }
 
+
+#requestDocumentDlgId{
+    border: 2px solid #57c279;
+}
 /*@media screen and (max-width: 991px) {
     .layout-wrapper .layout-menu-container {
         width: 300px;

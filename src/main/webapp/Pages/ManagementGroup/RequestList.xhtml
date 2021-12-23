@@ -342,7 +342,7 @@
                                             style="" id="searchButton" styleClass="ui-button-warning-icon"
                                             onclick="checkDates(); filterTableFromPanel();"
                                             action="#{bean.prepareToModify}" icon="ui-icon ui-icon-search pi pi-search"
-                                            update=":form:table,searchPanel,editAndPrintDialog" />
+                                            update=":form:table,searchPanel,editAndPrintDialog printPanel" />
                                 </div>
                                 <div class="settingsBlock">
                                     <p:commandButton id="settingButton" onclick="togglePanel();"
@@ -576,9 +576,10 @@
                                             <div class="p-col-12 search-panel-btns" style="text-align: center;">
                                                 <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}"
                                                                  style="background: #00CC52;"
-                                                                 id="searchButton12345"
+                                                                 id="searchButtonFilter"
+                                                                 action="#{bean.prepareToModify}"
                                                                  onclick="checkDates(); filterTableFromPanel();"
-                                                                 update="searchPanel"
+                                                                 update="searchPanel printPanel editAndPrintDialog"
                                                                  oncomplete="PF('panelSetting').getJQ().hide();"/>
                                                 <p:commandButton id="manageReestablishBtn" style="width: auto;"
                                                                  value="#{ff:upper(msg.mailManageReestablish)}"
@@ -590,6 +591,22 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="p-col-6">
+                        </div>
+                        <div class="p-col-4"></div>
+                        <div class="p-col-2">
+                            <p:outputPanel id="printPanel">
+                            <div class="p-field">
+                                <p:commandButton value="#{msg.requestPrintExcel}"  rendered="#{bean.showPrintButton}"
+                                                 styleClass="search-btn" style="width: 30%;"
+                                                 id="printExcelButton" oncomplete="PF('createTotalCosthDocumentDialogWV').show()"/>
+                                <p:commandButton rendered="#{bean.showPrintButton}" value="#{msg.requestEditAndPrint}"
+                                                 styleClass="search-btn"
+                                                 id="editAndPrintButton" oncomplete="PF('editAndPrintDialogWV').show();"
+                                                 process="printPanel"/>
+                            </div>
+                            </p:outputPanel>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -598,7 +615,7 @@
 
         <p:remoteCommand name="resetTableData"
                          action="#{bean.reset}" update=":form:table :form:settingPanel :form:stateSelectCheckboxPanelDataTable :form:requestTypeSelectCheckboxPanelDataTable
-                             :form:serviceSelectCheckboxPanelDataTable"/>
+                             :form:serviceSelectCheckboxPanelDataTable :form:printPanel"/>
         <p:outputPanel id="searchPanel" style="display:none;" >
             <p:commandButton icon="fa fa-fw fa-file-pdf-o"  rendered="false"
                              action="#{bean.downloadPdfFile}" ajax="false" update="@form">
@@ -886,7 +903,7 @@
                     <br/>
                     <h:outputText value="#{not empty item.stateDescription ? ff:upper(item.stateDescription) : ''}"
                                   styleClass="#{item.stateDescription eq 'Inserita'
-                        ? 'status-icon status-green' : (item.stateDescription eq 'In lavorazione' ? 'status-icon status-yellow' :(item.stateDescription eq 'Da inviare' ? 'status-icon status-navy' : (item.stateDescription eq 'Sospesa' ? 'status-icon status-magenta' : (item.stateDescription eq 'Evasa' ? 'status-icon status-red': (item.stateDescription eq 'Inviata allo SDI' ? 'status-icon status-cyan': '')))))}"/>
+                        ? 'status-icon status-green' : (item.stateDescription eq 'In lavorazione' ? 'status-icon status-yellow' :(item.stateDescription eq 'Da inviare' ? 'status-icon status-navy' : (item.stateDescription eq 'Sospesa' ? 'status-icon status-magenta' : (item.stateDescription eq 'Evasa' ? 'status-icon status-red': (item.stateDescription eq 'Inviata allo SDI' ? 'status-icon status-cyan': (item.stateDescription eq 'Fatturata' ? 'status-icon state-blue': ''))))))}"/>
                     <br/>
                     <h:outputText rendered="#{item.urgent}" styleClass="vertical-txt" value="#{ff:upper(msg.requestListUrgent)}" />
                     <br/>

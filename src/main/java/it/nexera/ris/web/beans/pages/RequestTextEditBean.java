@@ -2411,6 +2411,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             if(!ValidationHelper.isNullOrEmpty(getVatCollectabilityId()))
                 invoice.setVatCollectability(VatCollectability.getById(getVatCollectabilityId()));
             invoice.setNotes(getInvoiceNote());
+            invoice.setDocumentType(getDocumentType());
             InvoiceItem invoiceItem = new InvoiceItem();
             if(!ValidationHelper.isNullOrEmpty(getExamRequest())
                     && !ValidationHelper.isNullOrEmpty(getExamRequest().getSubject())){

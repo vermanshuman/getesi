@@ -8,6 +8,7 @@
 <ui:composition template="/resources/tpl/Admin/ListBase.xhtml">
     <ui:param name="list_title" value="#{msg.users}"/>
     <ui:param name="bean" value="#{userListBean}"/>
+
     <ui:define name="viewname">
         <li>
             <p:link outcome="/Pages/Configuration/UserList.jsf">#{msg.users}</p:link>

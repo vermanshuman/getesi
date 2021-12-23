@@ -309,6 +309,11 @@
                 background: #fed820;
                 color: #000000;
             }
+
+            #noUpdateDateDialogId{
+                border: 2px solid #D32F2F !important;
+            }
+
         </style>
 
         <h:form id="form" prependId="false" enctype="multipart/form-data"
@@ -532,7 +537,7 @@
                     <span class="ui-messages-error-summary">#{val.noUpdateDateIndicated}</span><br/>
                 </div>
                 <div class="btn_line">
-                    <p:commandButton value="#{msg.confirm}" oncomplete="PF('noUpdateDateDialogIdDialogWV').hide();"/>
+                    <p:commandButton styleClass="ui-button-success" value="#{msg.confirm}" oncomplete="PF('noUpdateDateDialogIdDialogWV').hide();"/>
                 </div>
             </p:dialog>
 

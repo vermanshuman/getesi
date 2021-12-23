@@ -176,3 +176,8 @@ td.ui-panelgrid-cell {
     border: 1px solid #fed820;
     margin-right: 10px;
 }
+
+.filter-container{
+    margin-right: 0px !important;
+    margin-left: auto !important;
+}

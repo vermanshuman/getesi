@@ -325,7 +325,7 @@
                                             style="" id="searchButton" styleClass="ui-button-warning-icon"
                                             onclick="checkDates(); filterTableFromPanel();"
                                             action="#{bean.prepareToModify}" icon="ui-icon ui-icon-search pi pi-search"
-                                            update=":form:table,searchPanel,editAndPrintDialog" />
+                                            update=":form:table,searchPanel,editAndPrintDialog btn_line" />
                                 </div>
                                 <div class="settingsBlock">
                                     <p:commandButton id="settingButton" onclick="togglePanel();"
@@ -524,15 +524,40 @@
                                                                  oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').getJQ().hide();"/>
                                                 <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}"
                                                                  style="background: #00CC52; margin-left:3px;"
-                                                                 id="searchButton12345"
+                                                                 id="searchButtonFilter"
+                                                                 action="#{bean.prepareToModify}"
                                                                  onclick="checkDates(); filterTableFromPanel();"
-                                                                 update="searchPanel"
+                                                                 update="searchPanel btn_line editAndPrintDialog"
                                                                  oncomplete="PF('panelSetting').getJQ().hide();"/>
                                             </div>
                                         </div>
                                     </p:panel>
                                 </div>
                             </div>
+                        </div>
+                        <div class="p-col-6">
+                        </div>
+                        <div class="p-col-2"></div>
+                        <div class="p-col-4">
+                            <p:outputPanel id="btn_line">
+                                <div class="p-field">
+                                    <p:commandButton value="#{msg.requestPrintExcel}"  rendered="#{bean.showPrintButton}"
+                                                     styleClass="search-btn" style="width: 15%;"
+                                                     id="printExcelButton" oncomplete="PF('createTotalCosthDocumentDialogWV').show()"/>
+                                    <p:commandButton rendered="#{bean.showPrintButton}" value="#{msg.requestEditAndPrint}"
+                                                     styleClass="search-btn" style="width: 35%;margin-left: 7px; "
+                                                     id="editAndPrintButton" oncomplete="PF('editAndPrintDialogWV').show();"
+                                                     process="btn_line"/>
+                                    <p:commandButton style="width: 45%;float: right;" rendered="#{bean.showPrintButton}"
+                                                     value="#{msg.requestTextEditCreateInvoice}"
+                                                     id="createInvoice"  styleClass="search-btn"
+                                                     action="#{bean.openInvoiceDialog()}"
+                                                     update="@widgetVar(invoiceDialogWV)"/>
+
+<!--                                                     -->
+<!--                                                     oncomplete="PF('invoiceDialogWV').show();"/>-->
+                                </div>
+                            </p:outputPanel>
                         </div>
                     </div>
                 </div>
@@ -541,7 +566,7 @@
 
 
         <p:remoteCommand name="resetTableData"
-                         action="#{bean.onLoad}" update=":form:table"/>
+                         action="#{bean.onLoad}" update=":form:table :form:btn_line"/>
         <p:outputPanel id="searchPanel" style="display:none;" >
             <p:commandButton icon="fa fa-fw fa-file-pdf-o"  rendered="false"
                              action="#{bean.downloadPdfFile}" ajax="false" update="@form">
@@ -656,7 +681,7 @@
                     <br/>
                     <h:outputText value="#{not empty item.stateDescription ? ff:upper(item.stateDescription) : ''}"
                                   styleClass="#{item.stateDescription eq 'Inserita'
-                         ? 'status-icon status-green' : (item.stateDescription eq 'In lavorazione' ? 'status-icon status-yellow' :(item.stateDescription eq 'Da inviare' ? 'status-icon status-navy' : (item.stateDescription eq 'Sospesa' ? 'status-icon status-magenta' : (item.stateDescription eq 'Evasa' ? 'status-icon status-red': (item.stateDescription eq 'Inviata allo SDI' ? 'status-icon status-cyan': '')))))}"/>
+                         ? 'status-icon status-green' : (item.stateDescription eq 'In lavorazione' ? 'status-icon status-yellow' :(item.stateDescription eq 'Da inviare' ? 'status-icon status-navy' : (item.stateDescription eq 'Sospesa' ? 'status-icon status-magenta' : (item.stateDescription eq 'Evasa' ? 'status-icon status-red': (item.stateDescription eq 'Inviata allo SDI' ? 'status-icon status-cyan': (item.stateDescription eq 'Fatturata' ? 'status-icon state-blue': ''))))))}"/>
                     <br/>
                     <h:outputText rendered="#{item.urgent}" styleClass="vertical-txt" value="#{ff:upper(msg.requestListUrgent)}" />
                     <br/>
@@ -957,7 +982,27 @@
             </div>
         </p:dialog>
 
+        <p:dialog widgetVar="requestInvoiceErrorDialogWV" id="requestInvoiceErrorDialogId" modal="true" draggable="false"
+                  position="center center"
+                  style="border: 2px solid #F3362B;">
+            <div class="ui-corner-all">
+                <span>#{bean.invoiceErrorMessage}</span><br/>
+            </div>
+            <br/>
+            <p:commandButton oncomplete="PF('requestInvoiceErrorDialogWV').hide();"
+                             value="#{msg.close}" style="float: right"/>
+        </p:dialog>
+
+        <p:dialog widgetVar="sendInvoiceErrorDialogWV"  id="sendBillingInvoiceErrorId" modal="true" draggable="false" position="center center">
+            <div class="ui-messages-error ui-corner-all">
+                <span class="ui-messages-error-summary">#{bean.apiError}</span><br/>
+            </div>
+            <p:commandButton oncomplete="PF('sendInvoiceErrorDialogWV').hide();"
+                             value="#{msg.close}" />
+        </p:dialog>
+
         <ui:include src="../Dialogs/TotalCostDocumentDialog.xhtml"/>
+        <ui:include src="../Dialogs/InvoiceDialog.xhtml"/>
     </ui:define>
 </ui:composition>
 </html>

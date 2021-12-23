@@ -2,7 +2,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:h="http://java.sun.com/jsf/html">
-<p:dialog widgetVar="requestDocumentDlg" modal="true" width="1200">
+<p:dialog widgetVar="requestDocumentDlg" id="requestDocumentDlgId" modal="true" width="1200">
     <h3>#{msg.requestDocumentDialogHeader}</h3>
     <h3>#{msg.requestDocumentDialogTable1Header}</h3>
     <p:dataTable value="#{bean.requestDocuments}" var="doc" id="requestDocumentTable">
@@ -69,9 +69,9 @@
     </p:dataTable>
     <div class="btn_line">
         <p:commandButton widgetVar="confirmButton" value="#{msg.confirm}" update="@form"
-                         action="#{bean.onConfirm}" styleClass="green-button"
+                         action="#{bean.onConfirm}" style="margin-right: 1cm;background-color: #00CC52!important;"
                          oncomplete="PF('confirmButton').enable();PF('requestDocumentDlg').hide();" onclick="PF('confirmButton').disable()"/>
-        <p:commandButton value="#{msg.cancel}" styleClass="red-button"
+        <p:commandButton value="#{msg.cancel}" style="background-color: #F3362B !important;"
                          oncomplete="PF('requestDocumentDlg').hide();"/>
     </div>
 </p:dialog>

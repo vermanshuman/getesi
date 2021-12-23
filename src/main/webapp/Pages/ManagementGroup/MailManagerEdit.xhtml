@@ -34,6 +34,32 @@
                 font-size: 19px !important;
                 border-color: #A7A8AB;
             }
+            #mailTo_panel,#mailCC_panel,#mailBCC_panel{
+                width: auto !important;
+            }
+            #mailTo .ui-icon-close{
+                color: red !important;
+            }
+            #confirmRedirect{
+                border: 2px solid #57c279 !important;
+
+            }
+            .ui-datatable-scrollable-theadclone > tr > th{
+                border : none !important;
+            }
+            #confirmRedirect{
+                border: 2px solid #57c279 !important;
+
+            }
+
+            #attachFielDlg{
+                width:50% !important;
+                left: calc(25% - 0px) ;
+                border: 2px solid #57c279 !important;
+            }
+            #tableFiles > .ui-datatable-tablewrapper > table > tbody > tr > td {
+                border-color: #808080 !important;
+            }
         </style>
 
         <script type="text/javascript">
@@ -349,7 +375,7 @@
             <h:outputText value="#{msg.mailManagerEditMailAttachedFiles}:"
                           style="font-weight: bold;"/>
 
-            <p:dataTable emptyMessage="#{msg.noRecordsFound}" var="file" scrollable="true"
+            <p:dataTable emptyMessage="#{msg.noRecordsFound}" var="file"
                          value="#{bean.attachedFiles}" id="tableFiles">
                 <f:facet name="header">
                     <p:fileUpload fileUploadListener="#{bean.handleFileUpload}"
@@ -398,7 +424,7 @@
             <div class="btn_line">
                 <p:commandButton value="#{msg.yes.toUpperCase()}"
                                  action="#{bean.confirmRedirect(true)}"
-                                 styleClass="green-button"
+                                 styleClass="green-button" style="margin-right: 0.5cm;"
                                  oncomplete="PF('confirmRedirect').hide();"/>
                 <p:commandButton value="#{msg.no.toUpperCase()}"
                                  action="#{bean.confirmRedirect(false)}"

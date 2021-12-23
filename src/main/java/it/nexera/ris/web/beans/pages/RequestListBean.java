@@ -320,6 +320,17 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             }
 
         }
+        String filterStateBy =  (String)SessionHelper.get("REQUEST_LIST_FILTER_BY");
+        if(!ValidationHelper.isNullOrEmpty(filterStateBy)){
+            getStateWrappers().forEach(r -> {
+                if (r.getState().equals(RequestState.valueOf(filterStateBy))){
+                    r.setSelected(Boolean.TRUE);
+                }else{
+                    r.setSelected(Boolean.FALSE);
+                }
+            });
+            SessionHelper.removeObject("REQUEST_LIST_FILTER_BY");
+        }
         filterTableFromPanel();
     }
 
@@ -1729,6 +1740,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         setUserWrappers(new ArrayList<>());
         setServiceWrappers(new ArrayList<>());
         setRequestTypeWrappers(new ArrayList<>());
+        setShowPrintButton(null);
         this.onLoad();
     }
 
