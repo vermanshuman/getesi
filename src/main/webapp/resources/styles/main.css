@@ -366,7 +366,7 @@ body .top-bar-cal .ui-widget-header {
 }
 
 .go-back-icon {
-    background-image: url("../images/go-back.png");
+    background-image: url("../images/previous.png");
     background-repeat: no-repeat;
     background-position: 50%;
     background-size: 21px;
@@ -377,7 +377,7 @@ body .top-bar-cal .ui-widget-header {
 }
 
 .go-forward-icon {
-    background-image: url("../images/go-forward.png");
+    background-image: url("../images/previous.png");
     background-repeat: no-repeat;
     background-position: 50%;
     background-size: 21px;
@@ -386,6 +386,11 @@ body .top-bar-cal .ui-widget-header {
     display: block;
     margin-top: -6px;
     margin-left: 55px;
+    -webkit-transform:rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    transform: rotate(180deg);
 }
 
 .email-icon {
@@ -746,6 +751,10 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
     background: #00CC52 !important;
 }
 
+
+#requestDocumentDlgId{
+    border: 2px solid #57c279;
+}
 /*@media screen and (max-width: 991px) {
     .layout-wrapper .layout-menu-container {
         width: 300px;

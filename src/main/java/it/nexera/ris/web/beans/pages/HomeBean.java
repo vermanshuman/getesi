@@ -156,7 +156,8 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
         List<Integer> data = new ArrayList<>();
         Map<RequestType, Integer> dataMapping = new HashMap<>();
         Collections.shuffle(colors);
-        List<List<String>> tooltips = new ArrayList<>();
+        Map<RequestType, List<String>> tooltips = new HashMap<>();
+        //List<List<String>> tooltips = new ArrayList<>();
         List<Long> stateIds = new ArrayList<>();
         stateIds.add(RequestState.INSERTED.getId());
         stateIds.add(RequestState.IN_WORK.getId());
@@ -214,7 +215,7 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
             }
 
             if (!ValidationHelper.isNullOrEmpty(tooltip))
-                tooltips.add(tooltip);
+                tooltips.put(requestType, tooltip);
             Integer requestCount = requests.size();
             if (requestCount > 0) {
                 dataMapping.put(requestType, requestCount);
@@ -240,13 +241,25 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
                 borderColors.add(colors.get(c) + ")");
                 backgroundColors.add(colors.get(c) + ", 0.2)");
             }
+            List<List<String>> tooltipData = new ArrayList<>();
+
+            List<RequestType> sortedData = dataMapping.entrySet()
+                    .stream()
+                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                    .map(e -> e.getKey())
+                    .collect(Collectors.toList());
+
+            for(RequestType sortedrequestType : sortedData){
+                tooltipData.add(tooltips.get(sortedrequestType));
+            }
+
             MixChartDataWrapper dataSet = MixChartDataWrapper.builder()
                     .label(ResourcesHelper.getString("requestListService"))
                     .data(data)
                     .backgroundColor(backgroundColors)
                     .borderColor(borderColors)
                     .borderWidth(1)
-                    .tooltip(tooltips)
+                    .tooltip(tooltipData)
                     .build();
             dataSets.add(dataSet);
         }

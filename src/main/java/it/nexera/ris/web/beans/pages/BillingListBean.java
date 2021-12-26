@@ -30,6 +30,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
+import org.primefaces.context.RequestContext;
 import org.primefaces.model.menu.DefaultMenuItem;
 import org.primefaces.model.menu.DefaultMenuModel;
 import org.primefaces.model.menu.MenuModel;
@@ -122,37 +123,37 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
     private List<SelectItem> userTypes;
 
     private List<SelectItem> landAggregations;
-    
+
     private Long aggregationFilterId;
 
     private byte[] anomalyRequestsFile;
 
     private Boolean createTotalCostSumDocumentRecord;
-    
+
     private List<SelectItem> fiduciaryClients;
-    
+
     private Long fiduciaryClientFilterId;
-    
+
     private List<SelectItem> managerClients;
-    
+
     private Long managerClientFilterid;
-    
+
     private List<RequestStateWrapper> selectedRequestStates;
-    
-    private List<ServiceFilterWrapper> serviceWrappers; 
+
+    private List<ServiceFilterWrapper> serviceWrappers;
 
     private ServiceFilterWrapper selectedServiceForFilter;
-    
+
     private List<SelectItem> servicesForSelect;
-    
+
     private List<RequestTypeFilterWrapper> requestTypeWrappers;
 
     private RequestTypeFilterWrapper selectedRequestTypeForFilter;
-    
+
     private List<SelectItem> requestTypesForSelect;
-    
+
     private List<SelectItem> cities;
-    
+
     private Integer expirationDays;
 
     // Fields for Invoice Dialog
@@ -192,11 +193,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
 
     private Date invoiceDate;
 
-    private boolean invoiceSentStatus;
-
     private String invoiceNote;
-
-    private List<Request> invoiceRequests;
 
     private String apiError;
 
@@ -207,6 +204,10 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
     private String documentType;
 
     List<RequestView> filteredRequest;
+
+    String invoiceErrorMessage;
+
+    private boolean invoiceSentStatus;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -226,47 +227,46 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
         setRequestTypesForSelect(new ArrayList<>());
 
 
-            setClients(ComboboxHelper.fillList(DaoManager.load(Client.class, new Criterion[]{
+        setClients(ComboboxHelper.fillList(DaoManager.load(Client.class, new Criterion[]{
                 Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
                         Restrictions.isNull("deleted"))
         }).stream()
-                    .filter(c -> (
-                            (ValidationHelper.isNullOrEmpty(c.getManager()) || !c.getManager()) &&
-                            (ValidationHelper.isNullOrEmpty(c.getFiduciary()) || !c.getFiduciary())
-                            )
-                    ).sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList()),Boolean.TRUE));
+                .filter(c -> (
+                                (ValidationHelper.isNullOrEmpty(c.getManager()) || !c.getManager()) &&
+                                        (ValidationHelper.isNullOrEmpty(c.getFiduciary()) || !c.getFiduciary())
+                        )
+                ).sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList()), Boolean.TRUE));
 
         setRequestTypes(ComboboxHelper.fillList(RequestType.class, Boolean.FALSE));
-        if(getRequestTypes().size() > 0) {
+        if (getRequestTypes().size() > 0) {
             Collections.sort(getRequestTypes(), new Comparator<SelectItem>() {
                 @Override
                 public int compare(final SelectItem object1, final SelectItem object2) {
                     return object1.getLabel().toUpperCase().compareTo(object2.getLabel().toUpperCase());
                 }
             });
-       }
-        
+        }
+
         setServiceTypes(ComboboxHelper.fillList(Service.class, Boolean.TRUE));
-        if(getServiceTypes().size() > 0) {
+        if (getServiceTypes().size() > 0) {
             Collections.sort(getServiceTypes(), new Comparator<SelectItem>() {
                 @Override
                 public int compare(final SelectItem object1, final SelectItem object2) {
                     return object1.getLabel().toUpperCase().compareTo(object2.getLabel().toUpperCase());
                 }
             });
-       }
+        }
         setUserTypes(ComboboxHelper.fillList(UserCategories.class, Boolean.FALSE));
         setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.TRUE));
-        
+
         setFiduciaryClients(ComboboxHelper.fillList(ClientView.class, Order.asc("name"), new Criterion[]{
                 Restrictions.eq("fiduciary", Boolean.TRUE),
         }, Boolean.FALSE));
-        
+
         setManagerClients(ComboboxHelper.fillList(ClientView.class, Order.asc("name"), new Criterion[]{
                 Restrictions.eq("manager", Boolean.TRUE),
         }, Boolean.FALSE));
 
-       
 
         List<User> notExternalCategoryUsers = DaoManager.load(User.class
                 , new Criterion[]{Restrictions.or(
@@ -276,7 +276,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
         notExternalCategoryUsers.forEach(u -> getUserWrappers().add(new UserFilterWrapper(u)));
 
         List<Service> services = DaoManager.load(Service.class, new Criterion[]{Restrictions.isNotNull("name")});
-        if(!ValidationHelper.isNullOrEmpty(services)) {
+        if (!ValidationHelper.isNullOrEmpty(services)) {
             Collections.sort(services, new Comparator<Service>() {
                 @Override
                 public int compare(final Service object1, final Service object2) {
@@ -285,34 +285,34 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
             });
             services.forEach(s -> getServiceWrappers().add(new ServiceFilterWrapper(s)));
         }
-        
-       
-        if(!ValidationHelper.isNullOrEmpty(getSearchLastName()) || !ValidationHelper.isNullOrEmpty(getSearchFiscalCode())
+
+
+        if (!ValidationHelper.isNullOrEmpty(getSearchLastName()) || !ValidationHelper.isNullOrEmpty(getSearchFiscalCode())
                 || !ValidationHelper.isNullOrEmpty(getSearchCreateUser())) {
             setSelectedAllStatesOnPanel(true);
         }
-        getStateWrappers().add(new RequestStateWrapper(true , RequestState.EVADED));
-        getStateWrappers().add(new RequestStateWrapper(true , RequestState.INVOICED));
-        getStateWrappers().add(new RequestStateWrapper(true , RequestState.SENT_TO_SDI));
+        getStateWrappers().add(new RequestStateWrapper(true, RequestState.EVADED));
+        getStateWrappers().add(new RequestStateWrapper(true, RequestState.INVOICED));
+        getStateWrappers().add(new RequestStateWrapper(true, RequestState.SENT_TO_SDI));
 
-        Long dueRequestTypeId =(Long)SessionHelper.get("dueRequestTypeId");
+        Long dueRequestTypeId = (Long) SessionHelper.get("dueRequestTypeId");
 
-        if(!ValidationHelper.isNullOrEmpty(dueRequestTypeId)) {
+        if (!ValidationHelper.isNullOrEmpty(dueRequestTypeId)) {
             SessionHelper.removeObject("dueRequestTypeId");
             List<RequestType> requestTypes = DaoManager.load(RequestType.class, new Criterion[]{Restrictions.isNotNull("name")});
             if (!ValidationHelper.isNullOrEmpty(requestTypes)) {
                 Collections.sort(requestTypes, Comparator.comparing(object -> object.toString().toUpperCase()));
                 requestTypes.forEach(r -> {
-                    getRequestTypeWrappers().add(new RequestTypeFilterWrapper(r.getId().equals(dueRequestTypeId),r));
+                    getRequestTypeWrappers().add(new RequestTypeFilterWrapper(r.getId().equals(dueRequestTypeId), r));
                 });
             }
 
-            Integer expirationDays = (Integer)SessionHelper.get("expirationDays");
-            if(!ValidationHelper.isNullOrEmpty(expirationDays)) {
+            Integer expirationDays = (Integer) SessionHelper.get("expirationDays");
+            if (!ValidationHelper.isNullOrEmpty(expirationDays)) {
                 SessionHelper.removeObject("expirationDays");
                 setExpirationDays(expirationDays);
             }
-        }else {
+        } else {
             setExpirationDays(null);
             List<RequestType> requestTypes = DaoManager.load(RequestType.class, new Criterion[]{Restrictions.isNotNull("name")});
             if (!ValidationHelper.isNullOrEmpty(requestTypes)) {
@@ -324,6 +324,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
         filterTableFromPanel();
         docTypes = new ArrayList<>();
         docTypes.add(new SelectItem("FE", "FATTURA"));
+        setDocumentType("FE");
         competence = new Date();
         setVatCollectabilityList(ComboboxHelper.fillList(VatCollectability.class,
                 false, false));
@@ -332,6 +333,14 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
                 .stream()
                 .filter(r -> !ValidationHelper.isNullOrEmpty(r.getTotalCost()))
                 .mapToDouble(r -> Double.parseDouble(r.getTotalCostDouble())).sum());
+        ums = new ArrayList<>();
+        ums.add(new SelectItem("pz", "pz"));
+
+        vatAmounts = new ArrayList<>();
+        vatAmounts.add(new SelectItem(0D, "0%"));
+        vatAmounts.add(new SelectItem(4D, "4%"));
+        vatAmounts.add(new SelectItem(10D, "10%"));
+        vatAmounts.add(new SelectItem(22D, "22%"));
     }
 
     public void loadRequestDocuments() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -367,7 +376,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
     }
 
     private List<Document> getAllegatiDocuments(Long requestId)
-        throws PersistenceBeanException, IllegalAccessException {
+            throws PersistenceBeanException, IllegalAccessException {
         List<Document> documents = DaoManager.load(Document.class, new Criterion[]{
                 Restrictions.eq("request.id", requestId),
                 Restrictions.eq("typeId", DocumentType.ALLEGATI.getId())
@@ -409,28 +418,28 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
 
     public static String getPdfRequestBody(Request request) {
         return getFirstPart(request) + getSecondPart(request) +
-        		getThirdPart(request);
+                getThirdPart(request);
     }
 
     public static String getPdfRequestBody(Request request, Subject subject) {
         return getFirstPart(request, subject) + getSecondPart(request, subject) +
-        		getThirdPart(request, subject);
+                getThirdPart(request, subject);
     }
 
     public static String getThirdPart(Request request) {
-    	return ( (request == null) || (request.getSubject() == null) ) ? "":
-    		getThirdPart(request, request.getSubject());
+        return ((request == null) || (request.getSubject() == null)) ? "" :
+                getThirdPart(request, request.getSubject());
     }
 
     public static String getThirdPart(Request request, Subject subject) {
         String thirdPart = "";
 
-    	try {
+        try {
 
-    		if (!ValidationHelper.isNullOrEmpty(subject)) {
+            if (!ValidationHelper.isNullOrEmpty(subject)) {
 
-    			thirdPart += "<hr/>";
-    			thirdPart += "<b>Richieste</b>:<br/>";
+                thirdPart += "<hr/>";
+                thirdPart += "<b>Richieste</b>:<br/>";
 
                 List<RequestShort> requestList;
                 List<Criterion> criteria = new ArrayList<Criterion>();
@@ -438,53 +447,53 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
                 List<Long> subjectsIds = EstateSituationHelper.getIdSubjects(request);
                 subjectsIds.add(subject.getId());
 
-				criteria.add(Restrictions.in("subject.id", subjectsIds));
+                criteria.add(Restrictions.in("subject.id", subjectsIds));
 
-				if(request != null)
-					criteria.add(Restrictions.ne("id", request.getId()));
+                if (request != null)
+                    criteria.add(Restrictions.ne("id", request.getId()));
 
                 criteria.add(Restrictions.or(Restrictions.eq("isDeleted", false),
                         Restrictions.isNull("isDeleted")));
 
-    			requestList = DaoManager.load(RequestShort.class, criteria.toArray(new Criterion[0]),
-    					Order.desc("createDate"));
+                requestList = DaoManager.load(RequestShort.class, criteria.toArray(new Criterion[0]),
+                        Order.desc("createDate"));
 
-    			
-    			for(RequestShort r : requestList) {
-    			    thirdPart +=
-    			            (request.getSubject().getId().equals(r.getSubject().getId()) ? "" : "PRES - ") +
-    			            r.getCreateDateStr() +
-    			            " - " +
-    			            r.getClientName() +
-    			            " - " +
-    			            r.getServiceName() +
-    			            " - " +
-    			            r.getAggregationLandChargesRegistryName() +
-    			            "<br/>";
 
-    			    if(!ValidationHelper.isNullOrEmpty(r.getMultipleServices())) {
-    			        thirdPart += "<ul>";
-    			        for(Service service : r.getMultipleServices()) {
-    			            thirdPart += "<li>";
-    			            thirdPart += service.getName();
-    			            thirdPart += "</li>";
-    			        }
-    			        thirdPart += "</ul>";
-    			    }
-    			}
+                for (RequestShort r : requestList) {
+                    thirdPart +=
+                            (request.getSubject().getId().equals(r.getSubject().getId()) ? "" : "PRES - ") +
+                                    r.getCreateDateStr() +
+                                    " - " +
+                                    r.getClientName() +
+                                    " - " +
+                                    r.getServiceName() +
+                                    " - " +
+                                    r.getAggregationLandChargesRegistryName() +
+                                    "<br/>";
 
-                List<RequestOLD> requestOLDS = DaoManager.load(RequestOLD.class, new Criterion[] {
-                       subject.getTypeIsPhysicalPerson() ?
+                    if (!ValidationHelper.isNullOrEmpty(r.getMultipleServices())) {
+                        thirdPart += "<ul>";
+                        for (Service service : r.getMultipleServices()) {
+                            thirdPart += "<li>";
+                            thirdPart += service.getName();
+                            thirdPart += "</li>";
+                        }
+                        thirdPart += "</ul>";
+                    }
+                }
+
+                List<RequestOLD> requestOLDS = DaoManager.load(RequestOLD.class, new Criterion[]{
+                        subject.getTypeIsPhysicalPerson() ?
                                 Restrictions.eq("fiscalCodeVat", subject.getFiscalCode()) :
                                 Restrictions.eq("fiscalCodeVat", subject.getNumberVAT())});
 
-                for(RequestOLD old : requestOLDS) {
+                for (RequestOLD old : requestOLDS) {
                     thirdPart +=
                             old.getRequestDateString() + " - " +
-                            old.getClient() + " - " +
-                            old.getType() + " - " +
-                            old.getLandChargesRegistry() +
-                             "<br/>";
+                                    old.getClient() + " - " +
+                                    old.getType() + " - " +
+                                    old.getLandChargesRegistry() +
+                                    "<br/>";
                 }
 //                
 //                if(!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
@@ -503,12 +512,12 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
 
                 thirdPart += "<b>Visure a testo:</b><br/>";
 
-                List<VisureRTF> visureRTFS = DaoManager.load(VisureRTF.class, new Criterion[] {
+                List<VisureRTF> visureRTFS = DaoManager.load(VisureRTF.class, new Criterion[]{
                         subject.getTypeIsPhysicalPerson() ?
                                 Restrictions.eq("fiscalCodeVat", subject.getFiscalCode()) :
-                                Restrictions.eq("fiscalCodeVat", subject.getNumberVAT()) });
+                                Restrictions.eq("fiscalCodeVat", subject.getNumberVAT())});
 
-                for(VisureRTF rtf : visureRTFS) {
+                for (VisureRTF rtf : visureRTFS) {
                     thirdPart +=
                             DateTimeHelper.toString(rtf.getUpdateDate()) + " - " +
                                     rtf.getNumFormality() + " - " +
@@ -522,24 +531,24 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
 
                 thirdPart += "<b>Visure DH:</b><br/>";
 
-                List<VisureDH> visureDHS = DaoManager.load(VisureDH.class, new Criterion[] {
+                List<VisureDH> visureDHS = DaoManager.load(VisureDH.class, new Criterion[]{
                         subject.getTypeIsPhysicalPerson() ?
                                 Restrictions.eq("fiscalCodeVat", subject.getFiscalCode()) :
                                 Restrictions.eq("fiscalCodeVat", subject.getNumberVAT())});
 
-                for(VisureDH dh : visureDHS) {
+                for (VisureDH dh : visureDHS) {
                     thirdPart +=
                             dh.getType() + " - " +
-                            DateTimeHelper.toString(dh.getUpdateDate()) + " - " +
-                            dh.getNumFormality() + " - " +
-                            dh.getNumberPractice() + " - " +
-                            dh.getLandChargesRegistry() +
-                            "<br/>";
+                                    DateTimeHelper.toString(dh.getUpdateDate()) + " - " +
+                                    dh.getNumFormality() + " - " +
+                                    dh.getNumberPractice() + " - " +
+                                    dh.getLandChargesRegistry() +
+                                    "<br/>";
                 }
 
-    			thirdPart += "<br/>";
+                thirdPart += "<br/>";
 
-    			thirdPart += "<hr/>";
+                thirdPart += "<hr/>";
 
                 thirdPart += "<b>Formalit&agrave;:</b><br/>";
 
@@ -555,19 +564,19 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
 
                 for (int i = 0; i < countOfRequests; ++i) {
 
-    	            List<Long> listIds = EstateSituationHelper.getIdSubjects(subject);
-    	            listIds.add(subject.getId());
-    	        	criteria = new ArrayList<>();
+                    List<Long> listIds = EstateSituationHelper.getIdSubjects(subject);
+                    listIds.add(subject.getId());
+                    criteria = new ArrayList<>();
 
-    	        	criteria.add(Restrictions.in("sub.id", listIds));
-    	            List<Formality> list =
-    	            		DaoManager.load(Formality.class, new CriteriaAlias[]{new CriteriaAlias
-    	                    ("sectionC", "sectionC", JoinType.INNER_JOIN),
-    	                    new CriteriaAlias("sectionC.subject", "sub", JoinType.INNER_JOIN)
-    	            }, criteria.toArray(new Criterion[0]));
+                    criteria.add(Restrictions.in("sub.id", listIds));
+                    List<Formality> list =
+                            DaoManager.load(Formality.class, new CriteriaAlias[]{new CriteriaAlias
+                                    ("sectionC", "sectionC", JoinType.INNER_JOIN),
+                                    new CriteriaAlias("sectionC.subject", "sub", JoinType.INNER_JOIN)
+                            }, criteria.toArray(new Criterion[0]));
 
-    	            formalityList.addAll(list);
-    	            }
+                    formalityList.addAll(list);
+                }
 
                 for (Formality f : formalityList) {
                     boolean isPresumptive = f.getSectionC().stream().map(SectionC::getSubject).flatMap(List::stream)
@@ -585,19 +594,19 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
                     thirdPart += "<br/>";
                 }
 
-    			thirdPart += "<br/>";
+                thirdPart += "<br/>";
 
-    			thirdPart += "<hr/>";
+                thirdPart += "<hr/>";
 
-    			thirdPart += "<b>Segnalazioni:</b><br/>";
+                thirdPart += "<b>Segnalazioni:</b><br/>";
 
-    			List<ReportFormalitySubject> rfsList =
-    					DaoManager.load(ReportFormalitySubject.class,
-    							new Criterion[] {
-									subject.getTypeIsPhysicalPerson() ?
-									Restrictions.eq("fiscalCode", subject.getFiscalCode()) :
-									Restrictions.eq("numberVAT", subject.getNumberVAT())
-    					}, Order.desc("createDate"));
+                List<ReportFormalitySubject> rfsList =
+                        DaoManager.load(ReportFormalitySubject.class,
+                                new Criterion[]{
+                                        subject.getTypeIsPhysicalPerson() ?
+                                                Restrictions.eq("fiscalCode", subject.getFiscalCode()) :
+                                                Restrictions.eq("numberVAT", subject.getNumberVAT())
+                                }, Order.desc("createDate"));
 
                 for (ReportFormalitySubject rfs : rfsList) {
                     if (rfs.getTypeFormalityId().equals(1L)) {
@@ -607,24 +616,24 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
                     } else {
                         thirdPart += "Annotamento - ";
                     }
-    				thirdPart +=
-    						DateTimeHelper.toString(rfs.getDate()) + " - " +
-                            (rfs.getNumber() == null ? "" : rfs.getNumber() + " - ") +
-    						((rfs.getLandChargesRegistry() == null) ? "" : rfs.getLandChargesRegistry().getName()) +
-    						"<br/>";
-    			}
+                    thirdPart +=
+                            DateTimeHelper.toString(rfs.getDate()) + " - " +
+                                    (rfs.getNumber() == null ? "" : rfs.getNumber() + " - ") +
+                                    ((rfs.getLandChargesRegistry() == null) ? "" : rfs.getLandChargesRegistry().getName()) +
+                                    "<br/>";
+                }
 
 
-    			if(subject.getTypeIsPhysicalPerson()) {
-    				thirdPart += "<hr/>";
-        			thirdPart += "<b>Presumibili:</b><br/>";
+                if (subject.getTypeIsPhysicalPerson()) {
+                    thirdPart += "<hr/>";
+                    thirdPart += "<b>Presumibili:</b><br/>";
 
-        		
-        			List<Subject> subjects = SubjectHelper.getPresumablesForSubject(
-        			        subject);
-        			
-        			subjects.removeIf(s -> s.equals(subject));
-        			for(Subject s :subjects) {
+
+                    List<Subject> subjects = SubjectHelper.getPresumablesForSubject(
+                            subject);
+
+                    subjects.removeIf(s -> s.equals(subject));
+                    for (Subject s : subjects) {
 
                         thirdPart += s.getFullName() + " - " + s.getSexType().getShortValue() + " - " +
                                 DateTimeHelper.toString(s.getBirthDate()) + " - " +
@@ -637,18 +646,18 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
                                 "<br/>";
                     }
                 }
-    		}
-    	} catch (Exception e) {
+            }
+        } catch (Exception e) {
             LogHelper.log(log, e);
-    		return "ERROR IN THIRD PART";
-    	}
+            return "ERROR IN THIRD PART";
+        }
 
-    	return thirdPart;
+        return thirdPart;
     }
 
     private static String getSecondPart(Request request) {
-    	return ( (request == null) || (request.getSubject() == null) ) ? "":
-    		getSecondPart(request, request.getSubject());
+        return ((request == null) || (request.getSubject() == null)) ? "" :
+                getSecondPart(request, request.getSubject());
     }
 
     private static String getSecondPart(Request request, Subject subject) {
@@ -656,31 +665,31 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
 
         if (!ValidationHelper.isNullOrEmpty(request)) {
 
-        if (!ValidationHelper.isNullOrEmpty(request.getNdg())) {
-            secondPart += "NDG: " + request.getNdg() + "<br/>";
-        }
-        if (!ValidationHelper.isNullOrEmpty(request.getPosition())) {
-            secondPart += "Posizione: " + request.getPosition() + "<br/>";
-        }
-        if (!ValidationHelper.isNullOrEmpty(request.getCreateUserId())) {
-            secondPart += "Utente: " + request.getCreateUserName() + "<br/>";
-        }
-        if (!ValidationHelper.isNullOrEmpty(request.getUserOfficeId())) {
-            Office office = new Office();
-            try {
-                office = DaoManager.get(Office.class, request.getUserOfficeId());
-            } catch (PersistenceBeanException | InstantiationException | IllegalAccessException e) {
-              //  LogHelper.log(log, e);
+            if (!ValidationHelper.isNullOrEmpty(request.getNdg())) {
+                secondPart += "NDG: " + request.getNdg() + "<br/>";
             }
-            if (!ValidationHelper.isNullOrEmpty(office)) {
-                secondPart += "Filiale: " + office.getCode() + " " + office.getDescription() + "<br/>";
+            if (!ValidationHelper.isNullOrEmpty(request.getPosition())) {
+                secondPart += "Posizione: " + request.getPosition() + "<br/>";
             }
-        }
-        if (!ValidationHelper.isNullOrEmpty(request.getNote())) {
-            secondPart += "Note: " + request.getNote() + "<br/>";
-        } else if (!ValidationHelper.isNullOrEmpty(request.getUltimaResidenza())) {
-            secondPart += "Note: " + request.getUltimaResidenza() + "<br/>";
-        }
+            if (!ValidationHelper.isNullOrEmpty(request.getCreateUserId())) {
+                secondPart += "Utente: " + request.getCreateUserName() + "<br/>";
+            }
+            if (!ValidationHelper.isNullOrEmpty(request.getUserOfficeId())) {
+                Office office = new Office();
+                try {
+                    office = DaoManager.get(Office.class, request.getUserOfficeId());
+                } catch (PersistenceBeanException | InstantiationException | IllegalAccessException e) {
+                    //  LogHelper.log(log, e);
+                }
+                if (!ValidationHelper.isNullOrEmpty(office)) {
+                    secondPart += "Filiale: " + office.getCode() + " " + office.getDescription() + "<br/>";
+                }
+            }
+            if (!ValidationHelper.isNullOrEmpty(request.getNote())) {
+                secondPart += "Note: " + request.getNote() + "<br/>";
+            } else if (!ValidationHelper.isNullOrEmpty(request.getUltimaResidenza())) {
+                secondPart += "Note: " + request.getUltimaResidenza() + "<br/>";
+            }
 
         }
 
@@ -688,8 +697,8 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public static String getFirstPart(Request request) {
-    	return ( (request == null) || (request.getSubject() == null) ) ? "":
-    		getFirstPart(request, request.getSubject());
+        return ((request == null) || (request.getSubject() == null)) ? "" :
+                getFirstPart(request, request.getSubject());
     }
 
     private static String getFirstPart(Request request, Subject subject) {
@@ -697,32 +706,32 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
 
         if (!ValidationHelper.isNullOrEmpty(request)) {
 
-        if (!ValidationHelper.isNullOrEmpty(request.getClientName())) {
-            result += "Cliente: " + request.getClientName() + "<br/>";
-        }
-        if (!ValidationHelper.isNullOrEmpty(request.getCreateDate())) {
-            result += "Data richiesta: " + request.getCreateDateStr() + "<br/>";
-        }
-        if (!ValidationHelper.isNullOrEmpty(request.getRequestType())) {
-            result += "Servizio: " + request.getRequestTypeName() + "<br/>";
-        }
-        if (!ValidationHelper.isNullOrEmpty(request.getService())) {
-            result += "Tipo Richiesta: " + request.getServiceName() + "<br/>";
-            result += "Ufficio: " + request.getService().getEmailTextCamelCase() + " ";
-        }
-        if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())) {
-            result += request.getAggregationLandChargesRegistryName() + "<br/>";
-        } else if (!ValidationHelper.isNullOrEmpty(request.getCity())) {
-            result += request.getCityDescription() + "<br/>";
+            if (!ValidationHelper.isNullOrEmpty(request.getClientName())) {
+                result += "Cliente: " + request.getClientName() + "<br/>";
+            }
+            if (!ValidationHelper.isNullOrEmpty(request.getCreateDate())) {
+                result += "Data richiesta: " + request.getCreateDateStr() + "<br/>";
+            }
+            if (!ValidationHelper.isNullOrEmpty(request.getRequestType())) {
+                result += "Servizio: " + request.getRequestTypeName() + "<br/>";
+            }
+            if (!ValidationHelper.isNullOrEmpty(request.getService())) {
+                result += "Tipo Richiesta: " + request.getServiceName() + "<br/>";
+                result += "Ufficio: " + request.getService().getEmailTextCamelCase() + " ";
+            }
+            if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())) {
+                result += request.getAggregationLandChargesRegistryName() + "<br/>";
+            } else if (!ValidationHelper.isNullOrEmpty(request.getCity())) {
+                result += request.getCityDescription() + "<br/>";
+            }
+
+            if (!ValidationHelper.isNullOrEmpty(request.getUrgent()) && request.getUrgent()) {
+                result += "Urgente: <b>S</b> <br/>";
+            } else {
+                result += "Urgente: <b>N</b> <br/>";
+            }
         }
 
-        if (!ValidationHelper.isNullOrEmpty(request.getUrgent()) && request.getUrgent()) {
-            result += "Urgente: <b>S</b> <br/>";
-        } else {
-            result += "Urgente: <b>N</b> <br/>";
-        }
-        }
-        
         if (!ValidationHelper.isNullOrEmpty(subject)) {
             if (subject.getTypeIsPhysicalPerson()) {
                 result += "Soggetto: " + subject.getSurnameUpper() + " "
@@ -733,23 +742,23 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
 
             }
             if (!ValidationHelper.isNullOrEmpty(subject.getBirthCity()) &&
-                !ValidationHelper.isNullOrEmpty(subject.getBirthProvince())) {
+                    !ValidationHelper.isNullOrEmpty(subject.getBirthProvince())) {
 
                 result += "Dati Anagrafici: " + (subject.getTypeIsPhysicalPerson() ? "nato a " : "con sede in ")
                         +
-                               ( (subject.getForeignCountry() != null &&
-        		subject.getForeignCountry()) ?
-        	( subject.getCountry().getDescription() + " (EE) " ) :
+                        ((subject.getForeignCountry() != null &&
+                                subject.getForeignCountry()) ?
+                                (subject.getCountry().getDescription() + " (EE) ") :
 
-                        (subject.getBirthCityDescription() + " ( "
-                        + subject.getBirthProvince().getCode() + " ) "));
+                                (subject.getBirthCityDescription() + " ( "
+                                        + subject.getBirthProvince().getCode() + " ) "));
 
                 if (!ValidationHelper.isNullOrEmpty(subject.getBirthDate())) {
                     result += "il " + DateTimeHelper.toString(subject.getBirthDate());
                 }
-            }else if(!ValidationHelper.isNullOrEmpty(subject.getCountry())) {
-            	result += "Dati Anagrafici: " + (subject.getTypeIsPhysicalPerson() ? "nato in " : "con sede in ")
-                        +( subject.getCountry().getDescription() + " (EE) " );
+            } else if (!ValidationHelper.isNullOrEmpty(subject.getCountry())) {
+                result += "Dati Anagrafici: " + (subject.getTypeIsPhysicalPerson() ? "nato in " : "con sede in ")
+                        + (subject.getCountry().getDescription() + " (EE) ");
             }
 
             result += "<br/>";
@@ -770,19 +779,19 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
         getServicesForSelect().add(SelectItemHelper.getNotSelected());
         getRequestTypesForSelect().add(SelectItemHelper.getNotSelected());
         Arrays.asList(RequestState.values()).forEach(st -> getStatesForSelect()
-            .add(new SelectItem(st.getId(), st.toString())));
+                .add(new SelectItem(st.getId(), st.toString())));
         getUserWrappers().forEach(u -> getUsersForSelect().add(new SelectItem(u.getId(), u.getValue())));
         getServiceWrappers().forEach(s -> getServicesForSelect().add(new SelectItem(s.getId(), s.getValue())));
         getRequestTypeWrappers().forEach(r -> getRequestTypesForSelect().add(new SelectItem(r.getId(), r.getValue())));
     }
 
     public void modifyRequests()
-        throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+            throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         filterTableFromPanel();
         setAllRequestViewsToModify(
-            DaoManager.load(RequestView.class, getFilterRestrictions().toArray(new Criterion[0])));
+                DaoManager.load(RequestView.class, getFilterRestrictions().toArray(new Criterion[0])));
         List<Long> requestIdList = getAllRequestViewsToModify().stream()
-            .map(RequestView::getId).collect(Collectors.toList());
+                .map(RequestView::getId).collect(Collectors.toList());
         if (!ValidationHelper.isNullOrEmpty(getSelectedState())) {
             for (Long id : requestIdList) {
                 RequestHelper.updateState(id, getSelectedState());
@@ -849,9 +858,9 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
 
     public void loadRequestsPdf() throws PersistenceBeanException, IllegalAccessException {
         setAllRequestViewsToModify(DaoManager.load(RequestView.class,
-            getFilterRestrictions().toArray(new Criterion[0])));
+                getFilterRestrictions().toArray(new Criterion[0])));
         List<Long> requestIdList = getAllRequestViewsToModify().stream()
-            .map(RequestView::getId).collect(Collectors.toList());
+                .map(RequestView::getId).collect(Collectors.toList());
         try {
             Map<String, byte[]> files = new HashMap<>();
             Integer fileCounter = 1;
@@ -889,6 +898,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
             LogHelper.log(log, e);
         }
     }
+
     public void downloadRequestFile() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         if (!ValidationHelper.isNullOrEmpty(getEntityEditId())) {
             Document document = DaoManager.get(Document.class, getEntityEditId());
@@ -948,7 +958,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
 
         List<Criterion> restrictions = RequestHelper.filterTableFromPanel(getDateFrom(), getDateTo(), getDateFromEvasion(),
                 getDateToEvasion(), getSelectedClientId(), getRequestTypeWrappers(), getStateWrappers(), getUserWrappers(),
-                getServiceWrappers(), getSelectedUserType(),getAggregationFilterId(), getSelectedServiceType(),Boolean.TRUE);
+                getServiceWrappers(), getSelectedUserType(), getAggregationFilterId(), getSelectedServiceType(), Boolean.TRUE);
 
         if (!ValidationHelper.isNullOrEmpty(getSearchLastName())) {
             restrictions.add(
@@ -979,8 +989,8 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
 
         if (!ValidationHelper.isNullOrEmpty(getExpirationDays())) {
             Date dueDate = DateTimeHelper.addDays(DateTimeHelper.getNow(), getExpirationDays());
-            restrictions.add(getExpirationDays() == 0 ? Restrictions.le("expirationDate",dueDate) :
-                    Restrictions.ge("expirationDate",dueDate));
+            restrictions.add(getExpirationDays() == 0 ? Restrictions.le("expirationDate", dueDate) :
+                    Restrictions.ge("expirationDate", dueDate));
         }
 
         if (getCurrentUser().isExternal()) {
@@ -1022,8 +1032,8 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
 
         List<Long> cityIds = new ArrayList<>();
 
-        for(RequestView request : getFilteredRequest()) {
-            if(!ValidationHelper.isNullOrEmpty(request.getCityId()) && !cityIds.contains(request.getCityId())) {
+        for (RequestView request : getFilteredRequest()) {
+            if (!ValidationHelper.isNullOrEmpty(request.getCityId()) && !cityIds.contains(request.getCityId())) {
                 cityIds.add(request.getCityId());
             }
         }
@@ -1039,11 +1049,11 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
             setExamRequest(examRequest);
         }
 
-        if(!ValidationHelper.isNullOrEmpty(cityIds)) {
+        if (!ValidationHelper.isNullOrEmpty(cityIds)) {
             setCities(ComboboxHelper.fillList(City.class,
                     Order.asc("description"),
                     new Criterion[]{Restrictions.isNotNull("province.id")
-                            , Restrictions.eq("external", Boolean.TRUE),Restrictions.in("id", cityIds)}, Boolean.FALSE));
+                            , Restrictions.eq("external", Boolean.TRUE), Restrictions.in("id", cityIds)}, Boolean.FALSE));
         }
 
     }
@@ -1133,7 +1143,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
             }
         }
     }
-    
+
     public void selectServiceForFilter() throws HibernateException, IllegalAccessException, PersistenceBeanException {
         if (!ValidationHelper.isNullOrEmpty(this.getServiceWrappers())) {
             for (ServiceFilterWrapper wkrsw : this.getServiceWrappers()) {
@@ -1145,46 +1155,46 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
         }
         selectServiceCheck();
     }
-    
+
     public void selectServiceCheck() throws HibernateException, IllegalAccessException, PersistenceBeanException {
-        
+
         if (!ValidationHelper.isNullOrEmpty(this.getServiceWrappers())) {
-            
-            List<ServiceFilterWrapper> filterWrappers = 
+
+            List<ServiceFilterWrapper> filterWrappers =
                     this.getServiceWrappers().stream().
-                    filter(sw -> Objects.nonNull(
-                            sw.getService().getServiceReferenceType()))
-                    .filter(distinctByKey(sw -> sw.getService().getServiceReferenceType()))
-                    .collect(Collectors.toList());
-            
-            if(ValidationHelper.isNullOrEmpty(filterWrappers)) {
+                            filter(sw -> Objects.nonNull(
+                                    sw.getService().getServiceReferenceType()))
+                            .filter(distinctByKey(sw -> sw.getService().getServiceReferenceType()))
+                            .collect(Collectors.toList());
+
+            if (ValidationHelper.isNullOrEmpty(filterWrappers)) {
                 setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.FALSE));
-            }else {
+            } else {
                 boolean isConservatory = false;
                 boolean isComuni = false;
                 for (ServiceFilterWrapper wkrsw : filterWrappers) {
-                    if(wkrsw.getSelected()) {
-                        if(wkrsw.getService().getServiceReferenceType() == ServiceReferenceTypes.COMMON) {
+                    if (wkrsw.getSelected()) {
+                        if (wkrsw.getService().getServiceReferenceType() == ServiceReferenceTypes.COMMON) {
                             isComuni = true;
-                        }else {
+                        } else {
                             isConservatory = true;
                         }
                     }
                 }
-                if(isComuni && isConservatory) {
+                if (isComuni && isConservatory) {
                     setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.FALSE));
                     getLandAggregations().addAll(getCities());
-                }else if(isComuni) {
+                } else if (isComuni) {
                     setLandAggregations(getCities());
-                }else {
+                } else {
                     setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.FALSE));
                 }
             }
-        }else {
+        } else {
             setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.FALSE));
         }
     }
-    
+
     public void selectRequestTypeForFilter() {
         if (!ValidationHelper.isNullOrEmpty(this.getRequestTypeWrappers())) {
             for (RequestTypeFilterWrapper wkrsw : this.getRequestTypeWrappers()) {
@@ -1248,7 +1258,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
 
         return true;
     }
-    
+
     public void setSelectedAllUsersOnPanel(boolean selectedAllStatesOnPanel) {
         if (this.getUserWrappers() != null) {
             for (UserFilterWrapper wlrsw : this.getUserWrappers()) {
@@ -1256,7 +1266,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
             }
         }
     }
-    
+
     public boolean getSelectedAllServicesOnPanel() {
         if (this.getServiceWrappers() != null) {
             for (ServiceFilterWrapper wlrsw : this.getServiceWrappers()) {
@@ -1276,7 +1286,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
             }
         }
     }
-    
+
     public boolean getSelectedAllRequestTypesOnPanel() {
         if (this.getRequestTypeWrappers() != null) {
             for (RequestTypeFilterWrapper wlrsw : this.getRequestTypeWrappers()) {
@@ -1296,7 +1306,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
             }
         }
     }
-    
+
 
     public void openRequestEditor() {
         RedirectHelper.goTo(PageTypes.REQUEST_TEXT_EDIT, getEntityEditId());
@@ -1305,7 +1315,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
     public void openRequestMail() {
         RedirectHelper.goTo(PageTypes.MAIL_MANAGER_VIEW, getEntityEditId());
     }
-    
+
     public void openRequestSubject() {
         RedirectHelper.goToOnlyView(PageTypes.SUBJECT, getEntityEditId());
     }
@@ -1600,38 +1610,38 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
         this.createTotalCostSumDocumentRecord = createTotalCostSumDocumentRecord;
     }
 
-	public List<SelectItem> getFiduciaryClients() {
-		return fiduciaryClients;
-	}
+    public List<SelectItem> getFiduciaryClients() {
+        return fiduciaryClients;
+    }
 
-	public List<SelectItem> getManagerClients() {
-		return managerClients;
-	}
+    public List<SelectItem> getManagerClients() {
+        return managerClients;
+    }
 
-	public void setFiduciaryClients(List<SelectItem> fiduciaryClients) {
-		this.fiduciaryClients = fiduciaryClients;
-	}
+    public void setFiduciaryClients(List<SelectItem> fiduciaryClients) {
+        this.fiduciaryClients = fiduciaryClients;
+    }
 
-	public void setManagerClients(List<SelectItem> managerClients) {
-		this.managerClients = managerClients;
-	}
+    public void setManagerClients(List<SelectItem> managerClients) {
+        this.managerClients = managerClients;
+    }
 
-	public Long getFiduciaryClientFilterId() {
-		return fiduciaryClientFilterId;
-	}
+    public Long getFiduciaryClientFilterId() {
+        return fiduciaryClientFilterId;
+    }
 
 
-	public void setFiduciaryClientFilterId(Long fiduciaryClientFilterId) {
-		this.fiduciaryClientFilterId = fiduciaryClientFilterId;
-	}
+    public void setFiduciaryClientFilterId(Long fiduciaryClientFilterId) {
+        this.fiduciaryClientFilterId = fiduciaryClientFilterId;
+    }
 
-	public Long getManagerClientFilterid() {
-		return managerClientFilterid;
-	}
+    public Long getManagerClientFilterid() {
+        return managerClientFilterid;
+    }
 
-	public void setManagerClientFilterid(Long managerClientFilterid) {
-		this.managerClientFilterid = managerClientFilterid;
-	}
+    public void setManagerClientFilterid(Long managerClientFilterid) {
+        this.managerClientFilterid = managerClientFilterid;
+    }
 
     public List<RequestStateWrapper> getSelectedRequestStates() {
         return selectedRequestStates;
@@ -1708,7 +1718,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
     public Integer getRequestTypeSelected() {
         int selected = 0;
         for (RequestTypeFilterWrapper requestTypeFilterWrapper : requestTypeWrappers) {
-            if(requestTypeFilterWrapper.getSelected()) {
+            if (requestTypeFilterWrapper.getSelected()) {
                 selected++;
             }
         }
@@ -1718,7 +1728,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
     public Integer getStateSelected() {
         int selected = 0;
         for (RequestStateWrapper requestStateWrapper : stateWrappers) {
-            if(requestStateWrapper.getSelected()) {
+            if (requestStateWrapper.getSelected()) {
                 selected++;
             }
         }
@@ -1728,35 +1738,64 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
     public Integer getServiceSelected() {
         int selected = 0;
         for (ServiceFilterWrapper serviceFilterWrapper : serviceWrappers) {
-            if(serviceFilterWrapper.getSelected()) {
+            if (serviceFilterWrapper.getSelected()) {
                 selected++;
             }
         }
         return selected;
     }
-    
+
     public void reset() {
-    	setSelectedClientId(null);
-    	setManagerClientFilterid(null);
-    	setFiduciaryClientFilterId(null);
-    	setAggregationFilterId(null);
+        setSelectedClientId(null);
+        setManagerClientFilterid(null);
+        setFiduciaryClientFilterId(null);
+        setAggregationFilterId(null);
         setShowPrintButton(null);
+    }
+
+    public void openInvoiceDialog() throws HibernateException {
+        if(ValidationHelper.isNullOrEmpty(getSelectedClientId())){
+            setInvoiceErrorMessage(ResourcesHelper.getString("clientNotSelectedError"));
+            RequestContext.getCurrentInstance().update("requestInvoiceErrorDialogId");
+            executeJS("PF('requestInvoiceErrorDialogWV').show();");
+            return;
+        }
+        if (!ValidationHelper.isNullOrEmpty(getFilteredRequest())) {
+            Optional<RequestView> invoiced = getFilteredRequest()
+                    .stream()
+                    .filter(r -> !ValidationHelper.isNullOrEmpty(r.getStateId()) && r.getStateId().equals(RequestState.SENT_TO_SDI.getId()))
+                    .findFirst();
+
+            if (invoiced != null && invoiced.isPresent()) {
+                setInvoiceErrorMessage(ResourcesHelper.getString("alreadyInvoiceError"));
+                RequestContext.getCurrentInstance().update("requestInvoiceErrorDialogId");
+                executeJS("PF('requestInvoiceErrorDialogWV').show();");
+                return;
+            }
+
+            setMaxInvoiceNumber();
+            RequestContext.getCurrentInstance().update("propertyErrorDialogId");
+            executeJS("PF('invoiceDialogWV').show();");
+        }
     }
 
     public void setMaxInvoiceNumber() throws HibernateException {
         LocalDate currentdate = LocalDate.now();
         int currentYear = currentdate.getYear();
 
-        Long lastInvoiceNumber = -1l;
+        Long lastInvoiceNumber = 0l;
         try {
             lastInvoiceNumber = (Long) DaoManager.getMax(Invoice.class, "id",
                     new Criterion[]{});
         } catch (PersistenceBeanException | IllegalAccessException e) {
             LogHelper.log(log, e);
         }
-        String invoiceNumber = (lastInvoiceNumber+1) + "-" + currentYear + "-FE";
+        if(lastInvoiceNumber == null)
+            lastInvoiceNumber = 0l;
+        String invoiceNumber = (lastInvoiceNumber + 1) + "-" + currentYear + "-FE";
         setInvoiceNumber(invoiceNumber);
     }
+
     private void generateMenuModel() {
         setTopMenuModel(new DefaultMenuModel());
         if (isMultipleCreate()) {
@@ -1783,10 +1822,10 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
 
     public Double getTotalGrossAmount() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         Double totalGrossAmount = 0D;
-        if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost())){
+        if (!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost())) {
             totalGrossAmount += getInvoiceTotalCost();
-            if(!ValidationHelper.isNullOrEmpty(getInvoiceItemVat())){
-                totalGrossAmount += (getInvoiceTotalCost() * (getInvoiceItemVat()/100));
+            if (!ValidationHelper.isNullOrEmpty(getInvoiceItemVat())) {
+                totalGrossAmount += (getInvoiceTotalCost() * (getInvoiceItemVat() / 100));
             }
         }
         return totalGrossAmount;
@@ -1794,31 +1833,31 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
 
     public Double getTotalVat() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         Double totalVat = 0D;
-        if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost()) &&
+        if (!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost()) &&
                 !ValidationHelper.isNullOrEmpty(getInvoiceItemVat()) && getInvoiceItemVat() > 0)
-            totalVat += getInvoiceTotalCost() * (getInvoiceItemVat()/100);
+            totalVat += getInvoiceTotalCost() * (getInvoiceItemVat() / 100);
 
         return totalVat;
     }
 
     public void sendInvoice() {
         cleanValidation();
-        if(ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId())){
+        if (ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId())) {
             addRequiredFieldException("form:paymentType");
             setValidationFailed(true);
         }
 
-        if(ValidationHelper.isNullOrEmpty(getInvoiceItemAmount())){
+        if (ValidationHelper.isNullOrEmpty(getInvoiceItemAmount())) {
             addRequiredFieldException("form:quantita");
             setValidationFailed(true);
         }
 
-        if(ValidationHelper.isNullOrEmpty(getInvoiceItemVat())){
+        if (ValidationHelper.isNullOrEmpty(getInvoiceItemVat())) {
             addRequiredFieldException("form:invoiceVat");
             setValidationFailed(true);
         }
 
-        if (getValidationFailed()){
+        if (getValidationFailed()) {
             executeJS("PF('invoiceErrorDialogWV').show();");
             return;
         }
@@ -1827,19 +1866,22 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
             Invoice invoice = new Invoice();
             invoice.setClient(getExamRequest().getClient());
             invoice.setDate(getInvoiceDate());
-            if(!ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId()))
+            if (!ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId()))
                 invoice.setPaymentType(DaoManager.get(PaymentType.class, getSelectedPaymentTypeId()));
 
-            if(!ValidationHelper.isNullOrEmpty(getVatCollectabilityId()))
+            if (!ValidationHelper.isNullOrEmpty(getVatCollectabilityId()))
                 invoice.setVatCollectability(VatCollectability.getById(getVatCollectabilityId()));
             invoice.setNotes(getInvoiceNote());
+            invoice.setDocumentType(getDocumentType());
+            invoice.setInvoiceNumber(getInvoiceNumber());
             InvoiceItem invoiceItem = new InvoiceItem();
-            if(!ValidationHelper.isNullOrEmpty(getExamRequest())
-                    && !ValidationHelper.isNullOrEmpty(getExamRequest().getSubject())){
+            if (!ValidationHelper.isNullOrEmpty(getExamRequest())
+                    && !ValidationHelper.isNullOrEmpty(getExamRequest().getSubject())) {
                 invoiceItem.setSubject(getExamRequest().getSubject().toString());
                 invoiceItem.setAmount(getInvoiceItemAmount());
                 invoiceItem.setVat(getInvoiceItemVat());
                 invoiceItem.setInvoiceTotalCost(getInvoiceTotalCost());
+                invoiceItem.setDescription(getInvoiceNote());
             }
             List<InvoiceItem> invoiceItems = new ArrayList<>();
             invoiceItems.add(invoiceItem);
@@ -1847,39 +1889,42 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
             String xmlData = fatturaAPI.getDataForXML(invoice, invoiceItems);
             log.info("Billing List XML DATA: " + xmlData);
             FatturaAPIResponse fatturaAPIResponse = fatturaAPI.callFatturaAPI(xmlData, log);
-
             if (fatturaAPIResponse != null && fatturaAPIResponse.getReturnCode() != -1) {
                 DaoManager.save(invoice, true);
                 invoiceItem.setInvoice(invoice);
-                DaoManager.save(invoiceItem,true);
-                CollectionUtils.emptyIfNull(getInvoiceRequests())
+                DaoManager.save(invoiceItem, true);
+                CollectionUtils.emptyIfNull(getFilteredRequest())
                         .stream()
                         .forEach(r -> {
                             try {
-                                r.setStateId(RequestState.SENT_TO_SDI.getId());
-                                r.setInvoice(invoice);
-                                DaoManager.save(r, true);
-                            } catch (PersistenceBeanException e) {
+                                Request request = DaoManager.get(Request.class, r.getId());
+                                request.setStateId(RequestState.SENT_TO_SDI.getId());
+                                request.setInvoice(invoice);
+                                DaoManager.save(request, true);
+                            } catch (Exception e) {
+                                e.printStackTrace();
                                 log.error("error in saving request after sending invoice ", e);
+                                LogHelper.log(log, e);
                             }
+
                         });
 
-                setInvoiceSentStatus(true);
                 executeJS("PF('invoiceDialogWV').hide();");
             } else {
                 setApiError(ResourcesHelper.getString("sendInvoiceErrorMsg"));
-                if(fatturaAPIResponse != null
-                        && !ValidationHelper.isNullOrEmpty(fatturaAPIResponse.getDescription())){
+                if (fatturaAPIResponse != null
+                        && !ValidationHelper.isNullOrEmpty(fatturaAPIResponse.getDescription())) {
 
-                    if(fatturaAPIResponse.getDescription().contains("already exists")) {
+                    if (fatturaAPIResponse.getDescription().contains("already exists")) {
                         setApiError(ResourcesHelper.getString("sendInvoiceDuplicateMsg"));
-                    }else
+                    } else
                         setApiError(fatturaAPIResponse.getDescription());
                 }
                 executeJS("PF('sendInvoiceErrorDialogWV').show();");
+                RequestContext.getCurrentInstance().update("sendBillingInvoiceErrorId");
             }
 
-        }catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             LogHelper.log(log, e);
             executeJS("PF('sendInvoiceErrorDialogWV').show();");

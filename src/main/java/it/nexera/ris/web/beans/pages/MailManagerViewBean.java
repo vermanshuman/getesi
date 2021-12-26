@@ -346,6 +346,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
         docTypes = new ArrayList<>();
         docTypes.add(new SelectItem("FE", "FATTURA"));
+        setDocumentType("FE");
         competence = new Date();
 
         ums = new ArrayList<>();
@@ -1052,12 +1053,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 }
             }
             DaoManager.save(getEntity(), true);
-             if(!redirect){
-                 RequestContext.getCurrentInstance().execute("PF('saveConfirmationDialogWV').show();");
-             }else{
-                 FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, ResourcesHelper.getString("mailManagerSave"), null);
-             FacesContext.getCurrentInstance().addMessage("", facesMessage);
-             }
+            if(!redirect){
+                RequestContext.getCurrentInstance().execute("PF('saveConfirmationDialogWV').show();");
+            }else{
+                FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, ResourcesHelper.getString("mailManagerSave"), null);
+                FacesContext.getCurrentInstance().addMessage("", facesMessage);
+            }
         }
         if (redirect) {
             processManagedState(true);
@@ -1142,13 +1143,15 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         LocalDate currentdate = LocalDate.now();
         int currentYear = currentdate.getYear();
 
-        Long lastInvoiceNumber = -1l;
+        Long lastInvoiceNumber = 0l;
         try {
             lastInvoiceNumber = (Long) DaoManager.getMax(Invoice.class, "id",
                     new Criterion[]{});
         } catch (PersistenceBeanException | IllegalAccessException e) {
             LogHelper.log(log, e);
         }
+        if(lastInvoiceNumber == null)
+            lastInvoiceNumber = 0l;
         String invoiceNumber = (lastInvoiceNumber+1) + "-" + currentYear + "-FE";
         setInvoiceNumber(invoiceNumber);
     }
@@ -1199,6 +1202,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             Invoice invoice = new Invoice();
             invoice.setClient(getExamRequest().getClient());
             invoice.setDate(getInvoiceDate());
+            invoice.setDocumentType(getDocumentType());
             if(!ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId()))
                 invoice.setPaymentType(DaoManager.get(PaymentType.class, getSelectedPaymentTypeId()));
 

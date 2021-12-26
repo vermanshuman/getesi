@@ -342,7 +342,7 @@
                                             style="" id="searchButton" styleClass="ui-button-warning-icon"
                                             onclick="checkDates(); filterTableFromPanel();"
                                             action="#{bean.prepareToModify}" icon="ui-icon ui-icon-search pi pi-search"
-                                            update=":form:table,searchPanel,editAndPrintDialog" />
+                                            update=":form:table,searchPanel,editAndPrintDialog printPanel" />
                                 </div>
                                 <div class="settingsBlock">
                                     <p:commandButton id="settingButton" onclick="togglePanel();"
@@ -1080,7 +1080,7 @@
                 </p:commandButton>
 
 
-                <p:commandLink id="actionPnl" global="false" style="padding: 40%" immediate="true"
+                <p:commandLink id="actionPnl" global="false" immediate="true"
                                readonly="true">
                     <i class="fa fa-angle-down" style="font-size: x-large;"
                        onmouseover="document.getElementById('table:#{rowId}:actionPnl').focus();" />
