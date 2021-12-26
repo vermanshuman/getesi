@@ -167,8 +167,56 @@
 
                                 <p:commandButton id="default_btn" style="display: none;"/>
                                 <p:defaultCommand target="default_btn" scope="table"/>
+                                <p:fieldset rendered="#{empty tableInsideField ? false : tableInsideField}" legend="#{msg.estateSituationListDocuments}" toggleable="true" toggleSpeed="500">
+                                    <p:dataTable var="item" id="table1" value="#{tableModel}"
+                                                 disabledSelection="#{empty disableSelection?'false':'true'}"
+                                                 lazy="#{lazyMode}" filteredValue="#{bean.filteredList}"
+                                                 paginator="true" rowKey="#{item.id}" rows="10"
+                                                 selectionMode="single" selection="#{bean.selectedItem}" reflow="true"
+                                                 paginatorAlwaysVisible="true" emptyMessage="#{msg.noRecordsFound}"
+                                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                 rowsPerPageTemplate="10,20,50" widgetVar="tableWV">
 
-                                <p:dataTable var="item" id="table" value="#{tableModel}"
+                                        <ui:insert name="action_columns"></ui:insert>
+
+                                        <p:column rendered="#{empty showEdit? true : showEdit}"
+                                                  styleClass="action_column"
+                                                  exportable="false">
+
+                                            <p:commandButton icon="ui-icon pi pi-pencil" style="border: none !important;"
+                                                             disabled="#{!bean.canEdit}" update=":form"
+                                                             action="#{bean.editEntity}"
+                                                             oncomplete="#{additionalEditAction}">
+                                                <f:setPropertyActionListener value="#{item.id}"
+                                                                             target="#{bean.entityEditId}"/>
+                                            </p:commandButton>
+                                        </p:column>
+
+                                        <p:column rendered="#{empty showDelete? true : showDelete}"
+                                                  styleClass="action_column" exportable="false">
+                                            <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"                                                         oncomplete="PF('dlg2').show()"
+                                                             disabled="#{!bean.canDelete || (item.id==sessionBean.currentUser.id and bean.userEntityPage)}">
+                                                <f:setPropertyActionListener value="#{item.id}"
+                                                                             target="#{bean.entityDeleteId}"/>
+                                            </p:commandButton>
+                                        </p:column>
+
+                                        <p:column rendered="#{empty showMyDelete ? false : showMyDelete}"
+                                                  styleClass="action_column" exportable="false">
+                                            <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"
+                                                             oncomplete="PF('dlg2').show()"
+                                                             disabled="#{!bean.getCanDelete(item) ||
+                                                             (item.id==sessionBean.currentUser.id
+                                                             and bean.userEntityPage)}">
+                                                <f:setPropertyActionListener value="#{item.id}"
+                                                                             target="#{bean.entityDeleteId}"/>
+                                            </p:commandButton>
+                                        </p:column>
+
+                                        <ui:insert name="columns"></ui:insert>
+                                    </p:dataTable>
+                                </p:fieldset>
+                                <p:dataTable var="item" id="table" value="#{tableModel}" rendered="#{empty tableInsideField ? true : !tableInsideField}"
                                              disabledSelection="#{empty disableSelection?'false':'true'}"
                                              lazy="#{lazyMode}" filteredValue="#{bean.filteredList}"
                                              paginator="true" rowKey="#{item.id}" rows="10"
@@ -206,8 +254,8 @@
                                         <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"
                                                          oncomplete="PF('dlg2').show()"
                                                          disabled="#{!bean.getCanDelete(item) ||
-                                                         (item.id==sessionBean.currentUser.id
-                                                         and bean.userEntityPage)}">
+                                                             (item.id==sessionBean.currentUser.id
+                                                             and bean.userEntityPage)}">
                                             <f:setPropertyActionListener value="#{item.id}"
                                                                          target="#{bean.entityDeleteId}"/>
                                         </p:commandButton>

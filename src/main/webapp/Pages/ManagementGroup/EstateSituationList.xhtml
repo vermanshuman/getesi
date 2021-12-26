@@ -12,13 +12,14 @@
     <ui:param name="renderMenu" value="false"/>
     <ui:param name="centerPartStyleClass" value="false"/>
     <ui:param name="disableSelection" value="true"/>
+    <ui:param name="tableInsideField" value="true"></ui:param>
     <ui:define name="back_buttons_panel">
         <p:commandButton id="add_btn" action="#{bean.addEstate}" value="#{msg.estateAddButton}" styleClass="p-mr-2 p-mb-2"/>
         <p:commandButton id="cancel_btn" action="#{bean.goBack}" value="#{msg.requestListOpenEdit}"
                          icon="pi pi-times-circle"/>
         <p:commandButton id="print_btn" action="#{bean.goTextEdit}" value="#{msg.requestManagePrint}"
                          style="float: right"/>
-    </ui:define>
+    </ui:define>s
     <ui:define name="columns">
         <p:column headerText="#{msg.formality}">
             <p:dataTable rendered="#{not empty item.estateFormalityList}" value="#{item.estateFormalityList}"
@@ -277,7 +278,7 @@
             }
         </style>
         <br/><br/><br/>
-        <p:fieldset legend="#{msg.estateSituationListDocuments}">
+        <p:fieldset legend="#{msg.estateSituationListDocuments}" toggleable="true" toggleSpeed="500" collapsed="true">
             <p:fileUpload label="#{msg.upload}" fileUploadListener="#{bean.saveDocumentXML}"
                           multiple="false" mode="advanced" styleClass="special-upload" auto="true"
                           update=":form:documentTable"/>
@@ -307,7 +308,7 @@
 
 
         <!-- <ui:fragment><br /></ui:fragment> -->
-        <p:fieldset legend="#{msg.estateSituationSalesDevelopmentHeader}" rendered="#{bean.salesDevelopmentShowing}">
+        <p:fieldset legend="#{msg.estateSituationSalesDevelopmentHeader}" rendered="#{bean.salesDevelopmentShowing}" toggleable="true" toggleSpeed="500" collapsed="true">
             <p:commandButton disabled="#{!bean.canCreate}" id="buttonCreateSalesDevelopment" style="margin-left: -13px;"
                              icon="pi pi-plus-circle" styleClass="ui-button-success p-mr-2 p-mb-2"
                              value="#{not empty addButtonTitle ? addButtonTitle : msg.newItem}"
