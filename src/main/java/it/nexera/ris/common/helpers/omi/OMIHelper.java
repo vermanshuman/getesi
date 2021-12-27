@@ -101,10 +101,19 @@ public final class OMIHelper {
     public static CalculatedOmi calculateOMI(Property property, boolean savePropertyIfZoneWasChanged) throws Exception {
         CalculatedOmi calculatedOmi = new CalculatedOmi();
 
-        String code = getCode(property.getCategoryCode());
+        /*
+       String code = getCode(property.getCategoryCode());
         if (ValidationHelper.isNullOrEmpty(code)) {
             return calculatedOmi;
         }
+        */
+
+        List<Long> codes = getCodes(property.getCategoryCode());
+        if (ValidationHelper.isNullOrEmpty(codes)) {
+            return calculatedOmi;
+        }
+
+
         String zones = property.getZone();
         
         if (ValidationHelper.isNullOrEmpty(zones)) {
@@ -113,7 +122,7 @@ public final class OMIHelper {
                 coordinates = GeolocationHelper.checkCoordinates(property.getCityDescription() + " " + property.getAddress());
             }
             
-           
+
             if(coordinates == null || (coordinates != null && coordinates.size() < 2)) {
                 zones = String.join("-", findZoneByPropertyInKML(property));
                 calculatedOmi.setMultipleCoordinates(false);
@@ -137,7 +146,7 @@ public final class OMIHelper {
         calculatedOmi.setSeveralZones(zonesArr.length > 1);
         List<Double> calculatedOmiValues = new ArrayList<>();
         for (String zone : zonesArr) {
-            List<OmiValue> omiValues = getOmiValues(property.getCity().getCfis(), zone, code);
+            List<OmiValue> omiValues = getOmiValues(property.getCity().getCfis(), zone, codes);
             
             if(ValidationHelper.isNullOrEmpty(omiValues) &&
                     !ValidationHelper.isNullOrEmpty(property.getCategory())) {
@@ -288,6 +297,15 @@ public final class OMIHelper {
         });
     }
 
+    private static List<OmiValue> getOmiValues(String propertyCityCfis, String zone, List<Long> codes)
+            throws PersistenceBeanException, IllegalAccessException {
+        return DaoManager.load(OmiValue.class, new Criterion[]{
+                Restrictions.eq("zone", zone),
+                Restrictions.eq("cityCfis", propertyCityCfis),
+                Restrictions.in("categoryCode", codes)
+        });
+    }
+
     public static double calculateCommercialOmi(Property property, double calcOmi)
             throws PersistenceBeanException, IllegalAccessException {
         if (!ValidationHelper.isNullOrEmpty(property) && !ValidationHelper.isNullOrEmpty(property.getCategory())) {
@@ -324,6 +342,15 @@ public final class OMIHelper {
         Optional<CategoryCodeForOmi> categoryCodeForOmi = CATEGORY_CODE_FOR_OMI_COLLECTION.stream()
                 .filter(c -> c.getCategory().equals(propertyCategoryCode)).findFirst();
         return categoryCodeForOmi.map(CategoryCodeForOmi::getCode).orElse(null);
+    }
+
+    public static List<Long> getCodes(String propertyCategoryCode) {
+
+        return CATEGORY_CODE_FOR_OMI_COLLECTION.stream()
+                .filter(c -> c.getCategory().equals(propertyCategoryCode))
+                .map(CategoryCodeForOmi::getCode)
+                .map(Long::valueOf)
+                .collect(Collectors.toList());
     }
 
     public static List<String> findZoneByPropertyInKML(Property property) throws Exception {

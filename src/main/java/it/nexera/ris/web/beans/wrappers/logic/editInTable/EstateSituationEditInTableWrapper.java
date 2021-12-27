@@ -20,6 +20,8 @@ public class EstateSituationEditInTableWrapper {
 
     public BaseEditInTableWrapper commentInit;
 
+    private Boolean regime;
+
     public EstateSituationEditInTableWrapper(EstateSituation situation) {
         this.estateFormalityList = situation.getEstateFormalityList().stream()
                 .map(EstateFormalityEditInTableWrapper::new).collect(Collectors.toList());
@@ -30,6 +32,7 @@ public class EstateSituationEditInTableWrapper {
                         ? situation.getCommentWithoutInitialize() : situation.getComment());
         this.commentInit = new BaseEditInTableWrapper(situation.getId(), situation.getCommentInit());
         this.estateSituationId = situation.getId();
+        this.regime = situation.getRegime();
     }
 
     public void save() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -89,5 +92,13 @@ public class EstateSituationEditInTableWrapper {
 
     public void setEstateSituationId(Long estateSituationId) {
         this.estateSituationId = estateSituationId;
+    }
+
+    public Boolean getRegime() {
+        return regime;
+    }
+
+    public void setRegime(Boolean regime) {
+        this.regime = regime;
     }
 }

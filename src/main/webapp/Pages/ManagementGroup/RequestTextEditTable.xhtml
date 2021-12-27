@@ -110,6 +110,9 @@
                 </p:column>
             </p:dataTable>
         </p:column>
+        <p:column headerText="#{msg.esateSituationRegime}:" style="width: 74px;">
+            <p:selectBooleanCheckbox value="#{item.regime}" disabled="true"/>
+        </p:column>
         <p:column style="width: 70%; vertical-align: top;" headerText="#{msg.estateLocation}">
             <p:dataTable rendered="#{not empty item.propertyList}" value="#{item.propertyList}" var="estate"
                          editable="true" editMode="cell" styleClass="without-header cadastral_table">
