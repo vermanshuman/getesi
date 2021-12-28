@@ -1001,14 +1001,14 @@
                             <h:outputText value="#{estate.calculatedCommercial}" style="color: #5f666c;"/>
                         </p:panelGrid>
                     </p:column>
-                    <p:column style="width: 34px;padding: 2px;">
+                    <p:column style="width: 9%;padding: 2px;">
                         <p:commandButton icon="fa fa-comment" oncomplete="PF('commentEditDlg').show();"
                                          update=":form:commentArea" action="#{bean.prepareComment}">
                             <f:setPropertyActionListener value="NOT_SELECTED_PROPERTY" target="#{bean.currentComment}"/>
                             <f:setPropertyActionListener value="#{estate.id}" target="#{bean.selectedId}"/>
                         </p:commandButton>
                     </p:column>
-                    <p:column style="width: 34px;padding: 2px;">
+                    <p:column style="width: 9%;padding: 2px;">
                         <p:commandButton icon="fa fa-bars" onclick="PF('relationshipDlg').show();"
                                          update=":form:relationshipArea, :form:relationshipTable"
                                          action="#{bean.prepareRelationships}">
