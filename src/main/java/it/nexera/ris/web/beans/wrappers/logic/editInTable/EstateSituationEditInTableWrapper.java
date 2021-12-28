@@ -20,6 +20,8 @@ public class EstateSituationEditInTableWrapper {
 
     public BaseEditInTableWrapper commentInit;
 
+    private Boolean regime;
+
     public EstateSituationEditInTableWrapper(EstateSituation situation) {
         this.estateFormalityList = situation.getEstateFormalityList().stream()
                 .map(EstateFormalityEditInTableWrapper::new).collect(Collectors.toList());
@@ -89,5 +91,13 @@ public class EstateSituationEditInTableWrapper {
 
     public void setEstateSituationId(Long estateSituationId) {
         this.estateSituationId = estateSituationId;
+    }
+
+    public Boolean getRegime() {
+        return regime;
+    }
+
+    public void setRegime(Boolean regime) {
+        this.regime = regime;
     }
 }

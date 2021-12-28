@@ -42,7 +42,7 @@
                                                                  value="#{empty save_button_text ? msg.save : save_button_text}"
                                                                  oncomplete="#{save_oncomplete}" icon="pi pi-save"
                                                                  update=":form, #{save_update}, messages"
-                                                                 styleClass="#{saveButtonStyle} p-mr-2 p-mb-2"/>
+                                                                 styleClass="#{saveButtonStyle} p-mr-2 p-mb-2 ui-button-success"/>
 
                                                 <p:commandButton id="cancel_btn" action="#{bean.goBack}" styleClass="p-mr-2 p-mb-2"
                                                                  rendered="#{empty showCancel ? true : showCancel}"

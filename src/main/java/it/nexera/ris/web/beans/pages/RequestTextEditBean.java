@@ -2365,13 +2365,15 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         LocalDate currentdate = LocalDate.now();
         int currentYear = currentdate.getYear();
 
-        Long lastInvoiceNumber = -1l;
+        Long lastInvoiceNumber = 0l;
         try {
             lastInvoiceNumber = (Long) DaoManager.getMax(Invoice.class, "id",
                     new Criterion[]{});
         } catch (PersistenceBeanException | IllegalAccessException e) {
             LogHelper.log(log, e);
         }
+        if(lastInvoiceNumber == null)
+            lastInvoiceNumber = 0l;
         String invoiceNumber = (lastInvoiceNumber+1) + "-" + currentYear + "-FE";
         setInvoiceNumber(invoiceNumber);
     }

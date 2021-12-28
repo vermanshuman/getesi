@@ -62,6 +62,9 @@ public class EstateSituation extends IndexedEntity implements BeforeSave, AfterS
     @Column(name = "sales_development")
     private Boolean salesDevelopment;
 
+    @Column(name = "regime")
+    private Boolean regime;
+
     @Override
     public void beforeSave() {
         if (ValidationHelper.isNullOrEmpty(getPropertyListWithoutInit())
@@ -212,5 +215,13 @@ public class EstateSituation extends IndexedEntity implements BeforeSave, AfterS
 
     public void setSalesDevelopment(Boolean salesDevelopment) {
         this.salesDevelopment = salesDevelopment;
+    }
+
+    public Boolean getRegime() {
+        return regime;
+    }
+
+    public void setRegime(Boolean regime) {
+        this.regime = regime;
     }
 }

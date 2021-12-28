@@ -19,7 +19,7 @@
                          icon="pi pi-times-circle"/>
         <p:commandButton id="print_btn" action="#{bean.goTextEdit}" value="#{msg.requestManagePrint}"
                          style="float: right"/>
-    </ui:define>s
+    </ui:define>
     <ui:define name="columns">
         <p:column headerText="#{msg.formality}">
             <p:dataTable rendered="#{not empty item.estateFormalityList}" value="#{item.estateFormalityList}"
@@ -183,12 +183,12 @@
             }
 
             body .ui-datatable .ui-paginator.ui-paginator-top {
-                background-color: #2f8ee5 !important;
+                /*background-color: #2f8ee5 !important;*/
                 color: #ffffff !important;
             }
 
             body .ui-datatable .ui-paginator.ui-paginator-bottom {
-                background-color: #2f8ee5 !important;
+                /*background-color: #2f8ee5 !important;*/
                 color: #ffffff !important;
             }
 
@@ -275,6 +275,13 @@
                 margin-bottom: 0px !important;
                 margin-right: 0px !important;
 
+            }
+            .cost_titles > .p-field > .p-col-fixed {
+                font-size: 14px !important;
+                font-weight: bold !important;
+            }
+            .ui-dialog .ui-dialog-titlebar{
+                padding: 3px !important;
             }
         </style>
         <br/><br/><br/>

@@ -19,15 +19,15 @@
                 margin-top: 18px !important;
             }
 
-            body .ui-datatable .ui-paginator.ui-paginator-top {
-                background-color: #2f8ee5 !important;
-                color: #ffffff !important;
-            }
+            /*body .ui-datatable .ui-paginator.ui-paginator-top {*/
+            /*    background-color: #2f8ee5 !important;*/
+            /*    color: #ffffff !important;*/
+            /*}*/
 
-            body .ui-datatable .ui-paginator.ui-paginator-bottom {
-                background-color: #2f8ee5 !important;
-                color: #ffffff !important;
-            }
+            /*body .ui-datatable .ui-paginator.ui-paginator-bottom {*/
+            /*    background-color: #2f8ee5 !important;*/
+            /*    color: #ffffff !important;*/
+            /*}*/
 
             body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page,
             body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev,
@@ -601,7 +601,7 @@
                                                  styleClass="search-btn" style="width: 30%;"
                                                  id="printExcelButton" oncomplete="PF('createTotalCosthDocumentDialogWV').show()"/>
                                 <p:commandButton rendered="#{bean.showPrintButton}" value="#{msg.requestEditAndPrint}"
-                                                 styleClass="search-btn"
+                                                 styleClass="search-btn" style="float: right;"
                                                  id="editAndPrintButton" oncomplete="PF('editAndPrintDialogWV').show();"
                                                  process="printPanel"/>
                             </div>
@@ -1080,7 +1080,7 @@
                 </p:commandButton>
 
 
-                <p:commandLink id="actionPnl" global="false" immediate="true"
+                <p:commandLink id="actionPnl" global="false" style="padding: 40%" immediate="true"
                                readonly="true">
                     <i class="fa fa-angle-down" style="font-size: x-large;"
                        onmouseover="document.getElementById('table:#{rowId}:actionPnl').focus();" />

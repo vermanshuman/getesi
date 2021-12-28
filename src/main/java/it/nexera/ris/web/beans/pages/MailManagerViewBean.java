@@ -71,6 +71,7 @@ import it.nexera.ris.web.beans.base.AccessBean;
 import it.nexera.ris.web.beans.wrappers.logic.FileWrapper;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.context.RequestContext;
 import org.primefaces.model.menu.DefaultMenuItem;
 import org.primefaces.model.menu.DefaultMenuModel;
 import org.primefaces.model.menu.MenuModel;
@@ -1052,8 +1053,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 }
             }
             DaoManager.save(getEntity(), true);
-            FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, ResourcesHelper.getString("mailManagerSave"), null);
-            FacesContext.getCurrentInstance().addMessage("", facesMessage);
+            if(!redirect){
+                RequestContext.getCurrentInstance().execute("PF('saveConfirmationDialogWV').show();");
+            }else{
+                FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, ResourcesHelper.getString("mailManagerSave"), null);
+                FacesContext.getCurrentInstance().addMessage("", facesMessage);
+            }
         }
         if (redirect) {
             processManagedState(true);
@@ -1138,13 +1143,15 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         LocalDate currentdate = LocalDate.now();
         int currentYear = currentdate.getYear();
 
-        Long lastInvoiceNumber = -1l;
+        Long lastInvoiceNumber = 0l;
         try {
             lastInvoiceNumber = (Long) DaoManager.getMax(Invoice.class, "id",
                     new Criterion[]{});
         } catch (PersistenceBeanException | IllegalAccessException e) {
             LogHelper.log(log, e);
         }
+        if(lastInvoiceNumber == null)
+            lastInvoiceNumber = 0l;
         String invoiceNumber = (lastInvoiceNumber+1) + "-" + currentYear + "-FE";
         setInvoiceNumber(invoiceNumber);
     }
