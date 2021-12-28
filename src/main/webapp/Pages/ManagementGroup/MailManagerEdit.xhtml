@@ -38,7 +38,17 @@
                 width: auto !important;
             }
             #mailTo .ui-icon-close{
+                background: none repeat scroll 0 0 transparent!important;
+                display: inline-block;
+                font: normal normal normal 14px/1 FontAwesome !important;
+                font-size: inherit;
+                text-rendering: auto;
+                -webkit-font-smoothing: antialiased;
                 color: red !important;
+
+            }
+            #mailTo .ui-icon-close:before{
+                content: "\f00d" !important;
             }
             #confirmRedirect{
                 border: 2px solid #57c279 !important;
@@ -187,7 +197,7 @@
                                         completeMethod="#{bean.completeDestinations}"
                                         var="dest" itemLabel="#{dest}" itemValue="#{dest}" id="mailTo"
                                         inputStyle="width: 100%;"
-                                        style="width: 100%;" maxResults="6"
+                                        style="width: 100%;" maxResults="6" 
                                         multiple="true"
                                         onkeydown="return lockValue(event);" immediate="false">
                             <p:column>
