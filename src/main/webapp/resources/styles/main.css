@@ -439,7 +439,7 @@ body .top-bar-cal .ui-widget-header {
 }
 
 .configurazione-icon {
-    background-image: url("../images/impostazioni-system.png");
+    background-image: url("../images/configurazione.png");
     background-repeat: no-repeat;
     background-position: 50%;
     background-size: 26px;
@@ -786,4 +786,13 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
 
 .layout-wrapper .layout-topbar .topbar-menu > li > a .topbar-icon{
     color: #063971 !important;
+}
+
+.configurazione-icon-new {
+    background-image: url("../images/impostazioni-system.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 26px;
+    height: 42px;
+    display: block;
 }
