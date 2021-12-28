@@ -226,29 +226,39 @@
                 /*font-weight: normal !important;*/
             }
 
-            body .ui-selectcheckboxmenu-panel {
-                padding: 0;
+            #states_panel {
                 background: #ffffff;
                 color: #495057;
+                padding: 0;
+                border: 0 none;
                 box-shadow: 0px 11px 15px -7px rgb(0 0 0 / 20%), 0px 24px 38px 3px rgb(0 0 0 / 14%), 0px 9px 46px 8px rgb(0 0 0 / 12%);
                 border-radius: 4px;
-                border: 12px solid rgba(48, 91, 135, 0.6) !important;
             }
 
-            .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item label {
-                color: #295887;
-                font-weight: 600;
+            #states_panel .ui-selectcheckboxmenu-items-wrapper {
+                padding: 0px 1rem 1rem 1rem;
+            }
+
+            #states_panel .ui-selectcheckboxmenu-header {
+                margin: 1rem 1rem 0px 1rem;
+                border: 1px solid #808080 ;
+                background-color: #D9E0E7 !important;
+                color: #000000 !important;
+            }
+
+            #states_panel .ui-selectcheckboxmenu-list-item {
+                border: 1px solid #c9cdd2;
+                border-top: none;
+            }
+
+            #states_panel .ui-selectcheckboxmenu-close {
+                display: none;
             }
 
             .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item {
                 border: 1px solid;
             }
 
-            .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item .ui-chkbox .ui-chkbox-box {
-                border: 2px solid #4D759D;
-                border-radius: 5px;
-                background-color: transparent;
-            }
             .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item .ui-chkbox .ui-chkbox-box.ui-state-hover {
                 border: 2px solid #4D759D;
             }
@@ -261,10 +271,6 @@
                 border-color: #4D759D;
                 color: #5f666c !important;
                 background-color: transparent !important;
-            }
-
-            body .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-header{
-                border: 1px solid;
             }
 
             #filterDateFrom_input {
@@ -371,8 +377,12 @@
                                               });
                                               function togglePanel() {
                                                   PF('panelSetting').getJQ().toggle();
+                                                  if($('#statoAllLabel').length==0) {
+                                                      $('.ui-selectcheckboxmenu-header .ui-chkbox.ui-widget').after('<label id="statoAllLabel">Stato</label>');
+                                                  }
                                               }
                                               jQuery(document).ready(function() {
+
                                                   PF('panelSetting').getJQ().hide();
                                               });
                                               // ]]>
@@ -404,7 +414,6 @@
                                                     <span style="margin-bottom: 5px">#{msg.status}:</span>
                                                     <p:selectCheckboxMenu value="#{bean.selectedSearchStateIds}" id="states"
                                                                           label="#{msg.mailManagerStates}"  multiple="true"
-                                                                          filter="true" filterMatchMode="startsWith"
                                                                           style="margin-right: 15px!important;width: 40%;" styleClass="statesmenu#{bean.selectedSearchStateIds ne null and fn:length(bean.selectedSearchStateIds) gt 0 ? ' select-checkbox' : ''}">
                                                         <f:selectItems value="#{bean.searchStates}"/>
                                                         <p:ajax event="change" update="@this"/>
