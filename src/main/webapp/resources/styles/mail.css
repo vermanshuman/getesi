@@ -184,20 +184,10 @@ td.ui-panelgrid-cell {
 
 body .ui-datatable .ui-paginator.ui-paginator-top{
     background-color:  #788FA7 !important;
-       color: #ffffff !important;
+    color: #ffffff !important;
 }
 
 
 body .ui-datatable .ui-paginator.ui-paginator-bottom{
     background-color:  #788FA7 !important;
 }
-/*
- body .ui-datatable .ui-paginator.ui-paginator-top {
-                background-color: #788FA7 !important;
-             
-            }
-
-            body .ui-datatable .ui-paginator.ui-paginator-bottom {
-                background-color: #788FA7 !important;
-                color: #ffffff !important;
-            }*/

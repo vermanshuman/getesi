@@ -779,9 +779,8 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
         left: 300px;
     }
 }*/
-
 .layout-wrapper .layout-topbar, .layout-menu-logo {
-  background-color: #c5d3df !important;
+    background-color: #c5d3df !important;
 }
 
 .layout-wrapper .layout-topbar .topbar-menu > li > a .topbar-icon{

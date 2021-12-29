@@ -19,15 +19,15 @@
                 margin-top: 18px !important;
             }
 
-/*            body .ui-datatable .ui-paginator.ui-paginator-top {
-                background-color: #2f8ee5 !important;
-                color: #ffffff !important;
-            }
+            /*body .ui-datatable .ui-paginator.ui-paginator-top {*/
+            /*    background-color: #2f8ee5 !important;*/
+            /*    color: #ffffff !important;*/
+            /*}*/
 
-            body .ui-datatable .ui-paginator.ui-paginator-bottom {
-                background-color: #2f8ee5 !important;
-                color: #ffffff !important;
-            }*/
+            /*body .ui-datatable .ui-paginator.ui-paginator-bottom {*/
+            /*    background-color: #2f8ee5 !important;*/
+            /*    color: #ffffff !important;*/
+            /*}*/
 
             body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page,
             body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev,
@@ -822,7 +822,7 @@
                         <p:ajax event="change" update="statuses" oncomplete="applyClickListener('statuses', 'stateSelectCheckboxWV');"/>
                     </p:selectBooleanCheckbox>
                 </p:column>
-                <p:column>
+                <p:column headerText="#{msg.status}">
                     <h:outputText value="#{state.value}"/>
                 </p:column>
             </p:dataTable>
@@ -848,13 +848,13 @@
                         <p:ajax event="change" update="services" oncomplete="applyClickListener('services', 'serviceSelectCheckboxWV');"/>
                     </p:selectBooleanCheckbox>
                 </p:column>
-                <p:column>
+                <p:column headerText="#{msg.requestService}">
                     <h:outputText value="#{service.value}"/>
                 </p:column>
             </p:dataTable>
         </p:overlayPanel>
 
-        <p:overlayPanel id="requestTypeSelectCheckboxPanel" my="left top" at="right bottom"
+        <p:overlayPanel id="requestTypeSelectCheckboxPanel" my="left top" at="left bottom"
                         widgetVar="requestTypeSelectCheckboxWV" for="requestTypes" dynamic="true" style="width:300px;">
             <p:dataTable id="requestTypeSelectCheckboxPanelDataTable" var="requestType"
                          value="#{bean.requestTypeWrappers}" selectionMode="single"
@@ -871,7 +871,7 @@
                     </f:facet>
                     <p:selectBooleanCheckbox value="#{requestType.selected}">
                         <p:ajax update="requestTypeSelectCheckboxPanelDataTable" event="change"/>
-                        <p:ajax event="change" update="requestTypes" oncomplete="applyClickListener('requestTypes', 'requestTypeSelectCheckboxWV');"/>`
+                        <p:ajax event="change" update="requestTypes" oncomplete="applyClickListener('requestTypes', 'requestTypeSelectCheckboxWV');"/>
                     </p:selectBooleanCheckbox>
                 </p:column>
                 <p:column>
