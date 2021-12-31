@@ -90,6 +90,7 @@ import it.nexera.ris.web.beans.EntityEditPageBean;
 import it.nexera.ris.web.beans.base.AccessBean;
 import it.nexera.ris.web.beans.wrappers.logic.SubjectWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.UploadDocumentWrapper;
+import java.util.function.Predicate;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 @ManagedBean(name = "requestEditBean")
@@ -260,11 +261,20 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private Boolean redirected;
 
     private String multipleReqMessage;
+    
+    private boolean multipleRequestCreate;
+    
+    private final String MULTIPLE_REQUEST = "RICHESTE_MULTIPLE";
+    
+    private List<String> mutipleRequestObjTabPath;
 
     @Override
     protected void preLoad() throws PersistenceBeanException {
         if (Boolean.parseBoolean(getRequestParameter(RedirectHelper.MULTIPLE))) {
             setMultipleCreate(true);
+            if(getRequestParameter(RedirectHelper.FROM_PARAMETER).equalsIgnoreCase(MULTIPLE_REQUEST)){
+                setMultipleRequestCreate(true);
+            }
         }
         if (getRequestParameter(RedirectHelper.MAIL) != null) {
             setRedirectFromMail(getRequestParameter(RedirectHelper.MAIL));
@@ -368,7 +378,16 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }
         generateMenuModel();
         if (isMultipleCreate()) {
+            if(isMultipleRequestCreate()){
+                setMutipleRequestObjTabPath(new ArrayList<>());
+                mutipleRequestObjTabPath = new ArrayList<>();
+                getMutipleRequestObjTabPath().add(ManageTypeFields.CDR.getPath());
+                getMutipleRequestObjTabPath().add(ManageTypeFields.NDG.getPath());
+                getMutipleRequestObjTabPath().add(ManageTypeFields.POSITION_PRACTICE.getPath());
+                
+            }
             setMultipleTabPath("requestComponents/SUBJECT_MASTERY.xhtml");
+            
         } else {
             setMultipleTabPath("");
         }
@@ -548,10 +567,17 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private void generateMenuModel() {
         setTopMenuModel(new DefaultMenuModel());
         if (isMultipleCreate()) {
+            if(isMultipleRequestCreate()){
+            addMenuItem(ResourcesHelper.getString("requestSubjectTab"));
+            addMenuItem(ResourcesHelper.getString("requestFirstTab"));
+            addMenuItem(ResourcesHelper.getString("requestLastTab"));
+            addMenuItem(ResourcesHelper.getString("requestServiceTab"));
+            }else{
             addMenuItem(ResourcesHelper.getString("requestSubjectTab"));
             addMenuItem(ResourcesHelper.getString("requestFirstTab"));
             addMenuItem(ResourcesHelper.getString("requestMultipleTab"));
             addMenuItem(ResourcesHelper.getString("requestLastTab"));
+            }
         } else {
             addMenuItem(ResourcesHelper.getString("requestFirstTab"));
             if (!ValidationHelper.isNullOrEmpty(getInputCardList())) {
@@ -794,7 +820,10 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void onMultipleServiceChange() throws PersistenceBeanException, IllegalAccessException {
         setInputCardList(RequestHelper.onMultipleServiceChange(getSelectedServiceIds().stream().map(Long::parseLong)
-                .collect(Collectors.toList())));
+                .collect(Collectors.toList()),isMultipleRequestCreate()));
+        if(isMultipleRequestCreate()){
+            generateTab();
+        }
     }
 
     /**
@@ -840,11 +869,13 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             return true;
         }
         if (isMultipleCreate() && getActiveMenuTabNum() == 2) {
-            onMultipleServiceChange();
-            generateTab();
+            if(!isMultipleRequestCreate()){
+                onMultipleServiceChange();
+                generateTab();
+            }
         } else if (getInputCardList() != null && getActiveMenuTabNum() <= getInputCardList().size()) {
             generateTab();
-        } else {
+        }else {
             setShownFields(null);
         }
 
@@ -957,7 +988,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         } else if ((!isMultipleCreate() && getActiveMenuTabNum() == 0)
                 || (isMultipleCreate() && getActiveMenuTabNum() == 1)) {
             return validFirstTab();
-        } else if (getActiveMenuTabNum() <= getInputCardList().size()) {
+        } else if (!isMultipleRequestCreate() && getActiveMenuTabNum() <= getInputCardList().size()) {
             return validGeneratedTab();
         } else return true;
     }
@@ -1201,13 +1232,13 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if (ValidationHelper.isNullOrEmpty(getSelectedClientId())) {
             addRequiredFieldException("form:client");
         }
-        if (ValidationHelper.isNullOrEmpty(getSelectedRequestTypeId())) {
+        if (!isMultipleRequestCreate() && ValidationHelper.isNullOrEmpty(getSelectedRequestTypeId())) {
             addRequiredFieldException("form:requestType");
         }
         if (!isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedServiceId())) {
             addRequiredFieldException("form:service");
         }
-        if (isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
+        if (isMultipleCreate() && !isMultipleRequestCreate() && ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
             addRequiredFieldException("form:multipleService");
         }
         return !getValidationFailed();
@@ -2831,5 +2862,33 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void setMultipleReqMessage(String multipleReqMessage) {
         this.multipleReqMessage = multipleReqMessage;
+    }
+
+    /**
+     * @return the multipleRequestCreate
+     */
+    public boolean isMultipleRequestCreate() {
+        return multipleRequestCreate;
+    }
+
+    /**
+     * @param multipleRequestCreate the multipleRequestCreate to set
+     */
+    public void setMultipleRequestCreate(boolean multipleRequestCreate) {
+        this.multipleRequestCreate = multipleRequestCreate;
+    }
+
+    /**
+     * @return the mutipleRequestObjTabPath
+     */
+    public List<String> getMutipleRequestObjTabPath() {
+        return mutipleRequestObjTabPath;
+    }
+
+    /**
+     * @param mutipleRequestObjTabPath the mutipleRequestObjTabPath to set
+     */
+    public void setMutipleRequestObjTabPath(List<String> mutipleRequestObjTabPath) {
+        this.mutipleRequestObjTabPath = mutipleRequestObjTabPath;
     }
 }

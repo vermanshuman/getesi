@@ -325,6 +325,12 @@
                                                      disabled="#{!bean.canCreate}"
                                                      action="#{bean.createNewMultipleRequest}" />
                                 </div>
+                                <div class="p-field">
+                                    <p:commandButton value="#{ff:upper(msg.requestNewMultiples)}"
+                                                     id="btn_new_multipa" styleClass="ui-button-success	search-btn new-button-multiple"
+                                                     disabled="#{!bean.canCreate}"
+                                                     action="#{bean.createNewMultipleRequests()}" />
+                                </div>
                             </div>
                         </div>
                         <div class="p-col-6">

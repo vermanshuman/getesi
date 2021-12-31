@@ -943,6 +943,10 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     public void createNewMultipleRequest() {
         RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT);
     }
+    public void createNewMultipleRequests() {
+        String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE";
+        RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT,queryParam);
+    }
 
     public void manageRequest() {
 
