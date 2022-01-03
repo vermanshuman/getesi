@@ -548,9 +548,9 @@
                                     <f:facet name="header">
                                         <div class="customers-table-header">
                                             <div class="ui-inputgroup ui-input-icon-left filter-container" >
-                                                <p:commandButton value="Search" action="#{bean.globalSearch}"  update=":form:table"/>
+                                                <p:commandButton value="#{msg.search}" action="#{bean.globalSearch}"  delay="500" update=":form:table"/>
                                                 <p:inputText id="globalFilter" value="#{bean.globalFilter}" placeholder="Global Search">
-                                                    <p:ajax event="keyup" delay="500" listener="#{bean.globalSearch}"  update=":form:table"/>
+                                                    <!--<p:ajax event="keyup" delay="500" listener="#{bean.globalSearch}"  update=":form:table"/>-->
                                                 </p:inputText>
                                             </div>
                                         </div>
