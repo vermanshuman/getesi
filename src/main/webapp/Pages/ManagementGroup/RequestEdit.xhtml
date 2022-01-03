@@ -121,8 +121,6 @@
         <script>
             function next(activeMenu, totalTabs) {
                 var nextMenu = activeMenu + 1;
-                console.log("aactiveMenu:"+activeMenu)
-                console.log("totalTabs:"+totalTabs)
                 PrimeFaces.ab({s:"pageTabMenu",u:"form",g:false,pa:[{name:"pageTabMenu_menuid",value:nextMenu.toString()}],f:"form"});return false;
             }
 
@@ -215,14 +213,15 @@
                                           styleClass="select-width">
                         <f:selectItems value="#{bean.services}"/>
                     </p:selectCheckboxMenu>
-                 </p:column>   
-                 <p:column rendered="#{bean.multipleRequestCreate}">
+                </p:column>
+                <p:column rendered="#{bean.multipleRequestCreate}">
                     <c:forEach items="#{bean.mutipleRequestObjTabPath}" var="objItem">
-                                <div class="ui-g-6" style="padding: 1%">
-                                    <ui:include src="#{objItem}"/>
-                                </div>
-                     </c:forEach>
-                  </p:column>
+                        <div class="ui-g-6" style="padding: 1%">
+                            <ui:include src="#{objItem}"/>
+                        </div>
+                    </c:forEach>
+                </p:column>
+
             </p:panelGrid>
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" id="requstType">
                 <p:selectOneRadio value="#{bean.selectedRequestEnumTypeFirst}" styleClass="request-select-radio">
@@ -237,33 +236,30 @@
         </ui:fragment>
 
         <ui:fragment id="dynamicFragment" rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size() - 1 ) or ( not empty bean.shownFields)}">
-            
-            
             <c:if test="#{bean.multipleRequestCreate}">
                 <div class="ui-g">
-                <div class="ui-g-3" style="padding: 1%">
-                    <span> #{msg.requestRequestType}<span class="red">*</span>:</span><br/>
-                    <p:selectOneMenu id="servicerequestType" value="#{bean.selectedRequestTypeId}"
-                                     label="#{msg.requestRequestType}" styleClass="select-width">
-                        <p:ajax listener="#{bean.onRequestTypeChange}"
-                                update="multipleServiceRequest"/>
-                        <f:selectItems value="#{bean.requestTypes}"/>
-                    </p:selectOneMenu>
+                    <div class="ui-g-3" style="padding: 1%">
+                        <span> #{msg.requestRequestType}<span class="red">*</span>:</span><br/>
+                        <p:selectOneMenu id="servicerequestType" value="#{bean.selectedRequestTypeId}"
+                                         label="#{msg.requestRequestType}" styleClass="select-width">
+                            <p:ajax listener="#{bean.onRequestTypeChange}"
+                                    update="multipleServiceRequest"/>
+                            <f:selectItems value="#{bean.requestTypes}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="ui-g-3" style="padding: 1%">
+                        <span> #{msg.requestService}<span class="red">*</span>:</span><br/>
+                        <p:selectCheckboxMenu value="#{bean.selectedServiceIds}" id="multipleServiceRequest"
+                                              label="#{msg.requestService}"
+                                              styleClass="select-width"   >
+                            <p:ajax delay="2000" event="change" listener="#{bean.onMultipleServiceChange()}" update="form" />
+                            <f:selectItems value="#{bean.services}"/>
+                        </p:selectCheckboxMenu>
+                    </div>
                 </div>
-                <div class="ui-g-3" style="padding: 1%">
-                    <span> #{msg.requestService}<span class="red">*</span>:</span><br/>
-                    <p:selectCheckboxMenu value="#{bean.selectedServiceIds}" id="multipleServiceRequest"
-                                           label="#{msg.requestService}"
-                                           styleClass="select-width"   >
-                        <p:ajax delay="2000" event="change" listener="#{bean.onMultipleServiceChange()}" update="form" />
-                        <f:selectItems value="#{bean.services}"/>
-                    </p:selectCheckboxMenu>
-                </div>   
-                </div>    
-                </c:if> 
-            
+            </c:if>
             <c:forEach rendered="#{(bean.multipleRequestCreate and not empty bean.shownFields) or !bean.multipleRequestCreate}" items="#{bean.shownFields}" var="item">
-                <div class="ui-g" style="#{item.getLineEven()?'background-color: #F5F5F5;':''}">
+            <div class="ui-g" style="#{item.getLineEven()?'background-color: #F5F5F5;':''}">
                     <c:if test="#{item.field != null}">
                         <div class="ui-g-12" style="padding: 1%; background: transparent">
                             <ui:include src="#{item.field.field.getPath()}"/>

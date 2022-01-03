@@ -10,6 +10,7 @@ import it.nexera.ris.persistence.beans.entities.domain.dictionary.TypeFormality;
 import it.nexera.ris.web.beans.wrappers.Pair;
 import it.nexera.ris.web.beans.wrappers.logic.RelationshipGroupingWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.TemplateEntity;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.criterion.Criterion;
@@ -22,6 +23,7 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -87,8 +89,7 @@ public class TemplatePdfTableHelper {
             return DateTimeHelper.toString(group);
         } else return "";
     }
-
-    public static List<String> groupPropertiesByQuoteTypeList(List<Property> propertyList, Subject subject,
+    public static List<String> groupPropertiesByQuoteTypeList(List<Property> propertyList, Subject subject, Request request,
                                                               boolean filterRelationship,
                                                               boolean showCadastralIncome,
                                                               boolean showAgriculturalIncome) {
@@ -98,14 +99,20 @@ public class TemplatePdfTableHelper {
             }
         }
         Map<List<RelationshipGroupingWrapper>, List<Property>> re = new HashMap<>();
-        wrapProperties(propertyList, subject, filterRelationship, re);
+        wrapRequestProperties(propertyList, subject, filterRelationship, re, request);
         List<String> joiner = new ArrayList<>();
         for (Iterator<Map.Entry<List<RelationshipGroupingWrapper>, List<Property>>> iterator = re.entrySet().iterator();
              iterator.hasNext(); ) {
             Map.Entry<List<RelationshipGroupingWrapper>, List<Property>> entry = iterator.next();
-            constructTableText(joiner, iterator, entry, true, showCadastralIncome, showAgriculturalIncome);
+            constructTableText(joiner, iterator, entry, true, showCadastralIncome, showAgriculturalIncome, request);
         }
         return joiner;
+    }
+    public static List<String> groupPropertiesByQuoteTypeList(List<Property> propertyList, Subject subject,
+                                                              boolean filterRelationship,
+                                                              boolean showCadastralIncome,
+                                                              boolean showAgriculturalIncome) {
+        return groupPropertiesByQuoteTypeList(propertyList, subject, null,filterRelationship, showCadastralIncome, showAgriculturalIncome);
     }
 
     public static List<Pair<String, String>> groupPropertiesByQuoteTypeListLikePairs(List<Property> propertyList, Subject subject,
@@ -120,7 +127,8 @@ public class TemplatePdfTableHelper {
                                                                                      List<Subject> presumableSubjects,
                                                                                      boolean filterRelationship, Formality formality,
                                                                                      boolean showCadastralIncome,
-                                                                                     boolean showAgriculturalIncome, Boolean addCommercialAndOmi) {
+                                                                                     boolean showAgriculturalIncome,
+                                                                                     Boolean addCommercialAndOmi) {
         for (Property property : propertyList) {
             if (!ValidationHelper.isNullOrEmpty(property.getCategoryCode())
                     && !RealEstateType.LAND.getShortValue().equals(property.getCategoryCode())) {
@@ -170,10 +178,26 @@ public class TemplatePdfTableHelper {
 
     private static void constructTableText(List<String> joiner, Iterator<Map.Entry<List<RelationshipGroupingWrapper>,
             List<Property>>> iterator, Map.Entry<List<RelationshipGroupingWrapper>, List<Property>> entry, boolean addCommercialAndOmi,
-            boolean showCadastralIncome,boolean showAgriculturalIncome) {
+                                           boolean showCadastralIncome,boolean showAgriculturalIncome) {
+        constructTableText(joiner, iterator, entry, true, showCadastralIncome, showAgriculturalIncome, null);
+    }
+    private static void constructTableText(List<String> joiner, Iterator<Map.Entry<List<RelationshipGroupingWrapper>,
+            List<Property>>> iterator, Map.Entry<List<RelationshipGroupingWrapper>, List<Property>> entry, boolean addCommercialAndOmi,
+                                           boolean showCadastralIncome,boolean showAgriculturalIncome, Request request) {
+        final AtomicBoolean showRegime = new AtomicBoolean(Boolean.FALSE);
+
+        if(!ValidationHelper.isNullOrEmpty(request) &&
+                ((!ValidationHelper.isNullOrEmpty(request.getClient()) &&
+                        !ValidationHelper.isNullOrEmpty(request.getClient().getRegime()) &&
+                        request.getClient().getRegime()) || (!ValidationHelper.isNullOrEmpty(request.getRegime()) &&
+                        request.getRegime()))) {
+            showRegime.set(Boolean.TRUE);
+        }
+
         joiner.add(entry.getKey().stream()
                 .map(p -> String.format("DIRITTI PARI A %s %s %s",
-                        p.getQuote(), p.getManagedPropertyType(), p.getExpectedRegimeFormat()))
+                        p.getQuote(), p.getManagedPropertyType(),
+                        showRegime.get() ? p.getExpectedRegimeFormat() : ""))
                 .collect(Collectors.joining("<br/>", "<div align=\"center\"><b>", "</b></div>")));
 
         List<Property> freeProperty = entry.getValue();
@@ -182,7 +206,7 @@ public class TemplatePdfTableHelper {
                         && p.isLandDataAreExistAndNotEmpty()).map(x ->
                 x.getAllFields(addCommercialAndOmi, true)).collect(Collectors.joining("<br />"));
 
-        
+
         freeProperty = freeProperty.stream().filter(p -> !PROPERTY_CADASTRAL_CATEGORY_CODE_FOR_LAND_PROPERTY_BLOCK.equals(p.getCategoryCode())
                 || !p.isLandDataAreExistAndNotEmpty()).collect(Collectors.toList());
         String bilding = freeProperty.stream().filter(p -> p.getType().equals(RealEstateType.BUILDING.getId()))
@@ -200,7 +224,7 @@ public class TemplatePdfTableHelper {
         List<Property> properties = freeProperty.stream()
                 .filter(p -> p.getType() != null)
                 .filter(p -> p.getType()
-                .equals(RealEstateType.LAND.getId())).collect(Collectors.toList());
+                        .equals(RealEstateType.LAND.getId())).collect(Collectors.toList());
 
         for (Property property : properties) {
             if (map.containsKey(property.getSheets())) {
@@ -222,9 +246,23 @@ public class TemplatePdfTableHelper {
         }
     }
 
-    public static void wrapProperties(List<Property> propertyList, Subject subject, boolean filterRelationship,
-                                      Map<List<RelationshipGroupingWrapper>, List<Property>> re) {
-        wrapProperties(propertyList, subject, filterRelationship, re, null);
+//    public static void wrapProperties(List<Property> propertyList, Subject subject, boolean filterRelationship,
+//                                      Map<List<RelationshipGroupingWrapper>, List<Property>> re) {
+//        wrapProperties(propertyList, subject, filterRelationship, re, null);
+//    }
+
+    public static void wrapRequestProperties(List<Property> propertyList, Subject subject, boolean filterRelationship,
+                                             Map<List<RelationshipGroupingWrapper>, List<Property>> re, Request request) {
+        wrapRequestProperties(propertyList, subject, filterRelationship, re, null, request);
+    }
+
+    public static void wrapRequestProperties(List<Property> propertyList, Subject subject, boolean filterRelationship,
+                                             Map<List<RelationshipGroupingWrapper>, List<Property>> re, Formality formality, Request request) {
+        for (Property property : propertyList) {
+            List<RelationshipGroupingWrapper> pairs = new LinkedList<>();
+            List<Relationship> relationshipList = getRelationships(subject, formality, property);
+            wrapRelationshipProperty(subject, filterRelationship, re, property, pairs, relationshipList, request);
+        }
     }
 
     public static void wrapProperties(List<Property> propertyList, Subject subject, boolean filterRelationship,
@@ -232,7 +270,7 @@ public class TemplatePdfTableHelper {
         for (Property property : propertyList) {
             List<RelationshipGroupingWrapper> pairs = new LinkedList<>();
             List<Relationship> relationshipList = getRelationships(subject, formality, property);
-            wrapRelationshipProperty(subject, filterRelationship, re, property, pairs, relationshipList);
+            wrapRelationshipProperty(subject, filterRelationship, re, property, pairs, relationshipList, null);
         }
     }
 
@@ -245,14 +283,14 @@ public class TemplatePdfTableHelper {
             for (Subject sub : presumableSubjects) {
                 relationshipList.addAll(getRelationships(sub, formality, property));
             }
-            wrapRelationshipProperty(subject, filterRelationship, re, property, pairs, relationshipList);
+            wrapRelationshipProperty(subject, filterRelationship, re, property, pairs, relationshipList, null);
         }
     }
 
     private static void wrapRelationshipProperty(Subject subject, boolean filterRelationship,
                                                  Map<List<RelationshipGroupingWrapper>, List<Property>> re,
                                                  Property property, List<RelationshipGroupingWrapper> pairs,
-                                                 List<Relationship> relationshipList) {
+                                                 List<Relationship> relationshipList, Request request) {
         if (filterRelationship) {
             relationshipList = relationshipList.stream()
                     .filter(r -> r.getRelationshipTypeId().equals(RelationshipType.MANUAL_ENTRY.getId()))
@@ -265,6 +303,33 @@ public class TemplatePdfTableHelper {
                             && r.getRelationshipTypeId().equals(RelationshipType.CADASTRAL_DOCUMENT.getId()))
                     .collect(Collectors.toList());
         }
+        Boolean showRegime = null;
+        if(request != null){
+            Optional<EstateSituation> estateSituation = CollectionUtils.emptyIfNull(request.getSituationEstateLocations())
+                    .stream()
+                    .filter(es -> !ValidationHelper.isNullOrEmpty(es.getRegime()) && es.getRegime())
+                    .findFirst();
+            if(estateSituation.isPresent())
+                showRegime = true;
+
+            estateSituation = CollectionUtils.emptyIfNull(request.getSituationEstateLocations())
+                    .stream()
+                    .filter(es -> !ValidationHelper.isNullOrEmpty(es.getRegime()) && !es.getRegime())
+                    .findFirst();
+            if(estateSituation.isPresent())
+                showRegime = false;
+
+            if(showRegime == null){
+                if(request.getRegime() != null)
+                    showRegime = request.getRegime();
+            }
+
+            if(showRegime == null){
+                if(request.getClient() != null && request.getClient().getRegime() != null)
+                    showRegime = request.getClient().getRegime();
+            }
+        }
+
         for (Relationship relationship : relationshipList) {
             if (relationship.getQuote() != null && relationship.getPropertyType() != null) {
                 RelationshipGroupingWrapper relationshipGroupingWrapper = new RelationshipGroupingWrapper(
@@ -272,7 +337,7 @@ public class TemplatePdfTableHelper {
                         relationship.getPropertyType().equalsIgnoreCase("Proprieta`")
                                 || relationship.getPropertyType().equalsIgnoreCase("Proprieta'")
                                 ? "DI PIENA PROPRIETA'" : "DI " + relationship.getPropertyType().toUpperCase(),
-                        relationship.getRegime() == null ? "" : relationship.getRegime(),
+                        showRegime == null || !showRegime ? "" : relationship.getRegime(),
                         relationship.getProperty().getCity());
                 if (pairs.stream().noneMatch(p -> p.equals(relationshipGroupingWrapper))) {
                     pairs.add(relationshipGroupingWrapper);
@@ -304,7 +369,7 @@ public class TemplatePdfTableHelper {
     }
 
     private static String landPropertyBlock(List<Property> propertyList,boolean showCadastralIncome,
-            boolean showAgriculturalIncome) {
+                                            boolean showAgriculturalIncome) {
         List<Property> landProperties = ValidationHelper.isNullOrEmpty(propertyList) ? null :
                 propertyList.stream().filter(p -> ValidationHelper.isNullOrEmpty(p.getCategory())
                         || !PROPERTY_CADASTRAL_CATEGORY_CODE_FOR_LAND_PROPERTY_BLOCK.equals(p.getCategory().getCode()))
@@ -355,13 +420,13 @@ public class TemplatePdfTableHelper {
             str.append("</td>");
             str.append("</tr>");
             if (showCadastralIncome || showAgriculturalIncome){
-                if(!ValidationHelper.isNullOrEmpty(property.getAgriculturalIncome())|| 
+                if(!ValidationHelper.isNullOrEmpty(property.getAgriculturalIncome())||
                         !ValidationHelper.isNullOrEmpty(property.getCadastralIncome())) {
                     str.append("<tr>");
                     str.append("<td style=\"border:none;\">");
                     str.append("</td>");
                     str.append("<td colspan=\"3\" style=\"border:none;\">");
-                  
+
                     if (showAgriculturalIncome) {
                         str.append("<span>");
                         str.append("(Red. agr. € ").append(property.getAgriculturalIncome());
@@ -373,27 +438,27 @@ public class TemplatePdfTableHelper {
                     }
                     if (showCadastralIncome) {
                         str.append("<span>");
-                         if(!showAgriculturalIncome)
+                        if(!showAgriculturalIncome)
                             str.append("(");
-                         else
-                             str.append("&nbsp;&nbsp;");
-                         str.append("Red. dom. € ").append(property.getCadastralIncome());
-                          str.append(")");
+                        else
+                            str.append("&nbsp;&nbsp;");
+                        str.append("Red. dom. € ").append(property.getCadastralIncome());
+                        str.append(")");
                         str.append("</span>");
                     }
-                 
+
                     str.append("</tr>");
                 }
-               
+
             }
         }
         str.append("</table></div>");
         str.append(propertyList.stream().filter(p -> !ValidationHelper.isNullOrEmpty(p.getComment())
                 && !p.getComment().equals(ResourcesHelper.getString("propertyCommentDefaultValue")))
                 .map(Property::getComment).collect(Collectors.joining("<br/>", "<i>", "</i>")));
-        
+
         return str.toString();
-        
+
     }
 
     private static void optimizePropertyParameters(Property property) {
@@ -734,13 +799,13 @@ public class TemplatePdfTableHelper {
         String defaultText = ResourcesHelper.getString("init_text_registry_or_table_default");
         AggregationLandChargesRegistry alcr = request.getAggregationLandChargesRegistry();
         boolean bReplaceWithConservatory = alcr.getLandChargesRegistries()
-        		.stream()
-        		.filter(lcr -> !ValidationHelper.isNullOrEmpty(lcr.getType()))
-        		.allMatch(x->x.getType().equals(LandChargesRegistryType.CONSERVATORY));
+                .stream()
+                .filter(lcr -> !ValidationHelper.isNullOrEmpty(lcr.getType()))
+                .allMatch(x->x.getType().equals(LandChargesRegistryType.CONSERVATORY));
         boolean bReplaceWithTavolare = alcr.getLandChargesRegistries()
-        		.stream()
-        		.filter(lcr -> !ValidationHelper.isNullOrEmpty(lcr.getType()))
-        		.anyMatch(lcr->lcr.getType().equals(LandChargesRegistryType.TAVOLARE));
+                .stream()
+                .filter(lcr -> !ValidationHelper.isNullOrEmpty(lcr.getType()))
+                .anyMatch(lcr->lcr.getType().equals(LandChargesRegistryType.TAVOLARE));
         if(bReplaceWithTavolare) {
             defaultText = ResourcesHelper.getString("init_text_registry_or_table_tavolare");
         }

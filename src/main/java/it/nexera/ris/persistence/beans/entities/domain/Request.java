@@ -416,6 +416,9 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     @JoinColumn(name = "invoice_id")
     private Invoice invoice;
 
+    @Column(name = "regime")
+    private Boolean regime;
+
     @Transient
     private Boolean haveRequestReport;
 
@@ -2030,5 +2033,13 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     public void setInvoice(Invoice invoice) {
         this.invoice = invoice;
+    }
+
+    public Boolean getRegime() {
+        return regime;
+    }
+
+    public void setRegime(Boolean regime) {
+        this.regime = regime;
     }
 }

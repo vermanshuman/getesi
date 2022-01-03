@@ -79,6 +79,14 @@
         </p:dataTable>
         <br/>
         <div align="center">
+            <p:outputPanel rendered="#{bean.showRegime}">
+                <h:panelGrid columns="2">
+                    <h:outputText value="#{msg.requestInsertRegime}:"/>
+                    <p:selectBooleanCheckbox id="requestRegime" value="#{bean.examRequest.regime}"/>
+                </h:panelGrid>
+            </p:outputPanel>
+        </div>
+        <div align="center">
             <p:outputPanel rendered="#{not empty bean.examRequest.distraintFormality}">
                 <h:outputText value="#{msg.requestTextEditDistraintFormalityPresentationDate}:"/>
                 <p:calendar value="#{bean.examRequest.distraintFormality.presentationDate}" style="margin-left: 10px"
@@ -145,7 +153,9 @@
             </p:dataTable>
         </p:column>
         <p:column headerText="#{msg.esateSituationRegime}:" style="width: 74px;">
-            <p:selectBooleanCheckbox value="#{item.regime}" disabled="true"/>
+            <p:selectBooleanCheckbox value="#{item.regime}">
+                <p:ajax listener="#{item.handleRegimeEdit()}" global="false" update="@this" />
+            </p:selectBooleanCheckbox>
         </p:column>
         <p:column style="width: 70%; vertical-align: top;" headerText="#{msg.estateLocation}">
             <p:dataTable rendered="#{not empty item.propertyList}" value="#{item.propertyList}" var="estate"

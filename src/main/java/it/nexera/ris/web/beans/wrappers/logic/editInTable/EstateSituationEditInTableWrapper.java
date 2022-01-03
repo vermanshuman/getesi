@@ -22,6 +22,8 @@ public class EstateSituationEditInTableWrapper {
 
     private Boolean regime;
 
+    private boolean edited;
+
     public EstateSituationEditInTableWrapper(EstateSituation situation) {
         this.estateFormalityList = situation.getEstateFormalityList().stream()
                 .map(EstateFormalityEditInTableWrapper::new).collect(Collectors.toList());
@@ -32,6 +34,7 @@ public class EstateSituationEditInTableWrapper {
                         ? situation.getCommentWithoutInitialize() : situation.getComment());
         this.commentInit = new BaseEditInTableWrapper(situation.getId(), situation.getCommentInit());
         this.estateSituationId = situation.getId();
+        this.regime = situation.getRegime() != null ? situation.getRegime() : Boolean.TRUE;
     }
 
     public void save() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -40,6 +43,11 @@ public class EstateSituationEditInTableWrapper {
         }
         for (PropertyEditInTableWrapper property : getPropertyList()) {
             property.save();
+        }
+        if(!ValidationHelper.isNullOrEmpty(isEdited())){
+            EstateSituation situation = DaoManager.get(EstateSituation.class, getEstateSituationId());
+            situation.setRegime(getRegime());
+            DaoManager.save(situation, true);
         }
         if(getComment().isEdited()){
             EstateSituation situation = DaoManager.get(EstateSituation.class, getComment().getId());
@@ -51,6 +59,7 @@ public class EstateSituationEditInTableWrapper {
             situation.setCommentInit(getCommentInit().getComment());
             DaoManager.save(situation, true);
         }
+
     }
 
     public List<EstateFormalityEditInTableWrapper> getEstateFormalityList() {
@@ -99,5 +108,17 @@ public class EstateSituationEditInTableWrapper {
 
     public void setRegime(Boolean regime) {
         this.regime = regime;
+    }
+
+    public void handleRegimeEdit() {
+        setEdited(true);
+    }
+
+    public boolean isEdited() {
+        return edited;
+    }
+
+    public void setEdited(boolean edited) {
+        this.edited = edited;
     }
 }

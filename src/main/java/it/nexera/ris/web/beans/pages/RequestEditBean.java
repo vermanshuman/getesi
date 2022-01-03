@@ -90,7 +90,6 @@ import it.nexera.ris.web.beans.EntityEditPageBean;
 import it.nexera.ris.web.beans.base.AccessBean;
 import it.nexera.ris.web.beans.wrappers.logic.SubjectWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.UploadDocumentWrapper;
-import java.util.function.Predicate;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 @ManagedBean(name = "requestEditBean")
@@ -261,11 +260,11 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private Boolean redirected;
 
     private String multipleReqMessage;
-    
+
     private boolean multipleRequestCreate;
-    
+
     private final String MULTIPLE_REQUEST = "RICHESTE_MULTIPLE";
-    
+
     private List<String> mutipleRequestObjTabPath;
 
     @Override
@@ -384,10 +383,9 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 getMutipleRequestObjTabPath().add(ManageTypeFields.CDR.getPath());
                 getMutipleRequestObjTabPath().add(ManageTypeFields.NDG.getPath());
                 getMutipleRequestObjTabPath().add(ManageTypeFields.POSITION_PRACTICE.getPath());
-                
+
             }
             setMultipleTabPath("requestComponents/SUBJECT_MASTERY.xhtml");
-            
         } else {
             setMultipleTabPath("");
         }
@@ -568,15 +566,15 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         setTopMenuModel(new DefaultMenuModel());
         if (isMultipleCreate()) {
             if(isMultipleRequestCreate()){
-            addMenuItem(ResourcesHelper.getString("requestSubjectTab"));
-            addMenuItem(ResourcesHelper.getString("requestFirstTab"));
-            addMenuItem(ResourcesHelper.getString("requestLastTab"));
-            addMenuItem(ResourcesHelper.getString("requestServiceTab"));
+                addMenuItem(ResourcesHelper.getString("requestSubjectTab"));
+                addMenuItem(ResourcesHelper.getString("requestFirstTab"));
+                addMenuItem(ResourcesHelper.getString("requestLastTab"));
+                addMenuItem(ResourcesHelper.getString("requestServiceTab"));
             }else{
-            addMenuItem(ResourcesHelper.getString("requestSubjectTab"));
-            addMenuItem(ResourcesHelper.getString("requestFirstTab"));
-            addMenuItem(ResourcesHelper.getString("requestMultipleTab"));
-            addMenuItem(ResourcesHelper.getString("requestLastTab"));
+                addMenuItem(ResourcesHelper.getString("requestSubjectTab"));
+                addMenuItem(ResourcesHelper.getString("requestFirstTab"));
+                addMenuItem(ResourcesHelper.getString("requestMultipleTab"));
+                addMenuItem(ResourcesHelper.getString("requestLastTab"));
             }
         } else {
             addMenuItem(ResourcesHelper.getString("requestFirstTab"));
@@ -875,7 +873,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             }
         } else if (getInputCardList() != null && getActiveMenuTabNum() <= getInputCardList().size()) {
             generateTab();
-        }else {
+        } else {
             setShownFields(null);
         }
 
