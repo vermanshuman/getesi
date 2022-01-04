@@ -118,6 +118,9 @@
             fieldset div {
                 font-size: 14px;
             }
+            body .ui-panel .ui-panel-titlebar, body .ui-panel .ui-panel-content,.card , #immobiliFieldset{
+                border: 1px solid #6c757d !important;    
+            } 
 
         </style>
         <p:remoteCommand name="removeFileCommand" update="form"/>
@@ -140,7 +143,7 @@
                 </span></p:column>
             </p:panelGrid>
         </div>
-        <p:fieldset legend="#{msg.databaseListSubjectProperties}" styleClass="sub-list-legend" style="margin-top: 10px;">
+        <p:fieldset id="immobiliFieldset" legend="#{msg.databaseListSubjectProperties}" styleClass="sub-list-legend" style="margin-top: 10px;">
             <p:panelGrid columns="9" styleClass="ui-panelgrid-blank form-group" layout="grid">
                 <p:commandButton icon="fa fa-fw fa-plus icon-align" actionListener="#{bean.createNewProperty}"
                                  style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%;"
