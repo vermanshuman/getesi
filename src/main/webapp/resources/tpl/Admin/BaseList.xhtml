@@ -151,24 +151,25 @@
 
                                 <ui:fragment
                                         rendered="#{empty displayControlPanel ? true : displayControlPanel}">
-                                    <div class="">
+                                    <ui:insert name="back_buttons_panel"></ui:insert>
+                                    <br/>
+                                </ui:fragment>
+
+                                <p:commandButton id="default_btn" style="display: none;"/>
+                                <p:defaultCommand target="default_btn" scope="table"/>
+                                </p:outputPanel>
+                                <p:fieldset rendered="#{empty tableInsideField ? false : tableInsideField}" legend="#{msg.viewCreation}" toggleable="true" toggleSpeed="500">
+                                   <div class="">
                                         <ui:insert name="buttons_panel"></ui:insert>
                                         <p:commandButton disabled="#{!bean.canCreate}" id="buttonCreate"
                                                          icon="pi pi-plus-circle"
                                                          style="#{empty renderCss ? '' : renderCss}"
                                                          styleClass="ui-button-success p-mr-2 p-mb-2"
                                                          value="#{not empty addButtonTitle ? addButtonTitle : msg.newItem}"
-                                                         update=":form"
+                                                         update=":form" rendered="#{empty displayControlPanel ? true : displayControlPanel}"
                                                          action="#{bean.addEntity}"/>
-                                        <ui:insert name="back_buttons_panel"></ui:insert>
+                                        
                                     </div>
-                                    <br/>
-                                </ui:fragment>
-
-                                <p:commandButton id="default_btn" style="display: none;"/>
-                                <p:defaultCommand target="default_btn" scope="table"/>
-
-                                <p:fieldset rendered="#{empty tableInsideField ? false : tableInsideField}" legend="#{msg.estateSituationListDocuments}" toggleable="true" toggleSpeed="500">
                                     <p:dataTable var="item" id="table1" value="#{tableModel}"
                                                  disabledSelection="#{empty disableSelection?'false':'true'}"
                                                  lazy="#{lazyMode}" filteredValue="#{bean.filteredList}"
@@ -264,7 +265,7 @@
 
                                     <ui:insert name="columns"></ui:insert>
                                 </p:dataTable>
-                            </p:outputPanel>
+                            
 
                             <p:dialog header="#{msg.deleteConfirmationHeader}" widgetVar="dlg2"
                                       modal="true" resizable="false" effect="SLIDE">

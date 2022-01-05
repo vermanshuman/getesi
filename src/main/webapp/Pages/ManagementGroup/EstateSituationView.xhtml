@@ -144,7 +144,7 @@
                 </span></p:column>
             </p:panelGrid>
         </div>
-        <p:fieldset id="immobiliFieldset" legend="#{msg.databaseListSubjectProperties}" styleClass="sub-list-legend" style="margin-top: 10px;">
+        <p:fieldset id="immobiliFieldset" legend="#{msg.databaseListSubjectProperties}" toggleable="true" toggleSpeed="500" collapsed="false" styleClass="sub-list-legend" style="margin-top: 10px;">
             <p:panelGrid columns="9" styleClass="ui-panelgrid-blank form-group" layout="grid">
                 <p:commandButton icon="fa fa-fw fa-plus icon-align" actionListener="#{bean.createNewProperty}"
                                  style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%;"
@@ -431,7 +431,7 @@
                          update="dialogReplacedSubjectDesc"/>
         <p:remoteCommand name="updatePresumableSubjectDescDialog" onstart="PF('dlgPresumableSubjectDesc').show();"
                          update="dialogPresumableSubjectDesc"/>
-        <p:fieldset legend="#{msg.estateFormality}" styleClass="sub-list-legend" style="margin-top: 10px;">
+        <p:fieldset legend="#{msg.estateFormality}" toggleable="true" toggleSpeed="500" collapsed="false" styleClass="sub-list-legend" style="margin-top: 10px;">
             <p:remoteCommand name="updateTab" update=":form:filePanel"/>
             <p:panelGrid columns="9" styleClass="ui-panelgrid-blank form-group" layout="grid" style="margin-top: 3%">
                 <p:commandButton icon="fa fa-fw fa-plus icon-align" actionListener="#{bean.createNewEstateFormality}"
@@ -532,7 +532,7 @@
             </p:dataTable>
         </p:fieldset>
 
-        <p:fieldset legend="#{msg.pdfFormality}" style="margin-top: 10px;" id="formalityDettaglio">
+        <p:fieldset legend="#{msg.pdfFormality}" toggleable="true" toggleSpeed="500" collapsed="false" style="margin-top: 10px;" id="formalityDettaglio">
             <p:panelGrid columns="9" styleClass="ui-panelgrid-blank form-group" layout="grid" style="margin-top: 3%">
                 <p:commandButton icon="fa fa-fw fa-plus" actionListener="#{bean.createNewFormality}"
                                  style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%;"/>
