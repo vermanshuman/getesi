@@ -79,14 +79,6 @@
         </p:dataTable>
         <br/>
         <div align="center">
-            <p:outputPanel rendered="#{bean.showRegime}">
-                <h:panelGrid columns="2">
-                    <h:outputText value="#{msg.requestInsertRegime}:"/>
-                    <p:selectBooleanCheckbox id="requestRegime" value="#{bean.examRequest.regime}"/>
-                </h:panelGrid>
-            </p:outputPanel>
-        </div>
-        <div align="center">
             <p:outputPanel rendered="#{not empty bean.examRequest.distraintFormality}">
                 <h:outputText value="#{msg.requestTextEditDistraintFormalityPresentationDate}:"/>
                 <p:calendar value="#{bean.examRequest.distraintFormality.presentationDate}" style="margin-left: 10px"

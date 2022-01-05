@@ -228,6 +228,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     private Boolean billinRequest;
 
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
     InstantiationException, IllegalAccessException {
