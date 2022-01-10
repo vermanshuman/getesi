@@ -116,6 +116,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private Long newSelectedBillingClientId;
 
     private Long selectedRequestTypeId;
+    
+    private List<String> selectedRequestTypes;
 
     private List<SelectItem> requestTypes;
 
@@ -441,7 +443,12 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             setSelectedBillingClientId(getEntity().getBillingClient() != null ? getEntity().getBillingClient().getId() : null);
         }
 
-        setRequestTypes(ComboboxHelper.fillList(RequestType.class));
+        if(isMultipleRequestCreate()){
+            setRequestTypes(ComboboxHelper.fillList(RequestType.class,false));
+        }else{
+            setRequestTypes(ComboboxHelper.fillList(RequestType.class));
+        }
+        
         setSelectedRequestTypeId(getEntity().getRequestType() != null ? getEntity().getRequestType().getId() : null);
         onRequestTypeChange();
 
@@ -808,7 +815,13 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     }
 
     public void onRequestTypeChange() throws IllegalAccessException, PersistenceBeanException {
-        setServices(RequestHelper.onRequestTypeChange(getSelectedRequestTypeId(), isMultipleCreate()));
+        if(isMultipleRequestCreate() && !ValidationHelper.isNullOrEmpty(getSelectedRequestTypes())){
+            List<Long> reqTypeIds = getSelectedRequestTypes().stream().map(Long::parseLong)
+                                        .collect(Collectors.toList());
+            setServices(RequestHelper.onRequestTypeChange(reqTypeIds, isMultipleCreate()));
+        }else{
+            setServices(RequestHelper.onRequestTypeChange(getSelectedRequestTypeId(), isMultipleCreate()));
+        }
     }
 
     public void onServiceChange() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -1265,6 +1278,17 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     @Override
     public void onSave() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        List<Long> selectedServiceReqType = new ArrayList();
+        if(isMultipleRequestCreate()){
+            selectedServiceReqType = getSelectedRequestTypes().stream().map(Long::parseLong)
+                                        .collect(Collectors.toList());
+        }else{
+            selectedServiceReqType.add(getSelectedRequestTypeId());
+        }
+        for (Long requestTypeId : selectedServiceReqType) {
+        
+        if(isMultipleRequestCreate())setEntity(new Request());
+        
         prepareRequestToSave();
 
         getEntity().setClient(DaoManager.get(Client.class, this.getSelectedClientId()));
@@ -1301,12 +1325,21 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                                 : RequestEnumTypes.getById(getSelectedRequestEnumTypeSecond()));
             }
         }
-        getEntity().setRequestType(DaoManager.get(RequestType.class, getSelectedRequestTypeId()));
+        getEntity().setRequestType(DaoManager.get(RequestType.class, requestTypeId));
         if (isMultipleCreate()) {
-            getEntity().setMultipleServices(DaoManager.load(Service.class, new Criterion[]{
+            List<Service> serviceList = DaoManager.load(Service.class, new Criterion[]{
                     Restrictions.in("id", getSelectedServiceIds().stream()
                             .map(Long::parseLong).collect(Collectors.toList()))
-            }));
+            });
+            if(isMultipleRequestCreate()){
+               serviceList = serviceList.stream().filter(service -> requestTypeId.equals(service.getRequestType().getId())).collect(Collectors.toList());
+            }
+//            getEntity().setMultipleServices(DaoManager.load(Service.class, new Criterion[]{
+//                    Restrictions.in("id", getSelectedServiceIds().stream()
+//                            .map(Long::parseLong).collect(Collectors.toList()))
+//            }));
+            getEntity().setMultipleServices(serviceList);
+
         } else {
             if(!ValidationHelper.isNullOrEmpty(getSelectedServiceId()))
                 getEntity().setService(DaoManager.get(Service.class, getSelectedServiceId()));
@@ -1407,6 +1440,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 saveAllDataRelatedToRequestOrNotify(request);
             }
         }
+       }
     }
 
     private void prepareRequestToSave() throws PersistenceBeanException, IllegalAccessException {
@@ -2888,5 +2922,19 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
      */
     public void setMutipleRequestObjTabPath(List<String> mutipleRequestObjTabPath) {
         this.mutipleRequestObjTabPath = mutipleRequestObjTabPath;
+    }
+
+    /**
+     * @return the selectedRequestTypes
+     */
+    public List<String> getSelectedRequestTypes() {
+        return selectedRequestTypes;
+    }
+
+    /**
+     * @param selectedRequestTypes the selectedRequestTypes to set
+     */
+    public void setSelectedRequestTypes(List<String> selectedRequestTypes) {
+        this.selectedRequestTypes = selectedRequestTypes;
     }
 }

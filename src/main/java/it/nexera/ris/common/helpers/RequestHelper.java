@@ -296,6 +296,17 @@ public class RequestHelper {
             return (ComboboxHelper.fillList(new ArrayList<>(), !multiple));
         }
     }
+    
+    public static List<SelectItem> onRequestTypeChange(List<Long> requestTypeIds, boolean multiple)
+            throws IllegalAccessException, PersistenceBeanException {
+        if (!ValidationHelper.isNullOrEmpty(requestTypeIds)) {
+            return ComboboxHelper.fillList(Service.class, Order.asc("name"), new Criterion[]{
+                    Restrictions.in("requestType.id", requestTypeIds)
+            }, !multiple);
+        } else {
+            return (ComboboxHelper.fillList(new ArrayList<>(), !multiple));
+        }
+    }
 
     public static List<InputCard> onServiceChange(Long serviceId)
             throws PersistenceBeanException, IllegalAccessException, InstantiationException {
