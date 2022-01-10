@@ -795,3 +795,18 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
     height: 42px;
     display: block;
 }
+
+.red-file{
+
+    background-image: url("../images/pdf_icon2.jpg");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 26px;
+    height: 42px;
+    display: block;
+
+}
+
+.red-file::before{
+    content: none !important;
+}
