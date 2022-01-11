@@ -174,7 +174,7 @@
                         <h:outputText value="#{fileEntry.getTitle()}"/>
                     </p:column>
                     <p:column styleClass="action_column">
-                        <p:commandButton icon="fa fa-fw fa-file-pdf-o icon-align" action="#{bean.showPDF}" ajax="false">
+                        <p:commandButton icon="fa fa-fw fa-file-pdf-o red-file icon-align" action="#{bean.showPDF}" ajax="false">
                             <f:setPropertyActionListener value="#{fileEntry.id}" target="#{bean.downloadFileId}"/>
                         </p:commandButton>
                     </p:column>
@@ -456,7 +456,7 @@
                         <h:outputText value="#{fileEntry.getTitle()}"/>
                     </p:column>
                     <p:column styleClass="action_column">
-                        <p:commandButton icon="fa fa-fw fa-file-pdf-o icon-align" action="#{bean.downloadEstateFormalityPDF}"
+                        <p:commandButton icon="fa fa-fw fa-file-pdf-o red-file icon-align" action="#{bean.downloadEstateFormalityPDF}"
                                          ajax="false">
                             <f:setPropertyActionListener value="#{fileEntry.id}"
                                                          target="#{bean.downloadFileId}"/>
@@ -563,7 +563,7 @@
                 </p:column>
                 <p:column styleClass="action_column">
                     <p:column headerText="#{msg.pdf}" styleClass="action_column">
-                        <p:commandButton icon="fa fa-file-pdf-o" action="#{bean.downloadFormalityPdf}" ajax="false">
+                        <p:commandButton icon="fa fa-file-pdf-o red-file" action="#{bean.downloadFormalityPdf}" ajax="false">
                             <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                         </p:commandButton>
                     </p:column>
