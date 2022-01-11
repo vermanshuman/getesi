@@ -807,6 +807,17 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
 
 }
 
+.action_column .ui-button .red-file{
+
+    background-image: url("../images/pdf_icon2.jpg") !important;
+    background-repeat: no-repeat !important;
+    background-position: 50% !important;
+    background-size: 26px !important;
+    height: 42px !important;
+    display: block !important;
+    top : 0% !important;
+}
+
 .red-file::before{
     content: none !important;
 }

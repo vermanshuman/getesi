@@ -122,6 +122,11 @@
             body .ui-panel .ui-panel-titlebar, body .ui-panel .ui-panel-content,.card , #immobiliFieldset{
                 border: 1px solid #6c757d !important;
             }
+            
+           .white-button{
+                background: white !important;    
+            }
+
 
         </style>
         <p:remoteCommand name="removeFileCommand" update="form"/>
@@ -174,7 +179,7 @@
                         <h:outputText value="#{fileEntry.getTitle()}"/>
                     </p:column>
                     <p:column styleClass="action_column">
-                        <p:commandButton icon="fa fa-fw fa-file-pdf-o red-file icon-align" action="#{bean.showPDF}" ajax="false">
+                        <p:commandButton styleClass="white-button" icon="fa fa-fw fa-file-pdf-o red-file icon-align" action="#{bean.showPDF}" ajax="false">
                             <f:setPropertyActionListener value="#{fileEntry.id}" target="#{bean.downloadFileId}"/>
                         </p:commandButton>
                     </p:column>
@@ -456,7 +461,7 @@
                         <h:outputText value="#{fileEntry.getTitle()}"/>
                     </p:column>
                     <p:column styleClass="action_column">
-                        <p:commandButton icon="fa fa-fw fa-file-pdf-o red-file icon-align" action="#{bean.downloadEstateFormalityPDF}"
+                        <p:commandButton styleClass="white-button" icon="fa fa-fw fa-file-pdf-o red-file icon-align" action="#{bean.downloadEstateFormalityPDF}"
                                          ajax="false">
                             <f:setPropertyActionListener value="#{fileEntry.id}"
                                                          target="#{bean.downloadFileId}"/>
@@ -563,7 +568,7 @@
                 </p:column>
                 <p:column styleClass="action_column">
                     <p:column headerText="#{msg.pdf}" styleClass="action_column">
-                        <p:commandButton icon="fa fa-file-pdf-o red-file" action="#{bean.downloadFormalityPdf}" ajax="false">
+                        <p:commandButton styleClass="white-button" icon="fa fa-fw fa-file-pdf-o red-file" action="#{bean.downloadFormalityPdf}" ajax="false">
                             <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                         </p:commandButton>
                     </p:column>
