@@ -1292,22 +1292,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             }
         }
     }
-    
-    public String getItemIconStyleClass(Long requestTypeId) {
-    	String iconStyleClass = "";
-    	if (!ValidationHelper.isNullOrEmpty(requestTypeId)) {    		
-    		try {
-				RequestType requestTypeDTO = DaoManager.get(RequestType.class, requestTypeId);
-				iconStyleClass = requestTypeDTO.getIcon();
-				if(iconStyleClass.startsWith("fa")) {
-					iconStyleClass = "fa " + iconStyleClass;
-				}
-			} catch (HibernateException | InstantiationException | IllegalAccessException | PersistenceBeanException e) {
-                LogHelper.log(log, e);
-            }
-    	}
-    	return iconStyleClass;
-    }
 
     public void openRequestEditor() {
         RedirectHelper.goTo(PageTypes.REQUEST_TEXT_EDIT, getEntityEditId());
