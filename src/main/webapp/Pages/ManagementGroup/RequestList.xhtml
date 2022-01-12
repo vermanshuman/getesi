@@ -943,12 +943,7 @@
                                    rendered="#{item.serviceName eq null}"
                                    style="background-color: transparent;width: inherit;"/>
                     <p:outputPanel>
-                        <h:outputText styleClass="fa #{item.requestTypeIcon}" style="font-size: 18px;margin-right: 5px;vertical-align: top;" rendered="#{item.requestTypeIcon.contains('fa-')}"/>
-                        <h:outputText styleClass="anagrafico-icon" style="display: inline-flex;margin-right: 5px;" rendered="#{(not item.requestTypeIcon.contains('fa-')) and item.requestTypeName ne null and ff:upper(item.requestTypeName) eq 'SERVIZIO ANAGRAFICO'}"/>
-                        <h:outputText styleClass="camerale-icon" style="display: inline-flex;margin-right: 5px;" rendered="#{(not item.requestTypeIcon.contains('fa-')) and item.requestTypeName ne null and ff:upper(item.requestTypeName) eq 'SERVIZIO CAMERALE'}"/>
-                        <h:outputText styleClass="immobiliare-icon" style="display: inline-flex;margin-right: 5px;" rendered="#{(not item.requestTypeIcon.contains('fa-')) and item.requestTypeName ne null and ff:upper(item.requestTypeName) eq 'SERVIZIO IMMOBILIARE'}"/>
-                        <h:outputText styleClass="investigativo-icon" style="display: inline-flex;margin-right: 5px;" rendered="#{(not item.requestTypeIcon.contains('fa-')) and item.requestTypeName ne null and ff:upper(item.requestTypeName) eq 'SERVIZIO INVESTIGATIVO'}"/>
-                        <h:outputText styleClass="camerale-icon" style="display: inline-flex;margin-right: 5px;" rendered="#{(not item.requestTypeIcon.contains('fa-')) and item.requestTypeName ne null and ff:upper(item.requestTypeName) ne 'SERVIZIO ANAGRAFICO' and ff:upper(item.requestTypeName) ne 'SERVIZIO CAMERALE' and ff:upper(item.requestTypeName) ne 'SERVIZIO IMMOBILIARE' and ff:upper(item.requestTypeName) ne 'SERVIZIO INVESTIGATIVO'}"/>
+                        <h:outputText styleClass="#{bean.getItemIconStyleClass(item.requestTypeId)}" style="display: inline-flex;margin-right: 5px;" />
                         <h:outputText id="requestTypeName" value="#{item.requestTypeName}" style="vertical-align: top;font-weight: bold !important;" rendered="#{item.requestTypeName ne null}"/>
                     </p:outputPanel>
                     <h:outputText id="service" value="#{item.serviceName}" rendered="#{item.serviceName ne null}"/>
