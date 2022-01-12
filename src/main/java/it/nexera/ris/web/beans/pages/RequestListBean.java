@@ -195,6 +195,8 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     private List<Service> selectedServices;
     
+    private List<RequestType> requestIconList;
+    
     private static final String KEY_CLIENT_ID = "KEY_CLIENT_ID_SESSION_KEY_NOT_COPY";
     private static final String KEY_STATES = "KEY_STATES_SESSION_KEY_NOT_COPY";
     private static final String KEY_REQUEST_TYPE = "KEY_REQUEST_TYPE_SESSION_KEY_NOT_COPY";
@@ -349,6 +351,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             SessionHelper.removeObject("REQUEST_LIST_FILTER_BY");
         }
         loadFilterValueFromSession();
+        setRequestIconList(RequestHelper.loadRequestTypeIcon());
         filterTableFromPanel();
     }
 
@@ -1893,4 +1896,26 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         
     }
     
+/**
+     * @param requestType
+     * @return the requestTypeStyle
+     */
+    public String getRequestTypeStyle(String requestType) {
+        return RequestHelper.getIcon(requestType, requestIconList);
+    }    
+
+    /**
+     * @return the requestIconList
+     */
+    public List<RequestType> getRequestIconList() {
+        return requestIconList;
+    }
+
+    /**
+     * @param requestIconList the requestIconList to set
+     */
+    public void setRequestIconList(List<RequestType> requestIconList) {
+        this.requestIconList = requestIconList;
+    }
+
 }

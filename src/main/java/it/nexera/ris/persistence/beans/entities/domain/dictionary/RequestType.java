@@ -37,6 +37,9 @@ public class RequestType extends IndexedEntity {
     
     @Transient
     private String styleClass;
+    
+    @Transient
+    private String styleClassForSmallIcons;
 
     @Override
     public String toString() {
@@ -108,5 +111,26 @@ public class RequestType extends IndexedEntity {
 
     public void setDefault_registry(AggregationLandChargesRegistry default_registry) {
         this.default_registry = default_registry;
+    }
+
+    /**
+     * @return the styleClassForSmallIcons
+     */
+    public String getStyleClassForSmallIcons() {
+         if(!ValidationHelper.isNullOrEmpty(getIcon())) {
+            if(getIcon().startsWith("fa-")) {
+                styleClassForSmallIcons = "fa " + getIcon() + " fa-2x";
+            }else {
+            styleClassForSmallIcons = getIcon();
+            }
+        }
+        return styleClassForSmallIcons;
+    }
+
+    /**
+     * @param styleClassForSmallIcons the styleClassForSmallIcons to set
+     */
+    public void setStyleClassForSmallIcons(String styleClassForSmallIcons) {
+        this.styleClassForSmallIcons = styleClassForSmallIcons;
     }
 }
