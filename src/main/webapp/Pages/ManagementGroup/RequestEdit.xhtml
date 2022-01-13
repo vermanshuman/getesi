@@ -23,7 +23,7 @@
             }
 
             body .ui-widget-header {
-                background-color: #2f8ee5 !important;
+                background-color: #788FA7 !important;
                 color: #ffffff;
             }
 
@@ -192,7 +192,7 @@
 
 
                 </p:column>
-                <p:column>
+                <p:column rendered="#{!bean.multipleRequestCreate}">
                     <span> #{msg.requestRequestType}<span class="red">*</span>:</span><br/>
                     <p:selectOneMenu id="requestType" value="#{bean.selectedRequestTypeId}"
                                      label="#{msg.requestRequestType}" styleClass="select-width">
@@ -201,7 +201,7 @@
                         <f:selectItems value="#{bean.requestTypes}"/>
                     </p:selectOneMenu>
                 </p:column>
-                <p:column>
+                <p:column rendered="#{!bean.multipleRequestCreate}">
                     <span> #{msg.requestService}<span class="red">*</span>:</span><br/>
                     <p:selectOneMenu value="#{bean.selectedServiceId}" rendered="#{!bean.multipleCreate}"
                                      label="#{msg.requestService}" styleClass="select-width" id="service">
@@ -214,6 +214,14 @@
                         <f:selectItems value="#{bean.services}"/>
                     </p:selectCheckboxMenu>
                 </p:column>
+                <p:column rendered="#{bean.multipleRequestCreate}">
+                    <c:forEach items="#{bean.mutipleRequestObjTabPath}" var="objItem">
+                        <div class="ui-g-6" style="padding: 1%">
+                            <ui:include src="#{objItem}"/>
+                        </div>
+                    </c:forEach>
+                </p:column>
+
             </p:panelGrid>
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" id="requstType">
                 <p:selectOneRadio value="#{bean.selectedRequestEnumTypeFirst}" styleClass="request-select-radio">
@@ -227,10 +235,31 @@
             </p:panelGrid>
         </ui:fragment>
 
-        <ui:fragment id="dynamicFragment" rendered="#{not empty bean.shownFields}">
-
-            <c:forEach items="#{bean.shownFields}" var="item">
-                <div class="ui-g" style="#{item.getLineEven()?'background-color: #F5F5F5;':''}">
+        <ui:fragment id="dynamicFragment" rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size() - 1 ) or ( not empty bean.shownFields)}">
+            <c:if test="#{bean.multipleRequestCreate}">
+                <div class="ui-g">
+                    <div class="ui-g-3" style="padding: 1%">
+                        <span> #{msg.requestRequestType}<span class="red">*</span>:</span><br/>
+                        <p:selectCheckboxMenu id="servicerequestType" value="#{bean.selectedRequestTypes}"
+                                         label="#{msg.requestRequestType}" styleClass="select-width">
+                            <p:ajax delay="2000" event="change" listener="#{bean.onRequestTypeChange}"
+                                    update="multipleServiceRequest"/>
+                            <f:selectItems value="#{bean.requestTypes}"/>
+                        </p:selectCheckboxMenu>
+                    </div>
+                    <div class="ui-g-3" style="padding: 1%">
+                        <span> #{msg.requestService}<span class="red">*</span>:</span><br/>
+                        <p:selectCheckboxMenu value="#{bean.selectedServiceIds}" id="multipleServiceRequest"
+                                              label="#{msg.requestService}"
+                                              styleClass="select-width"   >
+                            <p:ajax delay="2000" event="change" listener="#{bean.onMultipleServiceChange()}" update="form" />
+                            <f:selectItems value="#{bean.services}"/>
+                        </p:selectCheckboxMenu>
+                    </div>
+                </div>
+            </c:if>
+            <c:forEach rendered="#{(bean.multipleRequestCreate and not empty bean.shownFields) or !bean.multipleRequestCreate}" items="#{bean.shownFields}" var="item">
+            <div class="ui-g" style="#{item.getLineEven()?'background-color: #F5F5F5;':''}">
                     <c:if test="#{item.field != null}">
                         <div class="ui-g-12" style="padding: 1%; background: transparent">
                             <ui:include src="#{item.field.field.getPath()}"/>
@@ -255,7 +284,7 @@
 
         </ui:fragment>
 
-        <ui:fragment rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1}">
+        <ui:fragment rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2) or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)}">
             <p:panel id="userAddPanel" style="margin-top: 1%">
                 <span>#{msg.requestUserChange}:</span><br/>
                 <ui:fragment rendered="#{!empty bean.entity.userName}">

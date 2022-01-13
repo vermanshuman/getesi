@@ -412,4 +412,11 @@ public class RedirectHelper extends BaseHelper {
         }
     }
 
+    public static void goToMultiple(PageTypes type,String queryParameter) {
+        try {
+            sendRedirect(type.getPagesContext() + "?" + MULTIPLE + "=" + true + "&"+ queryParameter);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
 }

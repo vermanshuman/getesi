@@ -313,7 +313,7 @@ public class RequestHelper {
         return null;
     }
 
-    public static List<InputCard> onMultipleServiceChange(List<Long> serviceId)
+    public static List<InputCard> onMultipleServiceChange(List<Long> serviceId , boolean isMultiple)
             throws PersistenceBeanException, IllegalAccessException {
         if (!ValidationHelper.isNullOrEmpty(serviceId)) {
             List<Service> serviceList = DaoManager.load(Service.class, new Criterion[]{
@@ -333,7 +333,10 @@ public class RequestHelper {
                     inputCardOutput.setFields(new LinkedList<>());
                     for (InputCardManageField field : inputCardList.stream().map(InputCard::getFields)
                             .flatMap(List::stream).distinct().collect(Collectors.toList())) {
-                        if (field.getField() == ManageTypeFields.SUBJECT_MASTERY) {
+                        if ((field.getField() == ManageTypeFields.SUBJECT_MASTERY)
+                                || (isMultiple && (field.getField()==ManageTypeFields.CDR
+                                || field.getField()== ManageTypeFields.NDG
+                                || field.getField()== ManageTypeFields.POSITION_PRACTICE))){
                             continue;
                         }
                         InputCardManageField existingField = inputCardOutput.getFields().stream()
@@ -428,6 +431,17 @@ public class RequestHelper {
                 request.setUser(DaoManager.get(User.class, userId));
                 DaoManager.save(request, true);
             }
+        }
+    }
+
+    public static List<SelectItem> onRequestTypeChange(List<Long> requestTypeIds, boolean multiple)
+            throws IllegalAccessException, PersistenceBeanException {
+        if (!ValidationHelper.isNullOrEmpty(requestTypeIds)) {
+            return ComboboxHelper.fillList(Service.class, Order.asc("name"), new Criterion[]{
+                    Restrictions.in("requestType.id", requestTypeIds)
+            }, !multiple);
+        } else {
+            return (ComboboxHelper.fillList(new ArrayList<>(), !multiple));
         }
     }
 }

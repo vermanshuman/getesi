@@ -228,6 +228,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     private Boolean billinRequest;
 
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
     InstantiationException, IllegalAccessException {
@@ -1087,8 +1088,8 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
         for (EstateSituation estateSituation : situations) {
             Map<List<RelationshipGroupingWrapper>, List<Property>> re = new HashMap<>();
-            TemplatePdfTableHelper.wrapProperties(estateSituation.getPropertyList(), estateSituation.getRequest().getSubject(),
-                    true, re);
+            TemplatePdfTableHelper.wrapRequestProperties(estateSituation.getPropertyList(), estateSituation.getRequest().getSubject(),
+                    true, re, getExamRequest());
             estateSituation.setPropertyList(re.values().stream().flatMap(List::stream).collect(Collectors.toList()));
         }
 
