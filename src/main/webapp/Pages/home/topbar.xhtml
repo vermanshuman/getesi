@@ -28,15 +28,15 @@
             <i class="pi pi-ellipsis-v" />
         </a>
 
-        <ul class="topbar-menu fadeInDown">
-            <li>
+        <ul class="topbar-menu fadeInDown" id="top_bar_menu">
+            <li title="Logout">
                 <a href="#{facesContext.externalContext.requestContextPath}/j_spring_security_logout">
                     <i class="topbar-icon fa fa-fw fa-sign-out"/>
                 </a>
             </li>
             <ui:fragment id="topbarProfile">
                 <h:inputHidden value="#{sessionBean.overLayMode}" id="overLayModeData"/>
-                <li class="user-profile">
+                <li class="user-profile" title="#{sessionBean.currentUser.fullReverseName}">
                     <a href="#{facesContext.externalContext.requestContextPath}/Pages/Configuration/UserProfileView.jsf">
                         <p:graphicImage styleClass="profileImg" rendered="#{not empty sessionBean.currentUser.photo}" value="#{sessionBean.currentUser.photo}" width="35" />
                         <ui:fragment rendered="#{empty sessionBean.currentUser.photo}">
@@ -46,7 +46,7 @@
                 </li>
             </ui:fragment>
             <ui:fragment>
-                <li>
+                <li title="Calendario">
                     <a href="#{facesContext.externalContext.requestContextPath}/Pages/Configuration/Calendar.jsf">
                         <i class="topbar-icon pi pi-calendar-plus"/>
                     </a>
@@ -61,7 +61,7 @@
 <!--                </li>-->
 <!--            </ui:fragment>-->
             <ui:fragment rendered="#{sessionBean.canViewPage('APPLICATION_SETTINGS')}">
-                <li>
+                <li title="Impostazioni di sistema">
                     <a href="#{facesContext.externalContext.requestContextPath}/configuration/application_settings_edit/">
                         <i class="topbar-icon configurazione-icon-new"/>
                         <span class="topbar-item-name">Settings</span>

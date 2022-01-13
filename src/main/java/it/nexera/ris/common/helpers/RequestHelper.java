@@ -28,17 +28,11 @@ import it.nexera.ris.persistence.beans.entities.domain.InputCardManageField;
 import it.nexera.ris.persistence.beans.entities.domain.Request;
 import it.nexera.ris.persistence.beans.entities.domain.User;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.DataGroup;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import it.nexera.ris.web.beans.wrappers.logic.RequestStateWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.RequestTypeFilterWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.ServiceFilterWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.UserFilterWrapper;
-import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.HibernateException;
 
 public class RequestHelper {
 
@@ -302,17 +296,6 @@ public class RequestHelper {
             return (ComboboxHelper.fillList(new ArrayList<>(), !multiple));
         }
     }
-    
-    public static List<SelectItem> onRequestTypeChange(List<Long> requestTypeIds, boolean multiple)
-            throws IllegalAccessException, PersistenceBeanException {
-        if (!ValidationHelper.isNullOrEmpty(requestTypeIds)) {
-            return ComboboxHelper.fillList(Service.class, Order.asc("name"), new Criterion[]{
-                    Restrictions.in("requestType.id", requestTypeIds)
-            }, !multiple);
-        } else {
-            return (ComboboxHelper.fillList(new ArrayList<>(), !multiple));
-        }
-    }
 
     public static List<InputCard> onServiceChange(Long serviceId)
             throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -450,38 +433,15 @@ public class RequestHelper {
             }
         }
     }
-    
-    public static List<RequestType> loadRequestTypeIcon(){
-        List<RequestType> requestTypeIcons = new ArrayList();
-        
-        try {
-           
-            requestTypeIcons = DaoManager.load(RequestType.class);
-            
-        } catch (HibernateException ex) {
-            Logger.getLogger(RequestHelper.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (PersistenceBeanException ex) {
-            Logger.getLogger(RequestHelper.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            Logger.getLogger(RequestHelper.class.getName()).log(Level.SEVERE, null, ex);
+
+    public static List<SelectItem> onRequestTypeChange(List<Long> requestTypeIds, boolean multiple)
+            throws IllegalAccessException, PersistenceBeanException {
+        if (!ValidationHelper.isNullOrEmpty(requestTypeIds)) {
+            return ComboboxHelper.fillList(Service.class, Order.asc("name"), new Criterion[]{
+                    Restrictions.in("requestType.id", requestTypeIds)
+            }, !multiple);
+        } else {
+            return (ComboboxHelper.fillList(new ArrayList<>(), !multiple));
         }
-        
-        return requestTypeIcons;
     }
-    
-    public static String getIcon(String requestType , List<RequestType> requestTypeIcons){
-        
-        if(!ValidationHelper.isNullOrEmpty(requestTypeIcons) && !ValidationHelper.isNullOrEmpty(requestType)){
-                    
-            Optional<RequestType> requestTypeIcon = requestTypeIcons.stream()
-                                                .filter(aObj -> aObj.getName().equalsIgnoreCase(requestType))
-                                                .collect(Collectors.reducing((a, b) -> null));
-            
-            if(requestTypeIcon.isPresent())
-                return requestTypeIcon.get().getStyleClassForSmallIcons();
-        }
-        return StringUtils.EMPTY;
-    }
-    
-    
 }
