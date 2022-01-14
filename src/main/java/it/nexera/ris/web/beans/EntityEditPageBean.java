@@ -131,7 +131,7 @@ public abstract class EntityEditPageBean<T extends Entity> extends
     protected void pageLoadStatic() throws PersistenceBeanException {
     }
 
-     public void pageSave() {
+    public void pageSave() {
         if (this.getSaveFlag() == 0) {
             try {
                 this.cleanValidation();

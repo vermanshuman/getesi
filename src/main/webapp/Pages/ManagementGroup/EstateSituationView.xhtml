@@ -10,7 +10,8 @@
     <ui:param name="bean" value="#{estateSituationViewBean}"/>
     <ui:param name="goBackRendered" value="false"/>
     <ui:define name="view_body">
-        <style>
+
+    <style>
             @media screen and (max-width: 1810px) {
                 .estate-situation {
                     width: 100% !important;
@@ -119,11 +120,17 @@
                 font-size: 14px;
             }
 
-            body .ui-panel .ui-panel-titlebar, body .ui-panel .ui-panel-content,.card , #immobiliFieldset{
+            body .ui-panel .ui-panel-titlebar, body .ui-panel .ui-panel-content,.card , #immobiliFieldset, #formalityDettaglio, #sinteticheFieldSet{
                 border: 1px solid #6c757d !important;
             }
 
-        </style>
+            .ui-fileupload-buttonbar .ui-button .ui-icon-plusthick{
+                display: none !important;
+            }
+            .white-button{
+                background: white !important;
+            }
+    </style>
         <p:remoteCommand name="removeFileCommand" update="form"/>
         <div align="center">
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group estate-situation" layout="grid"
@@ -146,8 +153,9 @@
         </div>
         <p:fieldset id="immobiliFieldset" legend="#{msg.databaseListSubjectProperties}" toggleable="true" toggleSpeed="500" collapsed="false" styleClass="sub-list-legend" style="margin-top: 10px;">
             <p:panelGrid columns="9" styleClass="ui-panelgrid-blank form-group" layout="grid">
-                <p:commandButton icon="fa fa-fw fa-plus icon-align" actionListener="#{bean.createNewProperty}"
-                                 style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%;"
+                <p:commandButton value="#{msg.formalityEnterSectionBInsertProperty}"
+                                 actionListener="#{bean.createNewProperty}"
+                                 style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%; width: 190px;"
                                  rendered="#{!bean.viewRelatedEstate}"/>
                 <p:fileUpload label="#{msg.estateFormalityUploadPropertyXML}"
                               fileUploadListener="#{bean.savePropertyXML}"
@@ -156,7 +164,7 @@
                               auto="true" update=":form:filePanel, :form:estateTab, :form:estateTabLand, subjectDialog"
                               rendered="#{!bean.viewRelatedEstate}"/>
                 <p:commandButton
-                        style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%; width: 170px; height: 31px"
+                        style="margin-top: 8px!important; margin-bottom: 1%; width: 190px;"
                         value="#{msg.importFromDatabase}"
                         update=":form:filePanel, :form:estateTab, :form:estateTabLand, messages"
                         action="#{bean.loadMostRecentFile}"/>
@@ -174,7 +182,7 @@
                         <h:outputText value="#{fileEntry.getTitle()}"/>
                     </p:column>
                     <p:column styleClass="action_column">
-                        <p:commandButton icon="fa fa-fw fa-file-pdf-o icon-align" action="#{bean.showPDF}" ajax="false">
+                        <p:commandButton styleClass="white-button" icon="fa fa-fw fa-file-pdf-o red-file icon-align" action="#{bean.showPDF}" ajax="false">
                             <f:setPropertyActionListener value="#{fileEntry.id}" target="#{bean.downloadFileId}"/>
                         </p:commandButton>
                     </p:column>
@@ -431,11 +439,12 @@
                          update="dialogReplacedSubjectDesc"/>
         <p:remoteCommand name="updatePresumableSubjectDescDialog" onstart="PF('dlgPresumableSubjectDesc').show();"
                          update="dialogPresumableSubjectDesc"/>
-        <p:fieldset legend="#{msg.estateFormality}" toggleable="true" toggleSpeed="500" collapsed="false" styleClass="sub-list-legend" style="margin-top: 10px;">
+        <p:fieldset id="sinteticheFieldSet" legend="#{msg.estateFormality}" toggleable="true" toggleSpeed="500" collapsed="false" styleClass="sub-list-legend" style="margin-top: 10px;">
             <p:remoteCommand name="updateTab" update=":form:filePanel"/>
             <p:panelGrid columns="9" styleClass="ui-panelgrid-blank form-group" layout="grid" style="margin-top: 3%">
-                <p:commandButton icon="fa fa-fw fa-plus icon-align" actionListener="#{bean.createNewEstateFormality}"
-                                 style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%;"
+                <p:commandButton value="#{msg.estateFormalityUploadEstateFormalityInsert}"
+                                 actionListener="#{bean.createNewEstateFormality}"
+                                 style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%;width: 100%;"
                                  rendered="#{!bean.viewRelatedEstate}"/>
 
                 <p:fileUpload label="#{msg.estateFormalityUploadEstateFormalityXML}"
@@ -445,7 +454,7 @@
                               rendered="#{!bean.viewRelatedEstate}"/>
                 <p:commandButton
                         update="formPanel, formalityTab, messages, subjectEstateFormalityDialog, conservatoryEstateFormalityDialog"
-                        style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%; width: 170px; height: 31px"
+                        style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%; width: 100%"
                         value="#{msg.importFromDatabase}" action="#{bean.loadMostRecentPresumableFile}"/>
             </p:panelGrid>
             <p:outputPanel id="formPanel">
@@ -456,7 +465,7 @@
                         <h:outputText value="#{fileEntry.getTitle()}"/>
                     </p:column>
                     <p:column styleClass="action_column">
-                        <p:commandButton icon="fa fa-fw fa-file-pdf-o icon-align" action="#{bean.downloadEstateFormalityPDF}"
+                        <p:commandButton styleClass="white-button" icon="fa fa-fw fa-file-pdf-o red-file icon-align" action="#{bean.downloadEstateFormalityPDF}"
                                          ajax="false">
                             <f:setPropertyActionListener value="#{fileEntry.id}"
                                                          target="#{bean.downloadFileId}"/>
@@ -534,14 +543,14 @@
 
         <p:fieldset legend="#{msg.pdfFormality}" toggleable="true" toggleSpeed="500" collapsed="false" style="margin-top: 10px;" id="formalityDettaglio">
             <p:panelGrid columns="9" styleClass="ui-panelgrid-blank form-group" layout="grid" style="margin-top: 3%">
-                <p:commandButton icon="fa fa-fw fa-plus" actionListener="#{bean.createNewFormality}"
-                                 style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%;"/>
+                <p:commandButton value="#{msg.formalityInsert}" actionListener="#{bean.createNewFormality}"
+                                 style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%;width: 100%;"/>
                 <p:fileUpload allowTypes="/(\.|\/)(pdf)$/" auto="true" label="#{msg.formalityUpload}"
                               styleClass="special-upload middle-size-upload" multiple="false"
                               update=":form:formPanel, :form:formalityPDFTab" oncomplete="PF('pdfPoll').start();"
                               fileUploadListener="#{bean.saveDocumentPDF}" rendered="#{!bean.viewRelatedEstate}"/>
                 <p:commandButton update="formPanel, formalityTab, messages"
-                                 style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%; width: 100px; height: 31px"
+                                 style="margin-top: 8px!important; margin-left: 2%; margin-bottom: 1%; width: 100px;"
                                  value="#{msg.estateSituationViewSearch}" oncomplete="PF('searchFormalitiesWV').show();"/>
             </p:panelGrid>
             <p:poll widgetVar="pdfPoll" interval="10" listener="#{bean.updatePDFTable}" update="formalityPDFTab"
@@ -563,7 +572,7 @@
                 </p:column>
                 <p:column styleClass="action_column">
                     <p:column headerText="#{msg.pdf}" styleClass="action_column">
-                        <p:commandButton icon="fa fa-file-pdf-o" action="#{bean.downloadFormalityPdf}" ajax="false">
+                        <p:commandButton styleClass="white-button" icon="fa fa-fw fa-file-pdf-o red-file" action="#{bean.downloadFormalityPdf}" ajax="false">
                             <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                         </p:commandButton>
                     </p:column>

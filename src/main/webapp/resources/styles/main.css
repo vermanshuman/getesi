@@ -208,6 +208,30 @@ body .top-bar-cal .ui-widget-header {
     display: inline-block;
 }
 
+
+.anagrafico-icon-alt {
+    background-image: url("../images/serv_anagrafico.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 25px;
+    width: 25px;
+    height: 25px;
+    margin: 0 auto;
+    display: inline-block;
+}
+
+
+.anagrafico-icon-alt-3x {
+    background-image: url("../images/serv_anagrafico.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 36px;
+    height: 40px;
+    margin: 0 auto;
+    display: block;
+    background-size: cover;
+}
+
 .camerale-icon {
     background-image: url("../images/servizi-comunali.png");
     background-repeat: no-repeat;
@@ -794,4 +818,31 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
     background-size: 26px;
     height: 42px;
     display: block;
+}
+
+.red-file{
+
+    background-image: url("../images/pdf_icon2.jpg");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 26px;
+    height: 42px;
+    display: block;
+
+}
+
+.action_column .ui-button .red-file{
+
+    background-image: url("../images/pdf_icon2.jpg") !important;
+    background-repeat: no-repeat !important;
+    background-position: 50% !important;
+    background-size: 26px !important;
+    height: 42px !important;
+    display: block !important;
+    top : 0% !important;
+}
+
+
+.red-file::before{
+    content: none !important;
 }

@@ -138,13 +138,11 @@
             /*    left: 1420px !important;*/
             /*}*/
 
-            #requestTypeSelectCheckboxPanel {
-                left: 1170px !important;
-            }
-
             #serviceSelectCheckboxPanel {
-                left: 1315px !important;
-                width: 320px !important;
+                left: 75% !important;
+                width: 22% !important;
+                height: 50%;
+                overflow: auto;
             }
 
             #requestTypeSelectCheckboxPanelDataTable .ui-chkbox .ui-chkbox-box.ui-state-active {
@@ -943,7 +941,7 @@
                                    rendered="#{item.serviceName eq null}"
                                    style="background-color: transparent;width: inherit;"/>
                     <p:outputPanel>
-                        <h:outputText styleClass="#{utilMethodBean.getItemIconStyleClass(item.requestTypeId)}" style="font-size: 18px;display: inline-flex;margin-right: 5px;" />
+                        <h:outputText styleClass="#{bean.getItemIconStyleClass(item.requestTypeId)}" style="display: inline-flex;margin-right: 5px;" />
                         <h:outputText id="requestTypeName" value="#{item.requestTypeName}" style="vertical-align: top;font-weight: bold !important;" rendered="#{item.requestTypeName ne null}"/>
                     </p:outputPanel>
                     <h:outputText id="service" value="#{item.serviceName}" rendered="#{item.serviceName ne null}"/>

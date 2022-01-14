@@ -34,7 +34,20 @@ public class EstateSituationEditInTableWrapper {
                         ? situation.getCommentWithoutInitialize() : situation.getComment());
         this.commentInit = new BaseEditInTableWrapper(situation.getId(), situation.getCommentInit());
         this.estateSituationId = situation.getId();
-        this.regime = situation.getRegime() != null ? situation.getRegime() : Boolean.TRUE;
+        Boolean regime = situation.getRegime();
+        if(ValidationHelper.isNullOrEmpty(regime) && !ValidationHelper.isNullOrEmpty(situation.getRequest())){
+            if(!ValidationHelper.isNullOrEmpty(situation.getRequest().getClient()) &&
+                    !ValidationHelper.isNullOrEmpty(situation.getRequest().getClient().getRegime()) &&
+                    situation.getRequest().getClient().getRegime()){
+                regime = situation.getRequest().getClient().getRegime();
+            }
+
+            if(!ValidationHelper.isNullOrEmpty(situation.getRequest().getRegime()) &&
+                    situation.getRequest().getRegime()){
+                regime = situation.getRequest().getRegime();
+            }
+        }
+        this.regime = regime;
     }
 
     public void save() throws PersistenceBeanException, IllegalAccessException, InstantiationException {

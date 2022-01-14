@@ -303,35 +303,40 @@ public class TemplatePdfTableHelper {
                             && r.getRelationshipTypeId().equals(RelationshipType.CADASTRAL_DOCUMENT.getId()))
                     .collect(Collectors.toList());
         }
-        Boolean showRegime = null;
-        if(request != null){
-            Optional<EstateSituation> estateSituation = CollectionUtils.emptyIfNull(request.getSituationEstateLocations())
-                    .stream()
-                    .filter(es -> !ValidationHelper.isNullOrEmpty(es.getRegime()) && es.getRegime())
-                    .findFirst();
-            if(estateSituation.isPresent())
-                showRegime = true;
-
-            estateSituation = CollectionUtils.emptyIfNull(request.getSituationEstateLocations())
-                    .stream()
-                    .filter(es -> !ValidationHelper.isNullOrEmpty(es.getRegime()) && !es.getRegime())
-                    .findFirst();
-            if(estateSituation.isPresent())
-                showRegime = false;
-
-            if(showRegime == null){
-                if(request.getRegime() != null)
-                    showRegime = request.getRegime();
-            }
-
-            if(showRegime == null){
-                if(request.getClient() != null && request.getClient().getRegime() != null)
-                    showRegime = request.getClient().getRegime();
-            }
-        }
 
         for (Relationship relationship : relationshipList) {
             if (relationship.getQuote() != null && relationship.getPropertyType() != null) {
+                List<EstateSituation> estateSituationList = relationship.getProperty().getEstateSituationList();
+
+                Boolean showRegime = null;
+                if(request != null){
+                    Optional<EstateSituation> estateSituation = CollectionUtils.emptyIfNull(estateSituationList)
+                            .stream()
+                            .filter(es -> !ValidationHelper.isNullOrEmpty(es.getRegime()) && es.getRegime())
+                            .findFirst();
+                    if(estateSituation.isPresent())
+                        showRegime = true;
+
+                    if(showRegime == null){
+                        estateSituation = CollectionUtils.emptyIfNull(estateSituationList)
+                                .stream()
+                                .filter(es -> !ValidationHelper.isNullOrEmpty(es.getRegime()) && !es.getRegime())
+                                .findFirst();
+                        if(estateSituation.isPresent())
+                            showRegime = false;
+                    }
+
+
+                    if(showRegime == null){
+                        if(request.getRegime() != null)
+                            showRegime = request.getRegime();
+                    }
+
+                    if(showRegime == null){
+                        if(request.getClient() != null && request.getClient().getRegime() != null)
+                            showRegime = request.getClient().getRegime();
+                    }
+                }
                 RelationshipGroupingWrapper relationshipGroupingWrapper = new RelationshipGroupingWrapper(
                         relationship.getQuote() == null ? "" : relationship.getQuote(),
                         relationship.getPropertyType().equalsIgnoreCase("Proprieta`")
