@@ -116,10 +116,7 @@ public class ImportXMLHelper extends BaseHelper {
     private static final String PERSON_PATTERN_ALT = "(([A-Z']{2,}\\s?){1,3})\\s(([a-zA-Z]{3,}\\s?){1,"
             + "3})\\s(\\d*\\/\\d*\\/\\d*)\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
 
-    private static final String PERSON_PATTERN_ALT_COMUNE = "(([A-Z]{2,}\\s?){1,3})\\s(([a-zA-Z]{3,}\\s?){1,3})\\s(\\d*\\/\\d*\\/\\d*);\\sComune\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
-
-    private static final String PERSON_PATTERN_ALT_COMUNE_QUOTE = "(([A-Z']{2,}\\s?){1,3})\\s(([a-zA-Z]{3,}\\s?){1,3})\\s(\\d*\\/\\d*\\/\\d*);\\sComune\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
-
+    private static final String PERSON_PATTERN_ALT_COMUNE = "(([a-zA-Z'#\",-]{2,}\\s?){1,3})\\s(([a-zA-Z'#\",-]{3,}\\s?){1,3})\\s(\\d*\\/\\d*\\/\\d*);\\sComune\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
 
     private static final String VANI = "VANI";
 
@@ -1242,11 +1239,7 @@ public class ImportXMLHelper extends BaseHelper {
                 if(fc != null)
                     fc = fc.replaceAll("\\r|\\n", "");
                 subject = convertRandomStringToPersonSubject(fc, subjectStr, session, PERSON_PATTERN_ALT_COMUNE);
-            }else if (ValidationHelper.checkCorrectFormatByExpression(PERSON_PATTERN_ALT_COMUNE_QUOTE, subjectStr)) {
-                if(fc != null)
-                    fc = fc.replaceAll("\\r|\\n", "");
-                subject = convertRandomStringToPersonSubject(fc, subjectStr, session, PERSON_PATTERN_ALT_COMUNE_QUOTE);
-            } else {
+            }else {
                 subject = crateNewLegalSubject(fc, subjectStr, session);
             }
             if (!ValidationHelper.isNullOrEmpty(subject)) {
