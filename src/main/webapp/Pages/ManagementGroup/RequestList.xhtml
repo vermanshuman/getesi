@@ -59,7 +59,9 @@
 						popupIconOnly="true"
 						onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
 						value="#{bean.dateFrom}"
-						placeholder="#{msg.mailManagerDateFromReqlist}" />
+						placeholder="#{msg.mailManagerDateFromReqlist}">
+						<p:ajax event="dateSelect" update="@this" />	
+					</p:calendar>
 				</p:column>
 				<p:column>
 					<h:outputText value="" />
@@ -68,7 +70,9 @@
 						onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
 						pattern="dd/MM/yyyy" mask="true" 
 						locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateToReqlist}"
-						onblur="check_date(this)" value="#{bean.dateTo}" />
+						onblur="check_date(this)" value="#{bean.dateTo}">
+						<p:ajax event="dateSelect" update="@this" />	
+					</p:calendar>
 				</p:column>
 
 				<p:column>
@@ -78,6 +82,7 @@
                         <f:selectItem itemLabel="#{ff:upper(msg.requestListClient)}" itemValue="#{null}"
                                       noSelectionOption="true" />
                         <f:selectItems value="#{bean.clients}"/>
+                        <p:ajax event="itemSelect" update="@this"/>
                     </p:selectOneMenu>
                 </p:column>
                 
@@ -105,6 +110,7 @@
                         <f:selectItem itemLabel="#{msg.subjectViewFormalityConservatoryCap}" itemValue="#{null}"
                                       noSelectionOption="true" />
                         <f:selectItems value="#{bean.landAggregations}"/>
+                        <p:ajax event="itemSelect" update="@this"/>
                     </p:selectOneMenu>
                 </p:column>
 				
@@ -119,7 +125,9 @@
 						popupIconOnly="true"
 						onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
 						value="#{bean.dateFromEvasion}"
-						placeholder="#{msg.mailManagerDateFromReqlist}" />
+						placeholder="#{msg.mailManagerDateFromReqlist}" >
+							<p:ajax event="dateSelect" update="@this" />
+					</p:calendar>
 				</p:column>
 				<p:column>
 					<h:outputText value="" />
@@ -130,7 +138,9 @@
 						onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
 						pattern="dd/MM/yyyy" mask="true"
 						locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateToReqlist}"
-						onblur="check_date(this)" value="#{bean.dateToEvasion}" />
+						onblur="check_date(this)" value="#{bean.dateToEvasion}" >
+							<p:ajax event="dateSelect" update="@this" />
+						</p:calendar>
 				</p:column>
 				
 				<p:column>
@@ -151,6 +161,7 @@
                         <f:selectItem itemLabel="#{ff:upper(msg.clientManager)}" itemValue="#{null}"
                                       noSelectionOption="true" />
                         <f:selectItems value="#{bean.managerClients}"/>
+                        <p:ajax event="itemSelect" update="@this"/>
                     </p:selectOneMenu>
                 </p:column>
                 
@@ -160,6 +171,7 @@
                         <f:selectItem itemLabel="#{ff:upper(msg.mailTrust)}" itemValue="#{null}"
                                       noSelectionOption="true" />
                         <f:selectItems value="#{bean.fiduciaryClients}"/>
+                        <p:ajax event="itemSelect" update="@this"/>
                     </p:selectOneMenu>
                 </p:column>
                 
@@ -169,7 +181,9 @@
                                 onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
                                 pattern="dd/MM/yyyy" mask="true"
                                 locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.expirationDateCap}"
-                                value="#{bean.dateExpiration}"/>
+                                value="#{bean.dateExpiration}">
+                        <p:ajax event="dateSelect" update="@this" />        
+                    </p:calendar>
                 </p:column>
                 
                 <p:column>

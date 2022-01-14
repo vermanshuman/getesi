@@ -187,6 +187,19 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     private List<SelectItem> cities;
     
     private Integer expirationDays;
+    
+    private static final String KEY_CLIENT_ID = "KEY_CLIENT_ID_SESSION_KEY_NOT_COPY";
+    private static final String KEY_STATES = "KEY_STATES_SESSION_KEY_NOT_COPY";
+    private static final String KEY_REQUEST_TYPE = "KEY_REQUEST_TYPE_SESSION_KEY_NOT_COPY";
+    private static final String KEY_SERVICES = "KEY_SERVICES_SESSION_KEY_NOT_COPY";
+    private static final String KEY_CLIENT_MANAGER_ID = "KEY_CLIENT_MANAGER_ID_SESSION_KEY_NOT_COPY";
+    private static final String KEY_CLIENT_FIDUCIARY_ID = "KEY_CLIENT_FIDUCIARY_ID_SESSION_KEY_NOT_COPY";
+    private static final String KEY_AGGREAGATION = "KEY_AGGREAGATION_SESSION_KEY_NOT_COPY";
+    private static final String KEY_DATE_EXPIRATION = "KEY_DATE_EXPIRATION_SESSION_KEY_NOT_COPY";
+    private static final String KEY_DATE_FROM_REQ = "KEY_DATE_FROM_REQ_SESSION_KEY_NOT_COPY";
+    private static final String KEY_DATE_TO_REQ = "KEY_DATE_TO_REQ_SESSION_KEY_NOT_COPY";
+    private static final String KEY_DATE_FROM_EVASION = "KEY_DATE_FROM_EVASION_SESSION_KEY_NOT_COPY";
+    private static final String KEY_DATE_TO_EVASION = "KEY_DATE_TO_EVASION_SESSION_KEY_NOT_COPY";
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -314,7 +327,87 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             }
 
         }
+        loadFilterValueFromSession();
         filterTableFromPanel();
+    }
+    
+    private void loadFilterValueFromSession(){
+
+        if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_ID))){
+            setSelectedClientId((Long) SessionHelper.get(KEY_CLIENT_ID));
+        }
+        if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_STATES))){
+            setStateWrappers((List<RequestStateWrapper>) SessionHelper.get(KEY_STATES));
+        }
+        if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_REQUEST_TYPE))){
+            setRequestTypeWrappers((List<RequestTypeFilterWrapper>) SessionHelper.get(KEY_REQUEST_TYPE));
+        }
+        if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_SERVICES)) ){
+            setServiceWrappers((List<ServiceFilterWrapper>) SessionHelper.get(KEY_SERVICES));
+        }
+        if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_MANAGER_ID)) ){
+            setManagerClientFilterid((Long) SessionHelper.get(KEY_CLIENT_MANAGER_ID));
+        }
+        if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_FIDUCIARY_ID)) ){
+            setFiduciaryClientFilterId((Long) SessionHelper.get(KEY_CLIENT_FIDUCIARY_ID));
+        }
+        if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_AGGREAGATION)) ){
+            setAggregationFilterId((Long) SessionHelper.get(KEY_AGGREAGATION));
+        }
+        if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_EXPIRATION)) ){
+            setDateExpiration((Date) SessionHelper.get(KEY_DATE_EXPIRATION));
+        }
+        if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_FROM_REQ)) ){
+            setDateFrom((Date) SessionHelper.get(KEY_DATE_FROM_REQ));
+        }
+        if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_TO_REQ)) ){
+            setDateTo((Date) SessionHelper.get(KEY_DATE_TO_REQ));
+        }
+        if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_FROM_EVASION)) ){
+            setDateFromEvasion((Date) SessionHelper.get(KEY_DATE_FROM_EVASION));
+        }
+        if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_TO_EVASION)) ){
+            setDateToEvasion((Date) SessionHelper.get(KEY_DATE_TO_EVASION));
+        }
+    }
+    
+    private void updateFilterValueInSession(){
+        if(!ValidationHelper.isNullOrEmpty(getSelectedClientId()) ){
+            SessionHelper.put(KEY_CLIENT_ID, getSelectedClientId());
+        }
+        if(!ValidationHelper.isNullOrEmpty(getStateWrappers()) ){
+            SessionHelper.put(KEY_STATES, getStateWrappers());
+        }
+        if(!ValidationHelper.isNullOrEmpty(getRequestTypeWrappers()) ){
+            SessionHelper.put(KEY_REQUEST_TYPE, getRequestTypeWrappers());
+        }
+        if(!ValidationHelper.isNullOrEmpty(getServiceWrappers()) ){
+            SessionHelper.put(KEY_SERVICES, getServiceWrappers());
+        }
+        if(!ValidationHelper.isNullOrEmpty(getManagerClientFilterid()) ){
+            SessionHelper.put(KEY_CLIENT_MANAGER_ID, getManagerClientFilterid());
+        }
+        if(!ValidationHelper.isNullOrEmpty(getFiduciaryClientFilterId()) ){
+            SessionHelper.put(KEY_CLIENT_FIDUCIARY_ID, getFiduciaryClientFilterId());
+        }
+        if(!ValidationHelper.isNullOrEmpty(getAggregationFilterId()) ){
+            SessionHelper.put(KEY_AGGREAGATION, getAggregationFilterId());
+        }
+        if(!ValidationHelper.isNullOrEmpty(getDateExpiration()) ){
+            SessionHelper.put(KEY_DATE_EXPIRATION, getDateExpiration());
+        }
+        if(!ValidationHelper.isNullOrEmpty(getDateFrom()) ){
+            SessionHelper.put(KEY_DATE_FROM_REQ, getDateFrom());
+        }
+        if(!ValidationHelper.isNullOrEmpty(getDateTo()) ){
+            SessionHelper.put(KEY_DATE_TO_REQ, getDateTo());
+        }
+        if(!ValidationHelper.isNullOrEmpty(getDateFromEvasion()) ){
+            SessionHelper.put(KEY_DATE_FROM_EVASION, getDateFromEvasion());
+        }
+        if(!ValidationHelper.isNullOrEmpty(getDateToEvasion()) ){
+            SessionHelper.put(KEY_DATE_TO_EVASION, getDateToEvasion());
+        }
     }
 
     public void loadRequestDocuments() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -937,6 +1030,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public void filterTableFromPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+    	updateFilterValueInSession();
         List<Criterion> restrictions = RequestHelper.filterTableFromPanel(getDateFrom(), getDateTo(), getDateFromEvasion(),
                 getDateToEvasion(), getSelectedClientId(), getRequestTypeWrappers(), getStateWrappers(), getUserWrappers(),
                 getServiceWrappers(), getSelectedUserType(),getAggregationFilterId(), getSelectedServiceType());
