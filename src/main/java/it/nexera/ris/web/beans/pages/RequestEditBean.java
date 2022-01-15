@@ -269,8 +269,11 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private List<String> mutipleRequestObjTabPath;
 
+    private Map<Long , Request>  multiRequestMap;
+    
     @Override
     protected void preLoad() throws PersistenceBeanException {
+        setMultiRequestMap(new HashMap());
         if (Boolean.parseBoolean(getRequestParameter(RedirectHelper.MULTIPLE))) {
             setMultipleCreate(true);
             if(getRequestParameter(RedirectHelper.FROM_PARAMETER).equalsIgnoreCase(MULTIPLE_REQUEST)){
@@ -1286,7 +1289,14 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }
         for (Long requestTypeId : selectedServiceReqType) {
 
-            if(isMultipleRequestCreate())setEntity(new Request());
+            if(isMultipleRequestCreate()){
+                   if(getMultiRequestMap().containsKey(requestTypeId)){
+                       setEntity(getMultiRequestMap().get(requestTypeId));
+                   }else{
+                       setEntity(new Request());
+                       getMultiRequestMap().put(requestTypeId, getEntity());
+                   }
+            }
 
             prepareRequestToSave();
 
@@ -2205,8 +2215,9 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         RedirectHelper.goToOnlyView(PageTypes.REQUEST_FORMALITY, this.getEntity().getTranscriptionActId().getId());
     }
 
-    public void validateMultipleRequest() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+    public void validateMultipleRequest(boolean redirect) throws IllegalAccessException, PersistenceBeanException, InstantiationException {
         boolean isShowConfirm = false;
+        setRedirected(redirect);
         if (multipleCreate && getEntity().isNew()) {
             List<Request> listRequestBySubject = DaoManager.load(Request.class, new CriteriaAlias[]{
                             new CriteriaAlias("subject", "subject", JoinType.INNER_JOIN)},
@@ -2935,5 +2946,19 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
      */
     public void setSelectedRequestTypes(List<String> selectedRequestTypes) {
         this.selectedRequestTypes = selectedRequestTypes;
+    }
+
+    /**
+     * @return the multiRequestMap
+     */
+    public Map<Long , Request> getMultiRequestMap() {
+        return multiRequestMap;
+    }
+
+    /**
+     * @param multiRequestMap the multiRequestMap to set
+     */
+    public void setMultiRequestMap(Map<Long , Request> multiRequestMap) {
+        this.multiRequestMap = multiRequestMap;
     }
 }

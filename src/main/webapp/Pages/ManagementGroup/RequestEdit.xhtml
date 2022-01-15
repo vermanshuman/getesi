@@ -235,7 +235,7 @@
             </p:panelGrid>
         </ui:fragment>
 
-        <ui:fragment id="dynamicFragment" rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size() - 1 ) or ( not empty bean.shownFields)}">
+        <ui:fragment id="dynamicFragment" rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size() - 1 ) or (!bean.multipleRequestCreate and not empty bean.shownFields)}">
             <c:if test="#{bean.multipleRequestCreate}">
                 <div class="ui-g">
                     <div class="ui-g-3" style="padding: 1%">
@@ -301,9 +301,17 @@
         <ui:fragment>
             <div class="ui-g">
                 <div class="ui-g-12" id="request-btns" style="margin-top:2%">
-                    <p:commandButton style="float: right" action="#{bean.validateMultipleRequest}" value="#{msg.save.toUpperCase()}"
+                    <p:commandButton style="float: right" action="#{bean.validateMultipleRequest(false)}" value="#{msg.save.toUpperCase()}"
                                      icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left" update="saveMultipleRequest"
                                      rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1}"/>
+                    <div style="clear: both"></div>
+                </div>
+            </div>
+            <div class="ui-g">
+                <div class="ui-g-12" id="request-btns-1" style="margin-top:2%">
+                    <p:commandButton style="float: right" action="#{bean.validateMultipleRequest(true)}" value="#{msg.saveAndClose.toUpperCase()}"
+                                     icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left"
+                                     rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1 and bean.multipleRequestCreate}"/>
                     <div style="clear: both"></div>
                 </div>
             </div>
@@ -433,9 +441,9 @@
                                  update="@form" action="#{bean.printPDF}"
                                  rendered="#{!bean.entity.isNew}"/>-->
                 <p:commandButton value="#{msg.requestManageEstateLocation}"
-                                 action="#{bean.openEstateLocation}" rendered="#{!bean.entity.isNew}"/>
+                                 action="#{bean.openEstateLocation}" rendered="#{!bean.entity.isNew and !bean.multipleRequestCreate}"/>
                 <p:commandButton value="#{msg.requestManagePrint}"
-                                 action="#{bean.generatePdf}" rendered="#{!bean.entity.isNew}"/>
+                                 action="#{bean.generatePdf}" rendered="#{!bean.entity.isNew and !bean.multipleRequestCreate}"/>
             </div>
         </ui:fragment>
         <ui:fragment id="buttonFragment">
