@@ -258,7 +258,7 @@
                     </div>
                 </div>
             </c:if>
-            <c:forEach rendered="#{(bean.multipleRequestCreate and not empty bean.shownFields) or !bean.multipleRequestCreate}" items="#{bean.shownFields}" var="item">
+            <c:forEach rendered="#{not empty bean.shownFields}" items="#{bean.shownFields}" var="item">
             <div class="ui-g" style="#{item.getLineEven()?'background-color: #F5F5F5;':''}">
                     <c:if test="#{item.field != null}">
                         <div class="ui-g-12" style="padding: 1%; background: transparent">
@@ -303,15 +303,15 @@
                 <div class="ui-g-12" id="request-btns" style="margin-top:2%">
                     <p:commandButton style="float: right" action="#{bean.validateMultipleRequest(false)}" value="#{msg.save.toUpperCase()}"
                                      icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left" update="saveMultipleRequest"
-                                     rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1}"/>
+                                     rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1 and bean.multipleRequestCreate}"/>
                     <div style="clear: both"></div>
                 </div>
             </div>
             <div class="ui-g">
                 <div class="ui-g-12" id="request-btns-1" style="margin-top:2%">
-                    <p:commandButton style="float: right" action="#{bean.validateMultipleRequest(true)}" value="#{msg.saveAndClose.toUpperCase()}"
-                                     icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left"
-                                     rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1 and bean.multipleRequestCreate}"/>
+                    <p:commandButton style="float: right" action="#{bean.validateMultipleRequest(true)}" value="#{bean.multipleRequestCreate ? msg.saveAndClose.toUpperCase() : msg.save.toUpperCase() }"
+                                     icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left" 
+                                     rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1}"/>
                     <div style="clear: both"></div>
                 </div>
             </div>

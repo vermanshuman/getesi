@@ -861,7 +861,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             setShownFields(null);
             return;
         }
-        if (isMultipleCreate() && getActiveMenuTabNum() == 2) {
+        if (isMultipleCreate() && getActiveMenuTabNum() == 2 && !isMultipleRequestCreate() ) {
             onMultipleServiceChange();
         }
         if (getActiveMenuTabNum() > 0) {
@@ -881,12 +881,10 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if (isMultipleCreate() && getActiveMenuTabNum() == 1) {
             return true;
         }
-        if (isMultipleCreate() && getActiveMenuTabNum() == 2) {
-            if(!isMultipleRequestCreate()){
+        if ((isMultipleCreate() && getActiveMenuTabNum() == 2 && !isMultipleRequestCreate()) ) {
                 onMultipleServiceChange();
                 generateTab();
-            }
-        } else if (getInputCardList() != null && getActiveMenuTabNum() <= getInputCardList().size()) {
+        } else if (getInputCardList() != null && (getActiveMenuTabNum() <= getInputCardList().size() || (isMultipleRequestCreate() && getActiveMenuTabNum() == 3) )) {
             generateTab();
         } else {
             setShownFields(null);
