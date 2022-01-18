@@ -117,6 +117,9 @@
                 background: #f8f9fa !important;
                 color: #000;
             }
+            .dynamic-fields input{
+                width : 98% !important;
+            }
         </style>
         <script>
             function next(activeMenu, totalTabs) {
@@ -236,6 +239,7 @@
         </ui:fragment>
 
         <ui:fragment id="dynamicFragment" rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size() - 1 ) or (!bean.multipleRequestCreate and not empty bean.shownFields)}">
+            <div class="dynamic-fields">  
             <c:if test="#{bean.multipleRequestCreate}">
                 <div class="ui-g">
                     <div class="ui-g-3" style="padding: 1%">
@@ -281,7 +285,7 @@
                     </c:if>
                 </div>
             </c:forEach>
-
+        </div>  
         </ui:fragment>
 
         <ui:fragment rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2) or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)}">
