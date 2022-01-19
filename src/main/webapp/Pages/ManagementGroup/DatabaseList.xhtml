@@ -20,6 +20,11 @@
             .to-bottom-text td.ui-panelgrid-cell {
                 vertical-align: bottom !important;
             }
+            .red-btn {
+                background: red !important;
+                background-color: red !important;
+                color: #FFFFFF !important;
+            }
         </style>
       <script>
     
@@ -97,7 +102,7 @@
                     </p:column>
 
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton icon="ui-icon pi pi-times" update=":form"
+                        <p:commandButton icon="ui-icon pi pi-times" update=":form" styleClass="red-btn"
                                          oncomplete="PF('dlg2').show()">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.entityDeleteId}"/>
