@@ -38,19 +38,43 @@
             .to-bottom-text td.ui-panelgrid-cell {
                 vertical-align: bottom !important;
             }
-        </style>
-        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group to-bottom-text">
-            <h:outputText style="font-size: 20px" value="#{msg.formalityTitle}"/>
-            <p:selectOneMenu style="font-size: 20px" value="#{bean.selectedId}">
-                <f:selectItems value="#{bean.conservatories}"/>
-            </p:selectOneMenu>
-            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+            body .ui-panel .ui-panel-titlebar, body .ui-panel .ui-panel-content ,.card , .card fieldset{
+                
+                border: 1px solid #6c757d !important;
 
-                <h:outputText style="font-size: 16px"
+            }
+            body .ui-fieldset .ui-fieldset-legend {
+                border: 1px solid #dee2e6 !important;
+                color: #FFFFFF !important;
+                padding: 0.6em 1em !important;
+                font-weight: normal !important;
+                border-radius: 4px !important;
+                user-select: none !important;
+                font-size: 14px !important;
+                transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+            }
+            fieldset div {
+             font-size: 14px !important; 
+            text-align: left !important;
+            }
+            body .ui-datatable tbody tr td {
+                border-color: #808080 !important;
+                color: #5f666c !important;
+            }
+            
+        </style>
+        <!--<p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group to-bottom-text">-->
+           
+            <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group">
+                <h:outputText  value="#{msg.formalityTitle}"/>
+                           <p:selectOneMenu  value="#{bean.selectedId}">
+                               <f:selectItems value="#{bean.conservatories}"/>
+                           </p:selectOneMenu>
+                <h:outputText 
                               value="#{msg.typeFormalityType} #{bean.entity.type}"
                               rendered="#{empty bean.entity.sectionA.annotationType}"/>
 
-                <p:selectOneMenu style="font-size: 20px" value="#{bean.selectedType}">
+                <p:selectOneMenu  value="#{bean.selectedType}">
                     <f:selectItems value="#{bean.types}"/>
                     <p:ajax listener="#{bean.showPartsOfSectionABySelectedType}" update="formalitySectionA"/>
                 </p:selectOneMenu>
@@ -61,31 +85,35 @@
                 <h:outputText value="#{msg.formalitySpecialRegister}"/>
                 <p:inputText value="#{bean.entity.particularRegister}"/>
 
-            </p:panelGrid>
-            <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group">
-
+                
                 <h:outputText value="#{msg.formalityPresentation}"/>
-                <p:inputText value="#{bean.entity.numberPresentation}"/><span> del</span>
+                <p:inputText value="#{bean.entity.numberPresentation}"/>
+                <h:outputText value="del"/>
                 <p:calendar value="#{bean.entity.presentationDate}"
                             pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" popupIconOnly="true"/>
 
+                
+                
             </p:panelGrid>
-        </p:panelGrid>
-        <p:fieldset legend="#{msg.formalitySectionA}" id="formalitySectionA">
+<!--            <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group">
+
+            </p:panelGrid>-->
+        <!--</p:panelGrid>-->
+        <p:fieldset legend="#{msg.formalitySectionA}" collapsed="false" toggleable="true" id="formalitySectionA">
             <h:outputText style="font-size: 20px" value="#{msg.formalityDataRelation}"/>
-            <p:panelGrid columns="2" columnClasses="ui-grid-col-2, ui-grid-col-4"
-                         styleClass="ui-panelgrid-blank form-group" layout="grid">
+            <p:panelGrid columns="4" 
+                         styleClass="ui-panelgrid-blank form-group">
 
                 <h:outputText value="#{msg.formalityDescription}"/>
-                <p:inputText value="#{bean.sectionA.titleDescription}" styleClass="input-width"/>
+                <p:inputText value="#{bean.sectionA.titleDescription}" />
 
                 <h:outputText value="#{msg.formalityDate}"/>
-                <p:calendar value="#{bean.sectionA.titleDate}" styleClass="formality-calendar-width"
+                <p:calendar value="#{bean.sectionA.titleDate}" 
                             showOn="button"
                             pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" popupIconOnly="true"/>
 
                 <h:outputText value="#{msg.formalityNotary}"/>
-                <p:inputText value="#{bean.sectionA.publicOfficialNotary}" styleClass="input-width"/>
+                <p:inputText value="#{bean.sectionA.publicOfficialNotary}" />
 
                 <h:outputText value="#{msg.formalityPublicOfficial}"/>
 				<ui:fragment>
@@ -99,20 +127,20 @@
 				</ui:fragment>
 
                 <h:outputText value="#{msg.formalitySeat}"/>
-                <p:inputText id="sede" value="#{bean.sectionA.seat}" styleClass="input-width"/>
+                <p:inputText id="sede" value="#{bean.sectionA.seat}" />
 
                 <h:outputText value="#{msg.formalityDirectoryNumber}"/>
-                <p:inputText value="#{bean.sectionA.numberDirectory}" styleClass="input-width"/>
+                <p:inputText value="#{bean.sectionA.numberDirectory}" />
 
                 <h:outputText value="#{msg.formalityFiscalCode}"/>
-                <p:inputText id="safc" value="#{bean.sectionA.fiscalCode}" styleClass="input-width"/>
+                <p:inputText id="safc" value="#{bean.sectionA.fiscalCode}" />
 
             </p:panelGrid>
             <h:outputText style="font-size: 20px" value="#{msg.formalityAnnotationDate}"
                           rendered="#{bean.typeAtto=='ANNOTAMENTO'}"/>
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
                          rendered="#{bean.typeAtto=='ANNOTAMENTO'}"
-                         columnClasses="ui-grid-col-2, ui-grid-col-4" layout="grid">
+                         >
 
                 <h:outputText value="#{msg.annotationType}"/>
                 <p:inputText value="#{bean.sectionA.annotationType}" styleClass="input-width"/>
@@ -130,7 +158,7 @@
                           rendered="#{bean.typeAtto=='ISCRIZIONE'}"/>
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
                          rendered="#{bean.typeAtto=='ISCRIZIONE'}"
-                         columnClasses="ui-grid-col-2, ui-grid-col-4" layout="grid">
+                          >
 
                 <h:outputText value="#{msg.formalityTypePrivilege}"/>
                 <p:inputText value="#{bean.sectionA.mortgageSpecies}" styleClass="input-width"/>
@@ -168,7 +196,7 @@
                           rendered="#{bean.typeAtto=='TRASCRIZIONE'}"/>
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
                          rendered="#{bean.typeAtto=='TRASCRIZIONE'}"
-                         columnClasses="ui-grid-col-2, ui-grid-col-4" layout="grid">
+                         >
 
                 <h:outputText value="#{msg.formalityTypeConvention}"/>
                 <p:inputText value="#{bean.sectionA.conventionSpecies}" styleClass="input-width"/>
@@ -182,9 +210,8 @@
             </p:panelGrid>
 
             <h:outputText style="font-size: 20px" value="#{msg.formalityOtherData}"/>
-            <p:panelGrid columns="8" layout="grid"  
-            styleClass="ui-panelgrid-blank form-group" 
-            columnClasses="ui-grid-col-2,ui-grid-col-2, ui-grid-col-1, ui-grid-col-2, ui-grid-col-1, ui-grid-col-2,ui-grid-col-1, ui-grid-col-2">
+            <p:panelGrid columns="8"  
+            styleClass="ui-panelgrid-blank form-group" >
 
                 <h:outputText value="#{msg.formalityReferenceFormalities}"/>
                 <p:inputText value="#{bean.sectionA.otherTypeFormality}"/>
@@ -204,9 +231,9 @@
                 <p:calendar value="#{bean.sectionA.deathDate}"
                             pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" popupIconOnly="true"/>
             </p:panelGrid>
-             <p:panelGrid columns="8"  layout="grid" 
+             <p:panelGrid columns="8" 
              styleClass="ui-panelgrid-blank form-group" 
-             columnClasses="ui-grid-col-2,ui-grid-col-2, ui-grid-col-1, ui-grid-col-2, ui-grid-col-1, ui-grid-col-2,ui-grid-col-1, ui-grid-col-2">
+             >
 
                 <h:outputText value="#{msg.formalityApplicant}"/>
                 <p:inputText value="#{bean.sectionA.applicant}"/>
@@ -223,7 +250,7 @@
         </p:fieldset>
 
         <br/>
-        <p:fieldset legend="#{msg.formalitySectionB}" id="formalitySectionB">
+        <p:fieldset legend="#{msg.formalitySectionB}" collapsed="false" toggleable="true" id="formalitySectionB">
             <p:commandButton value="#{msg.formalityEnterSectionB}" action="#{bean.createNewSectionB}"
                              update="formalitySectionB,relationshipArea"/>
 
@@ -347,7 +374,7 @@
         </p:fieldset>
 
         <br/>
-        <p:fieldset legend="#{msg.formalitySectionC}" id="formalitySectionC">
+        <p:fieldset legend="#{msg.formalitySectionC}" collapsed="false" toggleable="true" id="formalitySectionC">
             <h:outputText style="font-size: 20px" value="#{msg.formalityInFavor}"/>
             <br/><br/>
             <p:commandButton value="#{msg.formalityEnterSectionC}" oncomplete="PF('sectionCAddDlgWV').show();">
@@ -603,7 +630,7 @@
         </p:fieldset>
         <br/>
 
-        <p:fieldset legend="#{msg.formalitySectionD}">
+        <p:fieldset collapsed="false" toggleable="true" legend="#{msg.formalitySectionD}">
         
             <p:commandButton value="#{msg.formalitySectionDUpload}" 
             	oncomplete="PF('sectionDAddDlgWV').show();">
