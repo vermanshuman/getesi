@@ -1669,7 +1669,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         options.put("draggable", false);
         options.put("modal", true);
         options.put("contentHeight", 900);
-        options.put("contentWidth", 1700);
+        options.put("contentWidth", 1200);
         SessionHelper.put("requestEditDistraintFormalityDialog", Boolean.TRUE);
         SessionHelper.put("listProperties", Boolean.TRUE);
         SessionHelper.put("editedRequestId", getEntity().getId());

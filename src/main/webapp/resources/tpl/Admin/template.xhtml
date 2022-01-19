@@ -30,9 +30,13 @@
 
     <h:body styleClass="outlined">
         <div class="layout-wrapper layout-static layout-menu-dark layout-slim #{guestPreferences.orientationRTL ? 'layout-rtl' : null}" >
-            <ui:include src="/Pages/home/topbar.xhtml"/>
-            <ui:include src="/Pages/home/menu.xhtml"/>
-
+            <h:panelGroup styleClass="top-menu" rendered="#{empty renderHeaderMenu ? true : renderHeaderMenu}" >
+              <ui:include src="/Pages/home/topbar.xhtml" />
+            </h:panelGroup>
+            <h:panelGroup styleClass="side-menu" rendered="#{empty renderSideMenu ? true : renderSideMenu}" >
+            <ui:include src="/Pages/home/menu.xhtml" />
+            </h:panelGroup>
+            
             <div class="layout-main">
 <!--                <div class="route-bar">-->
 <!--                    <div class="route-bar-breadcrumb">-->
@@ -42,12 +46,14 @@
 <!--                    </div>-->
 <!--                </div> -->
                 <div class="layout-content">
-                    <ui:include src="Include/Menu.xhtml"/>
+                    <h:panelGroup styleClass="menu" rendered="#{empty renderNav ? true : renderSideMenu}" >
+                            <ui:include src="Include/Menu.xhtml"  />
+                    </h:panelGroup>
                     <ui:insert name="content"/>
                 </div>
-                <div class="layout-footer">
+                <h:panelGroup layout="block" styleClass="layout-footer" rendered="#{empty renderFooterMenu ? true : renderFooterMenu}">
                     <ui:include src="/Pages/home/footer.xhtml"/>
-                </div>
+                </h:panelGroup>
             </div>
 
             <p:ajaxStatus styleClass="layout-ajax-loader">
