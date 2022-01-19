@@ -331,7 +331,7 @@
                     </p:column>
 
                     <p:column styleClass="action_column min_padding_margin" exportable="false">
-                        <p:commandButton icon="ui-icon pi pi-times" update=":form"
+                        <p:commandButton icon="ui-icon pi pi-times" update=":form" styleClass="red-btn"
                                          oncomplete="PF('dlg3').show()">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.entityDeleteId}"/>
@@ -447,7 +447,7 @@
                         </p:commandButton>
                     </p:column>
                     <p:column styleClass="action_column">
-                        <p:commandButton icon="ui-icon pi pi-times" update=":form"
+                        <p:commandButton icon="ui-icon pi pi-times" update=":form" styleClass="red-btn"
                                          action="#{bean.checkFormalityForcedRequestEstateSituation}">
                             <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                         </p:commandButton>
