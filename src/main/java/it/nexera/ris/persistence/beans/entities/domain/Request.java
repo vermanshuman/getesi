@@ -44,6 +44,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 
 import it.nexera.ris.common.enums.NoteType;
+import it.nexera.ris.common.enums.RequestCreationType;
 import it.nexera.ris.common.enums.RequestEnumTypes;
 import it.nexera.ris.common.enums.RequestState;
 import it.nexera.ris.common.enums.SectionCType;
@@ -418,6 +419,10 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     @Column(name = "regime")
     private Boolean regime;
+    
+    @Column(name = "requestCreationType")
+    @Enumerated(EnumType.STRING)
+    private RequestCreationType requestCreationType;
 
     @Transient
     private Boolean haveRequestReport;
@@ -2041,5 +2046,19 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     public void setRegime(Boolean regime) {
         this.regime = regime;
+    }
+
+    /**
+     * @return the requestCreationType
+     */
+    public RequestCreationType getRequestCreationType() {
+        return requestCreationType;
+    }
+
+    /**
+     * @param requestCreationType the requestCreationType to set
+     */
+    public void setRequestCreationType(RequestCreationType requestCreationType) {
+        this.requestCreationType = requestCreationType;
     }
 }

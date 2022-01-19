@@ -381,6 +381,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             setMultipleCreate(true);
         }
         generateMenuModel();
+        validateRequestCreationType();
         if (isMultipleCreate()) {
             if(isMultipleRequestCreate()){
                 setMutipleRequestObjTabPath(new ArrayList<>());
@@ -446,12 +447,17 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             setSelectedBillingClientId(getEntity().getBillingClient() != null ? getEntity().getBillingClient().getId() : null);
         }
 
+        setRequestTypes(ComboboxHelper.fillList(RequestType.class));
         if(isMultipleRequestCreate()){
-            setRequestTypes(ComboboxHelper.fillList(RequestType.class,false));
+            if(getEntity().getRequestType() != null){
+            setSelectedRequestTypes(new ArrayList());
+            getSelectedRequestTypes().add(getEntity().getRequestType().getId().toString());
+            }
+            
         }else{
-            setRequestTypes(ComboboxHelper.fillList(RequestType.class));
+            setSelectedRequestTypeId(getEntity().getRequestType() != null ? getEntity().getRequestType().getId() : null);
         }
-        setSelectedRequestTypeId(getEntity().getRequestType() != null ? getEntity().getRequestType().getId() : null);
+        
         onRequestTypeChange();
 
         setSelectedServiceId(getEntity().getService() != null ? getEntity().getService().getId() : null);
@@ -884,6 +890,12 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if ((isMultipleCreate() && getActiveMenuTabNum() == 2 && !isMultipleRequestCreate()) ) {
                 onMultipleServiceChange();
                 generateTab();
+        } 
+       else if ((isMultipleRequestCreate() && getActiveMenuTabNum() == 3) ) {
+                if(!ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
+                    onMultipleServiceChange();
+                    generateTab();
+                }
         } else if (getInputCardList() != null && (getActiveMenuTabNum() <= getInputCardList().size() || (isMultipleRequestCreate() && getActiveMenuTabNum() == 3) )) {
             generateTab();
         } else {
@@ -1294,6 +1306,11 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                        setEntity(new Request());
                        getMultiRequestMap().put(requestTypeId, getEntity());
                    }
+                   getEntity().setRequestCreationType(RequestCreationType.MULTIPLE);
+            }else if(isMultipleCreate()){
+                getEntity().setRequestCreationType(RequestCreationType.MULTI);
+            }else{
+                getEntity().setRequestCreationType(RequestCreationType.SIMPLE);
             }
 
             prepareRequestToSave();
@@ -2958,5 +2975,27 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
      */
     public void setMultiRequestMap(Map<Long , Request> multiRequestMap) {
         this.multiRequestMap = multiRequestMap;
+    }
+
+    private void validateRequestCreationType() {
+
+        RequestCreationType reqCreationTyp = getEntity().getRequestCreationType();
+
+        if (!ValidationHelper.isNullOrEmpty(reqCreationTyp)) {
+
+            switch (reqCreationTyp) {
+                case MULTI:
+                    setMultipleCreate(Boolean.TRUE);
+                    break;
+                case MULTIPLE:
+                    setMultipleCreate(Boolean.TRUE);
+                    setMultipleRequestCreate(Boolean.TRUE);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
     }
 }

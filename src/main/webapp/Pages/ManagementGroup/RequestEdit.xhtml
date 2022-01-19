@@ -445,9 +445,9 @@
                                  update="@form" action="#{bean.printPDF}"
                                  rendered="#{!bean.entity.isNew}"/>-->
                 <p:commandButton value="#{msg.requestManageEstateLocation}"
-                                 action="#{bean.openEstateLocation}" rendered="#{!bean.entity.isNew and !bean.multipleRequestCreate}"/>
+                                 action="#{bean.openEstateLocation}" rendered="#{!bean.entity.isNew }"/>
                 <p:commandButton value="#{msg.requestManagePrint}"
-                                 action="#{bean.generatePdf}" rendered="#{!bean.entity.isNew and !bean.multipleRequestCreate}"/>
+                                 action="#{bean.generatePdf}" rendered="#{!bean.entity.isNew}"/>
             </div>
         </ui:fragment>
         <ui:fragment id="buttonFragment">
