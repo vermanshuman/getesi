@@ -171,54 +171,6 @@
                     </p:commandButton>
                 </p:column>
             </ui:remove>
-            <p:column exportable="false" styleClass="action_midle_column" headerText="#{ff:upper(msg.requestListManage)}"
-                      rendered="#{!requestBean.getCurrentUser().isExternal()}" style="width: 6vw;min-width: 99px;">
-
-                <p:commandButton id="gestisci-btn" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
-                                 disabled="#{!requestBean.canEdit}" action="#{requestBean.manageRequest}">
-                    <f:setPropertyActionListener value="#{item.id}"
-                                                 target="#{requestBean.entityEditId}"/>
-                </p:commandButton>
-                <p:commandButton id="banca-btn" value="#{ff:upper(msg.headerDatabase)}" rendered="#{item.subjectId ne null}" style="display: none;"
-                                 action="#{requestBean.openRequestSubject}" class="action-btn">
-                    <f:setPropertyActionListener value="#{item.subjectId}" target="#{requestBean.entityEditId}"/>
-                </p:commandButton>
-                <p:commandButton id="pdf-btn" value="#{msg.pdf}" rendered="#{!requestBean.getCurrentUser().isExternal()}" class="action-btn" style="display: none;"
-                                 action="#{requestBean.downloadPdfFile}" ajax="false" update="@form">
-                    <f:setPropertyActionListener value="#{item.id}"
-                                                 target="#{requestBean.downloadRequestId}"/>
-                </p:commandButton>
-                <p:commandButton id="elimina-btn" value="#{ff:upper(msg.roleCanDelete)}" class="action-btn" style="display: none;"
-                                 oncomplete="PF('dlg2').show()" disabled="#{!requestBean.canDelete}">
-                    <f:setPropertyActionListener value="#{item.id}"
-                                                 target="#{requestBean.entityDeleteId}"/>
-                </p:commandButton>
-
-
-                <p:commandLink id="actionPnl" global="false" style="padding: 40%;outline: none;" immediate="true"
-                               readonly="true">
-                    <i class="fa fa-angle-down" style="font-size: x-large;"
-                       onmouseover="document.getElementById('table:#{rowId}:actionPnl').focus();" />
-                </p:commandLink>
-                <p:tooltip for="actionPnl" hideEvent="blur" showEvent="focus" styleClass="actionPnl-tooltip">
-                    <p:outputPanel id="actionGrid" styleClass="actionPnl-panel">
-
-                        <p:commandButton value="#{ff:upper(msg.requestListManage)}" class="action-btn" onclick="document.getElementById('table:#{rowId}:gestisci-btn').click()"
-                                         disabled="#{!requestBean.canEdit}" style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;">
-                        </p:commandButton>
-                        <p:commandButton value="#{ff:upper(msg.headerDatabase)}" onclick="document.getElementById('table:#{rowId}:banca-btn').click()"
-                                         rendered="#{item.subjectId ne null}" class="action-btn" style="width:120px; margin-left: 5px; margin-right: 5px; margin-bottom:8px;">
-                        </p:commandButton>
-                        <p:commandButton value="#{msg.pdf}" rendered="#{!requestBean.getCurrentUser().isExternal()}" class="action-btn" onclick="document.getElementById('table:#{rowId}:pdf-btn').click()"
-                                         update="@form" style="width:120px; margin-left: 5px; margin-right: 5px; margin-bottom:8px;">
-                        </p:commandButton>
-                        <p:commandButton value="#{ff:upper(msg.roleCanDelete)}" class="action-btn" onclick="document.getElementById('table:#{rowId}:elimina-btn').click()"
-                                         disabled="#{!requestBean.canDelete}" style="width:120px; margin-left: 5px; margin-right: 5px; margin-bottom:5px;">
-                        </p:commandButton>
-                    </p:outputPanel>
-                </p:tooltip>
-            </p:column>
-
         </p:dataTable>
         
         
