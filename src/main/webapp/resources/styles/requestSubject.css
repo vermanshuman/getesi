@@ -252,3 +252,8 @@ body .ui-datatable .ui-datatable-data tr.ui-state-highlight {
         background-color: #ffffff !important;
         color: black !important;
 }
+
+
+#table_data .ui-commandlink{
+    color: #003871 !important;
+}

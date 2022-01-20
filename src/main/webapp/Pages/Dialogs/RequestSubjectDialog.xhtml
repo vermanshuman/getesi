@@ -9,12 +9,14 @@
     
         <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/requestSubject.css"
               media="all" rel="stylesheet" type="text/css"/>
-        <p:dialog widgetVar="requestubjectDlg" id="requestubjectDlgId" modal="true" closable="false" header="#{msg.requestSubjectHeader}" width="95%" style="height: 90% !important">
+        
+        <p:dialog widgetVar="requestubjectDlg" id="requestubjectDlgId" modal="true" closable="false" header="#{msg.requestSubjectHeader}" 
+                  width="98%"  style="height: 90% !important">
     
         
         
         
-     <p:dataTable var="item" id="table"
+            <p:dataTable var="item" id="table" style="height: 98%"
                      emptyMessage="#{msg.noRecordsFound}" value="#{bean.regSubjectList}"
                      rowKey="#{item.id}" lazy="true" rowIndexVar="rowId"
                      rowStyleClass="#{item.isInserted ? 'receive_new_mail_style':''}"
