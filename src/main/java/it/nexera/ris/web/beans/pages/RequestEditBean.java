@@ -85,11 +85,14 @@ import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import it.nexera.ris.persistence.view.ClientView;
+import it.nexera.ris.persistence.view.RequestView;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.beans.EntityEditPageBean;
 import it.nexera.ris.web.beans.base.AccessBean;
 import it.nexera.ris.web.beans.wrappers.logic.SubjectWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.UploadDocumentWrapper;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 @ManagedBean(name = "requestEditBean")
@@ -270,6 +273,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private List<String> mutipleRequestObjTabPath;
 
     private Map<Long , Request>  multiRequestMap;
+    
+    private List<RequestView> regSubjectList;
     
     @Override
     protected void preLoad() throws PersistenceBeanException {
@@ -452,6 +457,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             if(getEntity().getRequestType() != null){
             setSelectedRequestTypes(new ArrayList());
             getSelectedRequestTypes().add(getEntity().getRequestType().getId().toString());
+            getMultiRequestMap().put(getEntity().getRequestType().getId(),getEntity());
             }
             
         }else{
@@ -1363,7 +1369,6 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 //                            .map(Long::parseLong).collect(Collectors.toList()))
 //            }));
                 getEntity().setMultipleServices(serviceList);
-
             } else {
                 if(!ValidationHelper.isNullOrEmpty(getSelectedServiceId()))
                     getEntity().setService(DaoManager.get(Service.class, getSelectedServiceId()));
@@ -2259,7 +2264,12 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }
     }
 
-
+    public void openRequestSubjectDialog() throws HibernateException, PersistenceBeanException, IllegalAccessException{
+        setRegSubjectList(DaoManager.load(RequestView.class, new Criterion[]{Restrictions.eq("subjectId",getEntity().getSubject().getId())}));
+    }
+    
+    
+    
     public Long getSelectedClientId() {
         return selectedClientId;
     }
@@ -2997,5 +3007,19 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
         }
 
+    }
+
+    /**
+     * @return the regSubjectList
+     */
+    public List<RequestView> getRegSubjectList() {
+        return regSubjectList;
+    }
+
+    /**
+     * @param regSubjectList the regSubjectList to set
+     */
+    public void setRegSubjectList(List<RequestView> regSubjectList) {
+        this.regSubjectList = regSubjectList;
     }
 }
