@@ -308,7 +308,7 @@
                     <p:commandButton style="float: left"
                                      value="#{msg.requestEntered}"
                                       styleClass="ui-button-primary" iconPos="left" 
-                                     rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1 and bean.multipleRequestCreate and !bean.entity.isNew}"
+                                     rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1 and bean.multipleRequestCreate}"
                                      oncomplete="PF('requestubjectDlg').show();" update="requestubjectDlgId" actionListener="#{bean.openRequestSubjectDialog}"
                                      
                                      />

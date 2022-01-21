@@ -2264,10 +2264,22 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }
     }
 
-    public void openRequestSubjectDialog() throws HibernateException, PersistenceBeanException, IllegalAccessException{
-        setRegSubjectList(DaoManager.load(RequestView.class, new Criterion[]{Restrictions.eq("subjectId",getEntity().getSubject().getId())}));
+    public void openRequestSubjectDialog() throws HibernateException, PersistenceBeanException, IllegalAccessException, InstantiationException{
+//        SessionHelper.put("requestSubject", getEntity().getSubject());
+//        SessionHelper.put("isNewRequest", getEntity().isNew());
+        Subject aSubject = null;
+                if(getEntity().isNew()){
+                  aSubject =  SubjectHelper.getSubjectIfExists(getSubject(),getWrapper().getSelectedPersonId());
+                }else{
+                  aSubject = getEntity().getSubject();  
+                }
+        
+        if(!ValidationHelper.isNullOrEmpty(aSubject)){
+            setRegSubjectList(DaoManager.load(RequestView.class, new Criterion[]{Restrictions.eq("subjectId",aSubject.getId())}));
+        }else{
+            setRegSubjectList(new ArrayList());
+        }
     }
-    
     
     
     public Long getSelectedClientId() {
