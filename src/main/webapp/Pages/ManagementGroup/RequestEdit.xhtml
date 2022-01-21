@@ -132,7 +132,7 @@
                 PrimeFaces.ab({s:"pageTabMenu",u:"form",g:false,pa:[{name:"pageTabMenu_menuid",value:previousMenu.toString()}],f:"form"});return false;
             }
         </script>
-        <p:remoteCommand name="updateSubjects" update="form"/>
+        <p:remoteCommand name="updateSubjects" update=":form:pageTabMenu"/>
 
         <p:tabMenu activeIndex="#{bean.activeMenuTabNum}" model="#{bean.topMenuModel}" style="background-color:#FFFFFF !important;"
                    id="pageTabMenu"  />

@@ -91,9 +91,9 @@ import it.nexera.ris.web.beans.EntityEditPageBean;
 import it.nexera.ris.web.beans.base.AccessBean;
 import it.nexera.ris.web.beans.wrappers.logic.SubjectWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.UploadDocumentWrapper;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import it.nexera.ris.web.common.EntityLazyListModel;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import org.primefaces.model.LazyDataModel;
 
 @ManagedBean(name = "requestEditBean")
 @ViewScoped
@@ -275,6 +275,10 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private Map<Long , Request>  multiRequestMap;
     
     private List<RequestView> regSubjectList;
+    
+    private LazyDataModel<RequestView> reqSubjectList;
+    
+    private List<Document> requestDocuments;
     
     @Override
     protected void preLoad() throws PersistenceBeanException {
@@ -516,6 +520,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 setSelectedClientId(mail.getClient().getId());
             }
         }
+        loadSubjects();
     }
 
     private void fillRequestEnumTypes() {
@@ -2264,24 +2269,111 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }
     }
 
-    public void openRequestSubjectDialog() throws HibernateException, PersistenceBeanException, IllegalAccessException, InstantiationException{
-//        SessionHelper.put("requestSubject", getEntity().getSubject());
-//        SessionHelper.put("isNewRequest", getEntity().isNew());
-        Subject aSubject = null;
-                if(getEntity().isNew()){
-                  aSubject =  SubjectHelper.getSubjectIfExists(getSubject(),getWrapper().getSelectedPersonId());
-                }else{
-                  aSubject = getEntity().getSubject();  
-                }
-        
-        if(!ValidationHelper.isNullOrEmpty(aSubject)){
-            setRegSubjectList(DaoManager.load(RequestView.class, new Criterion[]{Restrictions.eq("subjectId",aSubject.getId())}));
-        }else{
-            setRegSubjectList(new ArrayList());
+    public void loadSubjects() throws HibernateException, PersistenceBeanException, IllegalAccessException, InstantiationException {
+        if (!getEntity().isNew()) {
+            setReqSubjectList(new EntityLazyListModel(RequestView.class, 
+                    new Criterion[]{
+                        Restrictions.eq("subjectId", getEntity().getSubject().getId()),
+                        Restrictions.ne("id", getEntity().getId())    
+                    }
+                    , null));
         }
     }
-    
-    
+
+    public void openRequestSubjectDialog() throws HibernateException, PersistenceBeanException, IllegalAccessException, InstantiationException {
+        if (getEntity().isNew()) {
+            Subject aSubject = SubjectHelper.getSubjectIfExists(getSubject(), getWrapper().getSelectedPersonId());
+            if (!ValidationHelper.isNullOrEmpty(aSubject)) {
+                setReqSubjectList(new EntityLazyListModel(RequestView.class, new Criterion[]{
+                    Restrictions.eq("subjectId", aSubject.getId())
+                }, null));
+            }
+        }
+    }
+
+    public void loadRequestDocuments(Long requestId) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        List<Document> documents = DaoManager.load(Document.class, new Criterion[]{
+            Restrictions.eq("request.id", requestId),
+            Restrictions.eq("selectedForEmail", true)
+        });
+
+        List<Document> formalities = DaoManager.load(Document.class, new CriteriaAlias[]{
+            new CriteriaAlias("formality", "f", JoinType.INNER_JOIN),
+            new CriteriaAlias("f.requestList", "r_f", JoinType.INNER_JOIN)
+        }, new Criterion[]{
+            Restrictions.eq("r_f.id", requestId),
+            Restrictions.eq("request.id", requestId),
+            Restrictions.eq("selectedForEmail", true)
+        });
+
+        if (!ValidationHelper.isNullOrEmpty(formalities)) {
+            for (Document temp : formalities) {
+                if (!documents.contains(temp)) {
+                    documents.add(temp);
+                }
+            }
+        }
+        setRequestDocuments(documents);
+    }
+
+    private List<Document> getAllegatiDocuments(Long requestId)
+            throws PersistenceBeanException, IllegalAccessException {
+        List<Document> documents = DaoManager.load(Document.class, new Criterion[]{
+            Restrictions.eq("request.id", requestId),
+            Restrictions.eq("typeId", DocumentType.ALLEGATI.getId())
+        });
+
+        List<Document> formalities = DaoManager.load(Document.class, new CriteriaAlias[]{
+            new CriteriaAlias("formality", "f", JoinType.INNER_JOIN),
+            new CriteriaAlias("f.requestList", "r_f", JoinType.INNER_JOIN)
+        }, new Criterion[]{
+            Restrictions.eq("r_f.id", requestId),
+            Restrictions.eq("typeId", DocumentType.ALLEGATI.getId())
+        });
+
+        if (!ValidationHelper.isNullOrEmpty(formalities)) {
+            for (Document temp : formalities) {
+                if (!documents.contains(temp)) {
+                    documents.add(temp);
+                }
+            }
+        }
+        return documents;
+    }
+
+    public void loadAllegatiDocuments(Long requestId) throws PersistenceBeanException, IllegalAccessException {
+        List<Document> documents = getAllegatiDocuments(getEntityId());
+        setRequestDocuments(documents);
+    }
+
+    public void openRequestSubject() {
+        RedirectHelper.goToOnlyView(PageTypes.SUBJECT, getEntity().getSubject().getId());
+    }
+
+    public String getItemIconStyleClass(Long requestTypeId) {
+        String iconStyleClass = "";
+        if (!ValidationHelper.isNullOrEmpty(requestTypeId)) {
+            try {
+                RequestType requestTypeDTO = DaoManager.get(RequestType.class, requestTypeId);
+                iconStyleClass = requestTypeDTO.getIcon();
+                if (iconStyleClass.startsWith("fa")) {
+                    iconStyleClass = "fa " + iconStyleClass;
+                }
+            } catch (HibernateException | InstantiationException | IllegalAccessException | PersistenceBeanException e) {
+                LogHelper.log(log, e);
+            }
+        }
+        return iconStyleClass;
+    }
+
+    public void openRequestEditor(Long requestTypeId) {
+        RedirectHelper.goTo(PageTypes.REQUEST_TEXT_EDIT, requestTypeId);
+    }
+
+    public void openRequestMail(Long mailId) {
+        RedirectHelper.goTo(PageTypes.MAIL_MANAGER_VIEW, mailId);
+    }
+ 
     public Long getSelectedClientId() {
         return selectedClientId;
     }
@@ -3033,5 +3125,33 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
      */
     public void setRegSubjectList(List<RequestView> regSubjectList) {
         this.regSubjectList = regSubjectList;
+    }
+
+    /**
+     * @return the reqSubjectList
+     */
+    public LazyDataModel<RequestView> getReqSubjectList() {
+        return reqSubjectList;
+    }
+
+    /**
+     * @param reqSubjectList the reqSubjectList to set
+     */
+    public void setReqSubjectList(LazyDataModel<RequestView> reqSubjectList) {
+        this.reqSubjectList = reqSubjectList;
+    }
+
+    /**
+     * @return the requestDocuments
+     */
+    public List<Document> getRequestDocuments() {
+        return requestDocuments;
+    }
+
+    /**
+     * @param requestDocuments the requestDocuments to set
+     */
+    public void setRequestDocuments(List<Document> requestDocuments) {
+        this.requestDocuments = requestDocuments;
     }
 }
