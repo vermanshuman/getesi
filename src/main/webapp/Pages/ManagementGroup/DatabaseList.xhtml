@@ -87,10 +87,11 @@
                 </p:outputPanel>
 	            <p:dataTable var="item" id="tableSubject"
                              emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyModel}"
-                             rowKey="#{item.id}" rows="10" lazy="true" paginator="true"
-                             paginatorAlwaysVisible="true" rowIndexVar="rowId"
+                             rowKey="#{item.id}" rows="#{rowValue.rowsPerPage}"  paginator="true"
+                             paginatorAlwaysVisible="true" rowIndexVar="rowId" lazy="true"
                              paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                             rowsPerPageTemplate="10,20,50" widgetVar="tableWV">
+                             rowsPerPageTemplate="20,30"
+                             widgetVar="tableWV">
                     <p:ajax event="filter" listener="#{bean.onFilterTableSubject}" update="@this"/>
 
                     <p:column styleClass="action_column" exportable="false">

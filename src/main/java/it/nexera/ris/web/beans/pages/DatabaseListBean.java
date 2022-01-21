@@ -57,7 +57,9 @@ import java.util.stream.Collectors;
 public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements Serializable {
 
     private static final long serialVersionUID = 3660894408028759761L;
-
+   
+    
+    
     private LazyDataModel<Property> lazyRealEstateModel;
 
     private LazyDataModel<Document> lazyDocumentModel;
@@ -1906,4 +1908,6 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
     public void setSubjectBirthPlace(String subjectBirthPlace) {
         this.subjectBirthPlace = subjectBirthPlace;
     }
+    
+   
 }
