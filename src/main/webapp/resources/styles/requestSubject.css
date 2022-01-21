@@ -291,3 +291,11 @@ body #table .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active
 #table_paginator_top :first-child {
     margin-top: 6px !important;
 }
+
+body #table .ui-paginator .ui-paginator-pages {
+    margin-top: -6px !important;
+}
+
+#table_paginator_bottom :first-child {
+    margin-top: 6px !important;
+}
