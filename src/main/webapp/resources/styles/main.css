@@ -846,3 +846,8 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
 .red-file::before{
     content: none !important;
 }
+
+.layout-wrapper{
+    overflow: auto !important;
+    height: 90% !important
+}
