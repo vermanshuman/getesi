@@ -11,6 +11,16 @@
     <ui:param name="bean" value="#{estateFormalityBean}"/>
     <ui:param name="saveButtonStyle" value="btn-green"/>
     <ui:define name="edit_body">
+    	    <style>
+            #save_btn {
+                margin-left: 0.5rem !important;
+            }
+            #cancel_btn {
+                background-color: #F3362B !important;
+            }
+
+        </style>
+    	
         <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid"
                      columnClasses="ui-grid-col-1, ui-grid-col-3, ui-grid-col-1, ui-grid-col-3, ui-grid-col-1, ui-grid-col-3">
             <p:column>
@@ -75,7 +85,7 @@
             <p:column>
                 <p:autoComplete id="typeAct" dropdown="true" var="item"
                                 styleClass="lazy-autocomplete autocomplete-estate"
-                                converter="typeActConverter" style="width: 100%;display: grid;"
+                                converter="typeActConverter" style="width: 100%;"
                                 itemValue="#{item}" itemLabel="#{item}" scrollHeight="400"
                                 value="#{bean.selectedTypeAct}" completeMethod="#{bean.completeTypeAct}"/>
             </p:column>
@@ -107,7 +117,7 @@
 
             <p:autoComplete dropdown="true" var="item" placeholder="#{msg.estateFormalityNoteType}"
                             styleClass="lazy-autocomplete autocomplete-estate"
-                            converter="typeActConverter" style="width: 100%;display: grid;"
+                            converter="typeActConverter" style="width: 100%;"
                             itemValue="#{item}" itemLabel="#{item}" scrollHeight="400"
                             value="#{bean.selectedFormalitySuccessTypeAct}"
                             completeMethod="#{bean.completeFormalitySuccessTypeAct}"/>
