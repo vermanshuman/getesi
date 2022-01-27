@@ -135,7 +135,7 @@
                                         onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
                                         pattern="dd/MM/yyyy" mask="true"
                                         locale="it" navigator="true" popupIconOnly="true"
-                                        onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+                                        onblur="setTimeout(function(){checkDates();}, 450);check_date(this);"
                                         value="#{bean.requestListBean.dateFrom}"
                                         placeholder="#{msg.mailManagerDateFrom}"/>
                             <p:calendar id="filterDateToRL" readonlyInput="false" showOn="button"
