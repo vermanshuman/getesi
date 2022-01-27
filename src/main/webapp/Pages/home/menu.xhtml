@@ -6,6 +6,7 @@
                 xmlns:pb="http://primefaces.org/babylon">
 
     <div class="layout-menu-container menu-shadow">
+    
         <style>
             #logolink {
                 text-align: center !important;
@@ -40,10 +41,12 @@
             }
 
             .layout-wrapper.layout-menu-dark .layout-menu-container .layout-menu li a:hover {
-                background-color: #dee2e6;
+                background-color: #dee2e6 !important;
             }
-
-            .menu-shadow {
+            .layout-wrapper.layout-menu-dark .layout-menu-container .layout-menu li a:visited {
+              background-color: #dee2e6 !important;
+            }
+		    .menu-shadow {
                 box-shadow: 2px 0px black;
             }
             .layout-wrapper .layout-topbar .layout-menu-button {
@@ -138,9 +141,13 @@
 
                     wrapperElement.attr('class', styleClass.replace(sectionClass, section + '-' + theme));
                 };
+           
+               
+                
             });
 
-            function clearLayoutState () {
+           
+              function clearLayoutState () {
                 var menu = PF('babylonMenuWidget');
 
                 if (menu) {
@@ -159,11 +166,10 @@
                     <p:remoteCommand name="umc" action="#{sessionBean.updateMailCount()}" update="@widgetVar(babylonMenuWidget)"/>
                     <p:remoteCommand name="urc" action="#{sessionBean.updateNumberUnclosedRequests()}" update="@widgetVar(babylonMenuWidget)"/>
                     <p:remoteCommand name="uplm" action="#{sessionBean.updateOverLayMode()}" update="@([id$=overLayModeData]) logoBlock"/>
+                    
                     <ui:fragment id="menuProfile" rendered="#{guestPreferences.profileMode == 'inline' ? true : false}">
-
                         <div class="layout-profile">
                             <a class="layout-profile-button" href="#">
-
                                 <p:graphicImage name="images/avatar.png" library="babylon-layout" />
                                 <div class="layout-profile-userinfo">
                                     <span class="layout-profile-name">Arlene Welch</span>
@@ -200,8 +206,8 @@
                         </div>
                     </ui:fragment>
 
-                    <pb:menu widgetVar="babylonMenuWidget">
-                        <p:menuitem id="homePage" styleClass="main" value="#{msg.home}" icon="topbar-icon home-icon" outcome="/Pages/Home.jsf"/>
+                    <pb:menu widgetVar="babylonMenuWidget"  >
+                        <p:menuitem id="homePage" styleClass="main" value="#{msg.home}" icon="topbar-icon home-icon" outcome="/Pages/Home.jsf"   />
                         <p:menuitem id="mailManager" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/MailManagerList.jsf')}" value="#{msg.headerMailManager}#{sessionBean.mailCounts gt 0 ? ' ('.concat(sessionBean.mailCounts).concat(')') : ''}" icon="topbar-icon email-icon" outcome="/Pages/ManagementGroup/MailManagerList.jsf"/>
                         <p:menuitem id="requestList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/RequestList.jsf')}" value="#{msg.headerRequestList}#{sessionBean.requestCounts gt 0 ? ' ('.concat(sessionBean.requestCounts).concat(')') : ''}" icon="topbar-icon richieste-icon"
                                     action="#{sessionBean.getRequestListPage()}" actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>

@@ -12,7 +12,8 @@ public class RowPageBean {
 	 public int getRowsPerPage() {
 			return rowsPerPage;
 		}
-		public void setRowsPerPage(int rowsPerPage) {
+	 
+	public void setRowsPerPage(int rowsPerPage) {
 			this.rowsPerPage = rowsPerPage;
 		}
 }
