@@ -20,6 +20,11 @@
             .to-bottom-text td.ui-panelgrid-cell {
                 vertical-align: bottom !important;
             }
+            .red-btn {
+                background: red !important;
+                background-color: red !important;
+                color: #FFFFFF !important;
+            }
         </style>
       <script>
     
@@ -89,8 +94,7 @@
                     <p:ajax event="filter" listener="#{bean.onFilterTableSubject}" update="@this"/>
 
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton icon="ui-icon pi pi-pencil" update=":form"
-                                         action="#{bean.editEntity}">
+                        <p:commandButton icon="ui-icon pi pi-pencil" update=":form" action="#{bean.editEntity}">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.entityEditId}"/>
                         </p:commandButton>
@@ -98,7 +102,7 @@
 
                     <p:column styleClass="action_column" exportable="false">
                         <p:commandButton icon="ui-icon pi pi-times" update=":form"
-                                         oncomplete="PF('dlg2').show()">
+                                         oncomplete="PF('dlg2').show()" styleClass="red-btn">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.entityDeleteId}"/>
                         </p:commandButton>
@@ -327,7 +331,7 @@
 
                     <p:column styleClass="action_column min_padding_margin" exportable="false">
                         <p:commandButton icon="ui-icon pi pi-times" update=":form"
-                                         oncomplete="PF('dlg3').show()">
+                                         oncomplete="PF('dlg3').show()" styleClass="red-btn">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.entityDeleteId}"/>
                         </p:commandButton>
@@ -442,8 +446,8 @@
                         </p:commandButton>
                     </p:column>
                     <p:column styleClass="action_column">
-                        <p:commandButton icon="ui-icon pi pi-times" update=":form"
-                                         action="#{bean.checkFormalityForcedRequestEstateSituation}">
+                        <p:commandButton icon="ui-icon pi pi-times" update=":form" styleClass="red-btn"
+                                         action="#{bean.checkFormalityForcedRequestEstateSituation}" >
                             <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                         </p:commandButton>
                     </p:column>
