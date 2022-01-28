@@ -813,19 +813,23 @@
             </p:tab>
             <p:tab title="#{msg.databaseListImportFile}">
                 <p:outputPanel id="searchPanelDocument">
-                    <div>
-                        <p:commandButton value="#{msg.databaseListDocumentAdd}" styleClass="standard_button"
-                                         action="#{bean.setReportShouldBeGenerated(true)}"
-                                         id="addDocumentBtn" oncomplete="PF('documentAddDlgWV').show();" process="@this"/>
-                        <p:commandButton value="#{msg.databaseListOpenReport}" styleClass="right-side"
-                                         id="openReport" actionListener="#{bean.downloadExistingReport}" ajax="false">
-                            <p:fileDownload value="#{bean.reportFile}"/>
-                        </p:commandButton>
+                    <div class="p-formgroup-inline">
+                       <div class="p-field">
+	                        <p:commandButton value="#{msg.databaseListDocumentAdd}" styleClass="standard_button"
+	                                         action="#{bean.setReportShouldBeGenerated(true)}"
+	                                         id="addDocumentBtn" oncomplete="PF('documentAddDlgWV').show();" process="@this"/>
+                        </div>
+                        <div class="p-field">
+	                        <p:commandButton value="#{msg.databaseListOpenReport}" styleClass="right-side"
+	                                         id="openReport" actionListener="#{bean.downloadExistingReport}" ajax="false">
+	                            <p:fileDownload value="#{bean.reportFile}"/>
+	                        </p:commandButton>
+                    	</div>
+                    	<div class="p-field">
+	                        <p:commandButton styleClass="standard_button" value="#{msg.databaseListFolderAdd}"
+	                                         id="addFolderBtn" oncomplete="PF('folderAddDlgWV').show(); clearAndUpdateDialogData()"/>
+                        </div>
                     </div>
-                    <span>
-                        <p:commandButton styleClass="standard_button" value="#{msg.databaseListFolderAdd}"
-                                         id="addFolderBtn" oncomplete="PF('folderAddDlgWV').show(); clearAndUpdateDialogData()"/>
-                    </span>
                 </p:outputPanel>
                 <p:remoteCommand name="updateTableDocument" update="tableDocument, openReport"/>
                 <p:dataTable var="item" id="tableDocument"
