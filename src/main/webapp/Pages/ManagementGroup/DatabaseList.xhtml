@@ -60,6 +60,7 @@
                   <p:remoteCommand name="filterTableSubject"
                                      update="tabs:tableSubject"
                                      action="#{bean.filterSubjectTable}"/>
+                    <!--
                     <p:panelGrid columns="6"
 						columnClasses="ui-g-12 ui-md-2,ui-g-12 ui-md-2,ui-g-12 ui-md-2,ui-g-12 ui-md-2,ui-g-12 ui-md-2,ui-g-12 ui-md-2"
 						styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
@@ -83,6 +84,58 @@
 							<p:inputText value="#{bean.subjectFiscalCodeVAT}"/>
 							
 					</p:panelGrid>
+					-->
+					
+					<div class="p-col-10" style="padding-top: 0px;padding-bottom: 0px;float: right">
+						<div class="p-formgroup-inline alignEnd" style="float: right">
+                            <div class="p-field">
+                                <p:inputText value="" id="filterEmailsender" placeholder="" style=" width: 300px !important;"/>
+                            </div>
+                            <div class="p-field">
+                                <p:inputText id="filterEmailSubject" value="" placeholder="" style=" width: 300px !important;"/>
+                            </div>
+                            <div class="p-field">
+                                <p:commandButton id="cercaButton" onclick="return false;"
+                                                         update="searchPanel" icon="ui-icon ui-icon-search pi pi-search" styleClass="searchPanelButton"/>
+                            </div>
+                            <div class="settingsBlock">
+                               <p:commandButton id="settingButton" onclick="togglePanel();" type="button" icon="ui-icon ui-icon-search pi pi-sliders-h" styleClass="searchPanelButton"/>
+                   				<script type="text/javascript">
+                                      // <![CDATA[
+                                      $("body").click(function(e){
+                                          var target = $(e.target);
+                                          if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('.ui-selectcheckboxmenu-panel').length) {
+                                              PF('panelSetting').getJQ().hide();
+                                          }
+                                          if(target.closest('.ui-selectcheckboxmenu-item').length) {
+                                              console.log("hello");
+                                              $("#states").addClass("border_class");
+                                          } else {
+                                              $("#states").removeClass("border_class");
+                                          }
+                                      });
+                                      function togglePanel() {
+                                          PF('panelSetting').getJQ().toggle();
+                                          if($('#statoAllLabel').length==0) {
+                                              $('.ui-selectcheckboxmenu-header .ui-chkbox.ui-widget').after('<label id="statoAllLabel">Stato</label>');
+                                          }
+                                      }
+                                      jQuery(document).ready(function() {
+                                          PF('panelSetting').getJQ().hide();
+                                      });
+                                      // ]]>
+                                  </script>
+                                  <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" styleClass="panelSetting" style="display: none;">
+                                          <div class="p-grid">
+                                                <div class="p-col-12" style="text-align: center;">
+                                                    <h2>Filtra per</h2>
+                                                </div>
+                                                
+                                            </div>
+                                        </p:panel>
+                           </div>
+                        </div>
+					</div>
                     <p:panelGrid columns="6"
 						columnClasses="ui-g-12 ui-md-1,ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-2,ui-g-12 ui-md-2,ui-g-12 ui-md-1"
 						styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
@@ -92,7 +145,7 @@
                         <h:outputText/>
                         <h:outputText/>
                         <h:outputText/>
-                        <p:commandButton value="#{msg.databaseListRealEstateSearch}" onclick="filterTableSubject();" />
+                        <!-- <p:commandButton value="#{msg.databaseListRealEstateSearch}" onclick="filterTableSubject();" /> -->
                     </p:panelGrid>
                 </p:outputPanel>
 	            <p:dataTable var="item" id="tableSubject"
