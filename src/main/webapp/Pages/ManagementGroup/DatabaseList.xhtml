@@ -437,7 +437,7 @@
                     </p:column>
                     <p:column styleClass="action_column">
                         <p:column headerText="#{msg.pdf}" styleClass="action_column">
-                            <p:commandButton icon="fa fa-file-pdf-o" action="#{bean.downloadFormalityPdf}" ajax="false">
+                            <p:commandButton styleClass="white-button" icon="fa fa-fw fa-file-pdf-o red-file icon-align" action="#{bean.downloadFormalityPdf}" ajax="false">
                                 <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                             </p:commandButton>
                         </p:column>
@@ -542,7 +542,7 @@
                         <h:outputText value="#{item.sumOfEstateFormalities}"/>
                     </p:column>
                     <p:column headerText="#{msg.pdf}" styleClass="action_column">
-                        <p:commandButton icon="fa fa-file-pdf-o" action="#{bean.downloadRequestPdf}" ajax="false"
+                        <p:commandButton styleClass="white-button" icon="fa fa-fw fa-file-pdf-o red-file icon-align" action="#{bean.downloadRequestPdf}" ajax="false"
                                          rendered="#{item.haveRequestReport}">
                             <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                         </p:commandButton>
