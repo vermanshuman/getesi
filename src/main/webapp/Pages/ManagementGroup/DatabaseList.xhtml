@@ -25,6 +25,16 @@
                 background-color: red !important;
                 color: #FFFFFF !important;
             }
+            .pdfImageClass {
+    			background-image: url("../images/pdf_icon2.jpg");
+			}
+			.white-button{
+                background: white !important;
+            }
+            .red-file{
+            	width:24px;
+            	left: 38%;
+            }
         </style>
       <script>
     
@@ -750,7 +760,7 @@
                         </p:commandButton>
                     </p:column>
                     <p:column styleClass="action_column" headerText="#{msg.pdf}">
-                        <p:commandButton icon="fa fa-download"
+                        <p:commandButton styleClass="white-button" icon="fa fa-fw fa-file-pdf-o red-file icon-align"
                                          action="#{bean.downloadVisureRTFasPDF}" ajax="false" update="@form">
                             <f:setPropertyActionListener value="#{item}"
                                                          target="#{bean.downloadVisureRTF}"/>
