@@ -447,7 +447,10 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
             List<Criterion> criterionList = new LinkedList<>();
 
             if (!ValidationHelper.isNullOrEmpty(this.getCogNome())) {
-                criterionList.add(Restrictions.ilike("surname", getCogNome(), MatchMode.ANYWHERE));
+                //criterionList.add(Restrictions.ilike("surname", getCogNome(), MatchMode.ANYWHERE));
+                criterionList.add(Restrictions.or(
+                        Restrictions.like("surname", getCogNome(), MatchMode.ANYWHERE),
+                        Restrictions.like("name", getCogNome(), MatchMode.ANYWHERE)));
             }
 
             if (!ValidationHelper.isNullOrEmpty(this.getNome())) {
@@ -479,7 +482,11 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
                 criterionList.clear();
 
                 if (!ValidationHelper.isNullOrEmpty(this.getCogNome())) {
-                    criterionList.add(Restrictions.ilike("lastName", getCogNome(), MatchMode.ANYWHERE));
+                	
+                    //criterionList.add(Restrictions.ilike("lastName", getCogNome(), MatchMode.ANYWHERE));
+                    criterionList.add(Restrictions.or(
+                            Restrictions.like("lastName", getCogNome(), MatchMode.ANYWHERE),
+                            Restrictions.like("firstName", getCogNome(), MatchMode.ANYWHERE)));
                 }
 
                 if (!ValidationHelper.isNullOrEmpty(this.getNome())) {
@@ -510,7 +517,14 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
 
             if(!showPopup) {
                 criterionList.clear();
-
+                System.out.println("jjbjofjonfkdnkdf758790878779857(^&(^#(&$#^($^(#^&(_#$");
+                System.out.println("jjbjofjonfkdnkdf758790878779857(^&(^#(&$#^($^(#^&(_#$");
+                System.out.println("jjbjofjonfkdnkdf758790878779857(^&(^#(&$#^($^(#^&(_#$");
+                System.out.println("jjbjofjonfkdnkdf758790878779857(^&(^#(&$#^($^(#^&(_#$");
+                System.out.println("jjbjofjonfkdnkdf758790878779857(^&(^#(&$#^($^(#^&(_#$");
+                System.out.println("jjbjofjonfkdnkdf758790878779857(^&(^#(&$#^($^(#^&(_#$");
+                System.out.println("jjbjofjonfkdnkdf758790878779857(^&(^#(&$#^($^(#^&(_#$");
+                System.out.println("jjbjofjonfkdnkdf758790878779857(^&(^#(&$#^($^(#^&(_#$");
                 if (!ValidationHelper.isNullOrEmpty(this.getNome()) && !ValidationHelper.isNullOrEmpty(this.getNome())) {
                     criterionList.add(Restrictions.ilike("name", getNome(), MatchMode.ANYWHERE));
                     criterionList.add(Restrictions.ilike("name", getCogNome(), MatchMode.ANYWHERE));
@@ -548,8 +562,11 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
             }
 
             if (!ValidationHelper.isNullOrEmpty(getCogNome())) {
-                criterionList.add(Restrictions.ilike("surname", getCogNome(),
-                        MatchMode.ANYWHERE));
+                //criterionList.add(Restrictions.ilike("surname", getCogNome(), MatchMode.ANYWHERE));
+                
+                criterionList.add(Restrictions.or(
+                        Restrictions.like("surname", getCogNome(), MatchMode.ANYWHERE),
+                        Restrictions.like("name", getCogNome(), MatchMode.ANYWHERE)));
             }
 
             if (!ValidationHelper.isNullOrEmpty(getSubjectBusinessName())) {
