@@ -92,14 +92,14 @@
 					<div class="p-col-10" style="padding-top: 0px;padding-bottom: 0px;float: right">
 						<div class="p-formgroup-inline alignEnd" style="float: right">
                             <div class="p-field">
-                                <p:inputText value="" id="filterEmailsender" placeholder="Nominativo" style=" width: 300px !important;"/>
+                                <p:inputText value="#{bean.cogNome}" id="filterEmailsender" placeholder="Nominativo" style=" width: 300px !important;"/>
                             </div>
                             <div class="p-field">
-                                <p:inputText id="filterEmailSubject" value="" placeholder="P.IVA o CF" style=" width: 300px !important;"/>
+                                <p:inputText id="filterEmailSubject" value="#{bean.nome}" placeholder="P.IVA o CF" style=" width: 300px !important;"/>
                             </div>
                             <div class="p-field">
-                                <p:commandButton id="cercaButton" onclick="return false;"
-                                                         update="searchPanel" icon="ui-icon ui-icon-search pi pi-search" styleClass="searchPanelButton"/>
+                                <p:commandButton id="cercaButton" onclick="filterTableSubject();" value=""
+                                	update="searchPanel" icon="ui-icon ui-icon-search pi pi-search" styleClass="searchPanelButton"/>
                             </div>
                             <div class="settingsBlock">
                                <p:commandButton id="settingButton" onclick="togglePanel();" type="button" icon="ui-icon ui-icon-search pi pi-sliders-h" styleClass="searchPanelButton"/>
