@@ -5,7 +5,8 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:ff="http://readytech.com/functions">
+      xmlns:ff="http://readytech.com/functions"
+	  xmlns:fn="http://java.sun.com/jsp/jstl/functions">
 <ui:composition template="/resources/tpl/Admin/LazyListTabBase.xhtml">
     <ui:param name="bean" value="#{databaseListBean}"/>
     <ui:param name="renderTitle" value="false"/>>
@@ -38,6 +39,16 @@
             .searchPanelButton {
                 background: #fb6e51 !important;
             }
+            
+            .panelSetting {
+			    position: absolute;
+			    z-index: 1;
+			    margin-top: 10px;
+			    max-width: 440px;
+			    right: 33px;
+			    border: 1px solid #547ac4;
+			}
+			
         </style>
       <script>
     
@@ -104,38 +115,53 @@
                             <div class="settingsBlock">
                                <p:commandButton id="settingButton" onclick="togglePanel();" type="button" icon="ui-icon ui-icon-search pi pi-sliders-h" styleClass="searchPanelButton"/>
                    				<script type="text/javascript">
-                                      // <![CDATA[
-                                      $("body").click(function(e){
-                                          var target = $(e.target);
-                                          if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('.ui-selectcheckboxmenu-panel').length) {
-                                              PF('panelSetting').getJQ().hide();
-                                          }
-                                          if(target.closest('.ui-selectcheckboxmenu-item').length) {
-                                              console.log("hello");
-                                              $("#states").addClass("border_class");
-                                          } else {
-                                              $("#states").removeClass("border_class");
-                                          }
-                                      });
-                                      function togglePanel() {
-                                          PF('panelSetting').getJQ().toggle();
-                                          if($('#statoAllLabel').length==0) {
-                                              $('.ui-selectcheckboxmenu-header .ui-chkbox.ui-widget').after('<label id="statoAllLabel">Stato</label>');
-                                          }
-                                      }
-                                      jQuery(document).ready(function() {
+                                  // <![CDATA[
+                                  $("body").click(function(e){
+                                      var target = $(e.target);
+                                      if (!target.parents('#tabs:settingButton').length && !target.parents('#tabs:settingPanel').length && !target.parents('.ui-selectcheckboxmenu-panel').length) {
                                           PF('panelSetting').getJQ().hide();
-                                      });
-                                      // ]]>
-                                  </script>
-                                  <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" styleClass="panelSetting" style="display: none;">
-                                          <div class="p-grid">
-                                                <div class="p-col-12" style="text-align: center;">
-                                                    <h2>Filtra per</h2>
-                                                </div>
-                                                
-                                            </div>
-                                        </p:panel>
+                                      }
+                                      if(target.closest('.ui-selectcheckboxmenu-item').length) {
+                                          console.log("hello");
+                                          $("#states").addClass("border_class");
+                                      } else {
+                                          $("#states").removeClass("border_class");
+                                      }
+                                  });
+                                  function togglePanel() {
+                                      PF('panelSetting').getJQ().toggle();
+                                      if($('#statoAllLabel').length==0) {
+                                          $('.ui-selectcheckboxmenu-header .ui-chkbox.ui-widget').after('<label id="statoAllLabel">Stato</label>');
+                                      }
+                                  }
+                                  jQuery(document).ready(function() {
+                                      PF('panelSetting').getJQ().hide();
+                                  });
+                                  // ]]>
+                              </script>
+                               <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" styleClass="panelSetting" style="display: none;">
+                                  <div class="p-grid">
+                                    <div class="p-col-12" style="text-align: center;">
+                                    	<h2>Filtra per</h2>
+                                	</div>
+                            	 	<div class="p-col-12" style="text-align: center;">
+	                                   <p:inputText value="#{bean.subjectBirthPlace}" id="subjectBirthPlace" placeholder="Comune di nascita" style=" margin-right: 25px; !important;"/>
+		                                
+		                                <p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
+                                                    onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                                                    pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" popupIconOnly="true" placeholder="data di nascita"
+                                                    onblur="check_date(this)" value="#{bean.subjectBirthDate}" styleClass="">
+                                        	<p:ajax event="dateSelect" update="@this" />
+                                        </p:calendar>
+                            		</div>
+                            		<div class="p-col-12" style="text-align: center;">
+                                        <p:commandButton id="manageReestablishBtns" value="#{ff:upper(msg.mailManageReestablish)}" update="settingPanel" oncomplete="PF('panelSetting').getJQ().hide()"/>
+                                        <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #00CC52;margin-left: 20px;" id="searchButtons"
+                                                         onclick="checkDates(); filterTableFromPanel();" update="searchPanel" oncomplete="PF('panelSetting').getJQ().hide()"/>
+                                                         
+                                    </div>
+                                </div>
+                             </p:panel>
                            </div>
                         </div>
 					</div>
