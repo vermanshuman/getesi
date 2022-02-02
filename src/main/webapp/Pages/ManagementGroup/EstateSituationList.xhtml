@@ -12,6 +12,7 @@
     <ui:param name="renderMenu" value="false"/>
     <ui:param name="centerPartStyleClass" value="false"/>
     <ui:param name="disableSelection" value="true"/>
+    <ui:param name="tableInsideField" value="true"></ui:param>
     <ui:define name="back_buttons_panel">
         <p:commandButton id="add_btn" action="#{bean.addEstate}" value="#{msg.estateAddButton}" styleClass="p-mr-2 p-mb-2"/>
         <p:commandButton id="cancel_btn" action="#{bean.goBack}" value="#{msg.requestListOpenEdit}"
@@ -161,7 +162,6 @@
             }
 
             body .ui-icon {
-                color: #ffffff !important;
                 width: 16px;
                 height: 16px;
                 line-height: 16px;
@@ -183,12 +183,12 @@
             }
 
             body .ui-datatable .ui-paginator.ui-paginator-top {
-                background-color: #2f8ee5 !important;
+                /*background-color: #2f8ee5 !important;*/
                 color: #ffffff !important;
             }
 
             body .ui-datatable .ui-paginator.ui-paginator-bottom {
-                background-color: #2f8ee5 !important;
+                /*background-color: #2f8ee5 !important;*/
                 color: #ffffff !important;
             }
 
@@ -224,14 +224,17 @@
             body .ui-datatable .ui-datatable-data > tr {
                 color: #5f666c;
             }
-            #list_panel {
-                margin-top: 10px;
-            }
 
             body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-button {
-                background: #009900;
+                background: #00CC52;
+            }
+            fieldset {
+                margin-top: 10px;
+                margin-left: 1cm;
+                margin-right: 1cm;
             }
             #list_panel {
+                margin-top: 10px;
                 margin-left: 1cm;
                 margin-right: 1cm;
             }
@@ -239,11 +242,53 @@
                 margin-left: -4px;
             }
             .btn-green {
-                background-color: #57c279!important;
+                background-color: #00CC52!important;
+            }
+
+            .cost_titles {
+                padding-top: 20px !important;
+            }
+
+            .cost_titles h3 {
+                font-size: 1.17em !important;
+                font-weight: bold !important;
+            }
+
+            .ui-datatable-scrollable-theadclone tr  {
+                display: none !important;
+            }
+
+            #requestExtraCostDialog .ui-dialog-titlebar {
+                padding: 0.4em 0.4em 0.4em 1em;
+                background: #ffffff !important;
+            }
+            #cke_body {
+                width: 67vw !important;
+            }
+            body .ui-button.ui-button-warning {
+                background: #fed820;
+                color: #000000;
+            }
+            .ui-dialog-content{
+                max-width: 1200px !important;
+                max-height: 700px !important;
+                margin-bottom: 5px !important;
+            }
+            .ui-spinner-up,.ui-spinner-down{
+                margin-bottom: 0px !important;
+                margin-right: 0px !important;
+
+            }
+            .cost_titles > .p-field > .p-col-fixed {
+                font-size: 14px !important;
+                font-weight: bold !important;
+            }
+            .ui-dialog .ui-dialog-titlebar{
+                padding: 3px !important;
             }
         </style>
         <br/><br/><br/>
-        <p:fieldset legend="#{msg.estateSituationListDocuments}">
+        <p:fieldset class="fieldset" legend="#{msg.estateSituationListDocuments}" toggleable="true" toggleSpeed="500" collapsed="true">
             <p:fileUpload label="#{msg.upload}" fileUploadListener="#{bean.saveDocumentXML}"
                           multiple="false" mode="advanced" styleClass="special-upload" auto="true"
                           update=":form:documentTable"/>
@@ -273,7 +318,7 @@
 
 
         <!-- <ui:fragment><br /></ui:fragment> -->
-        <p:fieldset legend="#{msg.estateSituationSalesDevelopmentHeader}" rendered="#{bean.salesDevelopmentShowing}">
+        <p:fieldset class="fieldset" legend="#{msg.estateSituationSalesDevelopmentHeader}" rendered="#{bean.salesDevelopmentShowing}" toggleable="true" toggleSpeed="500" collapsed="true">
             <p:commandButton disabled="#{!bean.canCreate}" id="buttonCreateSalesDevelopment" style="margin-left: -13px;"
                              icon="pi pi-plus-circle" styleClass="ui-button-success p-mr-2 p-mb-2"
                              value="#{not empty addButtonTitle ? addButtonTitle : msg.newItem}"

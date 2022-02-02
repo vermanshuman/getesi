@@ -314,7 +314,7 @@
                     <p:column exportable="false" styleClass="action_midle_column"
                               headerText="#{msg.requestOldRequestDetails}"
                               rendered="#{!bean.requestListBean.getCurrentUser().isExternal()}" width="60">
-                        <p:commandButton icon="ui-icon ui-icon-search"
+                        <p:commandButton icon="pi pi-search"
                                          disabled="#{!bean.requestListBean.canEdit}"
                                          action="#{bean.requestListBean.manageRequest}">
                             <f:setPropertyActionListener value="#{item.id}"
@@ -380,7 +380,7 @@
                         </p:column>
                     </ui:remove>
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton icon="ui-icon ui-icon-close" styleClass="btn-red"
+                        <p:commandButton  icon="ui-icon pi pi-times" styleClass="red-btn"
                                          oncomplete="PF('dlg2').show()" disabled="#{!bean.requestListBean.canDelete}">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.requestListBean.entityDeleteId}"/>

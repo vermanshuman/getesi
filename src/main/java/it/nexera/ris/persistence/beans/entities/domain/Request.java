@@ -31,6 +31,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import it.nexera.ris.common.enums.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
@@ -43,11 +44,6 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 
-import it.nexera.ris.common.enums.NoteType;
-import it.nexera.ris.common.enums.RequestEnumTypes;
-import it.nexera.ris.common.enums.RequestState;
-import it.nexera.ris.common.enums.SectionCType;
-import it.nexera.ris.common.enums.UserCategories;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.DateTimeHelper;
 import it.nexera.ris.common.helpers.EstateSituationHelper;
@@ -311,6 +307,10 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     })
     private List<EstateFormality> estateFormalityListUpdate;
 
+    @Column(name = "request_creation_type")
+    @Enumerated(EnumType.STRING)
+    private RequestCreationType requestCreationType;
+
     @Transient
     private List<EstateFormality> estateFormalityList;
 
@@ -415,6 +415,12 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "invoice_id")
     private Invoice invoice;
+
+    @Column(name = "regime")
+    private Boolean regime;
+
+    @Column(name = "multiple_request_types")
+    private Boolean multipleRequestTypes;
 
     @Transient
     private Boolean haveRequestReport;
@@ -2030,5 +2036,35 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     public void setInvoice(Invoice invoice) {
         this.invoice = invoice;
+    }
+
+    public Boolean getRegime() {
+        return regime;
+    }
+
+    public void setRegime(Boolean regime) {
+        this.regime = regime;
+    }
+
+    public Boolean getMultipleRequestTypes() {
+        return multipleRequestTypes;
+    }
+
+    public void setMultipleRequestTypes(Boolean multipleRequestTypes) {
+        this.multipleRequestTypes = multipleRequestTypes;
+    }
+
+    /**
+     * @return the requestCreationType
+     */
+    public RequestCreationType getRequestCreationType() {
+        return requestCreationType;
+    }
+
+    /**
+     * @param requestCreationType the requestCreationType to set
+     */
+    public void setRequestCreationType(RequestCreationType requestCreationType) {
+        this.requestCreationType = requestCreationType;
     }
 }

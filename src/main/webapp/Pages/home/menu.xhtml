@@ -213,6 +213,7 @@
                         <p:menuitem id="billing"
                                     value="#{msg.headerBilling}#{sessionBean.requestCounts gt 0 ? ' ('.concat(sessionBean.requestCounts).concat(')') : ''}" icon="topbar-icon fatturazione-icon"
                                     action="#{sessionBean.getBillingListPage()}"
+                                    rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/BillingList.jsf')}"
                                     actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>
                         <p:menuitem id="contactPage" styleClass="main" value="#{msg.headerContact}" icon="topbar-icon contact-icon"/>
                         <p:submenu id="amministrazione" label="#{msg.menuConfiguration}" icon="pi pi-align-left">
@@ -266,7 +267,7 @@
                             <p:menuitem id="tipologieDiritti" value="#{msg.relationship_types}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/RelationshipTypeList.jsf" />
                             <p:menuitem id="tipologieFormalità" value="#{msg.type_formality}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/TypeFormality.jsf" />
                             <p:menuitem id="toponomastica" value="#{msg.cadastral_topology}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CadastralTopology.jsf" />
-                            <p:menuitem id="iban" value="#{msg.requestType}" icon="fa fa-fw fa-bars" outcome="/Pages/ManagementGroup/IbanList.jsf" />
+                            <p:menuitem id="iban" value="#{msg.iban_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ManagementGroup/IbanList.jsf" />
                             <p:menuitem id="tribunali" value="#{msg.court_list}" icon="fa fa-fw fa-legal" outcome="/Pages/Dictionaries/CourtList.jsf" />
                             <p:menuitem id="caloriOMITerreni" value="#{msg.land_omi_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ConfigurationArea/LandOmiList.jsf" />
                         </p:submenu>

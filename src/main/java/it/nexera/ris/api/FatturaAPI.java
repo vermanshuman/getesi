@@ -89,7 +89,10 @@ public class FatturaAPI {
         context.put("sendEmail", false);
         context.put("invoiceItems", invoiceItems);
         context.put("numero", invoice.getInvoiceNumber());
-        context.put("invoiceNote", invoice.getNotes());
+        if(!ValidationHelper.isNullOrEmpty(invoice.getNotes()))
+            context.put("invoiceNote", invoice.getNotes());
+        else
+            context.put("invoiceNote", "");
         if(!ValidationHelper.isNullOrEmpty(invoice.getDate())){
             context.put("invoiceDate", DateTimeHelper.toFormatedString(invoice.getDate(),
                     DateTimeHelper.getMySQLDatePattern()));

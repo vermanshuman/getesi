@@ -1,5 +1,4 @@
 package it.nexera.ris.web.beans.pages.dictionary;
-
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.LogHelper;
 import it.nexera.ris.common.helpers.ValidationHelper;
@@ -48,8 +47,8 @@ public class ForeignStatesListBean extends
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
             IllegalAccessException, IOException {
-        this.loadList(Country.class, new Criterion[]{}, 
-        		new Order[] {Order.asc("description")});
+        this.loadList(Country.class, new Criterion[]{},
+                new Order[] {Order.asc("description")});
     }
 
     @Override
@@ -80,7 +79,7 @@ public class ForeignStatesListBean extends
             }
         }
     }
-    
+
     @Override
     public void resetFields() {
         super.resetFields();

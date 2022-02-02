@@ -18,6 +18,7 @@ import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import it.nexera.ris.persistence.view.FormalityView;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.beans.EntityEditPageBean;
+import it.nexera.ris.web.beans.base.AccessBean;
 import it.nexera.ris.web.beans.wrappers.logic.RelationshipGroupingWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.TemplateEntity;
 import it.nexera.ris.web.beans.wrappers.logic.editInTable.*;
@@ -224,8 +225,9 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     private String documentType;
 
     private String apiError;
-    
-    private Double invoiceNetAmount;
+
+    private Boolean billinRequest;
+
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
@@ -339,12 +341,14 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             setSelectedPaymentTypeId(invoice.getPaymentType().getId());
             List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
             for(InvoiceItem invoiceItem : invoiceItems) {
-                setInvoiceNetAmount(invoiceItem.getAmount());
+                setInvoiceItemAmount(invoiceItem.getAmount());
                 setInvoiceItemVat(invoiceItem.getVat());
             }
         }
         if(getExamRequest().getStateId().equals(RequestState.SENT_TO_SDI.getId()))
             setInvoiceSentStatus(true);
+
+        setBillinRequest(AccessBean.canViewPage(PageTypes.BILLING_LIST));
 
     }
 
@@ -1084,8 +1088,8 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
         for (EstateSituation estateSituation : situations) {
             Map<List<RelationshipGroupingWrapper>, List<Property>> re = new HashMap<>();
-            TemplatePdfTableHelper.wrapProperties(estateSituation.getPropertyList(), estateSituation.getRequest().getSubject(),
-                    true, re);
+            TemplatePdfTableHelper.wrapRequestProperties(estateSituation.getPropertyList(), estateSituation.getRequest().getSubject(),
+                    true, re, getExamRequest());
             estateSituation.setPropertyList(re.values().stream().flatMap(List::stream).collect(Collectors.toList()));
         }
 
@@ -2362,13 +2366,15 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         LocalDate currentdate = LocalDate.now();
         int currentYear = currentdate.getYear();
 
-        Long lastInvoiceNumber = -1l;
+        Long lastInvoiceNumber = 0l;
         try {
             lastInvoiceNumber = (Long) DaoManager.getMax(Invoice.class, "id",
                     new Criterion[]{});
         } catch (PersistenceBeanException | IllegalAccessException e) {
             LogHelper.log(log, e);
         }
+        if(lastInvoiceNumber == null)
+            lastInvoiceNumber = 0l;
         String invoiceNumber = (lastInvoiceNumber+1) + "-" + currentYear + "-FE";
         setInvoiceNumber(invoiceNumber);
     }
@@ -2408,12 +2414,14 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             if(!ValidationHelper.isNullOrEmpty(getVatCollectabilityId()))
                 invoice.setVatCollectability(VatCollectability.getById(getVatCollectabilityId()));
             invoice.setNotes(getInvoiceNote());
+            invoice.setDocumentType(getDocumentType());
             InvoiceItem invoiceItem = new InvoiceItem();
             if(!ValidationHelper.isNullOrEmpty(getExamRequest())
                     && !ValidationHelper.isNullOrEmpty(getExamRequest().getSubject())){
                 invoiceItem.setSubject(getExamRequest().getSubject().toString());
-                invoiceItem.setAmount(getInvoiceNetAmount());
+                invoiceItem.setAmount(getInvoiceItemAmount());
                 invoiceItem.setVat(getInvoiceItemVat());
+                invoiceItem.setInvoiceTotalCost(getInvoiceTotalCost());
             }
             List<InvoiceItem> invoiceItems = new ArrayList<>();
             invoiceItems.add(invoiceItem);
@@ -2647,13 +2655,12 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         this.apiError = apiError;
     }
 
-	public Double getInvoiceNetAmount() {
-		return invoiceNetAmount;
-	}
 
-	public void setInvoiceNetAmount(Double invoiceNetAmount) {
-		this.invoiceNetAmount = invoiceNetAmount;
-	}
-    
-    
+    public Boolean getBillinRequest() {
+        return billinRequest;
+    }
+
+    public void setBillinRequest(Boolean billinRequest) {
+        this.billinRequest = billinRequest;
+    }
 }

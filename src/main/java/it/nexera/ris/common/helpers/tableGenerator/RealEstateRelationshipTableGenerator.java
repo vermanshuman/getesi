@@ -77,7 +77,7 @@ public class RealEstateRelationshipTableGenerator extends TagTableGenerator {
             }
 
             List<String> property = TemplatePdfTableHelper.groupPropertiesByQuoteTypeList(estateSituation.getPropertyList(),
-                    estateSituation.getRequest().getSubject(), true, showCadastralIncome, showAgriculturalIncome);
+                    estateSituation.getRequest().getSubject(), estateSituation.getRequest(), true, showCadastralIncome, showAgriculturalIncome);
             if (!ValidationHelper.isNullOrEmpty(property)) {
                 wrapper.descriptionRows.addAll(property);
             }

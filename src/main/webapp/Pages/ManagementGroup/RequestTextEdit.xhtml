@@ -239,7 +239,7 @@
             }
 
             .btn-green {
-                background-color: #57c279!important;
+                background-color: #00CC52!important;
                 padding-left:0 !important;
                 width: 122px;
             }
@@ -309,6 +309,24 @@
                 background: #fed820;
                 color: #000000;
             }
+
+            #noUpdateDateDialogId{
+                border: 2px solid #D32F2F !important;
+            }
+
+            .cost_titles > .p-field > span {
+                font-size: 14px !important;
+                font-weight: bold !important;
+            }
+
+            .action_column_width{
+                width: 14% !important;
+                text-align:center
+            }
+
+            #requestExtraCostTable .ui-datatable-scrollable-header-box table, .ui-datatable-scrollable-footer-box table, .ui-datatable-scrollable-body table {
+                table-layout: auto;
+            }
         </style>
 
         <h:form id="form" prependId="false" enctype="multipart/form-data"
@@ -329,7 +347,7 @@
                             <f:selectItems value="#{bean.templates}"/>
                         </p:selectOneMenu>
                         <p:commandButton action="#{bean.updateTemplate}" value="#{msg.apply}" update=":edit_text_section @widgetVar(typeError)"
-                                         styleClass="margin-left" style="background-color: #57c279 !important;">
+                                         styleClass="margin-left" style="background-color: #00CC52 !important;">
                             <f:setPropertyActionListener value="true" target="#{bean.calledByApplicaButton}"/>
                         </p:commandButton>
 
@@ -346,12 +364,12 @@
                         <p:panelGrid styleClass="ui-panelgrid-blank form-group verical-top" columns="4">
                             <p:column>
                                 <p:panelGrid styleClass="ui-panelgrid-blank form-group buttonPanel" columns="1">
-                                    <p:selectBooleanButton id="switch" offLabel="" onLabel=""
-                                                           styleClass="selectBool" onchange="fullscreen();"
-                                                           offIcon="fa fa-fw fa-bars" onIcon="fa fa-bars"/>
-                                    <!--<p:commandButton value="#{msg.requestListOpenProcedure}"
+<!--                                    <p:selectBooleanButton id="switch" offLabel="" onLabel=""-->
+<!--                                                           styleClass="selectBool" onchange="fullscreen();"-->
+<!--                                                           offIcon="fa fa-fw fa-bars" onIcon="fa fa-bars"/>-->
+                                    <p:commandButton value="#{msg.requestListOpenProcedure}"
                                                      action="#{bean.openTableProcedure}"
-                                                     update="estateTab"/>-->
+                                                     update="estateTab"/>
                                     <p:commandButton value="#{msg.requestListOpenEdit}" action="#{bean.manageRequest}"/>
                                 </p:panelGrid>
                             </p:column>
@@ -410,7 +428,7 @@
                                     <p:commandButton value="#{bean.examRequest.stateId == 7 ? msg.requestTextEditSentToSdi : msg.requestTextEditCreateInvoice}"
                                                      id="createInvoice"
                                                      styleClass="#{bean.examRequest.stateId == 7 ? '' : 'btn-green'}"
-                                                     update="btn_line :form:invoiceTotalCost"
+                                                     update="btn_line :form:invoiceTotalCost" rendered="#{bean.billinRequest}"
                                                      oncomplete="PF('invoiceDialogWV').show();"/>
 
                                    <!-- <p:commandButton action="#{bean.goBack}" value="#{msg.cancel}" style="width:122px;"
@@ -532,7 +550,7 @@
                     <span class="ui-messages-error-summary">#{val.noUpdateDateIndicated}</span><br/>
                 </div>
                 <div class="btn_line">
-                    <p:commandButton value="#{msg.confirm}" oncomplete="PF('noUpdateDateDialogIdDialogWV').hide();"/>
+                    <p:commandButton styleClass="ui-button-success" value="#{msg.confirm}" oncomplete="PF('noUpdateDateDialogIdDialogWV').hide();"/>
                 </div>
             </p:dialog>
 

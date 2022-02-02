@@ -71,6 +71,7 @@ import it.nexera.ris.web.beans.base.AccessBean;
 import it.nexera.ris.web.beans.wrappers.logic.FileWrapper;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.context.RequestContext;
 import org.primefaces.model.menu.DefaultMenuItem;
 import org.primefaces.model.menu.DefaultMenuModel;
 import org.primefaces.model.menu.MenuModel;
@@ -209,8 +210,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private String apiError;
 
     private boolean sendInvoice;
-    
-    private Double invoiceNetAmount;
+
+    private Boolean billinRequest;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
@@ -345,6 +346,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
         docTypes = new ArrayList<>();
         docTypes.add(new SelectItem("FE", "FATTURA"));
+        setDocumentType("FE");
         competence = new Date();
 
         ums = new ArrayList<>();
@@ -365,7 +367,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             setSelectedPaymentTypeId(invoice.getPaymentType().getId());
             List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
             for(InvoiceItem invoiceItem : invoiceItems) {
-                setInvoiceNetAmount(invoiceItem.getAmount());
+                setInvoiceItemAmount(invoiceItem.getAmount());
                 setInvoiceItemVat(invoiceItem.getVat());
             }
         }
@@ -380,6 +382,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                                 RequestState.SENT_TO_SDI.getId().equals(x.getStateId())).collect(Collectors.toList());
         if(!requestListSentToSdi.isEmpty())
             setSendInvoice(true);
+        setBillinRequest(AccessBean.canViewPage(PageTypes.BILLING_LIST));
     }
 
     public void initOfficesList() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -1050,8 +1053,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 }
             }
             DaoManager.save(getEntity(), true);
-            FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, ResourcesHelper.getString("mailManagerSave"), null);
-            FacesContext.getCurrentInstance().addMessage("", facesMessage);
+            if(!redirect){
+                RequestContext.getCurrentInstance().execute("PF('saveConfirmationDialogWV').show();");
+            }else{
+                FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, ResourcesHelper.getString("mailManagerSave"), null);
+                FacesContext.getCurrentInstance().addMessage("", facesMessage);
+            }
         }
         if (redirect) {
             processManagedState(true);
@@ -1136,13 +1143,15 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         LocalDate currentdate = LocalDate.now();
         int currentYear = currentdate.getYear();
 
-        Long lastInvoiceNumber = -1l;
+        Long lastInvoiceNumber = 0l;
         try {
             lastInvoiceNumber = (Long) DaoManager.getMax(Invoice.class, "id",
                     new Criterion[]{});
         } catch (PersistenceBeanException | IllegalAccessException e) {
             LogHelper.log(log, e);
         }
+        if(lastInvoiceNumber == null)
+            lastInvoiceNumber = 0l;
         String invoiceNumber = (lastInvoiceNumber+1) + "-" + currentYear + "-FE";
         setInvoiceNumber(invoiceNumber);
     }
@@ -1193,6 +1202,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             Invoice invoice = new Invoice();
             invoice.setClient(getExamRequest().getClient());
             invoice.setDate(getInvoiceDate());
+            invoice.setDocumentType(getDocumentType());
             if(!ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId()))
                 invoice.setPaymentType(DaoManager.get(PaymentType.class, getSelectedPaymentTypeId()));
 
@@ -1203,8 +1213,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             if(!ValidationHelper.isNullOrEmpty(getExamRequest())
                     && !ValidationHelper.isNullOrEmpty(getExamRequest().getSubject())){
                 invoiceItem.setSubject(getExamRequest().getSubject().toString());
-                invoiceItem.setAmount(getInvoiceNetAmount());
+                invoiceItem.setAmount(getInvoiceItemAmount());
                 invoiceItem.setVat(getInvoiceItemVat());
+                invoiceItem.setInvoiceTotalCost(getInvoiceTotalCost());
             }
             List<InvoiceItem> invoiceItems = new ArrayList<>();
             invoiceItems.add(invoiceItem);
@@ -1288,13 +1299,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     }
 
     public Double getInvoiceTotalCost() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
-        if(!ValidationHelper.isNullOrEmpty(getExamRequest())){
-            Request invoiceRequest = DaoManager.get(Request.class, getExamRequest().getId());
-            if(!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
-                    !ValidationHelper.isNullOrEmpty(invoiceRequest.getTotalCostDouble())){
-                setInvoiceTotalCost(Double.parseDouble(invoiceRequest.getTotalCostDouble()));
-            }
-        }
         return invoiceTotalCost;
     }
 

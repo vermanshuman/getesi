@@ -28,7 +28,7 @@
         }
 
         .ui-button-success {
-            background: #57c279!important;
+            background: #00CC52!important;
         }
 
         body .ui-button.ui-button-icon-only .ui-icon {
@@ -50,9 +50,6 @@
     <div class="button-panel-space p-grid">
         <div class="p-col-9">
             <p:outputPanel id="btn_line">
-                <p:commandButton title="#{msg.mailManagerSendInvoice}" rendered="#{bean.sendInvoice}"
-                                 value="#{msg.mailManagerSendInvoice}" styleClass="grey-button"
-                                 action="#{bean.newInvoiceMail}" update=":form"/>
                 <p:commandButton icon="fa fa-reply-all" title="#{msg.mailManagerReplyToAll}"
                              value="#{msg.mailManagerReplyToAll}" styleClass="grey-button"
                              action="#{bean.replyToAllMail}" update=":form"/>
@@ -86,12 +83,18 @@
 
             <p:commandButton icon="fa fa-pencil-square" update=":form" styleClass="grey-button"
                              value="#{msg.mailManagerSendRequestToManager}"
+                             rendered="#{bean.entity.validRequests ne null and bean.entity.validRequests.size()>0 }"
                              oncomplete="PF('mailManagerViewRequestsDlg').show();"/>
+
+                <p:commandButton title="#{msg.mailManagerSendInvoice}" rendered="#{bean.sendInvoice and bean.billinRequest}"
+                                 value="#{msg.mailManagerSendInvoice}" styleClass="grey-button"
+                                 action="#{bean.newInvoiceMail}" update=":form"/>
 
 
             <p:commandButton style="margin-left: 2px;"
-                             value="#{msg.requestTextEditCreateInvoice}" rendered="#{not bean.invoiceSentStatus and bean.invoiceRequests.size() != 0}"
+                             value="#{msg.requestTextEditCreateInvoice}" rendered="#{not bean.invoiceSentStatus and bean.invoiceRequests.size() != 0 and bean.billinRequest}"
                              id="createInvoice" styleClass="grey-button"
+                             action="#{bean.setMaxInvoiceNumber()}" update="@widgetVar(invoiceDialogWV)"
                              oncomplete="PF('invoiceDialogWV').show();"/>
 
             <!--  <p:commandButton icon="ui-icon fa fa-pencil" update=":form" styleClass="right-side"

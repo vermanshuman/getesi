@@ -17,16 +17,74 @@
                 color: #ffffff !important;
                 font-size: 15px;
             }
-            
+
             body .ui-inputfield {
-            	border: 1px solid #a8acb1;
-            	font-size: 15px;
-            }
-            
-            body .ui-selectonemenu {
-            	border: 1px solid #a8acb1;
+                border: 1px solid #a8acb1;
+                font-size: 15px;
             }
 
+            body .ui-selectonemenu {
+                border: 1px solid #a8acb1;
+            }
+
+            body .ui-autocomplete-panel .ui-autocomplete-items .ui-autocomplete-item.ui-autocomplete-row > td {
+                padding: 0.5rem 0.5rem !important;
+            }
+            body .ui-autocomplete-panel .ui-autocomplete-items .ui-autocomplete-item.ui-autocomplete-row {
+                font-size: 19px !important;
+                border-color: #A7A8AB;
+            }
+            #mailTo_panel,#mailCC_panel,#mailBCC_panel{
+                width: 400px !important;
+            }
+            #mailTo .ui-icon-close,#mailCC_panel .ui-icon-close,#mailBCC_panel .ui-icon-close{
+                background: none repeat scroll 0 0 transparent!important;
+                display: inline-block;
+                font: normal normal normal 14px/1 FontAwesome !important;
+                font-size: inherit;
+                text-rendering: auto;
+                -webkit-font-smoothing: antialiased;
+            }
+
+            #mailTo_panel .fa-times,#mailCC_panel .fa-times,#mailBCC_panel .fa-times{
+                color: #FFFFFF !important;
+            }
+
+            #mailTo_panel .ui-autocomplete-item .ui-button, #mailCC_panel .ui-autocomplete-item .ui-button,#mailBCC_panel .ui-autocomplete-item .ui-button{
+                background: red !important;
+            }
+
+            #mailTo_panel .ui-autocomplete-item > td,#mailCC_panel .ui-autocomplete-item > td,#mailBCC_panel .ui-autocomplete-item > td{
+                font-size: 14px !important;
+            }
+
+            #mailTo_panel .ui-state-highlight,#mailCC_panel .ui-state-highlight,#mailBCC_panel .ui-state-highlight{
+                background: lightgray !important;
+                color: black !important;
+            }
+
+            #mailTo .ui-icon-close:before{
+                content: "\f00d" !important;
+            }
+            #confirmRedirect{
+                border: 2px solid #57c279 !important;
+
+            }
+            .ui-datatable-scrollable-theadclone > tr > th{
+                border : none !important;
+            }
+            #attachFielDlg{
+                width:50% !important;
+                left: calc(25% - 0px) ;
+                border: 2px solid #57c279 !important;
+            }
+            #tableFiles > .ui-datatable-tablewrapper > table > tbody > tr > td {
+                border-color: #808080 !important;
+            }
+            body .ui-fileupload .ui-fileupload-buttonbar,body .ui-fileupload .ui-fileupload-content{
+
+                border: 1px solid #808080 !important;
+            }
         </style>
 
         <script type="text/javascript">
@@ -115,7 +173,19 @@
                     change = false;
                     $("#changeVar").val("change");
                 });
+                $( "#mailTo .ui-autocomplete-multiple-container .ui-autocomplete-input-token input" ).focusout(function() {
+                    emailHeightAdjust();
+                }).focus(function() {
+                    $( "#mailTo .ui-autocomplete-multiple-container" ).css("height", "auto");
+                });
+                emailHeightAdjust();
             });
+            function emailHeightAdjust() {
+                var noOfEmail = $( "#mailTo .ui-autocomplete-multiple-container li" ).length - 1;
+                if(noOfEmail != 0 &amp;&amp; noOfEmail%2==0) {
+                    $( "#mailTo .ui-autocomplete-multiple-container" ).css("height", (((noOfEmail/2)*38)+'px'));
+                }
+            }
         </script>
 
         <p:remoteCommand name="onRedirect" action="#{bean.confirmRedirect(false)}" oncomplete="setCloseTab();"/>
@@ -166,7 +236,7 @@
                         <h:outputText value="#{msg.mailManagerEditMailCopy}:" style="font-weight: bold;"/>
                     </p:column>
                     <p:column colspan="8">
-                        <p:autoComplete value="#{bean.sendCC}" multiple="true" 
+                        <p:autoComplete value="#{bean.sendCC}" multiple="true"
                                         completeMethod="#{bean.completeMailCC}" immediate="false"
                                         var="dest" itemLabel="#{dest}" itemValue="#{dest}" id="mailCC"
                                         inputStyle="width: 100%;" style="width: 100%" maxResults="6">
@@ -185,7 +255,7 @@
                         <h:outputText value="#{msg.mailManagerEditMailBlindCopy}:" style="font-weight: bold;"/>
                     </p:column>
                     <p:column colspan="8">
-                        <p:autoComplete value="#{bean.sendBCC}" multiple="true" 
+                        <p:autoComplete value="#{bean.sendBCC}" multiple="true"
                                         completeMethod="#{bean.completeMailBCC}" immediate="false"
                                         var="dest" itemLabel="#{dest}" itemValue="#{dest}" id="mailBCC"
                                         inputStyle="width: 100%;" style="width: 100%" maxResults="6">
@@ -278,9 +348,9 @@
                     $("#changeVar").val("change");
                     change = true;
                 });
-                
-				CKEDITOR.instances.body.ui.editor.on('key', HandleTabEvent, null, null, 0);
-                
+
+                CKEDITOR.instances.body.ui.editor.on('key', HandleTabEvent, null, null, 0);
+
                 console.log("init success");
             }
 
@@ -288,38 +358,38 @@
                 var newWidth = parseInt(($("#bodyPanel").width() - 27) / (CKEDITOR.instances.body.ui.editor.toolbar[8].items[0].lastValue / 100), 10);
                 $("#bodyPanel").find(".cke_wysiwyg_frame").contents().find("body").css('width', newWidth + 'px');
             }
-            
-         // Custom Key Events function
-    		function HandleTabEvent(e) {
-				if (e.data.keyCode == 9){
-					var selection = CKEDITOR.instances.body.ui.editor.getSelection();
-					var startElement = selection.getStartElement();
-					if (e.data.keyCode == 9){
-						var handleTab = false;
-						var x = $(".cke_button__bulletedlist");
-						if(x &amp;&amp; x.attr('class') == 'cke_button cke_button__bulletedlist cke_button_on'){
-							handleTab = true;
-						}else {
-							x = $(".cke_button__numberedlist");
-							if(x &amp;&amp; x.attr('class') == 'cke_button cke_button__numberedlist cke_button_on'){
-								handleTab = true;
-							}
-						}
-						if(handleTab){
-							var element = selection.getStartElement();
-							var sText = element.getHtml();
-							var text = jQuery('&lt;div&gt;').html(sText).text();
-							var result = text.replace(/[^ -~]+/g, "");
-							if(!result || 0 === result.length){
-							}else {
-								e.cancel();
-								e.stop();
-								CKEDITOR.instances.body.ui.editor.insertText('    ');
-							}
-						}
-					}
-				}
-    		}
+
+            // Custom Key Events function
+            function HandleTabEvent(e) {
+                if (e.data.keyCode == 9){
+                    var selection = CKEDITOR.instances.body.ui.editor.getSelection();
+                    var startElement = selection.getStartElement();
+                    if (e.data.keyCode == 9){
+                        var handleTab = false;
+                        var x = $(".cke_button__bulletedlist");
+                        if(x &amp;&amp; x.attr('class') == 'cke_button cke_button__bulletedlist cke_button_on'){
+                            handleTab = true;
+                        }else {
+                            x = $(".cke_button__numberedlist");
+                            if(x &amp;&amp; x.attr('class') == 'cke_button cke_button__numberedlist cke_button_on'){
+                                handleTab = true;
+                            }
+                        }
+                        if(handleTab){
+                            var element = selection.getStartElement();
+                            var sText = element.getHtml();
+                            var text = jQuery('&lt;div&gt;').html(sText).text();
+                            var result = text.replace(/[^ -~]+/g, "");
+                            if(!result || 0 === result.length){
+                            }else {
+                                e.cancel();
+                                e.stop();
+                                CKEDITOR.instances.body.ui.editor.insertText('    ');
+                            }
+                        }
+                    }
+                }
+            }
         </script>
         <ui:include src="/resources/tpl/Admin/Include/ButtonLineBottom.xhtml"/>
         <p:remoteCommand update="listFile" name="updateFiles"/>
@@ -330,7 +400,7 @@
             <h:outputText value="#{msg.mailManagerEditMailAttachedFiles}:"
                           style="font-weight: bold;"/>
 
-            <p:dataTable emptyMessage="#{msg.noRecordsFound}" var="file" scrollable="true"
+            <p:dataTable emptyMessage="#{msg.noRecordsFound}" var="file"
                          value="#{bean.attachedFiles}" id="tableFiles">
                 <f:facet name="header">
                     <p:fileUpload fileUploadListener="#{bean.handleFileUpload}"
@@ -379,7 +449,7 @@
             <div class="btn_line">
                 <p:commandButton value="#{msg.yes.toUpperCase()}"
                                  action="#{bean.confirmRedirect(true)}"
-                                 styleClass="green-button"
+                                 styleClass="green-button" style="margin-right: 0.5cm;"
                                  oncomplete="PF('confirmRedirect').hide();"/>
                 <p:commandButton value="#{msg.no.toUpperCase()}"
                                  action="#{bean.confirmRedirect(false)}"

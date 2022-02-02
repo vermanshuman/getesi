@@ -37,14 +37,15 @@
 
                                                 <p:commandButton id="save_btn" onclick="#{save_onclick}"
                                                                  action="#{bean.pageSave}"
+                                                                 style="margin-top: 10px"
                                                                  rendered="#{empty showSave ? true : showSave}"
                                                                  disabled="#{empty disableSave ? false : disableSave}"
                                                                  value="#{empty save_button_text ? msg.save : save_button_text}"
                                                                  oncomplete="#{save_oncomplete}" icon="pi pi-save"
                                                                  update=":form, #{save_update}, messages"
-                                                                 styleClass="#{saveButtonStyle} p-mr-2 p-mb-2"/>
+                                                                 styleClass="#{saveButtonStyle} p-mr-2 p-mb-2 ui-button-success"/>
 
-                                                <p:commandButton id="cancel_btn" action="#{bean.goBack}" styleClass="p-mr-2 p-mb-2"
+                                                <p:commandButton id="cancel_btn" action="#{bean.goBack}" styleClass="p-mr-2 p-mb-2 ui-button-danger"
                                                                  rendered="#{empty showCancel ? true : showCancel}"
                                                                  value="#{empty customCancelMsg ? msg.cancel : customCancelMsg}"
                                                                  icon="pi pi-times-circle"/>

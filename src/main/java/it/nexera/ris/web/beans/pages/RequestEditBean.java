@@ -20,6 +20,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 
 import it.nexera.ris.common.enums.*;
+import it.nexera.ris.persistence.view.RequestView;
 import org.apache.commons.lang.math.NumberUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -116,6 +117,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private Long newSelectedBillingClientId;
 
     private Long selectedRequestTypeId;
+
+    private List<String> selectedRequestTypes;
 
     private List<SelectItem> requestTypes;
 
@@ -261,20 +264,36 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private String multipleReqMessage;
 
+    private boolean multipleRequestCreate;
+
+    private final String MULTIPLE_REQUEST = "RICHESTE_MULTIPLE";
+
+    private List<String> mutipleRequestObjTabPath;
+
+    private Map<Long , Request>  multiRequestMap;
+
+    private List<RequestView> regSubjectList;
+
     @Override
     protected void preLoad() throws PersistenceBeanException {
-        if (Boolean.parseBoolean(getRequestParameter(RedirectHelper.MULTIPLE))) {
+        setMultiRequestMap(new HashMap());
+        if (!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.MULTIPLE)) &&
+                Boolean.parseBoolean(getRequestParameter(RedirectHelper.MULTIPLE))) {
             setMultipleCreate(true);
+            if(!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.FROM_PARAMETER)) &&
+                    getRequestParameter(RedirectHelper.FROM_PARAMETER).equalsIgnoreCase(MULTIPLE_REQUEST)){
+                setMultipleRequestCreate(true);
+            }
         }
         if (getRequestParameter(RedirectHelper.MAIL) != null) {
             setRedirectFromMail(getRequestParameter(RedirectHelper.MAIL));
             try {
                 WLGInbox mail = DaoManager.get(WLGInbox.class,new CriteriaAlias[]{
-                        new CriteriaAlias("client", "client", JoinType.INNER_JOIN)
-                },
+                                new CriteriaAlias("client", "client", JoinType.INNER_JOIN)
+                        },
                         new Criterion[]{
                                 Restrictions.eq("id", Long.parseLong(getRequestParameter(RedirectHelper.MAIL)))
-                });
+                        });
                 if(mail != null ) {
                     setMail(mail);
                 }else
@@ -340,7 +359,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
-    InstantiationException, IllegalAccessException {
+            InstantiationException, IllegalAccessException {
         boolean dataFromEmail = false;
         setClientSelectItemWrapperConverter(new SelectItemWrapperConverter<>(Client.class));
         if (!ValidationHelper.isNullOrEmpty(getMail())) {
@@ -367,7 +386,16 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             setMultipleCreate(true);
         }
         generateMenuModel();
+        validateRequestCreationType();
         if (isMultipleCreate()) {
+            if(isMultipleRequestCreate()){
+                setMutipleRequestObjTabPath(new ArrayList<>());
+                //mutipleRequestObjTabPath = new ArrayList<>();
+                getMutipleRequestObjTabPath().add(ManageTypeFields.CDR.getPath());
+                getMutipleRequestObjTabPath().add(ManageTypeFields.NDG.getPath());
+                getMutipleRequestObjTabPath().add(ManageTypeFields.POSITION_PRACTICE.getPath());
+
+            }
             setMultipleTabPath("requestComponents/SUBJECT_MASTERY.xhtml");
         } else {
             setMultipleTabPath("");
@@ -425,14 +453,31 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }
 
         setRequestTypes(ComboboxHelper.fillList(RequestType.class));
-        setSelectedRequestTypeId(getEntity().getRequestType() != null ? getEntity().getRequestType().getId() : null);
+        if(isMultipleRequestCreate()){
+            if(getEntity().getRequestType() != null){
+                setSelectedRequestTypes(new ArrayList());
+                getSelectedRequestTypes().add(getEntity().getRequestType().getId().toString());
+                getMultiRequestMap().put(getEntity().getRequestType().getId(),getEntity());
+            }
+        }else{
+            setSelectedRequestTypeId(getEntity().getRequestType() != null ? getEntity().getRequestType().getId() : null);
+        }
+
         onRequestTypeChange();
 
         setSelectedServiceId(getEntity().getService() != null ? getEntity().getService().getId() : null);
-        setSelectedServiceIds(getEntity().getMultipleServices() != null ? getEntity().getMultipleServices().stream()
-                .map(Service::getId).map(i -> Long.toString(i)).collect(Collectors.toList()) : null);
-        onServiceChange();
 
+        setSelectedServiceIds(getEntity().getMultipleServices() != null
+                ? getEntity().getMultipleServices().stream()
+                .map(Service::getId).map(i -> Long.toString(i)).collect(Collectors.toList()) : null);
+
+        if(isMultipleRequestCreate()
+                && ValidationHelper.isNullOrEmpty(getEntity().getMultipleServices()) &&
+                !ValidationHelper.isNullOrEmpty(getEntity().getService())){
+            setSelectedServiceIds(new ArrayList<>());
+            getSelectedServiceIds().add(getEntity().getService().getId().toString());
+        }
+        onServiceChange();
         fillRequestEnumTypes();
 
         setUsers(ComboboxHelper.fillList(User.class, Order.asc("createDate"), new Criterion[]{
@@ -467,7 +512,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         setServiceUpdate(false);
         Hibernate.initialize(getEntity().getRequestFormalities());
         Hibernate.initialize(getEntity().getRequestSubjects());
-        
+
         fillSubjectWrapperList(getEntity());
         setSubjectWrapper(new SubjectWrapper());
 
@@ -517,14 +562,14 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 sbjWrp.setSelectedSexTypeId(sbj.getSexType() != null ? sbj.getSexType().getId() : null);
                 sbjWrp.setFiscalCode(sbj.getFiscalCode());
                 sbjWrp.setNumberVAT(sbj.getNumberVAT());
-                
+
                 RequestSubject requestSubject = request.getRequestSubjects().stream()
                         .filter(f -> f.getSubject().getId().equals(sbj.getId()))
                         .filter(f -> f.getRequest().getId().equals(request.getId())).findFirst().orElse(null);
                 if(!ValidationHelper.isNullOrEmpty(requestSubject)) {
                     sbjWrp.setSectionCType(requestSubject.getType());
                 }
-                
+
                 if (sbj.getTypeIsPhysicalPerson()) {
                     sbjWrp.setSelectedNationId(sbj.getCountry() != null ? sbj.getCountry().getId() : null);
                 } else {
@@ -548,15 +593,22 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private void generateMenuModel() {
         setTopMenuModel(new DefaultMenuModel());
         if (isMultipleCreate()) {
-            addMenuItem(ResourcesHelper.getString("requestSubjectTab"));
-            addMenuItem(ResourcesHelper.getString("requestFirstTab"));
-            addMenuItem(ResourcesHelper.getString("requestMultipleTab"));
-            addMenuItem(ResourcesHelper.getString("requestLastTab"));
+            if(isMultipleRequestCreate()){
+                addMenuItem(ResourcesHelper.getString("requestSubjectTab"));
+                addMenuItem(ResourcesHelper.getString("requestFirstTab"));
+                addMenuItem(ResourcesHelper.getString("requestLastTab"));
+                addMenuItem(ResourcesHelper.getString("requestServiceTab"));
+            }else{
+                addMenuItem(ResourcesHelper.getString("requestSubjectTab"));
+                addMenuItem(ResourcesHelper.getString("requestFirstTab"));
+                addMenuItem(ResourcesHelper.getString("requestMultipleTab"));
+                addMenuItem(ResourcesHelper.getString("requestLastTab"));
+            }
         } else {
             addMenuItem(ResourcesHelper.getString("requestFirstTab"));
             if (!ValidationHelper.isNullOrEmpty(getInputCardList())) {
                 getInputCardList()
-                .forEach(card -> addMenuItem(card.getName().toUpperCase()));
+                        .forEach(card -> addMenuItem(card.getName().toUpperCase()));
             }
             addMenuItem(ResourcesHelper.getString("requestLastTab"));
         }
@@ -614,10 +666,10 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if ((SubjectType.PHYSICAL_PERSON.getId().equals(getWrapper().getSelectedPersonId())
                 && !ValidationHelper.isNullOrEmpty(getSubject().getFiscalCode()))
                 || (SubjectType.LEGAL_PERSON.getId().equals(getWrapper().getSelectedPersonId())
-                        && !ValidationHelper.isNullOrEmpty(getSubject().getNumberVAT()))) {
+                && !ValidationHelper.isNullOrEmpty(getSubject().getNumberVAT()))) {
             List<Subject> subjectList = DaoManager.load(Subject.class, new Criterion[]{
                     SubjectType.PHYSICAL_PERSON.getId().equals(getWrapper().getSelectedPersonId())
-                    ? Restrictions.eq("fiscalCode", getSubject().getFiscalCode())
+                            ? Restrictions.eq("fiscalCode", getSubject().getFiscalCode())
                             : Restrictions.eq("numberVAT", getSubject().getNumberVAT())
             });
             if (!ValidationHelper.isNullOrEmpty(subjectList)) {
@@ -713,12 +765,12 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                                     Restrictions.eq("deleted", Boolean.FALSE),
                                     Restrictions.isNull("deleted"))
 //                            ,Restrictions.eq("fiduciary", true)
-                            });
+                    });
                 }
                 if (ValidationHelper.isNullOrEmpty(getFiduciaryClients())) {
                     setFiduciaryClients(new ArrayList<>());
                 }
-                
+
 //                if (!ValidationHelper.isNullOrEmpty(clients)) {
 //                    for (Client item : clients.stream()
 //                            .filter(c -> getFiduciaryClients().stream().noneMatch(x -> x.getId().equals(c.getId())))
@@ -728,7 +780,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 //                        getClientSelectItemWrapperConverter().getWrapperList().add(selectItem);
 //                    }
 //                }
-                
+
                 if (!ValidationHelper.isNullOrEmpty(clients)) {
                     List<Client> managers =  clients
                             .stream()
@@ -784,7 +836,13 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     }
 
     public void onRequestTypeChange() throws IllegalAccessException, PersistenceBeanException {
-        setServices(RequestHelper.onRequestTypeChange(getSelectedRequestTypeId(), isMultipleCreate()));
+        if(isMultipleRequestCreate() && !ValidationHelper.isNullOrEmpty(getSelectedRequestTypes())){
+            List<Long> reqTypeIds = getSelectedRequestTypes().stream().map(Long::parseLong)
+                    .collect(Collectors.toList());
+            setServices(RequestHelper.onRequestTypeChange(reqTypeIds, isMultipleCreate()));
+        }else{
+            setServices(RequestHelper.onRequestTypeChange(getSelectedRequestTypeId(), isMultipleCreate()));
+        }
     }
 
     public void onServiceChange() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -793,8 +851,13 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     }
 
     public void onMultipleServiceChange() throws PersistenceBeanException, IllegalAccessException {
-        setInputCardList(RequestHelper.onMultipleServiceChange(getSelectedServiceIds().stream().map(Long::parseLong)
-                .collect(Collectors.toList())));
+        if(!ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
+            setInputCardList(RequestHelper.onMultipleServiceChange(getSelectedServiceIds().stream().map(Long::parseLong)
+                    .collect(Collectors.toList()),isMultipleRequestCreate()));
+        }
+        if(isMultipleRequestCreate()){
+            generateTab();
+        }
     }
 
     /**
@@ -839,10 +902,16 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if (isMultipleCreate() && getActiveMenuTabNum() == 1) {
             return true;
         }
-        if (isMultipleCreate() && getActiveMenuTabNum() == 2) {
+        if ((isMultipleCreate() && getActiveMenuTabNum() == 2) ) {
             onMultipleServiceChange();
             generateTab();
-        } else if (getInputCardList() != null && getActiveMenuTabNum() <= getInputCardList().size()) {
+        }
+        else if ((isMultipleRequestCreate() && getActiveMenuTabNum() == 3) ) {
+            if(!ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
+                onMultipleServiceChange();
+                generateTab();
+            }
+        } else if (getInputCardList() != null && (getActiveMenuTabNum() <= getInputCardList().size() || (isMultipleRequestCreate() && getActiveMenuTabNum() == 3) )) {
             generateTab();
         } else {
             setShownFields(null);
@@ -871,83 +940,86 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     public void generateTab() throws PersistenceBeanException, IllegalAccessException {
         List<InputCardManageField> listWithPos;
         List<InputCardManageField> listNoPos;
-        if (isMultipleCreate()) {
-            listWithPos = new ArrayList<>();
-            listNoPos = new ArrayList<>(getInputCardList().get(0).getFields());
-        } else {
-            listWithPos = new ArrayList<>(getInputCardList()
-                    .get(getActiveMenuTabNum() - 1).getFields().stream()
-                    .filter(f -> f.getPosition() != null).collect(Collectors.toList()));
+        if(!ValidationHelper.isNullOrEmpty(getInputCardList())){
+            if (isMultipleCreate()) {
+                listWithPos = new ArrayList<>();
+                listNoPos = new ArrayList<>(getInputCardList().get(0).getFields());
+            } else {
+                listWithPos = new ArrayList<>(getInputCardList()
+                        .get(getActiveMenuTabNum() - 1).getFields().stream()
+                        .filter(f -> f.getPosition() != null).collect(Collectors.toList()));
 
-            listNoPos = new ArrayList<>(getInputCardList()
-                    .get(getActiveMenuTabNum() - 1).getFields().stream()
-                    .filter(f -> f.getPosition() == null).collect(Collectors.toList()));
-        }
-        List<RequestViewWrapper> wrappers = new ArrayList<>();
-        for (int i = 0; ; i++) {
-            if (listWithPos.isEmpty()) {
-                break;
+                listNoPos = new ArrayList<>(getInputCardList()
+                        .get(getActiveMenuTabNum() - 1).getFields().stream()
+                        .filter(f -> f.getPosition() == null).collect(Collectors.toList()));
             }
-            RequestViewWrapper wrapper = new RequestViewWrapper();
-            wrapper.setLineNum(i);
-            wrapper.setFields(new ArrayList<>());
-            for (int j = 1; j <= 4; j++) {
-                int pos = i * 4 + j;
-                InputCardManageField field = listWithPos
-                        .stream().filter(f -> f.getPosition() != null && f.getPosition().equals(pos))
-                        .findFirst().orElse(null);
-                if (field != null) {
-                    listWithPos.remove(field);
+
+            List<RequestViewWrapper> wrappers = new ArrayList<>();
+            for (int i = 0; ; i++) {
+                if (listWithPos.isEmpty()) {
+                    break;
                 }
-                if (field == null || !field.getField().getEnumPropsWrapper().isHasManyFields()) {
-                    wrapper.getFields().add(field);
-                } else {
-                    wrapper.setOneElement(true);
-                    wrapper.setField(field);
-                    // break;
-                }
-            }
-            wrappers.add(wrapper);
-        }
-        for (int i = wrappers.size(); ; i++) {
-            if (listNoPos.isEmpty()) {
-                break;
-            }
-            RequestViewWrapper wrapper = new RequestViewWrapper();
-            RequestViewWrapper additional = null;
-            wrapper.setLineNum(i);
-            wrapper.setFields(new ArrayList<>());
-            for (int j = 0; j < 4; j++) {
-                if (!listNoPos.isEmpty()) {
-                    InputCardManageField field = listNoPos.get(0);
-                    listNoPos.remove(field);
+                RequestViewWrapper wrapper = new RequestViewWrapper();
+                wrapper.setLineNum(i);
+                wrapper.setFields(new ArrayList<>());
+                for (int j = 1; j <= 4; j++) {
+                    int pos = i * 4 + j;
+                    InputCardManageField field = listWithPos
+                            .stream().filter(f -> f.getPosition() != null && f.getPosition().equals(pos))
+                            .findFirst().orElse(null);
+                    if (field != null) {
+                        listWithPos.remove(field);
+                    }
                     if (field == null || !field.getField().getEnumPropsWrapper().isHasManyFields()) {
                         wrapper.getFields().add(field);
                     } else {
-                        i++;
-                        j--;
-                        additional = new RequestViewWrapper();
-                        additional.setLineNum(i);
-                        additional.setOneElement(true);
-                        additional.setField(field);
-                        break;
+                        wrapper.setOneElement(true);
+                        wrapper.setField(field);
+                        // break;
                     }
                 }
-            }
-            if (!ValidationHelper.isNullOrEmpty(wrapper.getFields())) {
                 wrappers.add(wrapper);
-            } else {
-                additional.setLineNum(additional.getLineNum() - 1);
             }
-            if (additional != null) {
-                wrappers.add(additional);
+            for (int i = wrappers.size(); ; i++) {
+                if (listNoPos.isEmpty()) {
+                    break;
+                }
+                RequestViewWrapper wrapper = new RequestViewWrapper();
+                RequestViewWrapper additional = null;
+                wrapper.setLineNum(i);
+                wrapper.setFields(new ArrayList<>());
+                for (int j = 0; j < 4; j++) {
+                    if (!listNoPos.isEmpty()) {
+                        InputCardManageField field = listNoPos.get(0);
+                        listNoPos.remove(field);
+                        if (field == null || !field.getField().getEnumPropsWrapper().isHasManyFields()) {
+                            wrapper.getFields().add(field);
+                        } else {
+                            i++;
+                            j--;
+                            additional = new RequestViewWrapper();
+                            additional.setLineNum(i);
+                            additional.setOneElement(true);
+                            additional.setField(field);
+                            break;
+                        }
+                    }
+                }
+                if (!ValidationHelper.isNullOrEmpty(wrapper.getFields())) {
+                    wrappers.add(wrapper);
+                } else {
+                    additional.setLineNum(additional.getLineNum() - 1);
+                }
+                if (additional != null) {
+                    wrappers.add(additional);
+                }
             }
-        }
-        setShownFields(wrappers);
-        if (isMultipleCreate()) {
-            getWrapper().setLists(getInputCardList().get(0).getFields());
-        } else {
-            getWrapper().setLists(getInputCardList().get(getActiveMenuTabNum() - 1).getFields());
+            setShownFields(wrappers);
+            if (isMultipleCreate() && !ValidationHelper.isNullOrEmpty(getInputCardList())) {
+                getWrapper().setLists(getInputCardList().get(0).getFields());
+            } else if(!ValidationHelper.isNullOrEmpty(getInputCardList())){
+                getWrapper().setLists(getInputCardList().get(getActiveMenuTabNum() - 1).getFields());
+            }
         }
     }
 
@@ -957,7 +1029,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         } else if ((!isMultipleCreate() && getActiveMenuTabNum() == 0)
                 || (isMultipleCreate() && getActiveMenuTabNum() == 1)) {
             return validFirstTab();
-        } else if (getActiveMenuTabNum() <= getInputCardList().size()) {
+        } else if (!isMultipleRequestCreate() && !ValidationHelper.isNullOrEmpty(getInputCardList()) &&
+                getActiveMenuTabNum() <= getInputCardList().size()) {
             return validGeneratedTab();
         } else return true;
     }
@@ -1014,7 +1087,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                     addRequiredFieldException(DocumentValidation.SUBJECT_MASTERY_BIRTHDAY.name());
                 if (!ValidationHelper.isNullOrEmpty(getSubject().getBirthDate())
                         && (getSubject().getBirthDate().after(new Date())
-                                || getSubject().getBirthDate().before(DateTimeHelper.getHundredFiveBefore()))) {
+                        || getSubject().getBirthDate().before(DateTimeHelper.getHundredFiveBefore()))) {
                     addRequiredFieldException(DocumentValidation.SUBJECT_MASTERY_BIRTHDAY.name());
 
                 }
@@ -1080,119 +1153,119 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private void validateField(InputCardManageField field) {
 
         switch (field.getField()) {
-        case CONSERVATORY:
-            if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConserItemId()))
-                addRequiredFieldException(ManageTypeFields.CONSERVATORY.name());
-            break;
-        case TALOVARE:
-            if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedTaloreItemId()))
-                addRequiredFieldException(ManageTypeFields.TALOVARE.name());
-            break;
-        case PROPERTY_DATA:
-            if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedBuildingId()))
-                addRequiredFieldException("form:" + DocumentValidation.PROPERTY_DATA_LANDED_BUILDING.name());
-            if (ValidationHelper.isNullOrEmpty(getEntity().getSheet()))
-                addRequiredFieldException(DocumentValidation.PROPERTY_DATA_SHEET.name());
-            if (ValidationHelper.isNullOrEmpty(getEntity().getParticle()))
-                addRequiredFieldException(DocumentValidation.PROPERTY_DATA_PARTICLE.name());
-            break;
-        case SUBJECT_MASTERY:
-            checkSubjectMastery();
-            break;
-        case CDR:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getCdr()))
-                addRequiredFieldException(DocumentValidation.CDR.name());
-            break;
-        case NDG:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getNdg()))
-                addRequiredFieldException(DocumentValidation.NDG.name());
-            break;
-        case ULTIMA_RESIDENZA:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getUltimaResidenza()))
-                addRequiredFieldException(DocumentValidation.ULTIMA_RESIDENZA.name());
-            break;
-        case MANAGER:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getManager()))
-                addRequiredFieldException(DocumentValidation.MANAGER.name());
-            break;
-        case POSITION_PRACTICE:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getPosition()))
-                addRequiredFieldException(DocumentValidation.POSITION_PRACTICE.name());
-            break;
-        case FORMALITIES_AUTHORIZED:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getFormalityAuthorized()))
-                addRequiredFieldException(DocumentValidation.FORMALITIES_AUTHORIZED.name());
-            break;
-        case NOTE:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getNote()))
-                addRequiredFieldException(DocumentValidation.NOTE.name());
-            break;
-        case UPDATE_DATE:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getUpdateDate()))
-                addRequiredFieldException(DocumentValidation.UPDATE_DATE.name());
-            break;
-        case PROVINCE:
-            if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedProvincePropertyId()))
-                addRequiredFieldException(DocumentValidation.STANDART_PROVINCE.name());
-            break;
-        case ACT_TYPE:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getActType()))
-                addRequiredFieldException(DocumentValidation.ACT_TYPE.name());
-            break;
-        case ACT_NUMBER:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getActNumber()))
-                addRequiredFieldException(DocumentValidation.ACT_NUMBER.name());
-            break;
-        case ACT_DATE:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getActDate()))
-                addRequiredFieldException(DocumentValidation.ACT_DATE.name());
-            break;
-        case TERM_DATE:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getTermDate()))
-                addRequiredFieldException(DocumentValidation.TERM_DATE.name());
-            break;
-        case REA_NUMBER:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getReaNumber()))
-                addRequiredFieldException(DocumentValidation.REA_NUMBER.name());
-            break;
-        case NATURE_LEGAL:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getNatureLegal()))
-                addRequiredFieldException(DocumentValidation.NATURE_LEGAL.name());
-            break;
-        case ISTAT:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getIstat()))
-                addRequiredFieldException(DocumentValidation.ISTAT.name());
-            break;
-        case RESIDENCE:
-            if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedResidenceProvinceId()))
-                addRequiredFieldException(DocumentValidation.RESIDENCE_PROVINCE.name());
-            else if (getWrapper().getSelectedResidenceProvinceId().equals(-1L)) {
-                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedResidenceNationId()))
-                    addRequiredFieldException(DocumentValidation.RESIDENCE_NATIONS.name());
-            } else if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedResidenceCityId()))
-                addRequiredFieldException(DocumentValidation.RESIDENCE_COMUNE.name());
-            if (ValidationHelper.isNullOrEmpty(getEntity().getResidence().getAddress()))
-                addRequiredFieldException(DocumentValidation.RESIDENCE_ADDRESS.name());
-            if (ValidationHelper.isNullOrEmpty(getEntity().getResidence().getCap()))
-                addRequiredFieldException(DocumentValidation.RESIDENCE_CAP.name());
-            break;
-        case DOMICILE:
-            if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedDomicileProvinceId()))
-                addRequiredFieldException(DocumentValidation.DOMICILE_PROVINCE.name());
-            else if (getWrapper().getSelectedDomicileProvinceId().equals(-1L)) {
-                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedDomicileNationId()))
-                    addRequiredFieldException(DocumentValidation.DOMICILE_NATIONS.name());
-            } else if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedDomicileCityId()))
-                addRequiredFieldException(DocumentValidation.DOMICILE_COMUNE.name());
-            if (ValidationHelper.isNullOrEmpty(getEntity().getDomicile().getAddress()))
-                addRequiredFieldException(DocumentValidation.DOMICILE_ADDRESS.name());
-            if (ValidationHelper.isNullOrEmpty(getEntity().getDomicile().getCap()))
-                addRequiredFieldException(DocumentValidation.DOMICILE_CAP.name());
-            break;
-        case NOTARY:
-            if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedNotaryId()))
-                addRequiredFieldException(ManageTypeFields.NOTARY.name());
-            break;
+            case CONSERVATORY:
+                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConserItemId()))
+                    addRequiredFieldException(ManageTypeFields.CONSERVATORY.name());
+                break;
+            case TALOVARE:
+                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedTaloreItemId()))
+                    addRequiredFieldException(ManageTypeFields.TALOVARE.name());
+                break;
+            case PROPERTY_DATA:
+                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedBuildingId()))
+                    addRequiredFieldException("form:" + DocumentValidation.PROPERTY_DATA_LANDED_BUILDING.name());
+                if (ValidationHelper.isNullOrEmpty(getEntity().getSheet()))
+                    addRequiredFieldException(DocumentValidation.PROPERTY_DATA_SHEET.name());
+                if (ValidationHelper.isNullOrEmpty(getEntity().getParticle()))
+                    addRequiredFieldException(DocumentValidation.PROPERTY_DATA_PARTICLE.name());
+                break;
+            case SUBJECT_MASTERY:
+                checkSubjectMastery();
+                break;
+            case CDR:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getCdr()))
+                    addRequiredFieldException(DocumentValidation.CDR.name());
+                break;
+            case NDG:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getNdg()))
+                    addRequiredFieldException(DocumentValidation.NDG.name());
+                break;
+            case ULTIMA_RESIDENZA:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getUltimaResidenza()))
+                    addRequiredFieldException(DocumentValidation.ULTIMA_RESIDENZA.name());
+                break;
+            case MANAGER:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getManager()))
+                    addRequiredFieldException(DocumentValidation.MANAGER.name());
+                break;
+            case POSITION_PRACTICE:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getPosition()))
+                    addRequiredFieldException(DocumentValidation.POSITION_PRACTICE.name());
+                break;
+            case FORMALITIES_AUTHORIZED:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getFormalityAuthorized()))
+                    addRequiredFieldException(DocumentValidation.FORMALITIES_AUTHORIZED.name());
+                break;
+            case NOTE:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getNote()))
+                    addRequiredFieldException(DocumentValidation.NOTE.name());
+                break;
+            case UPDATE_DATE:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getUpdateDate()))
+                    addRequiredFieldException(DocumentValidation.UPDATE_DATE.name());
+                break;
+            case PROVINCE:
+                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedProvincePropertyId()))
+                    addRequiredFieldException(DocumentValidation.STANDART_PROVINCE.name());
+                break;
+            case ACT_TYPE:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getActType()))
+                    addRequiredFieldException(DocumentValidation.ACT_TYPE.name());
+                break;
+            case ACT_NUMBER:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getActNumber()))
+                    addRequiredFieldException(DocumentValidation.ACT_NUMBER.name());
+                break;
+            case ACT_DATE:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getActDate()))
+                    addRequiredFieldException(DocumentValidation.ACT_DATE.name());
+                break;
+            case TERM_DATE:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getTermDate()))
+                    addRequiredFieldException(DocumentValidation.TERM_DATE.name());
+                break;
+            case REA_NUMBER:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getReaNumber()))
+                    addRequiredFieldException(DocumentValidation.REA_NUMBER.name());
+                break;
+            case NATURE_LEGAL:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getNatureLegal()))
+                    addRequiredFieldException(DocumentValidation.NATURE_LEGAL.name());
+                break;
+            case ISTAT:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getIstat()))
+                    addRequiredFieldException(DocumentValidation.ISTAT.name());
+                break;
+            case RESIDENCE:
+                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedResidenceProvinceId()))
+                    addRequiredFieldException(DocumentValidation.RESIDENCE_PROVINCE.name());
+                else if (getWrapper().getSelectedResidenceProvinceId().equals(-1L)) {
+                    if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedResidenceNationId()))
+                        addRequiredFieldException(DocumentValidation.RESIDENCE_NATIONS.name());
+                } else if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedResidenceCityId()))
+                    addRequiredFieldException(DocumentValidation.RESIDENCE_COMUNE.name());
+                if (ValidationHelper.isNullOrEmpty(getEntity().getResidence().getAddress()))
+                    addRequiredFieldException(DocumentValidation.RESIDENCE_ADDRESS.name());
+                if (ValidationHelper.isNullOrEmpty(getEntity().getResidence().getCap()))
+                    addRequiredFieldException(DocumentValidation.RESIDENCE_CAP.name());
+                break;
+            case DOMICILE:
+                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedDomicileProvinceId()))
+                    addRequiredFieldException(DocumentValidation.DOMICILE_PROVINCE.name());
+                else if (getWrapper().getSelectedDomicileProvinceId().equals(-1L)) {
+                    if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedDomicileNationId()))
+                        addRequiredFieldException(DocumentValidation.DOMICILE_NATIONS.name());
+                } else if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedDomicileCityId()))
+                    addRequiredFieldException(DocumentValidation.DOMICILE_COMUNE.name());
+                if (ValidationHelper.isNullOrEmpty(getEntity().getDomicile().getAddress()))
+                    addRequiredFieldException(DocumentValidation.DOMICILE_ADDRESS.name());
+                if (ValidationHelper.isNullOrEmpty(getEntity().getDomicile().getCap()))
+                    addRequiredFieldException(DocumentValidation.DOMICILE_CAP.name());
+                break;
+            case NOTARY:
+                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedNotaryId()))
+                    addRequiredFieldException(ManageTypeFields.NOTARY.name());
+                break;
         }
     }
 
@@ -1201,13 +1274,13 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if (ValidationHelper.isNullOrEmpty(getSelectedClientId())) {
             addRequiredFieldException("form:client");
         }
-        if (ValidationHelper.isNullOrEmpty(getSelectedRequestTypeId())) {
+        if (!isMultipleRequestCreate() && ValidationHelper.isNullOrEmpty(getSelectedRequestTypeId())) {
             addRequiredFieldException("form:requestType");
         }
         if (!isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedServiceId())) {
             addRequiredFieldException("form:service");
         }
-        if (isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
+        if (isMultipleCreate() && !isMultipleRequestCreate() && ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
             addRequiredFieldException("form:multipleService");
         }
         return !getValidationFailed();
@@ -1236,146 +1309,196 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     @Override
     public void onSave() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        prepareRequestToSave();
-
-        getEntity().setClient(DaoManager.get(Client.class, this.getSelectedClientId()));
-
-        getEntity().setDistraintFormality(getDistraintFormality());
-
-        if (!ValidationHelper.isNullOrEmpty(this.getSelectedNotaryId()))
-            getEntity().setNotary(DaoManager.get(Notary.class, this.getSelectedNotaryId()));
-        else
-            getEntity().setNotary(null);
-
-        if (getSelectedBillingClientId() != null) {
-            getEntity().setBillingClient(DaoManager.get(Client.class, getSelectedBillingClientId()));
-        } else {
-            getEntity().setBillingClient(null);
+        List<Long> selectedServiceReqType = new ArrayList();
+        if(isMultipleRequestCreate()){
+            selectedServiceReqType = getSelectedRequestTypes().stream().map(Long::parseLong)
+                    .collect(Collectors.toList());
+        }else{
+            selectedServiceReqType.add(getSelectedRequestTypeId());
         }
+        for (Long requestTypeId : selectedServiceReqType) {
 
-        if (!ValidationHelper.isNullOrEmpty(getFiduciaryClientsSelected())) {
-            getEntity().setRequestMangerList(new ArrayList<>());
-            List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
-                    Restrictions.in("id", getFiduciaryClientsSelected().stream()
-                            .map(SelectItemWrapper::getId).collect(Collectors.toList()))});
-            getEntity().getRequestMangerList().addAll(clients);
-        }
-        if (getEntity().getStateId() == null) {
-            getEntity().setStateId(RequestState.INSERTED.getId());
-        }
-        if (!ValidationHelper.isNullOrEmpty(getSelectedRequestEnumTypeFirst())) {
-            if (getSelectedRequestEnumTypeFirst().equals(RequestEnumTypes.SUBJECT.getId())) {
-                getEntity().setType(RequestEnumTypes.SUBJECT);
+            if(isMultipleRequestCreate()){
+                if(getMultiRequestMap().containsKey(requestTypeId)){
+                    setEntity(getMultiRequestMap().get(requestTypeId));
+                }else{
+                    setEntity(new Request());
+                    getMultiRequestMap().put(requestTypeId, getEntity());
+                }
+                getEntity().setRequestCreationType(RequestCreationType.MULTIPLE);
+            }else if(isMultipleCreate()){
+                getEntity().setRequestCreationType(RequestCreationType.MULTI);
+            }else{
+                getEntity().setRequestCreationType(RequestCreationType.SIMPLE);
+            }
+
+            prepareRequestToSave();
+
+            getEntity().setClient(DaoManager.get(Client.class, this.getSelectedClientId()));
+
+            getEntity().setDistraintFormality(getDistraintFormality());
+
+            if (!ValidationHelper.isNullOrEmpty(this.getSelectedNotaryId()))
+                getEntity().setNotary(DaoManager.get(Notary.class, this.getSelectedNotaryId()));
+            else
+                getEntity().setNotary(null);
+
+            if (getSelectedBillingClientId() != null) {
+                getEntity().setBillingClient(DaoManager.get(Client.class, getSelectedBillingClientId()));
             } else {
-                getEntity().setType(getSelectedRequestEnumTypeSecond() == null
-                        ? RequestEnumTypes.PROPERTY
-                                : RequestEnumTypes.getById(getSelectedRequestEnumTypeSecond()));
+                getEntity().setBillingClient(null);
             }
-        }
-        getEntity().setRequestType(DaoManager.get(RequestType.class, getSelectedRequestTypeId()));
-        if (isMultipleCreate()) {
-            getEntity().setMultipleServices(DaoManager.load(Service.class, new Criterion[]{
-                    Restrictions.in("id", getSelectedServiceIds().stream()
-                            .map(Long::parseLong).collect(Collectors.toList()))
-            }));
-        } else {
-            if(!ValidationHelper.isNullOrEmpty(getSelectedServiceId()))
-                getEntity().setService(DaoManager.get(Service.class, getSelectedServiceId()));
-        }
-        if (!ValidationHelper.isNullOrEmpty(getSelectedAgencyId())) {
-            getEntity().setAgency(DaoManager.get(Agency.class, getSelectedAgencyId()));
-        } else {
-            getEntity().setAgency(null);
-        }
-        if (!ValidationHelper.isNullOrEmpty(getSelectedAgencyOfficeId())) {
-            getEntity().setOffice(DaoManager.get(Agency.class, getSelectedAgencyOfficeId()));
-        } else {
-            getEntity().setOffice(null);
-        }
 
-        if (getSubject() != null) {
-            Subject tempSubject = getSubject();
-            SubjectHelper.fillSubjectFromWrapper(tempSubject, getWrapper());
-            Subject subjectFromDB = SubjectHelper.getSubjectIfExists(tempSubject, getWrapper().getSelectedPersonId());
-            if (subjectFromDB != null) {
-                setSubject(subjectFromDB);
-                if (!ValidationHelper.isNullOrEmpty(tempSubject.getId())) {
-                    DaoManager.getSession().evict(DaoManager.getSession().get(Subject.class, tempSubject.getId()));
-                }
-            }else {
-                Subject newSubject = SubjectHelper.copySubject(tempSubject);
-                setSubject(newSubject);
+            if (!ValidationHelper.isNullOrEmpty(getFiduciaryClientsSelected())) {
+                getEntity().setRequestMangerList(new ArrayList<>());
+                List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
+                        Restrictions.in("id", getFiduciaryClientsSelected().stream()
+                                .map(SelectItemWrapper::getId).collect(Collectors.toList()))});
+                getEntity().getRequestMangerList().addAll(clients);
             }
-        }
-        if (!ValidationHelper.isNullOrEmpty(getMail())) {
-            getEntity().setMail(getMail());
-        }
-
-        fillRequestExpirationDate();
-        getEntity().setSubject(getSubject());
-        if (!ValidationHelper.isNullOrEmpty(getResidence())) {
-            getEntity().setResidence(getResidence());
-        }
-        if (!ValidationHelper.isNullOrEmpty(getDomicile())) {
-            getEntity().setDomicile(getDomicile());
-        }
-        
-        if(getEntity().isNew() &&  
-                ValidationHelper.isNullOrEmpty(getEntity().getAggregationLandChargesRegistry())
-                && !ValidationHelper.isNullOrEmpty(getEntity().getRequestType().getDefault_registry())) {
-            getEntity().setAggregationLandChargesRegistry(getEntity().getRequestType().getDefault_registry());
-        }
-
-        if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
-            getWrapper().setSelectedConservatoryItemId(new ArrayList<>());
-        }
-        if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConserItemId())) {
-            getWrapper().getSelectedConserItemId().forEach(elem -> {
-                if (!getWrapper().getSelectedConservatoryItemId().contains(elem)) {
-                    getWrapper().getSelectedConservatoryItemId().add(elem);
-                }
-            });
-        }
-        if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedTaloreItemId())) {
-            getWrapper().getSelectedTaloreItemId().forEach(elem -> {
-                if (!getWrapper().getSelectedConservatoryItemId().contains(elem)) {
-                    getWrapper().getSelectedConservatoryItemId().add(elem);
-                }
-            });
-        }
-
-        boolean saved = false;
-        if (!getEntity().isNew() && !ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())
-                && !ValidationHelper.isNullOrEmpty(getEntity().getAggregationLandChargesRegistry())
-                && getWrapper().getSelectedConservatoryItemId().stream().anyMatch(c -> c.getId().equals(getEntity().getAggregationLandChargesRegistry().getId()))
-                || ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
-
-            saveAllDataRelatedToRequestOrNotify(getEntity());
-            if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
-                getWrapper().getSelectedConservatoryItemId().remove(getWrapper().getSelectedConservatoryItemId()
-                        .stream().filter(c -> c.getId().equals(getEntity().getAggregationLandChargesRegistry().getId()))
-                        .findAny().orElse(null));
+            if (getEntity().getStateId() == null) {
+                getEntity().setStateId(RequestState.INSERTED.getId());
             }
-            saved = true;
-        }
-        if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
-            List<ConservatoriaSelectItem> selectedConservatoryItemId = getWrapper().getSelectedConservatoryItemId();
-            for (int i = 0; i < selectedConservatoryItemId.size(); i++) {
-                ConservatoriaSelectItem item = selectedConservatoryItemId.get(i);
-                Request request = null;
-                try {
-                    if (!saved) {                   // first element
-                        request = getEntity();
-                        saved = true;
-                    } else {
-                        request = getEntity().copy();
+            if (!ValidationHelper.isNullOrEmpty(getSelectedRequestEnumTypeFirst())) {
+                if (getSelectedRequestEnumTypeFirst().equals(RequestEnumTypes.SUBJECT.getId())) {
+                    getEntity().setType(RequestEnumTypes.SUBJECT);
+                } else {
+                    getEntity().setType(getSelectedRequestEnumTypeSecond() == null
+                            ? RequestEnumTypes.PROPERTY
+                            : RequestEnumTypes.getById(getSelectedRequestEnumTypeSecond()));
+                }
+            }
+            getEntity().setRequestType(DaoManager.get(RequestType.class, requestTypeId));
+            if (isMultipleCreate()) {
+                List<Service> serviceList = DaoManager.load(Service.class, new Criterion[]{
+                        Restrictions.in("id", getSelectedServiceIds().stream()
+                                .map(Long::parseLong).collect(Collectors.toList()))
+                });
+                if(isMultipleRequestCreate()){
+                    serviceList = serviceList.stream().filter(service -> requestTypeId.equals(service.getRequestType().getId())).collect(Collectors.toList());
+                }
+//            getEntity().setMultipleServices(DaoManager.load(Service.class, new Criterion[]{
+//                    Restrictions.in("id", getSelectedServiceIds().stream()
+//                            .map(Long::parseLong).collect(Collectors.toList()))
+//            }));
+                if(!ValidationHelper.isNullOrEmpty(serviceList)){
+                    if(serviceList.size() == 1){
+                        getEntity().setService(serviceList.get(0));
+                    }else {
+                        getEntity().setMultipleServices(serviceList);
                     }
-                } catch (CloneNotSupportedException e) {
-                    LogHelper.log(log, e);
                 }
-                request.setAggregationLandChargesRegistry(DaoManager.get(AggregationLandChargesRegistry.class, item.getId()));
 
-                saveAllDataRelatedToRequestOrNotify(request);
+
+            } else {
+                if(!ValidationHelper.isNullOrEmpty(getSelectedServiceId()))
+                    getEntity().setService(DaoManager.get(Service.class, getSelectedServiceId()));
+            }
+            if (!ValidationHelper.isNullOrEmpty(getSelectedAgencyId())) {
+                getEntity().setAgency(DaoManager.get(Agency.class, getSelectedAgencyId()));
+            } else {
+                getEntity().setAgency(null);
+            }
+            if (!ValidationHelper.isNullOrEmpty(getSelectedAgencyOfficeId())) {
+                getEntity().setOffice(DaoManager.get(Agency.class, getSelectedAgencyOfficeId()));
+            } else {
+                getEntity().setOffice(null);
+            }
+
+            if (getSubject() != null) {
+                Subject tempSubject;
+                if(getSubject().getId() != null){
+                    tempSubject = DaoManager.get(Subject.class, getSubject().getId());
+                    try {
+                        Hibernate.initialize(tempSubject.getCountry());
+                    } catch (Exception e) {
+                        tempSubject = getSubject();
+                    }
+                }else {
+                    tempSubject = getSubject();
+                }
+                SubjectHelper.fillSubjectFromWrapper(tempSubject, getWrapper());
+                Subject subjectFromDB = SubjectHelper.getSubjectIfExists(tempSubject, getWrapper().getSelectedPersonId());
+                if (subjectFromDB != null) {
+                    setSubject(subjectFromDB);
+                    if (!ValidationHelper.isNullOrEmpty(tempSubject.getId())) {
+                        DaoManager.getSession().evict(DaoManager.getSession().get(Subject.class, tempSubject.getId()));
+                    }
+                }else {
+                    Subject newSubject = SubjectHelper.copySubject(tempSubject);
+                    setSubject(newSubject);
+                }
+            }
+            if (!ValidationHelper.isNullOrEmpty(getMail())) {
+                getEntity().setMail(getMail());
+            }
+
+            fillRequestExpirationDate();
+            getEntity().setSubject(getSubject());
+            if (!ValidationHelper.isNullOrEmpty(getResidence())) {
+                getEntity().setResidence(getResidence());
+            }
+            if (!ValidationHelper.isNullOrEmpty(getDomicile())) {
+                getEntity().setDomicile(getDomicile());
+            }
+
+            if(getEntity().isNew() &&
+                    ValidationHelper.isNullOrEmpty(getEntity().getAggregationLandChargesRegistry())
+                    && !ValidationHelper.isNullOrEmpty(getEntity().getRequestType().getDefault_registry())) {
+                getEntity().setAggregationLandChargesRegistry(getEntity().getRequestType().getDefault_registry());
+            }
+
+            if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+                getWrapper().setSelectedConservatoryItemId(new ArrayList<>());
+            }
+            if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConserItemId())) {
+                getWrapper().getSelectedConserItemId().forEach(elem -> {
+                    if (!getWrapper().getSelectedConservatoryItemId().contains(elem)) {
+                        getWrapper().getSelectedConservatoryItemId().add(elem);
+                    }
+                });
+            }
+            if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedTaloreItemId())) {
+                getWrapper().getSelectedTaloreItemId().forEach(elem -> {
+                    if (!getWrapper().getSelectedConservatoryItemId().contains(elem)) {
+                        getWrapper().getSelectedConservatoryItemId().add(elem);
+                    }
+                });
+            }
+
+            boolean saved = false;
+            if (!getEntity().isNew() && !ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())
+                    && !ValidationHelper.isNullOrEmpty(getEntity().getAggregationLandChargesRegistry())
+                    && getWrapper().getSelectedConservatoryItemId().stream().anyMatch(c -> c.getId().equals(getEntity().getAggregationLandChargesRegistry().getId()))
+                    || ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+
+                saveAllDataRelatedToRequestOrNotify(getEntity());
+                if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+                    getWrapper().getSelectedConservatoryItemId().remove(getWrapper().getSelectedConservatoryItemId()
+                            .stream().filter(c -> c.getId().equals(getEntity().getAggregationLandChargesRegistry().getId()))
+                            .findAny().orElse(null));
+                }
+                saved = true;
+            }
+            if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+                List<ConservatoriaSelectItem> selectedConservatoryItemId = getWrapper().getSelectedConservatoryItemId();
+                for (int i = 0; i < selectedConservatoryItemId.size(); i++) {
+                    ConservatoriaSelectItem item = selectedConservatoryItemId.get(i);
+                    Request request = null;
+                    try {
+                        if (!saved) {                   // first element
+                            request = getEntity();
+                            saved = true;
+                        } else {
+                            request = getEntity().copy();
+                        }
+                    } catch (CloneNotSupportedException e) {
+                        LogHelper.log(log, e);
+                    }
+                    request.setAggregationLandChargesRegistry(DaoManager.get(AggregationLandChargesRegistry.class, item.getId()));
+
+                    saveAllDataRelatedToRequestOrNotify(request);
+                }
             }
         }
     }
@@ -1384,9 +1507,9 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         DaoManager.getSession().clear();
         if (!ValidationHelper.isNullOrEmpty(getEntity().getId())) {
             getEntity().setRequestFormalities(DaoManager.load(RequestFormality.class, new Criterion[]{
-                    Restrictions.eq("request.id", getEntity().getId())
-            })
-                    );
+                            Restrictions.eq("request.id", getEntity().getId())
+                    })
+            );
         }
     }
 
@@ -1599,7 +1722,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         options.put("draggable", false);
         options.put("modal", true);
         options.put("contentHeight", 900);
-        options.put("contentWidth", 1700);
+        options.put("contentWidth", 1200);
         SessionHelper.put("requestEditDistraintFormalityDialog", Boolean.TRUE);
         SessionHelper.put("listProperties", Boolean.TRUE);
         SessionHelper.put("editedRequestId", getEntity().getId());
@@ -1719,7 +1842,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private void createHistory(Request request, boolean beginTransaction) throws HibernateException, PersistenceBeanException {
         if (RequestHelper.isDifferent(getStartStateId(), request.getStateId())
                 || RequestHelper.isDifferent(getStartUserId(),
-                        request.getUser() == null ? null : request.getUser().getId())) {
+                request.getUser() == null ? null : request.getUser().getId())) {
             RequestHistory history = new RequestHistory();
 
             history.setDate(new Date());
@@ -1842,7 +1965,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     }
 
     private void saveAllDataRelatedToRequestOrNotify(Request entity) throws PersistenceBeanException,
-    InstantiationException, IllegalAccessException {
+            InstantiationException, IllegalAccessException {
         getWrapper().saveFields(entity);
         saveMultipleSubjects(entity);
         List<Request> sameRequestList = getSameRequestsIfExist(entity);
@@ -1915,7 +2038,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                     subject.setId(subjectFromDB.getId());
                 }
                 else {
-                    DaoManager.save(subject);    
+                    DaoManager.save(subject);
                     request.getSubjectList().add(subject);
                     request.getSubjectTypeMapping().put(subject.getId(),sbjWrp.getSectionCType());
                 }
@@ -1974,7 +2097,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 && !ValidationHelper.isNullOrEmpty(request.getSubject())
                 && !ValidationHelper.isNullOrEmpty(request.getService())
                 && (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())
-                        || !ValidationHelper.isNullOrEmpty(request.getCity()))) {
+                || !ValidationHelper.isNullOrEmpty(request.getCity()))) {
 
             List<Criterion> restrictionsList = new ArrayList<>();
 
@@ -2062,7 +2185,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void openEstateLocation() throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
 
-        if(getEntity().getService() != null 
+        if(getEntity().getService() != null
                 && getEntity().getService().getRequestOutputType().equals(RequestOutputTypes.XML)) {
 
             if(getEntity().getTranscriptionActId() == null) {
@@ -2071,7 +2194,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 requestForcedList.add(this.getEntity());
                 formality.setRequestForcedList(requestForcedList);
                 DaoManager.save(formality,true);
-                
+
                 SectionA sectionA = new SectionA();
                 String comapnyName = ApplicationSettingsHolder.getInstance()
                         .getByKey(ApplicationSettingsKeys.COMPANY_NAME).getValue();
@@ -2080,7 +2203,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                     comapnyName = "";
 
                 String applicant = comapnyName.toUpperCase() + " PER ";
-                if(!ValidationHelper.isNullOrEmpty(getEntity()) 
+                if(!ValidationHelper.isNullOrEmpty(getEntity())
                         && !ValidationHelper.isNullOrEmpty(getEntity().getClient())) {
                     applicant = applicant + getEntity().getClientName().toUpperCase();
                 }
@@ -2097,16 +2220,16 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 if(!ValidationHelper.isNullOrEmpty(addressAppliant))
                     addressAppliant = addressAppliant.toUpperCase();
                 sectionA.setAddressAppliant(addressAppliant);
-                
+
                 sectionA.setFormality(formality);
                 DaoManager.save(sectionA,true);
-                
-                List<RequestSubject> distinctByType = 
+
+                List<RequestSubject> distinctByType =
                         getEntity().getRequestSubjects().stream().
-                        filter(rs -> !ValidationHelper.isNullOrEmpty(
-                                rs.getType()))
-                        .filter(ListHelper.distinctByKey(rs -> rs.getType()))
-                        .collect(Collectors.toList());
+                                filter(rs -> !ValidationHelper.isNullOrEmpty(
+                                        rs.getType()))
+                                .filter(ListHelper.distinctByKey(rs -> rs.getType()))
+                                .collect(Collectors.toList());
                 for(RequestSubject requestSubject : distinctByType) {
                     SectionC sectionC = new SectionC();
                     sectionC.setSectionCType(requestSubject.getType());
@@ -2125,11 +2248,11 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             SessionHelper.put("requestViewFormality", Boolean.TRUE);
 
             Request request =  DaoManager.get(Request.class,new CriteriaAlias[]{
-                    new CriteriaAlias("transcriptionActId", "transcriptionActId", JoinType.INNER_JOIN)
-            },
+                            new CriteriaAlias("transcriptionActId", "transcriptionActId", JoinType.INNER_JOIN)
+                    },
                     new Criterion[]{
                             Restrictions.eq("id", this.getEntity().getId())
-            });
+                    });
 
             SessionHelper.put("transcriptionActId", request.getTranscriptionActId().getId());
             SessionHelper.put("editRequestId", this.getEntity().getId());
@@ -2143,8 +2266,9 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         RedirectHelper.goToOnlyView(PageTypes.REQUEST_FORMALITY, this.getEntity().getTranscriptionActId().getId());
     }
 
-    public void validateMultipleRequest() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+    public void validateMultipleRequest(boolean redirect) throws IllegalAccessException, PersistenceBeanException, InstantiationException {
         boolean isShowConfirm = false;
+        setRedirected(redirect);
         if (multipleCreate && getEntity().isNew()) {
             List<Request> listRequestBySubject = DaoManager.load(Request.class, new CriteriaAlias[]{
                             new CriteriaAlias("subject", "subject", JoinType.INNER_JOIN)},
@@ -2831,5 +2955,113 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void setMultipleReqMessage(String multipleReqMessage) {
         this.multipleReqMessage = multipleReqMessage;
+    }
+
+    /**
+     * @return the multipleRequestCreate
+     */
+    public boolean isMultipleRequestCreate() {
+        return multipleRequestCreate;
+    }
+
+    /**
+     * @param multipleRequestCreate the multipleRequestCreate to set
+     */
+    public void setMultipleRequestCreate(boolean multipleRequestCreate) {
+        this.multipleRequestCreate = multipleRequestCreate;
+    }
+
+    /**
+     * @return the mutipleRequestObjTabPath
+     */
+    public List<String> getMutipleRequestObjTabPath() {
+        return mutipleRequestObjTabPath;
+    }
+
+    /**
+     * @param mutipleRequestObjTabPath the mutipleRequestObjTabPath to set
+     */
+    public void setMutipleRequestObjTabPath(List<String> mutipleRequestObjTabPath) {
+        this.mutipleRequestObjTabPath = mutipleRequestObjTabPath;
+    }
+
+    /**
+     * @return the selectedRequestTypes
+     */
+    public List<String> getSelectedRequestTypes() {
+        return selectedRequestTypes;
+    }
+
+    /**
+     * @param selectedRequestTypes the selectedRequestTypes to set
+     */
+    public void setSelectedRequestTypes(List<String> selectedRequestTypes) {
+        this.selectedRequestTypes = selectedRequestTypes;
+    }
+
+    /**
+     * @return the multiRequestMap
+     */
+    public Map<Long , Request> getMultiRequestMap() {
+        return multiRequestMap;
+    }
+
+    /**
+     * @param multiRequestMap the multiRequestMap to set
+     */
+    public void setMultiRequestMap(Map<Long , Request> multiRequestMap) {
+        this.multiRequestMap = multiRequestMap;
+    }
+
+    private void validateRequestCreationType() {
+
+        RequestCreationType reqCreationTyp = getEntity().getRequestCreationType();
+
+        if (!ValidationHelper.isNullOrEmpty(reqCreationTyp)) {
+
+            switch (reqCreationTyp) {
+                case MULTI:
+                    setMultipleCreate(Boolean.TRUE);
+                    break;
+                case MULTIPLE:
+                    setMultipleCreate(Boolean.TRUE);
+                    setMultipleRequestCreate(Boolean.TRUE);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+    }
+
+    public void openRequestSubjectDialog() throws HibernateException, PersistenceBeanException, IllegalAccessException, InstantiationException{
+        Subject aSubject = null;
+        if(getEntity().isNew()){
+            aSubject =  SubjectHelper.getSubjectIfExists(getSubject(),getWrapper().getSelectedPersonId());
+        }else{
+            aSubject = getEntity().getSubject();
+        }
+
+        if(!ValidationHelper.isNullOrEmpty(aSubject)){
+            setRegSubjectList(DaoManager.load(RequestView.class, new Criterion[]{Restrictions.eq("subjectId",aSubject.getId())}));
+        }else{
+            setRegSubjectList(new ArrayList());
+        }
+    }
+
+
+    /**
+     * @return the regSubjectList
+     */
+    public List<RequestView> getRegSubjectList() {
+        return regSubjectList;
+    }
+
+    /**
+     * @param regSubjectList the regSubjectList to set
+     */
+    public void setRegSubjectList(List<RequestView> regSubjectList) {
+        this.regSubjectList = regSubjectList;
     }
 }

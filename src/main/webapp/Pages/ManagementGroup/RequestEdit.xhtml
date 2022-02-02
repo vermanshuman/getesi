@@ -23,7 +23,7 @@
             }
 
             body .ui-widget-header {
-                background-color: #2f8ee5 !important;
+                background-color: #788FA7 !important;
                 color: #ffffff;
             }
 
@@ -107,7 +107,7 @@
                 background-color: #000066 !important;
             }
             body .ui-button.ui-button-success {
-                background: #57c279 !important;
+                background: #00CC52 !important;
             }
             #changeUserDlg {
                 border: 2px solid #57c279;
@@ -116,6 +116,9 @@
                 border-bottom: none;
                 background: #f8f9fa !important;
                 color: #000;
+            }
+            .dynamic-fields input{
+                width : 98% !important;
             }
         </style>
         <script>
@@ -128,6 +131,15 @@
                 var previousMenu = activeMenu - 1;
                 PrimeFaces.ab({s:"pageTabMenu",u:"form",g:false,pa:[{name:"pageTabMenu_menuid",value:previousMenu.toString()}],f:"form"});return false;
             }
+            jQuery(document).ready(function() {
+                $(".ui-g-3").each(function()
+                {
+                    if($(this).children().length == 0)
+                    {
+                        $(this).hide();
+                    }
+                });
+            });
         </script>
         <p:remoteCommand name="updateSubjects" update="form"/>
 
@@ -192,7 +204,7 @@
 
 
                 </p:column>
-                <p:column>
+                <p:column rendered="#{!bean.multipleRequestCreate}">
                     <span> #{msg.requestRequestType}<span class="red">*</span>:</span><br/>
                     <p:selectOneMenu id="requestType" value="#{bean.selectedRequestTypeId}"
                                      label="#{msg.requestRequestType}" styleClass="select-width">
@@ -201,7 +213,7 @@
                         <f:selectItems value="#{bean.requestTypes}"/>
                     </p:selectOneMenu>
                 </p:column>
-                <p:column>
+                <p:column rendered="#{!bean.multipleRequestCreate}">
                     <span> #{msg.requestService}<span class="red">*</span>:</span><br/>
                     <p:selectOneMenu value="#{bean.selectedServiceId}" rendered="#{!bean.multipleCreate}"
                                      label="#{msg.requestService}" styleClass="select-width" id="service">
@@ -214,6 +226,14 @@
                         <f:selectItems value="#{bean.services}"/>
                     </p:selectCheckboxMenu>
                 </p:column>
+                <p:column rendered="#{bean.multipleRequestCreate}">
+                    <c:forEach items="#{bean.mutipleRequestObjTabPath}" var="objItem">
+                        <div class="ui-g-6" style="padding: 1%">
+                            <ui:include src="#{objItem}"/>
+                        </div>
+                    </c:forEach>
+                </p:column>
+
             </p:panelGrid>
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" id="requstType">
                 <p:selectOneRadio value="#{bean.selectedRequestEnumTypeFirst}" styleClass="request-select-radio">
@@ -227,35 +247,57 @@
             </p:panelGrid>
         </ui:fragment>
 
-        <ui:fragment id="dynamicFragment" rendered="#{not empty bean.shownFields}">
-
-            <c:forEach items="#{bean.shownFields}" var="item">
-                <div class="ui-g" style="#{item.getLineEven()?'background-color: #F5F5F5;':''}">
-                    <c:if test="#{item.field != null}">
-                        <div class="ui-g-12" style="padding: 1%; background: transparent">
-                            <ui:include src="#{item.field.field.getPath()}"/>
+        <ui:fragment id="dynamicFragment" rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size() - 1 ) or (!bean.multipleRequestCreate and not empty bean.shownFields)}">
+            <div class="dynamic-fields">
+                <c:if test="#{bean.multipleRequestCreate}">
+                    <div class="ui-g">
+                        <div class="ui-g-3" style="padding: 1%">
+                            <span> #{msg.requestRequestType}<span class="red">*</span>:</span><br/>
+                            <p:selectCheckboxMenu id="servicerequestType" value="#{bean.selectedRequestTypes}"
+                                                  label="#{msg.requestRequestType}" styleClass="select-width">
+                                <p:ajax delay="2000" event="change" listener="#{bean.onRequestTypeChange}"
+                                        update="multipleServiceRequest"/>
+                                <f:selectItems value="#{bean.requestTypes}"/>
+                            </p:selectCheckboxMenu>
                         </div>
-                    </c:if>
-                    <c:if test="#{(item.fields != null) and item.isAttachedDocumentsBlock()}">
-                        <c:forEach items="#{item.fields}" var="block">
-                            <div class="ui-g-6" style="padding: 1%">
-                                <ui:include src="#{block.field.getPath()}"/>
+                        <div class="ui-g-3" style="padding: 1%">
+                            <span> #{msg.requestService}<span class="red">*</span>:</span><br/>
+                            <p:selectCheckboxMenu value="#{bean.selectedServiceIds}" id="multipleServiceRequest"
+                                                  label="#{msg.requestService}"
+                                                  styleClass="select-width"   >
+                                <p:ajax delay="2000" event="change" listener="#{bean.onMultipleServiceChange()}" update="form" />
+                                <f:selectItems value="#{bean.services}"/>
+                            </p:selectCheckboxMenu>
+                        </div>
+                    </div>
+                </c:if>
+                <c:forEach rendered="#{not empty bean.shownFields}" items="#{bean.shownFields}" var="item">
+                    <div class="ui-g" style="#{item.getLineEven()?'background-color: #F5F5F5;':''}">
+                        <c:if test="#{item.field != null}">
+                            <div class="ui-g-12" style="padding: 1%; background: transparent">
+                                <ui:include src="#{item.field.field.getPath()}"/>
                             </div>
-                        </c:forEach>
-                    </c:if >
-                    <c:if test="#{(item.fields != null) and !item.isAttachedDocumentsBlock()}">
-                        <c:forEach items="#{item.fields}" var="block">
-                            <div class="ui-g-3" style="padding: 1%">
-                                <ui:include src="#{block.field.getPath()}"/>
-                            </div>
-                        </c:forEach>
-                    </c:if>
-                </div>
-            </c:forEach>
-
+                        </c:if>
+                        <c:if test="#{(item.fields != null) and item.isAttachedDocumentsBlock()}">
+                            <c:forEach items="#{item.fields}" var="block">
+                                <div class="ui-g-6" style="padding: 1%">
+                                    <ui:include src="#{block.field.getPath()}"/>
+                                </div>
+                            </c:forEach>
+                        </c:if >
+                        <c:if test="#{(item.fields != null) and !item.isAttachedDocumentsBlock()}">
+                            <c:forEach items="#{item.fields}" var="block">
+                                <div class="ui-g-3" style="padding: 1%">
+                                    <ui:include src="#{block.field.getPath()}"/>
+                                </div>
+                            </c:forEach>
+                        </c:if>
+                    </div>
+                </c:forEach>
+            </div>
         </ui:fragment>
 
-        <ui:fragment rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1}">
+        <ui:fragment rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2) or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)}">
             <p:panel id="userAddPanel" style="margin-top: 1%">
                 <span>#{msg.requestUserChange}:</span><br/>
                 <ui:fragment rendered="#{!empty bean.entity.userName}">
@@ -271,14 +313,34 @@
 
         <ui:fragment>
             <div class="ui-g">
-                <div class="ui-g-12" id="request-btns" style="margin-top:2%">
-                    <p:commandButton style="float: right" action="#{bean.validateMultipleRequest}" value="#{msg.save.toUpperCase()}"
+                <div class="ui-g-3" id="request-btns-2" style="margin-top:2%">
+                    <p:commandButton style="float: left"
+                                     value="#{msg.requestEntered}"
+                                     styleClass="ui-button-primary" iconPos="left"
+                                     rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1 and bean.multipleRequestCreate}"
+                                     oncomplete="PF('requestubjectDlg').show();" update="requestubjectDlgId" actionListener="#{bean.openRequestSubjectDialog}"
+
+                    />
+                    <div style="clear: both"></div>
+                </div>
+                <div class="ui-g-5" style="margin-top:2%"></div>
+                <div class="ui-g-2" id="request-btns" style="margin-top:2%">
+                    <p:commandButton style="float: right" action="#{bean.validateMultipleRequest(false)}" value="#{msg.save.toUpperCase()}"
                                      icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left" update="saveMultipleRequest"
+                                     rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1 and bean.multipleRequestCreate}"/>
+                    <div style="clear: both"></div>
+                </div>
+                <div class="ui-g-2" id="request-btns-1" style="margin-top:2%">
+                    <p:commandButton style="float: left" action="#{bean.validateMultipleRequest(true)}" value="#{bean.multipleRequestCreate ? msg.saveAndClose.toUpperCase() : msg.save.toUpperCase() }"
+                                     icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left"
                                      rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1}"/>
+
                     <div style="clear: both"></div>
                 </div>
             </div>
         </ui:fragment>
+
+        <ui:include src="../Dialogs/RequestSubjectDialog.xhtml" />
 
         <p:dialog id="changeUserDlg" widgetVar="changeUserDlgWV" modal="true"
                   resizable="false" draggable="false" effect="SLIDE"
@@ -293,7 +355,7 @@
             <div class="btn_line">
                 <p:commandButton value="#{msg.yes}" action="#{bean.changeUser}"
                                  update="@form" oncomplete="PF('changeUserDlgWV').hide();"
-                                    style="background-color: #57c279!important;"/>
+                                 style="background-color: #57c279!important;"/>
                 <p:commandButton value="#{msg.no}"
                                  oncomplete="PF('changeUserDlgWV').hide();" style="background-color: #F3362B !important;"/>
             </div>
@@ -391,20 +453,20 @@
                                      update="@form"
                                      rendered="#{!bean.performEdit and bean.canEdit and !bean.entity.isNew}"/>
                 </ui:remove>
-               <!-- <p:commandButton value="#{msg.requestSuspend}"
-                                 rendered="#{!bean.entity.isNew and !bean.isSuspend and bean.canSuspendRequest}"
-                                 oncomplete="PF('suspendDialogWV').show();"/>
-                <p:commandButton value="#{msg.requestUnSuspend}"
-                                 rendered="#{!bean.entity.isNew and bean.isSuspend and bean.canSuspendRequest}"
-                                 oncomplete="PF('unsuspendDialogWV').show();"/>-->
+                <!-- <p:commandButton value="#{msg.requestSuspend}"
+                                  rendered="#{!bean.entity.isNew and !bean.isSuspend and bean.canSuspendRequest}"
+                                  oncomplete="PF('suspendDialogWV').show();"/>
+                 <p:commandButton value="#{msg.requestUnSuspend}"
+                                  rendered="#{!bean.entity.isNew and bean.isSuspend and bean.canSuspendRequest}"
+                                  oncomplete="PF('unsuspendDialogWV').show();"/>-->
                 <p:commandButton value="#{msg.requestReactivate}"
                                  rendered="#{!bean.entity.isNew and bean.isSuspend}"
                                  oncomplete="PF('reactivateDialogWV').show();"/>
-               <!-- <p:commandButton value="#{msg.requestPrint}" ajax="false"
-                                 update="@form" action="#{bean.printPDF}"
-                                 rendered="#{!bean.entity.isNew}"/>-->
+                <!-- <p:commandButton value="#{msg.requestPrint}" ajax="false"
+                                  update="@form" action="#{bean.printPDF}"
+                                  rendered="#{!bean.entity.isNew}"/>-->
                 <p:commandButton value="#{msg.requestManageEstateLocation}"
-                                 action="#{bean.openEstateLocation}" rendered="#{!bean.entity.isNew}"/>
+                                 action="#{bean.openEstateLocation}" rendered="#{!bean.entity.isNew }"/>
                 <p:commandButton value="#{msg.requestManagePrint}"
                                  action="#{bean.generatePdf}" rendered="#{!bean.entity.isNew}"/>
             </div>
