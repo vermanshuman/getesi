@@ -101,19 +101,21 @@ public final class OMIHelper {
     public static CalculatedOmi calculateOMI(Property property, boolean savePropertyIfZoneWasChanged) throws Exception {
         CalculatedOmi calculatedOmi = new CalculatedOmi();
 
-        String code = getCode(property.getCategoryCode());
-        if (ValidationHelper.isNullOrEmpty(code)) {
+        List<Long> codes = getCodes(property.getCategoryCode());
+        if (ValidationHelper.isNullOrEmpty(codes)) {
             return calculatedOmi;
         }
+
+
         String zones = property.getZone();
-        
+
         if (ValidationHelper.isNullOrEmpty(zones)) {
             List<Pair<Double, Double>> coordinates = new ArrayList<Pair<Double,Double>>();
             if(property != null){
                 coordinates = GeolocationHelper.checkCoordinates(property.getCityDescription() + " " + property.getAddress());
             }
-            
-           
+
+
             if(coordinates == null || (coordinates != null && coordinates.size() < 2)) {
                 zones = String.join("-", findZoneByPropertyInKML(property));
                 calculatedOmi.setMultipleCoordinates(false);
@@ -123,12 +125,13 @@ public final class OMIHelper {
                 calculatedOmi.setMultipleCoordinates(true);
                 //return calculatedOmi;
             }
-            
+
             property.setZone(zones);
             if (savePropertyIfZoneWasChanged) {
                 DaoManager.save(property, true);
             }
         }
+        log.info("Zones: " + zones);
         if (ValidationHelper.isNullOrEmpty(zones)) {
             return calculatedOmi;
         }
@@ -137,8 +140,8 @@ public final class OMIHelper {
         calculatedOmi.setSeveralZones(zonesArr.length > 1);
         List<Double> calculatedOmiValues = new ArrayList<>();
         for (String zone : zonesArr) {
-            List<OmiValue> omiValues = getOmiValues(property.getCity().getCfis(), zone, code);
-            
+            List<OmiValue> omiValues = getOmiValues(property.getCity().getCfis(), zone, codes);
+
             if(ValidationHelper.isNullOrEmpty(omiValues) &&
                     !ValidationHelper.isNullOrEmpty(property.getCategory())) {
                 try {
@@ -159,7 +162,7 @@ public final class OMIHelper {
                         int nextPosition = position + currentPosition;
                         while(previousPosition >= -1) {
                             List<CategoryItemGroupOmi> previousCategoryItemGroupOmis = DaoManager.load(
-                                    CategoryItemGroupOmi.class, 
+                                    CategoryItemGroupOmi.class,
                                     new CriteriaAlias[]{
                                             new CriteriaAlias("itemGroupOmi", "itemGroupOmi", JoinType.INNER_JOIN)
                                     },
@@ -172,7 +175,7 @@ public final class OMIHelper {
                             }else {
                                 CategoryItemGroupOmi previousCategoryItemGroupOmi = previousCategoryItemGroupOmis.get(0);
                                 String preCode = getCode(previousCategoryItemGroupOmi.getCategory().getCode());
-                                if(!ValidationHelper.isNullOrEmpty(preCode)) 
+                                if(!ValidationHelper.isNullOrEmpty(preCode))
                                     omiValues = getOmiValues(property.getCity().getCfis(), zone, preCode);
                             }
                             if(!ValidationHelper.isNullOrEmpty(omiValues)) {
@@ -234,15 +237,15 @@ public final class OMIHelper {
                 omiValues.forEach(omi ->  {
                     if(!ValidationHelper.isNullOrEmpty(omi.getComprMax()))
                         omi.setMaxValue(omi.getComprMax().doubleValue());
-                    
+
                     if(!ValidationHelper.isNullOrEmpty(omi.getComprMin()))
                         omi.setMinValue(omi.getComprMin().doubleValue());
                 });
             }
-            
+
             calculatedOmi.setSeveralComprs(omiValues.size() > 1);
             double x = omiValues.stream().mapToDouble(omi -> (omi.getMaxValue() != null ? omi.getMaxValue() : 0.0 )+ (omi.getMinValue() != null ? omi.getMinValue() : 0.0)).average().orElse(0d);
-            
+
             if (x != 0) {
                 double y = 0;
                 List<CategoryPercentValue> categoryPercentValues = DaoManager.load(CategoryPercentValue.class, new Criterion[]{
@@ -288,6 +291,15 @@ public final class OMIHelper {
         });
     }
 
+    private static List<OmiValue> getOmiValues(String propertyCityCfis, String zone, List<Long> codes)
+            throws PersistenceBeanException, IllegalAccessException {
+        return DaoManager.load(OmiValue.class, new Criterion[]{
+                Restrictions.eq("zone", zone),
+                Restrictions.eq("cityCfis", propertyCityCfis),
+                Restrictions.in("categoryCode", codes)
+        });
+    }
+
     public static double calculateCommercialOmi(Property property, double calcOmi)
             throws PersistenceBeanException, IllegalAccessException {
         if (!ValidationHelper.isNullOrEmpty(property) && !ValidationHelper.isNullOrEmpty(property.getCategory())) {
@@ -320,10 +332,19 @@ public final class OMIHelper {
     }
 
     public static String getCode(String propertyCategoryCode) {
-        
+
         Optional<CategoryCodeForOmi> categoryCodeForOmi = CATEGORY_CODE_FOR_OMI_COLLECTION.stream()
                 .filter(c -> c.getCategory().equals(propertyCategoryCode)).findFirst();
         return categoryCodeForOmi.map(CategoryCodeForOmi::getCode).orElse(null);
+    }
+
+    public static List<Long> getCodes(String propertyCategoryCode) {
+
+        return CATEGORY_CODE_FOR_OMI_COLLECTION.stream()
+                .filter(c -> c.getCategory().equals(propertyCategoryCode))
+                .map(CategoryCodeForOmi::getCode)
+                .map(Long::valueOf)
+                .collect(Collectors.toList());
     }
 
     public static List<String> findZoneByPropertyInKML(Property property) throws Exception {
@@ -352,7 +373,7 @@ public final class OMIHelper {
         }
         return new ArrayList<>();
     }
-    
+
     public static List<String> findZoneByPropertyInKML(Property property,List<Pair<Double, Double>> coordinates) throws Exception {
         String path = ApplicationSettingsHolder.getInstance()
                 .getByKey(ApplicationSettingsKeys.OMI_KML_FILES).getValue();
@@ -379,7 +400,7 @@ public final class OMIHelper {
         }
         return new ArrayList<>();
     }
-    
+
     public static List<String> findZoneByCoordinates(Property property,List<Pair<Double, Double>> coordinates) throws Exception {
         String path = ApplicationSettingsHolder.getInstance()
                 .getByKey(ApplicationSettingsKeys.OMI_KML_FILES).getValue();

@@ -56,12 +56,25 @@
             }
         </style>
         <script>
+            // <![CDATA[
             setTimeout( function () {
                 $('.menu_div').css("display", "block");
+                if ((window.location.pathname.indexOf('Configuration/') > 0 && !(window.location.pathname.indexOf('Configuration/ApplicationSettings.jsf') > 0
+                    || window.location.pathname.indexOf('Configuration/ImportSettings.jsf') > 0 || window.location.pathname.indexOf('DocumentConversionSettings.jsf') > 0
+                    || window.location.pathname.indexOf('OMIValuationDocuments.jsf') > 0 || window.location.pathname.indexOf('DatiAziendali.jsf') > 0
+                    || window.location.pathname.indexOf('CodiciConservatorie.jsf') > 0 || window.location.pathname.indexOf('Edit.jsf') > 0))
+                    || (window.location.pathname.indexOf('Dictionaries/') > 0 && !(window.location.pathname.indexOf('Dictionaries/CadastralTopology.jsf') > 0
+                        || window.location.pathname.indexOf('Edit.jsf') > 0)) || ((window.location.pathname.indexOf('ConfigurationArea/') > 0)
+                        && !(window.location.pathname.indexOf('ConfigurationArea/ClientList.jsf') > 0 || window.location.pathname.indexOf('Edit.jsf')))
+                    || window.location.pathname.indexOf('ConfigurationArea/LandOmiList.jsf') > 0
+                    || (window.location.pathname.indexOf('ManagementGroup/PaymentTypeList.jsf') > 0)) {
+                    $('.menu_div').css("margin-left", "-5px");
+                }
             }, 200);
+            // ]]>
         </script>
         <p:outputPanel id="menu_div" class="layout-menu-container menu_div"  style="display:none;#{renderSideMenuTop ? 'top: 0; ' : ''}">
-        <div class="nano">
+            <div class="nano">
                 <div class="nano-content menu-scroll-content">
                     <pp:menu widgetVar="me"  model="#{menuBean.mainMenuModel}" id="mmm"/>
                 </div>

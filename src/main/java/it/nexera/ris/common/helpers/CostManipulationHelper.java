@@ -17,6 +17,8 @@ import org.hibernate.sql.JoinType;
 import org.primefaces.context.RequestContext;
 
 import javax.faces.model.SelectItem;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -297,7 +299,16 @@ public class CostManipulationHelper extends PageBean {
         request.setTotalCost(String.format("%.2f", totalCost));
         DaoManager.save(request, true);
     }
-    
+
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+
     public String getExtraCostLandRegistry() {
         return extraCostLandRegistry;
     }

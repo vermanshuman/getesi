@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.util.LinkedList;
 import java.util.List;
 
 @Getter
@@ -17,9 +16,9 @@ public class MixChartDataWrapper implements Serializable {
 
     private String type;
     private String label;
-    private LinkedList<Integer> data;
+    private List<Integer> data;
     private List<String> backgroundColor;
     private List<String> borderColor;
     private int borderWidth;
-    private LinkedList<List<String>> tooltip;
+    private List<List<String>> tooltip;
 }

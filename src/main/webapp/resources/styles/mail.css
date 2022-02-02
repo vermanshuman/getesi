@@ -176,3 +176,18 @@ td.ui-panelgrid-cell {
     border: 1px solid #fed820;
     margin-right: 10px;
 }
+
+.filter-container{
+    margin-right: 0px !important;
+    margin-left: auto !important;
+}
+
+body .ui-datatable .ui-paginator.ui-paginator-top{
+    background-color:  #788FA7 !important;
+    color: #ffffff !important;
+}
+
+
+body .ui-datatable .ui-paginator.ui-paginator-bottom{
+    background-color:  #788FA7 !important;
+}

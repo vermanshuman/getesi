@@ -38,3 +38,4 @@ thirdPartAppURL=http://Server:8888/pdfxml/pdfconverter.php?
 file.deploy.dir=.
 
 fatturaAPITemplatePath=FatturaAPITemplate.vm
+version=1.0

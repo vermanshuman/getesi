@@ -5,6 +5,6 @@
                 xmlns:p="http://primefaces.org/ui">
 
         <span>#{enums.documentGenerationTagsLEGAL}<span class="red" style="#{block.isRequired()?'':'display:none;'}">*</span></span>
-        <p:selectBooleanCheckbox id="LEGAL" value="#{bean.entity.legal}"/>
+        <p:selectBooleanCheckbox id="LEGAL" value="#{bean.entity.legal}" styleClass="input-width"/>
 
 </ui:composition>

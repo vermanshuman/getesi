@@ -146,20 +146,21 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
         chartWrapper.setType("bar");
         List<RequestType> requestTypes = DaoManager.load(RequestType.class, new Criterion[]{Restrictions.isNotNull("name")});
         // List<String> allRequestTypes = requestTypes.stream().map(RequestType::getName).distinct().collect(Collectors.toList());
-        LinkedList<String> chartXAxisData = new LinkedList<>();
+        List<String> chartXAxisData = new ArrayList<>();
 
         chartWrapper.setXLabel(ResourcesHelper.getString("requestListService"));
         chartWrapper.setYLabel(ResourcesHelper.getString("permissionRequest"));
 
 
         List<MixChartDataWrapper> dataSets = new ArrayList<>();
-        LinkedList<Integer> data = new LinkedList<>();
+        List<Integer> data = new ArrayList<>();
+        Map<RequestType, Integer> dataMapping = new HashMap<>();
         Collections.shuffle(colors);
-        LinkedList<List<String>> tooltips = new LinkedList<>();
+        Map<RequestType, List<String>> tooltips = new HashMap<>();
+        //List<List<String>> tooltips = new ArrayList<>();
         List<Long> stateIds = new ArrayList<>();
         stateIds.add(RequestState.INSERTED.getId());
         stateIds.add(RequestState.IN_WORK.getId());
-        LinkedList<BarGraph> barGraphs = new LinkedList<>();
         for (RequestType requestType : requestTypes) {
             List<String> tooltip = new ArrayList<>();
             List<Criterion> restrictions = new ArrayList<>();
@@ -212,29 +213,27 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
 
                 tooltip.add(sb.toString());
             }
-            BarGraph barGraph = new BarGraph();
-            if (!ValidationHelper.isNullOrEmpty(tooltip)) {
-                barGraph.setTooltip(tooltip);
-            }
-            
+
+            if (!ValidationHelper.isNullOrEmpty(tooltip))
+                tooltips.put(requestType, tooltip);
             Integer requestCount = requests.size();
             if (requestCount > 0) {
-                barGraph.setChartXAxisData(requestType.getName());
-                barGraph.setData(requestCount);
-                barGraphs.add(barGraph);
+                dataMapping.put(requestType, requestCount);
             }
         }
 
-        Collections.sort(barGraphs, Comparator.comparingInt(BarGraph::getData).reversed());
-        for(BarGraph barGraph : barGraphs) {
-        	tooltips.add(barGraph.getTooltip());
-        	chartXAxisData.add(barGraph.getChartXAxisData());
-        	data.add(barGraph.getData());
-        }
-//        List<String> missingRequestTypes  = allRequestTypes.stream()
-//                .filter(e -> !chartXAxisData.contains(e))
-//                .collect(Collectors.toList());
-//
+        chartXAxisData.addAll(dataMapping.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .map(e -> e.getKey().getName())
+                .collect(Collectors.toList()));
+
+        data.addAll(dataMapping.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .map(e -> e.getValue())
+                .collect(Collectors.toList()));
+
         if (data.size() > 0) {
             List<String> borderColors = new ArrayList<>();
             List<String> backgroundColors = new ArrayList<>();
@@ -242,13 +241,25 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
                 borderColors.add(colors.get(c) + ")");
                 backgroundColors.add(colors.get(c) + ", 0.2)");
             }
+            List<List<String>> tooltipData = new ArrayList<>();
+
+            List<RequestType> sortedData = dataMapping.entrySet()
+                    .stream()
+                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                    .map(e -> e.getKey())
+                    .collect(Collectors.toList());
+
+            for(RequestType sortedrequestType : sortedData){
+                tooltipData.add(tooltips.get(sortedrequestType));
+            }
+
             MixChartDataWrapper dataSet = MixChartDataWrapper.builder()
                     .label(ResourcesHelper.getString("requestListService"))
                     .data(data)
                     .backgroundColor(backgroundColors)
                     .borderColor(borderColors)
                     .borderWidth(1)
-                    .tooltip(tooltips)
+                    .tooltip(tooltipData)
                     .build();
             dataSets.add(dataSet);
         }
@@ -497,7 +508,24 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
     }
 
     public String getToolTipData() {
-        System.out.println(">>>>>>>>>>>>>>");
         return "";
     }
+
+    public void openMailList() {
+        String value = Arrays.toString(new Long[]{MailManagerStatuses.NEW.getId()});
+        setSessionValue("KEY_MAIL_TYPE_SESSION_KEY_NOT_COPY",value);
+        RedirectHelper.goTo(PageTypes.MAIL_MANAGER_LIST);
+
+    }
+
+    public void openRequestList(Long stateId) {
+        setSessionValue("REQUEST_LIST_FILTER_BY",RequestState.getById(stateId).name());
+        RedirectHelper.goTo(PageTypes.REQUEST_LIST);
+
+    }
+
+    private void setSessionValue(String key, String value) {
+        SessionHelper.put(key, value);
+    }
+
 }

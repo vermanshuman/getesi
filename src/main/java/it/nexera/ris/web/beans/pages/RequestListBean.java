@@ -1,77 +1,14 @@
 package it.nexera.ris.web.beans.pages;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.model.SelectItem;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.hibernate.HibernateException;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.MatchMode;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
-
-import it.nexera.ris.common.enums.DocumentGenerationPlaces;
-import it.nexera.ris.common.enums.DocumentType;
-import it.nexera.ris.common.enums.PageTypes;
-import it.nexera.ris.common.enums.RequestState;
-import it.nexera.ris.common.enums.ServiceReferenceTypes;
-import it.nexera.ris.common.enums.UserCategories;
+import it.nexera.ris.common.enums.*;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
-import it.nexera.ris.common.helpers.ComboboxHelper;
-import it.nexera.ris.common.helpers.DateTimeHelper;
-import it.nexera.ris.common.helpers.EstateSituationHelper;
-import it.nexera.ris.common.helpers.FileHelper;
-import it.nexera.ris.common.helpers.GeneralFunctionsHelper;
-import it.nexera.ris.common.helpers.LogHelper;
-import it.nexera.ris.common.helpers.MessageHelper;
-import it.nexera.ris.common.helpers.PrintPDFHelper;
-import it.nexera.ris.common.helpers.RedirectHelper;
-import it.nexera.ris.common.helpers.RequestHelper;
-import it.nexera.ris.common.helpers.ResourcesHelper;
-import it.nexera.ris.common.helpers.SaveRequestDocumentsHelper;
-import it.nexera.ris.common.helpers.SelectItemHelper;
-import it.nexera.ris.common.helpers.SessionHelper;
-import it.nexera.ris.common.helpers.SubjectHelper;
-import it.nexera.ris.common.helpers.ValidationHelper;
+import it.nexera.ris.common.helpers.*;
 import it.nexera.ris.common.helpers.create.xls.CreateExcelRequestsReportHelper;
 import it.nexera.ris.persistence.UserHolder;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
-import it.nexera.ris.persistence.beans.entities.domain.Client;
-import it.nexera.ris.persistence.beans.entities.domain.Document;
-import it.nexera.ris.persistence.beans.entities.domain.Formality;
-import it.nexera.ris.persistence.beans.entities.domain.ReportFormalitySubject;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
-import it.nexera.ris.persistence.beans.entities.domain.RequestOLD;
-import it.nexera.ris.persistence.beans.entities.domain.SectionC;
-import it.nexera.ris.persistence.beans.entities.domain.Subject;
-import it.nexera.ris.persistence.beans.entities.domain.User;
-import it.nexera.ris.persistence.beans.entities.domain.VisureDH;
-import it.nexera.ris.persistence.beans.entities.domain.VisureRTF;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
+import it.nexera.ris.persistence.beans.entities.domain.*;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
 import it.nexera.ris.persistence.beans.entities.domain.readonly.RequestShort;
 import it.nexera.ris.persistence.view.ClientView;
 import it.nexera.ris.persistence.view.RequestView;
@@ -80,6 +17,27 @@ import it.nexera.ris.web.beans.wrappers.logic.RequestStateWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.RequestTypeFilterWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.ServiceFilterWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.UserFilterWrapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.HibernateException;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
+import org.primefaces.event.data.PageEvent;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @ManagedBean(name = "requestListBean")
 @ViewScoped
@@ -155,38 +113,65 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     private List<SelectItem> userTypes;
 
     private List<SelectItem> landAggregations;
-    
+
     private Long aggregationFilterId;
 
     private byte[] anomalyRequestsFile;
 
     private Boolean createTotalCostSumDocumentRecord;
-    
+
     private List<SelectItem> fiduciaryClients;
-    
+
     private Long fiduciaryClientFilterId;
-    
+
     private List<SelectItem> managerClients;
-    
+
     private Long managerClientFilterid;
-    
+
     private List<RequestStateWrapper> selectedRequestStates;
-    
-    private List<ServiceFilterWrapper> serviceWrappers; 
+
+    private List<ServiceFilterWrapper> serviceWrappers;
 
     private ServiceFilterWrapper selectedServiceForFilter;
-    
+
     private List<SelectItem> servicesForSelect;
-    
+
     private List<RequestTypeFilterWrapper> requestTypeWrappers;
 
     private RequestTypeFilterWrapper selectedRequestTypeForFilter;
-    
+
     private List<SelectItem> requestTypesForSelect;
-    
+
     private List<SelectItem> cities;
-    
+
     private Integer expirationDays;
+
+    private List<RequestState> selectedStates;
+
+    private List<RequestType> selectedRequestTypes;
+
+    private List<Service> selectedServices;
+
+    private Integer rowsPerPage;
+
+    private Integer pageNumber;
+
+    private static final String KEY_CLIENT_ID = "KEY_CLIENT_ID_SESSION_KEY_NOT_COPY";
+    private static final String KEY_STATES = "KEY_STATES_SESSION_KEY_NOT_COPY";
+    private static final String KEY_REQUEST_TYPE = "KEY_REQUEST_TYPE_SESSION_KEY_NOT_COPY";
+    private static final String KEY_SERVICES = "KEY_SERVICES_SESSION_KEY_NOT_COPY";
+    private static final String KEY_CLIENT_MANAGER_ID = "KEY_CLIENT_MANAGER_ID_SESSION_KEY_NOT_COPY";
+    private static final String KEY_CLIENT_FIDUCIARY_ID = "KEY_CLIENT_FIDUCIARY_ID_SESSION_KEY_NOT_COPY";
+    private static final String KEY_AGGREAGATION = "KEY_AGGREAGATION_SESSION_KEY_NOT_COPY";
+    private static final String KEY_DATE_EXPIRATION = "KEY_DATE_EXPIRATION_SESSION_KEY_NOT_COPY";
+    private static final String KEY_DATE_FROM_REQ = "KEY_DATE_FROM_REQ_SESSION_KEY_NOT_COPY";
+    private static final String KEY_DATE_TO_REQ = "KEY_DATE_TO_REQ_SESSION_KEY_NOT_COPY";
+    private static final String KEY_DATE_FROM_EVASION = "KEY_DATE_FROM_EVASION_SESSION_KEY_NOT_COPY";
+    private static final String KEY_DATE_TO_EVASION = "KEY_DATE_TO_EVASION_SESSION_KEY_NOT_COPY";
+    private static final String KEY_NOMINATIVO = "KEY_NOMINATIVO_SESSION_KEY_NOT_COPY";
+    private static final String KEY_CF = "KEY_CF_SESSION_KEY_NOT_COPY";
+    private static final String KEY_ROWS_PER_PAGE = "KEY_ROWS_PER_PAGE_SESSION_KEY_NOT_COPY";
+    private static final String KEY_PAGE_NUMBER = "KEY_PAGE_NUMBER_SESSION_KEY_NOT_COPY";
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -206,47 +191,46 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         setRequestTypesForSelect(new ArrayList<>());
 
 
-            setClients(ComboboxHelper.fillList(DaoManager.load(Client.class, new Criterion[]{
+        setClients(ComboboxHelper.fillList(DaoManager.load(Client.class, new Criterion[]{
                 Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
                         Restrictions.isNull("deleted"))
         }).stream()
-                    .filter(c -> (
-                            (ValidationHelper.isNullOrEmpty(c.getManager()) || !c.getManager()) &&
-                            (ValidationHelper.isNullOrEmpty(c.getFiduciary()) || !c.getFiduciary())
-                            )
-                    ).sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList()),Boolean.TRUE));
+                .filter(c -> (
+                                (ValidationHelper.isNullOrEmpty(c.getManager()) || !c.getManager()) &&
+                                        (ValidationHelper.isNullOrEmpty(c.getFiduciary()) || !c.getFiduciary())
+                        )
+                ).sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList()), Boolean.TRUE));
 
         setRequestTypes(ComboboxHelper.fillList(RequestType.class, Boolean.FALSE));
-        if(getRequestTypes().size() > 0) {
+        if (getRequestTypes().size() > 0) {
             Collections.sort(getRequestTypes(), new Comparator<SelectItem>() {
                 @Override
                 public int compare(final SelectItem object1, final SelectItem object2) {
                     return object1.getLabel().toUpperCase().compareTo(object2.getLabel().toUpperCase());
                 }
             });
-       }
-        
+        }
+
         setServiceTypes(ComboboxHelper.fillList(Service.class, Boolean.TRUE));
-        if(getServiceTypes().size() > 0) {
+        if (getServiceTypes().size() > 0) {
             Collections.sort(getServiceTypes(), new Comparator<SelectItem>() {
                 @Override
                 public int compare(final SelectItem object1, final SelectItem object2) {
                     return object1.getLabel().toUpperCase().compareTo(object2.getLabel().toUpperCase());
                 }
             });
-       }
+        }
         setUserTypes(ComboboxHelper.fillList(UserCategories.class, Boolean.FALSE));
         setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.TRUE));
-        
+
         setFiduciaryClients(ComboboxHelper.fillList(ClientView.class, Order.asc("name"), new Criterion[]{
                 Restrictions.eq("fiduciary", Boolean.TRUE),
         }, Boolean.FALSE));
-        
+
         setManagerClients(ComboboxHelper.fillList(ClientView.class, Order.asc("name"), new Criterion[]{
                 Restrictions.eq("manager", Boolean.TRUE),
         }, Boolean.FALSE));
 
-       
 
         List<User> notExternalCategoryUsers = DaoManager.load(User.class
                 , new Criterion[]{Restrictions.or(
@@ -256,7 +240,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         notExternalCategoryUsers.forEach(u -> getUserWrappers().add(new UserFilterWrapper(u)));
 
         List<Service> services = DaoManager.load(Service.class, new Criterion[]{Restrictions.isNotNull("name")});
-        if(!ValidationHelper.isNullOrEmpty(services)) {
+        if (!ValidationHelper.isNullOrEmpty(services)) {
             Collections.sort(services, new Comparator<Service>() {
                 @Override
                 public int compare(final Service object1, final Service object2) {
@@ -265,16 +249,16 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             });
             services.forEach(s -> getServiceWrappers().add(new ServiceFilterWrapper(s)));
         }
-        
-       
-        if(!ValidationHelper.isNullOrEmpty(getSearchLastName()) || !ValidationHelper.isNullOrEmpty(getSearchFiscalCode())
+
+
+        if (!ValidationHelper.isNullOrEmpty(getSearchLastName()) || !ValidationHelper.isNullOrEmpty(getSearchFiscalCode())
                 || !ValidationHelper.isNullOrEmpty(getSearchCreateUser())) {
             setSelectedAllStatesOnPanel(true);
         }
-        
-        Long dueRequestTypeId =(Long)SessionHelper.get("dueRequestTypeId");
-        
-        if(!ValidationHelper.isNullOrEmpty(dueRequestTypeId)) {
+
+        Long dueRequestTypeId = (Long) SessionHelper.get("dueRequestTypeId");
+
+        if (!ValidationHelper.isNullOrEmpty(dueRequestTypeId)) {
             SessionHelper.removeObject("dueRequestTypeId");
             List<RequestType> requestTypes = DaoManager.load(RequestType.class, new Criterion[]{Restrictions.isNotNull("name")});
             if (!ValidationHelper.isNullOrEmpty(requestTypes)) {
@@ -285,23 +269,23 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                     }
                 });
                 requestTypes.forEach(r -> {
-                    getRequestTypeWrappers().add(new RequestTypeFilterWrapper(r.getId().equals(dueRequestTypeId),r));
+                    getRequestTypeWrappers().add(new RequestTypeFilterWrapper(r.getId().equals(dueRequestTypeId), r));
                 });
             }
-            for(RequestState rs: RequestState.values()) {
-                getStateWrappers().add(new RequestStateWrapper(!RequestState.EVADED.equals(rs) , rs));
+            for (RequestState rs : RequestState.values()) {
+                getStateWrappers().add(new RequestStateWrapper(!RequestState.EVADED.equals(rs), rs));
             }
-            Integer expirationDays = (Integer)SessionHelper.get("expirationDays");
-            if(!ValidationHelper.isNullOrEmpty(expirationDays)) {
+            Integer expirationDays = (Integer) SessionHelper.get("expirationDays");
+            if (!ValidationHelper.isNullOrEmpty(expirationDays)) {
                 SessionHelper.removeObject("expirationDays");
                 setExpirationDays(expirationDays);
             }
-        }else {
+        } else {
             setExpirationDays(null);
-             Arrays.asList(RequestState.values()).forEach(st -> getStateWrappers()
-                .add(new RequestStateWrapper(PageTypes.REPORT_LIST.equals(getCurrentPage())
-                        ? RequestState.EVADED.equals(st) : st.isNeedShow(), st)));
-             
+            Arrays.asList(RequestState.values()).forEach(st -> getStateWrappers()
+                    .add(new RequestStateWrapper(PageTypes.REPORT_LIST.equals(getCurrentPage())
+                            ? RequestState.EVADED.equals(st) : st.isNeedShow(), st)));
+
             List<RequestType> requestTypes = DaoManager.load(RequestType.class, new Criterion[]{Restrictions.isNotNull("name")});
             if (!ValidationHelper.isNullOrEmpty(requestTypes)) {
                 Collections.sort(requestTypes, new Comparator<RequestType>() {
@@ -314,6 +298,18 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             }
 
         }
+        String filterStateBy = (String) SessionHelper.get("REQUEST_LIST_FILTER_BY");
+        if (!ValidationHelper.isNullOrEmpty(filterStateBy)) {
+            getStateWrappers().forEach(r -> {
+                if (r.getState().equals(RequestState.valueOf(filterStateBy))) {
+                    r.setSelected(Boolean.TRUE);
+                } else {
+                    r.setSelected(Boolean.FALSE);
+                }
+            });
+            SessionHelper.removeObject("REQUEST_LIST_FILTER_BY");
+        }
+        loadFilterValueFromSession();
         filterTableFromPanel();
     }
 
@@ -350,7 +346,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     private List<Document> getAllegatiDocuments(Long requestId)
-        throws PersistenceBeanException, IllegalAccessException {
+            throws PersistenceBeanException, IllegalAccessException {
         List<Document> documents = DaoManager.load(Document.class, new Criterion[]{
                 Restrictions.eq("request.id", requestId),
                 Restrictions.eq("typeId", DocumentType.ALLEGATI.getId())
@@ -380,7 +376,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             Request request = DaoManager.get(Request.class, downloadRequestId);
 
             String body = getPdfRequestBody(request);
-
+            updateFilterValueInSession();
 
             FileHelper.sendFile("richiesta-" + request.getStrId() + ".pdf",
                     PrintPDFHelper.convertToPDF(null, body, null,
@@ -392,28 +388,28 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     public static String getPdfRequestBody(Request request) {
         return getFirstPart(request) + getSecondPart(request) +
-        		getThirdPart(request);
+                getThirdPart(request);
     }
 
     public static String getPdfRequestBody(Request request, Subject subject) {
         return getFirstPart(request, subject) + getSecondPart(request, subject) +
-        		getThirdPart(request, subject);
+                getThirdPart(request, subject);
     }
 
     public static String getThirdPart(Request request) {
-    	return ( (request == null) || (request.getSubject() == null) ) ? "":
-    		getThirdPart(request, request.getSubject());
+        return ((request == null) || (request.getSubject() == null)) ? "" :
+                getThirdPart(request, request.getSubject());
     }
 
     public static String getThirdPart(Request request, Subject subject) {
         String thirdPart = "";
 
-    	try {
+        try {
 
-    		if (!ValidationHelper.isNullOrEmpty(subject)) {
+            if (!ValidationHelper.isNullOrEmpty(subject)) {
 
-    			thirdPart += "<hr/>";
-    			thirdPart += "<b>Richieste</b>:<br/>";
+                thirdPart += "<hr/>";
+                thirdPart += "<b>Richieste</b>:<br/>";
 
                 List<RequestShort> requestList;
                 List<Criterion> criteria = new ArrayList<Criterion>();
@@ -421,53 +417,53 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                 List<Long> subjectsIds = EstateSituationHelper.getIdSubjects(request);
                 subjectsIds.add(subject.getId());
 
-				criteria.add(Restrictions.in("subject.id", subjectsIds));
+                criteria.add(Restrictions.in("subject.id", subjectsIds));
 
-				if(request != null)
-					criteria.add(Restrictions.ne("id", request.getId()));
+                if (request != null)
+                    criteria.add(Restrictions.ne("id", request.getId()));
 
                 criteria.add(Restrictions.or(Restrictions.eq("isDeleted", false),
                         Restrictions.isNull("isDeleted")));
 
-    			requestList = DaoManager.load(RequestShort.class, criteria.toArray(new Criterion[0]),
-    					Order.desc("createDate"));
+                requestList = DaoManager.load(RequestShort.class, criteria.toArray(new Criterion[0]),
+                        Order.desc("createDate"));
 
-    			
-    			for(RequestShort r : requestList) {
-    			    thirdPart +=
-    			            (request.getSubject().getId().equals(r.getSubject().getId()) ? "" : "PRES - ") +
-    			            r.getCreateDateStr() +
-    			            " - " +
-    			            r.getClientName() +
-    			            " - " +
-    			            r.getServiceName() +
-    			            " - " +
-    			            r.getAggregationLandChargesRegistryName() +
-    			            "<br/>";
 
-    			    if(!ValidationHelper.isNullOrEmpty(r.getMultipleServices())) {
-    			        thirdPart += "<ul>";
-    			        for(Service service : r.getMultipleServices()) {
-    			            thirdPart += "<li>";
-    			            thirdPart += service.getName();
-    			            thirdPart += "</li>";
-    			        }
-    			        thirdPart += "</ul>";
-    			    }
-    			}
+                for (RequestShort r : requestList) {
+                    thirdPart +=
+                            (request.getSubject().getId().equals(r.getSubject().getId()) ? "" : "PRES - ") +
+                                    r.getCreateDateStr() +
+                                    " - " +
+                                    r.getClientName() +
+                                    " - " +
+                                    r.getServiceName() +
+                                    " - " +
+                                    r.getAggregationLandChargesRegistryName() +
+                                    "<br/>";
 
-                List<RequestOLD> requestOLDS = DaoManager.load(RequestOLD.class, new Criterion[] {
-                       subject.getTypeIsPhysicalPerson() ?
+                    if (!ValidationHelper.isNullOrEmpty(r.getMultipleServices())) {
+                        thirdPart += "<ul>";
+                        for (Service service : r.getMultipleServices()) {
+                            thirdPart += "<li>";
+                            thirdPart += service.getName();
+                            thirdPart += "</li>";
+                        }
+                        thirdPart += "</ul>";
+                    }
+                }
+
+                List<RequestOLD> requestOLDS = DaoManager.load(RequestOLD.class, new Criterion[]{
+                        subject.getTypeIsPhysicalPerson() ?
                                 Restrictions.eq("fiscalCodeVat", subject.getFiscalCode()) :
                                 Restrictions.eq("fiscalCodeVat", subject.getNumberVAT())});
 
-                for(RequestOLD old : requestOLDS) {
+                for (RequestOLD old : requestOLDS) {
                     thirdPart +=
                             old.getRequestDateString() + " - " +
-                            old.getClient() + " - " +
-                            old.getType() + " - " +
-                            old.getLandChargesRegistry() +
-                             "<br/>";
+                                    old.getClient() + " - " +
+                                    old.getType() + " - " +
+                                    old.getLandChargesRegistry() +
+                                    "<br/>";
                 }
 //                
 //                if(!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
@@ -486,12 +482,12 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
                 thirdPart += "<b>Visure a testo:</b><br/>";
 
-                List<VisureRTF> visureRTFS = DaoManager.load(VisureRTF.class, new Criterion[] {
+                List<VisureRTF> visureRTFS = DaoManager.load(VisureRTF.class, new Criterion[]{
                         subject.getTypeIsPhysicalPerson() ?
                                 Restrictions.eq("fiscalCodeVat", subject.getFiscalCode()) :
-                                Restrictions.eq("fiscalCodeVat", subject.getNumberVAT()) });
+                                Restrictions.eq("fiscalCodeVat", subject.getNumberVAT())});
 
-                for(VisureRTF rtf : visureRTFS) {
+                for (VisureRTF rtf : visureRTFS) {
                     thirdPart +=
                             DateTimeHelper.toString(rtf.getUpdateDate()) + " - " +
                                     rtf.getNumFormality() + " - " +
@@ -505,24 +501,24 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
                 thirdPart += "<b>Visure DH:</b><br/>";
 
-                List<VisureDH> visureDHS = DaoManager.load(VisureDH.class, new Criterion[] {
+                List<VisureDH> visureDHS = DaoManager.load(VisureDH.class, new Criterion[]{
                         subject.getTypeIsPhysicalPerson() ?
                                 Restrictions.eq("fiscalCodeVat", subject.getFiscalCode()) :
                                 Restrictions.eq("fiscalCodeVat", subject.getNumberVAT())});
 
-                for(VisureDH dh : visureDHS) {
+                for (VisureDH dh : visureDHS) {
                     thirdPart +=
                             dh.getType() + " - " +
-                            DateTimeHelper.toString(dh.getUpdateDate()) + " - " +
-                            dh.getNumFormality() + " - " +
-                            dh.getNumberPractice() + " - " +
-                            dh.getLandChargesRegistry() +
-                            "<br/>";
+                                    DateTimeHelper.toString(dh.getUpdateDate()) + " - " +
+                                    dh.getNumFormality() + " - " +
+                                    dh.getNumberPractice() + " - " +
+                                    dh.getLandChargesRegistry() +
+                                    "<br/>";
                 }
 
-    			thirdPart += "<br/>";
+                thirdPart += "<br/>";
 
-    			thirdPart += "<hr/>";
+                thirdPart += "<hr/>";
 
                 thirdPart += "<b>Formalit&agrave;:</b><br/>";
 
@@ -538,19 +534,19 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
                 for (int i = 0; i < countOfRequests; ++i) {
 
-    	            List<Long> listIds = EstateSituationHelper.getIdSubjects(subject);
-    	            listIds.add(subject.getId());
-    	        	criteria = new ArrayList<>();
+                    List<Long> listIds = EstateSituationHelper.getIdSubjects(subject);
+                    listIds.add(subject.getId());
+                    criteria = new ArrayList<>();
 
-    	        	criteria.add(Restrictions.in("sub.id", listIds));
-    	            List<Formality> list =
-    	            		DaoManager.load(Formality.class, new CriteriaAlias[]{new CriteriaAlias
-    	                    ("sectionC", "sectionC", JoinType.INNER_JOIN),
-    	                    new CriteriaAlias("sectionC.subject", "sub", JoinType.INNER_JOIN)
-    	            }, criteria.toArray(new Criterion[0]));
+                    criteria.add(Restrictions.in("sub.id", listIds));
+                    List<Formality> list =
+                            DaoManager.load(Formality.class, new CriteriaAlias[]{new CriteriaAlias
+                                    ("sectionC", "sectionC", JoinType.INNER_JOIN),
+                                    new CriteriaAlias("sectionC.subject", "sub", JoinType.INNER_JOIN)
+                            }, criteria.toArray(new Criterion[0]));
 
-    	            formalityList.addAll(list);
-    	            }
+                    formalityList.addAll(list);
+                }
 
                 for (Formality f : formalityList) {
                     boolean isPresumptive = f.getSectionC().stream().map(SectionC::getSubject).flatMap(List::stream)
@@ -568,19 +564,19 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                     thirdPart += "<br/>";
                 }
 
-    			thirdPart += "<br/>";
+                thirdPart += "<br/>";
 
-    			thirdPart += "<hr/>";
+                thirdPart += "<hr/>";
 
-    			thirdPart += "<b>Segnalazioni:</b><br/>";
+                thirdPart += "<b>Segnalazioni:</b><br/>";
 
-    			List<ReportFormalitySubject> rfsList =
-    					DaoManager.load(ReportFormalitySubject.class,
-    							new Criterion[] {
-									subject.getTypeIsPhysicalPerson() ?
-									Restrictions.eq("fiscalCode", subject.getFiscalCode()) :
-									Restrictions.eq("numberVAT", subject.getNumberVAT())
-    					}, Order.desc("createDate"));
+                List<ReportFormalitySubject> rfsList =
+                        DaoManager.load(ReportFormalitySubject.class,
+                                new Criterion[]{
+                                        subject.getTypeIsPhysicalPerson() ?
+                                                Restrictions.eq("fiscalCode", subject.getFiscalCode()) :
+                                                Restrictions.eq("numberVAT", subject.getNumberVAT())
+                                }, Order.desc("createDate"));
 
                 for (ReportFormalitySubject rfs : rfsList) {
                     if (rfs.getTypeFormalityId().equals(1L)) {
@@ -590,24 +586,24 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                     } else {
                         thirdPart += "Annotamento - ";
                     }
-    				thirdPart +=
-    						DateTimeHelper.toString(rfs.getDate()) + " - " +
-                            (rfs.getNumber() == null ? "" : rfs.getNumber() + " - ") +
-    						((rfs.getLandChargesRegistry() == null) ? "" : rfs.getLandChargesRegistry().getName()) +
-    						"<br/>";
-    			}
+                    thirdPart +=
+                            DateTimeHelper.toString(rfs.getDate()) + " - " +
+                                    (rfs.getNumber() == null ? "" : rfs.getNumber() + " - ") +
+                                    ((rfs.getLandChargesRegistry() == null) ? "" : rfs.getLandChargesRegistry().getName()) +
+                                    "<br/>";
+                }
 
 
-    			if(subject.getTypeIsPhysicalPerson()) {
-    				thirdPart += "<hr/>";
-        			thirdPart += "<b>Presumibili:</b><br/>";
+                if (subject.getTypeIsPhysicalPerson()) {
+                    thirdPart += "<hr/>";
+                    thirdPart += "<b>Presumibili:</b><br/>";
 
-        		
-        			List<Subject> subjects = SubjectHelper.getPresumablesForSubject(
-        			        subject);
-        			
-        			subjects.removeIf(s -> s.equals(subject));
-        			for(Subject s :subjects) {
+
+                    List<Subject> subjects = SubjectHelper.getPresumablesForSubject(
+                            subject);
+
+                    subjects.removeIf(s -> s.equals(subject));
+                    for (Subject s : subjects) {
 
                         thirdPart += s.getFullName() + " - " + s.getSexType().getShortValue() + " - " +
                                 DateTimeHelper.toString(s.getBirthDate()) + " - " +
@@ -620,18 +616,18 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                                 "<br/>";
                     }
                 }
-    		}
-    	} catch (Exception e) {
+            }
+        } catch (Exception e) {
             LogHelper.log(log, e);
-    		return "ERROR IN THIRD PART";
-    	}
+            return "ERROR IN THIRD PART";
+        }
 
-    	return thirdPart;
+        return thirdPart;
     }
 
     private static String getSecondPart(Request request) {
-    	return ( (request == null) || (request.getSubject() == null) ) ? "":
-    		getSecondPart(request, request.getSubject());
+        return ((request == null) || (request.getSubject() == null)) ? "" :
+                getSecondPart(request, request.getSubject());
     }
 
     private static String getSecondPart(Request request, Subject subject) {
@@ -639,31 +635,31 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
         if (!ValidationHelper.isNullOrEmpty(request)) {
 
-        if (!ValidationHelper.isNullOrEmpty(request.getNdg())) {
-            secondPart += "NDG: " + request.getNdg() + "<br/>";
-        }
-        if (!ValidationHelper.isNullOrEmpty(request.getPosition())) {
-            secondPart += "Posizione: " + request.getPosition() + "<br/>";
-        }
-        if (!ValidationHelper.isNullOrEmpty(request.getCreateUserId())) {
-            secondPart += "Utente: " + request.getCreateUserName() + "<br/>";
-        }
-        if (!ValidationHelper.isNullOrEmpty(request.getUserOfficeId())) {
-            Office office = new Office();
-            try {
-                office = DaoManager.get(Office.class, request.getUserOfficeId());
-            } catch (PersistenceBeanException | InstantiationException | IllegalAccessException e) {
-              //  LogHelper.log(log, e);
+            if (!ValidationHelper.isNullOrEmpty(request.getNdg())) {
+                secondPart += "NDG: " + request.getNdg() + "<br/>";
             }
-            if (!ValidationHelper.isNullOrEmpty(office)) {
-                secondPart += "Filiale: " + office.getCode() + " " + office.getDescription() + "<br/>";
+            if (!ValidationHelper.isNullOrEmpty(request.getPosition())) {
+                secondPart += "Posizione: " + request.getPosition() + "<br/>";
             }
-        }
-        if (!ValidationHelper.isNullOrEmpty(request.getNote())) {
-            secondPart += "Note: " + request.getNote() + "<br/>";
-        } else if (!ValidationHelper.isNullOrEmpty(request.getUltimaResidenza())) {
-            secondPart += "Note: " + request.getUltimaResidenza() + "<br/>";
-        }
+            if (!ValidationHelper.isNullOrEmpty(request.getCreateUserId())) {
+                secondPart += "Utente: " + request.getCreateUserName() + "<br/>";
+            }
+            if (!ValidationHelper.isNullOrEmpty(request.getUserOfficeId())) {
+                Office office = new Office();
+                try {
+                    office = DaoManager.get(Office.class, request.getUserOfficeId());
+                } catch (PersistenceBeanException | InstantiationException | IllegalAccessException e) {
+                    //  LogHelper.log(log, e);
+                }
+                if (!ValidationHelper.isNullOrEmpty(office)) {
+                    secondPart += "Filiale: " + office.getCode() + " " + office.getDescription() + "<br/>";
+                }
+            }
+            if (!ValidationHelper.isNullOrEmpty(request.getNote())) {
+                secondPart += "Note: " + request.getNote() + "<br/>";
+            } else if (!ValidationHelper.isNullOrEmpty(request.getUltimaResidenza())) {
+                secondPart += "Note: " + request.getUltimaResidenza() + "<br/>";
+            }
 
         }
 
@@ -671,8 +667,8 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public static String getFirstPart(Request request) {
-    	return ( (request == null) || (request.getSubject() == null) ) ? "":
-    		getFirstPart(request, request.getSubject());
+        return ((request == null) || (request.getSubject() == null)) ? "" :
+                getFirstPart(request, request.getSubject());
     }
 
     private static String getFirstPart(Request request, Subject subject) {
@@ -680,32 +676,32 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
         if (!ValidationHelper.isNullOrEmpty(request)) {
 
-        if (!ValidationHelper.isNullOrEmpty(request.getClientName())) {
-            result += "Cliente: " + request.getClientName() + "<br/>";
-        }
-        if (!ValidationHelper.isNullOrEmpty(request.getCreateDate())) {
-            result += "Data richiesta: " + request.getCreateDateStr() + "<br/>";
-        }
-        if (!ValidationHelper.isNullOrEmpty(request.getRequestType())) {
-            result += "Servizio: " + request.getRequestTypeName() + "<br/>";
-        }
-        if (!ValidationHelper.isNullOrEmpty(request.getService())) {
-            result += "Tipo Richiesta: " + request.getServiceName() + "<br/>";
-            result += "Ufficio: " + request.getService().getEmailTextCamelCase() + " ";
-        }
-        if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())) {
-            result += request.getAggregationLandChargesRegistryName() + "<br/>";
-        } else if (!ValidationHelper.isNullOrEmpty(request.getCity())) {
-            result += request.getCityDescription() + "<br/>";
+            if (!ValidationHelper.isNullOrEmpty(request.getClientName())) {
+                result += "Cliente: " + request.getClientName() + "<br/>";
+            }
+            if (!ValidationHelper.isNullOrEmpty(request.getCreateDate())) {
+                result += "Data richiesta: " + request.getCreateDateStr() + "<br/>";
+            }
+            if (!ValidationHelper.isNullOrEmpty(request.getRequestType())) {
+                result += "Servizio: " + request.getRequestTypeName() + "<br/>";
+            }
+            if (!ValidationHelper.isNullOrEmpty(request.getService())) {
+                result += "Tipo Richiesta: " + request.getServiceName() + "<br/>";
+                result += "Ufficio: " + request.getService().getEmailTextCamelCase() + " ";
+            }
+            if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())) {
+                result += request.getAggregationLandChargesRegistryName() + "<br/>";
+            } else if (!ValidationHelper.isNullOrEmpty(request.getCity())) {
+                result += request.getCityDescription() + "<br/>";
+            }
+
+            if (!ValidationHelper.isNullOrEmpty(request.getUrgent()) && request.getUrgent()) {
+                result += "Urgente: <b>S</b> <br/>";
+            } else {
+                result += "Urgente: <b>N</b> <br/>";
+            }
         }
 
-        if (!ValidationHelper.isNullOrEmpty(request.getUrgent()) && request.getUrgent()) {
-            result += "Urgente: <b>S</b> <br/>";
-        } else {
-            result += "Urgente: <b>N</b> <br/>";
-        }
-        }
-        
         if (!ValidationHelper.isNullOrEmpty(subject)) {
             if (subject.getTypeIsPhysicalPerson()) {
                 result += "Soggetto: " + subject.getSurnameUpper() + " "
@@ -716,23 +712,23 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
             }
             if (!ValidationHelper.isNullOrEmpty(subject.getBirthCity()) &&
-                !ValidationHelper.isNullOrEmpty(subject.getBirthProvince())) {
+                    !ValidationHelper.isNullOrEmpty(subject.getBirthProvince())) {
 
                 result += "Dati Anagrafici: " + (subject.getTypeIsPhysicalPerson() ? "nato a " : "con sede in ")
                         +
-                               ( (subject.getForeignCountry() != null &&
-        		subject.getForeignCountry()) ?
-        	( subject.getCountry().getDescription() + " (EE) " ) :
+                        ((subject.getForeignCountry() != null &&
+                                subject.getForeignCountry()) ?
+                                (subject.getCountry().getDescription() + " (EE) ") :
 
-                        (subject.getBirthCityDescription() + " ( "
-                        + subject.getBirthProvince().getCode() + " ) "));
+                                (subject.getBirthCityDescription() + " ( "
+                                        + subject.getBirthProvince().getCode() + " ) "));
 
                 if (!ValidationHelper.isNullOrEmpty(subject.getBirthDate())) {
                     result += "il " + DateTimeHelper.toString(subject.getBirthDate());
                 }
-            }else if(!ValidationHelper.isNullOrEmpty(subject.getCountry())) {
-            	result += "Dati Anagrafici: " + (subject.getTypeIsPhysicalPerson() ? "nato in " : "con sede in ")
-                        +( subject.getCountry().getDescription() + " (EE) " );
+            } else if (!ValidationHelper.isNullOrEmpty(subject.getCountry())) {
+                result += "Dati Anagrafici: " + (subject.getTypeIsPhysicalPerson() ? "nato in " : "con sede in ")
+                        + (subject.getCountry().getDescription() + " (EE) ");
             }
 
             result += "<br/>";
@@ -753,19 +749,19 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         getServicesForSelect().add(SelectItemHelper.getNotSelected());
         getRequestTypesForSelect().add(SelectItemHelper.getNotSelected());
         Arrays.asList(RequestState.values()).forEach(st -> getStatesForSelect()
-            .add(new SelectItem(st.getId(), st.toString())));
+                .add(new SelectItem(st.getId(), st.toString())));
         getUserWrappers().forEach(u -> getUsersForSelect().add(new SelectItem(u.getId(), u.getValue())));
         getServiceWrappers().forEach(s -> getServicesForSelect().add(new SelectItem(s.getId(), s.getValue())));
         getRequestTypeWrappers().forEach(r -> getRequestTypesForSelect().add(new SelectItem(r.getId(), r.getValue())));
     }
 
     public void modifyRequests()
-        throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+            throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         filterTableFromPanel();
         setAllRequestViewsToModify(
-            DaoManager.load(RequestView.class, getFilterRestrictions().toArray(new Criterion[0])));
+                DaoManager.load(RequestView.class, getFilterRestrictions().toArray(new Criterion[0])));
         List<Long> requestIdList = getAllRequestViewsToModify().stream()
-            .map(RequestView::getId).collect(Collectors.toList());
+                .map(RequestView::getId).collect(Collectors.toList());
         if (!ValidationHelper.isNullOrEmpty(getSelectedState())) {
             for (Long id : requestIdList) {
                 RequestHelper.updateState(id, getSelectedState());
@@ -832,9 +828,9 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     public void loadRequestsPdf() throws PersistenceBeanException, IllegalAccessException {
         setAllRequestViewsToModify(DaoManager.load(RequestView.class,
-            getFilterRestrictions().toArray(new Criterion[0])));
+                getFilterRestrictions().toArray(new Criterion[0])));
         List<Long> requestIdList = getAllRequestViewsToModify().stream()
-            .map(RequestView::getId).collect(Collectors.toList());
+                .map(RequestView::getId).collect(Collectors.toList());
         try {
             Map<String, byte[]> files = new HashMap<>();
             Integer fileCounter = 1;
@@ -893,7 +889,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                         String title = prepareDocumentTitle(document);
                         try {
                             FileHelper.sendFile(title,
-                                new FileInputStream(file), (int) file.length());
+                                    new FileInputStream(file), (int) file.length());
                         } catch (Exception e) {
                             LogHelper.log(log, e);
                         }
@@ -932,14 +928,15 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         SessionHelper.put("searchLastName", getSearchLastName());
         SessionHelper.put("searchFiscalCode", getSearchFiscalCode());
         SessionHelper.put("searchCreateUser", getSearchCreateUser());
-
+        updateFilterValueInSession();
         RedirectHelper.goTo(PageTypes.REQUEST_EDIT, getEntityEditId());
     }
 
     public void filterTableFromPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        updateFilterValueInSession();
         List<Criterion> restrictions = RequestHelper.filterTableFromPanel(getDateFrom(), getDateTo(), getDateFromEvasion(),
                 getDateToEvasion(), getSelectedClientId(), getRequestTypeWrappers(), getStateWrappers(), getUserWrappers(),
-                getServiceWrappers(), getSelectedUserType(),getAggregationFilterId(), getSelectedServiceType());
+                getServiceWrappers(), getSelectedUserType(), getAggregationFilterId(), getSelectedServiceType(), Boolean.FALSE);
 
         if (!ValidationHelper.isNullOrEmpty(getSearchLastName())) {
             restrictions.add(
@@ -952,7 +949,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                                     + getSearchLastName().replaceAll("\\.", "")
                                     .replaceAll("\\s+", " ")
                                     .replaceAll("'", "").trim() + "%'")
-                            )
+                    )
 
             );
         }
@@ -967,11 +964,11 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             restrictions.add(Restrictions.le("expirationDate",
                     DateTimeHelper.getDayEnd(getDateExpiration())));
         }
-        
+
         if (!ValidationHelper.isNullOrEmpty(getExpirationDays())) {
             Date dueDate = DateTimeHelper.addDays(DateTimeHelper.getNow(), getExpirationDays());
-            restrictions.add(getExpirationDays() == 0 ? Restrictions.le("expirationDate",dueDate) : 
-                Restrictions.ge("expirationDate",dueDate));
+            restrictions.add(getExpirationDays() == 0 ? Restrictions.le("expirationDate", dueDate) :
+                    Restrictions.ge("expirationDate", dueDate));
         }
 
         if (getCurrentUser().isExternal()) {
@@ -995,36 +992,36 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
         if (!ValidationHelper.isNullOrEmpty(getFiduciaryClientFilterId())) {
             restrictions.add(Restrictions.eq("fiduciaryId",
-            		getFiduciaryClientFilterId()));
+                    getFiduciaryClientFilterId()));
         }
-        
+
 
         if (!ValidationHelper.isNullOrEmpty(getManagerClientFilterid())) {
             restrictions.add(Restrictions.eq("managerId",
-            		getManagerClientFilterid()));
+                    getManagerClientFilterid()));
         }
-        
+
         setFilterRestrictions(restrictions);
         loadList(RequestView.class, restrictions.toArray(new Criterion[0]),
                 new Order[]{Order.desc("createDate")});
-        
+
         List<RequestView> requestList = DaoManager.load(RequestView.class, restrictions.toArray(new Criterion[0]));
-        
+
         List<Long> cityIds = new ArrayList<Long>();
-        
-        
-        for(RequestView request : requestList) {
-            if(!ValidationHelper.isNullOrEmpty(request.getCityId()) && !cityIds.contains(request.getCityId())) {
+
+
+        for (RequestView request : requestList) {
+            if (!ValidationHelper.isNullOrEmpty(request.getCityId()) && !cityIds.contains(request.getCityId())) {
                 cityIds.add(request.getCityId());
             }
         }
-        if(!ValidationHelper.isNullOrEmpty(cityIds)) {
+        if (!ValidationHelper.isNullOrEmpty(cityIds)) {
             setCities(ComboboxHelper.fillList(City.class,
                     Order.asc("description"),
                     new Criterion[]{Restrictions.isNotNull("province.id")
-                            , Restrictions.eq("external", Boolean.TRUE),Restrictions.in("id", cityIds)}, Boolean.FALSE));
+                            , Restrictions.eq("external", Boolean.TRUE), Restrictions.in("id", cityIds)}, Boolean.FALSE));
         }
-        
+
     }
 
     public void verifyRequests() throws PersistenceBeanException, InstantiationException, IllegalAccessException, IOException {
@@ -1112,7 +1109,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             }
         }
     }
-    
+
     public void selectServiceForFilter() throws HibernateException, IllegalAccessException, PersistenceBeanException {
         if (!ValidationHelper.isNullOrEmpty(this.getServiceWrappers())) {
             for (ServiceFilterWrapper wkrsw : this.getServiceWrappers()) {
@@ -1124,46 +1121,46 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         }
         selectServiceCheck();
     }
-    
+
     public void selectServiceCheck() throws HibernateException, IllegalAccessException, PersistenceBeanException {
-        
+
         if (!ValidationHelper.isNullOrEmpty(this.getServiceWrappers())) {
-            
-            List<ServiceFilterWrapper> filterWrappers = 
+
+            List<ServiceFilterWrapper> filterWrappers =
                     this.getServiceWrappers().stream().
-                    filter(sw -> Objects.nonNull(
-                            sw.getService().getServiceReferenceType()))
-                    .filter(distinctByKey(sw -> sw.getService().getServiceReferenceType()))
-                    .collect(Collectors.toList());
-            
-            if(ValidationHelper.isNullOrEmpty(filterWrappers)) {
+                            filter(sw -> Objects.nonNull(
+                                    sw.getService().getServiceReferenceType()))
+                            .filter(distinctByKey(sw -> sw.getService().getServiceReferenceType()))
+                            .collect(Collectors.toList());
+
+            if (ValidationHelper.isNullOrEmpty(filterWrappers)) {
                 setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.FALSE));
-            }else {
+            } else {
                 boolean isConservatory = false;
                 boolean isComuni = false;
                 for (ServiceFilterWrapper wkrsw : filterWrappers) {
-                    if(wkrsw.getSelected()) {
-                        if(wkrsw.getService().getServiceReferenceType() == ServiceReferenceTypes.COMMON) {
+                    if (wkrsw.getSelected()) {
+                        if (wkrsw.getService().getServiceReferenceType() == ServiceReferenceTypes.COMMON) {
                             isComuni = true;
-                        }else {
+                        } else {
                             isConservatory = true;
                         }
                     }
                 }
-                if(isComuni && isConservatory) {
+                if (isComuni && isConservatory) {
                     setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.FALSE));
                     getLandAggregations().addAll(getCities());
-                }else if(isComuni) {
+                } else if (isComuni) {
                     setLandAggregations(getCities());
-                }else {
+                } else {
                     setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.FALSE));
                 }
             }
-        }else {
+        } else {
             setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.FALSE));
         }
     }
-    
+
     public void selectRequestTypeForFilter() {
         if (!ValidationHelper.isNullOrEmpty(this.getRequestTypeWrappers())) {
             for (RequestTypeFilterWrapper wkrsw : this.getRequestTypeWrappers()) {
@@ -1227,7 +1224,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
         return true;
     }
-    
+
     public void setSelectedAllUsersOnPanel(boolean selectedAllStatesOnPanel) {
         if (this.getUserWrappers() != null) {
             for (UserFilterWrapper wlrsw : this.getUserWrappers()) {
@@ -1235,7 +1232,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             }
         }
     }
-    
+
     public boolean getSelectedAllServicesOnPanel() {
         if (this.getServiceWrappers() != null) {
             for (ServiceFilterWrapper wlrsw : this.getServiceWrappers()) {
@@ -1255,7 +1252,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             }
         }
     }
-    
+
     public boolean getSelectedAllRequestTypesOnPanel() {
         if (this.getRequestTypeWrappers() != null) {
             for (RequestTypeFilterWrapper wlrsw : this.getRequestTypeWrappers()) {
@@ -1275,7 +1272,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             }
         }
     }
-    
+
 
     public void openRequestEditor() {
         RedirectHelper.goTo(PageTypes.REQUEST_TEXT_EDIT, getEntityEditId());
@@ -1284,9 +1281,170 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     public void openRequestMail() {
         RedirectHelper.goTo(PageTypes.MAIL_MANAGER_VIEW, getEntityEditId());
     }
-    
+
     public void openRequestSubject() {
+        updateFilterValueInSession();
         RedirectHelper.goToOnlyView(PageTypes.SUBJECT, getEntityEditId());
+    }
+
+    private void updateFilterValueInSession() {
+        if (!ValidationHelper.isNullOrEmpty(getSelectedClientId())) {
+            SessionHelper.put(KEY_CLIENT_ID, getSelectedClientId());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getStateWrappers())) {
+            SessionHelper.put(KEY_STATES, getStateWrappers());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getRequestTypeWrappers())) {
+            SessionHelper.put(KEY_REQUEST_TYPE, getRequestTypeWrappers());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getServiceWrappers())) {
+            SessionHelper.put(KEY_SERVICES, getServiceWrappers());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getManagerClientFilterid())) {
+            SessionHelper.put(KEY_CLIENT_MANAGER_ID, getManagerClientFilterid());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getFiduciaryClientFilterId())) {
+            SessionHelper.put(KEY_CLIENT_FIDUCIARY_ID, getFiduciaryClientFilterId());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getAggregationFilterId())) {
+            SessionHelper.put(KEY_AGGREAGATION, getAggregationFilterId());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getDateExpiration())) {
+            SessionHelper.put(KEY_DATE_EXPIRATION, getDateExpiration());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getDateFrom())) {
+            SessionHelper.put(KEY_DATE_FROM_REQ, getDateFrom());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getDateTo())) {
+            SessionHelper.put(KEY_DATE_TO_REQ, getDateTo());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getDateFromEvasion())) {
+            SessionHelper.put(KEY_DATE_FROM_EVASION, getDateFromEvasion());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getDateToEvasion())) {
+            SessionHelper.put(KEY_DATE_TO_EVASION, getDateToEvasion());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getSearchLastName())) {
+            SessionHelper.put(KEY_NOMINATIVO, getSearchLastName());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getSearchFiscalCode())) {
+            SessionHelper.put(KEY_CF, getSearchFiscalCode());
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(getRowsPerPage())) {
+            SessionHelper.put(KEY_ROWS_PER_PAGE, getRowsPerPage());
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(getPageNumber())) {
+            SessionHelper.put(KEY_PAGE_NUMBER, getPageNumber());
+        }
+    }
+
+    private void loadFilterValueFromSession() {
+
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_ID))) {
+            setSelectedClientId((Long) SessionHelper.get(KEY_CLIENT_ID));
+        }else {
+            setSelectedClientId(null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_STATES))) {
+            setStateWrappers((List<RequestStateWrapper>) SessionHelper.get(KEY_STATES));
+        }else {
+            setStateWrappers(new ArrayList<>());
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_REQUEST_TYPE))) {
+            setRequestTypeWrappers((List<RequestTypeFilterWrapper>) SessionHelper.get(KEY_REQUEST_TYPE));
+        }else {
+            setRequestTypeWrappers(new ArrayList<>());
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_SERVICES))) {
+            setServiceWrappers((List<ServiceFilterWrapper>) SessionHelper.get(KEY_SERVICES));
+        }else {
+            setServiceWrappers(new ArrayList<>());
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_MANAGER_ID))) {
+            setManagerClientFilterid((Long) SessionHelper.get(KEY_CLIENT_MANAGER_ID));
+        }else {
+            setManagerClientFilterid(null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_FIDUCIARY_ID))) {
+            setFiduciaryClientFilterId((Long) SessionHelper.get(KEY_CLIENT_FIDUCIARY_ID));
+        }else {
+            setFiduciaryClientFilterId(null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_AGGREAGATION))) {
+            setAggregationFilterId((Long) SessionHelper.get(KEY_AGGREAGATION));
+        }else {
+            setAggregationFilterId(null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_EXPIRATION))) {
+            setDateExpiration((Date) SessionHelper.get(KEY_DATE_EXPIRATION));
+        }else {
+            setDateExpiration(null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_FROM_REQ))) {
+            setDateFrom((Date) SessionHelper.get(KEY_DATE_FROM_REQ));
+        }else {
+            setDateFrom(null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_TO_REQ))) {
+            setDateTo((Date) SessionHelper.get(KEY_DATE_TO_REQ));
+        }else {
+            setDateTo(null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_FROM_EVASION))) {
+            setDateFromEvasion((Date) SessionHelper.get(KEY_DATE_FROM_EVASION));
+        }else {
+            setDateFromEvasion(null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_TO_EVASION))) {
+            setDateToEvasion((Date) SessionHelper.get(KEY_DATE_TO_EVASION));
+        }else {
+            setDateToEvasion(null);
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_NOMINATIVO))) {
+            setSearchLastName((String) SessionHelper.get(KEY_NOMINATIVO));
+        }else {
+            setSearchLastName(null);
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CF))) {
+            setSearchFiscalCode((String) SessionHelper.get(KEY_CF));
+        }else {
+            setSearchFiscalCode(null);
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_ROWS_PER_PAGE))) {
+            setRowsPerPage((Integer) SessionHelper.get(KEY_ROWS_PER_PAGE));
+        } else {
+            setRowsPerPage(10);
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_PAGE_NUMBER))) {
+            setPageNumber((Integer) SessionHelper.get(KEY_PAGE_NUMBER));
+        } else {
+            setPageNumber(0);
+        }
+        executeJS("if (PF('tableWV').getPaginator() != null ) " +
+                "PF('tableWV').getPaginator().setPage(" + getPageNumber() + ");");
+    }
+
+    public void onPageChange(PageEvent event) {
+        if (event != null)
+            setPageNumber(event.getPage());
+        SessionHelper.put(KEY_PAGE_NUMBER, getPageNumber());
+        Map<String, String> params = FacesContext.getCurrentInstance().
+                getExternalContext().getRequestParameterMap();
+        if (!params.isEmpty()) {
+            String rows = params.get("table_rows");
+            if (!ValidationHelper.isNullOrEmpty(rows)) {
+                try {
+                    setRowsPerPage(Integer.parseInt(rows));
+                    SessionHelper.put(KEY_ROWS_PER_PAGE, getRowsPerPage());
+                } catch (NumberFormatException e) {
+                }
+            }
+        }
     }
 
     public Date getDateFrom() {
@@ -1579,38 +1737,38 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         this.createTotalCostSumDocumentRecord = createTotalCostSumDocumentRecord;
     }
 
-	public List<SelectItem> getFiduciaryClients() {
-		return fiduciaryClients;
-	}
+    public List<SelectItem> getFiduciaryClients() {
+        return fiduciaryClients;
+    }
 
-	public List<SelectItem> getManagerClients() {
-		return managerClients;
-	}
+    public List<SelectItem> getManagerClients() {
+        return managerClients;
+    }
 
-	public void setFiduciaryClients(List<SelectItem> fiduciaryClients) {
-		this.fiduciaryClients = fiduciaryClients;
-	}
+    public void setFiduciaryClients(List<SelectItem> fiduciaryClients) {
+        this.fiduciaryClients = fiduciaryClients;
+    }
 
-	public void setManagerClients(List<SelectItem> managerClients) {
-		this.managerClients = managerClients;
-	}
+    public void setManagerClients(List<SelectItem> managerClients) {
+        this.managerClients = managerClients;
+    }
 
-	public Long getFiduciaryClientFilterId() {
-		return fiduciaryClientFilterId;
-	}
+    public Long getFiduciaryClientFilterId() {
+        return fiduciaryClientFilterId;
+    }
 
 
-	public void setFiduciaryClientFilterId(Long fiduciaryClientFilterId) {
-		this.fiduciaryClientFilterId = fiduciaryClientFilterId;
-	}
+    public void setFiduciaryClientFilterId(Long fiduciaryClientFilterId) {
+        this.fiduciaryClientFilterId = fiduciaryClientFilterId;
+    }
 
-	public Long getManagerClientFilterid() {
-		return managerClientFilterid;
-	}
+    public Long getManagerClientFilterid() {
+        return managerClientFilterid;
+    }
 
-	public void setManagerClientFilterid(Long managerClientFilterid) {
-		this.managerClientFilterid = managerClientFilterid;
-	}
+    public void setManagerClientFilterid(Long managerClientFilterid) {
+        this.managerClientFilterid = managerClientFilterid;
+    }
 
     public List<RequestStateWrapper> getSelectedRequestStates() {
         return selectedRequestStates;
@@ -1687,7 +1845,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     public Integer getRequestTypeSelected() {
         int selected = 0;
         for (RequestTypeFilterWrapper requestTypeFilterWrapper : requestTypeWrappers) {
-            if(requestTypeFilterWrapper.getSelected()) {
+            if (requestTypeFilterWrapper.getSelected()) {
                 selected++;
             }
         }
@@ -1697,7 +1855,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     public Integer getStateSelected() {
         int selected = 0;
         for (RequestStateWrapper requestStateWrapper : stateWrappers) {
-            if(requestStateWrapper.getSelected()) {
+            if (requestStateWrapper.getSelected()) {
                 selected++;
             }
         }
@@ -1707,7 +1865,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     public Integer getServiceSelected() {
         int selected = 0;
         for (ServiceFilterWrapper serviceFilterWrapper : serviceWrappers) {
-            if(serviceFilterWrapper.getSelected()) {
+            if (serviceFilterWrapper.getSelected()) {
                 selected++;
             }
         }
@@ -1723,7 +1881,86 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         setUserWrappers(new ArrayList<>());
         setServiceWrappers(new ArrayList<>());
         setRequestTypeWrappers(new ArrayList<>());
+        setShowPrintButton(null);
         this.onLoad();
     }
 
+    public void setSelectedStates(List<RequestState> selectedStates) {
+        this.selectedStates = selectedStates;
+    }
+
+    public List<RequestState> getSelectedStates() {
+        List<RequestState> selected = new ArrayList<>();
+        for (RequestStateWrapper requestStateWrapper : stateWrappers) {
+            if (requestStateWrapper.getSelected()) {
+                selected.add(requestStateWrapper.getState());
+            }
+        }
+        return selected;
+    }
+
+    public List<RequestType> getSelectedRequestTypes() {
+        List<RequestType> selected = new ArrayList<>();
+        for (RequestTypeFilterWrapper requestTypeFilterWrapper : requestTypeWrappers) {
+            if (requestTypeFilterWrapper.getSelected()) {
+                selected.add(requestTypeFilterWrapper.getRequestType());
+            }
+        }
+        return selected;
+    }
+
+    public String getItemIconStyleClass(Long requestTypeId) {
+        String iconStyleClass = "";
+        if (!ValidationHelper.isNullOrEmpty(requestTypeId)) {
+            try {
+                RequestType requestTypeDTO = DaoManager.get(RequestType.class, requestTypeId);
+                iconStyleClass = requestTypeDTO.getIcon();
+                if (iconStyleClass.startsWith("fa")) {
+                    iconStyleClass = "fa " + iconStyleClass;
+                }
+            } catch (HibernateException | InstantiationException | IllegalAccessException | PersistenceBeanException e) {
+                LogHelper.log(log, e);
+            }
+        }
+        return iconStyleClass;
+    }
+
+    public void setSelectedRequestTypes(List<RequestType> selectedRequestTypes) {
+        this.selectedRequestTypes = selectedRequestTypes;
+    }
+
+    public List<Service> getSelectedServices() {
+        List<Service> selected = new ArrayList<>();
+        for (ServiceFilterWrapper serviceFilterWrapper : serviceWrappers) {
+            if (serviceFilterWrapper.getSelected()) {
+                selected.add(serviceFilterWrapper.getService());
+            }
+        }
+        return selected;
+    }
+
+    public void setSelectedServices(List<Service> selectedServices) {
+        this.selectedServices = selectedServices;
+    }
+
+    public void createNewMultipleRequests() {
+        String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE";
+        RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT, queryParam);
+    }
+
+    public Integer getRowsPerPage() {
+        return rowsPerPage;
+    }
+
+    public void setRowsPerPage(Integer rowsPerPage) {
+        this.rowsPerPage = rowsPerPage;
+    }
+
+    public Integer getPageNumber() {
+        return pageNumber;
+    }
+
+    public void setPageNumber(Integer pageNumber) {
+        this.pageNumber = pageNumber;
+    }
 }

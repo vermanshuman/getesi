@@ -2,10 +2,7 @@ package it.nexera.ris.web.beans.pages;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -22,6 +19,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.primefaces.component.datatable.DataTable;
 import org.primefaces.event.SelectEvent;
+import org.primefaces.event.data.PageEvent;
 import org.primefaces.model.LazyDataModel;
 
 import it.nexera.ris.common.enums.ApplicationSettingsKeys;
@@ -78,17 +76,20 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
     private static final String KEY_SORT_ORDER = "KEY_SORT_ORDER_SESSION_KEY_NOT_COPY";
 
     private static final String KEY_SORT_COLUMN = "KEY_SORT_COLUMN_SESSION_KEY_NOT_COPY";
-    
-  private static final String KEY_EMAIL_FROM = "KEY_EMAIL_FROM_SESSION_KEY_NOT_COPY";
-    
+
+    private static final String KEY_EMAIL_FROM = "KEY_EMAIL_FROM_SESSION_KEY_NOT_COPY";
+
     private static final String KEY_EMAIL_TO = "KEY_EMAIL_TO_SESSION_KEY_NOT_COPY";
-    
+
     private static final String KEY_EMAIL_SUBJECT = "KEY_EMAIL_SUBJECT_SESSION_KEY_NOT_COPY";
-    
+
     private static final String KEY_EMAIL_BODY = "KEY_EMAIL_BODY_SESSION_KEY_NOT_COPY";
-    
+
     private static final String KEY_EMAIL_FILE = "KEY_EMAIL_FILE_SESSION_KEY_NOT_COPY";
 
+    private static final String KEY_ROWS_PER_PAGE = "KEY_MAIL_ROWS_PER_PAGE_SESSION_KEY_NOT_COPY";
+
+    private static final String KEY_PAGE_NUMBER = "KEY_MAIL_PAGE_NUMBER_SESSION_KEY_NOT_COPY";
 
     private Date dateFrom;
 
@@ -127,7 +128,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
     private Boolean needShowChangeStateUser;
 
     private String filterAll;
-    
+
     private Long oldSize;
 
     private Long mailManagerButtonSelectedId;
@@ -139,15 +140,17 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
     private String tableSortOrder;
 
     private String tableSortColumn;
-    
+
+    private Integer rowsPerPage;
+
     @Getter
     @Setter
     private String filterEmailFrom;
-    
+
     @Getter
     @Setter
     private String filterEmailTo;
-    
+
     @Getter
     @Setter
     private String filterEmailSubject;
@@ -155,7 +158,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
     @Getter
     @Setter
     private String filterEmailBody;
-    
+
     @Getter
     @Setter
     private String filterEmailFile;
@@ -168,10 +171,17 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
     @Setter
     private String globalFilter;
 
+    private String mailManagerSent;
+
+    private String mailManagerStorage;
+
+    private String mailManagerDraft;
+
+    private String mailManagerReceived;
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
-    PersistenceBeanException, InstantiationException,
-    IllegalAccessException, IOException {
+            PersistenceBeanException, InstantiationException,
+            IllegalAccessException, IOException {
 
         String tablePage = getRequestParameter(RedirectHelper.TABLE_PAGE);
         if (!ValidationHelper.isNullOrEmpty(tablePage) && !"null".equalsIgnoreCase(tablePage)) {
@@ -235,7 +245,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
             List<Long> longList = Stream.of(value.substring(1, value.length()-1).split(",")).map(String::trim).map(Long::valueOf).collect(Collectors.toList());
             setSelectedSearchStateIds(longList.toArray(new Long[longList.size()]));
         }
-        
+
         value = getSessionValue(KEY_KEY_WORD);
         if (!ValidationHelper.isNullOrEmpty(value)) {
             setFilterAll(value);
@@ -245,7 +255,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         if (!ValidationHelper.isNullOrEmpty(value)) {
             setFilterEmail(value);
         }
-        
+
         value = getSessionValue(KEY_EMAIL_FROM);
         if (!ValidationHelper.isNullOrEmpty(value)) {
             setFilterEmailFrom(value);
@@ -284,6 +294,24 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         } else {
             setTableSortOrder("UNSORTED");
         }
+
+        value = getSessionValue(KEY_ROWS_PER_PAGE);
+        if (!ValidationHelper.isNullOrEmpty(value)) {
+            setRowsPerPage(Integer.parseInt(value));
+        } else {
+            setRowsPerPage(15);
+        }
+        if(getRowsPerPage() == 0)
+            setRowsPerPage(15);
+
+        value = getSessionValue(KEY_PAGE_NUMBER);
+        if (!ValidationHelper.isNullOrEmpty(value)) {
+            setTablePage(Integer.parseInt(value));
+        } else {
+            setTablePage(0);
+        }
+        executeJS("if (PF('tableWV').getPaginator() != null ) " +
+                "PF('tableWV').getPaginator().setPage(" + getTablePage() + ");");
     }
 
     public void goMain() {
@@ -393,7 +421,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
 
     @Override
     public void editEntity() throws HibernateException, InstantiationException,
-    IllegalAccessException, PersistenceBeanException {
+            IllegalAccessException, PersistenceBeanException {
         if (getCanEdit()) {
             RedirectHelper.goToMailEdit(getEntityEditId(), MailEditType.EDIT);
         }
@@ -423,6 +451,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
 
     @SuppressWarnings("unchecked")
     public void filterTableFromPanel() {
+        updateFilterValueInSession();
         setGlobalFilter(null);
         List<Criterion> restrictions = new ArrayList<>();
 
@@ -442,7 +471,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
             List<Long> listId = null;
             try {
                 listId = DaoManager.loadIds(WLGInbox.class, new CriteriaAlias[]{
-                        new CriteriaAlias("wlgExports", "we", JoinType.INNER_JOIN)},
+                                new CriteriaAlias("wlgExports", "we", JoinType.INNER_JOIN)},
                         new Criterion[]{
                                 Restrictions.ilike("we.destinationPath",
                                         !ValidationHelper.isNullOrEmpty(getFilterAll())
@@ -470,8 +499,8 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
                     restrictions.add(Restrictions.or(
                             Restrictions.like("emailTo", getFilterAll(), MatchMode.ANYWHERE),
                             Restrictions.like("emailFrom", getFilterAll(), MatchMode.ANYWHERE),
-                        Restrictions.like("emailSubject", getFilterAll(), MatchMode.ANYWHERE),
-                        Restrictions.like("emailBody", getFilterAll(), MatchMode.ANYWHERE)
+                            Restrictions.like("emailSubject", getFilterAll(), MatchMode.ANYWHERE),
+                            Restrictions.like("emailBody", getFilterAll(), MatchMode.ANYWHERE)
                             )
                     );
                 }else {
@@ -488,7 +517,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         if (!ValidationHelper.isNullOrEmpty(getFilterEmailFile())) {
             try {
                 listId = DaoManager.loadIds(WLGInbox.class, new CriteriaAlias[]{
-                        new CriteriaAlias("wlgExports", "we", JoinType.INNER_JOIN)},
+                                new CriteriaAlias("wlgExports", "we", JoinType.INNER_JOIN)},
                         new Criterion[]{Restrictions.ilike("we.destinationPath", getFilterEmailFile(), MatchMode.ANYWHERE)});
             } catch (Exception e) {
                 LogHelper.log(log, e);
@@ -517,7 +546,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
             Criterion r = Restrictions.in("id", listId);
             restrictionsLike.add(r);
         }
-        
+
         if(restrictionsLike.size()>0) {
             if(restrictionsLike.size()>1) {
                 restrictions.add(Restrictions.or(restrictionsLike.toArray(new Criterion[restrictionsLike.size()])));
@@ -552,7 +581,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
 
             if (defaultType == null || defaultType.getType() != MailManagerTypes.STORAGE) {
                 Arrays.stream(MailManagerStatuses.values()).filter(MailManagerStatuses::isNeedShow)
-                .forEach(wkrsw -> stateIds.add(wkrsw.getId()));
+                        .forEach(wkrsw -> stateIds.add(wkrsw.getId()));
             } else {
                 stateIds.add(MailManagerStatuses.CANCELED.getId());
                 stateIds.add(MailManagerStatuses.DELETED.getId());
@@ -566,41 +595,41 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         restrictions.add(Restrictions.isNull("folder"));
         if (defaultType != null) {
             switch (defaultType.getType()) {
-            case SENT:
-                restrictions.add(Restrictions.eq("serverId", Long.parseLong(ApplicationSettingsHolder
-                        .getInstance().getByKey(ApplicationSettingsKeys.SENT_SERVER_ID).getValue())));
-                setNeedShowEmailTo(Boolean.TRUE);
-                setNeedShowEmailFrom(Boolean.FALSE);
-                setNeedShowEmailUser(Boolean.TRUE);
-                setNeedShowChangeStateUser(Boolean.FALSE);
-                break;
-            case DRAFT:
-                restrictions.add(Restrictions.isNull("serverId"));
-                setNeedShowEmailTo(Boolean.TRUE);
-                setNeedShowEmailFrom(Boolean.FALSE);
-                setNeedShowEmailUser(Boolean.FALSE);
-                setNeedShowChangeStateUser(Boolean.FALSE);
-                break;
-            case RECEIVED:
-                restrictions.add(Restrictions.eq("serverId", Long.parseLong(ApplicationSettingsHolder
-                        .getInstance().getByKey(ApplicationSettingsKeys.RECEIVED_SERVER_ID).getValue())));
-                setNeedShowEmailTo(Boolean.FALSE);
-                setNeedShowEmailFrom(Boolean.TRUE);
-                setNeedShowEmailUser(Boolean.FALSE);
-                setNeedShowChangeStateUser(Boolean.TRUE);
-                break;
-            case STORAGE:
-                setNeedShowEmailTo(Boolean.FALSE);
-                setNeedShowEmailFrom(Boolean.TRUE);
-                setNeedShowEmailUser(Boolean.FALSE);
-                setNeedShowChangeStateUser(Boolean.FALSE);
-                break;
+                case SENT:
+                    restrictions.add(Restrictions.eq("serverId", Long.parseLong(ApplicationSettingsHolder
+                            .getInstance().getByKey(ApplicationSettingsKeys.SENT_SERVER_ID).getValue())));
+                    setNeedShowEmailTo(Boolean.TRUE);
+                    setNeedShowEmailFrom(Boolean.FALSE);
+                    setNeedShowEmailUser(Boolean.TRUE);
+                    setNeedShowChangeStateUser(Boolean.FALSE);
+                    break;
+                case DRAFT:
+                    restrictions.add(Restrictions.isNull("serverId"));
+                    setNeedShowEmailTo(Boolean.TRUE);
+                    setNeedShowEmailFrom(Boolean.FALSE);
+                    setNeedShowEmailUser(Boolean.FALSE);
+                    setNeedShowChangeStateUser(Boolean.FALSE);
+                    break;
+                case RECEIVED:
+                    restrictions.add(Restrictions.eq("serverId", Long.parseLong(ApplicationSettingsHolder
+                            .getInstance().getByKey(ApplicationSettingsKeys.RECEIVED_SERVER_ID).getValue())));
+                    setNeedShowEmailTo(Boolean.FALSE);
+                    setNeedShowEmailFrom(Boolean.TRUE);
+                    setNeedShowEmailUser(Boolean.FALSE);
+                    setNeedShowChangeStateUser(Boolean.TRUE);
+                    break;
+                case STORAGE:
+                    setNeedShowEmailTo(Boolean.FALSE);
+                    setNeedShowEmailFrom(Boolean.TRUE);
+                    setNeedShowEmailUser(Boolean.FALSE);
+                    setNeedShowChangeStateUser(Boolean.FALSE);
+                    break;
             }
         }
         boolean isLoaded = false;
         if (SessionHelper.get("isFromMailView") != null
                 && ((Boolean) SessionHelper.get("isFromMailView"))) {
-            
+
             SessionHelper.removeObject("isFromMailView");
             LazyDataModel<WLGInboxShort> lazyDataModel = (LazyDataModel<WLGInboxShort>) SessionHelper.get("mailManagerLazyModel");
             if(lazyDataModel != null) {
@@ -613,9 +642,9 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
             loadList(WLGInboxShort.class, restrictions.toArray(new Criterion[0]),
                     new Order[]{
                             Order.desc("sendDate")
-            }, new CriteriaAlias[]{
-                    new CriteriaAlias("folder", "folder", JoinType.LEFT_OUTER_JOIN)
-            });    
+                    }, new CriteriaAlias[]{
+                            new CriteriaAlias("folder", "folder", JoinType.LEFT_OUTER_JOIN)
+                    });
         }
     }
 
@@ -742,20 +771,59 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         filterTableFromPanel();
     }
 
-    public String getMailManagerRECEIVED() {
-        return getMailTitleValue(new MailManagerTypeWrapper(MailManagerTypes.RECEIVED));
+    public String getMailManagerReceived() {
+        return mailManagerReceived;
     }
 
-    public String getMailManagerSENT() {
-        return getMailTitleValue(new MailManagerTypeWrapper(MailManagerTypes.SENT));
+    public void setMailManagerReceived(String mailManagerReceived) {
+        this.mailManagerReceived = mailManagerReceived;
     }
 
-    public String getMailManagerDRAFT() {
-        return getMailTitleValue(new MailManagerTypeWrapper(MailManagerTypes.DRAFT));
+    public String getMailManagerSent() {
+        return mailManagerSent;
     }
 
-    public String getMailManagerSTORAGE() {
-        return getMailTitleValue(new MailManagerTypeWrapper(MailManagerTypes.STORAGE));
+    public void setMailManagerSent(String mailManagerSent) {
+        this.mailManagerSent = mailManagerSent;
+    }
+
+    public String getMailManagerDraft() {
+        return mailManagerDraft;
+    }
+
+    public void setMailManagerDraft(String mailManagerDraft) {
+        this.mailManagerDraft = mailManagerDraft;
+    }
+
+    public String getMailManagerStorage() {
+        //return getMailTitleValue(new MailManagerTypeWrapper(MailManagerTypes.STORAGE));
+        return mailManagerStorage;
+    }
+
+    public void setMailManagerStorage(String mailManagerStorage) {
+        this.mailManagerStorage = mailManagerStorage;
+    }
+
+    public void loadStorage() {
+        String titleValue = getMailTitleValue(new MailManagerTypeWrapper(MailManagerTypes.STORAGE));
+        setMailManagerStorage(titleValue);
+    }
+
+    public void loadSent() {
+        String titleValue = getMailTitleValue(new MailManagerTypeWrapper(MailManagerTypes.SENT));
+        setMailManagerSent(titleValue);
+
+    }
+
+    public void loadRecieved() {
+
+        String titleValue = getMailTitleValue(new MailManagerTypeWrapper(MailManagerTypes.RECEIVED));
+        setMailManagerReceived(titleValue);
+    }
+
+    public void loadDraft() {
+        String titleValue = getMailTitleValue(new MailManagerTypeWrapper(MailManagerTypes.DRAFT));
+        setMailManagerDraft(titleValue);
     }
 
     public boolean isSendOrStorage() {
@@ -809,42 +877,83 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         }
         DataTable dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot()
                 .findComponent("form:table");
-        if (!ValidationHelper.isNullOrEmpty(getDateFrom())) {
-            setSessionValue(KEY_DATE_FROM, Long.toString(getDateFrom().getTime()));
-        }
-        if (!ValidationHelper.isNullOrEmpty(getDateTo())) {
-            setSessionValue(KEY_DATE_TO, Long.toString(getDateTo().getTime()));
-        }
-        if (!ValidationHelper.isNullOrEmpty(getSelectedSearchStateIds())) {
-            setSessionValue(KEY_MAIL_TYPE, Arrays.toString(getSelectedSearchStateIds()));
-        }
-        if (!ValidationHelper.isNullOrEmpty(getFilterEmailFrom())) {
-            setSessionValue(KEY_EMAIL_FROM, getFilterEmailFrom());
-        }
-        if (!ValidationHelper.isNullOrEmpty(getFilterEmailTo())) {
-            setSessionValue(KEY_EMAIL_TO, getFilterEmailTo());
-        }
-        if (!ValidationHelper.isNullOrEmpty(getFilterEmailSubject())) {
-            setSessionValue(KEY_EMAIL_SUBJECT, getFilterEmailSubject());
-        }
-        if (!ValidationHelper.isNullOrEmpty(getFilterEmailBody())) {
-            setSessionValue(KEY_EMAIL_BODY, getFilterEmailBody());
-        }
-        if (!ValidationHelper.isNullOrEmpty(getFilterEmailFile())) {
-            setSessionValue(KEY_EMAIL_FILE, getFilterEmailFile());
-        }
-        if (!ValidationHelper.isNullOrEmpty(getFilterAll())) {
-            setSessionValue(KEY_KEY_WORD, getFilterAll());
-        }
-        if (!ValidationHelper.isNullOrEmpty(getMailManagerButtonSelectedId())) {
-            setSessionValue(KEY_SELECTED_TAB, Long.toString(getMailManagerButtonSelectedId()));
-        }
+        updateFilterValueInSession();
         setSessionValue(KEY_SORT_ORDER, dataTable.getSortOrder());
         if (!ValidationHelper.isNullOrEmpty(dataTable.getSortColumn())) {
             setSessionValue(KEY_SORT_COLUMN, dataTable.getSortColumn().getClientId().split(":")[1]);
         }
         RedirectHelper.goToSavePage(PageTypes.MAIL_MANAGER_VIEW, getEntityEditId(),
                 dataTable.getPage() * dataTable.getRows());
+    }
+
+
+    private void updateFilterValueInSession() {
+        if (!ValidationHelper.isNullOrEmpty(getDateFrom())) {
+            setSessionValue(KEY_DATE_FROM, Long.toString(getDateFrom().getTime()));
+        }else {
+            setSessionValue(KEY_DATE_FROM, null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(getDateTo())) {
+            setSessionValue(KEY_DATE_TO, Long.toString(getDateTo().getTime()));
+        }else {
+            setSessionValue(KEY_DATE_TO, null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(getSelectedSearchStateIds())) {
+            setSessionValue(KEY_MAIL_TYPE, Arrays.toString(getSelectedSearchStateIds()));
+        }else {
+            setSessionValue(KEY_MAIL_TYPE, null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(getFilterEmailFrom())) {
+            setSessionValue(KEY_EMAIL_FROM, getFilterEmailFrom());
+        }else {
+            setSessionValue(KEY_EMAIL_FROM, null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(getFilterEmailTo())) {
+            setSessionValue(KEY_EMAIL_TO, getFilterEmailTo());
+        }else {
+            setSessionValue(KEY_EMAIL_TO, null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(getFilterEmailSubject())) {
+            setSessionValue(KEY_EMAIL_SUBJECT, getFilterEmailSubject());
+        }else {
+            setSessionValue(KEY_EMAIL_SUBJECT, null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(getFilterEmailBody())) {
+            setSessionValue(KEY_EMAIL_BODY, getFilterEmailBody());
+        }else {
+            setSessionValue(KEY_EMAIL_BODY, null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(getFilterEmailFile())) {
+            setSessionValue(KEY_EMAIL_FILE, getFilterEmailFile());
+        }else {
+            setSessionValue(KEY_EMAIL_FILE, null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(getFilterEmail())) {
+            setSessionValue(KEY_EMAIL, getFilterEmail());
+        }else {
+            setSessionValue(KEY_EMAIL, null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(getFilterAll())) {
+            setSessionValue(KEY_KEY_WORD, getFilterAll());
+        }else {
+            setSessionValue(KEY_KEY_WORD, null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(getMailManagerButtonSelectedId())) {
+            setSessionValue(KEY_SELECTED_TAB, Long.toString(getMailManagerButtonSelectedId()));
+        }else {
+            setSessionValue(KEY_SELECTED_TAB, null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(getRowsPerPage())) {
+            setSessionValue(KEY_ROWS_PER_PAGE, Long.toString(getRowsPerPage()));
+        }else {
+            setSessionValue(KEY_ROWS_PER_PAGE, null);
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(getTablePage())) {
+            setSessionValue(KEY_PAGE_NUMBER, Long.toString(getTablePage()));
+        }else {
+            setSessionValue(KEY_PAGE_NUMBER, null);
+        }
     }
 
     public boolean isSentMail() {
@@ -1063,7 +1172,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
     public void setTableSortColumn(String tableSortColumn) {
         this.tableSortColumn = tableSortColumn;
     }
-    
+
     public String getFilterAll() {
         return filterAll;
     }
@@ -1117,12 +1226,38 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
             }
             loadList(WLGInboxShort.class,  rest.toArray(new Criterion[0]),
                     new Order[]{
-                                Order.desc("sendDate")
-                        }, new CriteriaAlias[]{
-                                new CriteriaAlias("folder", "folder", JoinType.LEFT_OUTER_JOIN)
-            });
+                            Order.desc("sendDate")
+                    }, new CriteriaAlias[]{
+                            new CriteriaAlias("folder", "folder", JoinType.LEFT_OUTER_JOIN)
+                    });
         }else {
             this.filterTableFromPanel();
+        }
+    }
+
+    public Integer getRowsPerPage() {
+        return rowsPerPage;
+    }
+
+    public void setRowsPerPage(Integer rowsPerPage) {
+        this.rowsPerPage = rowsPerPage;
+    }
+
+    public void onPageChange(PageEvent event) {
+        if (event != null)
+            setTablePage(event.getPage());
+        setSessionValue(KEY_PAGE_NUMBER, Long.toString(getTablePage()));
+        Map<String, String> params = FacesContext.getCurrentInstance().
+                getExternalContext().getRequestParameterMap();
+        if (!params.isEmpty()) {
+            String rows = params.get("table_rows");
+            if (!ValidationHelper.isNullOrEmpty(rows)) {
+                try {
+                    setRowsPerPage(Integer.parseInt(rows));
+                    setSessionValue(KEY_ROWS_PER_PAGE, Long.toString(getRowsPerPage()));
+                } catch (NumberFormatException e) {
+                }
+            }
         }
     }
 }

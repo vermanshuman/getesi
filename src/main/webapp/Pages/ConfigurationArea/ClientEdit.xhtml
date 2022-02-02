@@ -261,6 +261,17 @@
                                 <f:selectItems value="#{bean.ibans}"/>
                             </p:selectOneMenu></p:column>
                     </p:row>
+                    <p:row>
+                        <p:column style="padding-right: 20px">
+                            <span>#{msg.invoicePaymentType}: </span><br/>
+                            <p:selectOneMenu id="paymentMode" value="#{bean.paymentTypeId}"
+                                             label="#{msg.invoicePaymentType}"
+                                             rendered="#{!bean.onlyView}">
+                                <f:selectItem itemValue="" itemLabel="- Non selezionato -" />
+                                <f:selectItems value="#{bean.paymentTypes}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                    </p:row>
                 </p:panelGrid>
             </p:tab>
             <p:tab id="wizardTabMAIL" title="#{msg.wizardTabMAIL.toUpperCase()}">

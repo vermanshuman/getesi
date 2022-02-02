@@ -44,6 +44,8 @@ public class RedirectHelper extends BaseHelper {
 
     public static final String MULTIPLE = "multiple";
 
+    public static final String MULTIPLE_SERVICE_REQUEST_TYPES = "multipleServiceRequestTypes";
+
     public static final String REQUEST_ID = "request_id";
     
     public static final String DAYS_PARAMETER = "days";
@@ -65,6 +67,14 @@ public class RedirectHelper extends BaseHelper {
     public static void goToMultiple(PageTypes type) {
         try {
             sendRedirect(type.getPagesContext() + "?" + MULTIPLE + "=" + true);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+    public static void goToMultipleServiceRequestTypes(PageTypes type) {
+        try {
+            sendRedirect(type.getPagesContext() + "?" + MULTIPLE_SERVICE_REQUEST_TYPES + "=" + true);
         } catch (Exception e) {
             LogHelper.log(log, e);
         }
@@ -412,4 +422,11 @@ public class RedirectHelper extends BaseHelper {
         }
     }
 
+    public static void goToMultiple(PageTypes type,String queryParameter) {
+        try {
+            sendRedirect(type.getPagesContext() + "?" + MULTIPLE + "=" + true + "&"+ queryParameter);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
 }

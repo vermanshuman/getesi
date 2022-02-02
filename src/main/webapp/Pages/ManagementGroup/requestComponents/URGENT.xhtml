@@ -6,6 +6,6 @@
                 xmlns:p="http://primefaces.org/ui">
 
     <span>#{enums.documentGenerationTagsURGENT}<span class="red" style="#{block.isRequired()?'':'display:none;'}">*</span></span>
-    <p:selectBooleanCheckbox id="URGENT" value="#{bean.entity.urgent}"/>
+    <p:selectBooleanCheckbox id="URGENT" value="#{bean.entity.urgent}" styleClass="input-width"/>
 
 </ui:composition>

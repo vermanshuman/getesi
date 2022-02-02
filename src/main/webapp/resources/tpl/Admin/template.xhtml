@@ -21,6 +21,10 @@
         <h:outputScript name="js/layout.js" library="babylon-layout" />
         <script type="text/javascript"
                 src="#{facesContext.externalContext.requestContextPath}/resources/javascript/javascript_helper.js"/>
+        <script type="text/javascript"
+                src="#{facesContext.externalContext.requestContextPath}/resources/javascript/locale.js"/>
+        <script type="text/javascript"
+                src="#{facesContext.externalContext.requestContextPath}/resources/javascript/field-formatters.js"/>
         <ui:insert name="head"/>
         <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/main.css"
               media="all" rel="stylesheet" type="text/css"/>
@@ -28,24 +32,22 @@
 
     <h:body styleClass="outlined">
         <div class="layout-wrapper layout-static layout-menu-dark layout-slim #{guestPreferences.orientationRTL ? 'layout-rtl' : null}" >
-            <ui:include src="/Pages/home/topbar.xhtml"/>
-            <ui:include src="/Pages/home/menu.xhtml"/>
-
+            <h:panelGroup styleClass="top-menu" rendered="#{empty renderHeaderMenu ? true : renderHeaderMenu}" >
+                <ui:include src="/Pages/home/topbar.xhtml" />
+            </h:panelGroup>
+            <h:panelGroup rendered="#{empty renderSideMenu ? true : renderSideMenu}" >
+                <ui:include src="/Pages/home/menu.xhtml" />
+            </h:panelGroup>
             <div class="layout-main">
-<!--                <div class="route-bar">-->
-<!--                    <div class="route-bar-breadcrumb">-->
-<!--                        <i class="pi pi-home"/>-->
-<!--                        <span>/ </span>-->
-<!--                        <ui:insert name="viewname" />-->
-<!--                    </div>-->
-<!--                </div> -->
                 <div class="layout-content">
-                    <ui:include src="Include/Menu.xhtml"/>
+                    <h:panelGroup styleClass="menu" rendered="#{empty renderNav ? true : renderSideMenu}" >
+                        <ui:include src="Include/Menu.xhtml"  />
+                    </h:panelGroup>
                     <ui:insert name="content"/>
                 </div>
-                <div class="layout-footer">
+                <h:panelGroup layout="block" styleClass="layout-footer" rendered="#{empty renderFooterMenu ? true : renderFooterMenu}">
                     <ui:include src="/Pages/home/footer.xhtml"/>
-                </div>
+                </h:panelGroup>
             </div>
 
             <p:ajaxStatus styleClass="layout-ajax-loader">
