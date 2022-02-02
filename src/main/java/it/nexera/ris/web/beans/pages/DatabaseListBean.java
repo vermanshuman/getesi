@@ -446,12 +446,19 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
 
             List<Criterion> criterionList = new LinkedList<>();
 
+            if (!ValidationHelper.isNullOrEmpty(this.getCogNome()) && !ValidationHelper.isNullOrEmpty(this.getNome())) {
+                criterionList.add(Restrictions.or(
+                        Restrictions.like("surname", getCogNome(), MatchMode.ANYWHERE),
+                        Restrictions.like("name", getNome(), MatchMode.ANYWHERE)));
+            }
+
+
             if (!ValidationHelper.isNullOrEmpty(this.getCogNome())) {
                 criterionList.add(Restrictions.ilike("surname", getCogNome(), MatchMode.ANYWHERE));
             }
 
             if (!ValidationHelper.isNullOrEmpty(this.getNome())) {
-                criterionList.add(Restrictions.ilike("name", getNome(), MatchMode.ANYWHERE));
+                criterionList.add(Restrictions.ilike("", getNome(), MatchMode.ANYWHERE));
             }
 
             if (!ValidationHelper.isNullOrEmpty(this.getSubjectBusinessName())) {

@@ -3,6 +3,7 @@ package it.nexera.ris.web.beans.pages;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -11,6 +12,8 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 
+import it.nexera.ris.persistence.beans.entities.domain.*;
+import it.nexera.ris.web.common.EntityLazyListModel;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
@@ -18,6 +21,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.primefaces.component.datatable.DataTable;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.PageEvent;
 import org.primefaces.model.LazyDataModel;
@@ -41,10 +45,6 @@ import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.UserHolder;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
-import it.nexera.ris.persistence.beans.entities.domain.ReadWLGInbox;
-import it.nexera.ris.persistence.beans.entities.domain.User;
-import it.nexera.ris.persistence.beans.entities.domain.WLGFolder;
-import it.nexera.ris.persistence.beans.entities.domain.WLGInbox;
 import it.nexera.ris.persistence.beans.entities.domain.readonly.UserShort;
 import it.nexera.ris.persistence.beans.entities.domain.readonly.WLGInboxShort;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
@@ -54,6 +54,7 @@ import it.nexera.ris.web.beans.wrappers.logic.ClientEmailWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.MailManagerTypeWrapper;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.model.SortOrder;
 
 @ManagedBean(name = "mailManagerListBean")
 @ViewScoped
@@ -178,11 +179,61 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
     private String mailManagerDraft;
 
     private String mailManagerReceived;
+
+    @Getter
+    @Setter
+    private Integer rowCount;
+
+    @Getter
+    @Setter
+    private Integer totalPages;
+
+    @Getter
+    @Setter
+    private Integer currentPageNumber;
+
+    @Getter
+    @Setter
+    private String pageNavigationStart;
+
+    @Getter
+    @Setter
+    private String pageNavigationEnd;
+
+    @Getter
+    @Setter
+    private String paginatorString;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
             IllegalAccessException, IOException {
 
+        setRowCount(10);
+        setTotalPages(1);
+        setCurrentPageNumber(1);
+        StringBuilder builder = new StringBuilder();
+        builder.append("<a href=\"#\" class=\"ui-paginator-first ui-state-default ui-corner-all ui-state-disabled");
+        builder.append(" tabindex=\"-1\">\n");
+        builder.append("<span class=\"ui-icon ui-icon-seek-first\">F</span>\n</a>\n");
+        builder.append("<a href=\"#\" onclick=\"previousPage()\"");
+        builder.append(" class=\"ui-paginator-prev ui-corner-all ui-state-disabled\" tabindex=\"-1\">\n");
+        builder.append("<span class=\"ui-icon ui-icon-seek-prev\">P</span>\n</a>\n");
+        setPageNavigationStart(builder.toString());
+        builder.setLength(0);
+        builder.append("<a href=\"#\" class=\"ui-paginator-next ui-state-default ui-corner-all\"  onclick=\"nextPage()\"");
+        builder.append(" tabindex=\"0\">\n");
+        builder.append("<span class=\"ui-icon ui-icon-seek-next\">N</span>\n</a>\n");
+        builder.append("<a href=\"#\"");
+        builder.append(" class=\"ui-paginator-last ui-state-default ui-corner-all\" tabindex=\"-1\" onclick=\"lastPage()\">\n");
+        builder.append("<span class=\"ui-icon ui-icon-seek-end\">E</span>\n</a>\n");
+        setPageNavigationEnd(builder.toString());
+        builder.setLength(0);
+        for(int i = 1; i <=10;i++ ){
+            builder.append("<a class=\"ui-paginator-page ui-state-default ui-corner-all page_" + i + "\"");
+            builder.append("tabindex=\"0\" href=\"#\" onclick=\"changePage(" + i + ")\">" + i +"</a>");
+        }
+        setPaginatorString(builder.toString());
         String tablePage = getRequestParameter(RedirectHelper.TABLE_PAGE);
         if (!ValidationHelper.isNullOrEmpty(tablePage) && !"null".equalsIgnoreCase(tablePage)) {
             setTablePage(Integer.parseInt(tablePage));
@@ -310,8 +361,8 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         } else {
             setTablePage(0);
         }
-        executeJS("if (PF('tableWV').getPaginator() != null ) " +
-                "PF('tableWV').getPaginator().setPage(" + getTablePage() + ");");
+//        executeJS("if (PF('tableWV').getPaginator() != null ) " +
+//                "PF('tableWV').getPaginator().setPage(" + getTablePage() + ");");
     }
 
     public void goMain() {
@@ -424,6 +475,33 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
             IllegalAccessException, PersistenceBeanException {
         if (getCanEdit()) {
             RedirectHelper.goToMailEdit(getEntityEditId(), MailEditType.EDIT);
+        }
+    }
+
+    public void rowDblSelectListener() {
+        SessionHelper.put("mailManagerLazyModel", this.getLazyModel());
+        try {
+            WLGInboxShort wlgInbox = DaoManager.get(WLGInboxShort.class, getEntityEditId());
+            if (!wlgInbox.getRead()) {
+                ReadWLGInbox inbox = new ReadWLGInbox(wlgInbox.getId(), getCurrentUser().getId());
+                try {
+                    DaoManager.save(inbox, true);
+                } catch (PersistenceBeanException e) {
+                    LogHelper.log(log, e);
+                }
+            }
+            if (wlgInbox.getState().equals(MailManagerStatuses.NEW.getId())) {
+                wlgInbox.setState(MailManagerStatuses.READ.getId());
+                try {
+                    DaoManager.save(wlgInbox, true);
+                } catch (PersistenceBeanException e) {
+                    LogHelper.log(log, e);
+                }
+            }
+            updateFilterValueInSession();
+            this.editEntity();
+        } catch (Exception e) {
+            LogHelper.log(log, e);
         }
     }
 
@@ -645,6 +723,20 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
                     }, new CriteriaAlias[]{
                             new CriteriaAlias("folder", "folder", JoinType.LEFT_OUTER_JOIN)
                     });
+
+            this.setLazyModel(new EntityLazyListModel<>(WLGInboxShort.class, restrictions.toArray(new Criterion[0]),
+                    new Order[]{
+                            Order.desc("sendDate")
+                    }, new CriteriaAlias[]{
+                    new CriteriaAlias("folder", "folder", JoinType.LEFT_OUTER_JOIN)
+            }));
+            getLazyModel().load( getTablePage()-1, getRowsPerPage(), null, SortOrder.ASCENDING, new HashMap<>());
+            Integer rowCount = getLazyModel().getRowCount()/getRowsPerPage();
+            setTotalPages(rowCount);
+            if(rowCount > 10)
+                setRowCount(10);
+            else
+                setRowCount(rowCount);
         }
     }
 
@@ -816,7 +908,6 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
     }
 
     public void loadRecieved() {
-
         String titleValue = getMailTitleValue(new MailManagerTypeWrapper(MailManagerTypes.RECEIVED));
         setMailManagerReceived(titleValue);
     }
@@ -1243,6 +1334,115 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         this.rowsPerPage = rowsPerPage;
     }
 
+    public void onPageChange() {
+        String rowsPerPage = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("table_rppDD");
+        String pageNumber = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("pageNumber");
+
+        if(!ValidationHelper.isNullOrEmpty(rowsPerPage))
+            setRowsPerPage(Integer.parseInt(rowsPerPage));
+        if(!ValidationHelper.isNullOrEmpty(pageNumber)){
+            Integer currentPage = Integer.parseInt(pageNumber);
+
+            StringBuilder builder = new StringBuilder();
+            String cls = "ui-paginator-first ui-state-default ui-corner-all";
+            if(currentPage == 1){
+                cls += " ui-state-disabled";
+            }
+            builder.append("<a href=\"#\" class=\"" + cls + "\"");
+            builder.append(" tabindex=\"-1\" onclick=\"firstPage()\">\n");
+            builder.append("<span class=\"ui-icon ui-icon-seek-first\">F</span>\n</a>\n");
+            builder.append("<a href=\"#\" onclick=\"previousPage()\"");
+            cls = "ui-paginator-prev ui-corner-all";
+            if(currentPage == 1){
+                cls += " ui-state-disabled";
+            }
+            builder.append(" class=\"" + cls + "\"");
+            builder.append(" tabindex=\"-1\">\n");
+            builder.append("<span class=\"ui-icon ui-icon-seek-prev\">P</span>\n</a>\n");
+
+            setPageNavigationStart(builder.toString());
+            builder.setLength(0);
+            for(int i = 1; i <=10;i++ ){
+                builder.append("<a class=\"ui-paginator-page ui-state-default ui-corner-all page_" + i + "\"");
+                builder.append("tabindex=\"0\" href=\"#\" onclick=\"changePage(" + i + ")\">" + i +"</a>");
+            }
+
+            if(currentPage == getTotalPages()){
+                builder.setLength(0);
+                Integer pageEnd = getTotalPages();
+                Integer pageStart = getTotalPages() - 10;
+                for(int i = pageStart; i <= pageEnd;i++ ){
+                    builder.append("<a class=\"ui-paginator-page ui-state-default ui-corner-all page_" + i + "\"");
+                    builder.append("tabindex=\"0\" href=\"#\" onclick=\"changePage(" + i + ")\">" + i +"</a>");
+                }
+                setPaginatorString(builder.toString());
+                builder.setLength(0);
+                builder.append("<a href=\"#\" class=\"ui-paginator-next ui-state-default ui-corner-all ui-state-disabled\"");
+                builder.append(" tabindex=\"0\">\n");
+                builder.append("<span class=\"ui-icon ui-icon-seek-next\">N</span>\n</a>\n");
+                builder.append("<a href=\"#\"");
+                builder.append(" class=\"ui-paginator-last ui-state-default ui-corner-all ui-state-disabled\" tabindex=\"-1\">\n");
+                builder.append("<span class=\"ui-icon ui-icon-seek-end\">E</span>\n</a>\n");
+                setPageNavigationEnd(builder.toString());
+            }else {
+                builder.setLength(0);
+                builder.append("<a href=\"#\" class=\"ui-paginator-next ui-state-default ui-corner-all\"  onclick=\"nextPage()\"");
+                builder.append(" tabindex=\"0\">\n");
+                builder.append("<span class=\"ui-icon ui-icon-seek-next\">N</span>\n</a>\n");
+                builder.append("<a href=\"#\"");
+                builder.append(" class=\"ui-paginator-last ui-state-default ui-corner-all\" tabindex=\"-1\" onclick=\"lastPage()\">\n");
+                builder.append("<span class=\"ui-icon ui-icon-seek-end\">E</span>\n</a>\n");
+                setPageNavigationEnd(builder.toString());
+                if(currentPage != null && (currentPage -1)% 10 == 0){
+
+                    builder.setLength(0);
+                    Integer pageEnd = currentPage+9;
+                    if(pageEnd > getTotalPages())
+                        pageEnd = getTotalPages();
+                    for(int i = currentPage; i <= pageEnd;i++ ){
+                        builder.append("<a class=\"ui-paginator-page ui-state-default ui-corner-all page_" + i + "\"");
+                        builder.append("tabindex=\"0\" href=\"#\" onclick=\"changePage(" + i + ")\">" + i +"</a>");
+                    }
+                    setPaginatorString(builder.toString());
+                }
+            }
+
+            setTablePage(currentPage);
+        }
+
+        filterTableFromPanel();
+    }
+
+    public void handleRowsChange() {
+        String rowsPerPage = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("table_rppDD");
+        String pageNumber = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("pageNumber");
+        if(!ValidationHelper.isNullOrEmpty(rowsPerPage))
+            setRowsPerPage(Integer.parseInt(rowsPerPage));
+
+        Integer totalPages = getRowCount()/getRowsPerPage();
+        Integer pageEnd = 10;
+        if(pageEnd < totalPages)
+            pageEnd = totalPages;
+        StringBuilder builder = new StringBuilder();
+        for(int i = 1; i <= pageEnd;i++ ){
+            builder.append("<a class=\"ui-paginator-page ui-state-default ui-corner-all page_" + i + "\"");
+            builder.append("tabindex=\"0\" href=\"#\" onclick=\"changePage(" + i + ")\">" + i +"</a>");
+        }
+        setPaginatorString(builder.toString());
+        setTablePage(1);
+        filterTableFromPanel();
+    }
+
+    public void onBottomPageChange() {
+        String rowsPerPage = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("table_rppDD_bottom");
+        String pageNumber = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("pageNumber");
+        if(!ValidationHelper.isNullOrEmpty(rowsPerPage))
+            setRowsPerPage(Integer.parseInt(rowsPerPage));
+        if(!ValidationHelper.isNullOrEmpty(pageNumber))
+            setTablePage(Integer.parseInt(pageNumber));
+
+        filterTableFromPanel();
+    }
     public void onPageChange(PageEvent event) {
         if (event != null)
             setTablePage(event.getPage());

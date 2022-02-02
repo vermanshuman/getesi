@@ -20,21 +20,6 @@
             .to-bottom-text td.ui-panelgrid-cell {
                 vertical-align: bottom !important;
             }
-            .red-btn {
-                background: red !important;
-                background-color: red !important;
-                color: #FFFFFF !important;
-            }
-            .pdfImageClass {
-                background-image: url("../images/pdf_icon2.jpg");
-            }
-            .white-button{
-                background: white !important;
-            }
-            .red-file{
-                width:24px;
-                left: 38%;
-            }
         </style>
       <script>
     
@@ -104,7 +89,8 @@
                     <p:ajax event="filter" listener="#{bean.onFilterTableSubject}" update="@this"/>
 
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton icon="ui-icon pi pi-pencil" update=":form" action="#{bean.editEntity}">
+                        <p:commandButton icon="ui-icon pi pi-pencil" update=":form"
+                                         action="#{bean.editEntity}">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.entityEditId}"/>
                         </p:commandButton>
@@ -112,7 +98,7 @@
 
                     <p:column styleClass="action_column" exportable="false">
                         <p:commandButton icon="ui-icon pi pi-times" update=":form"
-                                         oncomplete="PF('dlg2').show()" styleClass="red-btn">
+                                         oncomplete="PF('dlg2').show()">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.entityDeleteId}"/>
                         </p:commandButton>
@@ -341,7 +327,7 @@
 
                     <p:column styleClass="action_column min_padding_margin" exportable="false">
                         <p:commandButton icon="ui-icon pi pi-times" update=":form"
-                                         oncomplete="PF('dlg3').show()" styleClass="red-btn">
+                                         oncomplete="PF('dlg3').show()">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.entityDeleteId}"/>
                         </p:commandButton>
@@ -437,7 +423,7 @@
                     </p:column>
                     <p:column styleClass="action_column">
                         <p:column headerText="#{msg.pdf}" styleClass="action_column">
-                            <p:commandButton styleClass="white-button" icon="fa fa-fw fa-file-pdf-o red-file icon-align" action="#{bean.downloadFormalityPdf}" ajax="false">
+                            <p:commandButton icon="fa fa-file-pdf-o" action="#{bean.downloadFormalityPdf}" ajax="false">
                                 <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                             </p:commandButton>
                         </p:column>
@@ -456,10 +442,9 @@
                         </p:commandButton>
                     </p:column>
                     <p:column styleClass="action_column">
-                        <p:commandButton icon="ui-icon pi pi-times" update=":form" styleClass="red-btn"
-                                         action="#{bean.checkFormalityForcedRequestEstateSituation}" >
-
-                        <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                        <p:commandButton icon="ui-icon pi pi-times" update=":form"
+                                         action="#{bean.checkFormalityForcedRequestEstateSituation}">
+                            <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                         </p:commandButton>
                     </p:column>
                 </p:dataTable>
@@ -543,7 +528,7 @@
                         <h:outputText value="#{item.sumOfEstateFormalities}"/>
                     </p:column>
                     <p:column headerText="#{msg.pdf}" styleClass="action_column">
-                        <p:commandButton styleClass="white-button" icon="fa fa-fw fa-file-pdf-o red-file icon-align" action="#{bean.downloadRequestPdf}" ajax="false"
+                        <p:commandButton icon="fa fa-file-pdf-o" action="#{bean.downloadRequestPdf}" ajax="false"
                                          rendered="#{item.haveRequestReport}">
                             <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                         </p:commandButton>
@@ -761,7 +746,7 @@
                         </p:commandButton>
                     </p:column>
                     <p:column styleClass="action_column" headerText="#{msg.pdf}">
-                        <p:commandButton styleClass="white-button" icon="fa fa-fw fa-file-pdf-o red-file icon-align"
+                        <p:commandButton icon="fa fa-download"
                                          action="#{bean.downloadVisureRTFasPDF}" ajax="false" update="@form">
                             <f:setPropertyActionListener value="#{item}"
                                                          target="#{bean.downloadVisureRTF}"/>
@@ -883,7 +868,7 @@
                     </p:column>
 
                     <p:column styleClass="action_column">
-                        <p:commandButton icon="ui-icon pi pi-plus" ajax="false" update="@form">
+                        <p:commandButton icon="ui-icon ui-icon-plusthick" ajax="false" update="@form">
                         </p:commandButton>
                     </p:column>
 
