@@ -1,0 +1,505 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ff="http://readytech.com/functions">
+<ui:composition template="/resources/tpl/Admin/LazyListTabBase.xhtml">
+    <ui:param name="bean" value="#{reportListBean}"/>
+    <ui:param name="renderTitle" value="false"/>>
+    <ui:param name="renderMenu" value="false"/>
+    <ui:param name="centerPartStyleClass" value="false"/>
+    <ui:define name="list_body">
+        <script>
+            function checkDates() {
+                var dateFrom = $('#tabs\\:filterDateFromRL_input').val();
+                var dateTo = $('#tabs\\:filterDateToRL_input').val();
+
+                var dFrom = new Date(dateFrom.substring(6) + '-'
+                    + dateFrom.substring(3, 5) + '-'
+                    + dateFrom.substring(0, 2));
+                var dTo = new Date(dateTo.substring(6) + '-'
+                    + dateTo.substring(3, 5) + '-' + dateTo.substring(0, 2));
+
+                if (dFrom > dTo) {
+                    $('#tabs\\:filterDateToRL_input').val(
+                        $('#tabs\\:filterDateFromRL_input').val());
+                    updateCalendarTo();
+                }
+            }
+            ;
+        </script>
+        <p:tabView dynamic="true" cache="true" id="tabs">
+            <p:tab title="#{msg.reportListInvoices}">
+                <p:outputPanel id="printPanel">
+									
+					<p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
+						layout="grid"
+						columnClasses="ui-grid-col-3, ui-grid-col-3">
+						<p:column>
+							<h:outputText value="#{msg.expirationDate}" />
+							<br />
+							<p:calendar id="filterDateFrom" readonlyInput="false"
+								showOn="button"
+								onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+								pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
+								popupIconOnly="true"
+								onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+								value="#{bean.dateFrom}"
+								placeholder="#{msg.mailManagerDateFrom}" />
+							
+						</p:column>
+						<p:column>
+						<h:outputText value="" />
+						<br />
+						<p:calendar id="filterDateTo" readonlyInput="false"
+								showOn="button"
+								onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+								pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
+								popupIconOnly="true" placeholder="#{msg.mailManagerDateTo}"
+								onblur="check_date(this)" value="#{bean.dateTo}" />
+						</p:column>
+
+					</p:panelGrid>
+                     
+                             
+					<p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+						<p:commandButton value="#{msg.search}"
+                                 id="search" onclick="checkDates();"
+                                 action="#{bean.filterInvoicesTableFromPanel}"
+                                 update="tableInvoices,printPanel"/>
+                        <p:commandButton value="#{msg.reportListGenerateExcel}" ajax="false"
+                                         action="#{bean.generateXlsWithInvoicesReport}"/>
+                    </p:panelGrid>
+                </p:outputPanel>
+                <p:dataTable var="item" id="tableInvoices"
+                             emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyModel}"
+                             rowKey="#{item.invoiceNumber}" rows="10" lazy="true" paginator="true"
+                             paginatorAlwaysVisible="true" rowIndexVar="rowId"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,20,50" widgetVar="tableWV">
+
+                    <p:column headerText="#{msg.reportListInvoiceNumber}"
+                    	filterBy="#{item.invoiceNumber}"  filterMatchMode="contains">
+                        <h:outputText value="#{item.invoiceNumber}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.reportListDate}">
+                        <f:facet name="header">
+                            <h:outputText value="#{msg.reportListDate}"/>
+                            <br/>
+                            <p:calendar id="filterReportListDate" readonlyInput="false" popupIconOnly="true"
+                                        pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" showOn="button"
+                                        placeholder="#{msg.expirationDate}" value="#{bean.filterReportListDate}">
+                                <p:ajax event="dateSelect" listener="#{bean.filterByDate}" update="tableInvoices"/>
+                                <p:ajax event="change" listener="#{bean.filterByDate}" update="tableInvoices"/>
+                            </p:calendar>
+
+                        </f:facet>
+                        <h:outputText value="#{item.date}" converter="dateTimeConverter"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.reportListTotalCost}">
+                        <h:outputText value="#{item.cost}"/>
+                    </p:column>
+
+                    <p:column styleClass="action_midle_column" headerText="#{msg.reportListEmail}">
+                        <p:commandButton icon="fa fa-envelope" action="#{bean.openRequestMail}"
+                                         rendered="#{not empty item.mail and item.mail.id != null}">
+                            <f:setPropertyActionListener value="#{item.mail.id}" target="#{bean.entityEditId}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                </p:dataTable>
+
+            </p:tab>
+            <p:tab title="#{msg.reportListProcessedRequests}">
+                <p:outputPanel id="searchPanel">
+                    <p:commandButton icon="fa fa-fw fa-file-pdf-o" rendered="false"
+                                     action="#{bean.requestListBean.downloadPdfFile}" ajax="false" update="@form">
+                        <f:setPropertyActionListener value="612"
+                                                     target="#{bean.requestListBean.downloadRequestId}"/>
+                    </p:commandButton>
+
+                    <p:remoteCommand name="updateCalendarTo" update="filterDateToRL"/>
+                    <p:remoteCommand name="filterTableFromPanel"
+                                     action="#{bean.requestListBean.filterTableFromPanel}" update="table"/>
+                    <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                                 columnClasses="ui-grid-col-3, ui-grid-col-3, ui-grid-col-3, ui-grid-col-3">
+                        <p:column>
+                            <h:outputText value="#{msg.requestListDateOfInput}:"/>
+                            <br/>
+                            <p:calendar id="filterDateFromRL" readonlyInput="false" showOn="button"
+                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+                                        pattern="dd/MM/yyyy" mask="true"
+                                        locale="it" navigator="true" popupIconOnly="true"
+                                        onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+                                        value="#{bean.requestListBean.dateFrom}"
+                                        placeholder="#{msg.mailManagerDateFrom}"/>
+                            <p:calendar id="filterDateToRL" readonlyInput="false" showOn="button"
+                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                                        pattern="dd/MM/yyyy" mask="true"
+                                        locale="it" navigator="true" popupIconOnly="true"
+                                        placeholder="#{msg.mailManagerDateTo}"
+                                        onblur="check_date(this)" value="#{bean.requestListBean.dateTo}"/>
+                        </p:column>
+
+                        <p:column>
+                            <br/>
+                            <p:inputText value="#{bean.requestListBean.searchLastName}"
+                                         placeholder="#{msg.requestLastName}"
+                                         style="width: 92%"/>
+                        </p:column>
+                        <p:column>
+                            <br/>
+                            <p:inputText value="#{bean.requestListBean.searchFiscalCode}"
+                                         placeholder="#{msg.requestFiscalCode}"
+                                         style="width: 92%"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{msg.requestListClient}:"/>
+                            <p:selectOneMenu id="client" value="#{bean.requestListBean.selectedClientId}"
+                                             label="#{msg.requestClient}" style="width: 85%">
+                                <f:selectItems value="#{bean.requestListBean.clients}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+
+                        <p:column>
+                            <h:outputText value="#{msg.requestListDateOfEvasion}:"/>
+                            <br/>
+                            <p:calendar id="filterDateFromEvasione" readonlyInput="false" showOn="button"
+                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+                                        pattern="dd/MM/yyyy" mask="true"
+                                        locale="it" navigator="true" popupIconOnly="true"
+                                        onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+                                        value="#{bean.requestListBean.dateFromEvasion}"
+                                        placeholder="#{msg.mailManagerDateFrom}"/>
+                            <p:calendar id="filterDateToEvasione" readonlyInput="false" showOn="button"
+                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                                        pattern="dd/MM/yyyy" mask="true"
+                                        locale="it" navigator="true" popupIconOnly="true"
+                                        placeholder="#{msg.mailManagerDateTo}"
+                                        onblur="check_date(this)" value="#{bean.requestListBean.dateToEvasion}"/>
+                        </p:column>
+
+                        <p:column>
+                            <h:outputText value="#{msg.requestListServiceType}:"/>
+                            <p:selectOneMenu id="requestType" value="#{bean.requestListBean.selectedRequestType}"
+                                             label="#{msg.requestListServiceType}" style="width: 85%">
+                                <f:selectItems value="#{bean.requestListBean.requestTypes}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{msg.requestListService}:"/>
+                            <p:selectOneMenu id="serviceType" value="#{bean.requestListBean.selectedServiceType}"
+                                             label="#{msg.requestListService}" style="width: 85%">
+                                <f:selectItems value="#{bean.requestListBean.serviceTypes}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                        <p:column>
+                            <br/>
+                            <p:calendar id="filterExpiration" readonlyInput="false" showOn="button"
+                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                                        pattern="dd/MM/yyyy" mask="true" styleClass="special-calendar-width"
+                                        locale="it" navigator="true" popupIconOnly="true"
+                                        placeholder="#{msg.expirationDate}"
+                                        value="#{bean.requestListBean.dateExpiration}"/>
+                        </p:column>
+                        <p:column>
+                            <br/>
+                            <p:inputText value="#{bean.requestListBean.searchCreateUser}"
+                                         placeholder="#{msg.requestCreateUser}"
+                                         style="width: 92%"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{msg.requestUserType}:"/>
+                            <p:selectOneMenu id="requestUserType" value="#{bean.requestListBean.selectedUserType}"
+                                             label="#{msg.requestUserType}" style="width: 85%">
+                                <f:selectItems value="#{bean.requestListBean.userTypes}"/>
+                            </p:selectOneMenu>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{msg.subjectViewFormalityConservatory}:"/>
+                            <p:selectOneMenu value="#{bean.requestListBean.aggregationFilterId}" style="width: 85%">
+                                <f:selectItems value="#{bean.requestListBean.landAggregations}"/>
+                            </p:selectOneMenu>
+
+                        </p:column>
+                        <p:column>
+                            <p:outputPanel>
+                                <br/>
+                                <p:commandButton rendered="#{bean.requestListBean.showPrintButton}"
+                                                 value="#{msg.requestPrintExcel}"
+                                                 style="float: right; margin-right: 15px;"
+                                                 id="printExcelButton"
+                                                 oncomplete="PF('createTotalCosthDocumentDialogWV').show()"
+                                                 action="#{bean.requestListBean.loadRequestsExcel}"/>
+                                <p:commandButton rendered="#{bean.requestListBean.showPrintButton}"
+                                                 value="#{msg.requestEditAndPrint}"
+                                                 style="float: right; margin-right: 15px;"
+                                                 id="editAndPrintButton" oncomplete="PF('editAndPrintDialogWV').show();"
+                                                 process="searchPanel"/>
+                                <p:commandButton value="#{msg.search}" style="float: right;margin-right: 15px;"
+                                                 id="searchButton" onclick="checkDates(); filterTableFromPanel();"
+                                                 action="#{bean.requestListBean.prepareToModify}"
+                                                 update="table,searchPanel,editAndPrintDialog"/>
+                                <p:commandButton value="#{msg.requestVerify}" style="float: right;margin-right: 15px;"
+                                                 id="verifyButton"
+                                                 action="#{bean.requestListBean.verifyRequests}"
+                                                 update="fakeButton"
+                                                 oncomplete="document.getElementById('tabs:fakeButton').click();"/>
+                                <p:commandButton id="fakeButton"
+                                                 disabled="#{bean.requestListBean.anomalyRequestsFile == null}"
+                                                 ajax="false" styleClass="non_displayed_button"
+                                                 action="#{bean.requestListBean.loadExcelWithAnomalyRequests}"/>
+                            </p:outputPanel>
+                        </p:column>
+                    </p:panelGrid>
+                </p:outputPanel>
+
+                <p:dataTable var="item" id="table"
+                             emptyMessage="#{msg.noRecordsFound}" value="#{bean.requestListBean.lazyModel}"
+                             rowKey="#{item.id}" rows="10" lazy="true" paginator="true"
+                             paginatorAlwaysVisible="true" rowIndexVar="rowId"
+                             rowStyleClass="#{item.isInserted ? 'receive_new_mail_style':''}"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,20,50" widgetVar="tableWV">
+
+                    <p:column headerText="#{msg.requestCreateDate}" sortBy="#{item.createDate}"
+                              style="width: 72px; text-align: center;">
+                        <h:outputText value="#{item.createDate}" converter="dateTimeConverter"/>
+                        <br/>
+                        <h:outputText value="#{item.createDate}" converter="timeConverter"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.requestListClient}">
+                        <h:outputText value="#{item.clientName}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.requestListService}" styleClass="min_padding_margin" width="135">
+                        <p:outputPanel id="servicesColumn"
+                                       rendered="#{item.serviceName eq null}"
+                                       style="background-color: transparent; min-height: 34px; width: inherit;"/>
+                        <h:outputText id="service" value="#{item.serviceName}" rendered="#{item.serviceName ne null}"/>
+                        <p:tooltip for="servicesColumn" value="#{item.servicesNames}"
+                                   rendered="#{item.serviceName eq null}"
+                                   escape="false"/>
+                    </p:column>
+
+                    <p:column style="width: 100px;" headerText="#{msg.requestLastBusinessName}" sortBy="#{item.name}">
+                        <h:outputText value="#{ff:upper(item.nameStr)}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.requestFiscalCodeVATNamber}" style="width: 135px; margin-left: 10px;"
+                              sortBy="#{item.code}">
+                        <h:outputText value="#{item.code}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.requestListCorservatoryName}" style="width: 135px; margin-left: 10px;">
+                        <h:outputText value="#{item.aggregationLandCharRegNameOrCity}"/>
+                    </p:column>
+
+                    <p:column styleClass=" action_midle_column" headerText="#{msg.requestListOpenMail}">
+                        <p:commandButton icon="fa fa-envelope" action="#{bean.requestListBean.openRequestMail}"
+                                         rendered="#{not empty item.mailId}">
+                            <f:setPropertyActionListener value="#{item.mailId}"
+                                                         target="#{bean.requestListBean.entityEditId}"/>
+                        </p:commandButton>
+                        <h:outputText id="externalUserIcon" rendered="#{item.external}" styleClass="fa fa-user"
+                                      style="font-size: 25px"/>
+                        <p:tooltip for="externalUserIcon" value="#{item.createUserFullName}" escape="false"/>
+                    </p:column>
+
+                    <p:column exportable="false" styleClass="action_midle_column"
+                              headerText="#{msg.requestOldRequestDetails}"
+                              rendered="#{!bean.requestListBean.getCurrentUser().isExternal()}" width="60">
+                        <p:commandButton icon="pi pi-search"
+                                         disabled="#{!bean.requestListBean.canEdit}"
+                                         action="#{bean.requestListBean.manageRequest}">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.requestListBean.entityEditId}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                    <p:column styleClass="min_padding_margin"
+                              rendered="#{!bean.requestListBean.getCurrentUser().isExternal()}">
+                        <f:facet name="header">
+                            <h:outputText value="#{msg.requestListCurrentOperator}"
+                                          rendered="#{not bean.requestListBean.canSeeAllUsers}"/>
+                            <p:commandButton id="userSelectCheckboxShow"
+                                             rendered="#{bean.requestListBean.canSeeAllUsers}"
+                                             onclick="PF('userSelectCheckboxWV').show(); event.stopImmediatePropagation();"
+                                             value="#{msg.requestListCurrentOperator}" type="button"/>
+                        </f:facet>
+                        <h:outputText value="#{item.userName}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.formality}">
+                        <h:outputText value="#{item.formalityNumberStr}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.requestListCostEstateFormality}">
+                        <h:outputText value="#{item.costEstateFormality}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.requestListCadastralCost}">
+                        <h:outputText value="#{item.costCadastral}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.requestListCostPay}">
+                        <h:outputText value="#{item.costPay}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.requestListTotalCost}">
+                        <h:outputText value="#{item.totalCostDouble}"/>
+                    </p:column>
+
+                    <p:column exportable="false" styleClass="action_midle_column">
+                        <p:commandButton icon="fa fa-pencil-square-o" action="#{bean.viewExtraCost()}">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.entityEditId}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                    <p:column styleClass=" action_midle_column" headerText="#{msg.requestListDocuments}">
+                        <p:commandButton icon="fa fa-file" action="#{bean.requestListBean.loadRequestDocuments}"
+                                         update="requestDocs"
+                                         rendered="#{item.haveDocuments}" oncomplete="PF('documentDialog').show();">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.requestListBean.entityEditId}"/>
+                        </p:commandButton>
+                    </p:column>
+                    <ui:remove>
+                        <p:column styleClass=" min_padding_margin" headerText="#{msg.requestListOpenEditor}"
+                                  rendered="#{!bean.requestListBean.getCurrentUser().isExternal()}">
+                            <p:commandButton icon="fa fa-indent" action="#{bean.requestListBean.openRequestEditor}">
+                                <f:setPropertyActionListener value="#{item.id}"
+                                                             target="#{bean.requestListBean.entityEditId}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </ui:remove>
+                    <p:column styleClass="action_column" exportable="false">
+                        <p:commandButton  icon="ui-icon pi pi-times" styleClass="red-btn"
+                                         oncomplete="PF('dlg2').show()" disabled="#{!bean.requestListBean.canDelete}">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.requestListBean.entityDeleteId}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                </p:dataTable>
+
+                <p:overlayPanel id="userSelectCheckboxPanel" my="left top" at="left bottom"
+                                widgetVar="userSelectCheckboxWV" for="table:userSelectCheckboxShow"
+                                onHide="filterTableFromPanel();" dynamic="true" style="width:300px">
+                    <p:dataTable id="userSelectCheckboxPanelDataTable" var="state"
+                                 value="#{bean.requestListBean.userWrappers}" selectionMode="single"
+                                 selection="#{bean.requestListBean.selectedUserForFilter}" rowKey="#{state.value}">
+
+                        <p:ajax event="rowSelect"
+                                listener="#{requestListbean.requestListBean.selectUserForFilter}"
+                                update="userSelectCheckboxPanelDataTable"/>
+
+                        <p:column style="width:18px">
+                            <f:facet name="header">
+                                <p:selectBooleanCheckbox value="#{bean.requestListBean.selectedAllUsersOnPanel}">
+                                    <p:ajax update="userSelectCheckboxPanelDataTable" event="change"/>
+                                </p:selectBooleanCheckbox>
+                            </f:facet>
+                            <p:selectBooleanCheckbox value="#{state.selected}">
+                                <p:ajax update="userSelectCheckboxPanelDataTable" event="change"/>
+                            </p:selectBooleanCheckbox>
+                        </p:column>
+
+                        <p:column headerText="#{msg.mailManagerStates}">
+                            <h:outputText value="#{state.value}"/>
+                        </p:column>
+                    </p:dataTable>
+                </p:overlayPanel>
+            </p:tab>
+        </p:tabView>
+        <p:dialog id="documentDialog" widgetVar="documentDialog" modal="true" resizable="false" draggable="false"
+                  width="600">
+            <p:dataTable value="#{bean.requestListBean.requestDocuments}" var="doc" id="requestDocs">
+                <p:column headerText="#{msg.name}">
+                    <h:outputText value="#{doc.title}"/>
+                </p:column>
+                <p:column styleClass="action_column">
+                    <p:commandButton icon="fa fa-download" action="#{bean.requestListBean.downloadRequestFile}" ajax="false">
+                        <f:setPropertyActionListener value="#{doc.id}" target="#{bean.requestListBean.entityEditId}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+        </p:dialog>
+        <p:dialog id="dlg2" widgetVar="dlg2" modal="true" resizable="false"
+                  draggable="false" effect="SLIDE">
+            #{msg.deleteRequestConfirmation}<br/>
+            <br/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.yes}" action="#{bean.requestListBean.deleteEntity}" update="messages"
+                                 oncomplete="PF('dlg2').hide(); filterTableFromPanel();"/>
+                <p:commandButton value="#{msg.no}" onclick="PF('dlg2').hide()"/>
+            </div>
+        </p:dialog>
+
+        <p:dialog widgetVar="templates" resizable="false"
+                  header="#{msg.docTemplates}" modal="true">
+            <p:selectOneMenu value="#{bean.requestListBean.selectedTemplateId}"
+                             style="width:150px;">
+                <f:selectItems value="#{bean.requestListBean.templates}"/>
+            </p:selectOneMenu>
+
+            <div class="btn_line">
+                <p:commandButton value="#{msg.ok}" ajax="false"
+                                 actionListener="#{bean.requestListBean.generate}" onclick="PF('templates').hide()"
+                                 update="messages"/>
+                <p:commandButton value="#{msg.cancel}"
+                                 onclick="PF('templates').hide()"/>
+            </div>
+        </p:dialog>
+
+        <p:dialog id="editAndPrintDialog" widgetVar="editAndPrintDialogWV" modal="true" resizable="false"
+                  draggable="false">
+            <h3>#{msg.requestEditAndPrintDialogHeader}:</h3>
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" id="editArea">
+                <span>#{msg.status}:</span>
+                <p:column>
+                    <p:selectOneMenu value="#{bean.requestListBean.selectedState}" label="#{msg.status}"
+                                     styleClass="select-width">
+                        <f:selectItems value="#{bean.requestListBean.statesForSelect}"/>
+                    </p:selectOneMenu>
+                </p:column>
+
+                <span>#{msg.requestListCurrentOperator}:</span>
+                <p:column>
+                    <p:selectOneMenu value="#{bean.requestListBean.selectedUser}" label="#{msg.requestListCurrentOperator}"
+                                     styleClass="select-width">
+                        <f:selectItems value="#{bean.requestListBean.usersForSelect}"/>
+                    </p:selectOneMenu>
+                </p:column>
+            </p:panelGrid>
+
+            <div class="btn_line">
+                <p:commandButton value="#{msg.requestPrint}"
+                                 action="#{bean.requestListBean.loadRequestsPdf}"/>
+                <p:commandButton value="#{msg.ok}"
+                                 action="#{bean.requestListBean.modifyRequests}"
+                                 oncomplete="PF('editAndPrintDialogWV').hide(); filterTableFromPanel();"/>
+            </div>
+        </p:dialog>
+        <p:dialog widgetVar="nonAnomalyRequestFound" resizable="false" modal="true" draggable="false">
+            <h:outputText value="#{msg.requestNonAnomalRequestsFound}"/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.ok}" onclick="PF('nonAnomalyRequestFound').hide()"/>
+            </div>
+        </p:dialog>
+
+        <ui:include src="../Dialogs/RequestExtraCostDialog.xhtml"/>
+        <ui:include src="../Dialogs/EstateFormalityCostDialog.xhtml"/>
+        <ui:include src="../Dialogs/TotalCostDocumentDialog.xhtml">
+            <ui:param name="bean" value="#{bean.requestListBean}"></ui:param>
+        </ui:include>
+    </ui:define>
+
+</ui:composition>
+</html>

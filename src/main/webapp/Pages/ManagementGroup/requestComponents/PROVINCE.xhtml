@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <script type="application/javascript">
+        function filterCity(itemLabel, filterValue) {
+            debugger;
+            let strArray = itemLabel.split(" ");
+            return strArray[1].startsWith(filterValue);
+        }
+    </script>
+    <p:panel style="background: transparent; border: none" styleClass="ui-g-6">
+        <p:panelGrid columns="2" style="width: 100%;" styleClass="ui-panelgrid-blank form-group" layout="grid">
+            <p:column>
+        <span>#{msg.requestProvince}<span class="red"
+                                                                    style="#{block.isRequired()?'':'display:none;'}">*</span></span>
+                <p:selectOneMenu id="STANDART_PROVINCE" value="#{bean.wrapper.selectedProvincePropertyId}"
+                                 styleClass="select-width">
+                    <f:selectItems value="#{bean.wrapper.provinces}"/>
+                    <p:ajax event="change" update="STANDART_PROVINCE_COMUNE" listener="#{bean.onChangePropertyProvince()}"/>
+                </p:selectOneMenu>
+            </p:column>
+            <p:column>
+                <h:outputText value="#{msg.requestCity}"/><br/>
+                <p:selectOneMenu id="STANDART_PROVINCE_COMUNE" value="#{bean.wrapper.selectedCityPropertyId}"
+                                 styleClass="select-width" filter="true" filterFunction="filterCity"
+                                 filterMatchMode="custom">
+                    <f:selectItems value="#{bean.wrapper.propertyCities}"/>
+                </p:selectOneMenu>
+            </p:column>
+        </p:panelGrid>
+    </p:panel>
+</ui:composition>

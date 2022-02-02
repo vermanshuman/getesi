@@ -1,0 +1,85 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pp="http://primefaces.org/poseidon">
+
+    <h:form id="menuform1">
+        <style>
+            div[id*='menuform1:menu_div'] {
+                width: calc(100% - 37px) !important;
+                height: auto !important;
+                background-color: transparent !important;
+                margin-top: 44px;
+                margin-left: -21px;
+            }
+            div[id*='menuform1:menu_div'] ul {
+                display: flex;
+                width: 100%;
+            }
+            div[id*='menuform1:menu_div'] ul li {
+                width: 50%;
+            }
+            div[id*='menuform1:menu_div'] ul li a {
+                color: #FFFFFF !important;
+                background-color: transparent !important;
+                width: 100px;
+            }
+            .last-menu-icon {
+                float: right;
+                padding-top: 0px !important;
+                padding-bottom: 0px !important;
+                display: flex !important;
+                margin-left: 10px;
+            }
+            .last-menu-icon .fa-chevron-circle-right {
+                float: right;
+                margin-right: 25px;
+                margin-top: 2px;
+            }
+            .last-menu-icon span {
+                padding-left: 9px;
+                margin-left: -82px;
+            }
+            .first-menu-icon span {
+                padding-left: 3px !important;
+            }
+            .first-menu-icon {
+                padding-left: 5px !important;
+                padding-top: 0px !important;
+                padding-bottom: 0px !important;
+                display: flex !important;
+                margin-left: 10px;
+            }
+            .layout-topbar {
+                padding-right: 65px !important;
+            }
+        </style>
+        <script>
+            // <![CDATA[
+            setTimeout( function () {
+                $('.menu_div').css("display", "block");
+                if ((window.location.pathname.indexOf('Configuration/') > 0 && !(window.location.pathname.indexOf('Configuration/ApplicationSettings.jsf') > 0
+                    || window.location.pathname.indexOf('Configuration/ImportSettings.jsf') > 0 || window.location.pathname.indexOf('DocumentConversionSettings.jsf') > 0
+                    || window.location.pathname.indexOf('OMIValuationDocuments.jsf') > 0 || window.location.pathname.indexOf('DatiAziendali.jsf') > 0
+                    || window.location.pathname.indexOf('CodiciConservatorie.jsf') > 0 || window.location.pathname.indexOf('Edit.jsf') > 0))
+                    || (window.location.pathname.indexOf('Dictionaries/') > 0 && !(window.location.pathname.indexOf('Dictionaries/CadastralTopology.jsf') > 0
+                        || window.location.pathname.indexOf('Edit.jsf') > 0)) || ((window.location.pathname.indexOf('ConfigurationArea/') > 0)
+                        && !(window.location.pathname.indexOf('ConfigurationArea/ClientList.jsf') > 0 || window.location.pathname.indexOf('Edit.jsf')))
+                    || window.location.pathname.indexOf('ConfigurationArea/LandOmiList.jsf') > 0
+                    || (window.location.pathname.indexOf('ManagementGroup/PaymentTypeList.jsf') > 0)) {
+                    $('.menu_div').css("margin-left", "-5px");
+                }
+            }, 200);
+            // ]]>
+        </script>
+        <p:outputPanel id="menu_div" class="layout-menu-container menu_div"  style="display:none;#{renderSideMenuTop ? 'top: 0; ' : ''}">
+            <div class="nano">
+                <div class="nano-content menu-scroll-content">
+                    <pp:menu widgetVar="me"  model="#{menuBean.mainMenuModel}" id="mmm"/>
+                </div>
+            </div>
+        </p:outputPanel>
+    </h:form>
+
+</ui:composition>

@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/resources/tpl/Admin/EmptyBase.xhtml">
+    <ui:param name="view_title" value="#{msg.systemMonitoring}"/>
+    <ui:param name="bean" value="#{monitoringBean}"/>
+    <ui:param name="showAjax" value="#{false}"/>
+
+    <ui:define name="view_body">
+        <script type="text/javascript">
+            window.onload = function () {
+                PF('socketWV').connect('/notify');
+            };
+
+            window.onbeforeunload = function (e) {
+                PF('socketWV').disconnect();
+            }
+        </script>
+        <p:socket onMessage="handleMessageSocket" channel="/notify" autoConnect="false" widgetVar="socketWV"/>
+        <p:remoteCommand name="handleMessageSocket"
+                         update="tabs:outpanel,tabs:importXlsServiceProgressPanelId, tabs:importVisureRTFServiceProgressPanelId,
+                                 tabs:importVisureDHServiceProgressPanelId, tabs:importRequestOLDServiceProgressPanelId,
+                                 tabs:importOmiXlsxServiceProgressPanelId tabs:removeSubjectsServiceProgressPanelId"/>
+        <p:remoteCommand oncomplete="#{monitoringBean.updateXlsService()}" autoRun="true"/>
+        <p:tabView id="tabs">
+            <p:tab title="#{msg.services}">
+                <p:outputPanel id="outpanel">
+                    <ui:include src="MonitorigBlock.xhtml">
+                        <ui:param name="header" value="#{msg.tempRemoverService}"/>
+                        <ui:param name="service" value="#{bean.tempRemoverService}"/>
+                        <ui:param name="startBtnWV" value="tempRemoverStartWV"/>
+                        <ui:param name="stopBtnWV" value="tempRemoverStopWV"/>
+                        <ui:param name="progressPanelId" value="tempRemoverServiceProgressPanelId"/>
+                    </ui:include>
+                    <ui:include src="MonitorigBlock.xhtml">
+                        <ui:param name="header" value="#{msg.keepAliveService}"/>
+                        <ui:param name="service" value="#{bean.keepAliveService}"/>
+                        <ui:param name="startBtnWV" value="keepAliveStartWV"/>
+                        <ui:param name="stopBtnWV" value="keepAliveStopWV"/>
+                        <ui:param name="progressPanelId" value="keepAliveServiceProgressPanelId"/>
+                    </ui:include>
+                    <ui:include src="MonitorigBlock.xhtml">
+                        <ui:param name="header" value="#{msg.importPropertyService}"/>
+                        <ui:param name="service" value="#{bean.importPropertyService}"/>
+                        <ui:param name="startBtnWV" value="importPropertyStartWV"/>
+                        <ui:param name="stopBtnWV" value="importPropertyStopWV"/>
+                        <ui:param name="progressPanelId" value="importPropertyServiceProgressPanelId"/>
+                    </ui:include>
+                    <ui:include src="MonitorigBlock.xhtml">
+                        <ui:param name="header" value="#{msg.importEstateFormalityService}"/>
+                        <ui:param name="service" value="#{bean.importEstateFormalityService}"/>
+                        <ui:param name="startBtnWV" value="importEstateFormalityStartWV"/>
+                        <ui:param name="stopBtnWV" value="importEstateFormalityStopWV"/>
+                        <ui:param name="progressPanelId" value="importEstateFormalityServiceProgressPanelId"/>
+                    </ui:include>
+                    <ui:include src="MonitorigBlock.xhtml">
+                        <ui:param name="header" value="#{msg.importFormalityService}"/>
+                        <ui:param name="service" value="#{bean.importFormalityService}"/>
+                        <ui:param name="startBtnWV" value="importFormalityStartWV"/>
+                        <ui:param name="stopBtnWV" value="importFormalityStopWV"/>
+                        <ui:param name="progressPanelId" value="importFormalityServiceProgressPanelId"/>
+                    </ui:include>
+                    <ui:include src="MonitorigBlock.xhtml">
+                        <ui:param name="header" value="#{msg.importXlsService}"/>
+                        <ui:param name="service" value="#{bean.importXLSXService}"/>
+                        <ui:param name="startBtnWV" value="importXLSXServiceStartWV"/>
+                        <ui:param name="stopBtnWV" value="importXLSXServiceStopWV"/>
+                        <ui:param name="progressPanel" value="#{true}"/>
+                        <ui:param name="blockService" value="#{bean.xlsImporting}"/>
+                        <ui:param name="progressPanelId" value="importXlsServiceProgressPanelId"/>
+                    </ui:include>
+                    <ui:include src="MonitorigBlock.xhtml">
+                        <ui:param name="header" value="#{msg.importXLSXUpdateFormalityImported}"/>
+                        <ui:param name="service" value="#{bean.importXLSXUpdateFormalityImported}"/>
+                        <ui:param name="startBtnWV" value="importXLSXUpdateFormalityImportedServiceStartWV"/>
+                        <ui:param name="stopBtnWV" value="importXLSXUpdateFormalityImportedServiceStopWV"/>
+                        <ui:param name="progressPanel" value="#{true}"/>
+                        <ui:param name="blockService" value="#{bean.xlsImporting}"/>
+                        <ui:param name="progressPanelId" value="importXLSXUpdateFormalityImportedServiceProgressPanelId"/>
+                    </ui:include>
+                    <ui:include src="MonitorigBlock.xhtml">
+                        <ui:param name="header" value="#{msg.importReportFormalitySubjectService}"/>
+                        <ui:param name="service" value="#{bean.importReportFormalitySubjectService}"/>
+                        <ui:param name="startBtnWV" value="importReportFormalitySubjectStartWV"/>
+                        <ui:param name="stopBtnWV" value="importReportFormalitySubjectStopWV"/>
+                        <ui:param name="progressPanelId" value="importReportFormalitySubjectServiceProgressPanelId"/>
+                    </ui:include>
+                    <ui:include src="MonitorigBlock.xhtml">
+                        <ui:param name="header" value="#{msg.importVisureRTFService}"/>
+                        <ui:param name="service" value="#{bean.importVisureRTFService}"/>
+                        <ui:param name="startBtnWV" value="importVisureRTFServiceStartWV"/>
+                        <ui:param name="stopBtnWV" value="importVisureRTFServiceStopWV"/>
+                        <ui:param name="progressPanel" value="#{true}"/>
+                        <ui:param name="progressPanelId" value="importVisureRTFServiceProgressPanelId"/>
+                    </ui:include>
+                    <ui:include src="MonitorigBlock.xhtml">
+                        <ui:param name="header" value="#{msg.importVisureDHService}"/>
+                        <ui:param name="service" value="#{bean.importVisureDHService}"/>
+                        <ui:param name="startBtnWV" value="importVisureDHServiceStartWV"/>
+                        <ui:param name="stopBtnWV" value="importVisureDHServiceStopWV"/>
+                        <ui:param name="progressPanel" value="#{true}"/>
+                        <ui:param name="progressPanelId" value="importVisureDHServiceProgressPanelId"/>
+                    </ui:include>
+                    <ui:include src="MonitorigBlock.xhtml">
+                        <ui:param name="header" value="#{msg.importRequestOLDService}"/>
+                        <ui:param name="service" value="#{bean.importRequestOLDService}"/>
+                        <ui:param name="startBtnWV" value="importRequestOLDServiceStartWV"/>
+                        <ui:param name="stopBtnWV" value="importRequestOLDServiceStopWV"/>
+                        <ui:param name="progressPanel" value="#{true}"/>
+                        <ui:param name="progressPanelId" value="importRequestOLDServiceProgressPanelId"/>
+                    </ui:include>
+                    <ui:include src="MonitorigBlock.xhtml">
+                        <ui:param name="header" value="#{msg.importSecuritiesOMIService}"/>
+                        <ui:param name="service" value="#{bean.importOmiXlsxService}"/>
+                        <ui:param name="startBtnWV" value="importOmiXlsxServiceStartWV"/>
+                        <ui:param name="stopBtnWV" value="importOmiXlsxServiceStopWV"/>
+                        <ui:param name="progressPanel" value="#{true}"/>
+                        <ui:param name="progressPanelId" value="importOmiXlsxServiceProgressPanelId"/>
+                    </ui:include>
+                    <ui:include src="MonitorigBlock.xhtml">
+                        <ui:param name="header" value="#{msg.removeSubjectsService}"/>
+                        <ui:param name="service" value="#{bean.removeSubjectsService}"/>
+                        <ui:param name="startBtnWV" value="removeSubjectsStartWV"/>
+                        <ui:param name="stopBtnWV" value="removeSubjectsStopWV"/>
+                        <ui:param name="progressPanel" value="#{true}"/>
+                        <ui:param name="progressPanelId" value="removeSubjectsServiceProgressPanelId"/>
+                    </ui:include>
+                    <br/>
+                </p:outputPanel>
+            </p:tab>
+        </p:tabView>
+
+    </ui:define>
+</ui:composition>
+</html>

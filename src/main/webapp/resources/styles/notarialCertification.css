@@ -1,0 +1,354 @@
+#table table {
+	margin-top: 20px;
+}
+
+.ui-datatable thead th {
+	background-color: #003871 !important;
+	color: #ffffff !important;
+	font-weight: normal;
+	font-size: 14px;
+}
+
+.status-yellow {
+	border: 2px solid #ED9C43;
+	color: #ED9C43;
+}
+
+.status-green {
+	border: 2px solid #00C347;
+	color: #00C347;
+}
+
+.status-navy {
+	border: 2px solid #123df7;
+	color: #123df7;
+}
+
+.status-magenta {
+	border: 2px solid #616CA2;
+	color: #616CA2;
+}
+
+.status-red {
+	border: 2px solid #FF0000;
+	color: #FF0000;
+}
+
+.status-icon {
+	height: 24px;
+	width: 142px;
+	padding-right: 4px;
+	padding-left: 4px;
+	border-radius: 10px;
+	text-align: center;
+	box-sizing: border-box;
+	font-size: 12px;
+	font-weight: 600;
+	font-family: 'Mukta', sans-serif;
+}
+
+.request-table table {
+	border-collapse: collapse;
+	border-spacing: 0 1em;
+}
+
+::-webkit-input-placeholder { /* Edge */
+	color: #003871;
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+	color: #003871;
+}
+
+::placeholder {
+	color: #003871;
+}
+
+input {
+	background-color: #F0F3F5 !important;
+	border: none !important;;
+	border-radius: 7px !important;
+	min-height: 28px;
+}
+
+.ui-datepicker-trigger {
+	color: #003871 !important;;
+}
+
+body .ui-calendar .ui-button {
+	background-color: transparent !important;
+	margin-left: -37px;
+}
+
+.ui-selectonemenu {
+	background-color: #F0F3F5 !important;
+	border: none !important;
+	border-radius: 7px !important;
+}
+
+.ui-selectonemenu-label {
+	background-color: #F0F3F5 !important;
+	border-radius: 7px !important;
+	color: #003871;
+	margin-top: 4px;
+	margin-bottom: 4px;
+}
+
+.ui-selectonemenu-trigger {
+	color: #003871;
+	margin-top: 4px;
+}
+
+.ui-calendar input {
+	width: calc(100% - 8px);
+}
+
+body .custom-design-tooltip .ui-tooltip-text {
+	background: #D9E0E7;
+	color: #6688AA;
+	border: 10px solid #68a;
+	border-radius: 10px;
+	padding: 10px !important;
+	box-shadow: none;
+	position: relative;
+	top: 20px;
+	min-width: 220px !important;
+}
+
+body .custom-design-tooltip .ui-tooltip-arrow {
+	display: none;
+}
+
+.search-btn {
+	margin-top: 20px;
+	min-height: 36px;
+	border-radius: 7px !important;
+}
+
+.vertical-txt {
+	font-size: 12px;
+	font-weight: 600;
+	font-family: 'Mukta', sans-serif;
+	-webkit-transform: rotate(-90deg);
+	-moz-transform: rotate(-90deg);
+	-ms-transform: rotate(-90deg);
+	-o-transform: rotate(-90deg);
+	position: absolute;
+	margin-left: -75px;
+	margin-top: -42px;
+	color: #FFFCFC !important;
+	background-color: #FF0000 !important;
+	border-radius: 3px !important;
+	min-width: 93px;
+	height: 13.4px;
+	text-align: center;
+}
+
+.action-btn {
+	border-radius: 7px !important;
+	width: 100%;
+}
+
+.action-btn>span {
+	font-weight: 600 !important;
+}
+
+body .ui-tooltip-text .ui-button {
+	background-color: #D9E0E7 !important;
+}
+
+body .ui-tooltip-text .ui-button .ui-button-text {
+	color: #003871 !important;
+}
+
+.ui-tooltip .ui-tooltip-text {
+	padding: 0 !important;
+	color: #D9E0E7;
+}
+
+.ui-tooltip .ui-panelgrid-content {
+	background-color: #6688AA;
+	border-radius: 7px;
+	opacity: 0.8;
+}
+
+.action-tooltip-grid .ui-tooltip-text {
+	background-color: transparent !important;
+}
+
+.g-btn .ui-button-text {
+	margin-top: -5px;
+	margin-left: -5px;
+	font-weight: 600;
+	color: #003871 !important;
+}
+
+#stateSelectCheckboxPanel .ui-overlaypanel-content {
+	padding: .0em 0em;
+}
+
+#stateSelectCheckboxPanel {
+	border: 12px solid rgba(48, 91, 135, 0.6) !important;
+	border-radius: 10px;
+}
+
+#stateSelectCheckboxPanel thead th {
+	background-color: white !important;
+	border-right-color: white;
+}
+
+#serviceSelectCheckboxPanel .ui-overlaypanel-content {
+	padding: .0em 0em;
+}
+
+#serviceSelectCheckboxPanel {
+	border: 12px solid rgba(48, 91, 135, 0.6) !important;
+	border-radius: 10px;
+}
+
+#serviceSelectCheckboxPanelDataTable .ui-datatable-data tr {
+	border: none;
+	border-bottom: 2px solid #95A7BA;
+	background-color: transparent !important;
+}
+
+#serviceSelectCheckboxPanelDataTable .ui-datatable-data tr td {
+	border: none;
+}
+
+#serviceSelectCheckboxPanelDataTable .ui-datatable-data tr td:nth-child(2)
+	{
+	color: #295887;
+	font-weight: 800;
+}
+
+#serviceSelectCheckboxPanel {
+	background-color: transparent;
+}
+
+#serviceSelectCheckboxPanelDataTable .ui-datatable-tablewrapper {
+	border-radius: 6px;
+}
+
+#serviceSelectCheckboxPanelDataTable .ui-chkbox .ui-chkbox-box {
+	border: 2px solid #4D759D;
+	border-radius: 5px;
+	background-color: transparent;
+}
+
+#serviceSelectCheckboxPanelDataTable .ui-chkbox .ui-chkbox-box.ui-service-active
+	{
+	background-color: transparent !important;
+	border-color: #4D759D !important;
+	color: #5f666c !important;
+}
+
+#serviceSelectCheckboxPanelDataTable .ui-datatable-tablewrapper {
+	height: 500px !important;
+}
+
+#serviceSelectCheckboxPanelDataTable thead th {
+	background-color: white !important;
+	border-right-color: white;
+}
+
+#requestTypeSelectCheckboxPanel .ui-overlaypanel-content {
+	padding: .0em 0em;
+}
+
+#requestTypeSelectCheckboxPanel {
+	border: 12px solid rgba(48, 91, 135, 0.6) !important;
+	border-radius: 10px;
+}
+
+#requestTypeSelectCheckboxPanelDataTable .ui-datatable-data tr {
+	border: none;
+	border-bottom: 2px solid #95A7BA;
+	background-color: transparent !important;
+}
+
+#requestTypeSelectCheckboxPanelDataTable .ui-datatable-data tr td {
+	border: none;
+}
+
+#requestTypeSelectCheckboxPanelDataTable .ui-datatable-data tr td:nth-child(2)
+	{
+	color: #295887;
+	font-weight: 800;
+}
+
+#requestTypeSelectCheckboxPanel {
+	background-color: transparent;
+}
+
+#requestTypeSelectCheckboxPanelDataTable .ui-datatable-tablewrapper {
+	border-radius: 6px;
+	max-height: 500px !important;
+}
+
+#requestTypeSelectCheckboxPanelDataTable .ui-chkbox .ui-chkbox-box {
+	border: 2px solid #4D759D;
+	border-radius: 5px;
+	background-color: transparent;
+}
+
+#requestTypeSelectCheckboxPanelDataTable .ui-chkbox .ui-chkbox-box.ui-requestType-active
+	{
+	background-color: transparent !important;
+	border-color: #4D759D !important;
+	color: #5f666c !important;
+}
+
+#requestTypeSelectCheckboxPanelDataTable thead th {
+	background-color: white !important;
+	border-right-color: white;
+}
+
+body .ui-state-highlight {
+	background-color: inherit !important;
+}
+
+body .ui-state-highlight {
+	color: inherit !important;
+}
+
+body .ui-datatable .ui-datatable-data tr.ui-state-highlight {
+	border-color: inherit !important;
+}
+
+#stateSelectCheckboxPanelDataTable .ui-datatable-data tr {
+	border: none;
+	border-bottom: 2px solid #95A7BA;
+	background-color: transparent !important;
+}
+
+#stateSelectCheckboxPanelDataTable .ui-datatable-data tr td {
+	border: none;
+}
+
+#stateSelectCheckboxPanelDataTable .ui-datatable-data tr td:nth-child(2)
+	{
+	color: #295887;
+	font-weight: 800;
+}
+
+#stateSelectCheckboxPanel {
+	background-color: transparent;
+}
+
+#stateSelectCheckboxPanelDataTable .ui-datatable-tablewrapper {
+	border-radius: 6px;
+}
+
+#stateSelectCheckboxPanelDataTable .ui-chkbox .ui-chkbox-box {
+	border: 2px solid #4D759D;
+	border-radius: 5px;
+	background-color: transparent;
+}
+
+#stateSelectCheckboxPanelDataTable .ui-chkbox .ui-chkbox-box.ui-state-active
+	{
+	background-color: transparent !important;
+	border-color: #4D759D !important;
+	color: #5f666c !important;
+}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<!--    <div class="p-grid">-->
+<!--        <div class="p-col-3">-->
+<!--            <h1><img class="forecast-big-icon" src="#{request.contextPath}#{homeBean.forecastToday.code.img}"/></h1>-->
+<!--        </div>-->
+<!--        <div class="p-col-9" style="text-align: left;">-->
+<!--            <span class="forecast-text-center">#{homeBean.forecastToday.code.toString()}</span><br/>-->
+<!--            <span class="forecast-text-center">#{homeBean.forecastToday.temp}°</span>-->
+<!--        </div>-->
+<!--    </div>-->
+
+    <div class="p-grid">
+        <div class="p-col-3">
+            <h1>   <img class="forecast-big-icon" src="#{request.contextPath}/resources/images/weather.png"/></h1>
+        </div>
+        <div class="p-col-9" style="text-align: left;">
+            <span class="forecast-text-center">Parzialmente nuvoloso</span>
+            <br/>
+            <span class="forecast-text-center">25°</span>
+        </div>
+    </div>
+
+<!--        <h2>#{msg.forecastCity} - #{msg.forecastCountry}</h2>-->
+<!--    <h1>-->
+<!--        <span class="forecast-text-center">25°</span>-->
+<!--        <img class="forecast-big-icon" src="#{request.contextPath}/resources/images/weather.png"/>-->
+<!--        <span class="forecast-text-center">Parzialmente nuvoloso</span>-->
+<!--    </h1>-->
+
+<!--    <span>-->
+<!--        #{msg.forecastHumidity}:-->
+<!--          <h:outputText value="#{homeBean.forecastToday.humidity}"/>-->
+<!--    </span><br/>-->
+<!--    <span>-->
+<!--        #{msg.forecastWindSpeed}:-->
+<!--        <h:outputText value="#{homeBean.forecastToday.windSpeed}"/>-->
+<!--    </span><br/><br/>-->
+<!--    <p:dataTable value="#{homeBean.futureForecast}" var="item" styleClass="without-header">-->
+<!--        <p:column styleClass="forecast-date-column">-->
+<!--            #{item.day}<br/>#{item.date}-->
+<!--        </p:column>-->
+<!--        <p:column>-->
+<!--            <img class="forecast-small-icon" src="#{request.contextPath}#{item.code.img}"/>-->
+<!--            <span class="forecast-text-center">#{item.code.toString()}</span>-->
+<!--        </p:column>-->
+<!--        <p:column styleClass="forecast-temp-column">-->
+<!--            <i class="fa fa-fw  fa-long-arrow-up forecast-temp-arrow-up"/>#{item.maxTemp}°-->
+<!--            <i class="fa fa-fw  fa-long-arrow-down forecast-temp-arrow-down"/>#{item.minTemp}°-->
+<!--        </p:column>-->
+<!--    </p:dataTable>-->
+</ui:composition>

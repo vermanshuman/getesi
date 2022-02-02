@@ -1,0 +1,309 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+>
+<ui:composition template="/resources/tpl/Admin/template.xhtml">
+
+    <ui:define name="viewname">
+        <li>
+            <p:link outcome="#{bean.currentPage.page}">#{list_title}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:define name="content">
+        <style>
+            body .ui-widget, body .ui-widget .ui-widget {
+                font-family: "Open Sans", "Helvetica Neue", sans-serif !important;
+                text-decoration: none !important;
+                font-size: 14px !important;
+                font-weight: normal !important;
+            }
+
+            body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
+                background-color: #ebf5fa !important;
+            }
+
+            .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td,
+            .ui-datatable tfoot th {
+                border: 1px solid #c9cdd2 !important;
+            }
+
+            .ui-datatable tbody td, .ui-datatable tfoot td {
+                border-width: 0 1px 1px 0 !important;
+            }
+
+            body .ui-datatable thead th {
+                background-color: #f8f9fa !important;
+                color: #495057 !important;
+                padding: 1rem 1rem !important;
+            }
+
+            body .ui-datatable .ui-datatable-data tr td {
+                padding: 6px 6px !important;
+                color: #5f666c !important;
+            }
+
+            body .ui-datatable thead th.ui-state-active {
+                color: #2196F3 !important;
+            }
+
+            body .ui-datatable .ui-datatable-data > tr:hover {
+                background: #e9ecef !important;
+            }
+
+            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page,
+            body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev,
+            body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last {
+                color: #6c757d !important;
+            }
+
+            body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+                background: #2196F3 !important;
+                color: #ffffff !important;
+            }
+
+            .ui-datatable-gridlines.td {
+                border-width: 1px !important;
+            }
+
+            body .ui-datatable .ui-datatable-header {
+                border-top: 2px solid #c9cdd2 !important;
+            }
+
+            .ui-datatable-header {
+                padding-top: 5px !important;
+                padding-bottom: 5px !important;
+            }
+
+            body .ui-datatable .ui-paginator.ui-paginator-top {
+                /*background-color: #2f8ee5 !important;*/
+                color: #ffffff !important;
+            }
+
+            body .ui-datatable .ui-paginator.ui-paginator-bottom {
+                /*background-color: #2f8ee5 !important;*/
+                color: #ffffff !important;
+            }
+
+            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page,
+            body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev,
+            body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last {
+                color: #FFFFFF !important;
+            }
+
+            body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+                background: #FFF !important;
+                color: #000000 !important;
+            }
+
+            .ui-datatable tbody.ui-datatable-data {
+                border-left: 1px solid #c9cdd2;
+            }
+
+            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-rpp-options {
+                margin: 0;
+            }
+
+            .card {
+                border: none !important;
+                padding-bottom: 0px !important;
+                margin-bottom: 0px !important;
+                padding-top: 0px !important;
+            }
+
+            .layout-footer {
+                border-top: 1px solid #c9cdd2;
+            }
+
+            .layout-wrapper .layout-main .layout-content {
+                padding: 0;
+            }
+
+            .ui-g-12 {
+                padding: 0;
+            }
+
+            .red-btn {
+                background: red !important;
+                background-color: red !important;
+                color: #FFFFFF !important;
+            }
+        </style>
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <div class="card card-w-title">
+                    <p:outputPanel autoUpdate="true"
+                                   rendered="#{empty renderTitle ? true : renderTitle}">
+                        <h1 class="#{title_class}">#{list_title}</h1>
+                    </p:outputPanel>
+                    <div class="content">
+
+                        <h:form id="form" prependId="false">
+                            <ui:insert name="common_components"></ui:insert>
+
+                            <p:outputPanel id="list_panel" autoUpdate="false">
+                                <ui:insert name="in_list_edit_body"></ui:insert>
+                                <ui:insert name="search_body"></ui:insert>
+
+                                <ui:fragment
+                                        rendered="#{empty displayControlPanel ? true : displayControlPanel}">
+                                    <ui:insert name="back_buttons_panel"></ui:insert>
+                                    <br/>
+                                </ui:fragment>
+
+                                <p:commandButton id="default_btn" style="display: none;"/>
+                                <p:defaultCommand target="default_btn" scope="table"/>
+                            </p:outputPanel>
+                            <p:fieldset rendered="#{empty tableInsideField ? false : tableInsideField}" legend="#{msg.viewCreation}" toggleable="true" toggleSpeed="500">
+                                <div class="">
+                                    <ui:insert name="buttons_panel"></ui:insert>
+                                    <p:commandButton disabled="#{!bean.canCreate}" id="buttonCreate"
+                                                     icon="pi pi-plus-circle"
+                                                     style="#{empty renderCss ? '' : renderCss}"
+                                                     styleClass="ui-button-success p-mr-2 p-mb-2"
+                                                     value="#{not empty addButtonTitle ? addButtonTitle : msg.newItem}"
+                                                     update=":form" rendered="#{empty displayControlPanel ? true : displayControlPanel}"
+                                                     action="#{bean.addEntity}"/>
+
+                                </div>
+                                <p:dataTable var="item" id="table1" value="#{tableModel}"
+                                             disabledSelection="#{empty disableSelection?'false':'true'}"
+                                             lazy="#{lazyMode}" filteredValue="#{bean.filteredList}"
+                                             paginator="true" rowKey="#{item.id}" rows="10"
+                                             selectionMode="single" selection="#{bean.selectedItem}" reflow="true"
+                                             paginatorAlwaysVisible="true" emptyMessage="#{msg.noRecordsFound}"
+                                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             rowsPerPageTemplate="10,20,50" widgetVar="tableWV">
+
+                                    <ui:insert name="action_columns"></ui:insert>
+
+                                    <p:column rendered="#{empty showEdit? true : showEdit}"
+                                              styleClass="action_column"
+                                              exportable="false">
+
+                                        <p:commandButton icon="ui-icon pi pi-pencil" style="border: none !important;"
+                                                         disabled="#{!bean.canEdit}" update=":form"
+                                                         action="#{bean.editEntity}"
+                                                         oncomplete="#{additionalEditAction}">
+                                            <f:setPropertyActionListener value="#{item.id}"
+                                                                         target="#{bean.entityEditId}"/>
+                                        </p:commandButton>
+                                    </p:column>
+
+                                    <p:column rendered="#{empty showDelete? true : showDelete}"
+                                              styleClass="action_column" exportable="false">
+                                        <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"                                                         oncomplete="PF('dlg2').show()"
+                                                         disabled="#{!bean.canDelete || (item.id==sessionBean.currentUser.id and bean.userEntityPage)}">
+                                            <f:setPropertyActionListener value="#{item.id}"
+                                                                         target="#{bean.entityDeleteId}"/>
+                                        </p:commandButton>
+                                    </p:column>
+
+                                    <p:column rendered="#{empty showMyDelete ? false : showMyDelete}"
+                                              styleClass="action_column" exportable="false">
+                                        <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"
+                                                         oncomplete="PF('dlg2').show()"
+                                                         disabled="#{!bean.getCanDelete(item) ||
+                                                             (item.id==sessionBean.currentUser.id
+                                                             and bean.userEntityPage)}">
+                                            <f:setPropertyActionListener value="#{item.id}"
+                                                                         target="#{bean.entityDeleteId}"/>
+                                        </p:commandButton>
+                                    </p:column>
+
+                                    <ui:insert name="columns"></ui:insert>
+                                </p:dataTable>
+                            </p:fieldset>
+                            <p:dataTable var="item" id="table" value="#{tableModel}" rendered="#{empty tableInsideField ? true : !tableInsideField}"
+                                         disabledSelection="#{empty disableSelection?'false':'true'}"
+                                         lazy="#{lazyMode}" filteredValue="#{bean.filteredList}"
+                                         paginator="true" rowKey="#{item.id}" rows="10"
+                                         selectionMode="single" selection="#{bean.selectedItem}" reflow="true"
+                                         paginatorAlwaysVisible="true" emptyMessage="#{msg.noRecordsFound}"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         rowsPerPageTemplate="10,20,50" widgetVar="tableWV">
+
+                                <ui:insert name="action_columns"></ui:insert>
+
+                                <p:column rendered="#{empty showEdit? true : showEdit}"
+                                          styleClass="action_column"
+                                          exportable="false">
+
+                                    <p:commandButton icon="ui-icon pi pi-pencil" style="border: none !important;"
+                                                     disabled="#{!bean.canEdit}" update=":form"
+                                                     action="#{bean.editEntity}"
+                                                     oncomplete="#{additionalEditAction}">
+                                        <f:setPropertyActionListener value="#{item.id}"
+                                                                     target="#{bean.entityEditId}"/>
+                                    </p:commandButton>
+                                </p:column>
+
+                                <p:column rendered="#{empty showDelete? true : showDelete}"
+                                          styleClass="action_column" exportable="false">
+                                    <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"                                                         oncomplete="PF('dlg2').show()"
+                                                     disabled="#{!bean.canDelete || (item.id==sessionBean.currentUser.id and bean.userEntityPage)}">
+                                        <f:setPropertyActionListener value="#{item.id}"
+                                                                     target="#{bean.entityDeleteId}"/>
+                                    </p:commandButton>
+                                </p:column>
+
+                                <p:column rendered="#{empty showMyDelete ? false : showMyDelete}"
+                                          styleClass="action_column" exportable="false">
+                                    <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"
+                                                     oncomplete="PF('dlg2').show()"
+                                                     disabled="#{!bean.getCanDelete(item) ||
+                                                         (item.id==sessionBean.currentUser.id
+                                                         and bean.userEntityPage)}">
+                                        <f:setPropertyActionListener value="#{item.id}"
+                                                                     target="#{bean.entityDeleteId}"/>
+                                    </p:commandButton>
+                                </p:column>
+
+                                <ui:insert name="columns"></ui:insert>
+                            </p:dataTable>
+
+
+                            <p:dialog header="#{msg.deleteConfirmationHeader}" widgetVar="dlg2"
+                                      modal="true" resizable="false" effect="SLIDE">
+                                #{empty deleteMessage ? msg.deleteConfirmation : deleteMessage}<br/>
+                                <br/>
+                                <div>
+                                    <p:commandButton value="#{msg.yes}" action="#{bean.deleteEntity}"
+                                                     oncomplete="goToPreviousPage();PF('dlg2').hide();#{dynamicOnComplete}"
+                                                     update="table,:form:messages"/>
+                                    <p:commandButton value="#{msg.no}" onclick="PF('dlg2').hide()"/>
+                                </div>
+
+                                <script>
+                                    function goToPreviousPage() {
+                                        if (PF('tableWV').getPaginator().cfg.rowCount
+                                            % PF('tableWV').getPaginator().cfg.rows == 0) {
+                                            var page = PF('tableWV').getPaginator()
+                                                .getCurrentPage();
+                                            if (page > 0) {
+                                                PF('tableWV').getPaginator().setPage(
+                                                    page - 1);
+                                            }
+                                        }
+                                    }
+                                </script>
+                            </p:dialog>
+
+                            <ui:insert name="dialogs_body"></ui:insert>
+
+                            <p:remoteCommand name="updateMessages" update=":form:messages"/>
+
+                            <p:growl id="messages" showDetail="true" autoUpdate="false"
+                                     widgetVar="messagesVar" globalOnly="true"/>
+                        </h:form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
+</html>

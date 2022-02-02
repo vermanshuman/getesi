@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+>
+<ui:composition template="/resources/tpl/Admin/template.xhtml">
+
+    <ui:define name="viewname">
+        <li>
+            <p:link outcome="#{bean.currentPage.page}">#{page_header}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <div class="card card-w-title">
+                    <ui:insert name="scripts"></ui:insert>
+                    <ui:insert name="common"></ui:insert>
+                    <h:form id="form" prependId="false" enctype="multipart/form-data">
+                        <h:inputHidden value="#{bean.entityId}"/>
+                        <div class="content">
+                            <p:outputPanel id="form_panel">
+                                <p:panel header="#{edit_title}">
+
+                                    <ui:include src="/resources/tpl/common/ValidationMessages.xhtml"/>
+
+                                    <ui:insert name="edit_body"></ui:insert>
+                                    <p:outputPanel>
+                                        <div class="additional_button">
+                                            <div align="center">
+                                                <ui:insert name="additional_buttons"></ui:insert>
+
+                                                <p:commandButton id="save_btn" onclick="#{save_onclick}"
+                                                                 action="#{bean.pageSave}"
+                                                                 style="margin-top: 10px"
+                                                                 rendered="#{empty showSave ? true : showSave}"
+                                                                 disabled="#{empty disableSave ? false : disableSave}"
+                                                                 value="#{empty save_button_text ? msg.save : save_button_text}"
+                                                                 oncomplete="#{save_oncomplete}" icon="pi pi-save"
+                                                                 update=":form, #{save_update}, messages"
+                                                                 styleClass="#{saveButtonStyle} p-mr-2 p-mb-2 ui-button-success"/>
+
+                                                <p:commandButton id="cancel_btn" action="#{bean.goBack}" styleClass="p-mr-2 p-mb-2 ui-button-danger"
+                                                                 rendered="#{empty showCancel ? true : showCancel}"
+                                                                 value="#{empty customCancelMsg ? msg.cancel : customCancelMsg}"
+                                                                 icon="pi pi-times-circle"/>
+
+                                                <p:commandButton value="#{msg.setDefault}"
+                                                                 rendered="#{!empty showDefaultBtn}"
+                                                                 icon="ui-icon ui-icon-arrowreturnthick-1-s"
+                                                                 update=":form"
+                                                                 id="setDefaultButton" action="#{bean.setDefault}"/>
+                                            </div>
+                                        </div>
+                                    </p:outputPanel>
+                                </p:panel>
+                            </p:outputPanel>
+
+                            <ui:insert name="dialog_body"></ui:insert>
+                            <p:growl id="messages" showDetail="true" autoUpdate="false"
+                                     widgetVar="messagesVar" globalOnly="true"/>
+                        </div>
+
+                        <ui:insert name="context_body"></ui:insert>
+                    </h:form>
+                    <ui:insert name="invoices_recipient"></ui:insert>
+                </div>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
+</html>

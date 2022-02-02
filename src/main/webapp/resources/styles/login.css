@@ -1,0 +1,107 @@
+form .login-ui-button {
+    background-image: url('../images/user-shape.png') !important;
+    background-repeat: no-repeat !important;
+    width: 100%;
+    background-position: 10px center !important;
+    height: 40px;
+    padding-left: 4px;
+    line-height: 30px !important;
+    color: white !important;
+    background-color: #005586 !important;
+    display: inline-block;
+    font-weight: bold;
+}
+
+form .forgot-ui-button {
+    background-image: url('../images/vintage-key-outline.png') !important;
+    background-repeat: no-repeat !important;
+    width: 100%;
+    background-position: 10px center !important;
+    height: 40px;
+    padding-left: 20px;
+    line-height: 30px !important;
+    color: white !important;
+    background-color: #F3362B!important;
+    display: inline-block;
+    font-weight: bold;
+    font-size: 15px;
+}
+form .sendforgot-ui-button {
+    margin-top: 10px;
+    text-align: center;
+    background-image: url('../images/vintage-key-outline.png') !important;
+    background-repeat: no-repeat !important;
+    width: 230px;
+    background-position: 10px center !important;
+    height: 40px;
+    padding-left: 20px;
+    line-height: 30px !important;
+    color: white !important;
+    background-color: #F3362B!important;
+    display: inline-block;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+body {
+    background: url('../images/login-bg.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: 100%;
+}
+
+.grandParentContaniner {
+    display: table;
+    height: 100%;
+    margin: auto auto;
+}
+
+.parentContainer {
+    position: absolute;
+    top: 50%;
+    display: table-cell;
+    vertical-align: middle;
+    transform: translate(-50%, -50%);
+}
+
+.fixweight {
+    width: 265px;
+    height: 30px;
+}
+
+form .booleanCheckbox .ui-chkbox-label {
+    vertical-align: middle;
+    margin-top: 0;
+}
+
+form .booleanCheckbox.ui-chkbox {
+    width: auto;
+}
+
+form .booleanCheckbox .ui-chkbox-box {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+body .ui-dialog .ui-dialog-titlebar {
+    padding: 0px !important;
+}
+
+body .ui-dialog .ui-dialog-titlebar .ui-dialog-title {
+    font-size: 15px !important;
+    padding: 10px;
+    display: inline-block;
+    color: #fff;
+    font-weight: 400;
+}
+
+body .ui-dialog .ui-dialog-content {
+    padding-top: 1.5em;
+}
+
+.ui-icon-closethick {
+    color: #fff;
+}

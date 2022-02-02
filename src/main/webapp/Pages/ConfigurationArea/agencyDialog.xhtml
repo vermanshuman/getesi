@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+<ui:param name="bean" value="#{agencyDialogBean}"/>
+
+<h:head>
+    <title><h:outputText value="#{bean.isFilial()?msg.title:msg.titleOffice}"/></title>
+
+    <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/default.css"
+          media="all" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript"
+            src="#{facesContext.externalContext.requestContextPath}/resources/javascript/field-formatters.js"/>
+    <script type="text/javascript"
+            src="#{facesContext.externalContext.requestContextPath}/resources/javascript/locale.js"/>
+    <script type="text/javascript"
+            src="#{facesContext.externalContext.requestContextPath}/resources/javascript/javascript_helper.js"/>
+
+</h:head>
+
+<h:body>
+    <f:view locale="#{localizeBean.locale}">
+        <script type="text/javascript">
+            $(document)
+                .ready(
+                    function () {
+                        PrimeFaces.widget.DefaultCommand = PrimeFaces.widget.BaseWidget
+                            .extend({
+                                init: function (b) {
+                                    this.cfg = b;
+                                    this.id = this.cfg.id;
+                                    this.jqId = PrimeFaces
+                                        .escapeClientId(this.id);
+                                    this.jqTarget = $(PrimeFaces
+                                        .escapeClientId(this.cfg.target));
+                                    var a = this;
+                                    this.jqTarget
+                                        .parents("form:first")
+                                        .keypress(
+                                            function (d) {
+                                                var c = $.ui.keyCode;
+                                                if (d.which == c.ENTER) {
+                                                    a.jqTarget
+                                                        .click();
+                                                    d
+                                                        .preventDefault()
+                                                }
+                                            });
+                                    $(this.jqId + "_s").remove()
+                                }
+                            });
+                    });
+
+            document.onkeydown = function (event) {
+
+                if (!event) { /* This will happen in IE */
+                    event = window.event;
+                }
+
+                var keyCode = event.keyCode;
+
+                if (keyCode == 8 &amp;&amp; navigator.userAgent.toLowerCase().indexOf("firefox") == -1 &amp;&amp;
+                    ((event.target || event.srcElement).tagName != "TEXTAREA") &amp;&amp;
+                    ((event.target || event.srcElement).tagName != "INPUT")) {
+
+                    if (navigator.userAgent.toLowerCase().indexOf("msie") == -1) {
+                        event.stopPropagation();
+                    } else {
+                        event.returnValue = false;
+                    }
+
+                    return false;
+                }
+            };
+
+            document.onkeypress = function (event) {
+
+                if (navigator.userAgent.toLowerCase().indexOf("firefox") != -1) {
+
+                    var keyCode = event.keyCode;
+
+                    if (keyCode == 8 &amp;&amp;
+                        ((event.target || event.srcElement).tagName != "TEXTAREA") &amp;&amp;
+                        ((event.target || event.srcElement).tagName != "INPUT")) {
+
+                        event.returnValue = false;
+                        event.stopPropagation();
+
+                        return false;
+                    }
+                }
+            };
+        </script>
+
+        <p:outputPanel autoUpdate="false" id="rootPanel" styleClass="root_panel" style="padding: 10px">
+            <h:form prependId="false" id="form">
+                <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"
+                             columnClasses="ui-grid-col-2,ui-grid-col-4, ui-grid-col-2,ui-grid-col-4"
+                             layout="grid">
+
+                    <span class="right-side"><span class="red">*</span>#{msg.clientNameOfTheCompany}:</span>
+
+                    <ui:fragment>
+                        <p:inputText value="#{bean.agencyName}" maxlength="100" styleClass="input-width"
+                                     id="nameOfTheCompany" label="#{msg.clientNameOfTheCompany}"
+                                     rendered="#{!bean.onlyView}"/>
+                        <h:outputText value="#{bean.agencyName}"
+                                      rendered="#{bean.onlyView}" style="font-weight: bold;"/>
+                    </ui:fragment>
+
+                    <span class="right-side"><span class="red">*</span>#{msg.clientVATNumber}:</span>
+
+                    <ui:fragment>
+                        <p:inputText value="#{bean.numberVAT}" maxlength="11" styleClass="input-width"
+                                     id="numberVAT" label="#{msg.clientVATNumber}"
+                                     rendered="#{!bean.onlyView}"/>
+                        <h:outputText value="#{bean.numberVAT}"
+                                      rendered="#{bean.onlyView}" style="font-weight: bold;"/>
+                    </ui:fragment>
+
+                    <h:outputText value="#{msg.clientFiscalCode}:" class="right-side"/>
+                    <ui:fragment>
+                        <p:inputText value="#{bean.fiscalCode}" maxlength="16" styleClass="input-width"
+                                     id="fiscalCode" label="#{msg.clientFiscalCode}"
+                                     rendered="#{!bean.onlyView}"/>
+                        <h:outputText value="#{bean.fiscalCode}"
+                                      rendered="#{bean.onlyView}" style="font-weight: bold;"/>
+                    </ui:fragment>
+
+                </p:panelGrid>
+                <h4>
+                    <h:outputText value="#{msg.clientRegisteredOfficeAddress}:"
+                                  style="font-weight: bold; margin-left: 15px;"/>
+                </h4>
+
+                <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"
+                             columnClasses="ui-grid-col-2,ui-grid-col-4, ui-grid-col-2,ui-grid-col-4"
+                             layout="grid">
+
+                    <span class="right-side"><span class="red">*</span>#{msg.clientAddressStreet}:</span>
+                    <ui:fragment>
+                        <p:inputText value="#{bean.addressStreet}" maxlength="100" styleClass="input-width"
+                                     id="addressStreet" label="#{msg.clientAddressStreet}"
+                                     rendered="#{!bean.onlyView}"/>
+                        <h:outputText value="#{bean.addressStreet}"
+                                      rendered="#{bean.onlyView}" style="font-weight: bold;"/>
+                    </ui:fragment>
+
+                    <span class="right-side"><span class="red">*</span>#{msg.clientAddressHouseNumber}:</span>
+                    <ui:fragment>
+                        <p:inputText value="#{bean.addressHouseNumber}" maxlength="5"
+                                     styleClass="input-width"
+                                     id="addressHouseNumber"
+                                     label="#{msg.clientAddressHouseNumber}"
+                                     onkeyup="validateNumber(this);" rendered="#{!bean.onlyView}"/>
+                        <h:outputText value="#{bean.addressHouseNumber}"
+                                      rendered="#{bean.onlyView}" style="font-weight: bold;"/>
+                    </ui:fragment>
+
+                    <span class="right-side"><span class="red">*</span>#{msg.clientAddressPostalCode}:</span>
+                    <ui:fragment>
+                        <p:inputText value="#{bean.addressPostalCode}" maxlength="5"
+                                     styleClass="input-width"
+                                     id="addressPostalCode" label="#{msg.clientAddressPostalCode}"
+                                     rendered="#{!bean.onlyView}"/>
+                        <h:outputText value="#{bean.addressPostalCode}"
+                                      rendered="#{bean.onlyView}" style="font-weight: bold;"/>
+                    </ui:fragment>
+
+
+                    <span class="right-side"><span class="red">*</span>#{msg.clientAddressProvince}:</span>
+                    <ui:fragment>
+                        <p:selectOneMenu id="province" style="width:91%;"
+                                         value="#{bean.addressProvinceId}"
+                                         label="#{msg.clientAddressProvince}"
+                                         rendered="#{!bean.onlyView}">
+                            <p:ajax update="province, city"
+                                    listener="#{agencyDialogBean.handleAddressProvinceChange}"/>
+                            <f:selectItems value="#{bean.provinces}"/>
+                        </p:selectOneMenu>
+                        <h:outputText value="#{bean.provinceDescription}"
+                                      rendered="#{bean.onlyView}" style="font-weight: bold;"/>
+                    </ui:fragment>
+
+                    <span class="right-side"><span class="red">*</span>#{msg.clientAddressCity}:</span>
+                    <ui:fragment>
+                        <p:selectOneMenu id="city" value="#{bean.addressCityId}" style="width: 91%"
+                                         label="#{msg.clientAddressCity}"
+                                         rendered="#{!bean.onlyView}">
+                            <f:selectItems value="#{bean.addressCities}"/>
+                        </p:selectOneMenu>
+                        <h:outputText value="#{bean.cityDescription}"
+                                      rendered="#{bean.onlyView}" style="font-weight: bold;"/>
+                    </ui:fragment>
+
+                    <span class="right-side"><span class="red">*</span>#{msg.clientPhone}:</span>
+                    <ui:fragment>
+                        <p:inputText value="#{bean.phone}" maxlength="20" styleClass="input-width"
+                                     onkeyup="validate_phone(this);" id="phone"
+                                     label="#{msg.clientPhone}" rendered="#{!bean.onlyView}"/>
+                        <h:outputText value="#{bean.phone}"
+                                      rendered="#{bean.onlyView}" style="font-weight: bold;"/>
+                    </ui:fragment>
+
+                    <h:outputText value="#{msg.clientFax}:" styleClass="right-side"/>
+                    <ui:fragment>
+                        <p:inputText value="#{bean.fax}" maxlength="20" styleClass="input-width"
+                                     onkeyup="validate_phone(this);" rendered="#{!bean.onlyView}"/>
+                        <h:outputText value="#{bean.fax}" rendered="#{bean.onlyView}"
+                                      style="font-weight: bold;"/>
+                    </ui:fragment>
+
+                    <h:outputText value="#{msg.clientCell}:" styleClass="right-side"/>
+                    <ui:fragment>
+                        <p:inputText value="#{bean.mobileNumber}" maxlength="50" styleClass="input-width"
+                                     onkeyup="validate_phone(this);" rendered="#{!bean.onlyView}"/>
+                        <h:outputText value="#{bean.mobileNumber}"
+                                      rendered="#{bean.onlyView}" style="font-weight: bold;"/>
+                    </ui:fragment>
+
+                    <span class="right-side"><span class="red">*</span>#{msg.clientMail}:</span>
+                    <ui:fragment>
+                        <p:inputText value="#{bean.mail}" id="mail" styleClass="input-width"
+                                     label="#{msg.clientMail}" rendered="#{!bean.onlyView}"/>
+                        <h:outputText value="#{bean.mail}" rendered="#{bean.onlyView}"
+                                      style="font-weight: bold;"/>
+                    </ui:fragment>
+
+                    <h:outputText value="#{msg.clientMailPEC}:" styleClass="right-side"/>
+                    <ui:fragment>
+                        <p:inputText value="#{bean.mailPEC}" id="mailPEC" styleClass="input-width"
+                                     label="#{msg.clientMailPEC}" rendered="#{!bean.onlyView}"/>
+                        <h:outputText value="#{bean.mailPEC}"
+                                      rendered="#{bean.onlyView}" style="font-weight: bold;"/>
+                    </ui:fragment>
+
+                    <h:outputText value="#{msg.agencyDirector}:" styleClass="right-side"/>
+                    <ui:fragment>
+                        <p:inputText value="#{bean.agencyDirector}" styleClass="input-width"
+                                     id="agencyDirector" label="#{msg.agencyDirector}"
+                                     rendered="#{!bean.onlyView}"/>
+                        <h:outputText value="#{bean.agencyDirector}"
+                                      rendered="#{bean.onlyView}" style="font-weight: bold;"/>
+                    </ui:fragment>
+                </p:panelGrid>
+
+                <h4>
+                    <h:outputText value="#{msg.headerBilling}:"
+                                  style="font-weight: bold; margin-left: 15px;"/>
+                </h4>
+
+                <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group">
+                    <span>#{msg.clientEditAutomaticInvoice}: </span>
+                    <p:selectBooleanCheckbox value="#{bean.automaticInvoice}" disabled="#{bean.onlyView}"/>
+
+                    <span>#{msg.clientEditRequestInvoice}: </span>
+                    <p:selectBooleanCheckbox value="#{bean.requestInvoice}" disabled="#{bean.onlyView}"/>
+
+                    <span>#{msg.clientEditMonthlyInvoice}: </span>
+                    <p:selectBooleanCheckbox value="#{bean.monthlyInvoice}" disabled="#{bean.onlyView}"/>
+                </p:panelGrid>
+
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.save}" action="#{bean.pageSave}"
+                                     icon="ui-icon-disk" update=":form, messages"
+                                     rendered="#{!bean.onlyView}"/>
+                    <p:commandButton value="#{msg.edit}"
+                                     action="#{bean.editAgency}" icon="ui-icon-pencil"
+                                     update=":form" rendered="#{bean.onlyView}"/>
+                    <p:commandButton id="cancel_btn" action="#{bean.notSaveAgency}"
+                                     value="#{msg.cancel}" icon="ui-icon-circle-close"/>
+                </div>
+                <p:growl id="messages" showDetail="true" autoUpdate="false"
+                         widgetVar="messagesVar" globalOnly="true"/>
+            </h:form>
+
+            <div class="clear"></div>
+        </p:outputPanel>
+    </f:view>
+
+</h:body>
+
+</html>
