@@ -267,15 +267,16 @@
                             </p:dataTable>
 
 
-                            <p:dialog header="#{msg.deleteConfirmationHeader}" widgetVar="dlg2"
+                            <p:dialog header="#{msg.deleteConfirmationHeader}" widgetVar="dlg2" id="confirmReadDlg"  draggable="false" 
                                       modal="true" resizable="false" effect="SLIDE">
+                                      <br/>
                                 #{empty deleteMessage ? msg.deleteConfirmation : deleteMessage}<br/>
                                 <br/>
-                                <div>
-                                    <p:commandButton value="#{msg.yes}" action="#{bean.deleteEntity}"
+                                <div class="btn_line">
+                                    <p:commandButton value="#{msg.confirm}" action="#{bean.deleteEntity}" style="margin-right: 1cm;background-color: #00CC52!important;" 
                                                      oncomplete="goToPreviousPage();PF('dlg2').hide();#{dynamicOnComplete}"
                                                      update="table,:form:messages"/>
-                                    <p:commandButton value="#{msg.no}" onclick="PF('dlg2').hide()"/>
+                                    <p:commandButton value="#{msg.cancel}" onclick="PF('dlg2').hide()" style="background-color: #F3362B !important;"/>
                                 </div>
 
                                 <script>
