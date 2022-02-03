@@ -61,22 +61,6 @@
             </ui:repeat>
         </p:column>
 
-
-        <p:column styleClass="action_column" exportable="false">
-            <p:commandButton disabled="#{!bean.canDelete}"
-                             icon="ui-icon-myCancel" oncomplete="PF('dlg2').show()">
-                <f:setPropertyActionListener value="#{item.id}"
-                                             target="#{bean.entityDeleteId}" />
-            </p:commandButton>
-        </p:column>
-
-        <p:column styleClass="action_column" exportable="false">
-            <p:commandButton icon="ui-icon-myEdit" update=":form"
-                             action="#{bean.editEntity}" disabled="#{!bean.canEdit}">
-                <f:setPropertyActionListener value="#{item.id}"
-                                             target="#{bean.entityEditId}" />
-            </p:commandButton>
-        </p:column>
     </ui:define>
 </ui:composition>
 </html>
