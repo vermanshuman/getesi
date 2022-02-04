@@ -885,7 +885,7 @@
                 </p:column>
             </p:dataTable>
         </p:overlayPanel>
-
+<!--
         <p:dataTable var="item" id="table"
                      emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyModel}"
                      rowKey="#{item.id}" rows="#{bean.rowsPerPage}" lazy="true" paginator="true"
@@ -902,6 +902,7 @@
                     style="color: red; font-weight: bold; font-size: 19px;" value="S" />
             </p:column>
              -->
+			 <!--
             <p:column headerText="#{ff:upper(msg.requestListDate)}" sortBy="#{item.createDate}" style="width: 7vw;min-width: 163px;text-align: center;">
                 <p:outputPanel style="margin-left: 10px;text-align: left;max-height: 80px;">
                     <h:outputText value="#{item.createDate}" converter="dateTimeConverter" style="color:#003871;font-weight: bold !important;"/>
@@ -1108,7 +1109,10 @@
             </p:column>
 
         </p:dataTable>
+-->
+		<p:panel id="table" widgetVar="panelSetting" closable="true" toggleable="true" style="display: none;">
 
+		</p:panel>
         <p:overlayPanel id="userSelectCheckboxPanel" my="left top" at="left bottom"
                         widgetVar="userSelectCheckboxWV" for="table:userSelectCheckboxShow"
                         onHide="filterTableFromPanel();" dynamic="true" style="width:300px">
