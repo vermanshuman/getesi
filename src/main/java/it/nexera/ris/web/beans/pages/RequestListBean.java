@@ -38,6 +38,10 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
+import lombok.Getter;
+import lombok.Setter;
+import org.primefaces.model.SortOrder;
+import it.nexera.ris.web.common.EntityLazyListModel;
 
 @ManagedBean(name = "requestListBean")
 @ViewScoped
@@ -156,6 +160,34 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     private Integer pageNumber;
 
+    
+    @Getter
+    @Setter
+    private Integer rowCount;
+
+    @Getter
+    @Setter
+    private Integer totalPages;
+
+    @Getter
+    @Setter
+    private Integer currentPageNumber;
+
+    @Getter
+    @Setter
+    private String pageNavigationStart;
+
+    @Getter
+    @Setter
+    private String pageNavigationEnd;
+
+    @Getter
+    @Setter
+    private String paginatorString;
+    @Getter
+    @Setter
+    private Integer tablePage;
+    
     private static final String KEY_CLIENT_ID = "KEY_CLIENT_ID_SESSION_KEY_NOT_COPY";
     private static final String KEY_STATES = "KEY_STATES_SESSION_KEY_NOT_COPY";
     private static final String KEY_REQUEST_TYPE = "KEY_REQUEST_TYPE_SESSION_KEY_NOT_COPY";
@@ -191,6 +223,36 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         setRequestTypesForSelect(new ArrayList<>());
 
 
+        setRowCount(10);
+        setTotalPages(1);
+        setCurrentPageNumber(1);
+        StringBuilder builder = new StringBuilder();
+        builder.append("<a href=\"#\" class=\"ui-paginator-first ui-state-default ui-corner-all ui-state-disabled");
+        builder.append(" tabindex=\"-1\">\n");
+        builder.append("<span class=\"ui-icon ui-icon-seek-first\">F</span>\n</a>\n");
+        builder.append("<a href=\"#\" onclick=\"previousPage()\"");
+        builder.append(" class=\"ui-paginator-prev ui-corner-all ui-state-disabled\" tabindex=\"-1\">\n");
+        builder.append("<span class=\"ui-icon ui-icon-seek-prev\">P</span>\n</a>\n");
+        setPageNavigationStart(builder.toString());
+        builder.setLength(0);
+        builder.append("<a href=\"#\" class=\"ui-paginator-next ui-state-default ui-corner-all\"  onclick=\"nextPage()\"");
+        builder.append(" tabindex=\"0\">\n");
+        builder.append("<span class=\"ui-icon ui-icon-seek-next\">N</span>\n</a>\n");
+        builder.append("<a href=\"#\"");
+        builder.append(" class=\"ui-paginator-last ui-state-default ui-corner-all\" tabindex=\"-1\" onclick=\"lastPage()\">\n");
+        builder.append("<span class=\"ui-icon ui-icon-seek-end\">E</span>\n</a>\n");
+        setPageNavigationEnd(builder.toString());
+        builder.setLength(0);
+        for(int i = 1; i <=10;i++ ){
+            builder.append("<a class=\"ui-paginator-page ui-state-default ui-corner-all page_" + i + "\"");
+            builder.append("tabindex=\"0\" href=\"#\" onclick=\"changePage(" + i + ")\">" + i +"</a>");
+        }
+        setPaginatorString(builder.toString());
+        String tablePage = getRequestParameter(RedirectHelper.TABLE_PAGE);
+        if (!ValidationHelper.isNullOrEmpty(tablePage) && !"null".equalsIgnoreCase(tablePage)) {
+            setTablePage(Integer.parseInt(tablePage));
+        }
+        
         setClients(ComboboxHelper.fillList(DaoManager.load(Client.class, new Criterion[]{
                 Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
                         Restrictions.isNull("deleted"))
@@ -1004,6 +1066,19 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         setFilterRestrictions(restrictions);
         loadList(RequestView.class, restrictions.toArray(new Criterion[0]),
                 new Order[]{Order.desc("createDate")});
+        
+         this.setLazyModel(new EntityLazyListModel<>(RequestView.class, restrictions.toArray(new Criterion[0]),
+                new Order[]{Order.desc("createDate")}));
+        
+          getLazyModel().load( getTablePage()-1, getRowsPerPage(), null, SortOrder.ASCENDING, new HashMap<>());
+            Integer rowCount = getLazyModel().getRowCount()/getRowsPerPage();
+            setTotalPages(rowCount);
+            if(rowCount > 10)
+                setRowCount(10);
+            else
+                setRowCount(rowCount);
+        
+        
 
         List<RequestView> requestList = DaoManager.load(RequestView.class, restrictions.toArray(new Criterion[0]));
 
@@ -1425,6 +1500,13 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         } else {
             setPageNumber(0);
         }
+        
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_PAGE_NUMBER))) {
+            setTablePage(Integer.parseInt((String) SessionHelper.get(KEY_PAGE_NUMBER)));
+        } else {
+            setTablePage(0);
+        }
+        
         executeJS("if (PF('tableWV').getPaginator() != null ) " +
                 "PF('tableWV').getPaginator().setPage(" + getPageNumber() + ");");
     }
