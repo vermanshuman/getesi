@@ -219,7 +219,7 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
     private Long annotationDescription;
 
     private List<FileWrapper> importedFiles;
-    
+
     private String cogNome;
 
     private String nome;
@@ -231,6 +231,8 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
     private String subjectBirthPlace;
     
     private Date subjectBirthDate;
+
+    private String nominativo;
 
     private void pageLoadStatic() {
     	if (SessionHelper.get("requestFormalityView") != null)
@@ -429,7 +431,8 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
     
     public void filterSubjectTable() {
 
-        if(ValidationHelper.isNullOrEmpty(this.getCogNome()) && 
+        if(ValidationHelper.isNullOrEmpty(this.getNominativo()) &&
+                ValidationHelper.isNullOrEmpty(this.getCogNome()) &&
                 ValidationHelper.isNullOrEmpty(this.getNome()) &&
                 ValidationHelper.isNullOrEmpty(this.getSubjectBusinessName()) &&
                 ValidationHelper.isNullOrEmpty(this.getSubjectFiscalCodeVAT())&&
@@ -549,20 +552,22 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
 
             criterionList.clear();
 
-            if (!ValidationHelper.isNullOrEmpty(getNome())) {
-                criterionList.add(Restrictions.ilike("name", getNome(),
-                        MatchMode.ANYWHERE));
+            if (!ValidationHelper.isNullOrEmpty(getNominativo())) {
+                criterionList.add(Restrictions.or(
+                        Restrictions.ilike("name", getNominativo(), MatchMode.ANYWHERE),
+                        Restrictions.ilike("surname", getNominativo(), MatchMode.ANYWHERE),
+                        Restrictions.ilike("businessName", getNominativo(), MatchMode.ANYWHERE)));
             }
 
-            if (!ValidationHelper.isNullOrEmpty(getCogNome())) {
-                criterionList.add(Restrictions.ilike("surname", getCogNome(),
-                        MatchMode.ANYWHERE));
-            }
-
-            if (!ValidationHelper.isNullOrEmpty(getSubjectBusinessName())) {
-                criterionList.add(Restrictions.ilike("businessName", getSubjectBusinessName(),
-                        MatchMode.ANYWHERE));
-            }
+//            if (!ValidationHelper.isNullOrEmpty(getCogNome())) {
+//                criterionList.add(Restrictions.ilike("surname", getCogNome(),
+//                        MatchMode.ANYWHERE));
+//            }
+//
+//            if (!ValidationHelper.isNullOrEmpty(getSubjectBusinessName())) {
+//                criterionList.add(Restrictions.ilike("businessName", getSubjectBusinessName(),
+//                        MatchMode.ANYWHERE));
+//            }
 
             if (!ValidationHelper.isNullOrEmpty(getSubjectFiscalCodeVAT())) {
                 criterionList.add(Restrictions.or(Restrictions.ilike("fiscalCode", getSubjectFiscalCodeVAT(),
@@ -1800,6 +1805,10 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
         return currentDate.getTime();
     }
 
+    public void clearFiltraPanel() {
+    }
+
+
     public boolean standardContainsFilterForStringColumn(Object columnValue, Object filterValue, Locale locale) {
         
         return columnValue.toString().contains(filterValue.toString());
@@ -1912,5 +1921,13 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
     }
     public void setSubjectBirthPlace(String subjectBirthPlace) {
         this.subjectBirthPlace = subjectBirthPlace;
+    }
+
+    public String getNominativo() {
+        return nominativo;
+    }
+
+    public void setNominativo(String nominativo) {
+        this.nominativo = nominativo;
     }
 }

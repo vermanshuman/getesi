@@ -35,6 +35,84 @@
 
                     <div class="content">
                         <h:form id="form" prependId="false" enctype="multipart/form-data">
+                            <script>
+                                // <![CDATA[
+
+                                $(document ).ready(function() {
+                                    var value = $("[name='pageNumber']").val();
+                                    if(value == 1) {
+                                        $('.page_1').addClass("ui-state-active");
+                                        $('#page_bottom_1').addClass("ui-state-active");
+                                    }else{
+                                        $('.page_1').removeClass("ui-state-active");
+                                        $('#page_bottom_1').removeClass("ui-state-active");
+                                    }
+                                });
+
+                                function nextPage(e) {
+                                    e.preventDefault();
+                                    var pageNumber = getCurrentPageNumber();
+                                    var totalPages = getTotalPagesCount();
+                                    if(pageNumber < totalPages) {
+                                        pageNumber++;
+                                        changePage(pageNumber,e);
+                                    }
+                                }
+
+                                function getTotalPagesCount() {
+                                    var totalPages = $('input[id="numTotalPages"]').val();
+                                    return totalPages;
+                                }
+
+                                function loadPerPage(id) {
+                                    $('input[id="rowsPerPageSelected"]').val($('#' + id).val());
+                                    handleRowsChange();
+                                }
+
+                                function firstPage(e) {
+                                    e.preventDefault();
+                                    changePage(1,e);
+                                }
+
+                                function changePage(pageNumber, e) {
+                                    e.preventDefault();
+                                    $('input[name="pageNumber"]').val(pageNumber);
+                                    onPageChange();
+                                    getCurrentPageNumber();
+                                }
+
+                                function previousPage(e) {
+                                    e.preventDefault();
+                                    var pageNumber = getCurrentPageNumber();
+                                    if(pageNumber>1) {
+                                        pageNumber = pageNumber-1;
+                                        changePage(pageNumber, e);
+                                    }
+                                }
+
+                                function lastPage(e) {
+                                    e.preventDefault();
+                                    var totalPages = getTotalPagesCount();
+                                    changePage(totalPages, e);
+                                }
+
+                                function getCurrentPageNumber() {
+                                    var pageNumber = $('input[name="pageNumber"]').val();
+                                    return parseInt(pageNumber);
+                                }
+                                function setPageNumber(){
+                                    var value = $("[name='pageNumber']").val();
+                                    for (let i = 0; i < 10; i++) {
+                                        $('.page_' + i).removeClass("ui-state-active");
+                                        $('.page_bottom_' + i).removeClass("ui-state-active");
+                                    }
+                                    $('.page_' + value).addClass("ui-state-active");
+                                    $('.page_bottom_' + value).addClass("ui-state-active");
+                                }
+
+                                // ]]>
+                            </script>
+
                             <ui:insert name="list_body"></ui:insert>
                             <p:growl id="messages" showDetail="true" autoUpdate="false"
                                      globalOnly="true"/>
