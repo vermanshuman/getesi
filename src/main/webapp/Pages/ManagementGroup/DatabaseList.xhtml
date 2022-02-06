@@ -30,6 +30,29 @@
                 right: 33px;
                 border: 1px solid #547ac4;
             }
+
+            #tabs ul {
+                background-color: transparent !important;
+                text-transform: uppercase;
+            }
+
+            #tabs ul::before {
+                border-bottom: none;
+            }
+
+            #tabs ul li:not(.ui-tabs-selected.ui-state-active) a {
+                color: gray !important;
+                border-bottom: 2px solid #dee2e6;
+            }
+
+            #tabs ul li.ui-tabs-selected.ui-state-active {
+                background-color: transparent !important;
+            }
+
+            #tabs ul li.ui-tabs-selected.ui-state-active a {
+                color: #000 !important;
+                border-bottom: 2px solid #3366FF;
+            }
         </style>
         <script>
 
