@@ -4,6 +4,7 @@
 package it.nexera.ris.persistence;
 
 import it.nexera.ris.common.helpers.LogHelper;
+import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.ModulePage;
 import org.apache.commons.logging.Log;
@@ -48,8 +49,11 @@ public class ModulesHolder {
                 if (ids == null) {
                     ids = new ArrayList<Long>();
                 }
-                ids.add(mp.getModule().getId());
-                modules.put(mp.getPage_type(), ids);
+                if(!ValidationHelper.isNullOrEmpty(mp)
+                        && !ValidationHelper.isNullOrEmpty(mp.getModule())){
+                    ids.add(mp.getModule().getId());
+                    modules.put(mp.getPage_type(), ids);
+                }
             }
         } catch (Exception e) {
             LogHelper.log(log, e);

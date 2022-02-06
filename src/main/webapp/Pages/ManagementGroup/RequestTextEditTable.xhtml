@@ -261,19 +261,19 @@
                             <p:outputPanel style="display:inline-flex;">
                                 <h:outputText value="#{estate.calculatedOmi.value}" style="color: #5f666c;"/>
                                 <p:outputPanel style="margin-left: 3px;" id="omiSevZones" rendered="#{estate.calculatedOmi.severalZones}">
-                                    <img alt="?" src="../../resources/images/index.png" style="width: 19px;"/>
+                                    <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
                                 </p:outputPanel>
                                 <p:tooltip for="omiSevZones" value="#{msg.requestTextEditSeveralZones}"/>
                                 <p:outputPanel style="margin-left: 3px;" id="omiSevComprs" rendered="#{estate.calculatedOmi.severalComprs}">
-                                    <img alt="?" src="../../resources/images/index.png" style="width: 19px;"/>
+                                    <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
                                 </p:outputPanel>
                                 <p:tooltip for="omiSevComprs" value="#{msg.requestTextEditSeveralMaxMinComprs}"/>
                                 <p:outputPanel style="margin-left: 3px;" id="omiMultiCoord" rendered="#{estate.calculatedOmi.multipleCoordinates}">
-                                    <img alt="?" src="../../resources/images/index.png" style="width: 19px;"/>
+                                    <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
                                 </p:outputPanel>
                                 <p:tooltip for="omiMultiCoord" value="#{msg.requestTextEditMultipleCoordinates}"/>
                                 <p:outputPanel style="margin-left: 3px;" id="categoryCodeInfo" rendered="#{not estate.calculatedOmi.multipleCoordinates and estate.calculatedOmi.categoryCodeMissing}">
-                                    <img alt="?" src="../../resources/images/index.png" style="width: 19px;"/>
+                                    <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
                                 </p:outputPanel>
                                 <p:tooltip for="categoryCodeInfo" value="#{msg.requestTextEditCategoryCodeMissing}"/>
                             </p:outputPanel>
@@ -560,20 +560,20 @@
                                     <p:outputPanel style="display: inline-flex;">
                                         <h:outputText value="#{gestate.calculatedOmi.value}" style="color: #5f666c;"/>
                                         <p:outputPanel style="margin-left: 3px;" id="omiGSevZonesNotSelected" rendered="#{gestate.calculatedOmi.severalZones}">
-                                            <img alt="?" src="../../resources/images/index.png" style="width: 19px;"/>
+                                            <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
                                         </p:outputPanel>
                                         <p:tooltip for="omiGSevComprsNotSelected" value="#{msg.requestTextEditSeveralZones}"/>
                                         <p:outputPanel style="margin-left: 3px;" id="omiGSevComprsNotSelected" rendered="#{gestate.calculatedOmi.severalComprs}">
-                                            <img alt="?" src="../../resources/images/index.png" style="width: 19px;"/>
+                                            <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
                                         </p:outputPanel>
                                         <p:tooltip for="omiGMultiCoordNotSelected" value="#{msg.requestTextEditSeveralMaxMinComprs}"/>
                                         <p:outputPanel style="margin-left: 3px;" id="omiGMultiCoordNotSelected" rendered="#{gestate.calculatedOmi.multipleCoordinates}">
-                                            <img alt="?" src="../../resources/images/index.png" style="width: 19px;"/>
+                                            <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
                                         </p:outputPanel>
                                         <p:tooltip for="gCategoryCodeInfoNotSelected" value="#{msg.requestTextEditMultipleCoordinates}"/>
                                         <p:outputPanel style="margin-left: 3px;" id="gCategoryCodeInfoNotSelected"
                                                        rendered="#{not gestate.calculatedOmi.multipleCoordinates and gestate.calculatedOmi.categoryCodeMissing}">
-                                            <img alt="?" src="../../resources/images/index.png"
+                                            <img alt="?" src="../../resources/images/attention.png"
                                                  style="width: 19px;" />
                                         </p:outputPanel>
                                         <p:tooltip for="gCategoryCodeInfoNotSelected"
@@ -758,20 +758,20 @@
                                 <p:outputPanel style="display: inline-flex;">
                                     <h:outputText value="#{salesestate.calculatedOmi.value}" style="color: #5f666c;"/>
                                     <p:outputPanel style="margin-left: 3px;" id="omiSalesSevZonesNotSelected" rendered="#{salesestate.calculatedOmi.severalZones}">
-                                        <img alt="?" src="../../resources/images/index.png" style="width: 19px;"/>
+                                        <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
                                     </p:outputPanel>
                                     <p:tooltip for="omiSalesSevZonesNotSelected" value="#{msg.requestTextEditSeveralZones}"/>
                                     <p:outputPanel style="margin-left: 3px;" id="omiSalesSevComprsNotSelected" rendered="#{salesestate.calculatedOmi.severalComprs}">
-                                        <img alt="?" src="../../resources/images/index.png" style="width: 19px;"/>
+                                        <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
                                     </p:outputPanel>
                                     <p:tooltip for="omiSalesSevComprsNotSelected" value="#{msg.requestTextEditSeveralMaxMinComprs}"/>
                                     <p:outputPanel style="margin-left: 3px;" id="omiSalesMultiCoordNotSelected" rendered="#{salesestate.calculatedOmi.multipleCoordinates}">
-                                        <img alt="?" src="../../resources/images/index.png" style="width: 19px;"/>
+                                        <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
                                     </p:outputPanel>
                                     <p:tooltip for="omiSalesMultiCoordNotSelected" value="#{msg.requestTextEditMultipleCoordinates}"/>
                                     <p:outputPanel style="margin-left: 3px;" id="salesCategoryCodeInfoNotSelected"
                                                    rendered="#{not salesestate.calculatedOmi.multipleCoordinates and salesestate.calculatedOmi.categoryCodeMissing}">
-                                        <img alt="?" src="../../resources/images/index.png"
+                                        <img alt="?" src="../../resources/images/attention.png"
                                              style="width: 19px;" />
                                     </p:outputPanel>
                                     <p:tooltip for="salesCategoryCodeInfoNotSelected"
@@ -965,20 +965,20 @@
                                 <p:outputPanel style="display: inline-flex;">
                                     <h:outputText value="#{estate.calculatedOmi.value}" style="color: #5f666c;"/>
                                     <p:outputPanel style="margin-left: 3px;" id="omiSevZonesNotSelected" rendered="#{estate.calculatedOmi.severalZones}">
-                                        <img alt="?" src="../../resources/images/index.png" style="width: 19px;"/>
+                                        <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
                                     </p:outputPanel>
                                     <p:tooltip for="omiSevZonesNotSelected" value="#{msg.requestTextEditSeveralZones}"/>
                                     <p:outputPanel style="margin-left: 3px;" id="omiSevComprsNotSelected" rendered="#{estate.calculatedOmi.severalComprs}">
-                                        <img alt="?" src="../../resources/images/index.png" style="width: 19px;"/>
+                                        <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
                                     </p:outputPanel>
                                     <p:tooltip for="omiSevComprsNotSelected" value="#{msg.requestTextEditSeveralMaxMinComprs}"/>
                                     <p:outputPanel style="margin-left: 3px;" id="omiMultiCoordNotSelected" rendered="#{estate.calculatedOmi.multipleCoordinates}">
-                                        <img alt="?" src="../../resources/images/index.png" style="width: 19px;"/>
+                                        <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
                                     </p:outputPanel>
                                     <p:tooltip for="omiMultiCoordNotSelected" value="#{msg.requestTextEditMultipleCoordinates}"/>
                                     <p:outputPanel style="margin-left: 3px;" id="categoryCodeInfoNotSelected"
                                                    rendered="#{not estate.calculatedOmi.multipleCoordinates and estate.calculatedOmi.categoryCodeMissing}">
-                                        <img alt="?" src="../../resources/images/index.png"
+                                        <img alt="?" src="../../resources/images/attention.png"
                                              style="width: 19px;" />
                                     </p:outputPanel>
                                     <p:tooltip for="categoryCodeInfoNotSelected"

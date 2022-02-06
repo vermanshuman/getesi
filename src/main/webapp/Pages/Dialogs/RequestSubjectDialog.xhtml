@@ -1,0 +1,196 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ff="http://readytech.com/functions"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+    <!--<ui:param name="requestSubject" value="#{requestSubjectBean}"/>-->
+    <ui:param name="requestBean" value="#{requestListBean}"/>
+
+    <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/requestSubject.css"
+          media="all" rel="stylesheet" type="text/css"/>
+
+    <p:dialog widgetVar="requestubjectDlg" id="requestubjectDlgId" modal="true" closable="false" header="#{msg.requestSubjectHeader}"
+              width="98%"  style="height: 90% !important">
+
+
+
+
+        <p:dataTable var="item" id="table" style="height: 98%"
+                     emptyMessage="#{msg.noRecordsFound}" value="#{bean.regSubjectList}"
+                     rowKey="#{item.id}" rows="10" lazy="true" paginator="true"
+                     paginatorAlwaysVisible="true" rowIndexVar="rowId"
+                     rowStyleClass="#{item.isInserted ? 'receive_new_mail_style':''}"
+                     paginatorTemplate="&lt;span style='float: left;'&gt;Elementi visibili nella pagina&lt;/span&gt; {RowsPerPageDropdown}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {CurrentPageReport}"
+                     currentPageReportTemplate="Pagina {currentPage} di {totalPages}"
+                     rowsPerPageTemplate="10,20,50" widgetVar="tableWV" styleClass="request-table"
+        >
+
+            <p:column headerText="#{ff:upper(msg.requestListDate)}" sortBy="#{item.createDate}" style="width: 7vw;min-width: 163px;text-align: center;">
+                <p:outputPanel style="margin-left: 10px;text-align: left;max-height: 80px;">
+                    <h:outputText value="#{item.createDate}" converter="dateTimeConverter" style="color:#003871;font-weight: bold !important;"/>
+                    <br/>
+                    <h:outputText value="#{item.createDate}" converter="timeConverter" style="color:#003871;"/>
+                    <br/>
+                    <br/>
+                    <h:outputText value="#{not empty item.stateDescription ? ff:upper(item.stateDescription) : ''}"
+                                  styleClass="#{item.stateDescription eq 'Inserita'
+                        ? 'status-icon status-green' : (item.stateDescription eq 'In lavorazione' ? 'status-icon status-yellow' :(item.stateDescription eq 'Da inviare' ? 'status-icon status-navy' : (item.stateDescription eq 'Sospesa' ? 'status-icon status-magenta' : (item.stateDescription eq 'Evasa' ? 'status-icon status-red': (item.stateDescription eq 'Inviata allo SDI' ? 'status-icon status-cyan': (item.stateDescription eq 'Fatturata' ? 'status-icon state-blue': ''))))))}"/>
+                    <br/>
+                    <h:outputText rendered="#{item.urgent}" styleClass="vertical-txt" value="#{ff:upper(msg.requestListUrgent)}" />
+                    <br/>
+                </p:outputPanel>
+            </p:column>
+
+
+            <p:column style="width: 9vw;min-width: 159px;position: relative" headerText="#{ff:upper(msg.requestListClient)}">
+                <p:outputPanel>
+                    <h:outputText value="#{item.clientName}"/>
+                </p:outputPanel>
+                <br/>
+                <p:graphicImage id="info" url="/resources/images/tooltip.png"
+                                style="height :25px;bottom: 5px;position: absolute;"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
+                <p:tooltip for="info" styleClass="custom-design-tooltip">
+                    <h:outputText value="#{ff:upper(msg.requestManagers)}" style="font-weight:bold;color:#003871;"/>
+                    <br />
+                    <h:outputText value="#{item.haveManagers()}" escape="false" rendered="#{not empty item.haveManagers()}"/>
+                    <br />
+                    <h:outputText value="#{ff:upper(msg.requestTrustees)}" style="font-weight:bold;color:#003871;" />
+                    <br />
+                    <h:outputText value="#{item.getClientNameProfessional(item.fiduciaryId)}" escape="false"
+                                  rendered="#{not empty item.fiduciaryId}" style="color:#003871;"/>
+                </p:tooltip>
+            </p:column>
+
+            <p:column headerText="#{ff:upper(msg.requestListServiceCap)}" styleClass="min_padding_margin" style="width: 13.1vw;min-width: 180px;">
+                <p:outputPanel style="margin-left: 20px;text-align: left;">
+                    <p:outputPanel id="servicesColumn"
+                                   rendered="#{item.serviceName eq null}"
+                                   style="background-color: transparent;width: inherit;"/>
+                    <p:outputPanel>
+                        <h:outputText styleClass="#{requestBean.getItemIconStyleClass(item.requestTypeId)}" style="display: inline-flex;margin-right: 5px;" />
+                        <h:outputText id="requestTypeName" value="#{item.requestTypeName}" style="vertical-align: top;font-weight: bold !important;" rendered="#{item.requestTypeName ne null}"/>
+                    </p:outputPanel>
+                    <h:outputText id="service" value="#{item.serviceName}" rendered="#{item.serviceName ne null}"/>
+                    <br/>
+                    <p:graphicImage id="multipleservice" url="/resources/images/tooltip.png"
+                                    style="height :25px;margin-top: -9px;margin-left: -20px;position: absolute;"  rendered="#{not empty item.multipleServices}" />
+                    <p:tooltip for="multipleservice" styleClass="custom-design-tooltip" rendered="#{not empty item.multipleServices}">
+                        <ui:repeat var="ele" value="#{item.multipleServices}" varStatus="service">
+                            <h:outputText value="#{ele}" escape="false" style="color:#003871;margin-left: 24px;"/>
+                            <br />
+                        </ui:repeat>
+                    </p:tooltip>
+                </p:outputPanel>
+
+            </p:column>
+
+
+            <p:column rendered="false" style="width: 100px;min-width: 100px;" headerText="#{ff:upper(msg.requestLastBusinessName)}" sortBy="#{item.name}">
+                <p:commandLink value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId ne null}" action="#{requestBean.openRequestSubject}" style="cursor: pointer;">
+                    <f:setPropertyActionListener value="#{item.subjectId}" target="#{requestBean.entityEditId}"/>
+                </p:commandLink>
+                <h:outputText value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId eq null}"/>
+            </p:column>
+
+            <p:column headerText="#{ff:upper(msg.requestNameFiscalCodeVATNumber)}"  style="width: 13.1vw;min-width: 180px;"
+                      sortBy="#{item.code}">
+                <p:commandLink value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId ne null}" action="#{requestBean.openRequestSubject}" style="cursor: pointer;">
+                    <f:setPropertyActionListener value="#{item.subjectId}" target="#{requestBean.entityEditId}"/>
+                </p:commandLink>
+                <h:outputText value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId eq null}"/>
+                <br/>
+                <h:outputText value="#{item.code}" style="color:#003871"/>
+            </p:column>
+            <p:column headerText="#{ff:upper(msg.requestListCorservatoryName)}" style="width: 9vw;min-width: 159px;text-align: center;">
+                <h:outputText value="#{item.aggregationLandCharRegNameOrCity}"/>
+            </p:column>
+            <p:column styleClass="min_padding_margin" headerText="#{ff:upper(msg.requestListCurrentOperator)}" rendered="#{!requestBean.getCurrentUser().isExternal()}" style="width: 8.3vw;min-width: 177px;">
+                <h:outputText value="#{item.userName}"/>
+            </p:column>
+
+            <p:column style="width: 6vw;min-width: 125px;text-align: center;" headerText="#{ff:upper(msg.expirationDateCap)}" sortBy="#{item.expirationDate}"
+                      rendered="#{!requestBean.getCurrentUser().isExternal()}">
+                <h:outputText value="#{item.expirationDate}" converter="dateTimeConverter"/>
+            </p:column>
+
+            <p:column style="width: 4vw;min-width: 81px;" headerText="#{ff:upper(msg.requestListOpenMail)}">
+                <p:outputPanel style="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments ? 'text-align: center;' : 'display: flex;'}">
+                    <p:commandButton id="mailBtn" styleClass="richiesta-da-mail-icon" action="#{requestBean.openRequestMail}"
+                                     style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
+                                     rendered="#{not empty item.mailId}">
+                        <f:setPropertyActionListener value="#{item.mailId}" target="#{requestBean.entityEditId}"/>
+                    </p:commandButton>
+                    <p:tooltip for="mailBtn" value="#{item.mailSubject}"/>
+
+                    <h:outputText id="externalUserIcon" rendered="#{item.external and not item.haveAllegatiDocuments}"
+                                  style="margin: 0 auto;" styleClass="richiesta-da-clienti-icon" />
+                    <p:tooltip for="externalUserIcon" value="#{item.createUserFullName}" escape="false"/>
+
+                    <p:outputPanel rendered="#{item.external and item.haveAllegatiDocuments}" style="display: flex;margin-left: calc( 50% - 15px );">
+                        <p:commandButton id="externalUserIconA"  styleClass="richiesta-da-clienti-icon" action="#{requestBean.loadAllegatiDocuments}" update="requestDocs"
+                                         style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
+                                         oncomplete="PF('documentDialog').show();">
+                            <f:setPropertyActionListener value="#{item.id}" target="#{requestBean.entityEditId}"/>
+                        </p:commandButton>
+                        <p:tooltip for="externalUserIconA" value="#{item.createUserFullName}" escape="false"/>
+                        <h:outputText value="A"  style="width: 19px;height: 20px;background-color: #003871;border-radius: 50%;color: white;display: block;margin-top: -10px;margin-left: -6px;text-align: center;" />
+                    </p:outputPanel>
+
+
+                    <p:graphicImage id="internalUserIcon" url="/resources/images/richiesta-da-operatore-getesi.png"
+                                    style="height :28px;"  rendered="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments}" />
+                    <p:tooltip for="internalUserIcon" value="#{item.createUserFullName}" escape="false"/>
+
+                    <p:outputPanel style="display: flex;#{empty item.mailId ? 'margin-left: 38%;' : ''}" rendered="#{not item.external and empty item.mailId and item.haveAllegatiDocuments}">
+                        <p:commandButton id="internalUserIconA" value="G" action="#{requestBean.loadAllegatiDocuments}" update="requestDocs" styleClass="g-btn" style="background-color: transparent !important;display: block;width: 24px;height: 24px;border: 2px solid;border-radius: 50%;color: #003871;margin: 0 auto;cursor: pointer;"
+                                         oncomplete="PF('documentDialog').show();">
+                            <f:setPropertyActionListener value="#{item.id}" target="#{requestBean.entityEditId}"/>
+                        </p:commandButton>
+                        <p:tooltip for="internalUserIconA" value="#{item.createUserFullName}" escape="false"/>
+                        <h:outputText value="A"  style="width: 19px;height: 20px;background-color: #003871;border-radius: 50%;color: white;display: block;margin-top: -10px;margin-left: -6px;text-align: center;" />
+                    </p:outputPanel>
+
+
+                </p:outputPanel>
+            </p:column>
+
+            <p:column styleClass=" action_midle_column al-cen-fx" headerText="#{ff:upper(msg.requestListDocuments)}" style="width: 4vw;min-width: 81px;">
+                <p:outputPanel style="display: flex;" rendered="#{item.haveDocuments}">
+                    <p:outputPanel style="display: flex;">
+                        <p:commandButton styleClass="attachment-icon" action="#{requestBean.loadRequestDocuments}" update="requestDocs"
+                                         style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
+                                         oncomplete="PF('documentDialog').show();">
+                            <f:setPropertyActionListener value="#{item.id}" target="#{requestBean.entityEditId}"/>
+                        </p:commandButton>
+                        <h:outputText value="#{item.documentsCount}" style="width: 19px;height: 20px;background-color: #003871;border-radius: 50%;color: white;display: block;margin-top: -10px;margin-left: -6px;text-align: center;" />
+                    </p:outputPanel>
+                </p:outputPanel>
+            </p:column>
+            <ui:remove>
+                <p:column styleClass=" min_padding_margin" headerText="#{ff:upper(msg.requestListOpenEditor)}"
+                          rendered="#{!requestBean.getCurrentUser().isExternal()}">
+                    <p:commandButton icon="fa fa-indent" action="#{requestBean.openRequestEditor}">
+                        <f:setPropertyActionListener value="#{item.id}" target="#{requestBean.entityEditId}"/>
+                    </p:commandButton>
+                </p:column>
+            </ui:remove>
+        </p:dataTable>
+
+
+        <div class="ui-g">
+            <div class="ui-g-10" ></div>
+            <div class="ui-g-2" id="close" style="margin-top:2%">
+                <p:commandButton style="float: right"
+                                 value="#{msg.close.toUpperCase() }"
+                                 styleClass="ui-button-primary" iconPos="right"
+                                 oncomplete="PF('requestubjectDlg').hide();" update="requestubjectDlgId"
+                />
+                <div style="clear: both"></div>
+
+            </div>
+        </div>
+
+    </p:dialog>
+</ui:composition>

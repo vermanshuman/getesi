@@ -9,9 +9,10 @@
                 template="/resources/tpl/Admin/EditBase.xhtml">
     <ui:param name="bean" value="#{formalityCreateBean}"/>
     <ui:param name="edit_title" value="#{msg.formality}"/>
-
+    <ui:param name="saveButtonStyle" value="button-top-margin"/>
     <ui:param name="renderSideMenu" value="#{!bean.itDialog}"/>
     <ui:param name="notShowMenu" value="#{bean.itDialog}"/>
+    <ui:param name="renderNav" value="#{bean.itDialog}"/>
     <ui:param name="renderHeaderMenu" value="#{!bean.itDialog}"/>
     <ui:param name="renderFooterMenu" value="#{!bean.itDialog}"/>
     <ui:param name="removePaddingTop" value="#{bean.itDialog}"/>
@@ -37,81 +38,109 @@
             .to-bottom-text td.ui-panelgrid-cell {
                 vertical-align: bottom !important;
             }
+            body .ui-panel .ui-panel-titlebar, body .ui-panel .ui-panel-content ,.card , .card fieldset{
+
+                border: 1px solid #6c757d !important;
+
+            }
+            body .ui-fieldset .ui-fieldset-legend {
+                border: 1px solid #dee2e6 !important;
+                color: #FFFFFF !important;
+                padding: 0.6em 1em !important;
+                font-weight: normal !important;
+                border-radius: 4px !important;
+                user-select: none !important;
+                font-size: 14px !important;
+                transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+            }
+            fieldset div {
+                font-size: 14px !important;
+                text-align: left !important;
+            }
+            body .ui-datatable tbody tr td {
+                border-color: #808080 !important;
+                color: #5f666c !important;
+            }
+
         </style>
-        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group to-bottom-text">
-            <h:outputText style="font-size: 20px" value="#{msg.formalityTitle}"/>
-            <p:selectOneMenu style="font-size: 20px" value="#{bean.selectedId}">
+        <!--<p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group to-bottom-text">-->
+
+        <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group">
+            <h:outputText  value="#{msg.formalityTitle}"/>
+            <p:selectOneMenu  value="#{bean.selectedId}">
                 <f:selectItems value="#{bean.conservatories}"/>
             </p:selectOneMenu>
-            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+            <h:outputText
+                    value="#{msg.typeFormalityType} #{bean.entity.type}"
+                    rendered="#{empty bean.entity.sectionA.annotationType}"/>
 
-                <h:outputText style="font-size: 16px"
-                              value="#{msg.typeFormalityType} #{bean.entity.type}"
-                              rendered="#{empty bean.entity.sectionA.annotationType}"/>
+            <p:selectOneMenu  value="#{bean.selectedType}">
+                <f:selectItems value="#{bean.types}"/>
+                <p:ajax listener="#{bean.showPartsOfSectionABySelectedType}" update="formalitySectionA"/>
+            </p:selectOneMenu>
 
-                <p:selectOneMenu style="font-size: 20px" value="#{bean.selectedType}">
-                    <f:selectItems value="#{bean.types}"/>
-                    <p:ajax listener="#{bean.showPartsOfSectionABySelectedType}" update="formalitySectionA"/>
-                </p:selectOneMenu>
+            <h:outputText value="#{msg.formalityGeneralRegister}"/>
+            <p:inputText value="#{bean.entity.generalRegister}"/>
 
-                <h:outputText value="#{msg.formalityGeneralRegister}"/>
-                <p:inputText value="#{bean.entity.generalRegister}"/>
+            <h:outputText value="#{msg.formalitySpecialRegister}"/>
+            <p:inputText value="#{bean.entity.particularRegister}"/>
 
-                <h:outputText value="#{msg.formalitySpecialRegister}"/>
-                <p:inputText value="#{bean.entity.particularRegister}"/>
 
-            </p:panelGrid>
-            <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group">
+            <h:outputText value="#{msg.formalityPresentation}"/>
+            <p:inputText value="#{bean.entity.numberPresentation}"/>
+            <h:outputText value="del"/>
+            <p:calendar value="#{bean.entity.presentationDate}"
+                        pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" popupIconOnly="true"/>
 
-                <h:outputText value="#{msg.formalityPresentation}"/>
-                <p:inputText value="#{bean.entity.numberPresentation}"/><span> del</span>
-                <p:calendar value="#{bean.entity.presentationDate}"
-                            pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" popupIconOnly="true"/>
 
-            </p:panelGrid>
+
         </p:panelGrid>
-        <p:fieldset legend="#{msg.formalitySectionA}" id="formalitySectionA">
+        <!--            <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group">
+
+                    </p:panelGrid>-->
+        <!--</p:panelGrid>-->
+        <p:fieldset legend="#{msg.formalitySectionA}" collapsed="false" toggleable="true" id="formalitySectionA">
             <h:outputText style="font-size: 20px" value="#{msg.formalityDataRelation}"/>
-            <p:panelGrid columns="2" columnClasses="ui-grid-col-2, ui-grid-col-4"
-                         styleClass="ui-panelgrid-blank form-group" layout="grid">
+            <p:panelGrid columns="4"
+                         styleClass="ui-panelgrid-blank form-group">
 
                 <h:outputText value="#{msg.formalityDescription}"/>
-                <p:inputText value="#{bean.sectionA.titleDescription}" styleClass="input-width"/>
+                <p:inputText value="#{bean.sectionA.titleDescription}" />
 
                 <h:outputText value="#{msg.formalityDate}"/>
-                <p:calendar value="#{bean.sectionA.titleDate}" styleClass="formality-calendar-width"
+                <p:calendar value="#{bean.sectionA.titleDate}"
                             showOn="button"
                             pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" popupIconOnly="true"/>
 
                 <h:outputText value="#{msg.formalityNotary}"/>
-                <p:inputText value="#{bean.sectionA.publicOfficialNotary}" styleClass="input-width"/>
+                <p:inputText value="#{bean.sectionA.publicOfficialNotary}" />
 
                 <h:outputText value="#{msg.formalityPublicOfficial}"/>
-				<ui:fragment>
-					<p:autoComplete id="publicOfficial" value="#{bean.selectedCourt}"
-						var="item" itemLabel="#{item}" itemValue="#{item}" maxResults="9"
-						completeMethod="#{bean.filterCourts}" styleClass="input-width">
-						<p:ajax event="itemSelect" 
-							listener="#{bean.courtSelectListener}" update="safc sede " />
-						
-					</p:autoComplete>
-				</ui:fragment>
+                <ui:fragment>
+                    <p:autoComplete id="publicOfficial" value="#{bean.selectedCourt}"
+                                    var="item" itemLabel="#{item}" itemValue="#{item}" maxResults="9"
+                                    completeMethod="#{bean.filterCourts}" styleClass="input-width">
+                        <p:ajax event="itemSelect"
+                                listener="#{bean.courtSelectListener}" update="safc sede " />
+
+                    </p:autoComplete>
+                </ui:fragment>
 
                 <h:outputText value="#{msg.formalitySeat}"/>
-                <p:inputText id="sede" value="#{bean.sectionA.seat}" styleClass="input-width"/>
+                <p:inputText id="sede" value="#{bean.sectionA.seat}" />
 
                 <h:outputText value="#{msg.formalityDirectoryNumber}"/>
-                <p:inputText value="#{bean.sectionA.numberDirectory}" styleClass="input-width"/>
+                <p:inputText value="#{bean.sectionA.numberDirectory}" />
 
                 <h:outputText value="#{msg.formalityFiscalCode}"/>
-                <p:inputText id="safc" value="#{bean.sectionA.fiscalCode}" styleClass="input-width"/>
+                <p:inputText id="safc" value="#{bean.sectionA.fiscalCode}" />
 
             </p:panelGrid>
             <h:outputText style="font-size: 20px" value="#{msg.formalityAnnotationDate}"
                           rendered="#{bean.typeAtto=='ANNOTAMENTO'}"/>
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
                          rendered="#{bean.typeAtto=='ANNOTAMENTO'}"
-                         columnClasses="ui-grid-col-2, ui-grid-col-4" layout="grid">
+            >
 
                 <h:outputText value="#{msg.annotationType}"/>
                 <p:inputText value="#{bean.sectionA.annotationType}" styleClass="input-width"/>
@@ -129,7 +158,7 @@
                           rendered="#{bean.typeAtto=='ISCRIZIONE'}"/>
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
                          rendered="#{bean.typeAtto=='ISCRIZIONE'}"
-                         columnClasses="ui-grid-col-2, ui-grid-col-4" layout="grid">
+            >
 
                 <h:outputText value="#{msg.formalityTypePrivilege}"/>
                 <p:inputText value="#{bean.sectionA.mortgageSpecies}" styleClass="input-width"/>
@@ -138,20 +167,20 @@
                 <p:selectOneMenu styleClass="input-width" value="#{bean.derivedFrom}">
                     <f:selectItems value="#{bean.codeAndDescription}"/>
                 </p:selectOneMenu>
-                
+
                 <h:outputText value="#{msg.formalityAnnualInterestRate}"/>
                 <p:inputText value="#{bean.sectionA.annualInterestRate}" styleClass="input-width"/>
-                
+
                 <h:outputText value="#{msg.formalityCapital}"/>
                 <p:inputText value="#{bean.sectionA.capital}" styleClass="input-width"/>
-                
-                 
+
+
                 <h:outputText value="#{msg.formalitySemiAnnualInterestRate}"/>
                 <p:inputText value="#{bean.sectionA.semiAnnualInterestRate}" styleClass="input-width"/>
-                
+
                 <h:outputText value="#{msg.formalityInterest}"/>
                 <p:inputText value="#{bean.sectionA.interests}" styleClass="input-width"/>
-                
+
                 <h:outputText value="#{msg.formalityExpenses}"/>
                 <p:inputText value="#{bean.sectionA.expense}" styleClass="input-width"/>
 
@@ -167,7 +196,7 @@
                           rendered="#{bean.typeAtto=='TRASCRIZIONE'}"/>
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
                          rendered="#{bean.typeAtto=='TRASCRIZIONE'}"
-                         columnClasses="ui-grid-col-2, ui-grid-col-4" layout="grid">
+            >
 
                 <h:outputText value="#{msg.formalityTypeConvention}"/>
                 <p:inputText value="#{bean.sectionA.conventionSpecies}" styleClass="input-width"/>
@@ -181,17 +210,16 @@
             </p:panelGrid>
 
             <h:outputText style="font-size: 20px" value="#{msg.formalityOtherData}"/>
-            <p:panelGrid columns="8" layout="grid"  
-            styleClass="ui-panelgrid-blank form-group" 
-            columnClasses="ui-grid-col-2,ui-grid-col-2, ui-grid-col-1, ui-grid-col-2, ui-grid-col-1, ui-grid-col-2,ui-grid-col-1, ui-grid-col-2">
+            <p:panelGrid columns="8"
+                         styleClass="ui-panelgrid-blank form-group" >
 
                 <h:outputText value="#{msg.formalityReferenceFormalities}"/>
                 <p:inputText value="#{bean.sectionA.otherTypeFormality}"/>
-                
+
                 <h:outputText value="#{msg.formalityConservativeReferenceFormalities}"/>
                 <p:selectOneMenu style="font-size: 20px" value="#{bean.conservatoryFilterId}">
-                	<f:selectItems value="#{bean.conservatories}"/>
-            	</p:selectOneMenu>
+                    <f:selectItems value="#{bean.conservatories}"/>
+                </p:selectOneMenu>
 
                 <h:outputText value="#{msg.formalityNumRP}"/>
                 <p:inputText value="#{bean.sectionA.otherParticularRegister}"/>
@@ -203,9 +231,9 @@
                 <p:calendar value="#{bean.sectionA.deathDate}"
                             pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" popupIconOnly="true"/>
             </p:panelGrid>
-             <p:panelGrid columns="8"  layout="grid" 
-             styleClass="ui-panelgrid-blank form-group" 
-             columnClasses="ui-grid-col-2,ui-grid-col-2, ui-grid-col-1, ui-grid-col-2, ui-grid-col-1, ui-grid-col-2,ui-grid-col-1, ui-grid-col-2">
+            <p:panelGrid columns="8"
+                         styleClass="ui-panelgrid-blank form-group"
+            >
 
                 <h:outputText value="#{msg.formalityApplicant}"/>
                 <p:inputText value="#{bean.sectionA.applicant}"/>
@@ -215,14 +243,14 @@
 
                 <h:outputText value="#{msg.formalityAddress}"/>
                 <p:inputText value="#{bean.sectionA.addressAppliant}"/>
-                
+
                 <h:outputText value=""/>
                 <h:outputText value=""/>
             </p:panelGrid>
         </p:fieldset>
 
         <br/>
-        <p:fieldset legend="#{msg.formalitySectionB}" id="formalitySectionB">
+        <p:fieldset legend="#{msg.formalitySectionB}" collapsed="false" toggleable="true" id="formalitySectionB">
             <p:commandButton value="#{msg.formalityEnterSectionB}" action="#{bean.createNewSectionB}"
                              update="formalitySectionB,relationshipArea"/>
 
@@ -231,18 +259,19 @@
                 <p:fieldset legend="#{msg.formalitySectionBMapKey} #{elem.bargainingUnit}" id="formalitySectionBList">
 
                     <p:commandButton value="#{bean.fromRequestEdit ? msg.formalityEnterSectionBProperty : msg.formalityEnterSectionBInsertProperty}"
-                                     oncomplete="PF('sectionBAddDlgWV').show();"
+                                     oncomplete="PF('sectionBAddDlgWV').show();" styleClass="p-mr-2 p-mb-2"
                                      action="#{bean.fillFilteredProvinces}"
                                      update="province sectionBAddDlg" rendered="#{!bean.listProperties}">
                         <p:ajax update="@this sectionBAddDlg" listener="#{bean.handleCreateProperty(elem)}"/>
                     </p:commandButton>
-                    
+
                     <p:commandButton value="#{bean.fromRequestEdit ? msg.formalityEnterSectionBProperty : msg.formalityEnterSectionBInsertProperty}"
-                     				 oncomplete="PF('searchPropertiesWV').show();" update="searchProprertyTab"
-                                     action="#{bean.fillProperties(elem)}" rendered="#{bean.listProperties}">
+                                     oncomplete="PF('searchPropertiesWV').show();" update="searchProprertyTab"
+                                     action="#{bean.fillProperties(elem)}" rendered="#{bean.listProperties}"
+                    styleClass="p-mr-2 p-mb-2">
                     </p:commandButton>
-                     <p:commandButton value="#{msg.formalityCreateNewProperty}"
-                     				 oncomplete="PF('sectionBAddDlgWV').show();" update=":form"
+                    <p:commandButton value="#{msg.formalityCreateNewProperty}"
+                                     oncomplete="PF('sectionBAddDlgWV').show();" update=":form"
                                      action="#{bean.handleCreateProperty(elem)}" rendered="#{bean.listProperties}">
                     </p:commandButton>
                     <br/><br/>
@@ -251,7 +280,7 @@
                                  value="#{bean.getPropertiesOfSectionBToView(elem.bargainingUnit)}"
                                  id="estateTab">
                         <p:columnGroup type="header">
-	                    <p:row>
+                            <p:row>
                                 <p:column rowspan="2" colspan="2" headerText="N." styleClass="action_large_column"/>
                                 <p:column colspan="5" headerText="DATI IDENTIFICATIVI" style="width: 30%;"/>
                                 <p:column colspan="4" headerText="DATI DI CLASSAMENTO" style="width: 30%;"/>
@@ -346,7 +375,7 @@
         </p:fieldset>
 
         <br/>
-        <p:fieldset legend="#{msg.formalitySectionC}" id="formalitySectionC">
+        <p:fieldset legend="#{msg.formalitySectionC}" collapsed="false" toggleable="true" id="formalitySectionC">
             <h:outputText style="font-size: 20px" value="#{msg.formalityInFavor}"/>
             <br/><br/>
             <p:commandButton value="#{msg.formalityEnterSectionC}" oncomplete="PF('sectionCAddDlgWV').show();">
@@ -602,11 +631,11 @@
         </p:fieldset>
         <br/>
 
-        <p:fieldset legend="#{msg.formalitySectionD}">
-        
-            <p:commandButton value="#{msg.formalitySectionDUpload}" 
-            	oncomplete="PF('sectionDAddDlgWV').show();">
-            	  <p:ajax update="sectionDDialog" listener="#{bean.setSectionDFormat()}"/>
+        <p:fieldset collapsed="false" toggleable="true" legend="#{msg.formalitySectionD}">
+
+            <p:commandButton value="#{msg.formalitySectionDUpload}"
+                             oncomplete="PF('sectionDAddDlgWV').show();">
+                <p:ajax update="sectionDDialog" listener="#{bean.setSectionDFormat()}"/>
             </p:commandButton>
             <br/><br/>
             <p:inputTextarea id="formalitySectionD" value="#{bean.sectionD.additionalInformation}"
@@ -763,108 +792,108 @@
             <div class="btn_line">
                 <p:commandButton value="#{msg.save}" update="formalitySectionB"
                                  action="#{bean.saveSectionB}"
-                                 oncomplete="PF('sectionBAddDlgWV').hide();"/>
+                                 oncomplete="PF('sectionBAddDlgWV').hide();" styleClass="save-btn p-mr-2 p-mb-2"/>
                 <p:commandButton value="#{msg.cancel}" update="formalitySectionB"
                                  action="#{bean.cancelSaveFile}"
-                                 oncomplete="PF('sectionBAddDlgWV').hide();"/>
+                                 oncomplete="PF('sectionBAddDlgWV').hide();" styleClass="annula-btn"/>
             </div>
 
         </p:dialog>
 
-		<p:dialog  modal="true"
-                  id="searchProperties" resizable="false" draggable="false" dynamic="true"
-                  widgetVar="searchPropertiesWV" style="min-width:70%;z-index: 9999 !important;">
-                   <p:scrollPanel mode="native" style="width:100%; min-height: 300px; max-height: 600px" id="dialogPanel">
-                        <p:dataTable value="#{bean.propertyList}"
-					selection="#{bean.selectedSearchedProperty}"
-					styleClass="simple-table estate-situation-edit-select" var="form"
-					id="searchProprertyTab" rowKey="#{form.id}"
-					rowSelectMode="checkbox" paginator="true"
-					paginatorAlwaysVisible="false" rows="5"
-					paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-					rowsPerPageTemplate="5, 20, 50">
-                        <p:columnGroup type="header">
-	                    <p:row>
-	                    	<p:column selectionMode="multiple" style="width: 18px;"/>
-	                        <p:column colspan="5" headerText="DATI IDENTIFICATIVI" style="width: 30%;"/>
-	                        <p:column colspan="4" headerText="DATI DI CLASSAMENTO" style="width: 30%;"/>
-	                        <p:column colspan="2" headerText="ALTRE INFORMAZIONI" style="width: 30%;"/>
-	                    </p:row>
-	                    <p:row>
-                                <p:column/>
-	                        <p:column headerText="Scheda"/>
-	                        <p:column headerText="Sezione"/>
-	                        <p:column headerText="Foglio"/>
-	                        <p:column headerText="Particella"/>
-	                        <p:column headerText="Sub"/>
-	
-	                        <p:column headerText="Cat"/>
-	                        <p:column headerText="Consistenza"/>
-	                        <p:column headerText="Superficie Catastale (MQ)"/>
-	                        <p:column headerText="Rendita (€)"/>
-	                        
-	                        <p:column headerText="Indirizzo" style="width: 20%;"/>
-	                        <p:column headerText="Comune" style="width: 15%;"/>
-	                    </p:row>
-	                </p:columnGroup>
-                        <p:column styleClass="action_column" selectionMode="multiple" />
-                        <p:column colspan="1" style="width: 75px">
-	                    <h:outputText value="#{form.schedas} / #{form.dataSchedas}" rendered="#{not empty form.schedas}"/>
-	                </p:column>
-                        <p:column colspan="1">
-	                    <p:repeat var="str" value="#{form.sectionList}">
-	                        <h:outputText value="#{str}"/>
-	                        <br/>
-	                    </p:repeat>
-	                </p:column>
-	                <p:column colspan="1">
-	                    <p:repeat var="str" value="#{form.sheetList}">
-	                        <h:outputText value="#{str}"/>
-	                        <br/>
-	                    </p:repeat>
-	                </p:column>
-                           <p:column colspan="1">
-	                    <p:repeat var="str" value="#{form.particleList}">
-	                        <h:outputText value="#{str}"/>
-	                        <br/>
-	                    </p:repeat>
-	                </p:column>
-	                <p:column colspan="1">
-	                    <p:repeat var="str" value="#{form.subList}">
-	                        <h:outputText value="#{str}"/>
-	                        <br/>
-	                    </p:repeat>
-	                </p:column>
-                        <p:column colspan="1">
-	                    <h:outputText value="#{form.category.codeInVisura}" id="category"/>
-	                    <p:tooltip for="category" value="#{form.category.description}"/>
-	                </p:column>
-	
-	                <p:column colspan="1">
-	                    <h:outputText value="#{form.consistency}"/>
-	                </p:column>
-	                <p:column colspan="1">
-	                    <h:outputText value="#{form.cadastralArea}"/>
-	                </p:column>
-	                <p:column colspan="1">
-	                    <h:outputText value="#{form.revenue}"/>
-	                </p:column>
-	                <p:column colspan="1">
-	                    <h:outputText value="#{form.address}"/>
-	                </p:column>
-	                <p:column colspan="1" >
-	                    <h:outputText value="#{form.city}"/>
-	                </p:column>
-                    </p:dataTable>
-				
-                    <p:commandButton value="#{msg.estateSituationViewAssociate}"
-                             action="#{bean.associateProperties}" 
-                             oncomplete="PF('searchPropertiesWV').hide();"
-                             update="formalitySectionB aFavoreTable, controTable, debitoriTable"
-                             style="margin: 10px; width: 100px; height: 31px; float:right"/>
-			</p:scrollPanel>
+        <p:dialog  modal="true"
+                   id="searchProperties" resizable="false" draggable="false" dynamic="true"
+                   widgetVar="searchPropertiesWV" style="min-width:70%;z-index: 9999 !important;">
+            <p:scrollPanel mode="native" style="width:100%; min-height: 300px; max-height: 600px" id="dialogPanel">
+                <p:dataTable value="#{bean.propertyList}"
+                             selection="#{bean.selectedSearchedProperty}"
+                             styleClass="simple-table estate-situation-edit-select" var="form"
+                             id="searchProprertyTab" rowKey="#{form.id}"
+                             rowSelectMode="checkbox" paginator="true"
+                             paginatorAlwaysVisible="false" rows="5"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5, 20, 50">
+                    <p:columnGroup type="header">
+                        <p:row>
+                            <p:column selectionMode="multiple" style="width: 18px;"/>
+                            <p:column colspan="5" headerText="DATI IDENTIFICATIVI" style="width: 30%;"/>
+                            <p:column colspan="4" headerText="DATI DI CLASSAMENTO" style="width: 30%;"/>
+                            <p:column colspan="2" headerText="ALTRE INFORMAZIONI" style="width: 30%;"/>
+                        </p:row>
+                        <p:row>
+                            <p:column/>
+                            <p:column headerText="Scheda"/>
+                            <p:column headerText="Sezione"/>
+                            <p:column headerText="Foglio"/>
+                            <p:column headerText="Particella"/>
+                            <p:column headerText="Sub"/>
+
+                            <p:column headerText="Cat"/>
+                            <p:column headerText="Consistenza"/>
+                            <p:column headerText="Superficie Catastale (MQ)"/>
+                            <p:column headerText="Rendita (€)"/>
+
+                            <p:column headerText="Indirizzo" style="width: 20%;"/>
+                            <p:column headerText="Comune" style="width: 15%;"/>
+                        </p:row>
+                    </p:columnGroup>
+                    <p:column styleClass="action_column" selectionMode="multiple" />
+                    <p:column colspan="1" style="width: 75px">
+                        <h:outputText value="#{form.schedas} / #{form.dataSchedas}" rendered="#{not empty form.schedas}"/>
+                    </p:column>
+                    <p:column colspan="1">
+                        <p:repeat var="str" value="#{form.sectionList}">
+                            <h:outputText value="#{str}"/>
+                            <br/>
+                        </p:repeat>
+                    </p:column>
+                    <p:column colspan="1">
+                        <p:repeat var="str" value="#{form.sheetList}">
+                            <h:outputText value="#{str}"/>
+                            <br/>
+                        </p:repeat>
+                    </p:column>
+                    <p:column colspan="1">
+                        <p:repeat var="str" value="#{form.particleList}">
+                            <h:outputText value="#{str}"/>
+                            <br/>
+                        </p:repeat>
+                    </p:column>
+                    <p:column colspan="1">
+                        <p:repeat var="str" value="#{form.subList}">
+                            <h:outputText value="#{str}"/>
+                            <br/>
+                        </p:repeat>
+                    </p:column>
+                    <p:column colspan="1">
+                        <h:outputText value="#{form.category.codeInVisura}" id="category"/>
+                        <p:tooltip for="category" value="#{form.category.description}"/>
+                    </p:column>
+
+                    <p:column colspan="1">
+                        <h:outputText value="#{form.consistency}"/>
+                    </p:column>
+                    <p:column colspan="1">
+                        <h:outputText value="#{form.cadastralArea}"/>
+                    </p:column>
+                    <p:column colspan="1">
+                        <h:outputText value="#{form.revenue}"/>
+                    </p:column>
+                    <p:column colspan="1">
+                        <h:outputText value="#{form.address}"/>
+                    </p:column>
+                    <p:column colspan="1" >
+                        <h:outputText value="#{form.city}"/>
+                    </p:column>
+                </p:dataTable>
+
+                <p:commandButton value="#{msg.estateSituationViewAssociate}"
+                                 action="#{bean.associateProperties}"
+                                 oncomplete="PF('searchPropertiesWV').hide();"
+                                 update="formalitySectionB aFavoreTable, controTable, debitoriTable"
+                                 style="margin: 10px; width: 100px; height: 31px; float:right"/>
+            </p:scrollPanel>
         </p:dialog>
-                  
+
         <p:remoteCommand name="updateForm" update="sectionCDialog"/>
 
         <p:dialog header="#{msg.formalitySectionC}" modal="true"
@@ -1008,7 +1037,7 @@
                             <p:inputText id="fiscalCode" maxlength="16"
                                          value="#{bean.newSubject.fiscalCode}"/>
                             <p:commandButton action="#{bean.generateFiscalCode}"
-                                             update="fiscalCode, sectionCDialog"
+                                             update="fiscalCode, sectionCDialog" style="margin-top: 10px;"
                                              value="#{msg.databaseListSubjectFiscalCodeGenerate}"/>
                         </div>
                     </ui:fragment>
@@ -1028,34 +1057,36 @@
 
             <div class="btn_line">
                 <p:commandButton value="#{msg.save}" update="aFavoreTable, controTable, debitoriTable, sectionCDialog"
-                                 action="#{bean.saveSubjectSectionC}"/>
+                                 action="#{bean.saveSubjectSectionC}" styleClass="save-btn p-mr-2 p-mb-2"/>
                 <p:commandButton value="#{msg.cancel}" update="aFavoreTable, controTable, debitoriTable, sectionCAddDlg"
-                                 action="#{bean.cancelSaveFile}"
+                                 action="#{bean.cancelSaveFile}" styleClass="annula-btn"
                                  oncomplete="PF('sectionCAddDlgWV').hide();"/>
             </div>
 
 
         </p:dialog>
-        
-          <p:dialog header="#{msg.formalitySectionD}" modal="true"
+
+        <p:dialog header="#{msg.formalitySectionD}" modal="true"
                   id="sectionDAddDlg" resizable="false" draggable="false" dynamic="true"
                   widgetVar="sectionDAddDlgWV" style="min-width:50%;z-index: 9999 !important;">
-                   <p:outputPanel id="sectionDDialog">
-	                   <p:selectOneRadio value="#{bean.selectedSectionDId}" id="sectionds">
-	                    	<f:selectItems value="#{bean.sectionDs}"/>
-	                	</p:selectOneRadio>
-                   </p:outputPanel>
-					<div class="btn_line">
-						<p:commandButton value="#{msg.save}"
-							action="#{bean.setSectionD}"
-							update="sectionds formalitySectionD"
-							oncomplete="PF('sectionDAddDlgWV').hide();" />
-						<p:commandButton value="#{msg.cancel}"
-							action="#{bean.cancelSectionD}"
-							update="sectionds"
-							oncomplete="PF('sectionDAddDlgWV').hide();" />
-					</div>
-		</p:dialog>
+            <p:outputPanel id="sectionDDialog">
+                <p:selectOneRadio value="#{bean.selectedSectionDId}" id="sectionds">
+                    <f:selectItems value="#{bean.sectionDs}"/>
+                </p:selectOneRadio>
+            </p:outputPanel>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.save}"
+                                 action="#{bean.setSectionD}"
+                                 update="sectionds formalitySectionD"
+                                 oncomplete="PF('sectionDAddDlgWV').hide();"
+                                 styleClass="save-btn p-mr-2 p-mb-2"/>
+                <p:commandButton value="#{msg.cancel}"
+                                 action="#{bean.cancelSectionD}"
+                                 update="sectionds"
+                                 oncomplete="PF('sectionDAddDlgWV').hide();"
+                                 styleClass="annula-btn"/>
+            </div>
+        </p:dialog>
 
 
         <p:dialog widgetVar="relationshipDlg" resizable="false"  draggable="false" modal="true"

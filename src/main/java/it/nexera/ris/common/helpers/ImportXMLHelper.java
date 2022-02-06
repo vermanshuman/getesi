@@ -110,8 +110,16 @@ public class ImportXMLHelper extends BaseHelper {
 
     private static final String LEGAL_PATTERN = "(.+)(\\s*con sede in)\\s(([A-ZÀÈÉÌÍÎÒÓÙÚ`]\\s?)+)";
 
-    private static final String PERSON_PATTERN_ALT = "(([A-Z]{2,}\\s?){1,3})\\s(([a-zA-Z]{3,}\\s?){1,"
+//    private static final String PERSON_PATTERN_ALT = "(([A-Z]{2,}\\s?){1,3})\\s(([a-zA-Z]{3,}\\s?){1,"
+//            + "3})\\s(\\d*\\/\\d*\\/\\d*)\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
+
+    private static final String PERSON_PATTERN_ALT = "(([A-Z']{2,}\\s?){1,3})\\s(([a-zA-Z]{3,}\\s?){1,"
             + "3})\\s(\\d*\\/\\d*\\/\\d*)\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
+
+    private static final String PERSON_PATTERN_ALT_COMUNE = "(([A-Z]{2,}\\s?){1,3})\\s(([a-zA-Z]{3,}\\s?){1,3})\\s(\\d*\\/\\d*\\/\\d*);\\sComune\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
+
+    private static final String PERSON_PATTERN_ALT_COMUNE_QUOTE = "(([A-Z']{2,}\\s?){1,3})\\s(([a-zA-Z]{3,}\\s?){1,3})\\s(\\d*\\/\\d*\\/\\d*);\\sComune\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
+
 
     private static final String VANI = "VANI";
 
@@ -1230,6 +1238,14 @@ public class ImportXMLHelper extends BaseHelper {
                 if(fc != null)
                     fc = fc.replaceAll("\\r|\\n", "");
                 subject = convertNewFormatStringToPersonSubject(fc, subjectStr, session);
+            }else if (ValidationHelper.checkCorrectFormatByExpression(PERSON_PATTERN_ALT_COMUNE, subjectStr)) {
+                if(fc != null)
+                    fc = fc.replaceAll("\\r|\\n", "");
+                subject = convertRandomStringToPersonSubject(fc, subjectStr, session, PERSON_PATTERN_ALT_COMUNE);
+            }else if (ValidationHelper.checkCorrectFormatByExpression(PERSON_PATTERN_ALT_COMUNE_QUOTE, subjectStr)) {
+                if(fc != null)
+                    fc = fc.replaceAll("\\r|\\n", "");
+                subject = convertRandomStringToPersonSubject(fc, subjectStr, session, PERSON_PATTERN_ALT_COMUNE_QUOTE);
             } else {
                 subject = crateNewLegalSubject(fc, subjectStr, session);
             }
@@ -1417,6 +1433,65 @@ public class ImportXMLHelper extends BaseHelper {
             subject.setBirthProvince(subject.getBirthCity() != null ? subject.getBirthCity().getProvince() : null);
             subject.setFiscalCode(fiscalCode);
             subject.setTypeId(SubjectType.PHYSICAL_PERSON.getId());
+            ConnectionManager.save(subject, true, session);
+        }
+        return subject;
+    }
+
+    private static Subject convertRandomStringToPersonSubject(String fiscalCode, String subjectStr, Session session,
+                                                              String regex){
+
+        if (ValidationHelper.isNullOrEmpty(fiscalCode) || ValidationHelper.isNullOrEmpty(subjectStr)) return null;
+        Subject subject = null;
+        Pattern pattern = Pattern.compile(regex);
+        Matcher m = pattern.matcher(subjectStr);
+        City city = null;
+        Country country = null;
+        while (m.find()) {
+            if (!ValidationHelper.isNullOrEmpty(CalcoloCodiceFiscale.getCityFiscalCode(fiscalCode))) {
+                List<City> cities = ConnectionManager.load(City.class, new Criterion[]{Restrictions.eq("cfis",
+                        CalcoloCodiceFiscale.getCityFiscalCode(fiscalCode)), Restrictions.isNotNull("province")}, session);
+                List<Subject> subjects = null;
+                String completeName = m.group(1) + " " + m.group(3);
+                List<Criterion> criterionList = new ArrayList<>(Arrays.asList(
+                        Restrictions.eq("completeName", completeName),
+                        Restrictions.eq("birthDate",
+                                DateTimeHelper.fromXMLString(m.group(5).replaceAll("/", ""))),
+                        Restrictions.eq("fiscalCode", fiscalCode)
+                ));
+
+                if (!ValidationHelper.isNullOrEmpty(cities)) {
+                    city = cities.get(0);
+                    if (city != null && !ValidationHelper.isNullOrEmpty(city.getProvince())) {
+                        criterionList.add(Restrictions.eq("birthProvince.id", city.getProvince().getId()));
+                        criterionList.add(Restrictions.eq("city.description", city.getDescription()));
+
+                        subjects = ConnectionManager.load(Subject.class, new CriteriaAlias[]{
+                                new CriteriaAlias("birthCity", "city", JoinType.INNER_JOIN)
+                        }, criterionList.toArray(new Criterion[0]), session);
+                        if (!ValidationHelper.isNullOrEmpty(subjects)) {
+                            subject = subjects.get(0);
+                        }
+                    }
+                }
+                if (!ValidationHelper.isNullOrEmpty(subjects)) {
+                    subject = subjects.get(0);
+                }
+            }
+            //ART_RISFW-463 update data on new import
+            if (ValidationHelper.isNullOrEmpty(subject)) {
+                subject = new Subject();
+            }
+            subject.setBirthDate(DateTimeHelper.fromXMLString(m.group(5).replaceAll("/", "")));
+            subject.setSex(CalcoloCodiceFiscale.getSexFromFiscalCode(fiscalCode));
+            subject.setName(m.group(3));
+            subject.setSurname(m.group(1));
+            subject.setTypeId(SubjectType.PHYSICAL_PERSON.getId());
+            subject.setFiscalCode(fiscalCode);
+            subject.setBirthCity(city);
+            subject.setCountry(country);
+            subject.setBirthProvince(subject.getBirthCity() != null ? subject.getBirthCity().getProvince() : null);
+
             ConnectionManager.save(subject, true, session);
         }
         return subject;

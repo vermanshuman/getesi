@@ -131,6 +131,7 @@ public final class OMIHelper {
                 DaoManager.save(property, true);
             }
         }
+        log.info("Zones: " + zones);
         if (ValidationHelper.isNullOrEmpty(zones)) {
             return calculatedOmi;
         }

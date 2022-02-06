@@ -846,3 +846,52 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
 .red-file::before{
     content: none !important;
 }
+
+.red-btn {
+    background: red !important;
+    background-color: red !important;
+    color: #FFFFFF !important;
+}
+
+.save-btn {
+    background-color: #00CC52 !important;
+    margin-right: 15px;
+    width: 100px;
+}
+
+
+.annula-btn {
+    background-color: #F3362B !important;
+    width: 100px;
+}
+
+.button-top-margin {
+    margin-top: 10px
+}
+
+.layout-wrapper{
+    overflow: auto !important;
+    height: 90% !important
+}
+
+.additional_button{
+    margin-top: 5px;
+}
+
+
+.alignEnd {
+    place-content: flex-end;
+}
+
+.searchPanelButton {
+    background: #fb6e51 !important;
+}
+
+@media screen and (max-width: 1200px) {
+    #settingPanel {
+        margin-top: 90px;
+    }
+    .alignEnd {
+        place-content: flex-start;
+    }
+}
