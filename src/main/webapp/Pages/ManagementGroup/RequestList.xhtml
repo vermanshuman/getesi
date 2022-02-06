@@ -306,6 +306,9 @@
                     PF(wv).show();
                 });
             }
+               $("#requestTypes").click(function(){
+                    PF('requestTypeSelectCheckboxWV').loadContents();
+                });
         </script>
 
         <div class="p-grid">
@@ -353,7 +356,7 @@
                                 </div>
                                 <div class="settingsBlock">
                                     <p:commandButton id="settingButton" onclick="togglePanel();"
-                                                     type="button"
+                                                     type="button" update=":form:settingPanel"
                                                      styleClass="ui-button-warning-icon"
                                                      icon="ui-icon ui-icon-search pi pi-sliders-h"/>
 
@@ -385,6 +388,7 @@
                                             }
                                         });
                                         function togglePanel() {
+                                            updatePaneData();                                    
                                             PF('panelSetting').getJQ().toggle();
                                         }
                                         jQuery(document).ready(function() {
@@ -392,7 +396,6 @@
                                         });
                                         // ]]>
                                     </script>
-
                                     <p:panel id="settingPanel" widgetVar="panelSetting" closable="true"
                                              toggleable="true" style="display: none;">
                                         <div class="p-grid">
@@ -424,18 +427,18 @@
                                             </div>
 
                                             <div class="p-col-6">
-<!--                                                <p:outputPanel id="statuses" styleClass="#{bean.getStateSelected() gt 0 ? ' select-checkbox' : ''}"-->
-<!--                                                               style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">-->
-<!--                                                    <h:outputText value="#{ff:upper(msg.status)}"-->
-<!--                                                                  style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>-->
-<!--                                                    <i class="fa fa-angle-down"-->
-<!--                                                       style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"-->
-<!--                                                       onclick="PF('stateSelectCheckboxWV').show(); event.stopImmediatePropagation(); applyBorder('statuses');"/>-->
-<!--                                                </p:outputPanel>-->
-                                                <p:selectCheckboxMenu id="statuses" style="width: 100%;min-height: 38px;" multiple="true" label="" value="#{bean.selectedStates}"
-                                                                      onclick="PF('stateSelectCheckboxWV').show();applyBorder('statuses');" styleClass="#{bean.getStateSelected() gt 0 ? ' select-checkbox' : ''}">
+<!--                                                <p:outputPanel id="statuses" styleClass="#{bean.getStateSelected() gt 0 ? ' select-checkbox' : ''}"
+                                                               style="width: calc( 100% - 5px);background-color: #F0F3F5 !important; border-radius: 7px !important; min-height: 38px;">
+                                                    <h:outputText value="#{ff:upper(msg.status)}"
+                                                                  style="color:#003871;text-align: center; height: 38px;line-height: 38px;margin-left:5px"/>
+                                                    <i class="fa fa-angle-down"
+                                                       style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"
+                                                       onclick="PF('stateSelectCheckboxWV').show(); event.stopImmediatePropagation(); applyBorder('statuses');"/>
+                                                </p:outputPanel>-->
+                                                <p:selectCheckboxMenu id="statuses" onShow="PF('stateSelectCheckboxWV').loadContents('#{component.clientId}');" style="width: 100%;min-height: 38px;" multiple="true" label="" value="#{bean.selectedStates}"
+                                                                   styleClass="#{bean.getStateSelected() gt 0 ? ' select-checkbox' : ''}" >
                                                     <f:selectItems value="#{bean.stateWrappers}" var="state" itemValue="#{state}"
-                                                                   itemLabel="#{state.value}"/>
+                                                                   itemLabel="#{state.value}" />
                                                 </p:selectCheckboxMenu>
                                             </div>
                                             <div class="p-col-6">
@@ -459,8 +462,8 @@
 <!--                                                       style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"-->
 <!--                                                       onclick="PF('requestTypeSelectCheckboxWV').show(); event.stopImmediatePropagation(); applyBorder('requestTypes');"/>-->
 <!--                                                </p:outputPanel>-->
-                                                <p:selectCheckboxMenu id="requestTypes" style="width: 100%;min-height: 38px;" multiple="true" label="#{msg.requestType}" value="#{bean.selectedRequestTypes}"
-                                                                      onclick="PF('requestTypeSelectCheckboxWV').show();applyBorder('requestTypes');" styleClass="#{bean.getRequestTypeSelected() gt 0 ? ' select-checkbox' : ''}">
+                                                   <p:selectCheckboxMenu id="requestTypes" onShow="PF('requestTypeSelectCheckboxWV').loadContents('#{component.clientId}');" style="width: 100%;min-height: 38px;" multiple="true" label="#{msg.requestType}" value="#{bean.selectedRequestTypes}"
+                                                                      styleClass="#{bean.getRequestTypeSelected() gt 0 ? ' select-checkbox' : ''}">
                                                     <f:selectItems value="#{bean.requestTypeWrappers}" var="requestType" itemValue="#{requestType}"
                                                                    itemLabel="#{requestType.value}"/>
                                                 </p:selectCheckboxMenu>
@@ -474,8 +477,8 @@
 <!--                                                       style="font-size: x-large;float:right;margin-right:10px;margin-top:5px"-->
 <!--                                                       onclick="PF('serviceSelectCheckboxWV').show(); event.stopImmediatePropagation(); applyBorder('services');"/>-->
 <!--                                                </p:outputPanel>-->
-                                                <p:selectCheckboxMenu id="services" style="width: 100%;min-height: 38px;" multiple="true" label="" value="#{bean.selectedServices}"
-                                                                      onclick="PF('serviceSelectCheckboxWV').show();applyBorder('services');" styleClass="#{bean.getServiceSelected() gt 0 ? ' select-checkbox' : ''}">
+                                                <p:selectCheckboxMenu id="services" onShow="PF('serviceSelectCheckboxWV').loadContents('#{component.clientId}');" style="width: 100%;min-height: 38px;" multiple="true" label="" value="#{bean.selectedServices}"
+                                                                       styleClass="#{bean.getServiceSelected() gt 0 ? ' select-checkbox' : ''}">
                                                     <f:selectItems value="#{bean.serviceWrappers}" var="service" itemValue="#{service}"
                                                                    itemLabel="#{service.value}"/>
                                                 </p:selectCheckboxMenu>
@@ -590,8 +593,9 @@
                                                                  oncomplete="PF('panelSetting').getJQ().hide();"/>
                                                 <p:commandButton id="manageReestablishBtn" style="width: auto;"
                                                                  value="#{ff:upper(msg.mailManageReestablish)}"
-                                                                 update="settingPanel searchPanel"
-                                                                 oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').getJQ().hide();"/>
+                                                                 action="#{bean.reset()}" 
+                                                                 update=":form:table :form:settingPanel :form:printPanel"
+                                                                 oncomplete="PF('panelSetting').getJQ().hide();" />
                                             </div>
                                         </div>
                                     </p:panel>
@@ -620,9 +624,7 @@
         </div>
 
 
-        <p:remoteCommand name="resetTableData"
-                         action="#{bean.reset}" update=":form:table :form:settingPanel :form:stateSelectCheckboxPanelDataTable :form:requestTypeSelectCheckboxPanelDataTable
-                             :form:serviceSelectCheckboxPanelDataTable :form:printPanel"/>
+        <p:remoteCommand name="updatePaneData" update=":form:table :form:settingPanel :form:printPanel"/>
         <p:outputPanel id="searchPanel" style="display:none;" >
             <p:commandButton icon="fa fa-fw fa-file-pdf-o"  rendered="false"
                              action="#{bean.downloadPdfFile}" ajax="false" update="@form">
@@ -808,10 +810,10 @@
              </p:panelGrid> -->
         </p:outputPanel>
 
-        <p:overlayPanel id="stateSelectCheckboxPanel" my="left top" at="right bottom"
+        <p:overlayPanel id="stateSelectCheckboxPanel" my="left top" at="right bottom"  
                         widgetVar="stateSelectCheckboxWV" for="statuses" dynamic="true" style="width:200px;left: 1650px !important;" styleClass="settingsBlock">
 
-            <p:dataTable id="stateSelectCheckboxPanelDataTable" var="state"
+            <p:dataTable id="stateSelectCheckboxPanelDataTable" var="state" 
                          value="#{bean.stateWrappers}" selectionMode="single"
                          selection="#{bean.selectedStateForFilter}" rowKey="#{state.value}">
                 <p:ajax event="rowSelect"
@@ -835,7 +837,7 @@
             </p:dataTable>
         </p:overlayPanel>
 
-        <p:overlayPanel id="serviceSelectCheckboxPanel" my="left top" at="right bottom"
+<p:overlayPanel id="serviceSelectCheckboxPanel" my="left top" at="right bottom"
                         widgetVar="serviceSelectCheckboxWV" for="services" dynamic="true" style="width:400px;">
             <p:dataTable id="serviceSelectCheckboxPanelDataTable" var="service"
                          value="#{bean.serviceWrappers}" selectionMode="single"
@@ -861,9 +863,9 @@
             </p:dataTable>
         </p:overlayPanel>
 
-        <p:overlayPanel id="requestTypeSelectCheckboxPanel" my="left top" at="left bottom"
+        <p:overlayPanel id="requestTypeSelectCheckboxPanel" my="left top" at="left bottom" 
                         widgetVar="requestTypeSelectCheckboxWV" for="requestTypes" dynamic="true" style="width:300px;">
-            <p:dataTable id="requestTypeSelectCheckboxPanelDataTable" var="requestType"
+            <p:dataTable id="requestTypeSelectCheckboxPanelDataTable" var="requestType" initMode="load"
                          value="#{bean.requestTypeWrappers}" selectionMode="single"
                          selection="#{bean.selectedRequestTypeForFilter}" rowKey="#{requestType.value}">
                 <p:ajax event="rowSelect"

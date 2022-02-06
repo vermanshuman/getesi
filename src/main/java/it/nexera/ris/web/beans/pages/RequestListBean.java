@@ -1027,14 +1027,14 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         }
 
         if (!ValidationHelper.isNullOrEmpty(getFiduciaryClientFilterId())) {
-            restrictions.add(Restrictions.eq("fiduciaryId",
-            		getFiduciaryClientFilterId()));
+            //restrictions.add(Restrictions.eq("fiduciaryId",
+            //		getFiduciaryClientFilterId()));
         }
         
 
         if (!ValidationHelper.isNullOrEmpty(getManagerClientFilterid())) {
-            restrictions.add(Restrictions.eq("managerId",
-            		getManagerClientFilterid()));
+           // restrictions.add(Restrictions.eq("managerId",
+           //		getManagerClientFilterid()));
         }
         
         setFilterRestrictions(restrictions);
@@ -1829,15 +1829,19 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     public void reset() throws PersistenceBeanException, IOException, InstantiationException, IllegalAccessException {
         setSelectedClientId(null);
+        getRequestTypeWrappers().forEach(req -> req.setSelected(Boolean.FALSE));
+        getStateWrappers().forEach(st -> st.setSelected(Boolean.FALSE));
+        getServiceWrappers().forEach(ser -> ser.setSelected(Boolean.FALSE));
         setManagerClientFilterid(null);
         setFiduciaryClientFilterId(null);
+        setDateExpiration(null);
+        setDateFrom(null);
+        setDateTo(null);
+        setDateFromEvasion(null);
+        setDateToEvasion(null);
         setAggregationFilterId(null);
-        setStateWrappers(new ArrayList<>());
-        setUserWrappers(new ArrayList<>());
-        setServiceWrappers(new ArrayList<>());
-        setRequestTypeWrappers(new ArrayList<>());
-        setShowPrintButton(null);
-        this.onLoad();
+        setShowPrintButton(false);
+        filterTableFromPanel();
     }
 
     public void setSelectedStates(List<RequestState> selectedStates) {
