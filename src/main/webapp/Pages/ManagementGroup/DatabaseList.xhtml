@@ -5,6 +5,7 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:p="http://primefaces.org/ui"
+
       xmlns:ff="http://readytech.com/functions">
 <ui:composition template="/resources/tpl/Admin/LazyListTabBase.xhtml">
     <ui:param name="bean" value="#{databaseListBean}"/>
@@ -19,6 +20,15 @@
 
             .to-bottom-text td.ui-panelgrid-cell {
                 vertical-align: bottom !important;
+            }
+
+            .panelSetting {
+                position: absolute;
+                z-index: 1;
+                margin-top: 10px;
+                max-width: 560px;
+                right: 33px;
+                border: 1px solid #547ac4;
             }
         </style>
         <script>
@@ -71,8 +81,8 @@
                                     // <![CDATA[
                                     $("body").click(function (e) {
                                         var target = $(e.target);
-                                        if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length &&
-                                            !target.parents('.ui-selectcheckboxmenu-panel').length) {
+                                        if (!target.parents('#settingButton').length && !target.parents('#tabs\\:settingButton').length &&
+                                            !target.parents('.ui-selectcheckboxmenu-panel').length && !target.parents('#tabs\\:settingPanel').length) {
                                             PF('panelSetting').getJQ().hide();
                                         }
 
