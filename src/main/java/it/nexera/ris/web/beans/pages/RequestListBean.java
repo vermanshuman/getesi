@@ -2011,9 +2011,26 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     	setSelectedClientId(null);
         setDateFrom(null);
         setDateTo(null);
+        setDateFromEvasion(null);
+        setDateToEvasion(null);
+        setDateExpiration(null);
+        //setServiceWrappers(null);
+        setRequestTypes(null);
+        setManagerClientFilterid(null);
+        setFiduciaryClientFilterId(null);
+        setAggregationFilterId(null);
+        
         SessionHelper.removeObject(KEY_CLIENT_ID);
         SessionHelper.removeObject(KEY_DATE_FROM_REQ);
         SessionHelper.removeObject(KEY_DATE_TO_REQ); 
+        SessionHelper.removeObject(KEY_DATE_FROM_EVASION);
+        SessionHelper.removeObject(KEY_DATE_TO_EVASION);
+        SessionHelper.removeObject(KEY_DATE_EXPIRATION);
+        //SessionHelper.removeObject(KEY_SERVICES);
+        SessionHelper.removeObject(KEY_REQUEST_TYPE);
+        SessionHelper.removeObject(KEY_CLIENT_MANAGER_ID);
+        SessionHelper.removeObject(KEY_CLIENT_FIDUCIARY_ID);
+        SessionHelper.removeObject(KEY_AGGREAGATION);
     }
 
     public void setSelectedRequestTypes(List<RequestType> selectedRequestTypes) {
