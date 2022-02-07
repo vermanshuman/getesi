@@ -2008,8 +2008,12 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public void clearFiltraPanel() {
-      setSelectedClientId(null);
-      SessionHelper.removeObject(KEY_CLIENT_ID);
+    	setSelectedClientId(null);
+        setDateFrom(null);
+        setDateTo(null);
+        SessionHelper.removeObject(KEY_CLIENT_ID);
+        SessionHelper.removeObject(KEY_DATE_FROM_REQ);
+        SessionHelper.removeObject(KEY_DATE_TO_REQ); 
     }
 
     public void setSelectedRequestTypes(List<RequestType> selectedRequestTypes) {
