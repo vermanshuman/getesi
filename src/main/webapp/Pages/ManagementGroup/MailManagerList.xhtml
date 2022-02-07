@@ -60,13 +60,27 @@
             }
 
             function selectAllRowTopTableWV() {
+                var selectedIds = '';
                 if (PF('selectTopAllWV').input.is(':checked')) {
-                    PF('selectBottomAllWV').check();
-                    PF('tableWV').selectAllRows();
+                        $('.rowcheckboxes').each(function () {
+                            if(selectedIds == ''){
+                                selectedIds = $(this).attr("id");
+                            }else {
+                                selectedIds = selectedIds + ","+ $(this).attr("id");
+                            }
+
+                        $(this).find('div.ui-chkbox-box').addClass('ui-state-active');
+                        $(this).find('span.ui-chkbox-icon').addClass('ui-icon-check');
+                    });
+
                 } else {
-                    PF('selectBottomAllWV').uncheck();
-                    PF('tableWV').unselectAllRows()
+                    $('.rowcheckboxes').each(function () {
+                        $(this).find('div.ui-chkbox-box').removeClass('ui-state-active');
+                        $(this).find('span.ui-chkbox-icon').removeClass('ui-icon-check');
+                    });
                 }
+                $('input[name="selectedIds"]').val(selectedIds)
+                onSelectAllInbox();
             }
 
             function selectAllRowBottomTableWV() {
@@ -389,10 +403,15 @@
                                             }
                                             jQuery(document).ready(function() {
                                                 PF('panelSetting').getJQ().hide();
-                                                loadStorage();
-                                                loadSent();
-                                                loadRecieved();
-                                                loadDraft();
+
+                                                // ajaxStop
+
+
+
+                                                // loadStorage();
+                                                // loadSent();
+                                                // loadRecieved();
+                                                // loadDraft();
                                             });
                                             // ]]>
                                         </script>
@@ -403,10 +422,16 @@
                                         <p:remoteCommand name="onPageChange"
                                                          action="#{bean.onPageChange()}" oncomplete="setPageNumber()"/>
                                         <p:remoteCommand name="onRowClick" action="#{bean.rowDblSelectListener}" update="table"/>
+                                        <p:remoteCommand name="onSortHeader" action="#{bean.sortData}" update="table"
+                                                         oncomplete="setHeaderSort()"/>
+
                                         <p:remoteCommand name="handleRowsChange"
                                                          action="#{bean.handleRowsChange()}" oncomplete="setPageNumber()"/>
                                         <p:remoteCommand name="onBottomPageChange"
                                                          action="#{bean.onBottomPageChange()}" oncomplete="setPageNumber()"/>
+
+                                        <p:remoteCommand name="onSelectInbox" action="#{bean.selectInbox()}"/>
+                                        <p:remoteCommand name="onSelectAllInbox" action="#{bean.selectAllInbox()}" update=":form" oncomplete="updatedCheckBoxes()"/>
                                         <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" styleClass="panelSetting" style="display: none;">
                                             <div class="p-grid">
                                                 <div class="p-col-12" style="text-align: center;">
@@ -510,28 +535,28 @@
                                          action="#{bean.filterLetterByOwner}"
                                          styleClass="#{bean.mailManagerButtonSelectedId==3?'selected-button p-mb-2':'cyan-blue-btn p-mb-2'}"
                                          update="form" id="mail_item_3" style="float: right"
-                                         value="#{bean.mailManagerStorage}">
+                                         value="#{bean.getMailManagerSTORAGE()}">
                             <f:setPropertyActionListener value="3" target="#{bean.mailManagerButtonSelectedId}"/>
                         </p:commandButton>
                         <p:commandButton ajax="true" icon="fa fa-spinner" oncomplete="editFormat(false);"
                                          action="#{bean.filterLetterByOwner}"
                                          styleClass="#{bean.mailManagerButtonSelectedId==0?'selected-button p-mr-2 p-mb-2':'cyan-blue-btn p-mr-2 p-mb-2'}"
                                          update="form" id="mail_item_0" style="float: right"
-                                         value="#{bean.mailManagerDraft}">
+                                         value="#{bean.getMailManagerDRAFT()}">
                             <f:setPropertyActionListener value="0" target="#{bean.mailManagerButtonSelectedId}"/>
                         </p:commandButton>
                         <p:commandButton ajax="true" icon="fa fa-arrow-right" oncomplete="editFormat(false);"
                                          action="#{bean.filterLetterByOwner}"
                                          styleClass="#{bean.mailManagerButtonSelectedId==1?'selected-button p-mr-2 p-mb-2':'cyan-blue-btn p-mr-2 p-mb-2'}"
                                          update="form" id="mail_item_1" style="float: right"
-                                         value="#{bean.mailManagerSent}">
+                                         value="#{bean.getMailManagerSENT()}">
                             <f:setPropertyActionListener value="1" target="#{bean.mailManagerButtonSelectedId}"/>
                         </p:commandButton>
                         <p:commandButton ajax="true" icon="fa fa-arrow-left" oncomplete="editFormat(false);"
                                          action="#{bean.filterLetterByOwner}"
                                          styleClass="#{bean.mailManagerButtonSelectedId==2?'selected-button p-mr-2 p-mb-2':'cyan-blue-btn p-mr-2 p-mb-2' }"
                                          update="@form" id="mail_item_2" style="float: right"
-                                         value="#{bean.mailManagerReceived}" escape="false">
+                                         value="#{bean.getMailManagerRECEIVED()}" escape="false">
                             <f:setPropertyActionListener value="2" target="#{bean.mailManagerButtonSelectedId}"/>
                         </p:commandButton>
                         <div style="clear: right"></div>
@@ -547,6 +572,8 @@
                                     <c:set value="${bean.rowsPerPage}" var="rowsPerPage"></c:set>
                                     <h:inputHidden id="numTotalPages" value="#{bean.totalPages}"/>
                                     <h:inputHidden id="entityEditId" value="#{bean.entityEditId}"/>
+                                    <h:inputHidden id="tableHeader" name="tableHeader" value="data_header"/>
+                                    <h:inputHidden id="selectedIds" name="selectedIds" value="#{bean.selectedIds}"/>
                                     <script>
                                         // <![CDATA[
 
@@ -570,6 +597,21 @@
                                             $('.page_' + value).addClass("ui-state-active");
                                             $('.page_bottom_' + value).addClass("ui-state-active");
                                         }
+
+                                        function setHeaderSort(){
+                                            var columnheader = $("[name='tableHeader']").val();
+                                            var cls = $('#' + columnheader).attr("class");
+                                            if(cls == 'ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s ui-icon-triangle-1-n'){
+                                                $('#' + columnheader).removeAttr("class");
+                                                $('#' + columnheader).addClass("ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s ui-icon-triangle-1-s");
+                                            }else {
+                                                if(cls == 'ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s ui-icon-triangle-1-s'){
+                                                    $('#' + columnheader).removeAttr("class");
+                                                    $('#' + columnheader).addClass("ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s ui-icon-triangle-1-n");
+                                                }
+                                            }
+                                        }
+
                                         function loadPerPage() {
                                             handleRowsChange();
                                         }
@@ -627,41 +669,67 @@
                                             $('input[id="entityEditId"]').val(id);
                                             onRowClick();
                                         }
+
+                                        function sortRow(columnheader){
+                                            $('input[id="tableHeader"]').val(columnheader);
+                                            onSortHeader();
+                                        }
+
+                                        function manageSelectInbox(){
+                                            //onSelectInbox();
+                                            updatedCheckBoxes();
+                                        }
+
+                                        function updatedCheckBoxes(){
+                                            var selectedIds = '';
+                                            if (PF('selectTopAllWV').input.is(':checked')) {
+
+                                                $('.rowcheckboxes').each(function () {
+                                                    if(selectedIds == ''){
+                                                        selectedIds = $(this).attr("id");
+                                                    }else {
+                                                        selectedIds = selectedIds + ","+ $(this).attr("id");
+                                                    }
+
+                                                    $(this).find('div.ui-chkbox-box').addClass('ui-state-active');
+                                                    $(this).find('span.ui-chkbox-icon').addClass('ui-icon-check');
+                                                });
+                                                $('input[name="selectedIds"]').val(selectedIds)
+                                            } else {
+                                                $('.rowcheckboxes').each(function () {
+                                                    $(this).find('div.ui-chkbox-box').removeClass('ui-state-active');
+                                                    $(this).find('span.ui-chkbox-icon').removeClass('ui-icon-check');
+                                                });
+                                            }
+                                        }
+
+                                        function disableAll(id){
+
+                                            $('[id^=mail_item_]').each(function() {
+
+                                                if(($(this).attr("id")) != id){
+                                                    console.log(id, 'kkkk', $(this).attr("id"));
+                                                    $(this).attr("disabled", "true");
+                                                }
+                                            });
+                                        }
+
+                                        function enableAll(){
+
+                                            $('[id^=mail_item_]').each(function() {
+                                                $(this).removeAttr('disabled');
+                                            });
+                                        }
+
                                         // ]]>
                                     </script>
                                     <div id="table_paginator_top" class="ui-paginator ui-paginator-top ui-widget-header">
                                         <h:outputText id="totalPages" value="(1 of #{bean.totalPages})"
                                                       styleClass="ui-paginator-current"/>
                                         <h:outputText value="#{bean.pageNavigationStart}" escape="false"/>
-<!--                                        <a href="#" class="ui-paginator-first ui-state-default ui-corner-all ui-state-disabled"-->
-<!--                                           tabindex="-1">-->
-<!--                                            <span class="ui-icon ui-icon-seek-first">F</span>-->
-<!--                                        </a>-->
-<!--                                        <a href="#"-->
-<!--                                           onclick="previousPage()"-->
-<!--                                           aria-label="Previous Page"-->
-<!--                                           class="ui-paginator-prev ui-state-default ui-corner-all">-->
-<!--                                            <span class="ui-icon ui-icon-seek-prev">P</span>-->
-<!--                                        </a>-->
                                         <h:outputText styleClass="ui-paginator-pages" value="#{bean.paginatorString}" escape="false"/>
-                                        <!--                                      <span class="ui-paginator-pages">
-
-                                                                           <c:forEach var="item" begin="#{bean.pageBegin}" end="#{bean.pageEnd}" varStatus="loop">-->
-<!--                                               <c:set value="page_${loop.index}" var="pageId"></c:set>-->
-<!--                                            <a class="ui-paginator-page ui-state-default ui-corner-all" id="${pageId}"-->
-<!--                                            tabindex="0" href="#" onclick="changePage(${item})">${item}</a>-->
-<!--                                         </c:forEach>
-                                     </span>-->
                                         <h:outputText value="#{bean.pageNavigationEnd}" escape="false"/>
-<!--                                <a href="#"	onclick="nextPage()" class="ui-paginator-next ui-state-default ui-corner-all"-->
-<!--                                                                                          aria-label="Next Page"-->
-<!--                                    ><span-->
-<!--                                            class="ui-icon ui-icon-seek-next">N</span></a><a href="#"-->
-<!--                                                                                             class="ui-paginator-last ui-state-default ui-corner-all"-->
-<!--                                                                                             tabindex="0"><span-->
-<!--                                            class="ui-icon ui-icon-seek-end">E</span></a>-->
-                                        <label id="table_rppLabel"
-                                                                                                class="ui-paginator-rpp-label ui-helper-hidden">Rows Per Page</label>
+                                        <label id="table_rppLabel" class="ui-paginator-rpp-label ui-helper-hidden">Rows Per Page</label>
                                         <h:selectOneMenu value = "#{bean.rowsPerPage}" onchange="loadPerPage()" name="table_rppDD" id="table_rppDD">
                                             <f:selectItem itemValue = "15" itemLabel = "15" />
                                             <f:selectItem itemValue = "30" itemLabel = "30" />
@@ -670,47 +738,35 @@
                                         </h:selectOneMenu>
                                     </div>
                                     <div class="ui-datatable-tablewrapper">
-                                        <table >
+                                        <table>
                                             <thead id="table_head">
                                             <tr role="row">
                                                 <th id="table:j_idt93"
                                                     class="ui-state-default ui-selection-column min_padding_margin icon_column"
                                                     role="columnheader" scope="col" style="width: 20px !important;">
-                                                        <span class="ui-column-title"><div id="table:checkTop"
-                                                                                           class="ui-chkbox ui-widget"><div
-                                                                class="ui-helper-hidden-accessible"></div><div
-                                                                class="ui-chkbox-box ui-widget ui-corner-all ui-state-default"><span
-                                                                class="ui-chkbox-icon ui-icon ui-icon-blank ui-c"></span></div></div></span>
-                                                    <div class="ui-chkbox ui-chkbox-all ui-widget">
-                                                        <div class="ui-helper-hidden-accessible"></div>
-                                                        <div class="ui-chkbox-box ui-widget ui-corner-all ui-state-default">
-                                                            <span class="ui-chkbox-icon ui-icon ui-icon-blank ui-c"></span>
-                                                        </div>
-                                                    </div>
+                                                    <p:selectBooleanCheckbox id="checkTop" async="true" widgetVar="selectTopAllWV"
+                                                                             onchange="selectAllRowTopTableWV()"/>
                                                 </th>
                                                 <th id="table:j_idt94"
                                                     class="ui-state-default min_padding_margin icon_column"
                                                     role="columnheader" scope="col" style="width: 20px !important;"><span
                                                         class="ui-column-title">
                                             <span class="fa fa-paperclip"></span></span></th><th id="table:j_idt98" class="ui-state-default min_padding_margin" role="columnheader" scope="col" style="width: 20px"><span class="ui-column-title"></span></th><th id="table:j_idt103" class="ui-state-default min_padding_margin" role="columnheader" scope="col" style="width: 20px"><span class="ui-column-title">
-                                            <i class="fa fa-exclamation" aria-hidden="true"></i></span></th>
+                                            <i class="fa fa-exclamation"></i></span></th>
                                                 <th id="table:sendDate" class="ui-state-default ui-sortable-column"
-                                                    role="columnheader"
-                                                    aria-label="Data: activate to sort column ascending" scope="col"
-                                                    style="width: 120px;" tabindex="0" aria-sort="other"><span
+                                                    scope="col"
+                                                    style="width: 120px;"><span
                                                         class="ui-column-title">Data</span><span
-                                                        class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s"></span>
+                                                        id="date_header" onclick="sortRow('date_header')"
+                                                        class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s ui-icon-triangle-1-s"></span>
                                                 </th>
-                                                <th id="table:emailFrom" class="ui-state-default ui-sortable-column"
-                                                    role="columnheader"
-                                                    aria-label="Mittente: activate to sort column ascending"
+                                                <th class="ui-state-default ui-sortable-column"
+                                                    id="email_from_header" onclick="sortRow('email_from_header')"
                                                     scope="col" style="width: 400px;" tabindex="0"><span
                                                         class="ui-column-title">Mittente</span><span
                                                         class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s"></span>
                                                 </th>
                                                 <th id="table:emailTo" class="ui-state-default ui-sortable-column"
-                                                    role="columnheader"
-                                                    aria-label="Destinatario: activate to sort column ascending"
                                                     scope="col" style="display : none" tabindex="0"><span
                                                         class="ui-column-title">Destinatario</span><span
                                                         class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s"></span>
@@ -722,18 +778,18 @@
                                                     aria-label="Operatore" scope="col"
                                                     style="width: 100px;display: none"><span
                                                         class="ui-column-title">Operatore</span></th>
-                                                <th id="table:state"
-                                                    class="ui-state-default ui-sortable-column min_padding_margin"
-                                                    role="columnheader"
-                                                    aria-label="Stato: activate to sort column ascending"
+                                                <th class="ui-state-default ui-sortable-column min_padding_margin"
+                                                    id="status_header" onclick="sortRow('status_header')"
                                                     scope="col" style="width: 70px;" tabindex="0"><span
                                                         class="ui-column-title">Stato</span><span
                                                         class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s"></span>
                                                 </th>
-                                                <th id="table:j_idt115" class="ui-state-default" role="columnheader"
-                                                    aria-label="Operatore" scope="col"
-                                                    style="width: 100px;"><span
-                                                        class="ui-column-title">Operatore</span></th>
+                                                <c:if test="${bean.needShowChangeStateUser}">
+                                                    <th id="table:j_idt115" class="ui-state-default" scope="col"
+                                                        style="width: 100px;"><span
+                                                            class="ui-column-title">Operatore</span></th>
+                                                </c:if>
+
                                             </tr>
                                             </thead>
                                             <tbody id="table_data" class="ui-datatable-data ui-widget-content">
@@ -772,22 +828,43 @@
                                                 <tr class="ui-widget-content ui-datatable-selectable ${cssClass} ${evenclass}">
                                                     <td style="width: 20px !important;"
                                                         class="ui-selection-column min_padding_margin icon_column">
-                                                        <div class="ui-chkbox ui-widget">
-                                                            <div class="ui-helper-hidden-accessible"><input type="checkbox"
-                                                                                                            name="table_checkbox"/>
-                                                            </div>
-                                                            <div class="ui-chkbox-box ui-widget ui-corner-all ui-state-default">
-                                                                <span class="ui-chkbox-icon ui-icon ui-icon-blank ui-c"></span>
-                                                            </div>
-                                                        </div>
+                                                        <p:selectBooleanCheckbox class="rowcheckboxes" id="mail_item_#{item.id}"
+                                                            onchange="disableAll(this.id)">
+<!--                                                            onchange="manageSelectInbox()">-->
+                                                        <p:ajax event="change"  listener="#{bean.selectInbox(item)}"
+                                                                process="@this"  update=":form"/>
+                                                        </p:selectBooleanCheckbox>
                                                     </td>
                                                     <td style="width: 20px !important;"
-                                                        class="min_padding_margin icon_column" onclick="selectRow(#{item.id})"></td>
-                                                    <td style="width: 20px" class="min_padding_margin" onclick="selectRow(#{item.id})"></td>
-                                                    <td style="width: 20px" class="min_padding_margin" onclick="selectRow(#{item.id})"></td>
-                                                    <td style="width: 120px;" onclick="selectRow(#{item.id})">  <h:outputText value="#{item.sendDateStr}"/></td>
+                                                        class="min_padding_margin icon_column" onclick="selectRow(#{item.id})">
+                                                        <div id="table:51:j_idt96" class="ui-outputpanel ui-widget"
+                                                             onclick="selectRow(#{item.id})">
+                                                            <p:outputPanel rendered="#{item.files}">
+                                                                <h:outputText class="fa fa-paperclip"/>
+                                                            </p:outputPanel>
+                                                        </div>
+                                                    </td>
+
+                                                    <td style="width: 20px" class="min_padding_margin" onclick="selectRow(#{item.id})">
+                                                        <p:outputPanel rendered="#{item.realForward}">
+                                                            <span class="fa fa-share"/>
+                                                        </p:outputPanel>
+                                                        <p:outputPanel rendered="#{item.realResponse}">
+                                                            <span class="fa fa-reply"/>
+                                                        </p:outputPanel>
+                                                    </td>
+
+                                                    <td style="width: 20px" class="min_padding_margin" onclick="selectRow(#{item.id})">
+                                                        <p:outputPanel rendered="#{bean.defaultType.showPriority and not empty item.priorityWrapper
+                                                       and not empty item.priorityWrapper.icon}">
+                                                            <span class="fa #{item.priorityWrapper.icon}"/>
+                                                        </p:outputPanel>
+                                                    </td>
+
+                                                    <td style="width: 120px;" onclick="selectRow(#{item.id})">
+                                                        <h:outputText value="#{item.sendDateStr}"/></td>
                                                     <c:if test="${bean.needShowEmailFrom}">
-                                                        <td style="width: 400px;">  <h:outputText value="#{item.emailFromStr[0]}" id="email_from"/></td>
+                                                        <td style="width: 400px;"  onclick="selectRow(#{item.id})">  <h:outputText value="#{item.emailFromStr[0]}" id="email_from"/></td>
                                                     </c:if>
                                                     <c:if test="${bean.needShowEmailTo}">
                                                         <td>  <h:outputText value="#{item.emailToStr[0]}" id="email_to"/></td>
@@ -814,23 +891,7 @@
                                         <h:outputText id="totalPagesBottom" value="(1 of #{bean.totalPages})" styleClass="ui-paginator-current"/>
                                         <h:outputText value="#{bean.pageNavigationStart}" escape="false"/>
                                         <h:outputText styleClass="ui-paginator-pages" value="#{bean.paginatorString}" escape="false"/>
-<!--                                        <span class="ui-paginator-pages">-->
-
-<!--                                         <c:forEach var="item" begin="1" end="#{bean.rowCount}" varStatus="loop">-->
-<!--                                               <c:set value="page_bottom_${loop.index}" var="pageId"></c:set>-->
-<!--                                            <a class="ui-paginator-page ui-state-default ui-corner-all" id="${pageId}"-->
-<!--                                               tabindex="0" href="#" onclick="changePage(${item})">${item}</a>-->
-<!--                                         </c:forEach>-->
-<!--                                     </span>-->
                                         <h:outputText value="#{bean.pageNavigationEnd}" escape="false"/>
-<!--                                        <a href="#"	onclick="nextPage()"-->
-<!--                                               class="ui-paginator-next ui-state-default ui-corner-all"-->
-<!--                                               aria-label="Next Page"-->
-<!--                                    ><span-->
-<!--                                            class="ui-icon ui-icon-seek-next">N</span></a><a href="#"-->
-<!--                                                                                             class="ui-paginator-last ui-state-default ui-corner-all"-->
-<!--                                                                                             tabindex="0"><span-->
-<!--                                            class="ui-icon ui-icon-seek-end">E</span></a>-->
                                         <label id="table_rppLabel_bottom"
                                                class="ui-paginator-rpp-label ui-helper-hidden">Rows Per Page</label>
                                         <h:selectOneMenu value = "#{bean.rowsPerPage}" onchange="loadPerPage()" name="table_rppDD"

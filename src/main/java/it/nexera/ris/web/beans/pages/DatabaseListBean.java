@@ -10,13 +10,18 @@ import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.Property;
 import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
+import it.nexera.ris.persistence.beans.entities.domain.readonly.WLGInboxShort;
 import it.nexera.ris.persistence.view.FormalityView;
+import it.nexera.ris.persistence.view.RequestView;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.beans.EntityLazyListPageBean;
 import it.nexera.ris.web.beans.wrappers.UploadFilesWithContent;
 import it.nexera.ris.web.beans.wrappers.logic.DocumentWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.FileWrapper;
 import it.nexera.ris.web.common.EntityLazyListModel;
+import it.nexera.ris.web.common.ListPaginator;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.hibernate.Criteria;
@@ -30,10 +35,7 @@ import org.primefaces.component.tabview.TabView;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.TabChangeEvent;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.LazyDataModel;
-import org.primefaces.model.StreamedContent;
-import org.primefaces.model.UploadedFile;
+import org.primefaces.model.*;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -117,7 +119,7 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
     private Long conservatoryFilterId;
 
     private List<SelectItem> conservatories;
-    
+
     private String generalRegisterFilter;
 
     private String particularRegisterFilter;
@@ -209,17 +211,17 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
     private boolean isReportShouldBeGenerated;
 
     private StreamedContent reportFile;
-    
+
     private String filterBirthCity;
-    
+
     private String filterFiscalCode;
-    
+
     private List<SelectItem> codeAndDescription;
-    
+
     private Long annotationDescription;
 
     private List<FileWrapper> importedFiles;
-    
+
     private String cogNome;
 
     private String nome;
@@ -227,10 +229,16 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
     private String subjectBusinessName;
 
     private String subjectFiscalCodeVAT;
-    
+
     private String subjectBirthPlace;
-    
+
     private Date subjectBirthDate;
+
+    private String nominativo;
+
+    @Getter
+    @Setter
+    private ListPaginator paginator;
 
     private void pageLoadStatic() {
     	if (SessionHelper.get("requestFormalityView") != null)
@@ -245,18 +253,33 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
             PersistenceBeanException, InstantiationException,
             IllegalAccessException, IOException {
 
-    	SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
-    	try {
-			setMinimumDate(simpleDateFormat.parse("01/01/1990"));
-		} catch (ParseException e) {
-			LogHelper.log(log, e);
-		}
+        setPaginator(new ListPaginator(10, 1, 1, 1,"ASC", "surname"));
 
-        this.loadList(Subject.class, new Criterion[]{
+    	setMinimumDate(DateTimeHelper.fromString("01/01/1990", DateTimeHelper.getDatePattern(), null));
+
+//        this.loadList(Subject.class, new Criterion[]{
+//                Restrictions.ne("incomplete", true)
+//        }, new Order[]{
+//                Order.asc("surname"), Order.asc("name"), Order.asc("birthDate")
+//        });
+
+        this.setLazyModel(new EntityLazyListModel<>(Subject.class, new Criterion[]{
                 Restrictions.ne("incomplete", true)
-        }, new Order[]{
+        },new Order[]{
                 Order.asc("surname"), Order.asc("name"), Order.asc("birthDate")
-        });
+        }));
+        getLazyModel().load((getPaginator().getTablePage() - 1) * getPaginator().getRowsPerPage(), getPaginator().getRowsPerPage(),
+                getPaginator().getTableSortColumn(),
+                (getPaginator().getTableSortOrder() == null || getPaginator().getTableSortOrder().equalsIgnoreCase("DESC")
+                        || getPaginator().getTableSortOrder().equalsIgnoreCase("UNSORTED")) ? SortOrder.DESCENDING : SortOrder.ASCENDING, new HashMap<>());
+
+        Integer totalPages = (int) Math.ceil((getLazyModel().getRowCount() * 1.0) / getPaginator().getRowsPerPage());
+        if (totalPages == 0)
+            totalPages = 1;
+
+        getPaginator().setRowCount(getLazyModel().getRowCount());
+        getPaginator().setTotalPages(totalPages);
+        getPaginator().setPage(getPaginator().getCurrentPageNumber());
 
         this.setDocumentForUploadVisureRTF(null);
         this.setFileForUploadVisureRTF(null);
@@ -292,14 +315,14 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
         setConservatories(ComboboxHelper.fillList(LandChargesRegistry.class, Order.asc("name")));
         setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name")));
         setCodeAndDescription(ComboboxHelper.fillListDictionary(TypeFormality.class,new Criterion[]{}));
-        
+
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get("activeTabIndex"))) {
             setActiveTabIndex((Integer) SessionHelper.get("activeTabIndex"));
         }
 
-        DataTable dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot()
-                .findComponent("form:tabs:tableSubject");
-        dataTable.setFilters((Map<String, Object>) SessionHelper.get("filtersTableSubject"));
+//        DataTable dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot()
+//                .findComponent("form:tabs:tableSubject");
+//        dataTable.setFilters((Map<String, Object>) SessionHelper.get("filtersTableSubject"));
 
         fillImportedFileList();
     }
@@ -397,7 +420,7 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
         } catch (Exception e) {
         	LogHelper.log(log, e);
         }
-        
+
         if (!ValidationHelper.isNullOrEmpty(getGeneralRegisterFilter())) {
             criterionList.add(Restrictions.ilike("generalRegister", getGeneralRegisterFilter(),
                     MatchMode.EXACT));
@@ -426,20 +449,40 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
         this.setLazyFormalityModel(new EntityLazyListModel<>(FormalityView.class,
                 criterionList.toArray(new Criterion[0]), new Order[]{}));
     }
-    
+
     public void filterSubjectTable() {
 
-        if(ValidationHelper.isNullOrEmpty(this.getCogNome()) && 
+        if(ValidationHelper.isNullOrEmpty(this.getNominativo()) &&
+                ValidationHelper.isNullOrEmpty(this.getCogNome()) &&
                 ValidationHelper.isNullOrEmpty(this.getNome()) &&
                 ValidationHelper.isNullOrEmpty(this.getSubjectBusinessName()) &&
                 ValidationHelper.isNullOrEmpty(this.getSubjectFiscalCodeVAT())&&
                 ValidationHelper.isNullOrEmpty(this.getSubjectBirthPlace()) &&
                 ValidationHelper.isNullOrEmpty(this.getSubjectBirthDate()) ) {
-            this.loadList(Subject.class, new Criterion[]{
+//            this.loadList(Subject.class, new Criterion[]{
+//                    Restrictions.ne("incomplete", true)
+//            }, new Order[]{
+//                    Order.asc("surname"), Order.asc("name"), Order.asc("birthDate")
+//            });
+
+            this.setLazyModel(new EntityLazyListModel<>(Subject.class, new Criterion[]{
                     Restrictions.ne("incomplete", true)
-            }, new Order[]{
+            },new Order[]{
                     Order.asc("surname"), Order.asc("name"), Order.asc("birthDate")
-            });
+            }));
+            getLazyModel().load((getPaginator().getTablePage() - 1) * getPaginator().getRowsPerPage(), getPaginator().getRowsPerPage(),
+                    getPaginator().getTableSortColumn(),
+                    (getPaginator().getTableSortOrder() == null || getPaginator().getTableSortOrder().equalsIgnoreCase("DESC")
+                            || getPaginator().getTableSortOrder().equalsIgnoreCase("UNSORTED")) ? SortOrder.DESCENDING : SortOrder.ASCENDING, new HashMap<>());
+
+            Integer totalPages = (int) Math.ceil((getLazyModel().getRowCount() * 1.0) / getPaginator().getRowsPerPage());
+            if (totalPages == 0)
+                totalPages = 1;
+
+            getPaginator().setRowCount(getLazyModel().getRowCount());
+            getPaginator().setTotalPages(totalPages);
+            getPaginator().setPage(getPaginator().getCurrentPageNumber());
+
         }else {
 
             boolean showPopup = false;
@@ -472,7 +515,7 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
             if(!ValidationHelper.isNullOrEmpty(criterionList)){
                 List<ReportFormalitySubject> reportFormalitySubjects = null;
                 try {
-                    reportFormalitySubjects = DaoManager.load(ReportFormalitySubject.class, 
+                    reportFormalitySubjects = DaoManager.load(ReportFormalitySubject.class,
                             criterionList.toArray(new Criterion[0]));
                 } catch (Exception e) {
                     LogHelper.log(log, e);
@@ -504,7 +547,7 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
                 if(!ValidationHelper.isNullOrEmpty(criterionList)){
                     List<VisureRTF> visureRTFs = null;
                     try {
-                        visureRTFs = DaoManager.load(VisureRTF.class, 
+                        visureRTFs = DaoManager.load(VisureRTF.class,
                                 criterionList.toArray(new Criterion[0]));
                     } catch (Exception e) {
                         LogHelper.log(log, e);
@@ -535,7 +578,7 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
                 if(!ValidationHelper.isNullOrEmpty(criterionList)){
                     List<VisureDH> visureDHs = null;
                     try {
-                        visureDHs = DaoManager.load(VisureDH.class, 
+                        visureDHs = DaoManager.load(VisureDH.class,
                                 criterionList.toArray(new Criterion[0]));
                     } catch (Exception e) {
                         LogHelper.log(log, e);
@@ -549,45 +592,66 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
 
             criterionList.clear();
 
-            if (!ValidationHelper.isNullOrEmpty(getNome())) {
-                criterionList.add(Restrictions.ilike("name", getNome(),
-                        MatchMode.ANYWHERE));
+            if (!ValidationHelper.isNullOrEmpty(getNominativo())) {
+                criterionList.add(Restrictions.or(
+                        Restrictions.ilike("name", getNominativo(), MatchMode.ANYWHERE),
+                        Restrictions.ilike("surname", getNominativo(), MatchMode.ANYWHERE),
+                        Restrictions.ilike("businessName", getNominativo(), MatchMode.ANYWHERE)));
             }
 
-            if (!ValidationHelper.isNullOrEmpty(getCogNome())) {
-                criterionList.add(Restrictions.ilike("surname", getCogNome(),
-                        MatchMode.ANYWHERE));
-            }
-
-            if (!ValidationHelper.isNullOrEmpty(getSubjectBusinessName())) {
-                criterionList.add(Restrictions.ilike("businessName", getSubjectBusinessName(),
-                        MatchMode.ANYWHERE));
-            }
+//            if (!ValidationHelper.isNullOrEmpty(getCogNome())) {
+//                criterionList.add(Restrictions.ilike("surname", getCogNome(),
+//                        MatchMode.ANYWHERE));
+//            }
+//
+//            if (!ValidationHelper.isNullOrEmpty(getSubjectBusinessName())) {
+//                criterionList.add(Restrictions.ilike("businessName", getSubjectBusinessName(),
+//                        MatchMode.ANYWHERE));
+//            }
 
             if (!ValidationHelper.isNullOrEmpty(getSubjectFiscalCodeVAT())) {
                 criterionList.add(Restrictions.or(Restrictions.ilike("fiscalCode", getSubjectFiscalCodeVAT(),
                         MatchMode.ANYWHERE),Restrictions.ilike("numberVAT", getSubjectFiscalCodeVAT(),
                                 MatchMode.ANYWHERE)));
             }
-            
+
             if (!ValidationHelper.isNullOrEmpty(getSubjectBirthPlace())) {
 
                 criterionList.add(Restrictions.ilike("b.description", getSubjectBirthPlace(),
                         MatchMode.ANYWHERE));
             }
-            
+
             if (!ValidationHelper.isNullOrEmpty(this.getSubjectBirthDate())) {
-                criterionList.add(Restrictions.eq("birthDate", getFilterBirthDate()));
+
+                criterionList.add(Restrictions.eq("birthDate", getSubjectBirthDate()));
             }
 
             criterionList.add( Restrictions.ne("incomplete", true));
 
-            this.loadList(Subject.class, criterionList.toArray(new Criterion[0]), 
-                    new Order[]{
-                            Order.asc("surname"), Order.asc("name"), Order.asc("birthDate")
+//            this.loadList(Subject.class, criterionList.toArray(new Criterion[0]),
+//                    new Order[]{
+//                            Order.asc("surname"), Order.asc("name"), Order.asc("birthDate")
+//            }, new CriteriaAlias[]{
+//                    new CriteriaAlias("birthCity", "b", JoinType.INNER_JOIN)
+//            });
+
+            this.setLazyModel(new EntityLazyListModel<>(Subject.class, criterionList.toArray(new Criterion[0]),new Order[]{
+                    Order.asc("surname"), Order.asc("name"), Order.asc("birthDate")
             }, new CriteriaAlias[]{
-                    new CriteriaAlias("birthCity", "b", JoinType.INNER_JOIN)
-            });
+                            new CriteriaAlias("birthCity", "b", JoinType.INNER_JOIN)
+                    }));
+            getLazyModel().load((getPaginator().getTablePage() - 1) * getPaginator().getRowsPerPage(), getPaginator().getRowsPerPage(),
+                    getPaginator().getTableSortColumn(),
+                    (getPaginator().getTableSortOrder() == null || getPaginator().getTableSortOrder().equalsIgnoreCase("DESC")
+                            || getPaginator().getTableSortOrder().equalsIgnoreCase("UNSORTED")) ? SortOrder.DESCENDING : SortOrder.ASCENDING, new HashMap<>());
+            Integer totalPages = (int) Math.ceil((getLazyModel().getRowCount() * 1.0) / getPaginator().getRowsPerPage());
+            if (totalPages == 0)
+                totalPages = 1;
+
+            getPaginator().setRowCount(getLazyModel().getRowCount());
+            getPaginator().setTotalPages(totalPages);
+            getPaginator().setPage(getPaginator().getCurrentPageNumber());
+
 
             if(showPopup) {
                 executeJS("PF('vecchiDatiWV').show()");
@@ -1155,13 +1219,13 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
             }
         }
     }
-    
+
     public void clearUploadedFile() {
     	this.setDocumentForUploadVisureRTF(null);
     	this.setFileForUploadVisureRTF(null);
     	this.setVisureFileName(null);
     }
-    
+
     public void onFilterTableSubject(AjaxBehaviorEvent event) {
         DataTable table = (DataTable) event.getSource();
         SessionHelper.put("filtersTableSubject", table.getFilters());
@@ -1800,8 +1864,108 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
         return currentDate.getTime();
     }
 
+    public void clearFiltraPanel() {
+        setSubjectBirthPlace(null);
+        setSubjectBirthDate(null);
+    }
+
+    public void handleRowsChange() {
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>" + FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap());
+        String rowsPerPage = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("tabs:rowsPerPageSelected");
+        if (!ValidationHelper.isNullOrEmpty(rowsPerPage))
+            getPaginator().setRowsPerPage(Integer.parseInt(rowsPerPage));
+
+        Integer totalPages = getPaginator().getRowCount() / getPaginator().getRowsPerPage();
+        Integer pageEnd = 10;
+        if (pageEnd < totalPages)
+            pageEnd = totalPages;
+        StringBuilder builder = new StringBuilder();
+        for (int i = 1; i <= pageEnd; i++) {
+            builder.append("<a class=\"ui-paginator-page ui-state-default ui-corner-all page_" + i + "\"");
+            builder.append("tabindex=\"0\" href=\"#\" onclick=\"changePage(" + i + ",event)\">" + i + "</a>");
+        }
+        getPaginator().setPaginatorString(builder.toString());
+        filterSubjectTable();
+    }
+
+    public void onPageChange() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        String rowsPerPage = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("tabs:rowsPerPageSelected");
+        String pageNumber = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("tabs:pageNumber");
+        if (!ValidationHelper.isNullOrEmpty(rowsPerPage))
+            getPaginator().setRowsPerPage(Integer.parseInt(rowsPerPage));
+        if (!ValidationHelper.isNullOrEmpty(pageNumber)) {
+            Integer currentPage = Integer.parseInt(pageNumber);
+            getPaginator().setCurrentPageNumber(currentPage);
+            StringBuilder builder = new StringBuilder();
+            String cls = "ui-paginator-first ui-state-default ui-corner-all";
+            if (currentPage == 1) {
+                cls += " ui-state-disabled";
+            }
+            builder.append("<a href=\"#\" class=\"" + cls + "\"");
+            builder.append(" tabindex=\"-1\" onclick=\"firstPage(event)\">\n");
+            builder.append("<span class=\"ui-icon ui-icon-seek-first\">F</span>\n</a>\n");
+            builder.append("<a href=\"#\" onclick=\"previousPage(event)\"");
+            cls = "ui-paginator-prev ui-corner-all";
+            if (currentPage == 1) {
+                cls += " ui-state-disabled";
+            }
+            builder.append(" class=\"" + cls + "\"");
+            builder.append(" tabindex=\"-1\">\n");
+            builder.append("<span class=\"ui-icon ui-icon-seek-prev\">P</span>\n</a>\n");
+
+            getPaginator().setPageNavigationStart(builder.toString());
+            if (currentPage == getPaginator().getTotalPages()) {
+                builder.setLength(0);
+                builder.append("<a href=\"#\" class=\"ui-paginator-next ui-state-default ui-corner-all ui-state-disabled\"");
+                builder.append(" tabindex=\"0\">\n");
+                builder.append("<span class=\"ui-icon ui-icon-seek-next\">N</span>\n</a>\n");
+                builder.append("<a href=\"#\"");
+                builder.append(" class=\"ui-paginator-last ui-state-default ui-corner-all ui-state-disabled\" tabindex=\"-1\">\n");
+                builder.append("<span class=\"ui-icon ui-icon-seek-end\">E</span>\n</a>\n");
+                getPaginator().setPageNavigationEnd(builder.toString());
+            } else {
+                builder.setLength(0);
+                builder.append("<a href=\"#\" class=\"ui-paginator-next ui-state-default ui-corner-all\"  onclick=\"nextPage(event)\"");
+                builder.append(" tabindex=\"0\">\n");
+                builder.append("<span class=\"ui-icon ui-icon-seek-next\">N</span>\n</a>\n");
+                builder.append("<a href=\"#\"");
+                builder.append(" class=\"ui-paginator-last ui-state-default ui-corner-all\" tabindex=\"-1\" onclick=\"lastPage(event)\">\n");
+                builder.append("<span class=\"ui-icon ui-icon-seek-end\">E</span>\n</a>\n");
+                getPaginator().setPageNavigationEnd(builder.toString());
+            }
+            getPaginator().setTablePage(currentPage);
+            filterSubjectTable();
+        }
+    }
+
+    public void sortData() {
+        String tableHeader = FacesContext.getCurrentInstance().
+                getExternalContext().getRequestParameterMap().get("tabs:tableHeader");
+
+        if(!ValidationHelper.isNullOrEmpty(tableHeader)){
+            String sortOrder = getPaginator().getTableSortOrder();
+            if(sortOrder.equalsIgnoreCase("DESC") || sortOrder.equalsIgnoreCase("UNSORTED")){
+                getPaginator().setTableSortOrder("ASC");
+            }else {
+                getPaginator().setTableSortOrder("DESC");
+            }
+            if(tableHeader.equalsIgnoreCase("nominativo_header")){
+                if(sortOrder.equalsIgnoreCase("DESC") || sortOrder.equalsIgnoreCase("UNSORTED")){
+                    ((List<Subject>)getLazyModel().getWrappedData())
+                            .sort(Comparator.comparing(Subject::getFullName).reversed());
+                }else {
+                    ((List<Subject>)getLazyModel().getWrappedData())
+                            .sort(Comparator.comparing(Subject::getFullName));
+                }
+            }else if(tableHeader.equalsIgnoreCase("fiscal_code_header")){
+                getPaginator().setTableSortColumn("fiscalCode");
+                filterSubjectTable();
+            }
+        }
+    }
+
     public boolean standardContainsFilterForStringColumn(Object columnValue, Object filterValue, Locale locale) {
-        
+
         return columnValue.toString().contains(filterValue.toString());
     }
 
@@ -1885,7 +2049,7 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
     public String getSubjectBusinessName() {
         return subjectBusinessName;
     }
-   
+
     public String getSubjectFiscalCodeVAT() {
         return subjectFiscalCodeVAT;
     }
@@ -1912,5 +2076,13 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
     }
     public void setSubjectBirthPlace(String subjectBirthPlace) {
         this.subjectBirthPlace = subjectBirthPlace;
+    }
+
+    public String getNominativo() {
+        return nominativo;
+    }
+
+    public void setNominativo(String nominativo) {
+        this.nominativo = nominativo;
     }
 }
