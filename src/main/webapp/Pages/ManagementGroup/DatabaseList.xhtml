@@ -180,86 +180,100 @@
                     <p:remoteCommand name="onPageChange"
                                      action="#{bean.onPageChange()}" update="tabs:tableSubject" oncomplete="setPageNumber()"/>
                     <p:remoteCommand name="onSortHeader" action="#{bean.sortData}" update="tabs:tableSubject" oncomplete="setHeaderSort()"/>
+                    
+                    
                     <div class="p-col-12" style="padding-top: 0px;padding-bottom: 0px;">
-                        <div class="p-formgroup-inline alignEnd">
-                            <div class="p-field">
-                                <p:inputText value="#{bean.nominativo}" id="nominativo"
-                                             placeholder="#{msg.databaseListName}" style=" width: 300px !important;"/>
-                            </div>
-                            <div class="p-field">
-                                <p:inputText id="subjectFiscalCodeVAT" value="#{bean.subjectFiscalCodeVAT}"
-                                             placeholder="#{msg.databaseListSubjectFiscalCodeVAT}"
-                                             style=" width: 300px !important;"/>
-                            </div>
-                            <div class="p-field">
-                                <p:commandButton id="cercaButton" onclick="filterTableSubject();"
-                                                 update="searchPanel" icon="ui-icon ui-icon-search pi pi-search"
-                                                 styleClass="searchPanelButton"/>
-                            </div>
-                            <div class="settingsBlock">
-                                <p:commandButton id="settingButton" onclick="togglePanel();" type="button"
-                                                 icon="ui-icon ui-icon-search pi pi-sliders-h"
-                                                 styleClass="searchPanelButton"/>
-
-                                <script type="text/javascript">
-                                    // <![CDATA[
-                                    $("body").click(function (e) {
-                                        var target = $(e.target);
-                                        if (!target.parents('#settingButton').length && !target.parents('#tabs\\:settingButton').length &&
-                                            !target.parents('.ui-selectcheckboxmenu-panel').length && !target.parents('#tabs\\:settingPanel').length) {
-                                            PF('panelSetting').getJQ().hide();
-                                        }
-
-                                    });
-
-                                    function togglePanel() {
-                                        PF('panelSetting').getJQ().toggle();
-                                    }
-
-                                    jQuery(document).ready(function () {
-                                        PF('panelSetting').getJQ().hide();
-                                    });
-                                    // ]]>
-                                </script>
-                                <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true"
-                                         styleClass="panelSetting" style="display: none;">
-                                    <div class="p-grid">
-                                        <div class="p-col-12" style="text-align: center;">
-                                            <h2>Filtra per</h2>
-                                        </div>
-                                        <div class="p-col-6">
-                                            <p:inputText value="#{bean.subjectBirthPlace}" style="width: calc( 100% - 10px);"
-                                                         placeholder="#{msg.databaseListSubjectCity}"
-                                                         styleClass="#{bean.subjectBirthPlace ne null ? 'calender-filled' : ''}"/>
-
-                                        </div>
-                                        <div class="p-col-6">
-                                            <p:calendar id="subjectBirthDate" readonlyInput="false" showOn="button"
-                                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
-                                                        pattern="dd/MM/yyyy" mask="true"
-                                                        locale="it" navigator="true" popupIconOnly="true"
-                                                        placeholder="#{msg.databaseListSubjectBirthDate}"
-                                                        value="#{bean.subjectBirthDate}"
-                                                        styleClass="#{bean.subjectBirthDate ne null ? 'calender-filled' : ''}">
-                                                <p:ajax event="dateSelect" update="@this"/>
-                                            </p:calendar>
-                                        </div>
-                                        <div class="p-col-12" style="text-align: center;">
-                                            <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}"
-                                                             style="background: #00CC52;margin-right: 20px;"
-                                                             id="subjectSearchButton"
-                                                             onclick="filterTableSubject();" update="searchPanel"
-                                                             oncomplete="PF('panelSetting').getJQ().hide()"/>
-                                            <p:commandButton id="manageReestablishBtn"
-                                                             value="#{ff:upper(msg.mailManageReestablish)}"
-                                                             actionListener="#{bean.clearFiltraPanel}"
-                                                             update="settingPanel"
-                                                             oncomplete="filterTableSubject();PF('panelSetting').getJQ().hide()"/>
-                                        </div>
-                                    </div>
-                                </p:panel>
-                            </div>
-                        </div>
+                    	<div class="p-grid">
+	                    	<div class="p-col-6">
+	                            <div class="p-formgroup-inline">
+	                                <div class="p-field">
+	                                    <p:commandButton value="#{msg.newItem}" styleClass="ui-button-success search-btn new-button" action="#{bean.createNewSubject}"/>
+	                                </div>
+	                               
+	                            </div>
+	                        </div>
+	                        <div class="p-col-6">
+		                    	<div class="p-formgroup-inline alignEnd">
+		                            <div class="p-field">
+		                                <p:inputText value="#{bean.nominativo}" id="nominativo"
+		                                             placeholder="#{msg.databaseListName}" style=" width: 300px !important;"/>
+		                            </div>
+		                            <div class="p-field">
+		                                <p:inputText id="subjectFiscalCodeVAT" value="#{bean.subjectFiscalCodeVAT}"
+		                                             placeholder="#{msg.databaseListSubjectFiscalCodeVAT}"
+		                                             style=" width: 300px !important;"/>
+		                            </div>
+		                            <div class="p-field">
+		                                <p:commandButton id="cercaButton" onclick="filterTableSubject();"
+		                                                 update="searchPanel" icon="ui-icon ui-icon-search pi pi-search"
+		                                                 styleClass="searchPanelButton"/>
+		                            </div>
+		                            <div class="settingsBlock">
+		                                <p:commandButton id="settingButton" onclick="togglePanel();" type="button"
+		                                                 icon="ui-icon ui-icon-search pi pi-sliders-h"
+		                                                 styleClass="searchPanelButton"/>
+		
+		                                <script type="text/javascript">
+		                                    // <![CDATA[
+		                                    $("body").click(function (e) {
+		                                        var target = $(e.target);
+		                                        if (!target.parents('#settingButton').length && !target.parents('#tabs\\:settingButton').length &&
+		                                            !target.parents('.ui-selectcheckboxmenu-panel').length && !target.parents('#tabs\\:settingPanel').length) {
+		                                            PF('panelSetting').getJQ().hide();
+		                                        }
+		
+		                                    });
+		
+		                                    function togglePanel() {
+		                                        PF('panelSetting').getJQ().toggle();
+		                                    }
+		
+		                                    jQuery(document).ready(function () {
+		                                        PF('panelSetting').getJQ().hide();
+		                                    });
+		                                    // ]]>
+		                                </script>
+		                                <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true"
+		                                         styleClass="panelSetting" style="display: none;">
+		                                    <div class="p-grid">
+		                                        <div class="p-col-12" style="text-align: center;">
+		                                            <h2>Filtra per</h2>
+		                                        </div>
+		                                        <div class="p-col-6">
+		                                            <p:inputText value="#{bean.subjectBirthPlace}" style="width: calc( 100% - 10px);"
+		                                                         placeholder="#{msg.databaseListSubjectCity}"
+		                                                         styleClass="#{bean.subjectBirthPlace ne null ? 'calender-filled' : ''}"/>
+		
+		                                        </div>
+		                                        <div class="p-col-6">
+		                                            <p:calendar id="subjectBirthDate" readonlyInput="false" showOn="button"
+		                                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+		                                                        pattern="dd/MM/yyyy" mask="true"
+		                                                        locale="it" navigator="true" popupIconOnly="true"
+		                                                        placeholder="#{msg.databaseListSubjectBirthDate}"
+		                                                        value="#{bean.subjectBirthDate}"
+		                                                        styleClass="#{bean.subjectBirthDate ne null ? 'calender-filled' : ''}">
+		                                                <p:ajax event="dateSelect" update="@this"/>
+		                                            </p:calendar>
+		                                        </div>
+		                                        <div class="p-col-12" style="text-align: center;">
+		                                            <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}"
+		                                                             style="background: #00CC52;margin-right: 20px;"
+		                                                             id="subjectSearchButton"
+		                                                             onclick="filterTableSubject();" update="searchPanel"
+		                                                             oncomplete="PF('panelSetting').getJQ().hide()"/>
+		                                            <p:commandButton id="manageReestablishBtn"
+		                                                             value="#{ff:upper(msg.mailManageReestablish)}"
+		                                                             actionListener="#{bean.clearFiltraPanel}"
+		                                                             update="settingPanel"
+		                                                             oncomplete="filterTableSubject();PF('panelSetting').getJQ().hide()"/>
+		                                        </div>
+		                                    </div>
+		                                </p:panel>
+		                            </div>
+                        		</div>
+                        	</div>
+                        </div>	
                     </div>
                     <!--                    <p:panelGrid columns="6"-->
                     <!--						columnClasses="ui-g-12 ui-md-2,ui-g-12 ui-md-2,ui-g-12 ui-md-2,ui-g-12 ui-md-2,ui-g-12 ui-md-2,ui-g-12 ui-md-2"-->
@@ -295,6 +309,7 @@
                     <!--                        <h:outputText/>-->
                     <!--                        <p:commandButton value="#{msg.databaseListRealEstateSearch}" onclick="filterTableSubject();" />-->
                     <!--                    </p:panelGrid>-->
+                    
                 </p:outputPanel>
 
                 <p:panel id="tableSubject" styleClass="ui-datatable ui-widget" widgetVar="tableWV">
