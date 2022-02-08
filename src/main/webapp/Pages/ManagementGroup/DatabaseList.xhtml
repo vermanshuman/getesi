@@ -14,6 +14,12 @@
     <ui:param name="centerPartStyleClass" value="false"/>
     <ui:define name="list_body">
         <style type="text/css">
+        	body .ui-dialog .ui-dialog-titlebar {
+			    padding: 0;
+			}
+			body .ui-dialog .ui-dialog-content {
+			    padding: 2rem 1.5rem 2rem 1.5rem;
+			}
             .customFilter span:nth-child(2) {
                 display: none !important;
             }
@@ -371,7 +377,7 @@
 
                                 <th     colspan="3"
                                         class="ui-state-default min_padding_margin"
-                                        role="columnheader" scope="col" style="width: 10px !important;"><span
+                                        role="columnheader" scope="col" style="width: 0px !important;padding: 0px 10px 0px 10px !important;"><span
                                         class="ui-column-title">
                                             #{msg.actions}</span>
                                 </th>
@@ -409,7 +415,7 @@
                                         <h:outputText value="#{item.birthDate}" converter="dateTimeConverter"/>
                                     </td>
 
-                                    <td style="width: 10px !important;"
+                                    <td style="width: 0px !important;"
                                         class="ui-selection-column min_padding_margin icon_column">
                                         <p:commandButton icon="ui-icon pi pi-pencil" update=":form" action="#{bean.editEntity}">
                                             <f:setPropertyActionListener value="#{item.id}"
@@ -417,7 +423,7 @@
                                         </p:commandButton>
                                     </td>
 
-                                    <td style="width: 10px !important;"
+                                    <td style="width: 0px !important;"
                                         class="ui-selection-column min_padding_margin icon_column">
                                         <p:commandButton icon="ui-icon pi pi-search" update=":form"
                                                          action="#{bean.viewEntity}">
@@ -426,7 +432,7 @@
                                         </p:commandButton>
                                     </td>
 
-                                    <td style="width: 10px !important;"
+                                    <td style="width: 0px !important;"
                                         class="ui-selection-column min_padding_margin icon_column">
                                         <p:commandButton icon="ui-icon pi pi-times" update=":form"
                                                          oncomplete="PF('dlg2').show()" styleClass="red-btn">
@@ -1325,7 +1331,7 @@
             #{msg.deleteConfirmation}<br/>
             <br/>
             <div class="btn_line">
-                <p:commandButton value="#{msg.confirm}" action="#{bean.deleteEntity}" style="margin-right: 1cm;background-color: #00CC52!important;"
+                <p:commandButton value="#{msg.confirm}" action="#{bean.deleteEntity}" style="margin-right: 10px;background-color: #00CC52!important;"
                                  oncomplete="PF('dlg2').hide()" update="tabs:tableSubject,:form:messages"/>
                 <p:commandButton value="#{msg.cancel}" onclick="PF('dlg2').hide()" style="background-color: #F3362B !important;"/>
             </div>

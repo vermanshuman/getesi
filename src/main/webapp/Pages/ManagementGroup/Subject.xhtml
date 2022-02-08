@@ -260,13 +260,13 @@
     <ui:define name="additional_buttons">
         <p:commandButton value="#{msg.edit}" rendered="#{bean.onlyView}"
                          update=":form" action="#{bean.editSubject}"
-                         icon="ui-icon ui-icon-pencil"/>
+                         icon="ui-icon ui-icon-pencil" style="background-color: #00CC52 !important; margin-right: 10px;"/>
         <p:commandButton value="#{msg.save}" rendered="#{not bean.showSave}"
                          update=":form" action="#{bean.saveFromDialog}"
                          icon="ui-icon ui-icon-disk"/>
         <p:commandButton action="#{bean.closeDialog}"
                          rendered="#{not bean.showCancel}" value="#{msg.cancel}"
-                         icon="ui-icon-circle-close"/>
+                         icon="ui-icon-circle-close" style="background-color: #F3362B !important"/>
     </ui:define>
 
 </ui:composition>
