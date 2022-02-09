@@ -260,7 +260,7 @@
     <ui:define name="additional_buttons">
         <p:commandButton value="#{msg.edit}" rendered="#{bean.onlyView}"
                          update=":form" action="#{bean.editSubject}"
-                         icon="ui-icon ui-icon-pencil" style="background-color: #00CC52 !important; margin-right: 10px;"/>
+                         con="ui-icon ui-icon-pencil" style="background-color: #00CC52 !important; margin-right: 10px;"/>
         <p:commandButton value="#{msg.save}" rendered="#{not bean.showSave}"
                          update=":form" action="#{bean.saveFromDialog}"
                          icon="ui-icon ui-icon-disk"/>
