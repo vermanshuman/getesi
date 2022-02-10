@@ -47,6 +47,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -235,6 +237,8 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
     @Getter
     @Setter
     private String cityColumnFilter;
+    
+    private Date birthDateColumnFilter;
 
     @Getter
     @Setter
@@ -460,7 +464,8 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
                 ValidationHelper.isNullOrEmpty(this.getSubjectFiscalCodeVAT()) &&
                 ValidationHelper.isNullOrEmpty(this.getSubjectBirthPlace()) &&
                 ValidationHelper.isNullOrEmpty(this.getSubjectBirthDate()) &&
-                ValidationHelper.isNullOrEmpty(this.getCityColumnFilter())) {
+                ValidationHelper.isNullOrEmpty(this.getCityColumnFilter()) &&
+                ValidationHelper.isNullOrEmpty(this.getBirthDateColumnFilter())) {
 //            this.loadList(Subject.class, new Criterion[]{
 //                    Restrictions.ne("incomplete", true)
 //            }, new Order[]{
@@ -637,9 +642,17 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
                                 MatchMode.ANYWHERE)));
             }
 
-            if (!ValidationHelper.isNullOrEmpty(this.getSubjectBirthDate())) {
-
+            if (!ValidationHelper.isNullOrEmpty(this.getSubjectBirthDate()) && ValidationHelper.isNullOrEmpty(this.getBirthDateColumnFilter())) {
                 criterionList.add(Restrictions.eq("birthDate", getSubjectBirthDate()));
+            }
+            
+            if (ValidationHelper.isNullOrEmpty(this.getSubjectBirthDate()) && !ValidationHelper.isNullOrEmpty(this.getBirthDateColumnFilter())) {
+                criterionList.add(Restrictions.eq("birthDate", getBirthDateColumnFilter()));
+            }
+            
+            if (!ValidationHelper.isNullOrEmpty(this.getSubjectBirthDate()) && !ValidationHelper.isNullOrEmpty(this.getBirthDateColumnFilter())) {
+                criterionList.add(Restrictions.and(Restrictions.eq("birthDate", getSubjectBirthDate()),
+                        Restrictions.eq("birthDate", getBirthDateColumnFilter())));
             }
 
             criterionList.add(Restrictions.ne("incomplete", true));
@@ -1983,7 +1996,10 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
     }
 
     public void filterCity() {
-        System.out.println("filterCity" + getCityColumnFilter());
+        filterSubjectTable();
+    }
+    
+    public void filterColumnBirthDate() throws ParseException {
         filterSubjectTable();
     }
 
@@ -2103,6 +2119,14 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
     public void setSubjectBirthDate(Date subjectBirthDate) {
         this.subjectBirthDate = subjectBirthDate;
     }
+    
+    public Date getBirthDateColumnFilter() {
+		return birthDateColumnFilter;
+	}
+
+	public void setBirthDateColumnFilter(Date birthDateColumnFilter) {
+		this.birthDateColumnFilter = birthDateColumnFilter;
+	}
 
     public String getSubjectBirthPlace() {
         return subjectBirthPlace;
@@ -2119,4 +2143,5 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
     public void setNominativo(String nominativo) {
         this.nominativo = nominativo;
     }
+
 }

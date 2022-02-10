@@ -377,6 +377,14 @@
                                             #{msg.databaseListSubjectBirthDate}</span><span
                                         id="birth_date_header" onclick="sortRow('birth_date_header')"
                                         class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s ui-icon-triangle-1-s"></span>
+                                                                                
+                                        <p:calendar id="birthDateColumnFilter" readonlyInput="false" popupIconOnly="true"
+                                        pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" showOn="button"
+                                        placeholder="" value="#{bean.birthDateColumnFilter}">
+                                        
+	                                        <p:ajax event="dateSelect" listener="#{bean.filterColumnBirthDate}" update="tabs:tableSubject"/>
+	                                        <p:ajax event="change" listener="#{bean.filterColumnBirthDate}" update="tabs:tableSubject"/>
+                                         </p:calendar>
                                 </th>
 
                                 <th     colspan="3"
