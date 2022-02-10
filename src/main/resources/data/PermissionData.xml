@@ -1061,4 +1061,24 @@
         <module_code>FSL</module_code>
         <role_id>2</role_id>
     </data_entry>
+    <data_entry>
+        <can_create>true</can_create>
+        <can_list>true</can_list>
+        <can_list_created_by_user>true</can_list_created_by_user>
+        <can_view>true</can_view>
+        <can_edit>true</can_edit>
+        <can_delete>true</can_delete>
+        <module_code>TRL</module_code>
+        <role_id>1</role_id>
+    </data_entry>
+    <data_entry>
+        <can_create>true</can_create>
+        <can_list>true</can_list>
+        <can_list_created_by_user>true</can_list_created_by_user>
+        <can_view>true</can_view>
+        <can_edit>true</can_edit>
+        <can_delete>true</can_delete>
+        <module_code>TRL</module_code>
+        <role_id>2</role_id>
+    </data_entry>
 </permission>

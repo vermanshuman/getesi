@@ -742,6 +742,8 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
             }else {
                 result = ValidationHelper.isNullOrEmpty(request.getTotalCost()) ? 0d
                         : Double.parseDouble(request.getTotalCost().replaceAll(",", "."));
+                //double calculatedTotalCost = new CostCalculationHelper(request).calculateTotalCost(Boolean.TRUE);
+                //System.out.println(calculatedTotalCost + ">>>>>>>>>>>>>>> " + result);
             }
             row.createCell(11, CellType.NUMERIC).setCellValue(result);
         }else {

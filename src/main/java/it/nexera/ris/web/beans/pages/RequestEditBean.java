@@ -27,6 +27,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.sql.JoinType;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
@@ -459,6 +460,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             }
         }
         setWrapper(new RequestWrapper(getEntity(), isMultipleCreate()));
+
         setSubject(getEntity().getSubject() != null ? getEntity().getSubject() : new Subject());
         setResidence(getEntity().getResidence() != null ? getEntity().getResidence() : new Residence());
         setDomicile(getEntity().getDomicile() != null ? getEntity().getDomicile() : new Residence());
@@ -1296,7 +1298,17 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }
 
         if (getSubject() != null) {
-            Subject tempSubject = getSubject();
+            Subject tempSubject;
+            if(getSubject().getId() != null){
+                tempSubject = DaoManager.get(Subject.class, getSubject().getId());
+                try {
+                    Hibernate.initialize(tempSubject.getCountry());
+                } catch (Exception e) {
+                    tempSubject = getSubject();
+                }
+            }else {
+                tempSubject = getSubject();
+            }
             SubjectHelper.fillSubjectFromWrapper(tempSubject, getWrapper());
             Subject subjectFromDB = SubjectHelper.getSubjectIfExists(tempSubject, getWrapper().getSelectedPersonId());
             if (subjectFromDB != null) {

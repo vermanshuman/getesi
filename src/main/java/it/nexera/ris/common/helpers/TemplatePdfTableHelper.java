@@ -10,6 +10,7 @@ import it.nexera.ris.persistence.beans.entities.domain.dictionary.TypeFormality;
 import it.nexera.ris.web.beans.wrappers.Pair;
 import it.nexera.ris.web.beans.wrappers.logic.RelationshipGroupingWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.TemplateEntity;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.criterion.Criterion;
@@ -98,7 +99,7 @@ public class TemplatePdfTableHelper {
             }
         }
         Map<List<RelationshipGroupingWrapper>, List<Property>> re = new HashMap<>();
-        wrapProperties(propertyList, subject, filterRelationship, re);
+        wrapRequestProperties(propertyList, subject, filterRelationship, re, request);
         List<String> joiner = new ArrayList<>();
         for (Iterator<Map.Entry<List<RelationshipGroupingWrapper>, List<Property>>> iterator = re.entrySet().iterator();
              iterator.hasNext(); ) {
@@ -245,9 +246,23 @@ public class TemplatePdfTableHelper {
         }
     }
 
-    public static void wrapProperties(List<Property> propertyList, Subject subject, boolean filterRelationship,
-                                      Map<List<RelationshipGroupingWrapper>, List<Property>> re) {
-        wrapProperties(propertyList, subject, filterRelationship, re, null);
+//    public static void wrapProperties(List<Property> propertyList, Subject subject, boolean filterRelationship,
+//                                      Map<List<RelationshipGroupingWrapper>, List<Property>> re) {
+//        wrapProperties(propertyList, subject, filterRelationship, re, null);
+//    }
+
+    public static void wrapRequestProperties(List<Property> propertyList, Subject subject, boolean filterRelationship,
+                                      Map<List<RelationshipGroupingWrapper>, List<Property>> re, Request request) {
+        wrapRequestProperties(propertyList, subject, filterRelationship, re, null, request);
+    }
+
+    public static void wrapRequestProperties(List<Property> propertyList, Subject subject, boolean filterRelationship,
+                                      Map<List<RelationshipGroupingWrapper>, List<Property>> re, Formality formality, Request request) {
+        for (Property property : propertyList) {
+            List<RelationshipGroupingWrapper> pairs = new LinkedList<>();
+            List<Relationship> relationshipList = getRelationships(subject, formality, property);
+            wrapRelationshipProperty(subject, filterRelationship, re, property, pairs, relationshipList, request);
+        }
     }
 
     public static void wrapProperties(List<Property> propertyList, Subject subject, boolean filterRelationship,
@@ -255,7 +270,7 @@ public class TemplatePdfTableHelper {
         for (Property property : propertyList) {
             List<RelationshipGroupingWrapper> pairs = new LinkedList<>();
             List<Relationship> relationshipList = getRelationships(subject, formality, property);
-            wrapRelationshipProperty(subject, filterRelationship, re, property, pairs, relationshipList);
+            wrapRelationshipProperty(subject, filterRelationship, re, property, pairs, relationshipList, null);
         }
     }
 
@@ -268,14 +283,14 @@ public class TemplatePdfTableHelper {
             for (Subject sub : presumableSubjects) {
                 relationshipList.addAll(getRelationships(sub, formality, property));
             }
-            wrapRelationshipProperty(subject, filterRelationship, re, property, pairs, relationshipList);
+            wrapRelationshipProperty(subject, filterRelationship, re, property, pairs, relationshipList, null);
         }
     }
 
     private static void wrapRelationshipProperty(Subject subject, boolean filterRelationship,
                                                  Map<List<RelationshipGroupingWrapper>, List<Property>> re,
                                                  Property property, List<RelationshipGroupingWrapper> pairs,
-                                                 List<Relationship> relationshipList) {
+                                                 List<Relationship> relationshipList, Request request) {
         if (filterRelationship) {
             relationshipList = relationshipList.stream()
                     .filter(r -> r.getRelationshipTypeId().equals(RelationshipType.MANUAL_ENTRY.getId()))
@@ -290,12 +305,43 @@ public class TemplatePdfTableHelper {
         }
         for (Relationship relationship : relationshipList) {
             if (relationship.getQuote() != null && relationship.getPropertyType() != null) {
+                List<EstateSituation> estateSituationList = relationship.getProperty().getEstateSituationList();
+
+                Boolean showRegime = null;
+                if(request != null){
+                    Optional<EstateSituation> estateSituation = CollectionUtils.emptyIfNull(estateSituationList)
+                            .stream()
+                            .filter(es -> !ValidationHelper.isNullOrEmpty(es.getRegime()) && es.getRegime())
+                            .findFirst();
+                    if(estateSituation.isPresent())
+                        showRegime = true;
+
+                    if(showRegime == null){
+                        estateSituation = CollectionUtils.emptyIfNull(estateSituationList)
+                                .stream()
+                                .filter(es -> !ValidationHelper.isNullOrEmpty(es.getRegime()) && !es.getRegime())
+                                .findFirst();
+                        if(estateSituation.isPresent())
+                            showRegime = false;
+                    }
+
+
+                    if(showRegime == null){
+                        if(request.getRegime() != null)
+                            showRegime = request.getRegime();
+                    }
+
+                    if(showRegime == null){
+                        if(request.getClient() != null && request.getClient().getRegime() != null)
+                            showRegime = request.getClient().getRegime();
+                    }
+                }
                 RelationshipGroupingWrapper relationshipGroupingWrapper = new RelationshipGroupingWrapper(
                         relationship.getQuote() == null ? "" : relationship.getQuote(),
                         relationship.getPropertyType().equalsIgnoreCase("Proprieta`")
                                 || relationship.getPropertyType().equalsIgnoreCase("Proprieta'")
                                 ? "DI PIENA PROPRIETA'" : "DI " + relationship.getPropertyType().toUpperCase(),
-                        relationship.getRegime() == null ? "" : relationship.getRegime(),
+                        showRegime == null || !showRegime ? "" : relationship.getRegime(),
                         relationship.getProperty().getCity());
                 if (pairs.stream().noneMatch(p -> p.equals(relationshipGroupingWrapper))) {
                     pairs.add(relationshipGroupingWrapper);

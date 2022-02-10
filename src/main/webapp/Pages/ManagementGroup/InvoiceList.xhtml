@@ -2,6 +2,7 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:ff="http://readytech.com/functions"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:p="http://primefaces.org/ui">
@@ -133,13 +134,10 @@
             </p:column>
 
             <p:column styleClass="action_midle_column" headerText="#{msg.invoiceSend}" style="width: 75px;">
-                <p:commandButton oncomplete="PF('confirmSendDialogWV').show();" rendered="#{!item.apiSentStatus}"
-                                 value="#{msg.invoiceSend}" update=":table">
+                <p:commandButton oncomplete="PF('confirmSendDialogWV').show();"
+                                 value="#{msg.invoiceSend}">
                     <f:setPropertyActionListener value="#{item.id}"
                                                  target="#{bean.entityEditId}" />
-                </p:commandButton>
-                <p:commandButton style="background-color: #00cc52 !important;" rendered="#{item.apiSentStatus}"
-                                 value="#{msg.invoiceSend}">
                 </p:commandButton>
             </p:column>
 

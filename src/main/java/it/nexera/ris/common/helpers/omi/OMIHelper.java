@@ -117,11 +117,11 @@ public final class OMIHelper {
         String zones = property.getZone();
         
         if (ValidationHelper.isNullOrEmpty(zones)) {
-            List<Pair<Double, Double>> coordinates = new ArrayList<Pair<Double,Double>>();
+            List<Pair<Double, Double>> coordinates = new ArrayList<>();
             if(property != null){
                 coordinates = GeolocationHelper.checkCoordinates(property.getCityDescription() + " " + property.getAddress());
             }
-            
+
 
             if(coordinates == null || (coordinates != null && coordinates.size() < 2)) {
                 zones = String.join("-", findZoneByPropertyInKML(property));
@@ -138,6 +138,7 @@ public final class OMIHelper {
                 DaoManager.save(property, true);
             }
         }
+        log.info("Zones: " + zones);
         if (ValidationHelper.isNullOrEmpty(zones)) {
             return calculatedOmi;
         }

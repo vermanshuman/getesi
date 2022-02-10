@@ -132,7 +132,10 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
                 && (property.getCategoryCode().startsWith("A") || property.getCategoryCode().startsWith("C"))) {
             try {
                 OMIHelper.CalculatedOmi calculatedOmi = OMIHelper.calculateOMI(property, true);
-
+                this.calculatedOmi.setMultipleCoordinates(calculatedOmi.isMultipleCoordinates());
+                if(!ValidationHelper.isNullOrEmpty(calculatedOmi.isMultipleCoordinates()) &&
+                        calculatedOmi.isMultipleCoordinates())
+                    this.lastOmi.setValue(null);
                 if (calculatedOmi.getValue() != 0d) {
                     this.calculatedOmi.setValue(String.valueOf(new BigDecimal(calculatedOmi.getValue())
                             .setScale(2, RoundingMode.HALF_UP).doubleValue()));
@@ -140,8 +143,6 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
                     this.calculatedOmi.setSeveralComprs(calculatedOmi.isSeveralComprs());
 
                     this.calculatedCommercial = String.valueOf(OMIHelper.calculateCommercialOmi(property, calculatedOmi.getValue()));
-                }else {
-                    this.calculatedOmi.setMultipleCoordinates(calculatedOmi.isMultipleCoordinates());
                 }
                 this.calculatedOmi.setCategoryCodeMissing(calculatedOmi.isCategoryCodeMissing());
                 if(this.calculatedOmi.categoryCodeMissing){
