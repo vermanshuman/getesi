@@ -877,3 +877,21 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
 .additional_button{
     margin-top: 5px;
 }
+
+
+.alignEnd {
+    place-content: flex-end;
+}
+
+.searchPanelButton {
+    background: #fb6e51 !important;
+}
+
+@media screen and (max-width: 1200px) {
+    #settingPanel {
+        margin-top: 90px;
+    }
+    .alignEnd {
+        place-content: flex-start;
+    }
+}

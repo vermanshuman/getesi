@@ -280,13 +280,15 @@
 
                                 <script>
                                     function goToPreviousPage() {
-                                        if (PF('tableWV').getPaginator().cfg.rowCount
-                                            % PF('tableWV').getPaginator().cfg.rows == 0) {
-                                            var page = PF('tableWV').getPaginator()
-                                                .getCurrentPage();
-                                            if (page > 0) {
-                                                PF('tableWV').getPaginator().setPage(
-                                                    page - 1);
+                                        if(PF('tableWV').getPaginator() != null){
+                                            if (PF('tableWV').getPaginator().cfg.rowCount
+                                                % PF('tableWV').getPaginator().cfg.rows == 0) {
+                                                var page = PF('tableWV').getPaginator()
+                                                    .getCurrentPage();
+                                                if (page > 0) {
+                                                    PF('tableWV').getPaginator().setPage(
+                                                        page - 1);
+                                                }
                                             }
                                         }
                                     }

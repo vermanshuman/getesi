@@ -27,6 +27,7 @@ import org.hibernate.loader.criteria.CriteriaJoinWalker;
 import org.hibernate.loader.criteria.CriteriaQueryTranslator;
 import org.hibernate.persister.entity.OuterJoinLoadable;
 import org.hibernate.sql.JoinType;
+import org.primefaces.context.RequestContext;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 
@@ -186,6 +187,10 @@ public class EntityLazyListModel<T extends IEntity> extends LazyDataModel<T> {
         }
 
         this.calculated = true;
+        if (WLGInboxShort.class.getName().equals(clazz.getName())) {
+            RequestContext.getCurrentInstance().update("table");
+        }
+
         return list;
     }
 
