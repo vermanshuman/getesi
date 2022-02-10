@@ -1991,6 +1991,9 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
             }else if (tableHeader.equalsIgnoreCase("birth_date_header")) {
                 getPaginator().setTableSortColumn("birthDate");
                 filterSubjectTable();
+            }else if (tableHeader.equalsIgnoreCase("birth_place_header")) {
+                getPaginator().setTableSortColumn("birthCity");
+                filterSubjectTable();
             }
         }
     }

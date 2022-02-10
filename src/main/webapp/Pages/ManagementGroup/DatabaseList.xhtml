@@ -363,6 +363,10 @@
                                         role="columnheader" scope="col" style="width: 25px !important;"><span
                                         class="ui-column-title">
                                             #{msg.databaseListSubjectCityheader}</span>
+                                            <span
+                                        id="birth_place_header" onclick="sortRow('birth_place_header')"
+                                        class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s ui-icon-triangle-1-s"></span>
+                                        
                                     <p:inputText value="#{bean.cityColumnFilter}"
                                                  styleClass="ui-column-filter ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all">
                                         <p:ajax event="keyup"  delay="500" listener="#{bean.filterCity}" update="tabs:tableSubject"/>
