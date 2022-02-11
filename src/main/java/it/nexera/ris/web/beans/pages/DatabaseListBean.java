@@ -243,6 +243,10 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
     @Getter
     @Setter
     private ListPaginator paginator;
+    
+    @Getter
+    @Setter
+    private int activeSubjectTabIndex;
 
     private void pageLoadStatic() {
         if (SessionHelper.get("requestFormalityView") != null)
@@ -1248,6 +1252,12 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
                 RequestContext.getCurrentInstance().update("attachVisureFile");
             }
         }
+    }
+    
+    public final void onSubjectTabChange(final TabChangeEvent event) {
+        TabView tv = (TabView) event.getComponent();
+        this.activeSubjectTabIndex = tv.getActiveIndex();
+        SessionHelper.put("activeSubjectTabIndex", activeSubjectTabIndex);
     }
 
     public void clearUploadedFile() {

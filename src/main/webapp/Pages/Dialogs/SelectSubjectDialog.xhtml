@@ -1,0 +1,63 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html">
+
+	<style>
+		.ui-tabs.ui-tabs-top .ui-tabs-nav li a, body .ui-tabs.ui-tabs-bottom .ui-tabs-nav li a, body .ui-tabs.ui-tabs-left .ui-tabs-nav li a, body .ui-tabs.ui-tabs-right .ui-tabs-nav li a {
+    		color: #000000 !important;
+		}
+		
+		#subjectTabs ul {
+			background-color: transparent !important;
+			text-transform: uppercase;
+		}
+		
+		#subjectTabs ul::before {
+			border-bottom: none;
+		}
+		
+		#subjectTabs ul li:not(.ui-tabs-selected.ui-state-active ) a {
+			color: gray !important;
+			border-bottom: 2px solid #dee2e6;
+		}
+		
+		#subjectTabs ul li.ui-tabs-selected.ui-state-active {
+			background-color: transparent !important;
+		}
+		
+		#subjectTabs ul li.ui-tabs-selected.ui-state-active a {
+			color: #000 !important;
+			border-bottom: 2px solid #3366FF;
+		}
+		
+		body .ui-widget-header {
+    		background-color: #ffffff !important;
+    		color: #000000 !important;
+		}
+		
+		#searchDlg_title {
+			margin-left: 20px;
+			line-height: 30px;
+		}
+	</style>
+	<p:dialog header="#{msg.databaseListSubjectDatabase}" modal="true" width="700" id="searchDlg" resizable="false" draggable="false"
+		dynamic="true" widgetVar="searchDlgWV">
+		<p:tabView dynamic="true" cache="true" id="subjectTabs"
+			activeIndex="#{bean.activeSubjectTabIndex}">
+			<p:ajax event="tabChange" listener="#{bean.onSubjectTabChange}" />
+			<p:tab title="#{msg.databaseListData}">
+			</p:tab>
+
+			<p:tab title="#{msg.databaseListDocumentsFile}">
+			</p:tab>
+
+			<p:tab title="#{msg.databaseListServicesFulfilled}">
+			</p:tab>
+
+			<p:tab title="#{msg.databaseListBilling}">
+			</p:tab>
+		</p:tabView>
+	</p:dialog>
+</ui:composition>
