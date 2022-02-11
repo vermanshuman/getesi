@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+<ui:composition template="/resources/tpl/Admin/LazyInListEditBase.xhtml">
+    <ui:param name="list_title" value="#{msg.mailManagerFolder}"/>
+    <ui:param name="bean" value="#{mailManagerFolderBean}"/>
+    <ui:param name="entity_name" value="#{msg.mailManagerFolder}"/>
+    <ui:param name="showEdit" value="false"/>
+    <ui:param name="showDelete" value="false"/>
+
+    <ui:define name="edit_fields">
+        <style>
+            #list_panel .card {
+                padding-left: 0px !important;
+                padding-right: 0px !important;
+            }
+        </style>
+        <p:panelGrid columns="2" columnClasses="ui-grid-col-2, ui-grid-col-10"
+                     styleClass="ui-panelgrid-blank form-group" layout="grid" style="width: 40%; padding:0px;">
+            <h:outputText value="#{msg.name}" style="margin-top:20px;"/>
+            <p:inputText value="#{bean.entity.name}" styleClass="input-width" id="name" label="#{msg.name}"/>
+        </p:panelGrid>
+    </ui:define>
+    <ui:define name="search_body">
+        <style>
+            .card {
+                padding-bottom: 15px !important;
+            }
+
+            .ui-grid-col-2 {
+                margin-top: 8px;
+            }
+
+            .red-btn {
+                background: red !important;
+                background-color: red !important;
+                color: #FFFFFF !important;
+            }
+
+            body .ui-selectonemenu {
+                vertical-align: middle;
+            }
+        </style>
+        <script>
+            function checkDates() {
+                var dateFrom = $('#filterDateFrom_input').val();
+                var dateTo = $('#filterDateTo_input').val();
+
+                var dFrom = new Date(dateFrom.substring(6) + '-'
+                    + dateFrom.substring(3, 5) + '-'
+                    + dateFrom.substring(0, 2));
+                var dTo = new Date(dateTo.substring(6) + '-'
+                    + dateTo.substring(3, 5) + '-' + dateTo.substring(0, 2));
+
+                if (dFrom > dTo) {
+                    $('#filterDateTo_input').val(
+                        $('#filterDateFrom_input').val());
+                    updateCalendarTo();
+                }
+            }
+        </script>
+        <p:remoteCommand name="filterTableFromPanel" action="#{bean.filterTableFromPanel}"
+                         update=":form:table"/>
+        <p:panel id="searchPanel" styleClass="searchContent">
+            <p:calendar id="filterDateFrom" readonlyInput="false" showOn="button" style="margin-right:10px;"
+                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+                        styleClass="search_group" pattern="dd/MM/yyyy" mask="true"
+                        locale="it" navigator="true" popupIconOnly="true"
+                        onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+                        value="#{bean.dateFrom}" placeholder="#{msg.mailManagerDateFrom}"/>
+
+            <p:calendar id="filterDateTo" readonlyInput="false" showOn="button" style="margin-right:10px;"
+                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                        styleClass="search_group" pattern="dd/MM/yyyy" mask="true"
+                        locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateTo}"
+                        onblur="check_date(this)" value="#{bean.dateTo}"/>
+
+            <p:selectOneMenu value="#{bean.selectedSearchStateId}" style="margin-right:10px;">
+                <f:selectItems value="#{bean.searchStates}"/>
+            </p:selectOneMenu>
+
+            <p:inputText value="#{bean.filterAll}"
+                         placeholder="#{msg.mailManagerEmailFrom}/#{msg.mailManagerEmailTo}/#{msg.mailManagerEmailSubject}/#{msg.mailManagerEmailBody}/#{msg.mailManagerEmailFile}"
+                         style="width: 30%; margin-right:10px;" styleClass="search_group"/>
+
+            <p:commandButton value="#{msg.search}" id="searchButton" onclick="checkDates(); filterTableFromPanel();" style="margin-right:10px;"
+                             update=":form:table,searchPanel" styleClass="grey-btn"/>
+        </p:panel>
+        <ui:include src="../Dialogs/ConfirmMoveMailDialog.xhtml">
+            <ui:param name="oncomplete_confirm_move_mail_dialog"
+                      value="updateTable();" />
+        </ui:include>
+    </ui:define>
+
+    <ui:define name="columns">
+        <p:column style="width: 12px;" exportable="false">
+            <p:rowToggler/>
+        </p:column>
+        <p:column styleClass="action_column" exportable="false">
+            <p:commandButton icon="ui-icon pi pi-pencil" disabled="#{!bean.canEdit or item.defaultFolder}"
+                             update=":form"
+                             action="#{bean.editEntity}">
+                <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+            </p:commandButton>
+        </p:column>
+        <p:column styleClass="action_column" exportable="false">
+            <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn" oncomplete="PF('dlg2').show()"
+                             disabled="#{!bean.canDelete || item.defaultFolder}">
+                <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityDeleteId}"/>
+            </p:commandButton>
+        </p:column>
+
+        <p:column headerText="#{msg.name}">
+            <h:outputText value="#{item.name}"/>
+        </p:column>
+        <p:column headerText="#{msg.user}">
+            <h:outputText value="#{item.user}"/>
+        </p:column>
+        <p:rowExpansion>
+            <p:panel id="searchInTable" styleClass="searchContent">
+                <p:calendar readonlyInput="false" showOn="button"
+                            styleClass="search_group" pattern="dd/MM/yyyy" mask="true"
+                            locale="it" navigator="true" popupIconOnly="true"
+                            value="#{bean.dateFromInner}" placeholder="#{msg.mailManagerDateFrom}"/>
+
+                <p:calendar readonlyInput="false" showOn="button"
+                            styleClass="search_group" pattern="dd/MM/yyyy" mask="true"
+                            locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateTo}"
+                            value="#{bean.dateToInner}"/>
+
+                <p:selectOneMenu value="#{bean.selectedSearchStateInnerId}" style="margin-right: 15px!important;">
+                    <f:selectItems value="#{bean.searchStates}"/>
+                </p:selectOneMenu>
+
+                <p:inputText value="#{bean.filterAllInner}"
+                             placeholder="#{msg.mailManagerEmailFrom}/#{msg.mailManagerEmailTo}/#{msg.mailManagerEmailSubject}/#{msg.mailManagerEmailBody}/#{msg.mailManagerEmailFile}"
+                             style="width: 30%" styleClass="search_group"/>
+
+                <p:commandButton value="#{msg.search}" action="#{bean.filterTableInExpansion}"
+                                 styleClass="grey-btn" oncomplete="updateTable();">
+                    <f:setPropertyActionListener value="#{item}" target="#{bean.selectedFolder}"/>
+                </p:commandButton>
+            </p:panel>
+            <p:remoteCommand name="updateTable" update="innerTable" />
+            <p:remoteCommand name="gotoView" action="#{bean.gotoEmailView}"/>
+            <p:remoteCommand name="deleteMail" action="#{bean.deleteMail}" update="innerTable"/>
+            <p:remoteCommand name="moveMail" action="#{bean.moveMail}" update=":form:messages"/>
+
+            <p:dataTable value="#{item.emailsLazy}" lazy="true" var="mail" paginator="true" rowKey="#{mail.id}"
+                         rows="10" reflow="true" paginatorAlwaysVisible="true" emptyMessage="#{msg.noRecordsFound}"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,20,50" id="innerTable">
+                <p:column styleClass="action_column" exportable="false">
+                    <p:commandButton icon="fa fa-search" onclick="gotoView([{name:'param', value:'#{mail.id}'}]);"/>
+                </p:column>
+                <p:column styleClass="action_column" exportable="false">
+                    <p:commandButton disabled="#{!bean.canDelete}" icon="ui-icon ui-icon-close"
+                                     onclick="deleteMail([{name:'param', value:'#{mail.id}'}]);"/>
+                </p:column>
+                <p:column styleClass="action_column" exportable="false">
+                    <h:commandLink disabled="#{!bean.canList}" ajax="true"
+                                   onclick="moveMail([{name:'selectedmailid', value:'#{mail.id}'}]);PF('confirmMoveMailDialog').show();return false;">
+                        <h:graphicImage name="images/moveto.png" style="width:21px;margin-top: 2px;" />
+                    </h:commandLink>
+
+                </p:column>
+                <p:column styleClass="min_padding_margin icon_column" exportable="false"
+                          style="width: 40px !important;">
+                    <f:facet name="header">
+                        <span class="fa fa-paperclip"/>
+                    </f:facet>
+                    <p:outputPanel rendered="#{not empty mail.files}">
+                        <span class="fa fa-paperclip"/>
+                    </p:outputPanel>
+                </p:column>
+                <p:column exportable="false" styleClass="min_padding_margin" style="width: 30px">
+                    <p:outputPanel rendered="#{mail.realForward}">
+                        <span class="fa fa-share"/>
+                    </p:outputPanel>
+                    <p:outputPanel rendered="#{mail.realResponse}">
+                        <span class="fa fa-reply"/>
+                    </p:outputPanel>
+                </p:column>
+                <p:column exportable="false" styleClass="min_padding_margin" style="width: 30px">
+                    <f:facet name="header">
+                        <i class="fa fa-exclamation" aria-hidden="true"/>
+                    </f:facet>
+                    <p:outputPanel rendered="#{not empty mail.priorityWrapper and not empty mail.priorityWrapper.icon}">
+                        <span class="fa #{mail.priorityWrapper.icon}"/>
+                    </p:outputPanel>
+                </p:column>
+                <p:column headerText="#{msg.mailManagerEmailReceiveDate}"
+                          sortBy="#{mail.sendDate}" style="width: 112px;">
+                    <h:outputText value="#{mail.sendDateStr}"/>
+                </p:column>
+                <p:column headerText="#{msg.mailManagerEmailFrom}">
+                    <h:outputText value="#{mail.emailFromStr[0]}" id="email_from"/>
+                    <p:tooltip for="email_from" value="#{mail.emailFromStr[1]}"/>
+                </p:column>
+
+                <p:column headerText="#{msg.mailManagerEmailTo}">
+                    <h:outputText value="#{mail.emailToStr[0]}" id="email_to"/>
+                    <p:tooltip for="email_to" value="#{mail.emailToStr[1]}"/>
+                </p:column>
+
+                <p:column headerText="#{msg.mailManagerEmailSubject}">
+                    <h:outputText value="#{mail.emailSubject}"/>
+                </p:column>
+
+                <p:column headerText="#{msg.mailManagerEmailUserChangedFolder}" style="width: 100px;">
+                    <h:outputText value="#{mail.userChangedFolder.firstName}"/>
+                </p:column>
+            </p:dataTable>
+        </p:rowExpansion>
+    </ui:define>
+
+</ui:composition>
+</html>

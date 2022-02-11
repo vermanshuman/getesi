@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core"
+                template="/resources/tpl/Admin/EditBase.xhtml">
+    <ui:param name="bean" value="#{referentEditBean}"/>
+    <ui:param name="edit_title" value="#{bean.entity.isNew ? msg.referentNew : msg.referentEdit}"/>
+    <ui:param name="showSave" value="#{!bean.onlyView and not bean.fromClient}"/>
+    <ui:param name="notShowMenu" value="#{bean.fromClient}"/>
+    <ui:param name="showCancel" value="#{not bean.fromClient}"/>
+    <ui:param name="renderHeaderMenu" value="#{not bean.fromClient}"/>
+    <ui:param name="renderFooterMenu" value="#{not bean.fromClient}"/>
+    <ui:param name="renderSideMenu" value="#{not bean.fromClient}"/>
+    <ui:param name="customCancelMsg" value="#{bean.onlyView ? msg.close : msg.cancel}"/>
+
+    <ui:define name="edit_body">
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                     columnClasses="ui-grid-col-1, ui-grid-col-2">
+
+            <span><span class="red">*</span>#{msg.searchSurname}:</span>
+            <p:inputText value="#{bean.entity.surname}" id="surname" rendered="#{!bean.onlyView}"
+                         onkeypress="numbers_letters_only('#surname');" styleClass="input-width"/>
+            <h:outputText value="#{bean.entity.surname}" rendered="#{bean.onlyView}"/>
+
+            <span><span class="red">*</span>#{msg.searchName}:</span>
+            <p:inputText value="#{bean.entity.name}" id="name" rendered="#{!bean.onlyView}"
+                         onkeypress="numbers_letters_only('#name');" styleClass="input-width"/>
+            <h:outputText value="#{bean.entity.name}" rendered="#{bean.onlyView}"/>
+
+            <span>#{msg.userPhone}:</span>
+            <p:inputText value="#{bean.entity.phone}" rendered="#{!bean.onlyView}" onkeyup="validate_phone(this);" styleClass="input-width"/>
+            <h:outputText value="#{bean.entity.phone}" rendered="#{bean.onlyView}"/>
+
+            <span>#{msg.referentEmail}:</span>
+            <p:inputText value="#{bean.entity.email}" id="email" rendered="#{!bean.onlyView}" styleClass="input-width"/>
+            <h:outputText value="#{bean.entity.email}" rendered="#{bean.onlyView}"/>
+
+            <span>#{msg.referentType}:</span>
+            <p:selectOneMenu value="#{bean.entity.type}" rendered="#{!bean.onlyView}" styleClass="select-width">
+                <f:selectItems value="#{bean.referentTypes}"/>
+            </p:selectOneMenu>
+            <h:outputText value="#{bean.entity.type}" converter="enumConverter" rendered="#{bean.onlyView}"/>
+
+        </p:panelGrid>
+    </ui:define>
+
+    <ui:define name="additional_buttons">
+        <p:commandButton value="#{msg.edit}" rendered="#{bean.onlyView and not bean.fromClient}" update=":form"
+                         action="#{bean.editEntity}" icon="pi pi-pencil"/>
+        <p:commandButton value="#{msg.save}" rendered="#{bean.fromClient}" update=":form"
+                         action="#{bean.saveFromDialog}" icon="pi pi-save" styleClass="p-mr-2 p-mb-2"/>
+        <p:commandButton action="#{bean.closeDialog}" rendered="#{bean.fromClient}" value="#{msg.cancel}"
+                         icon="pi pi-times-circle" styleClass="p-mr-2 p-mb-2"/>
+    </ui:define>
+</ui:composition>

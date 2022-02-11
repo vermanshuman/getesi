@@ -1,0 +1,92 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html">
+<p:dialog widgetVar="requestDocumentDlg" id="requestDocumentDlgId" modal="true" width="1200">
+    <h3>#{msg.requestDocumentDialogHeader}</h3>
+    <h3>#{msg.requestDocumentDialogTable1Header}</h3>
+    <p:dataTable value="#{bean.requestDocuments}" var="doc" id="requestDocumentTable">
+        <p:column styleClass="action_column">
+            <p:selectBooleanCheckbox value="#{doc.selectedForDialogList}" />
+        </p:column>
+        <p:column headerText="#{msg.mailManagerAttachedFileName}">
+            <h:outputText value="#{doc.title}"/>
+        </p:column>
+        <p:column headerText="#{msg.databaseListDocumentTypes}">
+            <h:outputText value="#{doc.typeDescription}"/>
+        </p:column>
+        <p:column style="width: 80px; text-align: center;" headerText="#{msg.databaseListCustomer}">
+            <p:selectBooleanCheckbox value="#{doc.selectedFormalityForExternal}" rendered="#{doc.isFormalityType}" />
+        </p:column>
+    </p:dataTable>
+      <br/>
+    <h3>#{msg.requestDocumentDialogNonSale}</h3>
+    <p:dataTable value="#{bean.requestNonSaleDocuments}" var="nonsaledoc" id="requestDocumentNonSaleTable">
+        <p:column styleClass="action_column">
+            <p:selectBooleanCheckbox value="#{nonsaledoc.selectedForDialogList}" />
+        </p:column>
+        <p:column headerText="#{msg.mailManagerAttachedFileName}">
+            <h:outputText value="#{nonsaledoc.title}"/>
+        </p:column>
+        <p:column headerText="#{msg.databaseListDocumentTypes}">
+            <h:outputText value="#{nonsaledoc.typeDescription}"/>
+        </p:column>
+        <p:column style="width: 80px; text-align: center;" headerText="#{msg.databaseListCustomer}">
+            <p:selectBooleanCheckbox value="#{nonsaledoc.selectedFormalityForExternal}" rendered="#{nonsaledoc.isFormalityType}" />
+        </p:column>
+    </p:dataTable>
+    <br/>
+    <h3>#{msg.requestDocumentDialogSale}</h3>
+    <p:dataTable value="#{bean.requestSaleDocuments}" var="saledoc" id="requestDocumentSaleTable">
+        <p:column styleClass="action_column">
+            <p:selectBooleanCheckbox value="#{saledoc.selectedForDialogList}" />
+        </p:column>
+        <p:column headerText="#{msg.mailManagerAttachedFileName}">
+            <h:outputText value="#{saledoc.title}"/>
+        </p:column>
+        <p:column headerText="#{msg.databaseListDocumentTypes}">
+            <h:outputText value="#{saledoc.typeDescription}"/>
+        </p:column>
+        <p:column style="width: 80px; text-align: center;" headerText="#{msg.databaseListCustomer}">
+            <p:selectBooleanCheckbox value="#{saledoc.selectedFormalityForExternal}" rendered="#{saledoc.isFormalityType}" />
+        </p:column>
+    </p:dataTable>
+    <br/>
+    <h3>#{msg.additionalFiles}</h3>
+    <p:dataTable value="#{bean.otherDocuments}" var="doc" id="otherDocumentTable">
+        <p:column styleClass="action_column">
+            <p:selectBooleanCheckbox value="#{doc.selectedForDialogList}" />
+        </p:column>
+        <p:column headerText="#{msg.mailManagerAttachedFileName}">
+            <h:outputText value="#{doc.title}"/>
+        </p:column>
+        <p:column headerText="#{msg.databaseListDocumentTypes}">
+            <h:outputText value="#{doc.typeDescription}"/>
+        </p:column>
+        <p:column style="width: 80px; text-align: center;" headerText="#{msg.databaseListCustomer}">
+            <p:selectBooleanCheckbox value="#{doc.selectedFormalityForExternal}" rendered="#{doc.isFormalityType}" />
+        </p:column>									
+    </p:dataTable>
+    <div class="btn_line">
+        <p:commandButton widgetVar="confirmButton" value="#{msg.confirm}" update="@form"
+                         action="#{bean.onConfirm}" style="margin-right: 1cm;background-color: #00CC52!important;"
+                         oncomplete="PF('confirmButton').enable();PF('requestDocumentDlg').hide();" onclick="PF('confirmButton').disable()"/>
+        <p:commandButton value="#{msg.cancel}" style="background-color: #F3362B !important;"
+                         oncomplete="PF('requestDocumentDlg').hide();"/>
+    </div>
+</p:dialog>
+<p:dialog id="confirmRedirect" widgetVar="confirmRedirect" modal="true"
+                  resizable="false" draggable="false">
+            <p:outputLabel value="#{msg.requestDocumentDialogConfirmEvasa}"/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.yes.toUpperCase()}"
+                                 action="#{bean.saveRequestDocumentsAndNotify(true)}"
+                                 styleClass="green-button"
+                                 oncomplete="PF('confirmRedirect').hide();"/>
+                <p:commandButton value="#{msg.no.toUpperCase()}"
+                                 action="#{bean.saveRequestDocumentsAndNotify(false)}"
+                                 styleClass="red-button"
+                                 oncomplete="PF('confirmRedirect').hide();"/>
+            </div>
+        </p:dialog>
+</ui:composition>

@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
+<ui:composition template="/resources/tpl/Admin/LazyInListEditBase.xhtml">
+    <ui:param name="bean" value="#{citiesListBean}"/>
+    <ui:param name="showDelete" value="false"/>
+    <ui:param name="list_title" value="#{msg.requestCity}"/>
+    <ui:param name="entity_name" value="#{msg.requestCity}"/>
+
+    <ui:define name="edit_fields">
+	     <style type="text/css">
+	     	.externalCity {
+             	text-align: initial;
+            }
+            
+	     </style>
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" style="width: 40%">
+            <span>#{msg.name}</span>
+            <p:inputText value="#{bean.entity.description}" styleClass="input-width"/>
+            <span>#{msg.citiesListPostalCode}</span>
+            <p:inputText value="#{bean.entity.cap}" styleClass="input-width"/>
+            <span>#{msg.citiesListCadastralCode}</span>
+            <p:inputText value="#{bean.entity.cfis}" styleClass="input-width"/>
+            <span>#{msg.citiesListProvince}</span>
+            <p:selectOneMenu value="#{bean.selectedProvinceId}" styleClass="select-width" id="province">
+                <f:selectItems value="#{bean.provinces}"/>
+            </p:selectOneMenu>
+            <span>#{msg.citiesListExternal}</span>
+			<h:panelGroup layout="block" styleClass="externalCity">
+				<p:selectBooleanCheckbox value="#{bean.entity.external}" />
+			</h:panelGroup>
+		</p:panelGrid>
+    </ui:define>
+
+    <ui:define name="action_columns">
+        <p:column headerText="#{msg.name}" filterBy="#{item.description}">
+            <h:outputText value="#{item.description}"/>
+        </p:column>
+        <p:column headerText="#{msg.citiesListPostalCode}" filterBy="#{item.cap}">
+            <h:outputText value="#{item.cap}"/>
+        </p:column>
+        <p:column headerText="#{msg.citiesListCadastralCode}" filterBy="#{item.cfis}">
+            <h:outputText value="#{item.cfis}"/>
+        </p:column>
+        <p:column headerText="#{msg.citiesListProvince}" filterBy="#{item.province.description}">
+            <h:outputText value="#{item.province.description}"/>
+        </p:column>
+    </ui:define>
+
+</ui:composition>
+</html>

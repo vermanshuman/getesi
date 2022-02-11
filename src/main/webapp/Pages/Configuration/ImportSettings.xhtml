@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/resources/tpl/Admin/EditBase.xhtml">
+    <ui:param name="bean" value="#{importSettingsBean}"/>
+    <ui:param name="edit_title" value="#{bean.header}"/>
+
+    <ui:define name="viewname">
+        <li>
+            <p:link href="/Pages/Configuration/ImportSettings.jsf?type=#{bean.currentType}">#{bean.header}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:define name="edit_body">
+        <div align="center">
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                         columnClasses="ui-grid-col-3, ui-grid-col-9" style="width: 40%;">
+
+                <span><span class="red">*</span>#{msg.importSettingsPath}:</span>
+                <p:inputText value="#{bean.path}" id="path" styleClass="input-width" label="#{msg.importSettingsPath}"/>
+
+                <span><span class="red">*</span>#{msg.importSettingsInterval} (min):</span>
+                <p:inputText value="#{bean.interval}" id="interval" onkeypress="numbers_only('#interval');"
+                             styleClass="input-width" label="#{msg.importSettingsInterval}"/>
+
+                <p:column rendered="#{bean.typeWithNumberFilesKey}">
+                    <span><span class="red">*</span>#{msg.importSettingsNumFiles}:</span>
+                </p:column>
+                <p:column rendered="#{bean.typeWithNumberFilesKey}">
+                    <p:inputText value="#{bean.numFiles}" id="numFiles" onkeypress="numbers_only('#numFiles');"
+                                 styleClass="input-width" label="#{msg.importSettingsNumFiles}"/>
+                </p:column>
+
+                <p:column rendered="#{bean.typeWithPathFilesServer}">
+                    <span>#{msg.importSettingsPathFilesServer}:</span>
+                </p:column>
+                <p:column rendered="#{bean.typeWithPathFilesServer}">
+                    <p:inputText value="#{bean.pathFilesServer}" id="pathFilesServer"
+                                 styleClass="input-width" label="#{msg.importSettingsPathFilesServer}"/>
+                </p:column>
+
+            </p:panelGrid>
+        </div>
+    </ui:define>
+</ui:composition>

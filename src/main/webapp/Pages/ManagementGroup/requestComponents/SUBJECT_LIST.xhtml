@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <span>#{enums.manageTypeFieldsSUBJECT_LIST}<span class="red" style="#{block.isRequired()?'':'display:none;'}">*</span></span>
+    <br/> <br/>
+    <p:remoteCommand update="subjectListTable" name="updateSubjectTable"/>
+    <p:dataTable id="subjectListTable" value="#{bean.subjectWrapperList}" var="subj" style="width: 1200px;">
+        <p:column headerText="#{msg.requestEditSubjectListName}">
+            <h:outputText value="#{subj.fullName}"/>
+        </p:column>
+        <p:column headerText="#{msg.requestEditSubjectListFiscalCode}">
+            <h:outputText value="#{subj.fiscalCodeVATNamber}"/>
+        </p:column>
+        <p:column headerText="#{msg.requestEditSubjectListBirthCity}">
+            <h:outputText value="#{subj.birthCityDescription}"/>
+        </p:column>
+        <p:column headerText="#{msg.requestEditSubjectListBirthDate}">
+            <h:outputText value="#{subj.birthDate}" converter="dateTimeConverter"/>
+        </p:column>
+        <p:column headerText="#{msg.databaseListRealEstatePropertyType}">
+            <h:outputText value="#{subj.sectionCType}"/>
+        </p:column>
+        <p:column styleClass="action_column" exportable="false">
+            <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"
+                             action="#{bean.removeSubjectFromList(subj)}" update="subjectListTable"/>
+        </p:column>
+    </p:dataTable>
+    <br/>
+    <p:commandButton value="#{msg.requestEditSubjectListAdd}" id="addSubjectToListBtn" action="#{bean.prepareSubjectToCreateInSubjectList}"
+                     oncomplete="PF('createSubjectDlgWV').show()" update="createSubjectDlg"/>
+
+</ui:composition>

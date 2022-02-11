@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                template="/resources/tpl/Admin/EditBase.xhtml">
+    <ui:param name="bean" value="#{cadastralCategoryEditBean}"/>
+    <ui:param name="page_header" value="#{msg.categoryPercentValueCategoryCode}"/>
+    <ui:param name="edit_title"
+              value="#{bean.entity.isNew ? msg.cadastralCategoryNew : msg.cadastralCategoryEdit}"/>
+    <ui:param name="showSave" value="#{!bean.onlyView}"/>
+    <ui:param name="customCancelMsg"
+              value="#{bean.onlyView ? msg.close : msg.cancel}"/>
+
+    <ui:define name="edit_body">
+        <div align="center">
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                         columnClasses="ui-grid-col-3,ui-grid-col-9" style="width: 50%">
+                <span><span class="red">*</span>#{msg.code}:</span>
+                <p:inputText value="#{bean.entity.code}" id="code" rendered="#{!bean.onlyView}"
+                             styleClass="input-width"/>
+                <h:outputText value="#{bean.entity.code}" rendered="#{bean.onlyView}"/>
+
+                <span>#{msg.description}:</span>
+                <p:inputText value="#{bean.entity.description}" maxlength="150" rendered="#{!bean.onlyView}"
+                             styleClass="input-width" onkeypress="numbers_letters_only('#description');"/>
+                <h:outputText value="#{bean.entity.description}" rendered="#{bean.onlyView}"/>
+
+                <span>#{msg.cadastralCategoryTextInTag}:</span>
+                <p:inputText value="#{bean.entity.textInTag}" maxlength="50" styleClass="input-width"
+                             rendered="#{!bean.onlyView}"/>
+                <h:outputText value="#{bean.entity.textInTag}" rendered="#{bean.onlyView}"/>
+
+                <span>#{msg.cadastralCategoryCodeInVisura}:</span>
+                <p:inputText value="#{bean.entity.codeInVisura}" styleClass="input-width" rendered="#{!bean.onlyView}"/>
+                <h:outputText value="#{bean.entity.codeInVisura}" rendered="#{bean.onlyView}"/>
+            </p:panelGrid>
+        </div>
+    </ui:define>
+
+    <ui:define name="additional_buttons">
+        <p:commandButton value="#{msg.edit}" rendered="#{bean.onlyView}"
+                         update=":form" action="#{bean.editEntity}"
+                         icon="ui-icon ui-icon-pencil"/>
+    </ui:define>
+</ui:composition>

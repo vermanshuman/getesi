@@ -1,0 +1,26 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html">
+    <p:dialog widgetVar="estateFormalityCostDlg" modal="true" width="600">
+
+        <div class="cost_titles">
+            <h3>#{msg.requestEstateFormalityCostText}</h3>
+        </div>
+
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" id="estateFormalityArea">
+            <span> #{msg.requestExtraNumberActs}:</span>
+            <p:column>
+                <p:inputText id="inputEstateCost" value="#{bean.costManipulationHelper.estateFormalityCost}"
+                             onkeypress="return numbers_only(this, event, 9, 0)" onkeyup="check_numbers(this, 9, 0);"/>
+            </p:column>
+        </p:panelGrid>
+
+           <div class="btn_line">
+             <p:commandButton value="#{msg.confirm}" update="@form"
+                              action="#{bean.saveRequestEstateFormalityCost}" oncomplete="PF('estateFormalityCostDlg').hide();"/>
+             <p:commandButton value="#{msg.cancel}" oncomplete="PF('estateFormalityCostDlg').hide();"/>
+         </div>
+    </p:dialog>
+</ui:composition>

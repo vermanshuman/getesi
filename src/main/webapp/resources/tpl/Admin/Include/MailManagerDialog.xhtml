@@ -1,0 +1,48 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+    <p:dialog widgetVar="moveDlgWV" width="370" style="border: 2px solid #57c279;"
+              draggable="false" modal="true" resizable="false"
+              header="#{msg.mailManagerMoveMailHeader}">
+        <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" layout="grid">
+            <h:outputText style="font-size: initial; margin: 0; position: absolute; top: 17%; -ms-transform: translateY(-50%); transform: translateY(-17%);"
+                          value="#{msg.mailManagerMailType}:"/>
+            <p:selectOneMenu value="#{bean.selectedTypeId}">
+                <f:selectItems value="#{bean.mailTypes}"/>
+            </p:selectOneMenu>
+        </p:panelGrid>
+        <div class="btn_line">
+            <p:commandButton value="#{msg.confirm}" style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"
+                             action="#{bean.changeMailType}" update=" form"
+                             actionListener="#{bean.goTable}"
+                             oncomplete="PF('moveDlgWV').hide();"/>
+            <p:commandButton value="#{msg.cancel}" style="background-color: #F3362B !important; width: 100px;"
+                             oncomplete="PF('moveDlgWV').hide();"/>
+        </div>
+    </p:dialog>
+
+    <p:dialog widgetVar="editStateDlgWV" width="300" id="editStateDlg"
+              draggable="false" modal="true" resizable="false"
+              header="#{msg.mailManagerEditStateHeader}" style="border: 2px solid #57c279;">
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid">
+            <h:outputText style="font-size: initial; margin: 0; position: absolute; top: 17%; -ms-transform: translateY(-50%); transform: translateY(-17%);"
+                          value="#{msg.mailManagerEditStates}:"/>
+            <p:selectOneMenu value="#{bean.selectedStateId}">
+                <f:selectItems value="#{bean.availableStates}"/>
+            </p:selectOneMenu>
+        </p:panelGrid>
+
+        <div class="btn_line">
+            <p:commandButton value="#{msg.confirm}" style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"
+                             action="#{bean.changeMailState}"
+                             update="form"
+                             oncomplete="PF('editStateDlgWV').hide();"/>
+            <p:commandButton value="#{msg.cancel}" style="background-color: #F3362B !important; width: 100px;"
+                             oncomplete="PF('editStateDlgWV').hide();"/>
+        </div>
+    </p:dialog>
+</ui:composition>

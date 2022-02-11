@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core">
+<ui:composition template="/resources/tpl/Admin/LazyInListEditBase.xhtml">
+    <ui:param name="list_title" value="#{msg.requestType}"/>
+    <ui:param name="bean" value="#{ibanListBean}"/>
+    <ui:param name="entity_name" value="#{msg.requestTypeEntity}"/>
+    <ui:param name="disableSelection" value="true"/>
+    <ui:param name="additionalEditAction" value="window.scrollTo(0,0);"/>
+
+    <ui:define name="edit_fields">
+        <!-- <h:inputHidden id="hiddenButton" value="#{bean.entity.icon}"/> -->
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+
+            <span><span class="red">*</span> #{msg.description}:</span>
+            <p:inputText id="description"
+            			value="#{bean.entity.description}"
+                         label="#{msg.description}"/>
+
+            <span>#{msg.bankName}:</span>
+            <p:inputText id="bankName"
+                         value="#{bean.entity.bankName}" label="#{msg.bankName}"
+                         />
+
+            <span>#{msg.bankAccountAddress}:</span>
+            <p:inputText id="bankAccountAddress" maxlength="36"
+                         value="#{bean.entity.address}" label="#{msg.address}"
+     onkeypress="numbers_letters_only('#bankAccountAddress');
+                var field = $('#bankAccountAddress');
+                field.bind('input',
+               	function(event){
+                	var str = field.val();
+                	var len = str.length;
+                	
+                	if (len &lt;= 2) {
+                		if (!/[A-Za-z]/.test(str.charAt(len - 1))) {
+                			field.val(str.substr(0,len - 1));
+                		}
+                	}else if(len &lt;= 4) {
+                		if (!/[0-9]/.test(str.charAt(len - 1))) {
+                			field.val(str.substr(0,len - 1));
+                		}
+                	}
+                	
+                	field.val(field.val().toUpperCase());
+                });" />
+        </p:panelGrid>
+    </ui:define>
+
+    <ui:define name="columns">
+        <p:column sortBy="#{item.description}" filterBy="#{item.description}"
+                  headerText="#{msg.description}">
+            <h:outputText value="#{item.description}"/>
+        </p:column>
+
+        <p:column sortBy="#{item.bankName}" filterBy="#{item.bankName}"
+                  headerText="#{msg.bankName}">
+            <h:outputText value="#{item.bankName}"/>
+        </p:column>
+        
+        <p:column sortBy="#{item.address}" filterBy="#{item.address}"
+                  headerText="#{msg.bankAccountAddress}">
+            <h:outputText value="#{item.address}"/>
+        </p:column>
+    </ui:define>
+
+</ui:composition>
+</html>

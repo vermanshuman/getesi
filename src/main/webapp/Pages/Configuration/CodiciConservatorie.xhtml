@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/resources/tpl/Admin/EditBase.xhtml">
+    <ui:param name="edit_title" value="#{msg.codiciConservatorie}"/>
+    <ui:param name="bean" value="#{codiciConservatorieBean}"/>
+
+    <ui:define name="viewname">
+        <li>
+            <p:link href="/Pages/Configuration/CodiciConservatorie.jsf">#{msg.codiciConservatorie}</p:link>
+        </li>
+    </ui:define>
+
+    <ui:define name="edit_body">
+        <div align="center">
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                         columnClasses="ui-grid-col-6, ui-grid-col-6" style="width: 40%;">
+
+                <span>#{msg.codiciConservatorieClientFiles}:</span>
+                <p:inputText value="#{bean.codiciConservatorieClientFilesPath}" id="codiciConservatorieClientFilesPath" styleClass="input-width"
+                             label="#{msg.codiciConservatorieClientFiles}"/>
+                <span>#{msg.codiciConservatorieClientTableFiles}:</span>
+                <p:inputText value="#{bean.codiciConservatorieTableFilesPath}" id="codiciConservatorieTableFilesPath" styleClass="input-width"
+                             label="#{msg.codiciConservatorieClientTableFiles}"/>
+                <span>#{msg.dtdFile}:</span>
+                <p:inputText value="#{bean.dtdFilePath}" id="dtdFilePath" styleClass="input-width"
+                             label="#{msg.dtdFile}"/>
+            </p:panelGrid>
+        </div>
+    </ui:define>
+</ui:composition>
