@@ -1,8 +1,22 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:p="http://primefaces.org/ui"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:h="http://java.sun.com/jsf/html">
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ff="http://readytech.com/functions"
+                >
+    <!-- <ui:param name="bean" value="#{subjectBean}"/> -->
+    <ui:param name="edit_title"
+              value="#{bean.selectedSubjectWrapper.entity.isNew ? msg.databaseListSubjectNew : msg.databaseListSubjectEdit}"/>
+    <ui:param name="renderSideMenu" value="#{bean.selectedSubjectWrapper.renderHeader}"/>
+    <ui:param name="centerPartStyleClass" value="false"/>
+    <ui:param name="showSave" value="#{!bean.selectedSubjectWrapper.isOnlyView() and bean.selectedSubjectWrapper.showSave}"/>
+    <ui:param name="showCancel" value="#{bean.selectedSubjectWrapper.showCancel}"/>
+    <ui:param name="notShowMenu" value="#{!bean.selectedSubjectWrapper.renderHeader}"/>
+    <ui:param name="renderHeaderMenu" value="#{bean.selectedSubjectWrapper.renderHeader}"/>
+    <ui:param name="renderFooterMenu" value="#{bean.selectedSubjectWrapper.renderFooter}"/>
+    <ui:param name="customCancelMsg"
+              value="#{bean.selectedSubjectWrapper.isOnlyView() ? msg.close : msg.cancel}"/>
 
 	<style>
 		.ui-tabs.ui-tabs-top .ui-tabs-nav li a, body .ui-tabs.ui-tabs-bottom .ui-tabs-nav li a, body .ui-tabs.ui-tabs-left .ui-tabs-nav li a, body .ui-tabs.ui-tabs-right .ui-tabs-nav li a {
@@ -42,12 +56,270 @@
 			line-height: 30px;
 		}
 	</style>
-	<p:dialog header="#{msg.databaseListSubjectDatabase}" modal="true" width="700" id="searchDlg" resizable="false" draggable="false"
+	<p:dialog header="#{msg.databaseListSubjectDatabase}" modal="true" width="900" id="searchDlg" resizable="false" draggable="false"
 		dynamic="true" widgetVar="searchDlgWV">
+		
 		<p:tabView dynamic="true" cache="true" id="subjectTabs"
-			activeIndex="#{bean.activeSubjectTabIndex}">
-			<p:ajax event="tabChange" listener="#{bean.onSubjectTabChange}" />
+			activeIndex="0">
+			<!-- <p:ajax event="tabChange" listener="#{bean.selectedSubjectWrapper.onSubjectTabChange}" /> -->
 			<p:tab title="#{msg.databaseListData}">
+				
+				<div class="ui-g">
+            		<div class="ui-g-12">	
+						<!-- <h:form id="form" prependId="false" enctype="multipart/form-data">  -->
+						
+				        <script>
+				            window.onload = function() {
+				                document.getElementById('hidden:link').onclick();
+				            }
+				        </script>
+						
+						<h:form id="hidden" style="display:none">
+				            <h:commandLink id="link">
+				                <f:ajax event="click" listener="#{bean.selectedSubjectWrapper.loadTabs}" />
+				            </h:commandLink>
+				        </h:form>
+				
+						<f:facet name="actions">
+				        	<h:commandLink styleClass="ui-panel-titlebar-icon
+				               ui-corner-all ui-state-default" 
+				               action="#{bean.selectedSubjectWrapper.downloadPdfFile}" ajax="false">
+				            	<h:outputText value="#{msg.subjectDossier}" />
+							</h:commandLink>
+						</f:facet>
+								
+				        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+				          		columnClasses="ui-grid-col-3, ui-grid-col-5">
+				
+							<span><span class="red">*</span>
+				                #{msg.databaseListSubjectType}:</span>
+				            <p:selectOneRadio value="#{bean.selectedSubjectWrapper.entity.typeId}" id="subjectType"
+				                              disabled="#{bean.selectedSubjectWrapper.isOnlyView()}" >
+				                <f:selectItems value="#{bean.selectedSubjectWrapper.subjectTypes}"/>
+				                <p:ajax update="subjectTabs"/>
+				            </p:selectOneRadio>
+				        </p:panelGrid>
+        
+				        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+				                     columnClasses="ui-grid-col-3, ui-grid-col-5" rendered="#{bean.selectedSubjectWrapper.isPhysicalPerson}">
+				
+				            <span><span class="red">*</span> #{msg.lastname}:</span>
+				            <p:inputText id="lastName" maxlength="50" styleClass="input-width"
+				                         onkeyup="fieldValueToUpperCase(this);"
+				                         value="#{bean.selectedSubjectWrapper.entity.surname}" label="#{msg.lastname}"
+				                         onkeypress="numbers_letters_only('#lastName');"
+				                         rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
+				            <h:outputText value="#{ff:upper(bean.selectedSubjectWrapper.entity.surname)}"
+				                          rendered="#{bean.selectedSubjectWrapper.isOnlyView()}" style="font-weight: bold;"/>
+				
+				            <span><span class="red">*</span> #{msg.name}:</span>
+				            <p:inputText id="name" maxlength="50" value="#{bean.selectedSubjectWrapper.entity.name}" styleClass="input-width"
+				                         label="#{msg.name}" onkeypress="numbers_letters_only('#name');"
+				                         rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}" onkeyup="fieldValueToUpperCase(this);"/>
+				            <h:outputText value="#{ff:upper(bean.selectedSubjectWrapper.entity.name)}" style="font-weight: bold;"
+				                          rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"/>
+				
+				            <span><span class="red">*</span>
+				                #{msg.databaseListSubjectBirthDate}:</span>
+				            <p:calendar id="birthdate" readonlyInput="#{bean.selectedSubjectWrapper.isOnlyView()}"
+				                        styleClass="calendar-width" pattern="dd/MM/yyyy" mask="true"
+				                        locale="it" navigator="true" popupIconOnly="true"
+				                        value="#{bean.selectedSubjectWrapper.entity.birthDate}" yearRange="c-70:c+10"
+				                        disabled="#{bean.selectedSubjectWrapper.isOnlyView()}"/>
+				        </p:panelGrid>
+
+				        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+				                     columnClasses="ui-grid-col-3, ui-grid-col-5" rendered="#{not bean.selectedSubjectWrapper.isPhysicalPerson}">
+							<span><span class="red">*</span>
+				                #{msg.databaseListSubjectBusinessName}:</span>
+				            <p:inputText value="#{bean.selectedSubjectWrapper.entity.businessName}" id="businessName" styleClass="input-width"
+				                         maxlength="150" rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
+				            <h:outputText value="#{ff:upper(bean.selectedSubjectWrapper.entity.businessName)}" style="font-weight: bold;"
+				                          rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"/>
+				
+				            <span><span class="red">*</span>
+				                #{msg.databaseListSubjectVATNumber}:</span>
+				            <p:inputText value="#{bean.selectedSubjectWrapper.entity.numberVAT}" id="numberVAT" styleClass="input-width" maxlength="11"
+				                         rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
+				            <h:outputText value="#{bean.selectedSubjectWrapper.entity.numberVAT}"
+				                          style="font-weight: bold;" rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"/>
+				
+				            <span><span class="red">*</span>
+				                #{msg.databaseListSubjectFiscalCode}:</span>
+				            <p:inputText maxlength="16" value="#{bean.selectedSubjectWrapper.entity.fiscalCode}" id="codeFiscal" styleClass="input-width"
+				                         rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
+				            <h:outputText value="#{bean.selectedSubjectWrapper.entity.fiscalCode}"
+				                          style="font-weight: bold;" rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"/>
+				
+				        </p:panelGrid>
+		
+						<p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+				                     columnClasses="ui-grid-col-3, ui-grid-col-5">
+				
+				            <ui:fragment>
+				                <span class="red">*</span>
+				                <h:outputText
+				                        value="#{bean.selectedSubjectWrapper.isPhysicalPerson ? msg.databaseListSubjectProvince : msg.databaseListSubjectNativeProvince}:"/>
+				            </ui:fragment>
+				            <ui:fragment>
+				                <p:selectOneMenu id="province" value="#{bean.selectedSubjectWrapper.addressProvinceId}" styleClass="select-width"
+				                                 label="#{msg.databaseListSubjectProvince}:"
+				                                 rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}">
+				                    <p:ajax update="province, city, country"
+				                            listener="#{subjectBean.handleAddressProvinceChange}"/>
+				                    <f:selectItems value="#{bean.selectedSubjectWrapper.provinces}"/>
+				                </p:selectOneMenu>
+				                <h:outputText value="#{bean.selectedSubjectWrapper.provinceDescription}"
+				                              rendered="#{bean.selectedSubjectWrapper.isOnlyView()}" style="font-weight: bold;"/>
+				            </ui:fragment>
+				
+				            <ui:fragment>
+				                <span class="red">*</span>
+				                <h:outputText
+				                        value="#{bean.selectedSubjectWrapper.isPhysicalPerson ? msg.databaseListSubjectCity : msg.databaseListSubjectNativeCity}:"/>
+				            </ui:fragment>
+				            <ui:fragment>
+				                <p:selectOneMenu id="city" value="#{bean.selectedSubjectWrapper.addressCityId}" styleClass="select-width"
+				                                 style="display: #{bean.selectedSubjectWrapper.foreignCountry ? 'none' : ''};"
+				                                 label="#{msg.databaseListSubjectCity}:"
+				                                 rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}">
+				                    <f:selectItems value="#{bean.selectedSubjectWrapper.addressCities}"/>
+				                </p:selectOneMenu>
+				                <h:outputText value="#{bean.selectedSubjectWrapper.cityDescription}"
+				                              rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"
+				                              style="font-weight: bold;display: #{bean.selectedSubjectWrapper.foreignCountry ? 'none' : ''};"/>
+				
+				                <p:selectOneMenu id="country" value="#{bean.selectedSubjectWrapper.selectedCountryId}" styleClass="select-width"
+				                                 style="display: #{bean.selectedSubjectWrapper.foreignCountry ? '' : 'none'};"
+				                                 label="#{msg.databaseListSubjectCity}:"
+				                                 rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}">
+				                    <f:selectItems value="#{bean.selectedSubjectWrapper.countries}"/>
+				                </p:selectOneMenu>
+				                <h:outputText value="#{bean.selectedSubjectWrapper.countryDescription}"
+				                              rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"
+				                              style="font-weight: bold;display: #{bean.selectedSubjectWrapper.foreignCountry ? '' : 'none'};"/>
+				            </ui:fragment>
+				        </p:panelGrid>
+
+				        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+				                     columnClasses="ui-grid-col-3, ui-grid-col-6" rendered="#{bean.selectedSubjectWrapper.isPhysicalPerson}">
+				            <ui:fragment>
+				                <span class="red">*</span>
+				                <h:outputText value="#{msg.databaseListSubjectSex}:"/>
+				            </ui:fragment>
+				            <p:selectOneRadio value="#{bean.selectedSubjectWrapper.entity.sex}" id="sex"
+				                              disabled="#{bean.selectedSubjectWrapper.isOnlyView()}">
+				                <f:selectItems value="#{bean.selectedSubjectWrapper.sexTypes}"/>
+				            </p:selectOneRadio>
+				
+				
+				            <h:outputText value="#{msg.databaseListSubjectBornInForeignState}:"/>
+				            <p:outputPanel>
+				                <p:selectBooleanCheckbox widgetVar="showAgency"
+				                                         value="#{bean.selectedSubjectWrapper.entity.bornInForeignState}" onchange="toggleAgency()"
+				                                         disabled="#{bean.selectedSubjectWrapper.isOnlyView()}"/>
+				
+				                <p:outputPanel id="agency"
+				                               style="display: #{bean.selectedSubjectWrapper.entity.bornInForeignState ? '' : 'none'}">
+				                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+										<span><span class="red">*</span>
+				                            #{msg.databaseListSubjectForeignState}:</span>
+				                        <p:inputText id="foreignState" maxlength="80" styleClass="input-width"
+				                                     value="#{bean.selectedSubjectWrapper.entity.foreignState}"
+				                                     label="#{msg.databaseListSubjectForeignState}"
+				                                     onkeypress="numbers_letters_only('#foreignState');"
+				                                     rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
+				                        <h:outputText value="#{bean.selectedSubjectWrapper.entity.foreignState}"
+				                                      rendered="#{bean.selectedSubjectWrapper.isOnlyView()}" style="font-weight: bold;"/>
+				                    </p:panelGrid>
+				                </p:outputPanel>
+				
+				            </p:outputPanel>
+				
+				            <span><span class="red">*</span>
+				                #{msg.databaseListSubjectFiscalCode}:</span>
+				            <ui:fragment>
+				                <div style="width: 100%">
+				                    <p:inputText id="fiscalCode" maxlength="16"
+				                                 value="#{bean.selectedSubjectWrapper.entity.fiscalCode}" rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
+				                    <h:outputText value="#{bean.selectedSubjectWrapper.entity.fiscalCode}"
+				                                  rendered="#{bean.selectedSubjectWrapper.isOnlyView()}" style="font-weight: bold;"/>
+				                    <p:commandButton action="#{bean.selectedSubjectWrapper.generateFiscalCode}"
+				                                     update="fiscalCode" rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"
+				                                     value="#{msg.databaseListSubjectFiscalCodeGenerate}"/>
+				                </div>
+				            </ui:fragment>
+				        </p:panelGrid>
+
+				        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+				                     columnClasses="ui-grid-col-3, ui-grid-col-5" rendered="#{not bean.selectedSubjectWrapper.isPhysicalPerson}">
+				            <h:outputText value="#{msg.databaseListSubjectElectedMortgageHome}:"/>
+				            <p:inputText value="#{bean.selectedSubjectWrapper.entity.electedMortgageHome}" styleClass="input-width"
+				                         id="electedMortgageHome" onkeypress="numbers_letters_comma_only('#electedMortgageHome');"
+				                         maxlength="200" rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
+				            <h:outputText value="#{bean.selectedSubjectWrapper.entity.electedMortgageHome}"
+				                          style="font-weight: bold;" rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"/>
+				
+				        </p:panelGrid>
+        
+				        <p:tabView id="tabView" rendered="#{bean.selectedSubjectWrapper.isOnlyView() and not bean.selectedSubjectWrapper.entity.isNew}" binding="#{bean.selectedSubjectWrapper.componentTabView}"/> 
+				        
+				        <p:dialog widgetVar="templates" resizable="false"
+				                  header="#{msg.docTemplates}" modal="true">
+				            <p:selectOneMenu value="#{bean.selectedSubjectWrapper.selectedTemplateId}"
+				                             style="width:150px;">
+				                <f:selectItems value="#{bean.selectedSubjectWrapper.templates}"/>
+				            </p:selectOneMenu>
+				
+				            <div class="btn_line">
+				                <p:commandButton value="#{msg.ok}" ajax="false"
+				                                 actionListener="#{bean.selectedSubjectWrapper.generate}" onclick="PF('templates').hide()"
+				                                 update=":form:messages"/>
+				                <p:commandButton value="#{msg.cancel}"
+				                                 onclick="PF('templates').hide()"/>
+				            </div>
+				        </p:dialog>
+				        
+				        <p:dialog id="documentDialog" widgetVar="documentDialog" modal="true" resizable="false" draggable="false"
+				                  width="600">
+				            <p:dataTable value="#{bean.selectedSubjectWrapper.requestDocuments}" var="doc" id="requestDocs">
+				                <p:column headerText="#{msg.name}">
+				                    <h:outputText value="#{doc.title}"/>
+				                </p:column>
+				                <p:column styleClass="action_column">
+				                    <p:commandButton icon="fa fa-download" action="#{bean.selectedSubjectWrapper.downloadRequestFile}" ajax="false">
+				                        <f:setPropertyActionListener value="#{doc.id}" target="#{bean.selectedSubjectWrapper.selectedDocumentId}"/>
+				                    </p:commandButton>
+				                </p:column>
+				            </p:dataTable>
+				        </p:dialog>
+        
+				        <script>
+				            function toggleAgency() {
+				                if (PF('showAgency').input[0].checked) {
+				                	alert("0 clicked");
+				                    //$(document.getElementById('agency')).fadeIn();
+				                } else {
+				                	alert("1 clicked");
+				                    //$(document.getElementById('agency')).fadeOut();
+				                }
+				            }
+				        </script>	
+						
+						<p:commandButton  action="#{bean.selectedSubjectWrapper.pageSave}"
+						                  style="margin-top: 10px"
+						                  value="#{empty save_button_text ? msg.save : save_button_text}"
+						                  icon="pi pi-save"
+						                  update=":messages"
+						                  styleClass="#{saveButtonStyle} p-mr-2 p-mb-2 ui-button-success"/>
+						
+						 <p:commandButton action="#{bean.selectedSubjectWrapper.goBack}" styleClass="p-mr-2 p-mb-2 ui-button-danger"
+						                  rendered="#{empty showCancel ? true : showCancel}"
+						                  value="#{empty customCancelMsg ? msg.cancel : customCancelMsg}"
+						                  icon="pi pi-times-circle"/>
+		
+    				</div>
+    			</div>
 			</p:tab>
 
 			<p:tab title="#{msg.databaseListDocumentsFile}">

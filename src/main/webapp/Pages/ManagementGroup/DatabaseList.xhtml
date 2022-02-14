@@ -438,10 +438,16 @@
 
                                     <td style="width: 0px !important;"
                                         class="ui-selection-column min_padding_margin icon_column">
-                                        <p:commandButton icon="ui-icon pi pi-search" update=":form" oncomplete="PF('searchDlgWV').show();">
+                                        <!-- <p:commandButton icon="ui-icon pi pi-search" update=":form"
+                                                         action="#{bean.viewEntity}">
+                                            <f:setPropertyActionListener value="#{item.id}"
+                                                                         target="#{bean.entityEditId}"/>
+                                        </p:commandButton> -->
+                                        <p:commandButton icon="ui-icon pi pi-search" update=":form" oncomplete="PF('searchDlgWV').show();"
+                                        				action="#{bean.loadSelectedSubject}">
                                                         <!--  action="#{bean.viewEntity}" > -->
-                                           <!--  <f:setPropertyActionListener value="#{item.id}"
-                                                                         target="#{bean.entityEditId}"/> -->
+                                           <f:setPropertyActionListener value="#{item.id}"
+                                                                         target="#{bean.entityEditId}"/>
                                         </p:commandButton>
                                     </td>
 
