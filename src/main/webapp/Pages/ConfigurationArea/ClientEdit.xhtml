@@ -17,7 +17,11 @@
               value="#{bean.onlyView ? msg.close : msg.cancel}"/>
 
     <ui:define name="edit_body">
-
+<style>
+       #configurePriceList .ui-panelgrid-cell{
+           border: 0px !important;
+        }
+    </style>
         <p:remoteCommand name="valid" action="#{bean.validTab()}"/>
         <p:remoteCommand name="updateRedStarFroms" action="#{bean.updateForms()}"
                          update=":form:wizard:secondPanel, :form:wizard:fifthPanel, :form:wizard:firstPanel"/>
@@ -894,7 +898,7 @@
 
         </p:dialog>
 
-        <p:dialog id="configurePriceList" widgetVar="configurePriceListWV" styleClass="table-center"
+        <p:dialog id="configurePriceList" width="90%" widgetVar="configurePriceListWV" styleClass="table-center"
                   resizable="false" closable="false" draggable="true" modal="true">
             <p:outputPanel widgetVar="configurePriceListPanel" id="configurePriceListPanel">
                 <p:dataTable var="itemR" value="#{bean.selectedService.priceLists}" styleClass="without-header borderless"
@@ -1016,9 +1020,9 @@
 
 
                 <div class="btn_line">
-                    <p:commandButton value="#{msg.confirm}" process="@(.myclass)"
-                                     oncomplete="PF('configurePriceListWV').hide()"/>
-                    <p:commandButton value="#{msg.cancel}" process="@(.myclass)"
+                    <p:commandButton value="#{msg.confirm}" process="@(.myclass)" class="ui-button-success "
+                                     oncomplete="PF('configurePriceListWV').hide()" style="margin-right: 5px;"/>
+                    <p:commandButton value="#{msg.cancel}" process="@(.myclass)" class="ui-button-danger"
                                      oncomplete="PF('configurePriceListWV').hide()"
                                      action="#{bean.cancelPriceList}" immediate="true"/>
                 </div>
