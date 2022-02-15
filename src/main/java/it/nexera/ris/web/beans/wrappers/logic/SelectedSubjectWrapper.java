@@ -1,52 +1,11 @@
-package it.nexera.ris.web.beans.wrappers;
+package it.nexera.ris.web.beans.wrappers.logic;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-
-import javax.el.ValueExpression;
-import javax.faces.application.FacesMessage;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.model.SelectItem;
-
-import org.hibernate.HibernateException;
-import org.hibernate.StaleObjectStateException;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
-import org.primefaces.component.tabview.Tab;
-import org.primefaces.component.tabview.TabView;
-import org.primefaces.context.RequestContext;
-import org.primefaces.model.LazyDataModel;
-
-import it.nexera.ris.common.enums.DocumentGenerationPlaces;
 import it.nexera.ris.common.enums.DocumentType;
-import it.nexera.ris.common.enums.PageTypes;
 import it.nexera.ris.common.enums.PropertyWrapperType;
 import it.nexera.ris.common.enums.SexTypes;
 import it.nexera.ris.common.enums.SubjectType;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
-import it.nexera.ris.common.helpers.CalcoloCodiceFiscale;
-import it.nexera.ris.common.helpers.ComboboxHelper;
-import it.nexera.ris.common.helpers.EstateSituationHelper;
-import it.nexera.ris.common.helpers.FileHelper;
-import it.nexera.ris.common.helpers.GeneralFunctionsHelper;
-import it.nexera.ris.common.helpers.LogHelper;
-import it.nexera.ris.common.helpers.MessageHelper;
-import it.nexera.ris.common.helpers.PrintPDFHelper;
-import it.nexera.ris.common.helpers.RedirectHelper;
-import it.nexera.ris.common.helpers.ResourcesHelper;
-import it.nexera.ris.common.helpers.SessionHelper;
-import it.nexera.ris.common.helpers.ValidationHelper;
-import it.nexera.ris.common.helpers.VisureManageHelper;
+import it.nexera.ris.common.helpers.*;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.Document;
@@ -56,124 +15,133 @@ import it.nexera.ris.persistence.beans.entities.domain.Subject;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Country;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
 import it.nexera.ris.web.beans.EntityEditPageBean;
-import it.nexera.ris.web.beans.pages.RequestListBean;
 import it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper.CadastralBindingWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper.FormalityBindingWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper.FormalitySubjectBindingWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper.RequestBindingWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper.RequestTypeBindingWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper.SyntheticBindingWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper.VisureDHBindingWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper.VisureRTFBindingWrapper;
-import lombok.Data;
+import org.hibernate.HibernateException;
+import org.hibernate.StaleObjectStateException;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
+import org.primefaces.component.tabview.Tab;
+import org.primefaces.context.RequestContext;
+import org.primefaces.model.LazyDataModel;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.component.UIComponent;
+import javax.faces.model.SelectItem;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 
 
 public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implements Serializable {
 
-	private static final long serialVersionUID = -7366211875713976214L;
+    private static final long serialVersionUID = -7366211875713976214L;
 
-	private boolean onlyView;
+    private boolean onlyView;
 
-	private Boolean foreignCountry;
+    private Boolean foreignCountry;
 
-	private Long addressProvinceId;
+    private Long addressProvinceId;
 
-	private Long addressCityId;
+    private Long addressCityId;
 
-	private Long selectedCountryId;
+    private Long selectedCountryId;
 
-	private Long downloadFileId;
+    private Long downloadFileId;
 
-	private Long selectedTemplateId;
+    private Long selectedTemplateId;
 
-	private List<SelectItem> provinces;
+    private List<SelectItem> provinces;
 
-	private List<SelectItem> addressCities;
+    private List<SelectItem> addressCities;
 
-	private List<SelectItem> sexTypes;
+    private List<SelectItem> sexTypes;
 
-	private List<SelectItem> subjectTypes;
+    private List<SelectItem> subjectTypes;
 
-	private List<SelectItem> countries;
+    private List<SelectItem> countries;
 
-	private List<SelectItem> templates;
+    private List<SelectItem> templates;
 
-	private LazyDataModel<Property> lazyRealEstateModel;
+    private LazyDataModel<Property> lazyRealEstateModel;
 
-	private Document printDocument;
+    private Document printDocument;
 
-	private Long editPropertyId;
+    private Long editPropertyId;
 
-	private Boolean renderHeader;
+    private Boolean renderHeader;
 
-	private Boolean renderFooter;
+    private Boolean renderFooter;
 
-	private Boolean showSave;
+    private Boolean showSave;
 
-	private Boolean showCancel;
+    private Boolean showCancel;
 
-	private List<SelectItem> propertyWrapperType;
+    private List<SelectItem> propertyWrapperType;
 
-	private Long selectedPropertyType;
+    private Long selectedPropertyType;
 
-	private UIComponent componentTabView;
+    private UIComponent componentTabView;
 
-	private Request downloadRequest;
+    private Request downloadRequest;
 
-	private List<Document> requestDocuments;
+    private List<Document> requestDocuments;
 
-	private Long selectedDocumentId;
+    private Long selectedDocumentId;
 
-	private List<Long> listIds;
+    private List<Long> listIds;
 
-	@Override
-	public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
-			InstantiationException, IllegalAccessException {
-		
+    @Override
+    public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
+            InstantiationException, IllegalAccessException {
 
-	}
 
-	public void onLoad(Long entityId) throws NumberFormatException, HibernateException, PersistenceBeanException,
-			InstantiationException, IllegalAccessException {
-		this.setEntityId(entityId);
-		setProvinces(ComboboxHelper.fillList(Province.class, Order.asc("description")));
-		getProvinces().add(new SelectItem(Province.FOREIGN_COUNTRY_ID, Province.FOREIGN_COUNTRY));
-		this.setPropertyWrapperType(ComboboxHelper.fillList(PropertyWrapperType.class, false, true));
+    }
 
-		this.setAddressCities(ComboboxHelper.fillList(new ArrayList<City>(), true));
+    public void onLoad(Long entityId) throws NumberFormatException, HibernateException, PersistenceBeanException,
+            InstantiationException, IllegalAccessException {
+        this.setEntityId(entityId);
+        setProvinces(ComboboxHelper.fillList(Province.class, Order.asc("description")));
+        getProvinces().add(new SelectItem(Province.FOREIGN_COUNTRY_ID, Province.FOREIGN_COUNTRY));
+        this.setPropertyWrapperType(ComboboxHelper.fillList(PropertyWrapperType.class, false, true));
 
-		if (this.getEntity().getBirthProvince() != null) {
-			this.setAddressProvinceId(this.getEntity().getBirthProvince().getId());
-			handleAddressProvinceChange();
-		}
+        this.setAddressCities(ComboboxHelper.fillList(new ArrayList<City>(), true));
 
-		setForeignCountry(getEntity().getForeignCountry());
+        if (this.getEntity().getBirthProvince() != null) {
+            this.setAddressProvinceId(this.getEntity().getBirthProvince().getId());
+            handleAddressProvinceChange();
+        }
 
-		if (getForeignCountry()) {
-			setAddressProvinceId(Province.FOREIGN_COUNTRY_ID);
-		}
+        setForeignCountry(getEntity().getForeignCountry());
 
-		if (this.getEntity().getBirthCity() != null) {
-			this.setAddressCityId(this.getEntity().getBirthCity().getId());
-		}
+        if (getForeignCountry()) {
+            setAddressProvinceId(Province.FOREIGN_COUNTRY_ID);
+        }
 
-		this.setCountries(ComboboxHelper.fillList(Country.class, Order.asc("description"),
-				new Criterion[] { Restrictions.ne("description", "ITALIA") }));
+        if (this.getEntity().getBirthCity() != null) {
+            this.setAddressCityId(this.getEntity().getBirthCity().getId());
+        }
 
-		if (this.getEntity().getCountry() != null) {
-			this.setSelectedCountryId(this.getEntity().getCountry().getId());
-		}
+        this.setCountries(ComboboxHelper.fillList(Country.class, Order.asc("description"),
+                new Criterion[]{Restrictions.ne("description", "ITALIA")}));
 
-		this.setSexTypes(ComboboxHelper.fillList(SexTypes.class, false));
-		this.setSubjectTypes(ComboboxHelper.fillList(SubjectType.class, false));
+        if (this.getEntity().getCountry() != null) {
+            this.setSelectedCountryId(this.getEntity().getCountry().getId());
+        }
 
-	}
+        this.setSexTypes(ComboboxHelper.fillList(SexTypes.class, false));
+        this.setSubjectTypes(ComboboxHelper.fillList(SubjectType.class, false));
 
-	@Override
-	public void onValidate() throws PersistenceBeanException, HibernateException, IllegalAccessException {
-		if (ValidationHelper.isNullOrEmpty(this.getEntity().getTypeId())) {
+    }
+
+    @Override
+    public void onValidate() throws PersistenceBeanException, HibernateException, IllegalAccessException {
+        if (ValidationHelper.isNullOrEmpty(this.getEntity().getTypeId())) {
             addRequiredFieldException("form:subjectType");
         }
 
@@ -229,14 +197,14 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
         }
 
         if (!getIsPhysicalPerson() && ValidationHelper
-        		.isNullOrEmpty(this.getEntity().getFiscalCode())
-                ) {
+                .isNullOrEmpty(this.getEntity().getFiscalCode())
+        ) {
             addRequiredFieldException("form:codeFiscal");
         }
-        
-        if(!getIsPhysicalPerson() && ValidationHelper
+
+        if (!getIsPhysicalPerson() && ValidationHelper
                 .isNullOrEmpty(this.getEntity().getNumberVAT())) {
-        	addRequiredFieldException("form:numberVAT");
+            addRequiredFieldException("form:numberVAT");
         }
         try {
             if (!getValidationFailed()) {
@@ -286,12 +254,12 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
             LogHelper.log(log, e);
         }
 
-	}
+    }
 
-	@Override
-	public void onSave() throws HibernateException, PersistenceBeanException, NumberFormatException, IOException,
-			InstantiationException, IllegalAccessException {
-		if (this.getAddressCityId() != null) {
+    @Override
+    public void onSave() throws HibernateException, PersistenceBeanException, NumberFormatException, IOException,
+            InstantiationException, IllegalAccessException {
+        if (this.getAddressCityId() != null) {
             City city = DaoManager.get(City.class, this.getAddressCityId());
             this.getEntity().setBirthCity(city);
         }
@@ -314,9 +282,9 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 
         DaoManager.save(this.getEntity());
 
-	}
-	
-	public void saveFromDialog() {
+    }
+
+    public void saveFromDialog() {
         if (this.getSaveFlag() == 0) {
             try {
                 this.cleanValidation();
@@ -364,25 +332,25 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
         }
     }
 
-	public void handleAddressProvinceChange()
-			throws HibernateException, PersistenceBeanException, IllegalAccessException {
-		if (!Province.FOREIGN_COUNTRY_ID.equals(this.getAddressProvinceId())) {
-			this.setForeignCountry(Boolean.FALSE);
+    public void handleAddressProvinceChange()
+            throws HibernateException, PersistenceBeanException, IllegalAccessException {
+        if (!Province.FOREIGN_COUNTRY_ID.equals(this.getAddressProvinceId())) {
+            this.setForeignCountry(Boolean.FALSE);
 
-			this.setAddressCities(ComboboxHelper.fillList(City.class, Order.asc("description"),
-					new Criterion[] { Restrictions.eq("province.id", this.getAddressProvinceId()),
-							Restrictions.eq("external", Boolean.TRUE) }));
-		} else {
-			this.setForeignCountry(Boolean.TRUE);
-		}
-	}
-	
-	public boolean getIsPhysicalPerson() {
+            this.setAddressCities(ComboboxHelper.fillList(City.class, Order.asc("description"),
+                    new Criterion[]{Restrictions.eq("province.id", this.getAddressProvinceId()),
+                            Restrictions.eq("external", Boolean.TRUE)}));
+        } else {
+            this.setForeignCountry(Boolean.TRUE);
+        }
+    }
+
+    public boolean getIsPhysicalPerson() {
         return getEntity().getTypeId() == null || SubjectType.PHYSICAL_PERSON
                 .getId().equals(getEntity().getTypeId());
     }
-	
-	public String getCityDescription() {
+
+    public String getCityDescription() {
         return this.loadDescriptionById(City.class, this.getAddressCityId());
     }
 
@@ -399,27 +367,26 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
         return this.loadDescriptionById(Province.class,
                 this.getAddressProvinceId());
     }
-    
-    public void loadTabs(){
+
+    public void loadTabs() {
         List<Tab> tabList = new ArrayList<>();
         ListIterator<UIComponent> itr = getComponentTabView().getChildren().listIterator();
-        while (itr.hasNext())
-        {
-            Tab tab = (Tab)itr.next();
+        while (itr.hasNext()) {
+            Tab tab = (Tab) itr.next();
             String title = tab.getTitle();
             try {
-                if(!ValidationHelper.isNullOrEmpty(title)){
-                    if(title.startsWith(ResourcesHelper.getString("subjectViewFormality"))){
+                if (!ValidationHelper.isNullOrEmpty(title)) {
+                    if (title.startsWith(ResourcesHelper.getString("subjectViewFormality"))) {
                         FormalityBindingWrapper formalityTab = new FormalityBindingWrapper(getEntity(), getListIds());
                         formalityTab.loadData(Boolean.FALSE);
                         itr.set(formalityTab.getTab());
                         RequestContext.getCurrentInstance().update("tabView");
-                    }else if(title.startsWith(ResourcesHelper.getString("subjectViewCadastral"))){
+                    } else if (title.startsWith(ResourcesHelper.getString("subjectViewCadastral"))) {
                         CadastralBindingWrapper cadastralBindingWrapper = new CadastralBindingWrapper(getListIds(), getEntity(), DocumentType.CADASTRAL);
                         cadastralBindingWrapper.loadData(true);
                         itr.set(cadastralBindingWrapper.getTab());
                         RequestContext.getCurrentInstance().update("tabView");
-                    }else if(title.startsWith(ResourcesHelper.getString("subjectViewDocuments"))){
+                    } else if (title.startsWith(ResourcesHelper.getString("subjectViewDocuments"))) {
                         CadastralBindingWrapper cadastralBindingWrapper = new CadastralBindingWrapper(getListIds(), getEntity(), DocumentType.INDIRECT_CADASTRAL);
                         cadastralBindingWrapper.loadData(true);
                         itr.set(cadastralBindingWrapper.getTab());
@@ -431,7 +398,7 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
             }
         }
     }
-    
+
     public void generateFiscalCode() {
         City city = null;
         try {
@@ -668,7 +635,7 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
     public void setRequestDocuments(List<Document> requestDocuments) {
         this.requestDocuments = requestDocuments;
     }
-    
+
     public Long getSelectedDocumentId() {
         return selectedDocumentId;
     }
@@ -676,7 +643,7 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
     public void setSelectedDocumentId(Long selectedDocumentId) {
         this.selectedDocumentId = selectedDocumentId;
     }
-    
+
     public List<Long> getListIds() {
         return listIds;
     }
