@@ -44,9 +44,10 @@
 		#subjectTabs ul li.ui-tabs-selected.ui-state-active a {
 			color: #000 !important;
 			border-bottom: 2px solid #3366FF;
+			font-weight: bold;
 		}
 		
-		body .ui-widget-header {
+		body #searchDlg .ui-widget-header {
     		background-color: #ffffff !important;
     		color: #000000 !important;
 		}
@@ -54,6 +55,16 @@
 		#searchDlg_title {
 			margin-left: 20px;
 			line-height: 30px;
+		}
+		
+		.close_btn {
+			color: #000000 !important;
+			background-color: #FFFFFF !important;
+			border: 1px solid #ced4da !important;
+		}
+		
+		body #searchDlg .ui-button {
+			border: 1px solid #ced4da !important;
 		}
 	</style>
 	<p:dialog header="#{msg.databaseListSubjectDatabase}" modal="true" width="900" id="searchDlg" resizable="false" draggable="false"
@@ -93,8 +104,8 @@
 				
 							<span><span class="red">*</span>
 				                #{msg.databaseListSubjectType}:</span>
-				            <p:selectOneRadio value="#{bean.selectedSubjectWrapper.entity.typeId}" id="subjectType"
-				                              disabled="#{bean.selectedSubjectWrapper.isOnlyView()}" >
+				            <p:selectOneRadio value="#{bean.selectedSubjectWrapper.entity.typeId}" id="subjectType" 
+				                              disabled="true" >
 				                <f:selectItems value="#{bean.selectedSubjectWrapper.subjectTypes}"/>
 				                <p:ajax update="subjectTabs"/>
 				            </p:selectOneRadio>
@@ -104,7 +115,7 @@
 				                     columnClasses="ui-grid-col-3, ui-grid-col-5" rendered="#{bean.selectedSubjectWrapper.isPhysicalPerson}">
 				
 				            <span><span class="red">*</span> #{msg.lastname}:</span>
-				            <p:inputText id="lastName" maxlength="50" styleClass="input-width"
+				            <p:inputText id="lastName" maxlength="50" styleClass="input-width" disabled="true"
 				                         onkeyup="fieldValueToUpperCase(this);"
 				                         value="#{bean.selectedSubjectWrapper.entity.surname}" label="#{msg.lastname}"
 				                         onkeypress="numbers_letters_only('#lastName');"
@@ -114,39 +125,39 @@
 				
 				            <span><span class="red">*</span> #{msg.name}:</span>
 				            <p:inputText id="name" maxlength="50" value="#{bean.selectedSubjectWrapper.entity.name}" styleClass="input-width"
-				                         label="#{msg.name}" onkeypress="numbers_letters_only('#name');"
+				                         label="#{msg.name}" onkeypress="numbers_letters_only('#name');" disabled="true"
 				                         rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}" onkeyup="fieldValueToUpperCase(this);"/>
 				            <h:outputText value="#{ff:upper(bean.selectedSubjectWrapper.entity.name)}" style="font-weight: bold;"
 				                          rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"/>
 				
 				            <span><span class="red">*</span>
 				                #{msg.databaseListSubjectBirthDate}:</span>
-				            <p:calendar id="birthdate" readonlyInput="#{bean.selectedSubjectWrapper.isOnlyView()}"
+				            <p:calendar id="birthdate" readonlyInput="#{bean.selectedSubjectWrapper.isOnlyView()}" 
 				                        styleClass="calendar-width" pattern="dd/MM/yyyy" mask="true"
 				                        locale="it" navigator="true" popupIconOnly="true"
 				                        value="#{bean.selectedSubjectWrapper.entity.birthDate}" yearRange="c-70:c+10"
-				                        disabled="#{bean.selectedSubjectWrapper.isOnlyView()}"/>
+				                        disabled="true"/>
 				        </p:panelGrid>
 
 				        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
 				                     columnClasses="ui-grid-col-3, ui-grid-col-5" rendered="#{not bean.selectedSubjectWrapper.isPhysicalPerson}">
 							<span><span class="red">*</span>
 				                #{msg.databaseListSubjectBusinessName}:</span>
-				            <p:inputText value="#{bean.selectedSubjectWrapper.entity.businessName}" id="businessName" styleClass="input-width"
+				            <p:inputText value="#{bean.selectedSubjectWrapper.entity.businessName}" id="businessName" styleClass="input-width" disabled="true"
 				                         maxlength="150" rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
 				            <h:outputText value="#{ff:upper(bean.selectedSubjectWrapper.entity.businessName)}" style="font-weight: bold;"
 				                          rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"/>
 				
 				            <span><span class="red">*</span>
 				                #{msg.databaseListSubjectVATNumber}:</span>
-				            <p:inputText value="#{bean.selectedSubjectWrapper.entity.numberVAT}" id="numberVAT" styleClass="input-width" maxlength="11"
+				            <p:inputText value="#{bean.selectedSubjectWrapper.entity.numberVAT}" id="numberVAT" styleClass="input-width" maxlength="11" disabled="true"
 				                         rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
 				            <h:outputText value="#{bean.selectedSubjectWrapper.entity.numberVAT}"
 				                          style="font-weight: bold;" rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"/>
 				
 				            <span><span class="red">*</span>
 				                #{msg.databaseListSubjectFiscalCode}:</span>
-				            <p:inputText maxlength="16" value="#{bean.selectedSubjectWrapper.entity.fiscalCode}" id="codeFiscal" styleClass="input-width"
+				            <p:inputText maxlength="16" value="#{bean.selectedSubjectWrapper.entity.fiscalCode}" id="codeFiscal" styleClass="input-width" disabled="true"
 				                         rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
 				            <h:outputText value="#{bean.selectedSubjectWrapper.entity.fiscalCode}"
 				                          style="font-weight: bold;" rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"/>
@@ -163,7 +174,7 @@
 				            </ui:fragment>
 				            <ui:fragment>
 				                <p:selectOneMenu id="province" value="#{bean.selectedSubjectWrapper.addressProvinceId}" styleClass="select-width"
-				                                 label="#{msg.databaseListSubjectProvince}:"
+				                                 label="#{msg.databaseListSubjectProvince}:" disabled="true"
 				                                 rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}">
 				                    <p:ajax update="province, city, country"
 				                            listener="#{subjectBean.handleAddressProvinceChange}"/>
@@ -180,7 +191,7 @@
 				            </ui:fragment>
 				            <ui:fragment>
 				                <p:selectOneMenu id="city" value="#{bean.selectedSubjectWrapper.addressCityId}" styleClass="select-width"
-				                                 style="display: #{bean.selectedSubjectWrapper.foreignCountry ? 'none' : ''};"
+				                                 style="display: #{bean.selectedSubjectWrapper.foreignCountry ? 'none' : ''};" disabled="true"
 				                                 label="#{msg.databaseListSubjectCity}:"
 				                                 rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}">
 				                    <f:selectItems value="#{bean.selectedSubjectWrapper.addressCities}"/>
@@ -189,8 +200,8 @@
 				                              rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"
 				                              style="font-weight: bold;display: #{bean.selectedSubjectWrapper.foreignCountry ? 'none' : ''};"/>
 				
-				                <p:selectOneMenu id="country" value="#{bean.selectedSubjectWrapper.selectedCountryId}" styleClass="select-width"
-				                                 style="display: #{bean.selectedSubjectWrapper.foreignCountry ? '' : 'none'};"
+				                <p:selectOneMenu id="country" value="#{bean.selectedSubjectWrapper.selectedCountryId}" disabled="true" styleClass="select-width"
+				                                 style="display: #{bean.selectedSubjectWrapper.foreignCountry ? '' : 'none'};" 
 				                                 label="#{msg.databaseListSubjectCity}:"
 				                                 rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}">
 				                    <f:selectItems value="#{bean.selectedSubjectWrapper.countries}"/>
@@ -207,8 +218,8 @@
 				                <span class="red">*</span>
 				                <h:outputText value="#{msg.databaseListSubjectSex}:"/>
 				            </ui:fragment>
-				            <p:selectOneRadio value="#{bean.selectedSubjectWrapper.entity.sex}" id="sex"
-				                              disabled="#{bean.selectedSubjectWrapper.isOnlyView()}">
+				            <p:selectOneRadio value="#{bean.selectedSubjectWrapper.entity.sex}" id="sex" 
+				                              disabled="true">
 				                <f:selectItems value="#{bean.selectedSubjectWrapper.sexTypes}"/>
 				            </p:selectOneRadio>
 				
@@ -217,14 +228,14 @@
 				            <p:outputPanel>
 				                <p:selectBooleanCheckbox widgetVar="showAgency"
 				                                         value="#{bean.selectedSubjectWrapper.entity.bornInForeignState}" onchange="toggleAgency()"
-				                                         disabled="#{bean.selectedSubjectWrapper.isOnlyView()}"/>
+				                                         disabled="true"/>
 				
 				                <p:outputPanel id="agency"
 				                               style="display: #{bean.selectedSubjectWrapper.entity.bornInForeignState ? '' : 'none'}">
 				                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
 										<span><span class="red">*</span>
 				                            #{msg.databaseListSubjectForeignState}:</span>
-				                        <p:inputText id="foreignState" maxlength="80" styleClass="input-width"
+				                        <p:inputText id="foreignState" maxlength="80" styleClass="input-width" disabled="true"
 				                                     value="#{bean.selectedSubjectWrapper.entity.foreignState}"
 				                                     label="#{msg.databaseListSubjectForeignState}"
 				                                     onkeypress="numbers_letters_only('#foreignState');"
@@ -240,13 +251,13 @@
 				                #{msg.databaseListSubjectFiscalCode}:</span>
 				            <ui:fragment>
 				                <div style="width: 100%">
-				                    <p:inputText id="fiscalCode" maxlength="16"
+				                    <p:inputText id="fiscalCode" maxlength="16" disabled="true"
 				                                 value="#{bean.selectedSubjectWrapper.entity.fiscalCode}" rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
 				                    <h:outputText value="#{bean.selectedSubjectWrapper.entity.fiscalCode}"
 				                                  rendered="#{bean.selectedSubjectWrapper.isOnlyView()}" style="font-weight: bold;"/>
-				                    <p:commandButton action="#{bean.selectedSubjectWrapper.generateFiscalCode}"
+				                    <!-- <p:commandButton action="#{bean.selectedSubjectWrapper.generateFiscalCode}" disabled="true"
 				                                     update="fiscalCode" rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"
-				                                     value="#{msg.databaseListSubjectFiscalCodeGenerate}"/>
+				                                     value="#{msg.databaseListSubjectFiscalCodeGenerate}"/> -->
 				                </div>
 				            </ui:fragment>
 				        </p:panelGrid>
@@ -254,7 +265,7 @@
 				        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
 				                     columnClasses="ui-grid-col-3, ui-grid-col-5" rendered="#{not bean.selectedSubjectWrapper.isPhysicalPerson}">
 				            <h:outputText value="#{msg.databaseListSubjectElectedMortgageHome}:"/>
-				            <p:inputText value="#{bean.selectedSubjectWrapper.entity.electedMortgageHome}" styleClass="input-width"
+				            <p:inputText value="#{bean.selectedSubjectWrapper.entity.electedMortgageHome}" styleClass="input-width" disabled="true"
 				                         id="electedMortgageHome" onkeypress="numbers_letters_comma_only('#electedMortgageHome');"
 				                         maxlength="200" rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
 				            <h:outputText value="#{bean.selectedSubjectWrapper.entity.electedMortgageHome}"
@@ -306,29 +317,45 @@
 				            }
 				        </script>	
 						
-						<p:commandButton  action="#{bean.selectedSubjectWrapper.pageSave}"
+						<!-- <p:commandButton  action="#{bean.selectedSubjectWrapper.pageSave}"
 						                  style="margin-top: 10px"
 						                  value="#{empty save_button_text ? msg.save : save_button_text}"
 						                  icon="pi pi-save"
 						                  update=":messages"
-						                  styleClass="#{saveButtonStyle} p-mr-2 p-mb-2 ui-button-success"/>
+						                  styleClass="#{saveButtonStyle} p-mr-2 p-mb-2 ui-button-success"/> -->
 						
-						 <p:commandButton action="#{bean.selectedSubjectWrapper.goBack}" styleClass="p-mr-2 p-mb-2 ui-button-danger"
-						                  rendered="#{empty showCancel ? true : showCancel}"
-						                  value="#{empty customCancelMsg ? msg.cancel : customCancelMsg}"
-						                  icon="pi pi-times-circle"/>
+						 <p:commandButton onclick="PF('searchDlgWV').hide();" styleClass="p-mr-2 p-mb-2 close_btn" style="float:right;"
+						                  value="#{msg.close.toUpperCase()}" />
 		
     				</div>
     			</div>
 			</p:tab>
 
 			<p:tab title="#{msg.databaseListDocumentsFile}">
+				<div class="ui-g">
+            		<div class="ui-g-12">
+            			<p:commandButton onclick="PF('searchDlgWV').hide();" styleClass="p-mr-2 p-mb-2 close_btn" style="float:right;"
+						                  value="#{msg.close.toUpperCase()}" />
+            		</div>
+            	</div>
 			</p:tab>
 
 			<p:tab title="#{msg.databaseListServicesFulfilled}">
+				<div class="ui-g">
+            		<div class="ui-g-12">
+            			<p:commandButton onclick="PF('searchDlgWV').hide();" styleClass="p-mr-2 p-mb-2 close_btn" style="float:right;"
+						                  value="#{msg.close.toUpperCase()}" />
+            		</div>
+            	</div>
 			</p:tab>
 
 			<p:tab title="#{msg.databaseListBilling}">
+				<div class="ui-g">
+            		<div class="ui-g-12">
+            			<p:commandButton onclick="PF('searchDlgWV').hide();" styleClass="p-mr-2 p-mb-2 close_btn" style="float:right;"
+						                  value="#{msg.close.toUpperCase()}" />
+            		</div>
+            	</div>
 			</p:tab>
 		</p:tabView>
 	</p:dialog>
