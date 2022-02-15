@@ -127,6 +127,8 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 	private Long selectedDocumentId;
 
 	private List<Long> listIds;
+	
+	private UIComponent formalitaTab;
 
 	@Override
 	public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
@@ -168,6 +170,11 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 
 		this.setSexTypes(ComboboxHelper.fillList(SexTypes.class, false));
 		this.setSubjectTypes(ComboboxHelper.fillList(SubjectType.class, false));
+		
+		List<Long> listIds = EstateSituationHelper.getIdSubjects(getEntity());
+        listIds.add(getEntity().getId());
+        setListIds(listIds);
+		loadFormalitaTab();
 
 	}
 
@@ -467,6 +474,14 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
             LogHelper.log(log, e);
         }
     }
+    
+	public void loadFormalitaTab() throws IllegalAccessException, PersistenceBeanException {
+    	FormalityBindingWrapper formalityBindingWrapper = new FormalityBindingWrapper(getEntity(), getListIds());
+    	formalityBindingWrapper.loadData(Boolean.FALSE);
+		Tab formalityTab = formalityBindingWrapper.getTab();
+		formalityTab.setDisabled(false);
+		setFormalitaTab(formalityTab);
+    }
 
     public boolean isOnlyView() {
         return onlyView;
@@ -684,5 +699,13 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
     public void setListIds(List<Long> listIds) {
         this.listIds = listIds;
     }
+    
+    public UIComponent getFormalitaTab() {
+		return formalitaTab;
+	}
+
+	public void setFormalitaTab(UIComponent formalitaTab) {
+		this.formalitaTab = formalitaTab;
+	}
 
 }

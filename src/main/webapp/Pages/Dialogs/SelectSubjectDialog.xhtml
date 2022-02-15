@@ -47,10 +47,10 @@
 			font-weight: bold;
 		}
 		
-		body #searchDlg .ui-widget-header {
+		/* body #searchDlg .ui-widget-header {
     		background-color: #ffffff !important;
     		color: #000000 !important;
-		}
+		} */
 		
 		#searchDlg_title {
 			margin-left: 20px;
@@ -66,6 +66,53 @@
 		body #searchDlg .ui-button {
 			border: 1px solid #ced4da !important;
 		}
+		
+		body .ui-accordion .ui-accordion-header {
+		    border: none;
+		    border-top: 0 none;
+		    background: #FFFFFF !important;
+		    color: #000000 !important;
+		    padding: 1rem;
+		    font-weight: 700;
+		    margin-top: 0;
+		    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+		    user-select: none;
+		    border-radius: 0;
+		    position: relative;
+		    outline: 0 none;
+		}
+		
+		body .ui-accordion .ui-accordion-header:focus {
+			box-shadow: 0 0 0 0.2rem #FFFFFF !important;
+		}
+		
+		body .ui-accordion .ui-accordion-header:first-child {
+		    border-top: none;
+		}
+		
+		body .ui-accordion .ui-accordion-content {
+    		border: none;
+    	}
+    	
+    	body #searchDlg .ui-button.ui-button-icon-only {
+    		width: 0px !important;
+		}
+		
+		body .ui-accordion .ui-accordion-content .ui-datatable thead th, 
+		.ui-accordion .ui-accordion-content .ui-datatable tbody td, 
+		.ui-accordion .ui-accordion-content .ui-datatable tfoot td, 
+		.ui-accordion .ui-accordion-content .ui-datatable tfoot th {
+    		border: none !important;
+		}
+		
+		body .ui-accordion .ui-accordion-content .ui-datatable tbody.ui-datatable-data {
+    		border-left: none !important;
+		}
+		
+		body .ui-accordion .ui-accordion-content .ui-widget-header {
+    		background-color: #788FA7 !important;
+    	}
+		
 	</style>
 	<p:dialog header="#{msg.databaseListSubjectDatabase}" modal="true" width="900" id="searchDlg" resizable="false" draggable="false"
 		dynamic="true" widgetVar="searchDlgWV">
@@ -334,6 +381,11 @@
 			<p:tab title="#{msg.databaseListDocumentsFile}">
 				<div class="ui-g">
             		<div class="ui-g-12">
+                    	<p:accordionPanel multiple="false" activeIndex="0" id="accordionPanel">
+                        	<p:tab binding="#{bean.selectedSubjectWrapper.formalitaTab}">
+                            
+                        	</p:tab>
+                    	</p:accordionPanel>
             			<p:commandButton onclick="PF('searchDlgWV').hide();" styleClass="p-mr-2 p-mb-2 close_btn" style="float:right;"
 						                  value="#{msg.close.toUpperCase()}" />
             		</div>
