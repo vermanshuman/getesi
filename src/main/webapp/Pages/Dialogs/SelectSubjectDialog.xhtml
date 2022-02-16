@@ -122,7 +122,7 @@
 		dynamic="true" widgetVar="searchDlgWV">
 		<p:scrollPanel mode="native"  style="width: 100%; min-height: 300px; max-height: 600px;">
 			<p:tabView dynamic="true" cache="true" id="subjectTabs"
-				activeIndex="0">
+				activeIndex="#{bean.selectedSubjectWrapper.activeTabIndex}">
 				<!-- <p:ajax event="tabChange" listener="#{bean.selectedSubjectWrapper.onSubjectTabChange}" /> -->
 				<p:tab title="#{msg.databaseListData}">
 					
@@ -386,9 +386,8 @@
 					<div class="ui-g">
 	            		<div class="ui-g-12">
 	                    	<p:accordionPanel multiple="false" activeIndex="0" id="accordionPanel">
-	                        	<p:tab binding="#{bean.selectedSubjectWrapper.formalitaTab}">
-	                            
-	                        	</p:tab>
+	                        	<p:tab binding="#{bean.selectedSubjectWrapper.formalitaTab}"/>
+								<p:tab binding="#{bean.selectedSubjectWrapper.catastiTab}"/>	                        	
 	                    	</p:accordionPanel>
 	            			<p:commandButton onclick="PF('searchDlgWV').hide();" styleClass="p-mr-2 p-mb-2 close_btn" style="float:right;"
 							                  value="#{msg.close.toUpperCase()}" />

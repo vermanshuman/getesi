@@ -129,6 +129,10 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 	private List<Long> listIds;
 	
 	private UIComponent formalitaTab;
+	
+	private int activeTabIndex;
+	
+	private UIComponent catastiTab;
 
 	@Override
 	public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
@@ -139,6 +143,7 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 
 	public void onLoad(Long entityId) throws NumberFormatException, HibernateException, PersistenceBeanException,
 			InstantiationException, IllegalAccessException {
+		this.setActiveTabIndex(0);
 		this.setEntityId(entityId);
 		setProvinces(ComboboxHelper.fillList(Province.class, Order.asc("description")));
 		getProvinces().add(new SelectItem(Province.FOREIGN_COUNTRY_ID, Province.FOREIGN_COUNTRY));
@@ -175,6 +180,7 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
         listIds.add(getEntity().getId());
         setListIds(listIds);
 		loadFormalitaTab();
+		loadCatastiTab();
 
 	}
 
@@ -482,6 +488,14 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 		formalityTab.setDisabled(false);
 		setFormalitaTab(formalityTab);
     }
+	
+	public void loadCatastiTab() throws IllegalAccessException, PersistenceBeanException {
+		CadastralBindingWrapper cadastralBindingWrapper = new CadastralBindingWrapper(getListIds(), getEntity(), DocumentType.CADASTRAL);
+        cadastralBindingWrapper.loadData(Boolean.TRUE);
+        Tab catastiTab = cadastralBindingWrapper.getTab();
+        catastiTab.setDisabled(false);
+        setCatastiTab(catastiTab);
+	}
 
     public boolean isOnlyView() {
         return onlyView;
@@ -708,4 +722,23 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 		this.formalitaTab = formalitaTab;
 	}
 
+	public int getActiveTabIndex() {
+		return activeTabIndex;
+	}
+
+	public void setActiveTabIndex(int activeTabIndex) {
+		this.activeTabIndex = activeTabIndex;
+	}
+
+	public UIComponent getCatastiTab() {
+		return catastiTab;
+	}
+
+	public void setCatastiTab(UIComponent catastiTab) {
+		this.catastiTab = catastiTab;
+	}
+	
+	
+
+	
 }
