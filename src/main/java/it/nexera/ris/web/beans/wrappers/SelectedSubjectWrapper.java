@@ -133,6 +133,8 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 	private int activeTabIndex;
 	
 	private UIComponent catastiTab;
+	
+	private UIComponent elenchiSinteticiTab;
 
 	@Override
 	public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
@@ -181,6 +183,7 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
         setListIds(listIds);
 		loadFormalitaTab();
 		loadCatastiTab();
+		loadElenchiSinteticiTab();
 
 	}
 
@@ -496,6 +499,13 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
         catastiTab.setDisabled(false);
         setCatastiTab(catastiTab);
 	}
+	
+	public void loadElenchiSinteticiTab() throws IllegalAccessException, PersistenceBeanException {
+		SyntheticBindingWrapper syntheticBindingWrapper = new SyntheticBindingWrapper(listIds);
+		Tab elenchiSinteticiTab = syntheticBindingWrapper.getTab();
+		elenchiSinteticiTab.setDisabled(false);
+		setElenchiSinteticiTab(elenchiSinteticiTab);
+	}
 
     public boolean isOnlyView() {
         return onlyView;
@@ -736,6 +746,14 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 
 	public void setCatastiTab(UIComponent catastiTab) {
 		this.catastiTab = catastiTab;
+	}
+
+	public UIComponent getElenchiSinteticiTab() {
+		return elenchiSinteticiTab;
+	}
+
+	public void setElenchiSinteticiTab(UIComponent elenchiSinteticiTab) {
+		this.elenchiSinteticiTab = elenchiSinteticiTab;
 	}
 	
 	
