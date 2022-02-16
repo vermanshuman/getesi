@@ -95,7 +95,7 @@
     	}
     	
     	body #searchDlg .ui-button.ui-button-icon-only {
-    		width: 0px !important;
+    		width: 26px !important;
 		}
 		
 		body .ui-accordion .ui-accordion-content .ui-datatable thead th, 
@@ -390,7 +390,8 @@
 								<p:tab binding="#{bean.selectedSubjectWrapper.catastiTab}"/>
 								<p:tab binding="#{bean.selectedSubjectWrapper.elenchiSinteticiTab}"/>
 								<p:tab binding="#{bean.selectedSubjectWrapper.visureIpotecarieTab}"/>
-								<p:tab binding="#{bean.selectedSubjectWrapper.soggettiValidatiTab}"/>	                        	
+								<p:tab binding="#{bean.selectedSubjectWrapper.soggettiValidatiTab}"/>
+								<p:tab binding="#{bean.selectedSubjectWrapper.visureTestoTab}"/>	                        	
 	                    	</p:accordionPanel>
 	            			<p:commandButton onclick="PF('searchDlgWV').hide();" styleClass="p-mr-2 p-mb-2 close_btn" style="float:right;"
 							                  value="#{msg.close.toUpperCase()}" />

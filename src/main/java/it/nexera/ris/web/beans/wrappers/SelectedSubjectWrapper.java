@@ -139,6 +139,8 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 	private UIComponent visureIpotecarieTab;
 	
 	private UIComponent soggettiValidatiTab;
+	
+	private UIComponent visureTestoTab;
 
 	@Override
 	public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
@@ -190,6 +192,7 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 		loadElenchiSinteticiTab();
 		loadVisureIpotecarieTab();
 		loadSoggettiValidatiTab();
+		loadVisureTestoTab();
 	}
 
 	@Override
@@ -526,6 +529,10 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 	public void loadSoggettiValidatiTab() throws IllegalAccessException, PersistenceBeanException {
 		setSoggettiValidatiTab(new FormalitySubjectBindingWrapper(listIds).getTab());
 	}
+	
+	public void loadVisureTestoTab() throws IllegalAccessException, PersistenceBeanException {
+		setVisureTestoTab(new VisureRTFBindingWrapper(getEntity()).getTab());
+	}
 
     public boolean isOnlyView() {
         return onlyView;
@@ -790,6 +797,14 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 
 	public void setSoggettiValidatiTab(UIComponent soggettiValidatiTab) {
 		this.soggettiValidatiTab = soggettiValidatiTab;
+	}
+
+	public UIComponent getVisureTestoTab() {
+		return visureTestoTab;
+	}
+
+	public void setVisureTestoTab(UIComponent visureTestoTab) {
+		this.visureTestoTab = visureTestoTab;
 	}
 	
 	
