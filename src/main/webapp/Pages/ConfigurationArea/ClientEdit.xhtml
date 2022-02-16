@@ -21,6 +21,12 @@
        #configurePriceList .ui-panelgrid-cell{
            border: 0px !important;
         }
+        #configurePriceList{
+            overflow: hidden !important;
+        }
+        #configurePriceList .ui-dialog-titlebar{
+            padding: 5px !important;
+        }
     </style>
         <p:remoteCommand name="valid" action="#{bean.validTab()}"/>
         <p:remoteCommand name="updateRedStarFroms" action="#{bean.updateForms()}"
@@ -899,10 +905,10 @@
         </p:dialog>
 
         <p:dialog id="configurePriceList" width="90%" widgetVar="configurePriceListWV" styleClass="table-center"
-                  resizable="false" closable="false" draggable="true" modal="true">
+                  resizable="false" closable="true" fitViewport="true"  draggable="false" modal="true" style="max-height: 85%;" >
             <p:outputPanel widgetVar="configurePriceListPanel" id="configurePriceListPanel">
                 <p:dataTable var="itemR" value="#{bean.selectedService.priceLists}" styleClass="without-header borderless"
-                             emptyMessage="#{msg.noRecordsFound}" id="configurePriceListTable">
+                             emptyMessage="#{msg.noRecordsFound}" id="configurePriceListTable" style="min-height: 100px; height: 300px; overflow: auto;">
                     <p:column>
                         <h:outputText value="#{itemR.costConfiguration}" style="font-weight: bold;"/>
                         <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group" columnClasses="column-height"
