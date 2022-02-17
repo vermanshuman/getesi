@@ -156,7 +156,7 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 	public void onLoad(Long entityId) throws NumberFormatException, HibernateException, PersistenceBeanException,
 			InstantiationException, IllegalAccessException {
 		this.setActiveTabIndex(0);
-		this.setActivePanelIndex(0);
+		this.setActivePanelIndex(-1);
 		this.setEntityId(entityId);
 		setProvinces(ComboboxHelper.fillList(Province.class, Order.asc("description")));
 		getProvinces().add(new SelectItem(Province.FOREIGN_COUNTRY_ID, Province.FOREIGN_COUNTRY));
@@ -505,7 +505,9 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 		formalityTab.setDisabled(false);
 		if(formalityBindingWrapper.getCountTable().longValue() == 0l) {
 			formalityTab.setDisabled(true);
-		}
+		}else{
+                    this.setActivePanelIndex(0);
+                }
 		setFormalitaTab(formalityTab);
     }
 	

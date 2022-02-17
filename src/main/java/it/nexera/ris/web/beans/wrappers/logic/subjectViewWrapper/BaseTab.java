@@ -33,13 +33,14 @@ public abstract class BaseTab {
         if (getCountTable() != 0L) {
             tab.setTitle(String.format("%s (%d)", getTabTitle(), getCountTable()));
             tab.setTitleStyle("font-weight: bold;");
+             DataTable dataTable = getTable();
+            dataTable.getChildren().addAll(getColumns());
+            tab.getChildren().add(dataTable);
         } else {
             tab.setTitle(getTabTitle());
             tab.setTitleStyle("font-weight: normal;");
         }
-        DataTable dataTable = getTable();
-        dataTable.getChildren().addAll(getColumns());
-        tab.getChildren().add(dataTable);
+       
         return tab;
     }
 
