@@ -13,10 +13,10 @@ import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
 import it.nexera.ris.persistence.view.FormalityView;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.beans.EntityLazyListPageBean;
-import it.nexera.ris.web.beans.wrappers.SelectedSubjectWrapper;
 import it.nexera.ris.web.beans.wrappers.UploadFilesWithContent;
 import it.nexera.ris.web.beans.wrappers.logic.DocumentWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.FileWrapper;
+import it.nexera.ris.web.beans.wrappers.logic.SelectedSubjectWrapper;
 import it.nexera.ris.web.common.EntityLazyListModel;
 import it.nexera.ris.web.common.ListPaginator;
 import lombok.Getter;
@@ -244,14 +244,15 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
     @Getter
     @Setter
     private ListPaginator paginator;
-    
+
     @Getter
     @Setter
     private int activeSubjectTabIndex;
-    
+
     @Getter
     @Setter
     private SelectedSubjectWrapper selectedSubjectWrapper = new SelectedSubjectWrapper();
+
 
     private void pageLoadStatic() {
         if (SessionHelper.get("requestFormalityView") != null)
@@ -1258,12 +1259,6 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
             }
         }
     }
-    
-    public final void onSubjectTabChange(final TabChangeEvent event) {
-        TabView tv = (TabView) event.getComponent();
-        this.activeSubjectTabIndex = tv.getActiveIndex();
-        SessionHelper.put("activeSubjectTabIndex", activeSubjectTabIndex);
-    }
 
     public void clearUploadedFile() {
         this.setDocumentForUploadVisureRTF(null);
@@ -2004,24 +1999,29 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
             } else if (tableHeader.equalsIgnoreCase("fiscal_code_header")) {
                 getPaginator().setTableSortColumn("fiscalCode");
                 filterSubjectTable();
-            }else if (tableHeader.equalsIgnoreCase("birth_date_header")) {
+            } else if (tableHeader.equalsIgnoreCase("birth_date_header")) {
                 getPaginator().setTableSortColumn("birthDate");
                 filterSubjectTable();
             }
         }
     }
-    
-    public void loadSelectedSubject() throws NumberFormatException, HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
-    	System.out.println(this.getEntityEditId());
-    	getSelectedSubjectWrapper().onLoad(this.getEntityEditId());
-    }
-    
-    public void saveSelectedSubject() {
-    	getSelectedSubjectWrapper().saveFromDialog();
-    }
 
     public void filterColumn() {
         filterSubjectTable();
+    }
+
+    public final void onSubjectTabChange(final TabChangeEvent event) {
+        TabView tv = (TabView) event.getComponent();
+        this.activeSubjectTabIndex = tv.getActiveIndex();
+        SessionHelper.put("activeSubjectTabIndex", activeSubjectTabIndex);
+    }
+
+    public void loadSelectedSubject() throws NumberFormatException, HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        getSelectedSubjectWrapper().onLoad(this.getEntityEditId());
+    }
+
+    public void saveSelectedSubject() {
+        getSelectedSubjectWrapper().saveFromDialog();
     }
 
     public boolean standardContainsFilterForStringColumn(Object columnValue, Object filterValue, Locale locale) {

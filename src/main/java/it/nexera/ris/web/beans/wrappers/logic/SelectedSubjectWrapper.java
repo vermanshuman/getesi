@@ -1,52 +1,11 @@
-package it.nexera.ris.web.beans.wrappers;
+package it.nexera.ris.web.beans.wrappers.logic;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-
-import javax.el.ValueExpression;
-import javax.faces.application.FacesMessage;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.model.SelectItem;
-
-import org.hibernate.HibernateException;
-import org.hibernate.StaleObjectStateException;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
-import org.primefaces.component.tabview.Tab;
-import org.primefaces.component.tabview.TabView;
-import org.primefaces.context.RequestContext;
-import org.primefaces.model.LazyDataModel;
-
-import it.nexera.ris.common.enums.DocumentGenerationPlaces;
 import it.nexera.ris.common.enums.DocumentType;
-import it.nexera.ris.common.enums.PageTypes;
 import it.nexera.ris.common.enums.PropertyWrapperType;
 import it.nexera.ris.common.enums.SexTypes;
 import it.nexera.ris.common.enums.SubjectType;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
-import it.nexera.ris.common.helpers.CalcoloCodiceFiscale;
-import it.nexera.ris.common.helpers.ComboboxHelper;
-import it.nexera.ris.common.helpers.EstateSituationHelper;
-import it.nexera.ris.common.helpers.FileHelper;
-import it.nexera.ris.common.helpers.GeneralFunctionsHelper;
-import it.nexera.ris.common.helpers.LogHelper;
-import it.nexera.ris.common.helpers.MessageHelper;
-import it.nexera.ris.common.helpers.PrintPDFHelper;
-import it.nexera.ris.common.helpers.RedirectHelper;
-import it.nexera.ris.common.helpers.ResourcesHelper;
-import it.nexera.ris.common.helpers.SessionHelper;
-import it.nexera.ris.common.helpers.ValidationHelper;
-import it.nexera.ris.common.helpers.VisureManageHelper;
+import it.nexera.ris.common.helpers.*;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.Document;
@@ -58,152 +17,170 @@ import it.nexera.ris.persistence.beans.entities.domain.dictionary.Country;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
 import it.nexera.ris.web.beans.EntityEditPageBean;
-import it.nexera.ris.web.beans.pages.RequestListBean;
-import it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper.CadastralBindingWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper.FormalityBindingWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper.FormalitySubjectBindingWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper.RequestBindingWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper.RequestTypeBindingWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper.SyntheticBindingWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper.VisureDHBindingWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper.VisureRTFBindingWrapper;
-import lombok.Data;
+import it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper.*;
+import org.hibernate.HibernateException;
+import org.hibernate.StaleObjectStateException;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
+import org.primefaces.component.tabview.Tab;
+import org.primefaces.context.RequestContext;
+import org.primefaces.model.LazyDataModel;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.component.UIComponent;
+import javax.faces.model.SelectItem;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 
 
 public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implements Serializable {
 
-	private static final long serialVersionUID = -7366211875713976214L;
+    private static final long serialVersionUID = -7366211875713976214L;
 
-	private boolean onlyView;
+    private boolean onlyView;
 
-	private Boolean foreignCountry;
+    private Boolean foreignCountry;
 
-	private Long addressProvinceId;
+    private Long addressProvinceId;
 
-	private Long addressCityId;
+    private Long addressCityId;
 
-	private Long selectedCountryId;
+    private Long selectedCountryId;
 
-	private Long downloadFileId;
+    private Long downloadFileId;
 
-	private Long selectedTemplateId;
+    private Long selectedTemplateId;
 
-	private List<SelectItem> provinces;
+    private List<SelectItem> provinces;
 
-	private List<SelectItem> addressCities;
+    private List<SelectItem> addressCities;
 
-	private List<SelectItem> sexTypes;
+    private List<SelectItem> sexTypes;
 
-	private List<SelectItem> subjectTypes;
+    private List<SelectItem> subjectTypes;
 
-	private List<SelectItem> countries;
+    private List<SelectItem> countries;
 
-	private List<SelectItem> templates;
+    private List<SelectItem> templates;
 
-	private LazyDataModel<Property> lazyRealEstateModel;
+    private LazyDataModel<Property> lazyRealEstateModel;
 
-	private Document printDocument;
+    private Document printDocument;
 
-	private Long editPropertyId;
+    private Long editPropertyId;
 
-	private Boolean renderHeader;
+    private Boolean renderHeader;
 
-	private Boolean renderFooter;
+    private Boolean renderFooter;
 
-	private Boolean showSave;
+    private Boolean showSave;
 
-	private Boolean showCancel;
+    private Boolean showCancel;
 
-	private List<SelectItem> propertyWrapperType;
+    private List<SelectItem> propertyWrapperType;
 
-	private Long selectedPropertyType;
+    private Long selectedPropertyType;
 
-	private UIComponent componentTabView;
+    private UIComponent componentTabView;
 
-	private Request downloadRequest;
+    private Request downloadRequest;
 
-	private List<Document> requestDocuments;
+    private List<Document> requestDocuments;
 
-	private Long selectedDocumentId;
+    private Long selectedDocumentId;
 
-	private List<Long> listIds;
-	
-	private UIComponent formalitaTab;
-	
-	private int activeTabIndex;
-	
-	private UIComponent catastiTab;
-	
-	private UIComponent elenchiSinteticiTab;
-	
-	private UIComponent visureIpotecarieTab;
-	
-	private UIComponent soggettiValidatiTab;
-	
-	private UIComponent visureTestoTab;
-	
-	private UIComponent visureDHTab;
-	
-	private Integer activePanelIndex; 
+    private List<Long> listIds;
 
-	@Override
-	public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
-			InstantiationException, IllegalAccessException {
-		
+    private UIComponent formalitaTab;
 
-	}
+    private int activeTabIndex;
 
-	public void onLoad(Long entityId) throws NumberFormatException, HibernateException, PersistenceBeanException,
-			InstantiationException, IllegalAccessException {
-		this.setActiveTabIndex(0);
-		this.setActivePanelIndex(-1);
-		this.setEntityId(entityId);
-		setProvinces(ComboboxHelper.fillList(Province.class, Order.asc("description")));
-		getProvinces().add(new SelectItem(Province.FOREIGN_COUNTRY_ID, Province.FOREIGN_COUNTRY));
-		this.setPropertyWrapperType(ComboboxHelper.fillList(PropertyWrapperType.class, false, true));
+    private UIComponent catastiTab;
 
-		this.setAddressCities(ComboboxHelper.fillList(new ArrayList<City>(), true));
+    private UIComponent elenchiSinteticiTab;
 
-		if (this.getEntity().getBirthProvince() != null) {
-			this.setAddressProvinceId(this.getEntity().getBirthProvince().getId());
-			handleAddressProvinceChange();
-		}
+    private UIComponent visureIpotecarieTab;
 
-		setForeignCountry(getEntity().getForeignCountry());
+    private UIComponent soggettiValidatiTab;
 
-		if (getForeignCountry()) {
-			setAddressProvinceId(Province.FOREIGN_COUNTRY_ID);
-		}
+    private UIComponent visureTestoTab;
 
-		if (this.getEntity().getBirthCity() != null) {
-			this.setAddressCityId(this.getEntity().getBirthCity().getId());
-		}
+    private UIComponent visureDHTab;
 
-		this.setCountries(ComboboxHelper.fillList(Country.class, Order.asc("description"),
-				new Criterion[] { Restrictions.ne("description", "ITALIA") }));
+    private Integer activePanelIndex;
 
-		if (this.getEntity().getCountry() != null) {
-			this.setSelectedCountryId(this.getEntity().getCountry().getId());
-		}
+    private UIComponent servizioAnagraficoTab;
 
-		this.setSexTypes(ComboboxHelper.fillList(SexTypes.class, false));
-		this.setSubjectTypes(ComboboxHelper.fillList(SubjectType.class, false));
-		
-		List<Long> listIds = EstateSituationHelper.getIdSubjects(getEntity());
+    private UIComponent servizioImmobiliareTab;
+
+    private UIComponent servizioInvestigativoTab;
+
+    private UIComponent servizioCameraleTab;
+
+    private Integer activePanelServicesIndex;
+
+    @Override
+    public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
+            InstantiationException, IllegalAccessException {
+    }
+
+    public void onLoad(Long entityId) throws NumberFormatException, HibernateException, PersistenceBeanException,
+            InstantiationException, IllegalAccessException {
+        this.setActiveTabIndex(0);
+        this.setActivePanelIndex(-1);
+        this.setActivePanelServicesIndex(0);
+        this.setEntityId(entityId);
+        setProvinces(ComboboxHelper.fillList(Province.class, Order.asc("description")));
+        getProvinces().add(new SelectItem(Province.FOREIGN_COUNTRY_ID, Province.FOREIGN_COUNTRY));
+        this.setPropertyWrapperType(ComboboxHelper.fillList(PropertyWrapperType.class, false, true));
+
+        this.setAddressCities(ComboboxHelper.fillList(new ArrayList<City>(), true));
+
+        if (this.getEntity().getBirthProvince() != null) {
+            this.setAddressProvinceId(this.getEntity().getBirthProvince().getId());
+            handleAddressProvinceChange();
+        }
+
+        setForeignCountry(getEntity().getForeignCountry());
+
+        if (getForeignCountry()) {
+            setAddressProvinceId(Province.FOREIGN_COUNTRY_ID);
+        }
+
+        if (this.getEntity().getBirthCity() != null) {
+            this.setAddressCityId(this.getEntity().getBirthCity().getId());
+        }
+
+        this.setCountries(ComboboxHelper.fillList(Country.class, Order.asc("description"),
+                new Criterion[]{Restrictions.ne("description", "ITALIA")}));
+
+        if (this.getEntity().getCountry() != null) {
+            this.setSelectedCountryId(this.getEntity().getCountry().getId());
+        }
+
+        this.setSexTypes(ComboboxHelper.fillList(SexTypes.class, false));
+        this.setSubjectTypes(ComboboxHelper.fillList(SubjectType.class, false));
+        List<Long> listIds = EstateSituationHelper.getIdSubjects(getEntity());
         listIds.add(getEntity().getId());
         setListIds(listIds);
-		loadFormalitaTab();
-		loadCatastiTab();
-		loadElenchiSinteticiTab();
-		loadVisureIpotecarieTab();
-		loadSoggettiValidatiTab();
-		loadVisureTestoTab();
-		loadVisureDHTab();
-	}
+        loadFormalitaTab();
+        loadCatastiTab();
+        loadElenchiSinteticiTab();
+        loadVisureIpotecarieTab();
+        loadSoggettiValidatiTab();
+        loadVisureTestoTab();
+        loadVisureDHTab();
+        loadServiziEvasiTabs();
+    }
 
-	@Override
-	public void onValidate() throws PersistenceBeanException, HibernateException, IllegalAccessException {
-		if (ValidationHelper.isNullOrEmpty(this.getEntity().getTypeId())) {
+    @Override
+    public void onValidate() throws PersistenceBeanException, HibernateException, IllegalAccessException {
+        if (ValidationHelper.isNullOrEmpty(this.getEntity().getTypeId())) {
             addRequiredFieldException("form:subjectType");
         }
 
@@ -259,14 +236,14 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
         }
 
         if (!getIsPhysicalPerson() && ValidationHelper
-        		.isNullOrEmpty(this.getEntity().getFiscalCode())
-                ) {
+                .isNullOrEmpty(this.getEntity().getFiscalCode())
+        ) {
             addRequiredFieldException("form:codeFiscal");
         }
-        
-        if(!getIsPhysicalPerson() && ValidationHelper
+
+        if (!getIsPhysicalPerson() && ValidationHelper
                 .isNullOrEmpty(this.getEntity().getNumberVAT())) {
-        	addRequiredFieldException("form:numberVAT");
+            addRequiredFieldException("form:numberVAT");
         }
         try {
             if (!getValidationFailed()) {
@@ -316,12 +293,12 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
             LogHelper.log(log, e);
         }
 
-	}
+    }
 
-	@Override
-	public void onSave() throws HibernateException, PersistenceBeanException, NumberFormatException, IOException,
-			InstantiationException, IllegalAccessException {
-		if (this.getAddressCityId() != null) {
+    @Override
+    public void onSave() throws HibernateException, PersistenceBeanException, NumberFormatException, IOException,
+            InstantiationException, IllegalAccessException {
+        if (this.getAddressCityId() != null) {
             City city = DaoManager.get(City.class, this.getAddressCityId());
             this.getEntity().setBirthCity(city);
         }
@@ -344,9 +321,9 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 
         DaoManager.save(this.getEntity());
 
-	}
-	
-	public void saveFromDialog() {
+    }
+
+    public void saveFromDialog() {
         if (this.getSaveFlag() == 0) {
             try {
                 this.cleanValidation();
@@ -394,25 +371,25 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
         }
     }
 
-	public void handleAddressProvinceChange()
-			throws HibernateException, PersistenceBeanException, IllegalAccessException {
-		if (!Province.FOREIGN_COUNTRY_ID.equals(this.getAddressProvinceId())) {
-			this.setForeignCountry(Boolean.FALSE);
+    public void handleAddressProvinceChange()
+            throws HibernateException, PersistenceBeanException, IllegalAccessException {
+        if (!Province.FOREIGN_COUNTRY_ID.equals(this.getAddressProvinceId())) {
+            this.setForeignCountry(Boolean.FALSE);
 
-			this.setAddressCities(ComboboxHelper.fillList(City.class, Order.asc("description"),
-					new Criterion[] { Restrictions.eq("province.id", this.getAddressProvinceId()),
-							Restrictions.eq("external", Boolean.TRUE) }));
-		} else {
-			this.setForeignCountry(Boolean.TRUE);
-		}
-	}
-	
-	public boolean getIsPhysicalPerson() {
+            this.setAddressCities(ComboboxHelper.fillList(City.class, Order.asc("description"),
+                    new Criterion[]{Restrictions.eq("province.id", this.getAddressProvinceId()),
+                            Restrictions.eq("external", Boolean.TRUE)}));
+        } else {
+            this.setForeignCountry(Boolean.TRUE);
+        }
+    }
+
+    public boolean getIsPhysicalPerson() {
         return getEntity().getTypeId() == null || SubjectType.PHYSICAL_PERSON
                 .getId().equals(getEntity().getTypeId());
     }
-	
-	public String getCityDescription() {
+
+    public String getCityDescription() {
         return this.loadDescriptionById(City.class, this.getAddressCityId());
     }
 
@@ -429,27 +406,26 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
         return this.loadDescriptionById(Province.class,
                 this.getAddressProvinceId());
     }
-    
-    public void loadTabs(){
+
+    public void loadTabs() {
         List<Tab> tabList = new ArrayList<>();
         ListIterator<UIComponent> itr = getComponentTabView().getChildren().listIterator();
-        while (itr.hasNext())
-        {
-            Tab tab = (Tab)itr.next();
+        while (itr.hasNext()) {
+            Tab tab = (Tab) itr.next();
             String title = tab.getTitle();
             try {
-                if(!ValidationHelper.isNullOrEmpty(title)){
-                    if(title.startsWith(ResourcesHelper.getString("subjectViewFormality"))){
+                if (!ValidationHelper.isNullOrEmpty(title)) {
+                    if (title.startsWith(ResourcesHelper.getString("subjectViewFormality"))) {
                         FormalityBindingWrapper formalityTab = new FormalityBindingWrapper(getEntity(), getListIds());
                         formalityTab.loadData(Boolean.FALSE);
                         itr.set(formalityTab.getTab());
                         RequestContext.getCurrentInstance().update("tabView");
-                    }else if(title.startsWith(ResourcesHelper.getString("subjectViewCadastral"))){
+                    } else if (title.startsWith(ResourcesHelper.getString("subjectViewCadastral"))) {
                         CadastralBindingWrapper cadastralBindingWrapper = new CadastralBindingWrapper(getListIds(), getEntity(), DocumentType.CADASTRAL);
                         cadastralBindingWrapper.loadData(true);
                         itr.set(cadastralBindingWrapper.getTab());
                         RequestContext.getCurrentInstance().update("tabView");
-                    }else if(title.startsWith(ResourcesHelper.getString("subjectViewDocuments"))){
+                    } else if (title.startsWith(ResourcesHelper.getString("subjectViewDocuments"))) {
                         CadastralBindingWrapper cadastralBindingWrapper = new CadastralBindingWrapper(getListIds(), getEntity(), DocumentType.INDIRECT_CADASTRAL);
                         cadastralBindingWrapper.loadData(true);
                         itr.set(cadastralBindingWrapper.getTab());
@@ -461,7 +437,7 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
             }
         }
     }
-    
+
     public void generateFiscalCode() {
         City city = null;
         try {
@@ -497,83 +473,125 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
             LogHelper.log(log, e);
         }
     }
-    
-	public void loadFormalitaTab() throws IllegalAccessException, PersistenceBeanException {
-    	FormalityBindingWrapper formalityBindingWrapper = new FormalityBindingWrapper(getEntity(), getListIds());
-    	formalityBindingWrapper.loadData(Boolean.FALSE);
-		Tab formalityTab = formalityBindingWrapper.getTab();
-		formalityTab.setDisabled(false);
-		if(formalityBindingWrapper.getCountTable().longValue() == 0l) {
-			formalityTab.setDisabled(true);
-		}else{
-                    this.setActivePanelIndex(0);
-                }
-		setFormalitaTab(formalityTab);
+
+    public void loadFormalitaTab() throws IllegalAccessException, PersistenceBeanException {
+        FormalityBindingWrapper formalityBindingWrapper = new FormalityBindingWrapper(getEntity(), getListIds());
+        formalityBindingWrapper.loadData(Boolean.TRUE);
+        Tab formalityTab = formalityBindingWrapper.getTab();
+        formalityTab.setDisabled(false);
+        if(formalityBindingWrapper.getCountTable().longValue() == 0l) {
+            formalityTab.setDisabled(true);
+        }else {
+            this.setActivePanelIndex(0);
+        }
+        setFormalitaTab(formalityTab);
     }
-	
-	public void loadCatastiTab() throws IllegalAccessException, PersistenceBeanException {
-		CadastralBindingWrapper cadastralBindingWrapper = new CadastralBindingWrapper(getListIds(), getEntity(), DocumentType.CADASTRAL);
+
+    public void loadCatastiTab() throws IllegalAccessException, PersistenceBeanException {
+        CadastralBindingWrapper cadastralBindingWrapper = new CadastralBindingWrapper(getListIds(), getEntity(), DocumentType.CADASTRAL);
         cadastralBindingWrapper.loadData(Boolean.TRUE);
         Tab catastiTab = cadastralBindingWrapper.getTab();
         catastiTab.setDisabled(false);
         if(cadastralBindingWrapper.getCountTable().longValue() == 0l) {
-        	catastiTab.setDisabled(true);
-		}
+            catastiTab.setDisabled(true);
+        }
         setCatastiTab(catastiTab);
-	}
-	
-	public void loadElenchiSinteticiTab() throws IllegalAccessException, PersistenceBeanException {
-		SyntheticBindingWrapper syntheticBindingWrapper = new SyntheticBindingWrapper(listIds);
-		Tab elenchiSinteticiTab = syntheticBindingWrapper.getTab();
-		elenchiSinteticiTab.setDisabled(false);
-		if(syntheticBindingWrapper.getCountTable().longValue() == 0l) {
-			elenchiSinteticiTab.setDisabled(true);
-		}
-		setElenchiSinteticiTab(elenchiSinteticiTab);
-	}
-	
-	public void loadVisureIpotecarieTab() {
-		Tab visureIpotecarieTab = getEmptyTab("subjectViewMortgage");
-		visureIpotecarieTab.setDisabled(true);
-		setVisureIpotecarieTab(visureIpotecarieTab);
-	}
-	
-	private Tab getEmptyTab(String titleResourceId) {
+    }
+
+    public void loadElenchiSinteticiTab() throws IllegalAccessException, PersistenceBeanException {
+        SyntheticBindingWrapper syntheticBindingWrapper = new SyntheticBindingWrapper(listIds);
+        Tab elenchiSinteticiTab = syntheticBindingWrapper.getTab();
+        elenchiSinteticiTab.setDisabled(false);
+        if(syntheticBindingWrapper.getCountTable().longValue() == 0l) {
+            elenchiSinteticiTab.setDisabled(true);
+        }
+        setElenchiSinteticiTab(elenchiSinteticiTab);
+    }
+
+    public void loadVisureIpotecarieTab() {
+        Tab visureIpotecarieTab = getEmptyTab("subjectViewMortgage");
+        visureIpotecarieTab.setDisabled(true);
+        setVisureIpotecarieTab(visureIpotecarieTab);
+    }
+
+    private Tab getEmptyTab(String titleResourceId) {
         Tab tab = new Tab();
         tab.setTitle(ResourcesHelper.getString(titleResourceId));
         tab.setTitleStyle("font-weight: normal;");
         return tab;
     }
-	
-	public void loadSoggettiValidatiTab() throws IllegalAccessException, PersistenceBeanException {
-		FormalitySubjectBindingWrapper formalitySubjectBindingWrapper = new FormalitySubjectBindingWrapper(listIds);
-		Tab soggettiValidatiTab = formalitySubjectBindingWrapper.getTab();
-		soggettiValidatiTab.setDisabled(false);
-		if(formalitySubjectBindingWrapper.getCountTable().longValue() == 0l) {
-			soggettiValidatiTab.setDisabled(true);
-		}
-		setSoggettiValidatiTab(soggettiValidatiTab);
-	}
-	
-	public void loadVisureTestoTab() throws IllegalAccessException, PersistenceBeanException {
-		VisureRTFBindingWrapper visureRTFBindingWrapper = new VisureRTFBindingWrapper(getEntity());
-		Tab visureTestoTab = visureRTFBindingWrapper.getTab();
-		visureTestoTab.setDisabled(false);
-		if(visureRTFBindingWrapper.getCountTable().longValue() == 0l) {
-			visureTestoTab.setDisabled(true);
-		}
-		setVisureTestoTab(visureTestoTab);
-	}
-	
-	public void loadVisureDHTab() throws IllegalAccessException, PersistenceBeanException {
-		VisureDHBindingWrapper visureDHBindingWrapper = new VisureDHBindingWrapper(getEntity());
-		Tab visureDHTab = visureDHBindingWrapper.getTab();
-		visureDHTab.setDisabled(false);
-		if(visureDHBindingWrapper.getCountTable().longValue() == 0l) {
-			visureDHTab.setDisabled(true);
-		}
-		setVisureDHTab(visureDHTab);
-	}
+
+    public void loadSoggettiValidatiTab() throws IllegalAccessException, PersistenceBeanException {
+        FormalitySubjectBindingWrapper formalitySubjectBindingWrapper = new FormalitySubjectBindingWrapper(listIds);
+        Tab soggettiValidatiTab = formalitySubjectBindingWrapper.getTab();
+        soggettiValidatiTab.setDisabled(false);
+        if(formalitySubjectBindingWrapper.getCountTable().longValue() == 0l) {
+            soggettiValidatiTab.setDisabled(true);
+        }
+        setSoggettiValidatiTab(soggettiValidatiTab);
+    }
+
+    public void loadVisureTestoTab() throws IllegalAccessException, PersistenceBeanException {
+        VisureRTFBindingWrapper visureRTFBindingWrapper = new VisureRTFBindingWrapper(getEntity());
+        Tab visureTestoTab = visureRTFBindingWrapper.getTab();
+        visureTestoTab.setDisabled(false);
+        if(visureRTFBindingWrapper.getCountTable().longValue() == 0l) {
+            visureTestoTab.setDisabled(true);
+        }
+        setVisureTestoTab(visureTestoTab);
+    }
+
+    public void loadVisureDHTab() throws IllegalAccessException, PersistenceBeanException {
+        VisureDHBindingWrapper visureDHBindingWrapper = new VisureDHBindingWrapper(getEntity());
+        Tab visureDHTab = visureDHBindingWrapper.getTab();
+        visureDHTab.setDisabled(false);
+        if(visureDHBindingWrapper.getCountTable().longValue() == 0l) {
+            visureDHTab.setDisabled(true);
+        }
+        setVisureDHTab(visureDHTab);
+    }
+
+    public void loadServiziEvasiTabs() throws HibernateException, IllegalAccessException, PersistenceBeanException {
+        List<RequestType> requestTypes = DaoManager.load(RequestType.class, new Criterion[]{Restrictions.isNotNull("name")});
+        for(RequestType requestType : requestTypes) {
+            if(requestType.getName().equalsIgnoreCase("Servizio Anagrafico")) {
+                RequestTypeBindingWrapper requestTypeBindingWrapper = new RequestTypeBindingWrapper(listIds, requestType, isOnlyView());
+                Tab servizioAnagraficoTab = requestTypeBindingWrapper.getTab();
+                servizioAnagraficoTab.setDisabled(false);
+                if(requestTypeBindingWrapper.getCountTable().longValue() == 0l) {
+                    servizioAnagraficoTab.setDisabled(true);
+                }
+                setServizioAnagraficoTab(servizioAnagraficoTab);
+            }
+            if(requestType.getName().equalsIgnoreCase("Servizio Immobiliare")) {
+                RequestTypeBindingWrapper requestTypeBindingWrapper = new RequestTypeBindingWrapper(listIds, requestType, isOnlyView());
+                Tab servizioImmobiliareTab = requestTypeBindingWrapper.getTab();
+                servizioImmobiliareTab.setDisabled(false);
+                if(requestTypeBindingWrapper.getCountTable().longValue() == 0l) {
+                    servizioImmobiliareTab.setDisabled(true);
+                }
+                setServizioImmobiliareTab(servizioImmobiliareTab);
+            }
+            if(requestType.getName().equalsIgnoreCase("Servizio Investigativo")) {
+                RequestTypeBindingWrapper requestTypeBindingWrapper = new RequestTypeBindingWrapper(listIds, requestType, isOnlyView());
+                Tab servizioInvestigativoTab = requestTypeBindingWrapper.getTab();
+                servizioInvestigativoTab.setDisabled(false);
+                if(requestTypeBindingWrapper.getCountTable().longValue() == 0l) {
+                    servizioInvestigativoTab.setDisabled(true);
+                }
+                setServizioInvestigativoTab(servizioInvestigativoTab);
+            }
+            if(requestType.getName().equalsIgnoreCase("Servizio Camerale")) {
+                RequestTypeBindingWrapper requestTypeBindingWrapper = new RequestTypeBindingWrapper(listIds, requestType, isOnlyView());
+                Tab servizioCameraleTab = requestTypeBindingWrapper.getTab();
+                servizioCameraleTab.setDisabled(false);
+                if(requestTypeBindingWrapper.getCountTable().longValue() == 0l) {
+                    servizioCameraleTab.setDisabled(true);
+                }
+                setServizioCameraleTab(servizioCameraleTab);
+            }
+        }
+    }
 
     public boolean isOnlyView() {
         return onlyView;
@@ -775,7 +793,7 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
     public void setRequestDocuments(List<Document> requestDocuments) {
         this.requestDocuments = requestDocuments;
     }
-    
+
     public Long getSelectedDocumentId() {
         return selectedDocumentId;
     }
@@ -783,7 +801,7 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
     public void setSelectedDocumentId(Long selectedDocumentId) {
         this.selectedDocumentId = selectedDocumentId;
     }
-    
+
     public List<Long> getListIds() {
         return listIds;
     }
@@ -791,81 +809,117 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
     public void setListIds(List<Long> listIds) {
         this.listIds = listIds;
     }
-    
+
+
     public UIComponent getFormalitaTab() {
-		return formalitaTab;
-	}
+        return formalitaTab;
+    }
 
-	public void setFormalitaTab(UIComponent formalitaTab) {
-		this.formalitaTab = formalitaTab;
-	}
+    public void setFormalitaTab(UIComponent formalitaTab) {
+        this.formalitaTab = formalitaTab;
+    }
 
-	public int getActiveTabIndex() {
-		return activeTabIndex;
-	}
+    public int getActiveTabIndex() {
+        return activeTabIndex;
+    }
 
-	public void setActiveTabIndex(int activeTabIndex) {
-		this.activeTabIndex = activeTabIndex;
-	}
+    public void setActiveTabIndex(int activeTabIndex) {
+        this.activeTabIndex = activeTabIndex;
+    }
 
-	public UIComponent getCatastiTab() {
-		return catastiTab;
-	}
+    public UIComponent getCatastiTab() {
+        return catastiTab;
+    }
 
-	public void setCatastiTab(UIComponent catastiTab) {
-		this.catastiTab = catastiTab;
-	}
+    public void setCatastiTab(UIComponent catastiTab) {
+        this.catastiTab = catastiTab;
+    }
 
-	public UIComponent getElenchiSinteticiTab() {
-		return elenchiSinteticiTab;
-	}
+    public UIComponent getElenchiSinteticiTab() {
+        return elenchiSinteticiTab;
+    }
 
-	public void setElenchiSinteticiTab(UIComponent elenchiSinteticiTab) {
-		this.elenchiSinteticiTab = elenchiSinteticiTab;
-	}
+    public void setElenchiSinteticiTab(UIComponent elenchiSinteticiTab) {
+        this.elenchiSinteticiTab = elenchiSinteticiTab;
+    }
 
-	public UIComponent getVisureIpotecarieTab() {
-		return visureIpotecarieTab;
-	}
+    public UIComponent getVisureIpotecarieTab() {
+        return visureIpotecarieTab;
+    }
 
-	public void setVisureIpotecarieTab(UIComponent visureIpotecarieTab) {
-		this.visureIpotecarieTab = visureIpotecarieTab;
-	}
+    public void setVisureIpotecarieTab(UIComponent visureIpotecarieTab) {
+        this.visureIpotecarieTab = visureIpotecarieTab;
+    }
 
-	public UIComponent getSoggettiValidatiTab() {
-		return soggettiValidatiTab;
-	}
+    public UIComponent getSoggettiValidatiTab() {
+        return soggettiValidatiTab;
+    }
 
-	public void setSoggettiValidatiTab(UIComponent soggettiValidatiTab) {
-		this.soggettiValidatiTab = soggettiValidatiTab;
-	}
+    public void setSoggettiValidatiTab(UIComponent soggettiValidatiTab) {
+        this.soggettiValidatiTab = soggettiValidatiTab;
+    }
 
-	public UIComponent getVisureTestoTab() {
-		return visureTestoTab;
-	}
+    public UIComponent getVisureTestoTab() {
+        return visureTestoTab;
+    }
 
-	public void setVisureTestoTab(UIComponent visureTestoTab) {
-		this.visureTestoTab = visureTestoTab;
-	}
+    public void setVisureTestoTab(UIComponent visureTestoTab) {
+        this.visureTestoTab = visureTestoTab;
+    }
 
-	public UIComponent getVisureDHTab() {
-		return visureDHTab;
-	}
+    public UIComponent getVisureDHTab() {
+        return visureDHTab;
+    }
 
-	public void setVisureDHTab(UIComponent visureDHTab) {
-		this.visureDHTab = visureDHTab;
-	}
+    public void setVisureDHTab(UIComponent visureDHTab) {
+        this.visureDHTab = visureDHTab;
+    }
 
-	public Integer getActivePanelIndex() {
-		return activePanelIndex;
-	}
+    public Integer getActivePanelIndex() {
+        return activePanelIndex;
+    }
 
-	public void setActivePanelIndex(Integer activePanelIndex) {
-		this.activePanelIndex = activePanelIndex;
-	}
-	
-	
-	
+    public void setActivePanelIndex(Integer activePanelIndex) {
+        this.activePanelIndex = activePanelIndex;
+    }
 
-	
+    public UIComponent getServizioAnagraficoTab() {
+        return servizioAnagraficoTab;
+    }
+
+    public void setServizioAnagraficoTab(UIComponent servizioAnagraficoTab) {
+        this.servizioAnagraficoTab = servizioAnagraficoTab;
+    }
+
+    public UIComponent getServizioImmobiliareTab() {
+        return servizioImmobiliareTab;
+    }
+
+    public void setServizioImmobiliareTab(UIComponent servizioImmobiliareTab) {
+        this.servizioImmobiliareTab = servizioImmobiliareTab;
+    }
+
+    public UIComponent getServizioInvestigativoTab() {
+        return servizioInvestigativoTab;
+    }
+
+    public void setServizioInvestigativoTab(UIComponent servizioInvestigativoTab) {
+        this.servizioInvestigativoTab = servizioInvestigativoTab;
+    }
+
+    public UIComponent getServizioCameraleTab() {
+        return servizioCameraleTab;
+    }
+
+    public void setServizioCameraleTab(UIComponent servizioCameraleTab) {
+        this.servizioCameraleTab = servizioCameraleTab;
+    }
+
+    public Integer getActivePanelServicesIndex() {
+        return activePanelServicesIndex;
+    }
+
+    public void setActivePanelServicesIndex(Integer activePanelServicesIndex) {
+        this.activePanelServicesIndex = activePanelServicesIndex;
+    }
 }

@@ -94,7 +94,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     private Client billingClient;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "request_type_id")
+    @JoinColumn(name = "request_type_id", nullable = false)
     private RequestType requestType;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -89,7 +89,6 @@ public class CadastralBindingWrapper extends BaseTab implements Serializable {
         commandButton.setAjax(false);
         commandButton.setIcon("fa fa-fw fa-file-pdf-o red-file icon-align");
         columns.add(getButtonColumn("subjectViewCadastralPDF", commandButton, "", "action_column"));
-
         columns.add(getTextColumn("subjectViewCadastralNote", null));
         return columns;
     }
