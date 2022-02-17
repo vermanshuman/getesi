@@ -144,7 +144,17 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 	
 	private UIComponent visureDHTab;
 	
-	private Integer activePanelIndex; 
+	private Integer activePanelIndex;
+	
+	private UIComponent servizioAnagraficoTab;
+	
+	private UIComponent servizioImmobiliareTab;
+	
+	private UIComponent servizioInvestigativoTab;
+	
+	private UIComponent servizioCameraleTab;
+	
+	private Integer activePanelServicesIndex;
 
 	@Override
 	public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
@@ -157,6 +167,7 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 			InstantiationException, IllegalAccessException {
 		this.setActiveTabIndex(0);
 		this.setActivePanelIndex(0);
+		this.setActivePanelServicesIndex(0);
 		this.setEntityId(entityId);
 		setProvinces(ComboboxHelper.fillList(Province.class, Order.asc("description")));
 		getProvinces().add(new SelectItem(Province.FOREIGN_COUNTRY_ID, Province.FOREIGN_COUNTRY));
@@ -199,6 +210,7 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 		loadSoggettiValidatiTab();
 		loadVisureTestoTab();
 		loadVisureDHTab();
+		loadServiziEvasiTabs();
 	}
 
 	@Override
@@ -572,6 +584,48 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 		}
 		setVisureDHTab(visureDHTab);
 	}
+	
+	public void loadServiziEvasiTabs() throws HibernateException, IllegalAccessException, PersistenceBeanException {
+		List<RequestType> requestTypes = DaoManager.load(RequestType.class, new Criterion[]{Restrictions.isNotNull("name")});
+        for(RequestType requestType : requestTypes) {
+        	if(requestType.getName().equalsIgnoreCase("Servizio Anagrafico")) {
+        		RequestTypeBindingWrapper requestTypeBindingWrapper = new RequestTypeBindingWrapper(listIds, requestType, isOnlyView());
+        		Tab servizioAnagraficoTab = requestTypeBindingWrapper.getTab();
+        		servizioAnagraficoTab.setDisabled(false);
+        		if(requestTypeBindingWrapper.getCountTable().longValue() == 0l) {
+        			servizioAnagraficoTab.setDisabled(true);
+        		}
+        		setServizioAnagraficoTab(servizioAnagraficoTab);
+        	}
+			if(requestType.getName().equalsIgnoreCase("Servizio Immobiliare")) {
+				RequestTypeBindingWrapper requestTypeBindingWrapper = new RequestTypeBindingWrapper(listIds, requestType, isOnlyView()); 
+				Tab servizioImmobiliareTab = requestTypeBindingWrapper.getTab();
+				servizioImmobiliareTab.setDisabled(false);
+        		if(requestTypeBindingWrapper.getCountTable().longValue() == 0l) {
+        			servizioImmobiliareTab.setDisabled(true);
+        		}
+        		setServizioImmobiliareTab(servizioImmobiliareTab);
+			}
+			if(requestType.getName().equalsIgnoreCase("Servizio Investigativo")) {
+				RequestTypeBindingWrapper requestTypeBindingWrapper = new RequestTypeBindingWrapper(listIds, requestType, isOnlyView());
+				Tab servizioInvestigativoTab = requestTypeBindingWrapper.getTab();
+				servizioInvestigativoTab.setDisabled(false);
+        		if(requestTypeBindingWrapper.getCountTable().longValue() == 0l) {
+        			servizioInvestigativoTab.setDisabled(true);
+        		}
+        		setServizioInvestigativoTab(servizioInvestigativoTab);
+			}
+			if(requestType.getName().equalsIgnoreCase("Servizio Camerale")) {
+				RequestTypeBindingWrapper requestTypeBindingWrapper = new RequestTypeBindingWrapper(listIds, requestType, isOnlyView());
+				Tab servizioCameraleTab = requestTypeBindingWrapper.getTab();
+				servizioCameraleTab.setDisabled(false);
+        		if(requestTypeBindingWrapper.getCountTable().longValue() == 0l) {
+        			servizioCameraleTab.setDisabled(true);
+        		}
+        		setServizioCameraleTab(servizioCameraleTab);
+			}
+        }
+	}
 
     public boolean isOnlyView() {
         return onlyView;
@@ -861,9 +915,46 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 	public void setActivePanelIndex(Integer activePanelIndex) {
 		this.activePanelIndex = activePanelIndex;
 	}
-	
-	
-	
 
+	public UIComponent getServizioAnagraficoTab() {
+		return servizioAnagraficoTab;
+	}
+
+	public void setServizioAnagraficoTab(UIComponent servizioAnagraficoTab) {
+		this.servizioAnagraficoTab = servizioAnagraficoTab;
+	}
+
+	public UIComponent getServizioImmobiliareTab() {
+		return servizioImmobiliareTab;
+	}
+
+	public void setServizioImmobiliareTab(UIComponent servizioImmobiliareTab) {
+		this.servizioImmobiliareTab = servizioImmobiliareTab;
+	}
+
+	public UIComponent getServizioInvestigativoTab() {
+		return servizioInvestigativoTab;
+	}
+
+	public void setServizioInvestigativoTab(UIComponent servizioInvestigativoTab) {
+		this.servizioInvestigativoTab = servizioInvestigativoTab;
+	}
+
+	public UIComponent getServizioCameraleTab() {
+		return servizioCameraleTab;
+	}
+
+	public void setServizioCameraleTab(UIComponent servizioCameraleTab) {
+		this.servizioCameraleTab = servizioCameraleTab;
+	}
+
+	public Integer getActivePanelServicesIndex() {
+		return activePanelServicesIndex;
+	}
+
+	public void setActivePanelServicesIndex(Integer activePanelServicesIndex) {
+		this.activePanelServicesIndex = activePanelServicesIndex;
+	}
+	
 	
 }

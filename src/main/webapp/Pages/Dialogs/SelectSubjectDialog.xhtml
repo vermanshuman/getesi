@@ -403,6 +403,12 @@
 				<p:tab title="#{msg.databaseListServicesFulfilled}">
 					<div class="ui-g">
 	            		<div class="ui-g-12">
+	            			<p:accordionPanel multiple="false" activeIndex="#{bean.selectedSubjectWrapper.activePanelServicesIndex}" id="accordionPanelServicesFulfilled">
+	            				<p:tab binding="#{bean.selectedSubjectWrapper.servizioAnagraficoTab}"/>
+	            				<p:tab binding="#{bean.selectedSubjectWrapper.servizioImmobiliareTab}"/>
+	            				<p:tab binding="#{bean.selectedSubjectWrapper.servizioInvestigativoTab}"/>
+	            				<p:tab binding="#{bean.selectedSubjectWrapper.servizioCameraleTab}"/>
+	            			</p:accordionPanel>
 	            			<p:commandButton onclick="PF('searchDlgWV').hide();" styleClass="p-mr-2 p-mb-2 close_btn" style="float:right;"
 							                  value="#{msg.close.toUpperCase()}" />
 	            		</div>
