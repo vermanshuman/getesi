@@ -103,7 +103,7 @@ public class CadastralBindingWrapper extends BaseTab implements Serializable {
     }
 
     @Override
-    Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+    public Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
         return DaoManager.getCount(DocumentSubject.class, "id", new Criterion[]{
                 Restrictions.in("subject.id", getListIds()),
                 Restrictions.eq("type", getType())

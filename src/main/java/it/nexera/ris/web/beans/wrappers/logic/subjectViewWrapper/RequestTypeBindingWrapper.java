@@ -61,7 +61,7 @@ public class RequestTypeBindingWrapper extends BaseTab implements Serializable {
     }
 
     @Override
-    Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+    public Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
         return DaoManager.getCount(Request.class, "id", 
                 new Criterion[]{
                         Restrictions.and(Restrictions.in("subject.id", getListIds()),

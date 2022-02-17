@@ -143,6 +143,8 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 	private UIComponent visureTestoTab;
 	
 	private UIComponent visureDHTab;
+	
+	private Integer activePanelIndex; 
 
 	@Override
 	public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
@@ -154,6 +156,7 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 	public void onLoad(Long entityId) throws NumberFormatException, HibernateException, PersistenceBeanException,
 			InstantiationException, IllegalAccessException {
 		this.setActiveTabIndex(0);
+		this.setActivePanelIndex(0);
 		this.setEntityId(entityId);
 		setProvinces(ComboboxHelper.fillList(Province.class, Order.asc("description")));
 		getProvinces().add(new SelectItem(Province.FOREIGN_COUNTRY_ID, Province.FOREIGN_COUNTRY));
@@ -500,6 +503,9 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
     	formalityBindingWrapper.loadData(Boolean.FALSE);
 		Tab formalityTab = formalityBindingWrapper.getTab();
 		formalityTab.setDisabled(false);
+		if(formalityBindingWrapper.getCountTable().longValue() == 0l) {
+			formalityTab.setDisabled(true);
+		}
 		setFormalitaTab(formalityTab);
     }
 	
@@ -508,6 +514,9 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
         cadastralBindingWrapper.loadData(Boolean.TRUE);
         Tab catastiTab = cadastralBindingWrapper.getTab();
         catastiTab.setDisabled(false);
+        if(cadastralBindingWrapper.getCountTable().longValue() == 0l) {
+        	catastiTab.setDisabled(true);
+		}
         setCatastiTab(catastiTab);
 	}
 	
@@ -515,11 +524,16 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 		SyntheticBindingWrapper syntheticBindingWrapper = new SyntheticBindingWrapper(listIds);
 		Tab elenchiSinteticiTab = syntheticBindingWrapper.getTab();
 		elenchiSinteticiTab.setDisabled(false);
+		if(syntheticBindingWrapper.getCountTable().longValue() == 0l) {
+			elenchiSinteticiTab.setDisabled(true);
+		}
 		setElenchiSinteticiTab(elenchiSinteticiTab);
 	}
 	
 	public void loadVisureIpotecarieTab() {
-		setVisureIpotecarieTab(getEmptyTab("subjectViewMortgage"));
+		Tab visureIpotecarieTab = getEmptyTab("subjectViewMortgage");
+		visureIpotecarieTab.setDisabled(true);
+		setVisureIpotecarieTab(visureIpotecarieTab);
 	}
 	
 	private Tab getEmptyTab(String titleResourceId) {
@@ -530,15 +544,33 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
     }
 	
 	public void loadSoggettiValidatiTab() throws IllegalAccessException, PersistenceBeanException {
-		setSoggettiValidatiTab(new FormalitySubjectBindingWrapper(listIds).getTab());
+		FormalitySubjectBindingWrapper formalitySubjectBindingWrapper = new FormalitySubjectBindingWrapper(listIds);
+		Tab soggettiValidatiTab = formalitySubjectBindingWrapper.getTab();
+		soggettiValidatiTab.setDisabled(false);
+		if(formalitySubjectBindingWrapper.getCountTable().longValue() == 0l) {
+			soggettiValidatiTab.setDisabled(true);
+		}
+		setSoggettiValidatiTab(soggettiValidatiTab);
 	}
 	
 	public void loadVisureTestoTab() throws IllegalAccessException, PersistenceBeanException {
-		setVisureTestoTab(new VisureRTFBindingWrapper(getEntity()).getTab());
+		VisureRTFBindingWrapper visureRTFBindingWrapper = new VisureRTFBindingWrapper(getEntity());
+		Tab visureTestoTab = visureRTFBindingWrapper.getTab();
+		visureTestoTab.setDisabled(false);
+		if(visureRTFBindingWrapper.getCountTable().longValue() == 0l) {
+			visureTestoTab.setDisabled(true);
+		}
+		setVisureTestoTab(visureTestoTab);
 	}
 	
 	public void loadVisureDHTab() throws IllegalAccessException, PersistenceBeanException {
-		setVisureDHTab(new VisureDHBindingWrapper(getEntity()).getTab());
+		VisureDHBindingWrapper visureDHBindingWrapper = new VisureDHBindingWrapper(getEntity());
+		Tab visureDHTab = visureDHBindingWrapper.getTab();
+		visureDHTab.setDisabled(false);
+		if(visureDHBindingWrapper.getCountTable().longValue() == 0l) {
+			visureDHTab.setDisabled(true);
+		}
+		setVisureDHTab(visureDHTab);
 	}
 
     public boolean isOnlyView() {
@@ -820,6 +852,14 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 
 	public void setVisureDHTab(UIComponent visureDHTab) {
 		this.visureDHTab = visureDHTab;
+	}
+
+	public Integer getActivePanelIndex() {
+		return activePanelIndex;
+	}
+
+	public void setActivePanelIndex(Integer activePanelIndex) {
+		this.activePanelIndex = activePanelIndex;
 	}
 	
 	

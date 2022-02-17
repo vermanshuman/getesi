@@ -385,7 +385,7 @@
 				<p:tab title="#{msg.databaseListDocumentsFile}">
 					<div class="ui-g">
 	            		<div class="ui-g-12">
-	                    	<p:accordionPanel multiple="false" activeIndex="0" id="accordionPanel">
+	                    	<p:accordionPanel multiple="false" activeIndex="#{bean.selectedSubjectWrapper.activePanelIndex}" id="accordionPanel">
 	                        	<p:tab binding="#{bean.selectedSubjectWrapper.formalitaTab}"/>
 								<p:tab binding="#{bean.selectedSubjectWrapper.catastiTab}"/>
 								<p:tab binding="#{bean.selectedSubjectWrapper.elenchiSinteticiTab}"/>
