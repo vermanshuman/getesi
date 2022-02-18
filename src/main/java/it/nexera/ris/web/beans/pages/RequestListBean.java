@@ -163,7 +163,11 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     @Getter
     @Setter
     private ListPaginator paginator;
-
+    
+    @Getter
+    @Setter
+    private Integer multipleCreateRedirect;
+    
     private static final String KEY_CLIENT_ID = "KEY_CLIENT_ID_SESSION_KEY_NOT_COPY";
     private static final String KEY_STATES = "KEY_STATES_SESSION_KEY_NOT_COPY";
     private static final String KEY_REQUEST_TYPE = "KEY_REQUEST_TYPE_SESSION_KEY_NOT_COPY";
@@ -2049,6 +2053,19 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     public void createNewMultipleRequests() {
         String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE";
         RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT, queryParam);
+    }
+    
+    public void redirectPage() {
+    	if(getMultipleCreateRedirect().intValue() == 1) {
+    		RedirectHelper.goTo(PageTypes.REQUEST_EDIT);
+    	}
+    	if(getMultipleCreateRedirect().intValue() == 2) {
+    		RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT);
+    	}
+    	if(getMultipleCreateRedirect().intValue() == 3) {
+    		String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE";
+            RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT, queryParam);
+    	}
     }
 
     public Integer getRowsPerPage() {
