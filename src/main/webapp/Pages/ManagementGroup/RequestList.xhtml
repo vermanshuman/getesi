@@ -326,18 +326,18 @@
                         <div class="p-col-6">
                             <div class="p-formgroup-inline">
                                 <div class="p-field">
-                                    <p:commandButton value="#{ff:upper(msg.requestNew)}" id="btn_new"
+                                    <p:commandButton rendered="false" value="#{ff:upper(msg.requestNew)}" id="btn_new"
                                                      styleClass="ui-button-success search-btn new-button" style="margin-left:20px;"
                                                      disabled="#{!bean.canCreate}" action="#{bean.createNewRequest}" />
                                 </div>
                                 <div class="p-field">
-                                    <p:commandButton value="#{ff:upper(msg.requestNewMultiple)}"
+                                    <p:commandButton rendered="false" value="#{ff:upper(msg.requestNewMultiple)}"
                                                      id="btn_new_multipe" styleClass="ui-button-success	search-btn new-button-multiple"
                                                      disabled="#{!bean.canCreate}"
                                                      action="#{bean.createNewMultipleRequest}" />
                                 </div>
                                 <div class="p-field">
-                                    <p:commandButton value="#{ff:upper(msg.requestNewMultiples)}"
+                                    <p:commandButton value="#{ff:upper(msg.requestNew)}"
                                                      id="btn_new_multipa" styleClass="ui-button-success	search-btn new-button-multiple"
                                                      disabled="#{!bean.canCreate}"
                                                      action="#{bean.createNewMultipleRequests()}" />
