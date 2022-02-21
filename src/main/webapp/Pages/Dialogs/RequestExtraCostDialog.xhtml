@@ -123,6 +123,23 @@
             <p:column/>
             <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('CATASTO')}"
                              update="extraCostArea, requestExtraCostTable"/>
+            
+            <span> #{msg.requestExtraCostStamps.toUpperCase()}</span>
+            <p:column>
+                <p:spinner id="minMaxStamp" value="#{bean.costManipulationHelper.stampSpinnerNumber}" min="0" max="1000" size="1"/>
+            </p:column>
+            <p:column/>
+            <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('MARCA')}"
+                             update="extraCostArea, requestExtraCostTable"/>
+            
+            <span> #{msg.requestExtraCostPostalExpense.toUpperCase()}</span>
+            <p:column>
+                <p:inputText id="inputCostPostalExp" value="#{bean.costManipulationHelper.extraCostPostalExpense}"/>
+            </p:column>
+            <p:column/>
+            <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('POSTALE')}"
+                             update="extraCostArea, requestExtraCostTable"/>
+            
 
             <span> #{msg.requestExtraCostOther.toUpperCase()}</span>
             <p:column>
