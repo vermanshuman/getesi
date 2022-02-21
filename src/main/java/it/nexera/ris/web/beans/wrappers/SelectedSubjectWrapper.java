@@ -155,6 +155,8 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 	private UIComponent servizioCameraleTab;
 	
 	private Integer activePanelServicesIndex;
+	
+	private UIComponent richiestaTab;
 
 	@Override
 	public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
@@ -210,6 +212,7 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 		loadSoggettiValidatiTab();
 		loadVisureTestoTab();
 		loadVisureDHTab();
+		loadRichiestaTab();
 		loadServiziEvasiTabs();
 	}
 
@@ -585,7 +588,19 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 		setVisureDHTab(visureDHTab);
 	}
 	
+	public void loadRichiestaTab() throws IllegalAccessException, PersistenceBeanException {
+		RequestBindingWrapper requestBindingWrapper = new RequestBindingWrapper(listIds);
+		Tab richiestaTab = requestBindingWrapper.getTab();
+		richiestaTab.setDisabled(false);
+		if(requestBindingWrapper.getCountTable().longValue() == 0l) {
+			richiestaTab.setDisabled(true);
+		}
+		setRichiestaTab(richiestaTab);
+	}
+	
 	public void loadServiziEvasiTabs() throws HibernateException, IllegalAccessException, PersistenceBeanException {
+		/**/
+		
 		List<RequestType> requestTypes = DaoManager.load(RequestType.class, new Criterion[]{Restrictions.isNotNull("name")});
         for(RequestType requestType : requestTypes) {
         	if(requestType.getName().equalsIgnoreCase("Servizio Anagrafico")) {
@@ -955,6 +970,17 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 	public void setActivePanelServicesIndex(Integer activePanelServicesIndex) {
 		this.activePanelServicesIndex = activePanelServicesIndex;
 	}
+
+	public UIComponent getRichiestaTab() {
+		return richiestaTab;
+	}
+
+	public void setRichiestaTab(UIComponent richiestaTab) {
+		this.richiestaTab = richiestaTab;
+	}
+
+	
+	
 	
 	
 }
