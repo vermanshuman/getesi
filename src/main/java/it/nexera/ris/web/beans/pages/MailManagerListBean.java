@@ -214,6 +214,9 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
             PersistenceBeanException, InstantiationException,
             IllegalAccessException, IOException {
 
+        if(ValidationHelper.isNullOrEmpty(SessionHelper.get("loadMailFilters"))){
+            clearFilterValueFromSession();
+        }
         setRowCount(10);
         setTotalPages(1);
         setCurrentPageNumber(1);
@@ -367,6 +370,35 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
 //                "PF('tableWV').getPaginator().setPage(" + getTablePage() + ");");
     }
 
+    private void clearFilterValueFromSession() {
+        SessionHelper.removeObject(KEY_DATE_FROM);
+        HttpSessionHelper.put(KEY_DATE_FROM, null);
+        SessionHelper.removeObject(KEY_DATE_TO);
+        HttpSessionHelper.put(KEY_DATE_TO, null);
+        SessionHelper.removeObject(KEY_MAIL_TYPE);
+        HttpSessionHelper.put(KEY_MAIL_TYPE, null);
+        SessionHelper.removeObject(KEY_KEY_WORD);
+        HttpSessionHelper.put(KEY_KEY_WORD, null);
+        SessionHelper.removeObject(KEY_SELECTED_TAB);
+        HttpSessionHelper.put(KEY_SELECTED_TAB, null);
+        SessionHelper.removeObject(KEY_SORT_ORDER);
+        HttpSessionHelper.put(KEY_SORT_ORDER, null);
+        SessionHelper.removeObject(KEY_SORT_COLUMN);
+        SessionHelper.removeObject(KEY_SORT_COLUMN);
+        HttpSessionHelper.put(KEY_SORT_COLUMN, null);
+        SessionHelper.removeObject(KEY_EMAIL_TO);
+        HttpSessionHelper.put(KEY_EMAIL_TO, null);
+        SessionHelper.removeObject(KEY_EMAIL_SUBJECT);
+        HttpSessionHelper.put(KEY_EMAIL_SUBJECT, null);
+        SessionHelper.removeObject(KEY_EMAIL_BODY);
+        HttpSessionHelper.put(KEY_EMAIL_BODY, null);
+        SessionHelper.removeObject(KEY_EMAIL_FILE);
+        HttpSessionHelper.put(KEY_EMAIL_FILE, null);
+        SessionHelper.removeObject(KEY_PAGE_NUMBER);
+        HttpSessionHelper.put(KEY_PAGE_NUMBER, null);
+        SessionHelper.removeObject(KEY_ROWS_PER_PAGE);
+        HttpSessionHelper.put(KEY_ROWS_PER_PAGE, null);
+    }
     public void goMain() {
         RedirectHelper.goTo(PageTypes.MAIL_MANAGER_LIST);
     }
@@ -541,6 +573,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
             }
         }
     }
+
     public boolean getCanGotoFolders() {
         return getCurrentUser().getPermissions().get("PMMF").isCanView() ||
                 getCurrentUser().getPermissions().get("PMMF").isCanCreate() ||
@@ -899,39 +932,6 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         filterTableFromPanel();
     }
 
-//    public String getMailManagerReceived() {
-//        return mailManagerReceived;
-//    }
-//
-//    public void setMailManagerReceived(String mailManagerReceived) {
-//        this.mailManagerReceived = mailManagerReceived;
-//    }
-//
-//    public String getMailManagerSent() {
-//        return mailManagerSent;
-//    }
-//
-//    public void setMailManagerSent(String mailManagerSent) {
-//        this.mailManagerSent = mailManagerSent;
-//    }
-//
-//    public String getMailManagerDraft() {
-//        return mailManagerDraft;
-//    }
-//
-//    public void setMailManagerDraft(String mailManagerDraft) {
-//        this.mailManagerDraft = mailManagerDraft;
-//    }
-//
-//    public String getMailManagerStorage() {
-//        //return getMailTitleValue(new MailManagerTypeWrapper(MailManagerTypes.STORAGE));
-//        return mailManagerStorage;
-//    }
-//
-//    public void setMailManagerStorage(String mailManagerStorage) {
-//        this.mailManagerStorage = mailManagerStorage;
-//    }
-
     public String getMailManagerRECEIVED() {
         return getMailTitleValue(new MailManagerTypeWrapper(MailManagerTypes.RECEIVED));
     }
@@ -947,28 +947,6 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
     public String getMailManagerSTORAGE() {
         return getMailTitleValue(new MailManagerTypeWrapper(MailManagerTypes.STORAGE));
     }
-
-
-//    public void loadStorage() {
-//        String titleValue = getMailTitleValue(new MailManagerTypeWrapper(MailManagerTypes.STORAGE));
-//        setMailManagerStorage(titleValue);
-//    }
-//
-//    public void loadSent() {
-//        String titleValue = getMailTitleValue(new MailManagerTypeWrapper(MailManagerTypes.SENT));
-//        setMailManagerSent(titleValue);
-//
-//    }
-//
-//    public void loadRecieved() {
-//        String titleValue = getMailTitleValue(new MailManagerTypeWrapper(MailManagerTypes.RECEIVED));
-//        setMailManagerReceived(titleValue);
-//    }
-//
-//    public void loadDraft() {
-//        String titleValue = getMailTitleValue(new MailManagerTypeWrapper(MailManagerTypes.DRAFT));
-//        setMailManagerDraft(titleValue);
-//    }
 
     public boolean isSendOrStorage() {
         if (!ValidationHelper.isNullOrEmpty(getMailManagerButtonSelectedId())) {

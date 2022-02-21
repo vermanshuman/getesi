@@ -322,6 +322,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         }
         loadFilterValueFromSession();
         filterTableFromPanel();
+
     }
 
     public void loadRequestDocuments() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -1020,7 +1021,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                         Order.desc("createDate")
                 }));
 
-        getLazyModel().load((getPaginator().getTablePage() - 1) * getRowsPerPage(), getPaginator().getRowsPerPage(),
+        getLazyModel().load((getPaginator().getTablePage() - 1) * getPaginator().getRowsPerPage(), getPaginator().getRowsPerPage(),
                 getPaginator().getTableSortColumn(),
                 (getPaginator().getTableSortOrder() == null || getPaginator().getTableSortOrder().equalsIgnoreCase("DESC")
                         || getPaginator().getTableSortOrder().equalsIgnoreCase("UNSORTED")) ? SortOrder.DESCENDING : SortOrder.ASCENDING, new HashMap<>());
@@ -1379,16 +1380,15 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             setStateWrappers((List<RequestStateWrapper>) SessionHelper.get(KEY_STATES));
         } else {
             setStateWrappers(new ArrayList<>());
+            for (RequestState rs : RequestState.values()) {
+                getStateWrappers().add(new RequestStateWrapper(!RequestState.EVADED.equals(rs), rs));
+            }
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_REQUEST_TYPE))) {
             setRequestTypeWrappers((List<RequestTypeFilterWrapper>) SessionHelper.get(KEY_REQUEST_TYPE));
-        } else {
-            setRequestTypeWrappers(new ArrayList<>());
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_SERVICES))) {
             setServiceWrappers((List<ServiceFilterWrapper>) SessionHelper.get(KEY_SERVICES));
-        } else {
-            setServiceWrappers(new ArrayList<>());
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_MANAGER_ID))) {
             setManagerClientFilterid((Long) SessionHelper.get(KEY_CLIENT_MANAGER_ID));
@@ -1958,7 +1958,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         String rowsPerPage = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("rowsPerPageSelected");
         String pageNumber = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("pageNumber");
         if (!ValidationHelper.isNullOrEmpty(rowsPerPage))
-            setRowsPerPage(Integer.parseInt(rowsPerPage));
+            getPaginator().setRowsPerPage(Integer.parseInt(rowsPerPage));
         if (!ValidationHelper.isNullOrEmpty(pageNumber)) {
             Integer currentPage = Integer.parseInt(pageNumber);
             getPaginator().setCurrentPageNumber(currentPage);
@@ -2004,6 +2004,29 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         }
     }
 
+    public void clearFiltraPanel() {
+        setSelectedClientId(null);
+        setDateFrom(null);
+        setDateTo(null);
+        setDateFromEvasion(null);
+        setDateToEvasion(null);
+        setDateExpiration(null);
+        setRequestTypes(null);
+        setManagerClientFilterid(null);
+        setFiduciaryClientFilterId(null);
+        setAggregationFilterId(null);
+
+        SessionHelper.removeObject(KEY_CLIENT_ID);
+        SessionHelper.removeObject(KEY_DATE_FROM_REQ);
+        SessionHelper.removeObject(KEY_DATE_TO_REQ);
+        SessionHelper.removeObject(KEY_DATE_FROM_EVASION);
+        SessionHelper.removeObject(KEY_DATE_TO_EVASION);
+        SessionHelper.removeObject(KEY_DATE_EXPIRATION);
+        SessionHelper.removeObject(KEY_REQUEST_TYPE);
+        SessionHelper.removeObject(KEY_CLIENT_MANAGER_ID);
+        SessionHelper.removeObject(KEY_CLIENT_FIDUCIARY_ID);
+        SessionHelper.removeObject(KEY_AGGREAGATION);
+    }
 
     public void setSelectedRequestTypes(List<RequestType> selectedRequestTypes) {
         this.selectedRequestTypes = selectedRequestTypes;

@@ -221,4 +221,8 @@
 		<page_type>LAND_CULTURE_LIST</page_type>
 		<module_code entity_field="code">LCl</module_code>
 	</data_entry>
+	<data_entry>
+		<page_type>TAX_RATE_LIST</page_type>
+		<module_code entity_field="code">TRL</module_code>
+	</data_entry>
 </module_page>

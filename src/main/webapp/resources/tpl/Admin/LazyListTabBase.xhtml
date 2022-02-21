@@ -39,7 +39,7 @@
                                 // <![CDATA[
 
                                 $(document ).ready(function() {
-                                    var value = $("[name='pageNumber']").val();
+                                    var value = $("[name*='pageNumber']").val();
                                     if(value == 1) {
                                         $('.page_1').addClass("ui-state-active");
                                         $('#page_bottom_1').addClass("ui-state-active");
@@ -60,12 +60,12 @@
                                 }
 
                                 function getTotalPagesCount() {
-                                    var totalPages = $('input[id="numTotalPages"]').val();
+                                    var totalPages = document.getElementById("tabs:numTotalPages").value;
                                     return totalPages;
                                 }
 
                                 function loadPerPage(id) {
-                                    $('input[id="rowsPerPageSelected"]').val($('#' + id).val());
+                                    $('input[id*="rowsPerPageSelected"]').val(document.getElementById(id).value);
                                     handleRowsChange();
                                 }
 
@@ -76,7 +76,7 @@
 
                                 function changePage(pageNumber, e) {
                                     e.preventDefault();
-                                    $('input[name="pageNumber"]').val(pageNumber);
+                                    $('input[name*="pageNumber"]').val(pageNumber);
                                     onPageChange();
                                     getCurrentPageNumber();
                                 }
@@ -97,11 +97,11 @@
                                 }
 
                                 function getCurrentPageNumber() {
-                                    var pageNumber = $('input[name="pageNumber"]').val();
+                                    var pageNumber = $('input[name*="pageNumber"]').val();
                                     return parseInt(pageNumber);
                                 }
                                 function setPageNumber(){
-                                    var value = $("[name='pageNumber']").val();
+                                    var value = $("[name*='pageNumber']").val();
                                     for (let i = 0; i < 10; i++) {
                                         $('.page_' + i).removeClass("ui-state-active");
                                         $('.page_bottom_' + i).removeClass("ui-state-active");
@@ -109,7 +109,6 @@
                                     $('.page_' + value).addClass("ui-state-active");
                                     $('.page_bottom_' + value).addClass("ui-state-active");
                                 }
-
                                 // ]]>
                             </script>
 

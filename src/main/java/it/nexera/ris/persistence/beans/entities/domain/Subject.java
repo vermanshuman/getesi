@@ -75,7 +75,7 @@ public class Subject extends IndexedEntity implements BeforeSave{
     @JoinColumn(name = "birth_city_id")
     private City birthCity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "country_id")
     private Country country;
 

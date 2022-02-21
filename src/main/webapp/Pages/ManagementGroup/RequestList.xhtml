@@ -264,6 +264,18 @@
             #statuses_panel, #requestTypes_panel, #services_panel {
                 display: none !important;
             }
+
+            #requestDelete {
+                border: 2px solid #57c279;
+            }
+
+            #requestDelete .ui-dialog-titlebar {
+                border-bottom: none;
+            }
+
+            body .ui-datatable .ui-datatable-data > tr.ui-datatable-selectable {
+                cursor: default;
+            }
         </style>
         <script>
             var doChange = true;
@@ -305,6 +317,7 @@
                     PF(wv).show();
                 });
             }
+
         </script>
 
         <div class="p-grid">
@@ -318,18 +331,18 @@
                                                      styleClass="ui-button-success search-btn new-button" style="margin-left:20px;"
                                                      disabled="#{!bean.canCreate}" action="#{bean.createNewRequest}" />
                                 </div>
-                                <div class="p-field">
-                                    <p:commandButton value="#{ff:upper(msg.requestNewMultiple)}"
-                                                     id="btn_new_multipe" styleClass="ui-button-success	search-btn new-button-multiple"
-                                                     disabled="#{!bean.canCreate}"
-                                                     action="#{bean.createNewMultipleRequest}" />
-                                </div>
-                                <div class="p-field">
-                                    <p:commandButton value="#{ff:upper(msg.requestNewMultiples)}"
-                                                     id="btn_new_multipa" styleClass="ui-button-success	search-btn new-button-multiple"
-                                                     disabled="#{!bean.canCreate}"
-                                                     action="#{bean.createNewMultipleRequests()}" />
-                                </div>
+<!--                                <div class="p-field">-->
+<!--                                    <p:commandButton value="#{ff:upper(msg.requestNewMultiple)}"-->
+<!--                                                     id="btn_new_multipe" styleClass="ui-button-success	search-btn new-button-multiple"-->
+<!--                                                     disabled="#{!bean.canCreate}"-->
+<!--                                                     action="#{bean.createNewMultipleRequest}" />-->
+<!--                                </div>-->
+<!--                                <div class="p-field">-->
+<!--                                    <p:commandButton value="#{ff:upper(msg.requestNewMultiples)}"-->
+<!--                                                     id="btn_new_multipa" styleClass="ui-button-success	search-btn new-button-multiple"-->
+<!--                                                     disabled="#{!bean.canCreate}"-->
+<!--                                                     action="#{bean.createNewMultipleRequests()}" />-->
+<!--                                </div>-->
 
                             </div>
                         </div>
@@ -582,6 +595,7 @@
                                                 <p:commandButton id="manageReestablishBtn" style="width: auto;"
                                                                  value="#{ff:upper(msg.mailManageReestablish)}"
                                                                  update="settingPanel searchPanel"
+                                                                 actionListener="#{bean.clearFiltraPanel}"
                                                                  oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').getJQ().hide();"/>
                                             </div>
                                         </div>
@@ -627,7 +641,7 @@
             <p:remoteCommand name="handleRowsChange"
                              action="#{bean.handleRowsChange()}" update="table" oncomplete="setPageNumber()"/>
             <p:remoteCommand name="onPageChange"
-                             action="#{bean.onPageChange()}" update="table" oncomplete="setPageNumber()"/>ss
+                             action="#{bean.onPageChange()}" update="table" oncomplete="setPageNumber()"/>
             <!--   <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid" style="margin-bottom: 20px;"
                           columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2">
                  <p:column>
@@ -916,30 +930,34 @@
                             <th id="table:j_idt123" class="ui-state-default ui-sortable-column" role="columnheader"
                                 aria-label="DATA/ORA: activate to sort column ascending" scope="col"
                                 style="width: 7vw;min-width: 163px;text-align: center;" tabindex="0" aria-sort="other">
-                                <span class="ui-column-title">DATA/ORA</span><span
+                                <span class="ui-column-title">#{ff:upper(msg.requestListDate)}</span><span
                                     class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s"></span></th>
                             <th id="table:j_idt133" class="ui-state-default" role="columnheader" aria-label="CLIENTE"
                                 scope="col" style="width: 9vw;min-width: 159px;position: relative"><span
-                                    class="ui-column-title">CLIENTE</span></th>
+                                    class="ui-column-title">#{ff:upper(msg.requestListClient)}</span></th>
                             <th id="table:j_idt145" class="ui-state-default min_padding_margin" role="columnheader"
                                 aria-label="RICHIESTA" scope="col" style="width: 13.1vw;min-width: 180px;"><span
-                                    class="ui-column-title">RICHIESTA</span></th>
+                                    class="ui-column-title">#{ff:upper(msg.requestListServiceCap)}</span></th>
                             <th id="table:j_idt157" class="ui-state-default ui-sortable-column" role="columnheader"
                                 aria-label="NOMINATIVO      C.F. O P.IVA: activate to sort column ascending" scope="col"
                                 style="width: 13.1vw;min-width: 180px;" tabindex="0"><span
-                                    class="ui-column-title">NOMINATIVO      C.F. O P.IVA</span><span
+                                    class="ui-column-title">#{ff:upper(msg.requestNameFiscalCodeVATNumber)}</span><span
                                     class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s"></span></th>
                             <th id="table:j_idt162" class="ui-state-default" role="columnheader" aria-label="UFFICIO"
                                 scope="col" style="width: 9vw;min-width: 159px;text-align: center;"><span
-                                    class="ui-column-title">UFFICIO</span></th>
-                            <th id="table:j_idt164" class="ui-state-default min_padding_margin" role="columnheader"
-                                scope="col" style="width: 8.3vw;min-width: 177px;"><span class="ui-column-title"><button
-                                    id="table:userSelectCheckboxShow" name="table:userSelectCheckboxShow"
-                                    class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"
-                                    onclick="PF('userSelectCheckboxWV').show(); event.stopImmediatePropagation();"
-                                    style="font-size: 14px;font-weight: normal;" type="button" role="button"
-                                    aria-disabled="false"><span
-                                    class="ui-button-text ui-c">OPERATORE</span></button></span></th>
+                                    class="ui-column-title">#{ff:upper(msg.requestListCorservatoryName)}</span></th>
+
+                            <c:if test="${!bean.getCurrentUser().isExternal()}">
+                                <th id="table:j_idt164" class="ui-state-default min_padding_margin" role="columnheader"
+                                    scope="col" style="width: 8.3vw;min-width: 177px;">
+                                    <h:outputText value="#{ff:upper(msg.requestListCurrentOperator)}"
+                                                  rendered="#{not bean.canSeeAllUsers}" style="font-size: medium;font-weight: normal;"/>
+                                    <p:commandButton id="userSelectCheckboxShow"
+                                                     rendered="#{bean.canSeeAllUsers}"
+                                                     onclick="PF('userSelectCheckboxWV').show(); event.stopImmediatePropagation();"
+                                                     value="#{ff:upper(msg.requestListCurrentOperator)}" type="button" style="font-size: 14px;font-weight: normal;"/>
+                                </th>
+                            </c:if>
                             <th id="table:j_idt167" class="ui-state-default ui-sortable-column" role="columnheader"
                                 aria-label="SCADENZA: activate to sort column ascending" scope="col"
                                 style="width: 6vw;min-width: 125px;text-align: center;" tabindex="0"><span
@@ -1113,45 +1131,45 @@
                                 </ui:remove>
                                 <c:if test="${!bean.getCurrentUser().isExternal()}">
                                     <td class=" min_padding_margin" style="width: 6vw;min-width: 99px;">
-                                        <p:commandButton id="gestisci-btn" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
+                                        <p:commandButton id="table_#{item.id}_gestisci-btn" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
                                                          disabled="#{!bean.canEdit}" action="#{bean.manageRequest}">
                                             <f:setPropertyActionListener value="#{item.id}"
                                                                          target="#{bean.entityEditId}"/>
                                         </p:commandButton>
-                                        <p:commandButton id="banca-btn" value="#{ff:upper(msg.headerDatabase)}" rendered="#{item.subjectId ne null}" style="display: none;"
+                                        <p:commandButton id="table_#{item.id}_banca-btn" value="#{ff:upper(msg.headerDatabase)}" rendered="#{item.subjectId ne null}" style="display: none;"
                                                          action="#{bean.openRequestSubject}" class="action-btn">
                                             <f:setPropertyActionListener value="#{item.subjectId}" target="#{bean.entityEditId}"/>
                                         </p:commandButton>
-                                        <p:commandButton id="pdf-btn" value="#{msg.pdf}" rendered="#{!bean.getCurrentUser().isExternal()}" class="action-btn" style="display: none;"
+                                        <p:commandButton id="table_#{item.id}_pdf-btn" value="#{msg.pdf}" rendered="#{!bean.getCurrentUser().isExternal()}" class="action-btn" style="display: none;"
                                                          action="#{bean.downloadPdfFile}" ajax="false" update="@form">
                                             <f:setPropertyActionListener value="#{item.id}"
                                                                          target="#{bean.downloadRequestId}"/>
                                         </p:commandButton>
-                                        <p:commandButton id="elimina-btn" value="#{ff:upper(msg.roleCanDelete)}" class="action-btn" style="display: none;"
+                                        <p:commandButton id="table_#{item.id}_elimina-btn" value="#{ff:upper(msg.roleCanDelete)}" class="action-btn" style="display: none;"
                                                          oncomplete="PF('dlg2').show()" disabled="#{!bean.canDelete}">
                                             <f:setPropertyActionListener value="#{item.id}"
                                                                          target="#{bean.entityDeleteId}"/>
                                         </p:commandButton>
 
 
-                                        <p:commandLink id="actionPnl" global="false" style="padding: 40%;outline: none;" immediate="true"
+                                        <p:commandLink id="table_#{item.id}_actionPnl" global="false" style="padding: 40%;outline: none;" immediate="true"
                                                        readonly="true">
                                             <i class="fa fa-angle-down" style="font-size: x-large;"
-                                               onmouseover="document.getElementById('table:#{rowId}:actionPnl').focus();" />
+                                               onmouseover="document.getElementById('table_#{item.id}_actionPnl').focus();" />
                                         </p:commandLink>
-                                        <p:tooltip for="actionPnl" hideEvent="blur" showEvent="focus" styleClass="actionPnl-tooltip">
+                                        <p:tooltip for="table_#{item.id}_actionPnl" hideEvent="blur" showEvent="focus" styleClass="actionPnl-tooltip">
                                             <p:outputPanel id="actionGrid" styleClass="actionPnl-panel">
 
-                                                <p:commandButton value="#{ff:upper(msg.requestListManage)}" class="action-btn" onclick="document.getElementById('table:#{rowId}:gestisci-btn').click()"
+                                                <p:commandButton value="#{ff:upper(msg.requestListManage)}" class="action-btn" onclick="document.getElementById('table_#{item.id}_gestisci-btn').click()"
                                                                  disabled="#{!bean.canEdit}" style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;">
                                                 </p:commandButton>
-                                                <p:commandButton value="#{ff:upper(msg.headerDatabase)}" onclick="document.getElementById('table:#{rowId}:banca-btn').click()"
+                                                <p:commandButton value="#{ff:upper(msg.headerDatabase)}" onclick="document.getElementById('table_#{item.id}_banca-btn').click()"
                                                                  rendered="#{item.subjectId ne null}" class="action-btn" style="width:120px; margin-left: 5px; margin-right: 5px; margin-bottom:8px;">
                                                 </p:commandButton>
-                                                <p:commandButton value="#{msg.pdf}" rendered="#{!bean.getCurrentUser().isExternal()}" class="action-btn" onclick="document.getElementById('table:#{rowId}:pdf-btn').click()"
+                                                <p:commandButton value="#{msg.pdf}" rendered="#{!bean.getCurrentUser().isExternal()}" class="action-btn" onclick="document.getElementById('table_#{item.id}_pdf-btn').click()"
                                                                  update="@form" style="width:120px; margin-left: 5px; margin-right: 5px; margin-bottom:8px;">
                                                 </p:commandButton>
-                                                <p:commandButton value="#{ff:upper(msg.roleCanDelete)}" class="action-btn" onclick="document.getElementById('table:#{rowId}:elimina-btn').click()"
+                                                <p:commandButton value="#{ff:upper(msg.roleCanDelete)}" class="action-btn" onclick="document.getElementById('table_#{item.id}_elimina-btn').click()"
                                                                  disabled="#{!bean.canDelete}" style="width:120px; margin-left: 5px; margin-right: 5px; margin-bottom:5px;">
                                                 </p:commandButton>
                                             </p:outputPanel>
@@ -1190,23 +1208,33 @@
             </div>
         </p:panel>
 
+        <p:overlayPanel id="userSelectCheckboxPanel" my="left top" at="left bottom"
+                        widgetVar="userSelectCheckboxWV" for="userSelectCheckboxShow"
+                        onHide="filterTableFromPanel();" dynamic="true" style="width:300px">
+            <p:dataTable id="userSelectCheckboxPanelDataTable" var="state"
+                         value="#{bean.userWrappers}" selectionMode="single"
+                         selection="#{bean.selectedUserForFilter}" rowKey="#{state.value}">
 
+                <p:ajax event="rowSelect"
+                        listener="#{requestListBean.selectUserForFilter}"
+                        update="userSelectCheckboxPanelDataTable"/>
 
+                <p:column style="width:18px">
+                    <f:facet name="header">
+                        <p:selectBooleanCheckbox value="#{bean.selectedAllUsersOnPanel}">
+                            <p:ajax update="userSelectCheckboxPanelDataTable" event="change"/>
+                        </p:selectBooleanCheckbox>
+                    </f:facet>
+                    <p:selectBooleanCheckbox value="#{state.selected}">
+                        <p:ajax update="userSelectCheckboxPanelDataTable" event="change"/>
+                    </p:selectBooleanCheckbox>
+                </p:column>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                <p:column headerText="#{msg.mailManagerStates}">
+                    <h:outputText value="#{state.value}"/>
+                </p:column>
+            </p:dataTable>
+        </p:overlayPanel>
 
         <p:dialog id="documentDialog" widgetVar="documentDialog" modal="true" resizable="false" draggable="false"
                   width="700">
@@ -1223,14 +1251,15 @@
                 </p:dataTable>
             </p:scrollPanel>
         </p:dialog>
-        <p:dialog id="dlg2" widgetVar="dlg2" modal="true" resizable="false"
-                  draggable="false" effect="SLIDE">
+
+        <p:dialog id="requestDelete" widgetVar="dlg2" modal="true" resizable="false"
+                  draggable="false" effect="SLIDE" >
             #{msg.deleteRequestConfirmation}<br/>
             <br/>
             <div class="btn_line">
-                <p:commandButton value="#{msg.yes}" action="#{bean.deleteEntity}" update="messages"
+                <p:commandButton value="#{msg.confirm}" action="#{bean.deleteEntity}" style="margin-right: 1cm;background-color: #00CC52!important;"
                                  oncomplete="PF('dlg2').hide(); filterTableFromPanel();"/>
-                <p:commandButton value="#{msg.no}" onclick="PF('dlg2').hide()"/>
+                <p:commandButton value="#{msg.cancel}" onclick="PF('dlg2').hide()" style="background-color: #F3362B !important;"/>
             </div>
         </p:dialog>
 

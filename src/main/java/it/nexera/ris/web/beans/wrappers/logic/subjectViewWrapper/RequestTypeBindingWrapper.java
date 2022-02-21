@@ -61,7 +61,7 @@ public class RequestTypeBindingWrapper extends BaseTab implements Serializable {
     }
 
     @Override
-    Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+    public Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
         return DaoManager.getCount(Request.class, "id", 
                 new Criterion[]{
                         Restrictions.and(Restrictions.in("subject.id", getListIds()),
@@ -85,9 +85,9 @@ public class RequestTypeBindingWrapper extends BaseTab implements Serializable {
 
         CommandButton commandButton = new CommandButton();
         commandButton.setActionExpression(createMethodExpression(String.format("#{subjectBean.%s}", "showFile(tableVar)"), new Class[]{Request.class}));
-        commandButton.setIcon("fa fa-fw fa-file-pdf-o");
+        commandButton.setIcon("fa fa-fw fa-file-pdf-o red-file icon-align");
 
-        columns.add(getButtonColumn("subjectViewRequestOutput", commandButton));
+        columns.add(getButtonColumn("subjectViewRequestOutput", commandButton, "", "action_column"));
 
         columns.add(getTextColumn("subjectViewRequestBilling", "billingClient"));
         columns.add(getTextColumn("subjectViewRequestNote", "note"));

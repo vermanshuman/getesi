@@ -38,7 +38,12 @@ public class CitiesListBean extends EntityLazyInListEditPageBean<City> implement
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException, IOException {
         setCanCreate(true);
-        this.loadList(City.class, new Order[]{Order.asc("code")});
+        this.loadList(City.class, new Criterion[]{
+                Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                        Restrictions.isNull("isDeleted"))
+        }, new Order[]{
+                Order.asc("code")
+        });
         setProvinces(ComboboxHelper.fillList(Province.class));
     }
 
@@ -87,6 +92,18 @@ public class CitiesListBean extends EntityLazyInListEditPageBean<City> implement
             addException("warning");
         }
         setSelectedProvinceId(null);
+    }
+
+    @Override
+    public void deleteEntity() throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException, NumberFormatException, IOException {
+        try {
+            City entity = DaoManager
+                    .get(City.class, getEntityDeleteId());
+            entity.setIsDeleted(Boolean.TRUE);
+            DaoManager.save(entity, true);
+        } catch (Exception e1) {
+            LogHelper.log(log, e1);
+        }
     }
 
     @Override

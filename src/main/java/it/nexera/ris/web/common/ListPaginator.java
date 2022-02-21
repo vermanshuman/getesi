@@ -87,7 +87,6 @@ public class ListPaginator {
 
         }
         setPaginatorString(builder.toString());
-        System.out.println(getPaginatorString());
     }
 
 }

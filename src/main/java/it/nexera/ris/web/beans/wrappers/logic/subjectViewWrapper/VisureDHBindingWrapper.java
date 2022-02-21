@@ -51,7 +51,7 @@ public class VisureDHBindingWrapper extends BaseTab implements Serializable {
     }
 
     @Override
-    Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+    public Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
         return DaoManager.getCount(VisureDH.class, "id", new Criterion[]{
                 Restrictions.eq("fiscalCodeVat", getSubject().getFiscalCodeVATNamber())});
     }
