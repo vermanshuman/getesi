@@ -54,6 +54,19 @@
             .layout-topbar {
                 padding-right: 65px !important;
             }
+            .logo-text-block {
+                position: absolute;
+            }
+            .logo-text {
+                margin-left: 100px;
+                height: 22px;
+                margin-top: -7px;
+            }
+            .logo-slogan {
+                margin-left: 8px;
+                height: 15px;
+                margin-top: -7px;
+            }
         </style>
         <script>
             // <![CDATA[
@@ -75,6 +88,10 @@
         </script>
         <p:outputPanel id="menu_div" class="layout-menu-container menu_div"  style="display:none;#{renderSideMenuTop ? 'top: 0; ' : ''}">
             <div class="nano">
+                <div class="logo-text-block">
+                    <p:graphicImage styleClass="logo-text" name="antares-text.png" library="images"  />
+                    <p:graphicImage styleClass="logo-slogan" name="antares-slogan.png" library="images"  />
+                </div>
                 <div class="nano-content menu-scroll-content">
                     <pp:menu widgetVar="me"  model="#{menuBean.mainMenuModel}" id="mmm"/>
                 </div>
