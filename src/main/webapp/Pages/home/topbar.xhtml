@@ -8,6 +8,17 @@
         .layout-menu-button-mode {
             text-align: center;
         }
+        .top-logo{
+            width: 12% !important;
+            height: 40% !important;
+            margin-left: 18% !important;
+            margin-top: 3% !important;
+        }
+        .top-logo-1{
+            width: 23%;
+            height: 29%;
+            margin-top: 3%;
+        }
     </style>
 
     <div class="layout-topbar">
@@ -27,7 +38,12 @@
         <a id="topbar-menu-button" href="#">
             <i class="pi pi-ellipsis-v" />
         </a>
-
+<h:panelGroup id="slides" layout="block" styleClass="p-grid">
+    <div class="p-col-12 p-lg-6 p-xl-9" >
+        <p:graphicImage class="top-logo"  name="antares_new.png" library="images"  />
+        <p:graphicImage class="top-logo-1" name="antares_new_1.png" library="images"  />
+    </div>
+    <div class="p-col-12 p-lg-6 p-xl-3">
         <ul class="topbar-menu fadeInDown" id="top_bar_menu">
             <li title="Logout">
                 <a href="#{facesContext.externalContext.requestContextPath}/j_spring_security_logout">
@@ -52,14 +68,14 @@
                     </a>
                 </li>
             </ui:fragment>
-<!--            <ui:fragment id="currentCal">-->
-<!--                <li>-->
-<!--                    <p:calendar id="currentDay" readonlyInput="false" showOn="button"-->
-<!--                                onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"-->
-<!--                                pattern="dd/MM/yyyy" mask="true"-->
-<!--                                locale="it" navigator="false" styleClass="only-date-icon"/>-->
-<!--                </li>-->
-<!--            </ui:fragment>-->
+            <!--            <ui:fragment id="currentCal">-->
+            <!--                <li>-->
+            <!--                    <p:calendar id="currentDay" readonlyInput="false" showOn="button"-->
+            <!--                                onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"-->
+            <!--                                pattern="dd/MM/yyyy" mask="true"-->
+            <!--                                locale="it" navigator="false" styleClass="only-date-icon"/>-->
+            <!--                </li>-->
+            <!--            </ui:fragment>-->
             <ui:fragment rendered="#{sessionBean.canViewPage('APPLICATION_SETTINGS')}">
                 <li title="Impostazioni di sistema">
                     <a href="#{facesContext.externalContext.requestContextPath}/configuration/application_settings_edit/">
@@ -69,6 +85,8 @@
                 </li>
             </ui:fragment>
         </ul>
+    </div>
+</h:panelGroup>
         <script type="text/javascript">
             jQuery(document).ready(function() {
                 $("#ui-datepicker-div").bind("DOMSubtreeModified", function() {
