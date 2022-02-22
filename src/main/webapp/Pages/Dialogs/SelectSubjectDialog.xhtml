@@ -120,6 +120,10 @@
         }
 
     </style>
+    <p:dialog header="test" modal="true" width="900" id="testDlg" resizable="false" draggable="false"
+              dynamic="true" widgetVar="testDlgWV">
+        <span>testing.....</span>
+    </p:dialog>
     <p:dialog header="#{msg.databaseListSubjectDatabase}" modal="true" width="900" id="searchDlg" resizable="false" draggable="false"
               dynamic="true" widgetVar="searchDlgWV">
         <p:scrollPanel mode="native"  style="width: 100%; min-height: 300px; max-height: 600px;">
@@ -411,7 +415,7 @@
                                 <p:tab binding="#{bean.selectedSubjectWrapper.servizioInvestigativoTab}"/>
                                 <p:tab binding="#{bean.selectedSubjectWrapper.servizioCameraleTab}"/>
                             </p:accordionPanel>
-                            <p:commandButton onclick="PF('searchDlgWV').hide();" styleClass="p-mr-2 p-mb-2 close_btn" style="float:right;"
+                            <p:commandButton styleClass="p-mr-2 p-mb-2 close_btn" style="float:right;"
                                              value="#{msg.close.toUpperCase()}" />
                         </div>
                     </div>
