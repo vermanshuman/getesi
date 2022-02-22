@@ -84,6 +84,8 @@ public class RequestTypeBindingWrapper extends BaseTab implements Serializable {
         columns.add(getTextColumn("subjectViewRequestClient", "client"));
 
         CommandButton commandButton = new CommandButton();
+        //commandButton.setOnclick("PF('testDlgWV').show();");
+        commandButton.setAjax(true);
         commandButton.setActionExpression(createMethodExpression(String.format("#{subjectBean.%s}", "showFile(tableVar)"), new Class[]{Request.class}));
         commandButton.setIcon("fa fa-fw fa-file-pdf-o red-file icon-align");
 

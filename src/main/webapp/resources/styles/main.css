@@ -814,8 +814,8 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
     background-image: url("../images/impostazioni-system.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 30px;
-    height: 42px;
+    background-size: 25px;
+    height: 25px;
     margin-top: 3px;
     display: block;
 }
