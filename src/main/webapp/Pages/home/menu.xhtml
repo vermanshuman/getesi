@@ -210,8 +210,13 @@
                         <p:menuitem id="database" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/DatabaseList.jsf')}" value="#{msg.headerDatabase}" icon="topbar-icon banca-bati-icon"
                                     action="#{sessionBean.getDatabaseListPage()}" actionListener="#{sessionBean.cleanFiltersOnDatabaseListSubjectTable()}"/>
                         <p:menuitem id="reportList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/ReportList.jsf')}" value="#{msg.headerReportList}" icon="topbar-icon reportistica-icon" outcome="/Pages/ManagementGroup/ReportList.jsf"/>
-                        <p:menuitem id="billing"
+                        <p:menuitem id="billing_old"
                                     value="#{msg.headerBilling}#{sessionBean.requestCounts gt 0 ? ' ('.concat(sessionBean.requestCounts).concat(')') : ''}" icon="topbar-icon fatturazione-icon"
+                                    action="#{sessionBean.getBillingListOldPage()}"
+                                    rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/BillingList_Old.jsf')}"
+                                    actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>
+                        <p:menuitem id="billing"
+                                    value="#{msg.headerBilling}" icon="topbar-icon fatturazione-icon"
                                     action="#{sessionBean.getBillingListPage()}"
                                     rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/BillingList.jsf')}"
                                     actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>

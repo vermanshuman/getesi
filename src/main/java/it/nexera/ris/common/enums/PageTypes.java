@@ -106,6 +106,7 @@ public enum PageTypes {
     REAL_ESTATE_VIEW("/Pages/ManagementGroup/RealEstateView.jsf"),
     REAL_ESTATE_EDIT("/Pages/ManagementGroup/RealEstateEdit.jsf"),
     REQUEST_LIST("/Pages/ManagementGroup/RequestList.jsf"),
+    BILLING_LIST_OLD("/Pages/ManagementGroup/BillingList_Old.jsf"),
     BILLING_LIST("/Pages/ManagementGroup/BillingList.jsf"),
     REQUEST_EDIT("/Pages/ManagementGroup/RequestEdit.jsf"),
     REQUEST_TEXT_EDIT("/Pages/ManagementGroup/RequestTextEdit.jsf"),
