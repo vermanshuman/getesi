@@ -224,8 +224,118 @@
 				cursor: se-resize;
 			}
 			
+			.wHMuN {
+			    width: 100%;
+			    height: 100%;
+			    border-radius: 5px;
+			    overflow: hidden;
+			    box-shadow: rgb(4 26 55 / 16%) 0px 1px 2.94px 0.06px;
+			    background: rgb(255, 255, 255);
+			    border: 1px solid rgb(221, 221, 221);
+			}
 			
-
+			.trimester {
+			    margin-top: 7px;
+			    margin-left: 10px;
+			    right: 45px;
+			    font-size: 18px;
+			    text-transform: uppercase;
+			    white-space: nowrap;
+			    overflow: hidden;
+			    text-overflow: ellipsis;
+			    color: rgb(110, 122, 129);
+			}
+			
+			.justifyContent-center-0-26 {
+			    justify-content: center;
+			}
+			
+			.alignContent-center-0-17 {
+			    align-content: center;
+			}
+			
+			.alignItems-stretch-0-14 {
+			    align-items: stretch;
+			}
+			
+			.wrap-nowrap-0-7 {
+			    flex-wrap: nowrap;
+			}
+			
+			.direction-column-0-5 {
+			    flex-direction: column;
+			}
+			
+			.fullWidth-0-2 {
+			    flex: 1 1 0;
+			    width: 100%;
+			}
+			
+			.flexBox-0-0 {
+			    display: flex;
+			}
+			
+			.month_div {
+			    margin-left: 10px;
+			    margin-right: 10px;
+			    border-top: 1px solid rgb(221, 221, 221);
+			    padding-top: 5px;
+			    padding-bottom: 5px;
+			}
+			
+			.month_outer {
+			    float: left;
+			    width: 50%;
+			}
+			
+			.month_inner {
+			    color: rgb(110, 122, 129);
+			    font-size: 16px;
+			    width: auto;
+			    line-height: 25px;
+			    text-align: left;
+			    font-weight: 100;
+			    white-space: nowrap;
+			    text-overflow: ellipsis;
+			    overflow: hidden;
+			}
+			
+			.cost_outer {
+			    float: right;
+			}
+			
+			.cost_inner {
+			    color: rgb(110, 122, 129);
+			    font-size: 16px;
+			    width: auto;
+			    line-height: 25px;
+			    text-align: right;
+			    font-weight: 100;
+			    white-space: nowrap;
+			    text-overflow: ellipsis;
+			    overflow: hidden;
+			}
+			
+			.cost_total {
+			    color: rgb(110, 122, 129);
+			    bottom: 20px;
+			    font-size: 2.5vw;
+			    left: 5px;
+			    right: 5px;
+			    text-align: center;
+			    font-weight: bold;
+			    white-space: nowrap;
+			    overflow: hidden;
+			    text-overflow: ellipsis;
+			}
+			
+			.list_icon_trimester{
+				font-size: 17px; 
+				color: rgb(110, 122, 129); 
+				float: right; 
+				margin-top: 7px; 
+				margin-left: 5px;
+			}			
 
 		</style>
 		<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
@@ -274,7 +384,7 @@
 											<i class="fa fa-line-chart" style="position: relative; left: 6px; bottom: -1px; font-size: 70px;"></i>
 										</div>
 										<div color="#fff" class="box_header">#{msg.billingListRevenues}</div>
-										<div class="cost">0 €</div>
+										<div class="cost">19.847 €</div>
 									</div>
 	
 									<div class="list_icon"
@@ -295,7 +405,7 @@
 											<i class="fa fa-bar-chart" style="position: relative; left: 6px; bottom: -1px; font-size: 70px;"></i>
 										</div>
 										<div color="#fff" class=" box_header">#{msg.billingListCosts}</div>
-										<div class="cost">0 €</div>
+										<div class="cost">30.000 €</div>
 									</div>
 									<div class="list_icon"
 										style="font-size: 17px; color: rgb(255, 255, 255);" title="">
@@ -311,17 +421,17 @@
 								style="width: 350px; height: 100px; line-height: 100px; position: absolute; transform: translate(730px, 0px); box-sizing: border-box;">
 								<div>
 									<div class="incassi_outer_div">
-										<div class=" inner_div">
-											<i class="fas fa-coins"
+										<div class="inner_div">
+											<i class="fan fa-coinss"
 												style="position: relative; left: 1px; bottom: -18px; font-size: 80px;"></i>
 										</div>
-										<div color="#fff" class=" box_header">#{msg.billingListCollections}</div>
-										<div class="cost">0 €</div>
+										<div color="#fff" class=" box_header"><!-- #{msg.billingListCollections} --></div>
+										<div class="cost">&nbsp;</div>
 									</div>
 	
 									<div class="list_icon"
 										style="font-size: 17px; color: rgb(255, 255, 255);" title="">
-										<i class="fa fa-fw fa-list"
+										<i class="fa fa-fw fa-list11"
 											style="font-size: inherit;"></i>
 									</div>
 	
@@ -334,16 +444,16 @@
 								<div>
 									<div class="tributi_outer_div">
 										<div class="inner_div">
-											<i class="fa fa-university"
+											<i class="fan fa-university1"
 												style="position: relative; left: 5px; bottom: -10px; font-size: 80px;"></i>
 										</div>
-										<div color="#fff" class=" box_header">#{msg.billingListTributes}</div>
-										<div class="cost">0 €</div>
+										<div color="#fff" class=" box_header"><!-- #{msg.billingListTributes} --></div>
+										<div class="cost">&nbsp;</div>
 									</div>
 	
 									<div class="list_icon"
 										style="font-size: 17px; color: rgb(255, 255, 255);" title="">
-										<i class="fa fa-fw fa-list"
+										<i class="fa fa-fw fa-list11"
 											style="font-size: inherit;"></i>
 									</div>
 	
@@ -351,8 +461,104 @@
 								<span class="resizable_icon"></span>
 							</div>
 						</p:panelGrid>
-					</div>
+						
+						<div class="layout-dashboard" style="max-width: 98%;">
+							<h:panelGroup id="slides1" layout="block" styleClass="p-grid" style="margin-top: 7% !important;">
+								<div class="p-col-12 p-lg-6 p-xl-3">
+									<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
+										style="width: 350px; height: 210px; border-radius: 5px; margin-left:14px;">
+										<div class="sc-hcnlBt wHMuN">
+											<div>
+												<div color="#6e7a81" class="trimester"
+													style="float: left;">#{msg.billingListFirstTrimester}</div>
+												<div class="list_icon_trimester">
+													<i class="fa fa-fw fa-list" style="font-size: inherit;"></i>
+												</div>
+											</div>
 	
+											<div style="margin-top: 42px;">
+												<div class="flexBox-0-0 fullWidth-0-2 wrap-nowrap-0-7 
+															direction-column-0-5 justifyContent-center-0-26 alignItems-stretch-0-14 alignContent-center-0-17">
+													<div class="month_div" style="border: 0px;">
+														<div class="month_outer">
+															<div class="month_inner">#{msg.january}</div>
+														</div>
+														<div class="cost_outer">
+															<div class="cost_inner">0,00</div>
+														</div>
+													</div>
+													<div class="month_div">
+														<div class="month_outer">
+															<div class="month_inner">#{msg.february}</div>
+														</div>
+														<div class="cost_outer">
+															<div class="cost_inner">0,00</div>
+														</div>
+													</div>
+													<div class="month_div">
+														<div class="month_outer">
+															<div class="month_inner">#{msg.march}</div>
+														</div>
+														<div class="cost_outer">
+															<div class="cost_inner">0,00</div>
+														</div>
+													</div>
+												</div>
+												<div class="cost_total">0 €</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								
+								<div class="p-col-12 p-lg-6 p-xl-3">
+									<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
+										style="width: 350px; height: 210px; border-radius: 5px; margin-left:7px;">
+										<div class="sc-hcnlBt wHMuN">
+											<div>
+												<div color="#6e7a81" class="trimester"
+													style="float: left;">#{msg.billingListSecondTrimester}</div>
+												<div class="list_icon_trimester">
+													<i class="fa fa-fw fa-list" style="font-size: inherit;"></i>
+												</div>
+											</div>
+	
+											<div style="margin-top: 42px;">
+												<div class="flexBox-0-0 fullWidth-0-2 wrap-nowrap-0-7 
+															direction-column-0-5 justifyContent-center-0-26 alignItems-stretch-0-14 alignContent-center-0-17">
+													<div class="month_div" style="border: 0px;">
+														<div class="month_outer">
+															<div class="month_inner">#{msg.april}</div>
+														</div>
+														<div class="cost_outer">
+															<div class="cost_inner">0,00</div>
+														</div>
+													</div>
+													<div class="month_div">
+														<div class="month_outer">
+															<div class="month_inner">#{msg.may}</div>
+														</div>
+														<div class="cost_outer">
+															<div class="cost_inner">0,00</div>
+														</div>
+													</div>
+													<div class="month_div">
+														<div class="month_outer">
+															<div class="month_inner">#{msg.june}</div>
+														</div>
+														<div class="cost_outer">
+															<div class="cost_inner">0,00</div>
+														</div>
+													</div>
+												</div>
+												<div class="cost_total">0 €</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</h:panelGroup>
+						</div>
+					
+					</div>
 				</div>
 				<div id="content_tab2" class="hide" style="display: none;">Content area2</div>
 				<div id="content_tab3" class="hide" style="display: none;">Content area3</div>
