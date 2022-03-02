@@ -53,31 +53,6 @@ public class RoleRightsFilter extends BaseFilter implements Filter {
             return;
         }
 
-        SessionHelper.removeObject("loadMailFilters");
-        SessionHelper.removeObject("loadRequestFilters");
-        if(!ValidationHelper.isNullOrEmpty(SessionHelper.get("currentPageURL"))) {
-            String previousURL = SessionHelper.get("currentPageURL").toString();
-            if(previousURL.endsWith(PageTypes.REQUEST_EDIT.getPage()) ||
-                    previousURL.endsWith(PageTypes.REQUEST_ESTATE_SITUATION_LIST.getPage()) ||
-                    previousURL.endsWith(PageTypes.REQUEST_ESTATE_SITUATION_VIEW.getPage()) ||
-                    previousURL.endsWith(PageTypes.REQUEST_TEXT_EDIT.getPage()) ||
-                    previousURL.endsWith(PageTypes.SUBJECT.getPage())){
-                if(httpRequest.getRequestURI().endsWith(PageTypes.REQUEST_LIST.getPage())){
-                    SessionHelper.put("loadRequestFilters", "true");
-                }
-            }else if(previousURL.endsWith(PageTypes.MAIL_MANAGER_LIST.getPage()) ||
-                    previousURL.endsWith(PageTypes.MAIL_MANAGER_EDIT.getPage()) ||
-                    previousURL.endsWith(PageTypes.MAIL_MANAGER_FOLDER.getPage()) ||
-                    previousURL.endsWith(PageTypes.MAIL_MANAGER_VIEW.getPage())){
-                if(httpRequest.getRequestURI().endsWith(PageTypes.MAIL_MANAGER_LIST.getPage())){
-                    SessionHelper.put("loadMailFilters", "true");
-                }
-            }
-        }
-        SessionHelper.removeObject("currentPageURL");
-        SessionHelper.put("currentPageURL", httpRequest.getRequestURI());
-
-
         UserWrapper currentUser = getCurrentUser(httpRequest, httpResponse);
 
         int result = doCustomHandle(httpRequest, httpResponse);

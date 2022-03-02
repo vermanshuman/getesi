@@ -977,6 +977,20 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                     0d : request.getCostPay());
             row.getCell(colIndex).setCellStyle(euroStyle);
         }
+        
+        colIndex = getIndex(BillingTypeFields.EXCEL_STAMPS.toString(), requestsEvasionColumns);
+        if (colIndex > -1) {
+            row.createCell(colIndex, CellType.NUMERIC).setCellValue(getMarcaCost(request));
+            row.getCell(colIndex).setCellStyle(euroStyle);
+        }
+        
+        colIndex = getIndex(BillingTypeFields.EXCEL_POSTAL_EXPENSES.toString(), requestsEvasionColumns);
+        if (colIndex > -1) {
+            row.createCell(colIndex, CellType.NUMERIC).setCellValue(getPostalCost(request));
+            row.getCell(colIndex).setCellStyle(euroStyle);
+        }
+        
+        
         colIndex = getIndex(BillingTypeFields.EXCEL_TOTAL.toString(), requestsEvasionColumns);
         if (colIndex > -1) {
             if(index != -2) {
@@ -1580,6 +1594,14 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
 
     private Double getAltroCost(Request request) throws PersistenceBeanException, IllegalAccessException {
         return getRequestExtraCostSumByType(request.getId(), ExtraCostType.ALTRO);
+    }
+    
+    private Double getMarcaCost(Request request) throws PersistenceBeanException, IllegalAccessException {
+        return getRequestExtraCostSumByType(request.getId(), ExtraCostType.MARCA);
+    }
+    
+    private Double getPostalCost(Request request) throws PersistenceBeanException, IllegalAccessException {
+        return getRequestExtraCostSumByType(request.getId(), ExtraCostType.POSTALE);
     }
 
     private Double getRequestExtraCostSumByType(Long requestId, ExtraCostType type)

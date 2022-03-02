@@ -1406,7 +1406,17 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             }
 
             if (getSubject() != null) {
-                Subject tempSubject  = getSubject();
+                Subject tempSubject;
+                if(getSubject().getId() != null){
+                    tempSubject = DaoManager.get(Subject.class, getSubject().getId());
+                    try {
+                        Hibernate.initialize(tempSubject.getCountry());
+                    } catch (Exception e) {
+                        tempSubject = getSubject();
+                    }
+                }else {
+                    tempSubject = getSubject();
+                }
                 SubjectHelper.fillSubjectFromWrapper(tempSubject, getWrapper());
                 Subject subjectFromDB = SubjectHelper.getSubjectIfExists(tempSubject, getWrapper().getSelectedPersonId());
                 if (subjectFromDB != null) {

@@ -56,8 +56,6 @@ public class City extends Dictionary {
     @ManyToMany(mappedBy = "cities")
     private List<LandOmi> landOmis;
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
     @Transient
     @XmlElement(name = "asl_region_code")
     private String asl_region_code;
@@ -208,13 +206,5 @@ public class City extends Dictionary {
 
     public void setLandOmis(List<LandOmi> landOmis) {
         this.landOmis = landOmis;
-    }
-
-    public Boolean getIsDeleted() {
-        return isDeleted == null ? Boolean.FALSE : isDeleted;
-    }
-
-    public void setIsDeleted(Boolean isDeleted) {
-        this.isDeleted = isDeleted;
     }
 }

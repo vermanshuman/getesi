@@ -302,9 +302,6 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                                 DateTimeHelper.getMonthWordDatePattert(), Locale.ITALY)
                         : DateTimeHelper.toString(subject.getBirthDate()));
                 result.append(", codice fiscale ").append(subject.getFiscalCode());
-                if((i == subjects.size() - 1)
-                        && !ValidationHelper.isNullOrEmpty(cType) && cType.equals(SectionCType.DEBITORI_NON_DATORI_DI_IPOTECA))
-                    result.append(";");
             } else {
                 result.append(subject.getBusinessName());
                 result.append(" sede ");
@@ -313,9 +310,6 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                         str -> subjectCityCamelCase ? WordUtils.capitalizeFully(str) : str));
                 result.append(frmTxt(subject.getBirthProvince(), " (", ")", Dictionary::getCode));
                 result.append(", codice fiscale ").append(subject.getNumberVAT());
-                if((i == subjects.size() - 1)
-                        && !ValidationHelper.isNullOrEmpty(cType) && cType.equals(SectionCType.DEBITORI_NON_DATORI_DI_IPOTECA))
-                    result.append(";");
             }
 
             if (addRelationshipData) {
@@ -683,15 +677,11 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
             }
             if(!ValidationHelper.isNullOrEmpty(formality.getSectionA()) &&  
                     !ValidationHelper.isNullOrEmpty(formality.getSectionA().getTotal())){
-                sb.append(" - Importo totale ").append(formality.getSectionA().getTotal()).append(" - ");
+                sb.append(" Importo totale ").append(formality.getSectionA().getTotal());
             }
             if(!ValidationHelper.isNullOrEmpty(formality.getSectionA()) &&  
                     !ValidationHelper.isNullOrEmpty(formality.getSectionA().getCapital())){
-                if(ValidationHelper.isNullOrEmpty(formality.getSectionA()) ||
-                        ValidationHelper.isNullOrEmpty(formality.getSectionA().getTotal())){
-                    sb.append(" - ");
-                }
-                sb.append("Importo Capitale ").append(formality.getSectionA().getCapital()).append(" - ");
+                sb.append(" Importo Capitale ").append(formality.getSectionA().getCapital());
             }
             if(!ValidationHelper.isNullOrEmpty(formality.getSectionA()) && 
                     !ValidationHelper.isNullOrEmpty(formality.getSectionA().getDuration())){
@@ -742,9 +732,9 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                     false, false, true);
             
             if(!ValidationHelper.isNullOrEmpty(result) && (!this.isSingularProperty || subjects != null && subjects.size() > 1))
-            sb.append("; Debitori non datori di ipoteca ").append(result);
+                sb.append(" e debitori non datori di ipoteca ").append(result);
             else if(!ValidationHelper.isNullOrEmpty(result))
-                sb.append("; Debitore non datore di ipoteca ").append(result);
+                sb.append(" e debitore non datore di ipoteca ").append(result);
             
             if (!ValidationHelper.isNullOrEmpty(getRequest().getDistraintFormality()) &&
                     !ValidationHelper.isNullOrEmpty(formality.getDistraintComment())) {

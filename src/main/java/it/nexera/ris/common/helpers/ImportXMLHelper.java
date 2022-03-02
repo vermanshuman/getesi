@@ -1535,25 +1535,11 @@ public class ImportXMLHelper extends BaseHelper {
             if(ValidationHelper.isNullOrEmpty(property.getAddress())){
                 String value  = getValueFromXML(eElement, "IndirizzoImm");
                 if(!ValidationHelper.isNullOrEmpty(value)){
-                    Pattern pattern = Pattern.compile("Piano", Pattern.CASE_INSENSITIVE);
-                    String tokens[] = pattern.split(value);
-                    if(tokens.length > 1){
-                        property.setField(PropertyXMLElements.FLOOR, tokens[1]);
-                        value = tokens[0].trim();
-                    }
-                    pattern = Pattern.compile("Interno", Pattern.CASE_INSENSITIVE);
-                    tokens = pattern.split(value);
-                    if(tokens.length > 1){
-                        property.setField(PropertyXMLElements.INTERNO, tokens[1]);
-                        value = tokens[0].trim();
-                    }
-                    pattern = Pattern.compile("Scala.", Pattern.CASE_INSENSITIVE);
-                    tokens = pattern.split(value);
-                    if(tokens.length > 1){
-                        property.setField(PropertyXMLElements.SCALA, tokens[1]);
-                        value = tokens[0].trim();
-                    }
                     property.setField(PropertyXMLElements.ADDRESS, value);
+                    Pattern pattern = Pattern.compile("Piano", Pattern.CASE_INSENSITIVE);
+                    String tokens[] = pattern.split("VIA DELLA LIBERTA` n. SNC Piano S1");
+                    if(tokens.length > 1)
+                        property.setField(PropertyXMLElements.FLOOR, tokens[1]);
                 }
             }
             if(ValidationHelper.isNullOrEmpty(property.getAdditionalData())){

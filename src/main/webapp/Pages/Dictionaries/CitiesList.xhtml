@@ -5,6 +5,7 @@
       xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
 <ui:composition template="/resources/tpl/Admin/LazyInListEditBase.xhtml">
     <ui:param name="bean" value="#{citiesListBean}"/>
+    <ui:param name="showDelete" value="false"/>
     <ui:param name="list_title" value="#{msg.requestCity}"/>
     <ui:param name="entity_name" value="#{msg.requestCity}"/>
 

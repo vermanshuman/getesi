@@ -134,17 +134,16 @@
 
 						<p:column styleClass="action_column" exportable="false">
 							<p:commandButton disabled="#{!bean.canDelete}"
-                                             styleClass="red-btn"
-                                             icon="ui-icon pi pi-times" oncomplete="PF('dlg2').show()">
+								style="background-color: Transparent!important;"
+								icon="ui-icon-myCancel" oncomplete="PF('dlg2').show()">
 								<f:setPropertyActionListener value="#{item.id}"
 									target="#{bean.entityDeleteId}" />
 							</p:commandButton>
 						</p:column>
 
 						<p:column styleClass="action_column" exportable="false">
-
-							<p:commandButton icon="ui-icon pi pi-pencil" update=":form"
-                                             style="border: none !important;"
+							<p:commandButton icon="ui-icon-myEdit" update=":form"
+								style="background-color: Transparent!important;"
 								action="#{bean.editEntity}" disabled="#{!bean.canEdit}">
 								<f:setPropertyActionListener value="#{item.id}"
 									target="#{bean.entityEditId}" />
@@ -240,15 +239,15 @@
                             <h:outputText value="#{item.clients}"/>
                         </p:column>
                         <p:column styleClass="action_column" exportable="false">
-                            <p:commandButton disabled="#{!bean.canDelete}" styleClass="red-btn"
-                                             icon="ui-icon pi pi-times"
+                            <p:commandButton disabled="#{!bean.canDelete}"  style="background-color: Transparent!important;"
+                                             icon="ui-icon-myCancel"
                                              oncomplete="PF('dlg2').show()">
                                 <f:setPropertyActionListener value="#{item.id}"
                                                              target="#{bean.entityDeleteId}"/>
                             </p:commandButton>
                         </p:column>
                         <p:column styleClass="action_column" exportable="false">
-                            <p:commandButton icon="ui-icon pi pi-pencil" update=":form"   style="border: none !important;"
+                            <p:commandButton icon="ui-icon-myEdit" update=":form"  style="background-color: Transparent!important;"
                                              action="#{bean.editEntity}" disabled="#{!bean.canEdit}">
                                 <f:setPropertyActionListener value="#{item.id}"
                                                              target="#{bean.entityEditId}"/>
@@ -323,15 +322,15 @@
                             <h:outputText value="#{item.clients}"/>
                         </p:column>
                         <p:column styleClass="action_column" exportable="false">
-                            <p:commandButton disabled="#{!bean.canDelete}"
-                                             icon="ui-icon pi pi-times" styleClass="red-btn"
+                            <p:commandButton disabled="#{!bean.canDelete}"  style="background-color: Transparent!important;"
+                                             icon="ui-icon-myCancel"
                                              oncomplete="PF('dlg2').show()">
                                 <f:setPropertyActionListener value="#{item.id}"
                                                              target="#{bean.entityDeleteId}"/>
                             </p:commandButton>
                         </p:column>
                         <p:column styleClass="action_column" exportable="false">
-                            <p:commandButton icon="ui-icon pi pi-pencil" style="border: none !important;" update=":form"
+                            <p:commandButton icon="ui-icon-myEdit" update=":form"  style="background-color: Transparent!important;"
                                              action="#{bean.editEntity}" disabled="#{!bean.canEdit}">
                                 <f:setPropertyActionListener value="#{item.id}"
                                                              target="#{bean.entityEditId}"/>
@@ -396,7 +395,7 @@
                         </p:column>
 
                         <p:column styleClass="action_column" exportable="false">
-                            <p:commandButton icon="ui-icon pi pi-pencil" style="border: none !important;" update=":form"
+                            <p:commandButton icon="ui-icon-myEdit" update=":form"  style="background-color: Transparent!important;"
                                              action="#{bean.editEntity}" disabled="#{!bean.canEdit}">
                                 <f:setPropertyActionListener value="#{item.id}"
                                                              target="#{bean.entityEditId}"/>
@@ -414,9 +413,9 @@
             #{msg.deleteConfirmation}<br/>
             <br/>
             <div class="btn_line">
-                <p:commandButton value="#{msg.confirm}" action="#{bean.deleteEntity}" style="margin-right: 10px;background-color: #00CC52!important;"
+                <p:commandButton value="#{msg.yes}" action="#{bean.deleteEntity}"
                                  oncomplete="PF('dlg2').hide()" update=":form, :form:messages"/>
-                <p:commandButton value="#{msg.cancel}" onclick="PF('dlg2').hide()" style="background-color: #F3362B !important;"/>
+                <p:commandButton value="#{msg.no}" onclick="PF('dlg2').hide()"/>
             </div>
         </p:dialog>
     </ui:define>

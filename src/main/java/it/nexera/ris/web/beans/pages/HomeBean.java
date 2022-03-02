@@ -431,7 +431,6 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
         List<Request> requests = DaoManager.load(Request.class, restrictions.toArray(new Criterion[0]));
 
         Map<RequestType, List<Request>> groupedByRequestTypes = requests.stream()
-                .filter(r -> !ValidationHelper.isNullOrEmpty(r.getRequestType()))
                 .collect(Collectors.groupingBy(Request::getRequestType));
 
         for (Map.Entry<RequestType, List<Request>> entry : groupedByRequestTypes.entrySet()) {

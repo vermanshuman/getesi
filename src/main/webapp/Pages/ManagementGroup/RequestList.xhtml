@@ -317,7 +317,6 @@
                     PF(wv).show();
                 });
             }
-
         </script>
 
         <div class="p-grid">
@@ -327,22 +326,22 @@
                         <div class="p-col-6">
                             <div class="p-formgroup-inline">
                                 <div class="p-field">
-                                    <p:commandButton value="#{ff:upper(msg.requestNew)}" id="btn_new"
+                                    <p:commandButton value="#{ff:upper(msg.requestNew)}" id="btn_new" oncomplete="PF('chooseSingleOrMultipleRequestCreateWV').show();"
                                                      styleClass="ui-button-success search-btn new-button" style="margin-left:20px;"
-                                                     disabled="#{!bean.canCreate}" action="#{bean.createNewRequest}" />
+                                                     disabled="#{!bean.canCreate}" />
                                 </div>
-<!--                                <div class="p-field">-->
-<!--                                    <p:commandButton value="#{ff:upper(msg.requestNewMultiple)}"-->
-<!--                                                     id="btn_new_multipe" styleClass="ui-button-success	search-btn new-button-multiple"-->
-<!--                                                     disabled="#{!bean.canCreate}"-->
-<!--                                                     action="#{bean.createNewMultipleRequest}" />-->
-<!--                                </div>-->
-<!--                                <div class="p-field">-->
-<!--                                    <p:commandButton value="#{ff:upper(msg.requestNewMultiples)}"-->
-<!--                                                     id="btn_new_multipa" styleClass="ui-button-success	search-btn new-button-multiple"-->
-<!--                                                     disabled="#{!bean.canCreate}"-->
-<!--                                                     action="#{bean.createNewMultipleRequests()}" />-->
-<!--                                </div>-->
+                                <!-- <div class="p-field">
+                                    <p:commandButton value="#{ff:upper(msg.requestNewMultiple)}"
+                                                     id="btn_new_multipe" styleClass="ui-button-success	search-btn new-button-multiple"
+                                                     disabled="#{!bean.canCreate}"
+                                                     action="#{bean.createNewMultipleRequest}" />
+                                </div>
+                                <div class="p-field">
+                                    <p:commandButton value="#{ff:upper(msg.requestNewMultiples)}"
+                                                     id="btn_new_multipa" styleClass="ui-button-success	search-btn new-button-multiple"
+                                                     disabled="#{!bean.canCreate}"
+                                                     action="#{bean.createNewMultipleRequests()}" />
+                                </div> -->
 
                             </div>
                         </div>
@@ -1306,6 +1305,22 @@
                 <p:commandButton value="#{msg.ok}"
                                  action="#{bean.modifyRequests}"
                                  oncomplete="PF('editAndPrintDialogWV').hide(); filterTableFromPanel();"/>
+            </div>
+        </p:dialog>
+        
+        <p:dialog id="chooseSingleOrMultipleRequestCreate" widgetVar="chooseSingleOrMultipleRequestCreateWV" modal="true" >
+            <h3>#{msg.requestListSingleOrMultipleRequest}:</h3>
+            <p:outputPanel style="justify-content: center; display: flex">
+                <p:selectOneRadio value="#{bean.multipleCreateRedirect}" >
+                    <f:selectItem itemLabel="#{msg.requestListSingleRequestCreate}" itemValue="1"/>
+                    <f:selectItem itemLabel="#{msg.requestListMultipleRequestCreate}" itemValue="2"/>
+                    <f:selectItem itemLabel="#{msg.requestListMultipleServiceCreate}" itemValue="3"/>
+                </p:selectOneRadio>
+            </p:outputPanel>
+            <br/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" update="@form" styleClass="confirm-button"
+                                 action="#{bean.redirectPage}" oncomplete="PF('chooseSingleOrMultiplerequestCreateWV').hide();"/>
             </div>
         </p:dialog>
 
