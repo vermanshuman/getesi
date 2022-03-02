@@ -406,9 +406,9 @@
                                                      styleClass="#{bean.examRequest.costButtonConfirmClicked ? '':'btn-green'}"
                                                      update="btn_line, requestExtraCostDialog"/>
 
-                                    <p:commandButton action="#{bean.checkRelatedEstateFormalities}" value="#{msg.save}"
-                                                     update="btn_line checkEstateFormalitySalesDialog" id="saveButton"
+                                    <p:commandButton action="#{bean.checkFormalitiesYear}" value="#{msg.save}"
                                                      styleClass="#{bean.entity.bodySaved ? '':'btn-green'}"
+                                                     update="btn_line"
                                                      rendered="#{bean.examRequest.confirmExtraCostsPressed}"
                                                      oncomplete="#{save_oncomplete}" icon="ui-icon-disk"/>
 
@@ -656,6 +656,21 @@
                 </p:dataTable>
             </p:dialog>
 
+
+            <p:dialog widgetVar="checkFormalityYearWV" modal="true" draggable="false" position="center center">
+                <div class="ui-corner-all">
+                    <span >#{msg.requestTextEditYearFormalityCheck}</span>
+                </div>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.confirm}" action="#{bean.checkRelatedEstateFormalities}"
+                                     oncomplete="PF('checkFormalityYearWV').hide();"
+                                     update="btn_line checkEstateFormalitySalesDialog"
+                                     style="margin-right: 1cm;background-color: #00CC52!important;"/>
+                    <p:commandButton value="#{msg.cancel}"
+                                     oncomplete="PF('checkFormalityYearWV').hide();"
+                                     style="background-color: #F3362B !important;"/>
+                </div>
+            </p:dialog>
 
             <p:dialog widgetVar="sendInvoiceErrorDialogWV"  modal="true" draggable="false"
                       position="center center">

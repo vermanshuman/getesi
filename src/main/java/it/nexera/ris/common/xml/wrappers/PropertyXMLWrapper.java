@@ -91,11 +91,6 @@ public class PropertyXMLWrapper extends BaseXMLWrapper<Property> {
 
     private String sectionCity;
 
-    private List<String> consistencyData = new LinkedList<>();
-
-    private List<String> consistencyDataAlt = new LinkedList<>();
-
-
     @Override
     public Property toEntity()
             throws HibernateException, InstantiationException,
@@ -137,18 +132,7 @@ public class PropertyXMLWrapper extends BaseXMLWrapper<Property> {
         }
         property.setCadastralIncome(sum.toString());
         property.setClassRealEstate(getClassRealEstate());
-
-        if(!ValidationHelper.isNullOrEmpty(getConsistencyDataAlt())){
-            sum = 0d;
-            for (String temp : getConsistencyDataAlt()) {
-                if (temp.length() > NUMBER_OF_THOUSANDS_DIGITS) {
-                    temp = temp.replaceAll("\\.", "");
-                }
-                sum += Double.parseDouble(temp.replaceAll(",", "."));
-            }
-            property.setConsistency(sum + " MQ");
-        }else
-            property.setConsistency(getConsistency());
+        property.setConsistency(getConsistency());
         property.setDeduction(getDeduction());
         property.setMicroZone(getMicroZone());
         property.setNumberOfRooms(getNumberOfRooms());
@@ -178,9 +162,9 @@ public class PropertyXMLWrapper extends BaseXMLWrapper<Property> {
         }
 
         List<City> cities = null;
-        if(!ValidationHelper.isNullOrEmpty(getCityCode()) &&
+        if(!ValidationHelper.isNullOrEmpty(getCityCode()) && 
                 !ValidationHelper.isNullOrEmpty(getSectionCity())) {
-            cities = ConnectionManager.load(City.class, new Criterion[]{Restrictions.eq("cfis", getCityCode() + getSectionCity())}, session);
+            cities = ConnectionManager.load(City.class, new Criterion[]{Restrictions.eq("cfis", getCityCode() + getSectionCity())}, session);    
         }
         if (ValidationHelper.isNullOrEmpty(cities)) {
             cities = ConnectionManager.load(City.class, new Criterion[]{Restrictions.eq("cfis", getCityCode())}, session);
@@ -374,7 +358,8 @@ public class PropertyXMLWrapper extends BaseXMLWrapper<Property> {
 
                 case CONSISTENCY_ALT:
                     if(!ValidationHelper.isNullOrEmpty(value))
-                        getConsistencyDataAlt().add(value);
+                        value += " MQ";
+                    setConsistency(value);
                     break;
 
                 case DEDUCTION:
@@ -717,21 +702,5 @@ public class PropertyXMLWrapper extends BaseXMLWrapper<Property> {
 
     public void setExclusedArea(Double exclusedArea) {
         this.exclusedArea = exclusedArea;
-    }
-
-    public List<String> getConsistencyData() {
-        return consistencyData;
-    }
-
-    public void setConsistencyData(List<String> consistencyData) {
-        this.consistencyData = consistencyData;
-    }
-
-    public List<String> getConsistencyDataAlt() {
-        return consistencyDataAlt;
-    }
-
-    public void setConsistencyDataAlt(List<String> consistencyDataAlt) {
-        this.consistencyDataAlt = consistencyDataAlt;
     }
 }

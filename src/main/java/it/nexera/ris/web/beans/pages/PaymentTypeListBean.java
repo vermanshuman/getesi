@@ -43,7 +43,7 @@ import java.util.List;
 public class PaymentTypeListBean extends EntityLazyInListEditPageBean<PaymentType>
         implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -2631748089590161876L;
 
 	@Override
 	public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,

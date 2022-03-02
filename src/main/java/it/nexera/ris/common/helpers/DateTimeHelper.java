@@ -746,6 +746,10 @@ public class DateTimeHelper extends BaseHelper {
         return new DateTime(date).plusDays(days).toDate();
     }
 
+    public static Date minusYears(Date date, int years) {
+        return new DateTime(date).minusYears(years).toDate();
+    }
+
     public static String toFileDateWithMinutes(Date value) {
         return toFormatedString(value, datePatternForFileWithMinutes);
     }

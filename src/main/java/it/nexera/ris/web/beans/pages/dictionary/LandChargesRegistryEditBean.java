@@ -82,13 +82,21 @@ public class LandChargesRegistryEditBean extends EntityEditPageBean<LandChargesR
             HibernateException, IllegalAccessException {
         if (ValidationHelper.isNullOrEmpty(this.getEntity().getName())) {
             addRequiredFieldException("form:name");
-        } else if (!ValidationHelper.isUnique(LandChargesRegistry.class, "name",
-                getEntity().getName(), this.getEntity().getId())) {
-            addFieldException("form:name", "nameAlreadyInUse");
         }
-
         if (ValidationHelper.isNullOrEmpty(this.getEntity().getType())) {
             addRequiredFieldException("form:type");
+        }
+        Long count = DaoManager.getCount(
+                LandChargesRegistry.class,
+                "type",
+                null,
+                new Criterion[]
+                        {Restrictions.eq("type", this.getEntity().getType()),
+                                Restrictions.eq("name", this.getEntity().getName()),
+                                Restrictions.ne("id", this.getEntity().getId() == null ? 0 : this.getEntity().getId())});
+
+        if(count > 0){
+            addException("nameTypeAlreadyInUse");
         }
     }
 

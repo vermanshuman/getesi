@@ -202,8 +202,8 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/servizio_anagrafico.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    width: 25px;
-    height: 25px;
+    width: 20px;
+    height: 20px;
     margin: 0 auto;
     display: inline-block;
 }
@@ -213,9 +213,9 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/serv_anagrafico.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 25px;
-    width: 25px;
-    height: 25px;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
     margin: 0 auto;
     display: inline-block;
 }
@@ -236,9 +236,9 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/servizi-comunali.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 25px;
-    width: 25px;
-    height: 25px;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
     margin: 0 auto;
     display: inline-block;
 }
@@ -247,9 +247,9 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/servizi-immobiliari.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 25px;
-    width: 25px;
-    height: 25px;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
     margin: 0 auto;
     display: inline-block;
 }
@@ -258,9 +258,9 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/servizi-investigativi.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 25px;
-    width: 25px;
-    height: 25px;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
     margin: 0 auto;
     display: inline-block;
 }
@@ -324,9 +324,9 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/servizi-catastali.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 25px;
-    width: 25px;
-    height: 25px;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
     margin: 0 auto;
     display: inline-block;
 }
@@ -350,9 +350,9 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/servizi-legali.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 25px;
-    width: 25px;
-    height: 25px;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
     margin: 0 auto;
     display: inline-block;
 }
@@ -393,7 +393,7 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/previous.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 21px;
+    background-size: 30px;
     height: 21px;
     width: 20px;
     display: block;
@@ -404,7 +404,7 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/previous.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 21px;
+    background-size: 30px;
     height: 21px;
     width: 20px;
     display: block;
@@ -636,20 +636,19 @@ body .ui-datatable thead th.ui-state-hover {
     color: #5f666c !important;
 }
 
-body .ui-datatable thead th {
+body .ui-datatable:not(.borderless) thead th {
     background-color: #ffffff !important;
     padding: 8px 2px;
     border-color: #808080 !important;
     color: #5f666c !important;
 }
 
-.ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+.ui-datatable:not(.borderless) thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
     padding: 4px 10px!important;
     overflow: hidden!important;
     border-width: 1px!important;
     border-style: solid!important;
 }
-
 
 body .ui-datatable .ui-datatable-data tr td {
     padding: 6px 12px;
@@ -752,7 +751,7 @@ select-width {
 }
 
 .layout-wrapper .layout-menu-container .layout-menu-logo img {
-    width: 60px;
+    width: 50px;
     margin-top: 15px;
 }
 
@@ -804,7 +803,7 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
     }
 }*/
 .layout-wrapper .layout-topbar, .layout-menu-logo {
-    background-color: #c5d3df !important;
+    background-color: #ffffff !important;
 }
 
 .layout-wrapper .layout-topbar .topbar-menu > li > a .topbar-icon{
@@ -815,8 +814,9 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
     background-image: url("../images/impostazioni-system.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 26px;
-    height: 42px;
+    background-size: 30px;
+    height: 25px;
+    margin-top: 3px;
     display: block;
 }
 
@@ -876,4 +876,27 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
 
 .additional_button{
     margin-top: 5px;
+}
+
+
+.alignEnd {
+    place-content: flex-end;
+}
+
+.searchPanelButton {
+    background: #fb6e51 !important;
+}
+
+@media screen and (max-width: 1200px) {
+    #settingPanel {
+        margin-top: 90px;
+    }
+    .alignEnd {
+        place-content: flex-start;
+    }
+}
+.ui-datatable.borderless thead th, .ui-datatable.borderless tbody,
+.ui-datatable.borderless tbody tr, .ui-datatable.borderless tbody td {
+    border-style: none;
+    background: #ffffff;
 }

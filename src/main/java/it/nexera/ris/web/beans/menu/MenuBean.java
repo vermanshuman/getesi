@@ -159,6 +159,7 @@ public class MenuBean extends PageBean implements Serializable {
             submenuAddElement(submenu, PageTypes.SECTION_D_FORMAT_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.LAND_OMI_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.LAND_CULTURE_LIST, "fa fa-fw fa-bars");
+            submenuAddElement(submenu, PageTypes.TAX_RATE_LIST, "fa fa-fw fa-bars");
         } catch (Exception e) {
             LogHelper.log(log, e);
         }
