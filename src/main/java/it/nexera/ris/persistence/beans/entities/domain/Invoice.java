@@ -1,5 +1,6 @@
 package it.nexera.ris.persistence.beans.entities.domain;
 
+import it.nexera.ris.common.enums.InvoiceStatus;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
 
 
@@ -41,6 +42,10 @@ public class Invoice extends IndexedEntity implements Serializable {
 
     @Column(name = "cloud_id")
     private Long cloudId;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+	private InvoiceStatus status;
     
 	public Long getCloudId() {
 		return cloudId;
@@ -113,4 +118,14 @@ public class Invoice extends IndexedEntity implements Serializable {
 	public void setSent(Boolean sent) {
 		this.sent = sent;
 	}
+
+	public InvoiceStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(InvoiceStatus status) {
+		this.status = status;
+	}
+	
+	
 }
