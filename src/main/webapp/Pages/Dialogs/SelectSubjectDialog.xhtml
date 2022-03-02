@@ -329,22 +329,6 @@
 
                             <p:tabView id="tabView" rendered="#{bean.selectedSubjectWrapper.isOnlyView() and not bean.selectedSubjectWrapper.entity.isNew}" binding="#{bean.selectedSubjectWrapper.componentTabView}"/>
 
-                            <p:dialog widgetVar="templates" resizable="false"
-                                      header="#{msg.docTemplates}" modal="true">
-                                <p:selectOneMenu value="#{bean.selectedSubjectWrapper.selectedTemplateId}"
-                                                 style="width:150px;">
-                                    <f:selectItems value="#{bean.selectedSubjectWrapper.templates}"/>
-                                </p:selectOneMenu>
-
-                                <div class="btn_line">
-                                    <p:commandButton value="#{msg.ok}" ajax="false"
-                                                     actionListener="#{bean.selectedSubjectWrapper.generate}" onclick="PF('templates').hide()"
-                                                     update=":form:messages"/>
-                                    <p:commandButton value="#{msg.cancel}"
-                                                     onclick="PF('templates').hide()"/>
-                                </div>
-                            </p:dialog>
-
                             <p:dialog id="documentDialog" widgetVar="documentDialog" modal="true" resizable="false" draggable="false"
                                       width="600">
                                 <p:dataTable value="#{bean.selectedSubjectWrapper.requestDocuments}" var="doc" id="requestDocs">
@@ -428,5 +412,20 @@
                 </p:tab>
             </p:tabView>
         </p:scrollPanel>
+    </p:dialog>
+    <p:dialog widgetVar="templates" resizable="false"
+              header="#{msg.docTemplates}" modal="true">
+        <p:selectOneMenu value="#{bean.selectedSubjectWrapper.selectedTemplateId}"
+                         style="width:150px;">
+            <f:selectItems value="#{bean.selectedSubjectWrapper.templates}"/>
+        </p:selectOneMenu>
+
+        <div class="btn_line">
+            <p:commandButton value="#{msg.ok}" ajax="false"
+                             actionListener="#{bean.selectedSubjectWrapper.generate}" onclick="PF('templates').hide()"
+                             update=":form:messages"/>
+            <p:commandButton value="#{msg.cancel}"
+                             onclick="PF('templates').hide()"/>
+        </div>
     </p:dialog>
 </ui:composition>
