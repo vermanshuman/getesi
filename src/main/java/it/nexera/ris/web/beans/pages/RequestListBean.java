@@ -17,10 +17,6 @@ import it.nexera.ris.web.beans.wrappers.logic.RequestStateWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.RequestTypeFilterWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.ServiceFilterWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.UserFilterWrapper;
-import it.nexera.ris.web.common.EntityLazyListModel;
-import it.nexera.ris.web.common.ListPaginator;
-import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
@@ -29,7 +25,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
-import org.primefaces.model.SortOrder;
+import org.primefaces.event.data.PageEvent;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -160,14 +156,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     private Integer pageNumber;
 
-    @Getter
-    @Setter
-    private ListPaginator paginator;
-    
-    @Getter
-    @Setter
-    private Integer multipleCreateRedirect;
-    
     private static final String KEY_CLIENT_ID = "KEY_CLIENT_ID_SESSION_KEY_NOT_COPY";
     private static final String KEY_STATES = "KEY_STATES_SESSION_KEY_NOT_COPY";
     private static final String KEY_REQUEST_TYPE = "KEY_REQUEST_TYPE_SESSION_KEY_NOT_COPY";
@@ -189,9 +177,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
             IllegalAccessException, IOException {
-
-        setPaginator(new ListPaginator(10, 1, 1, 1,
-                "DESC", "createDate"));
 
         setSearchLastName((String) SessionHelper.get("searchLastName"));
         setSearchFiscalCode((String) SessionHelper.get("searchFiscalCode"));
@@ -326,7 +311,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         }
         loadFilterValueFromSession();
         filterTableFromPanel();
-
     }
 
     public void loadRequestDocuments() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -1018,29 +1002,12 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         }
 
         setFilterRestrictions(restrictions);
-//        loadList(RequestView.class, restrictions.toArray(new Criterion[0]),
-//                new Order[]{Order.desc("createDate")});
-        this.setLazyModel(new EntityLazyListModel<>(RequestView.class, restrictions.toArray(new Criterion[0]),
-                new Order[]{
-                        Order.desc("createDate")
-                }));
-
-        getLazyModel().load((getPaginator().getTablePage() - 1) * getPaginator().getRowsPerPage(), getPaginator().getRowsPerPage(),
-                getPaginator().getTableSortColumn(),
-                (getPaginator().getTableSortOrder() == null || getPaginator().getTableSortOrder().equalsIgnoreCase("DESC")
-                        || getPaginator().getTableSortOrder().equalsIgnoreCase("UNSORTED")) ? SortOrder.DESCENDING : SortOrder.ASCENDING, new HashMap<>());
-
-        Integer totalPages = (int) Math.ceil((getLazyModel().getRowCount() * 1.0) / getPaginator().getRowsPerPage());
-        if (totalPages == 0)
-            totalPages = 1;
-
-        getPaginator().setRowCount(getLazyModel().getRowCount());
-        getPaginator().setTotalPages(totalPages);
-        getPaginator().setPage(getPaginator().getCurrentPageNumber());
+        loadList(RequestView.class, restrictions.toArray(new Criterion[0]),
+                new Order[]{Order.desc("createDate")});
 
         List<RequestView> requestList = DaoManager.load(RequestView.class, restrictions.toArray(new Criterion[0]));
 
-        List<Long> cityIds = new ArrayList<>();
+        List<Long> cityIds = new ArrayList<Long>();
 
 
         for (RequestView request : requestList) {
@@ -1377,73 +1344,74 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_ID))) {
             setSelectedClientId((Long) SessionHelper.get(KEY_CLIENT_ID));
-        } else {
+        }else {
             setSelectedClientId(null);
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_STATES))) {
             setStateWrappers((List<RequestStateWrapper>) SessionHelper.get(KEY_STATES));
-        } else {
+        }else {
             setStateWrappers(new ArrayList<>());
-            for (RequestState rs : RequestState.values()) {
-                getStateWrappers().add(new RequestStateWrapper(!RequestState.EVADED.equals(rs), rs));
-            }
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_REQUEST_TYPE))) {
             setRequestTypeWrappers((List<RequestTypeFilterWrapper>) SessionHelper.get(KEY_REQUEST_TYPE));
+        }else {
+            setRequestTypeWrappers(new ArrayList<>());
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_SERVICES))) {
             setServiceWrappers((List<ServiceFilterWrapper>) SessionHelper.get(KEY_SERVICES));
+        }else {
+            setServiceWrappers(new ArrayList<>());
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_MANAGER_ID))) {
             setManagerClientFilterid((Long) SessionHelper.get(KEY_CLIENT_MANAGER_ID));
-        } else {
+        }else {
             setManagerClientFilterid(null);
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_FIDUCIARY_ID))) {
             setFiduciaryClientFilterId((Long) SessionHelper.get(KEY_CLIENT_FIDUCIARY_ID));
-        } else {
+        }else {
             setFiduciaryClientFilterId(null);
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_AGGREAGATION))) {
             setAggregationFilterId((Long) SessionHelper.get(KEY_AGGREAGATION));
-        } else {
+        }else {
             setAggregationFilterId(null);
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_EXPIRATION))) {
             setDateExpiration((Date) SessionHelper.get(KEY_DATE_EXPIRATION));
-        } else {
+        }else {
             setDateExpiration(null);
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_FROM_REQ))) {
             setDateFrom((Date) SessionHelper.get(KEY_DATE_FROM_REQ));
-        } else {
+        }else {
             setDateFrom(null);
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_TO_REQ))) {
             setDateTo((Date) SessionHelper.get(KEY_DATE_TO_REQ));
-        } else {
+        }else {
             setDateTo(null);
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_FROM_EVASION))) {
             setDateFromEvasion((Date) SessionHelper.get(KEY_DATE_FROM_EVASION));
-        } else {
+        }else {
             setDateFromEvasion(null);
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_TO_EVASION))) {
             setDateToEvasion((Date) SessionHelper.get(KEY_DATE_TO_EVASION));
-        } else {
+        }else {
             setDateToEvasion(null);
         }
 
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_NOMINATIVO))) {
             setSearchLastName((String) SessionHelper.get(KEY_NOMINATIVO));
-        } else {
+        }else {
             setSearchLastName(null);
         }
 
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CF))) {
             setSearchFiscalCode((String) SessionHelper.get(KEY_CF));
-        } else {
+        }else {
             setSearchFiscalCode(null);
         }
 
@@ -1457,8 +1425,26 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         } else {
             setPageNumber(0);
         }
-//        executeJS("if (PF('tableWV').getPaginator() != null ) " +
-//                "PF('tableWV').getPaginator().setPage(" + getPageNumber() + ");");
+        executeJS("if (PF('tableWV').getPaginator() != null ) " +
+                "PF('tableWV').getPaginator().setPage(" + getPageNumber() + ");");
+    }
+
+    public void onPageChange(PageEvent event) {
+        if (event != null)
+            setPageNumber(event.getPage());
+        SessionHelper.put(KEY_PAGE_NUMBER, getPageNumber());
+        Map<String, String> params = FacesContext.getCurrentInstance().
+                getExternalContext().getRequestParameterMap();
+        if (!params.isEmpty()) {
+            String rows = params.get("table_rows");
+            if (!ValidationHelper.isNullOrEmpty(rows)) {
+                try {
+                    setRowsPerPage(Integer.parseInt(rows));
+                    SessionHelper.put(KEY_ROWS_PER_PAGE, getRowsPerPage());
+                } catch (NumberFormatException e) {
+                }
+            }
+        }
     }
 
     public Date getDateFrom() {
@@ -1939,99 +1925,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         return iconStyleClass;
     }
 
-    public void handleRowsChange() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        String rowsPerPage = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("rowsPerPageSelected");
-        String pageNumber = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("pageNumber");
-        if (!ValidationHelper.isNullOrEmpty(rowsPerPage))
-            getPaginator().setRowsPerPage(Integer.parseInt(rowsPerPage));
-
-        Integer totalPages = getPaginator().getRowCount() / getPaginator().getRowsPerPage();
-        Integer pageEnd = 10;
-        if (pageEnd < totalPages)
-            pageEnd = totalPages;
-        StringBuilder builder = new StringBuilder();
-        for (int i = 1; i <= pageEnd; i++) {
-            builder.append("<a class=\"ui-paginator-page ui-state-default ui-corner-all page_" + i + "\"");
-            builder.append("tabindex=\"0\" href=\"#\" onclick=\"changePage(" + i + ",event)\">" + i + "</a>");
-        }
-        getPaginator().setPaginatorString(builder.toString());
-        filterTableFromPanel();
-    }
-
-    public void onPageChange() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        String rowsPerPage = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("rowsPerPageSelected");
-        String pageNumber = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("pageNumber");
-        if (!ValidationHelper.isNullOrEmpty(rowsPerPage))
-            getPaginator().setRowsPerPage(Integer.parseInt(rowsPerPage));
-        if (!ValidationHelper.isNullOrEmpty(pageNumber)) {
-            Integer currentPage = Integer.parseInt(pageNumber);
-            getPaginator().setCurrentPageNumber(currentPage);
-            StringBuilder builder = new StringBuilder();
-            String cls = "ui-paginator-first ui-state-default ui-corner-all";
-            if (currentPage == 1) {
-                cls += " ui-state-disabled";
-            }
-            builder.append("<a href=\"#\" class=\"" + cls + "\"");
-            builder.append(" tabindex=\"-1\" onclick=\"firstPage(event)\">\n");
-            builder.append("<span class=\"ui-icon ui-icon-seek-first\">F</span>\n</a>\n");
-            builder.append("<a href=\"#\" onclick=\"previousPage(event)\"");
-            cls = "ui-paginator-prev ui-corner-all";
-            if (currentPage == 1) {
-                cls += " ui-state-disabled";
-            }
-            builder.append(" class=\"" + cls + "\"");
-            builder.append(" tabindex=\"-1\">\n");
-            builder.append("<span class=\"ui-icon ui-icon-seek-prev\">P</span>\n</a>\n");
-
-            getPaginator().setPageNavigationStart(builder.toString());
-            if (currentPage == getPaginator().getTotalPages()) {
-                builder.setLength(0);
-                builder.append("<a href=\"#\" class=\"ui-paginator-next ui-state-default ui-corner-all ui-state-disabled\"");
-                builder.append(" tabindex=\"0\">\n");
-                builder.append("<span class=\"ui-icon ui-icon-seek-next\">N</span>\n</a>\n");
-                builder.append("<a href=\"#\"");
-                builder.append(" class=\"ui-paginator-last ui-state-default ui-corner-all ui-state-disabled\" tabindex=\"-1\">\n");
-                builder.append("<span class=\"ui-icon ui-icon-seek-end\">E</span>\n</a>\n");
-                getPaginator().setPageNavigationEnd(builder.toString());
-            } else {
-                builder.setLength(0);
-                builder.append("<a href=\"#\" class=\"ui-paginator-next ui-state-default ui-corner-all\"  onclick=\"nextPage(event)\"");
-                builder.append(" tabindex=\"0\">\n");
-                builder.append("<span class=\"ui-icon ui-icon-seek-next\">N</span>\n</a>\n");
-                builder.append("<a href=\"#\"");
-                builder.append(" class=\"ui-paginator-last ui-state-default ui-corner-all\" tabindex=\"-1\" onclick=\"lastPage(event)\">\n");
-                builder.append("<span class=\"ui-icon ui-icon-seek-end\">E</span>\n</a>\n");
-                getPaginator().setPageNavigationEnd(builder.toString());
-            }
-            getPaginator().setTablePage(currentPage);
-            filterTableFromPanel();
-        }
-    }
-
-    public void clearFiltraPanel() {
-        setSelectedClientId(null);
-        setDateFrom(null);
-        setDateTo(null);
-        setDateFromEvasion(null);
-        setDateToEvasion(null);
-        setDateExpiration(null);
-        setRequestTypes(null);
-        setManagerClientFilterid(null);
-        setFiduciaryClientFilterId(null);
-        setAggregationFilterId(null);
-
-        SessionHelper.removeObject(KEY_CLIENT_ID);
-        SessionHelper.removeObject(KEY_DATE_FROM_REQ);
-        SessionHelper.removeObject(KEY_DATE_TO_REQ);
-        SessionHelper.removeObject(KEY_DATE_FROM_EVASION);
-        SessionHelper.removeObject(KEY_DATE_TO_EVASION);
-        SessionHelper.removeObject(KEY_DATE_EXPIRATION);
-        SessionHelper.removeObject(KEY_REQUEST_TYPE);
-        SessionHelper.removeObject(KEY_CLIENT_MANAGER_ID);
-        SessionHelper.removeObject(KEY_CLIENT_FIDUCIARY_ID);
-        SessionHelper.removeObject(KEY_AGGREAGATION);
-    }
-
     public void setSelectedRequestTypes(List<RequestType> selectedRequestTypes) {
         this.selectedRequestTypes = selectedRequestTypes;
     }
@@ -2053,19 +1946,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     public void createNewMultipleRequests() {
         String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE";
         RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT, queryParam);
-    }
-    
-    public void redirectPage() {
-    	if(getMultipleCreateRedirect().intValue() == 1) {
-    		RedirectHelper.goTo(PageTypes.REQUEST_EDIT);
-    	}
-    	if(getMultipleCreateRedirect().intValue() == 2) {
-    		RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT);
-    	}
-    	if(getMultipleCreateRedirect().intValue() == 3) {
-    		String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE";
-            RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT, queryParam);
-    	}
     }
 
     public Integer getRowsPerPage() {

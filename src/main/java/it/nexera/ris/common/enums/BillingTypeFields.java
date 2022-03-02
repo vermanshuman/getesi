@@ -21,9 +21,7 @@ public enum BillingTypeFields {
     EXCEL_NOTE(13l),
     EXCEL_CDR(14l),
     EXCEL_NDG(15l),
-    EXCEL_POSITION(16l),
-    EXCEL_STAMPS(17l),
-    EXCEL_POSTAL_EXPENSES(18l);
+    EXCEL_POSITION(16l);
 
     private Long id;
 

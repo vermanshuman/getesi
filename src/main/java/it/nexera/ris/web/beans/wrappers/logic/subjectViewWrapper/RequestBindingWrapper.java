@@ -49,7 +49,7 @@ public class RequestBindingWrapper extends BaseTab implements Serializable {
     }
 
     @Override
-    public Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+    Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
         return DaoManager.getCount(Request.class, "id",
                 new Criterion[]{
                         Restrictions.in("subject.id", getListIds()),
@@ -73,18 +73,13 @@ public class RequestBindingWrapper extends BaseTab implements Serializable {
         
         commandButton.setActionExpression(createMethodExpression(String.format("#{subjectBean.%s}", "loadAllegatiDocuments(tableVar)"), new Class[]{Request.class}));
         
-        commandButton.setIcon("fa fa-fw fa-file-pdf-o red-file icon-align");
-        //commandButton.setUpdate("requestDocs");
+        commandButton.setIcon("fa fa-fw fa-file-pdf-o");
+        commandButton.setUpdate("requestDocs");
         
-        columns.add(getButtonColumn("subjectViewRequestOutput", commandButton, "", "action_column"));
+        columns.add(getButtonColumn("subjectViewRequestOutput", commandButton));
 
         columns.add(getTextColumn("subjectViewRequestBilling", "billingClient"));
         columns.add(getTextColumn("subjectViewRequestNote", "note"));
-        
-        CommandButton commandButtonStartUpdate = new CommandButton();
-        commandButtonStartUpdate.setValue(ResourcesHelper.getString("subjectViewRequestStartUpdate"));
-        commandButtonStartUpdate.setStyleClass("btn-green");
-        columns.add(getButtonColumn("subjectViewRequestAction", commandButtonStartUpdate, "13%"));
         return columns;
     }
 

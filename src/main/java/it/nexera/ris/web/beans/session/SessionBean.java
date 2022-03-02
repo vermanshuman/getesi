@@ -314,7 +314,7 @@ public class SessionBean implements Serializable {
     public void getBillingListPage() {
         RedirectHelper.goTo(PageTypes.BILLING_LIST);
     }
-    
+
     public void getBillingListOldPage() {
         RedirectHelper.goTo(PageTypes.BILLING_LIST_OLD);
     }

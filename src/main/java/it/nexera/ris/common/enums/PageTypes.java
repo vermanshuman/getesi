@@ -150,8 +150,7 @@ public enum PageTypes {
     LAND_CULTURE_EDIT("/Pages/ConfigurationArea/LandCultureEdit.jsf", true),
 
     CALENDAR("/Pages/Configuration/Calendar.jsf"),
-    FOREIGN_STATES("/Pages/Configuration/ForeignStates.jsf"),
-    TAX_RATE_LIST("/Pages/ManagementGroup/TaxRateList.jsf");
+    FOREIGN_STATES("/Pages/Configuration/ForeignStates.jsf");
 
     private String page;
 

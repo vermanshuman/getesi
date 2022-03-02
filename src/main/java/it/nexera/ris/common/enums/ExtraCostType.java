@@ -8,9 +8,7 @@ public enum ExtraCostType {
     IPOTECARIO(1l),
     CATASTO(2l),
     ALTRO(3l),
-    NAZIONALEPOSITIVA(4l),
-	MARCA(5l),
-	POSTALE(6l);
+    NAZIONALEPOSITIVA(4l);
 
     private Long id;
 
