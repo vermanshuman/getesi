@@ -46,7 +46,7 @@
 				left: 0;
 				z-index: -1;
 				border-bottom: none;
-				border-radius: 10px 10px 0 0;
+				border-radius: 7px 7px 0 0;
 				background: #f6f7f9;
 				box-shadow: 0 2px hsla(0, 0%, 100%, .5) inset;
 				transform: perspective(20px) rotateX(3deg);
@@ -54,7 +54,7 @@
 			}
 			
 			nav.left a {
-				padding: 1em 1em 1em 1em;
+				padding: 1em 1em 1em 0.7em;
 			}
 			
 			nav.left a::before {
@@ -74,8 +74,8 @@
 			}
 			
 			nav a.selected::before {
-				margin-bottom: -1px;
-				border-top-width: 1px;
+				border-bottom: none;
+				height: 51px;
 			}
 			
 			nav a.selected::before, main {
@@ -84,9 +84,16 @@
 			
 			main {
 				display: block;
-				margin: -6px 0 30px -15px;
+				margin: -7px 0 30px -15px;
 				padding: 1em;
 				border-radius: 3px;
+				padding-left: 0px;
+				padding-top: 0px;
+			}
+
+			main .ui-panelgrid .ui-grid-responsive .ui-panelgrid-cell {
+				padding-top: 15px;
+    			padding-bottom: 0;
 			}
 			
 			.circle {
@@ -136,7 +143,6 @@
 			}
 			
 			.inner_div {
-				position: absolute;
 				color: rgb(255, 255, 255);
 				opacity: 0.2;
 				font-size: 74px;
@@ -147,7 +153,7 @@
 			
 			.box_header {
 				position: absolute;
-				top: -28px;
+				top: -32px;
 				left: 10px;
 				right: 45px;
 				font-size: 18px;
@@ -173,7 +179,7 @@
 			
 			.list_icon {
 				position: absolute;
-				top: -28px;
+				top: -32px;
 				right: 7px;
 				cursor: pointer;
 			}
@@ -337,15 +343,40 @@
 				margin-left: 5px;
 			}			
 
+			.inner_div img {
+				position: absolute;
+				height: 100px;
+				margin-top: 22px;
+				margin-left: -27px;
+			}
+
+			.ricavi-img, .incassi-bianco-img {
+			 	position: absolute;
+				margin-top: 24px;
+				height: 76px;
+				width: 100px;
+				background-size: 100px;
+				background-repeat: no-repeat;
+			}
+			.ricavi-img {
+				background-image: url('../../resources/images/ricavi.png') !important;
+				background-position-x: -20px;
+			}
+
+			.incassi-bianco-img {
+				background-image: url('../../resources/images/incassi_bianco.png') !important;
+				background-position-x: -20px;
+				background-position-y: 10px;
+			}
 		</style>
 		<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
 		<div style="margin-left: 20px;">
 			<nav class="left" style="margin-left:20px;"> 
-				<a href="#" id="tab1" class="tab selected">#{msg.billingListDashboard}<span class="circle" aria-hidden="true">x</span></a> 
-				<a href="#" id="tab2" class="tab">#{msg.billingListInvoices}<span class="circle" aria-hidden="true">x</span></a> 
-				<a href="#" id="tab3" class="tab">#{msg.billingListCreditNotes}<span class="circle" aria-hidden="true">x</span></a> 
-				<a href="#" id="tab4" class="tab">#{msg.billingListSubjectsToBeInvoiced}<span class="circle" aria-hidden="true">x</span></a> 
+				<a href="#" id="tab1" class="tab selected">#{msg.billingListDashboard}</a>
+				<a href="#" id="tab2" class="tab">#{msg.billingListInvoices}</a>
+				<a href="#" id="tab3" class="tab">#{msg.billingListCreditNotes}</a>
+				<a href="#" id="tab4" class="tab">#{msg.billingListSubjectsToBeInvoiced}</a>
 			</nav>
 			
 			<main>
@@ -377,11 +408,11 @@
 							columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3"
 							layout="grid">
 							<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
-								style="width: 350px; height: 100px; line-height: 100px; position: absolute; transform: translate(0px, 0px); box-sizing: border-box;">
+								style="width: 399px; height: 100px; line-height: 100px; position: absolute; transform: translate(0px, 0px); box-sizing: border-box;">
 								<div>
 									<div class="ricavi_outer_div">
 										<div class="inner_div">
-											<i class="fa fa-line-chart" style="position: relative; left: 6px; bottom: -1px; font-size: 70px;"></i>
+											<i class="ricavi-img"></i>
 										</div>
 										<div color="#fff" class="box_header">#{msg.billingListRevenues}</div>
 										<div class="cost">19.847 €</div>
@@ -398,11 +429,11 @@
 							</div>
 	
 							<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
-								style="width: 350px; height: 100px; line-height: 100px; position: absolute; transform: translate(365px, 0px); box-sizing: border-box;">
+								style="width: 399px; height: 100px; line-height: 100px; position: absolute; transform: translate(409px, 0px); box-sizing: border-box;">
 								<div>
 									<div class="costi_outer_div">
 										<div class="inner_div">
-											<i class="fa fa-bar-chart" style="position: relative; left: 6px; bottom: -1px; font-size: 70px;"></i>
+											<i class="ricavi-img"></i>
 										</div>
 										<div color="#fff" class=" box_header">#{msg.billingListCosts}</div>
 										<div class="cost">30.000 €</div>
@@ -418,20 +449,19 @@
 							</div>
 	
 							<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
-								style="width: 350px; height: 100px; line-height: 100px; position: absolute; transform: translate(730px, 0px); box-sizing: border-box;">
+								style="width: 399px; height: 100px; line-height: 100px; position: absolute; transform: translate(819px, 0px); box-sizing: border-box;">
 								<div>
 									<div class="incassi_outer_div">
 										<div class="inner_div">
-											<i class="fan fa-coinss"
-												style="position: relative; left: 1px; bottom: -18px; font-size: 80px;"></i>
+											<i class="incassi-bianco-img"></i>
 										</div>
-										<div color="#fff" class=" box_header"><!-- #{msg.billingListCollections} --></div>
-										<div class="cost">&nbsp;</div>
+										<div color="#fff" class=" box_header">#{msg.billingListTributes}</div>
+										<div class="cost">40.000 €</div>
 									</div>
 	
 									<div class="list_icon"
 										style="font-size: 17px; color: rgb(255, 255, 255);" title="">
-										<i class="fa fa-fw fa-list11"
+										<i class="fa fa-fw fa-list"
 											style="font-size: inherit;"></i>
 									</div>
 	
@@ -440,12 +470,12 @@
 							</div>
 	
 							<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
-								style="width: 350px; height: 100px; line-height: 100px; position: absolute; transform: translate(1095px, 0px); box-sizing: border-box;">
+								style="width: 399px; height: 100px; line-height: 100px; position: absolute; transform: translate(1228px, 0px); box-sizing: border-box;">
 								<div>
 									<div class="tributi_outer_div">
-										<div class="inner_div">
-											<i class="fan fa-university1"
-												style="position: relative; left: 5px; bottom: -10px; font-size: 80px;"></i>
+										<div class="inner_div" style="position: absolute;">
+											<i class="fa fa-university"
+												style="position: relative; left: -9px; bottom: -18px; font-size: 80px;"></i>
 										</div>
 										<div color="#fff" class=" box_header"><!-- #{msg.billingListTributes} --></div>
 										<div class="cost">&nbsp;</div>
@@ -466,7 +496,7 @@
 							<h:panelGroup id="slides1" layout="block" styleClass="p-grid" style="margin-top: 7% !important;">
 								<div class="p-col-12 p-lg-6 p-xl-3">
 									<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
-										style="width: 350px; height: 210px; border-radius: 5px; margin-left:14px;">
+										style="width: 399px; height: 210px; border-radius: 5px; margin-left:14px;">
 										<div class="sc-hcnlBt wHMuN">
 											<div>
 												<div color="#6e7a81" class="trimester"
@@ -512,7 +542,7 @@
 								
 								<div class="p-col-12 p-lg-6 p-xl-3">
 									<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
-										style="width: 350px; height: 210px; border-radius: 5px; margin-left:7px;">
+										style="width: 399px; height: 210px; border-radius: 5px; margin-left:7px;">
 										<div class="sc-hcnlBt wHMuN">
 											<div>
 												<div color="#6e7a81" class="trimester"
