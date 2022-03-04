@@ -340,7 +340,7 @@
 				color: rgb(110, 122, 129); 
 				float: right; 
 				margin-top: 7px; 
-				margin-left: 5px;
+				margin-right: 5px;
 			}			
 
 			.inner_div img {
@@ -367,6 +367,12 @@
 				background-image: url('../../resources/images/incassi_bianco.png') !important;
 				background-position-x: -20px;
 				background-position-y: 10px;
+			}
+
+			@media screen and (min-width: 1400px) {
+				.cost_total {
+					font-size: 35px;
+				}
 			}
 		</style>
 		<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
@@ -408,7 +414,7 @@
 							columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3"
 							layout="grid">
 							<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
-								style="width: 399px; height: 100px; line-height: 100px; position: absolute; transform: translate(0px, 0px); box-sizing: border-box;">
+								style="width: calc(25% - 9px); height: 100px; line-height: 100px; position: absolute; transform: translate(-4px, 0px); box-sizing: border-box;">
 								<div>
 									<div class="ricavi_outer_div">
 										<div class="inner_div">
@@ -429,7 +435,7 @@
 							</div>
 	
 							<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
-								style="width: 399px; height: 100px; line-height: 100px; position: absolute; transform: translate(409px, 0px); box-sizing: border-box;">
+								style="width: calc(25% - 9px); height: 100px; line-height: 100px; position: absolute; transform: translate(calc(100% + 6px), 0px); box-sizing: border-box;">
 								<div>
 									<div class="costi_outer_div">
 										<div class="inner_div">
@@ -449,7 +455,7 @@
 							</div>
 	
 							<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
-								style="width: 399px; height: 100px; line-height: 100px; position: absolute; transform: translate(819px, 0px); box-sizing: border-box;">
+								style="width: calc(25% - 9px); height: 100px; line-height: 100px; position: absolute; transform: translate(calc(200% + 16px), 0px); box-sizing: border-box;">
 								<div>
 									<div class="incassi_outer_div">
 										<div class="inner_div">
@@ -470,7 +476,7 @@
 							</div>
 	
 							<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
-								style="width: 399px; height: 100px; line-height: 100px; position: absolute; transform: translate(1228px, 0px); box-sizing: border-box;">
+								style="width: calc(25% - 9px); height: 100px; line-height: 100px; position: absolute; transform: translate(calc(300% + 26px), 0px); box-sizing: border-box;">
 								<div>
 									<div class="tributi_outer_div">
 										<div class="inner_div" style="position: absolute;">
@@ -494,9 +500,9 @@
 						
 						<div class="layout-dashboard" style="max-width: 98%;">
 							<h:panelGroup id="slides1" layout="block" styleClass="p-grid" style="margin-top: 7% !important;">
-								<div class="p-col-12 p-lg-6 p-xl-3">
+								<div style="width: calc(25% - 8px);position: absolute;transform: translate(16px, 0px);">
 									<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
-										style="width: 399px; height: 210px; border-radius: 5px; margin-left:14px;">
+										style="height: 210px; border-radius: 5px;">
 										<div class="sc-hcnlBt wHMuN">
 											<div>
 												<div color="#6e7a81" class="trimester"
@@ -506,7 +512,7 @@
 												</div>
 											</div>
 	
-											<div style="margin-top: 42px;">
+											<div style="margin-top: 38px;">
 												<div class="flexBox-0-0 fullWidth-0-2 wrap-nowrap-0-7 
 															direction-column-0-5 justifyContent-center-0-26 alignItems-stretch-0-14 alignContent-center-0-17">
 													<div class="month_div" style="border: 0px;">
@@ -540,9 +546,9 @@
 									</div>
 								</div>
 								
-								<div class="p-col-12 p-lg-6 p-xl-3">
+								<div style="width: calc(25% - 8px);position: absolute;transform: translate(calc(100% + 26px), 0px);">
 									<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
-										style="width: 399px; height: 210px; border-radius: 5px; margin-left:7px;">
+										style="height: 210px; border-radius: 5px;">
 										<div class="sc-hcnlBt wHMuN">
 											<div>
 												<div color="#6e7a81" class="trimester"
@@ -552,7 +558,7 @@
 												</div>
 											</div>
 	
-											<div style="margin-top: 42px;">
+											<div style="margin-top: 38px;">
 												<div class="flexBox-0-0 fullWidth-0-2 wrap-nowrap-0-7 
 															direction-column-0-5 justifyContent-center-0-26 alignItems-stretch-0-14 alignContent-center-0-17">
 													<div class="month_div" style="border: 0px;">
