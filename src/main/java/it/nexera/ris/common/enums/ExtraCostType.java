@@ -9,8 +9,8 @@ public enum ExtraCostType {
     CATASTO(2l),
     ALTRO(3l),
     NAZIONALEPOSITIVA(4l),
-	MARCA(5l),
-	POSTALE(6l);
+    MARCA(5l),
+    POSTALE(6l);
 
     private Long id;
 

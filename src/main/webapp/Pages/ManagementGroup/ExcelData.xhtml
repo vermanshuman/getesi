@@ -69,7 +69,7 @@
 
 		<ui:repeat value="#{bean.dataTable}" var="key">
 			<p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
-				<h:outputText value="#{key.requestName}" style="font-weight:bold;font-size: 20px;" />
+				<h:outputText value="#{key.requestName}" style="font-weight:bold;font-size: 20px;"/>
 				 <p:dataTable value="#{key.requests}" var="req" rowIndexVar="row">
 					<p:columns value="#{key.columnNames}" var="column">
                     	<f:facet name="header">

@@ -623,9 +623,9 @@ public class Formality extends IndexedEntity {
             if (!ValidationHelper.isNullOrEmpty(this.getSectionB())) {
                 return "S";
             }
-            return "O";
+            // return "O";
         }
-        return "";
+        return "O";
     }
 
     public String getForAgainst() {
@@ -1332,12 +1332,14 @@ public class Formality extends IndexedEntity {
         }
         return textInVisura;
     }
+
     public Date getComparedDate() {
-        if(!ValidationHelper.isNullOrEmpty(checkRenewalTypeFormality())){
-            if(!ValidationHelper.isNullOrEmpty(getSectionA())  &&
-                    !ValidationHelper.isNullOrEmpty(getSectionA().getOtherData()))
-                return  getSectionA().getOtherData();
-        }
+        // if(ValidationHelper.isNullOrEmpty(checkRenewalTypeFormality())){
+        // https://trello.com/c/nFIbO049/643-order-formality-in-tag-tabella-relazione-immobiliare
+        if (!ValidationHelper.isNullOrEmpty(getSectionA()) &&
+                !ValidationHelper.isNullOrEmpty(getSectionA().getOtherData()))
+            return getSectionA().getOtherData();
+        // }
         return getPresentationDateOrNewDateIfNull();
     }
 }

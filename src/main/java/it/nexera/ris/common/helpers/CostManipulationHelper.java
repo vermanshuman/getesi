@@ -28,8 +28,11 @@ public class CostManipulationHelper extends PageBean {
     private static final Double IPOTECARIO_TITOLO = 7.20d;
     private static final Double IPOTECARIO_ADDITIONAL_FORMALITY = 3.60d;
     private static final Double CATASTO_DIVISIBLE = 0.90d;
+    private static final Double MARCHE_DA_BOLLO_DEFAULT = 16.0d;
 
     private String extraCostLandRegistry;
+
+    private String extraCostPostalExpense;
 
     private String extraCostOther;
 
@@ -38,6 +41,8 @@ public class CostManipulationHelper extends PageBean {
     private Boolean costOutput;
 
     private Integer spinnerNumber;
+
+    private Integer stampSpinnerNumber;
 
     private String selectedMortgageNote;
 
@@ -58,13 +63,13 @@ public class CostManipulationHelper extends PageBean {
     private Double taxableCostTemp;
 
     private boolean isEditable;
-    
+
     private String extraCostOtherNote;
-    
+
     private String costNote;
-    
+
     private Boolean includeNationalCost;
-    
+
     public void saveRequestEstateFormalityCost(Request request) throws PersistenceBeanException {
         if (!ValidationHelper.isNullOrEmpty(getEstateFormalityCost())) {
             try {
@@ -90,7 +95,7 @@ public class CostManipulationHelper extends PageBean {
         }
 
         setIncludeNationalCost(request.getIncludeNationalCost());
-        
+
         List<EstateFormality> estateFormalitiesUpdated = DaoManager.load(EstateFormality.class, new CriteriaAlias[]{
                 new CriteriaAlias("requestListUpdate", "request", JoinType.INNER_JOIN)
         }, new Criterion[]{
@@ -134,7 +139,7 @@ public class CostManipulationHelper extends PageBean {
                 if(getSelectedMortgageNote().equals(MortgageType.AdditionalFormality.getName())) {
                     cost = IPOTECARIO_ADDITIONAL_FORMALITY;
                 }else if(getSelectedMortgageNote().equals(MortgageType.Titolo.getName())) {
-                   cost = IPOTECARIO_TITOLO;     
+                    cost = IPOTECARIO_TITOLO;
                 }
                 newExtraCost.setPrice((getSpinnerNumber() == null ? 1 : getSpinnerNumber()) * (cost));
                 newExtraCost.setType(ExtraCostType.IPOTECARIO);
@@ -193,6 +198,30 @@ public class CostManipulationHelper extends PageBean {
                     return;
                 }
                 break;
+            case MARCA:
+                Double stampcost = MARCHE_DA_BOLLO_DEFAULT;
+                newExtraCost.setPrice((getStampSpinnerNumber() == null ? 1 : getStampSpinnerNumber()) * (stampcost));
+                newExtraCost.setType(ExtraCostType.MARCA);
+                newExtraCost.setNote("Marca da bollo");
+                break;
+            case POSTALE:
+                if (!ValidationHelper.isNullOrEmpty(getExtraCostPostalExpense())) {
+                    try {
+                        Double.parseDouble(getExtraCostPostalExpense().replaceAll(",", "."));
+                    } catch (NumberFormatException e) {
+                        markInvalid("inputCostPostalExp", "warning");
+                        setExtraCostPostalExpense(null);
+                        return;
+                    }
+                    newExtraCost.setPrice(Double.valueOf(getExtraCostPostalExpense().replaceAll(",", ".")));
+                    newExtraCost.setType(ExtraCostType.POSTALE);
+                    newExtraCost.setNote("Spese postali");
+                    cleanValidation();
+                } else {
+                    return;
+                }
+                break;
+
         }
 
         newExtraCost.setRequestId(requestId);
@@ -201,8 +230,9 @@ public class CostManipulationHelper extends PageBean {
             setRequestExtraCosts(new ArrayList<>());
         }
         getRequestExtraCosts().add(newExtraCost);
-        
+        setExtraCostPostalExpense(null);
         setSpinnerNumber(null);
+        setStampSpinnerNumber(null);
         setSelectedMortgageNote(null);
         setExtraCostLandRegistry(null);
         setExtraCostOther(null);
@@ -220,7 +250,7 @@ public class CostManipulationHelper extends PageBean {
         TransactionExecuter.execute(new Action() {
             @Override
             public void execute() throws Exception {
-                
+
                 if (!ValidationHelper.isNullOrEmpty(getRequestExtraCosts()) || !getRequestExtraCosts().equals(removeList)) {
                     for (ExtraCost cost : removeList) {
                         DaoManager.remove(cost);
@@ -234,15 +264,15 @@ public class CostManipulationHelper extends PageBean {
                     for (ExtraCost cost : getRequestExtraCosts()) {
                         if(ValidationHelper.isNullOrEmpty(cost.getType()) ||
                                 !ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
-                            requestCost += cost.getPrice();    
+                            requestCost += cost.getPrice();
                         }
-                        
+
                         ExtraCost newCost = new ExtraCost();
                         newCost.setPrice(cost.getPrice());
                         newCost.setNote(cost.getNote());
                         newCost.setType(cost.getType());
                         newCost.setRequestId(cost.getRequestId());
-                        
+
                         DaoManager.save(newCost);
                     }
 
@@ -294,19 +324,10 @@ public class CostManipulationHelper extends PageBean {
             totalCost += getCostCadastralTemp();
 
         if(!ValidationHelper.isNullOrEmpty(getCostEstateFormalityTemp()))
-           totalCost += getCostEstateFormalityTemp();
+            totalCost += getCostEstateFormalityTemp();
 
         request.setTotalCost(String.format("%.2f", totalCost));
         DaoManager.save(request, true);
-    }
-
-
-    public static double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
-
-        BigDecimal bd = BigDecimal.valueOf(value);
-        bd = bd.setScale(places, RoundingMode.HALF_UP);
-        return bd.doubleValue();
     }
 
     public String getExtraCostLandRegistry() {
@@ -441,7 +462,7 @@ public class CostManipulationHelper extends PageBean {
     public void setExtraCostOtherNote(String extraCostOtherNote) {
         this.extraCostOtherNote = extraCostOtherNote;
     }
-    
+
     public String getCostNote() {
         return costNote;
     }
@@ -457,5 +478,22 @@ public class CostManipulationHelper extends PageBean {
     public void setIncludeNationalCost(Boolean includeNationalCost) {
         this.includeNationalCost = includeNationalCost;
     }
+
+    public Integer getStampSpinnerNumber() {
+        return stampSpinnerNumber;
+    }
+
+    public void setStampSpinnerNumber(Integer stampSpinnerNumber) {
+        this.stampSpinnerNumber = stampSpinnerNumber;
+    }
+
+    public String getExtraCostPostalExpense() {
+        return extraCostPostalExpense;
+    }
+
+    public void setExtraCostPostalExpense(String extraCostPostalExpense) {
+        this.extraCostPostalExpense = extraCostPostalExpense;
+    }
+
 
 }

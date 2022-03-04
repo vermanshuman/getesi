@@ -50,12 +50,12 @@ public class Invoice extends IndexedEntity implements Serializable {
 	@Column(name = "invoice_number")
 	private String invoiceNumber;
 
+	@Enumerated(EnumType.STRING)
+	@Column(name = "status")
+	private InvoiceStatus status;
+
 	@Transient
 	private String documentType;
-	
-	@Enumerated(EnumType.STRING)
-    @Column(name = "status")
-	private InvoiceStatus status;
 
 	public Long getCloudId() {
 		return cloudId;
@@ -160,6 +160,4 @@ public class Invoice extends IndexedEntity implements Serializable {
 	public void setStatus(InvoiceStatus status) {
 		this.status = status;
 	}
-	
-	
 }

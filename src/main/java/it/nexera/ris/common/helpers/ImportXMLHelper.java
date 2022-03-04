@@ -1389,6 +1389,7 @@ public class ImportXMLHelper extends BaseHelper {
         Matcher m = pattern.matcher(subjectStr);
         City city = null;
         Country country = null;
+        String fullName = "";
         while (m.find()) {
             if (!ValidationHelper.isNullOrEmpty(CalcoloCodiceFiscale.getCityFiscalCode(fiscalCode))) {
                 List<City> cities = ConnectionManager.load(City.class, new Criterion[]{Restrictions.eq("cfis",
@@ -1413,6 +1414,7 @@ public class ImportXMLHelper extends BaseHelper {
                         }, criterionList.toArray(new Criterion[0]), session);
                         if (!ValidationHelper.isNullOrEmpty(subjects)) {
                             subject = subjects.get(0);
+                            fullName = subject.getFullName();
                         }
                     }
                 }
@@ -1426,6 +1428,17 @@ public class ImportXMLHelper extends BaseHelper {
             }
             subject.setBirthDate(DateTimeHelper.fromXMLString(m.group(5).replaceAll("/", "")));
             subject.setSex(CalcoloCodiceFiscale.getSexFromFiscalCode(fiscalCode));
+            String importedFullName =m.group(1) + " " +  m.group(3) ;
+            if(!ValidationHelper.isNullOrEmpty(fullName)
+                    && !ValidationHelper.isNullOrEmpty(importedFullName)){
+                if(!importedFullName.equalsIgnoreCase(fullName)){
+                    subject.setName(m.group(3));
+                    subject.setSurname(m.group(1));
+                }
+            }else {
+                subject.setName(m.group(3));
+                subject.setSurname(m.group(1));
+            }
             subject.setName(m.group(3));
             subject.setSurname(m.group(1));
             subject.setBirthCity(city);
@@ -1447,6 +1460,7 @@ public class ImportXMLHelper extends BaseHelper {
         Matcher m = pattern.matcher(subjectStr);
         City city = null;
         Country country = null;
+        String fullName = "";
         while (m.find()) {
             if (!ValidationHelper.isNullOrEmpty(CalcoloCodiceFiscale.getCityFiscalCode(fiscalCode))) {
                 List<City> cities = ConnectionManager.load(City.class, new Criterion[]{Restrictions.eq("cfis",
@@ -1471,11 +1485,13 @@ public class ImportXMLHelper extends BaseHelper {
                         }, criterionList.toArray(new Criterion[0]), session);
                         if (!ValidationHelper.isNullOrEmpty(subjects)) {
                             subject = subjects.get(0);
+                            fullName = subject.getFullName();
                         }
                     }
                 }
                 if (!ValidationHelper.isNullOrEmpty(subjects)) {
                     subject = subjects.get(0);
+                    fullName = subject.getFullName();
                 }
             }
             //ART_RISFW-463 update data on new import
@@ -1484,8 +1500,17 @@ public class ImportXMLHelper extends BaseHelper {
             }
             subject.setBirthDate(DateTimeHelper.fromXMLString(m.group(5).replaceAll("/", "")));
             subject.setSex(CalcoloCodiceFiscale.getSexFromFiscalCode(fiscalCode));
-            subject.setName(m.group(3));
-            subject.setSurname(m.group(1));
+            String importedFullName =m.group(1) + " " +  m.group(3) ;
+            if(!ValidationHelper.isNullOrEmpty(fullName)
+                    && !ValidationHelper.isNullOrEmpty(importedFullName)){
+                if(!importedFullName.equalsIgnoreCase(fullName)){
+                    subject.setName(m.group(3));
+                    subject.setSurname(m.group(1));
+                }
+            }else {
+                subject.setName(m.group(3));
+                subject.setSurname(m.group(1));
+            }
             subject.setTypeId(SubjectType.PHYSICAL_PERSON.getId());
             subject.setFiscalCode(fiscalCode);
             subject.setBirthCity(city);
@@ -1535,11 +1560,25 @@ public class ImportXMLHelper extends BaseHelper {
             if(ValidationHelper.isNullOrEmpty(property.getAddress())){
                 String value  = getValueFromXML(eElement, "IndirizzoImm");
                 if(!ValidationHelper.isNullOrEmpty(value)){
-                    property.setField(PropertyXMLElements.ADDRESS, value);
                     Pattern pattern = Pattern.compile("Piano", Pattern.CASE_INSENSITIVE);
-                    String tokens[] = pattern.split("VIA DELLA LIBERTA` n. SNC Piano S1");
-                    if(tokens.length > 1)
+                    String tokens[] = pattern.split(value);
+                    if(tokens.length > 1){
                         property.setField(PropertyXMLElements.FLOOR, tokens[1]);
+                        value = tokens[0].trim();
+                    }
+                    pattern = Pattern.compile("Interno", Pattern.CASE_INSENSITIVE);
+                    tokens = pattern.split(value);
+                    if(tokens.length > 1){
+                        property.setField(PropertyXMLElements.INTERNO, tokens[1]);
+                        value = tokens[0].trim();
+                    }
+                    pattern = Pattern.compile("Scala.", Pattern.CASE_INSENSITIVE);
+                    tokens = pattern.split(value);
+                    if(tokens.length > 1){
+                        property.setField(PropertyXMLElements.SCALA, tokens[1]);
+                        value = tokens[0].trim();
+                    }
+                    property.setField(PropertyXMLElements.ADDRESS, value);
                 }
             }
             if(ValidationHelper.isNullOrEmpty(property.getAdditionalData())){
@@ -3037,6 +3076,20 @@ public class ImportXMLHelper extends BaseHelper {
                 break;
             case PROPERTY_HISTORY_RESULT_DATA:
                 value = getValueFromXML(nNode, "DatiDerivantiDaMutazSogg");
+                break;
+
+            case PROPERTY_LAND_CONSISTENCY:
+                NodeList nList1 = nNode.getElementsByTagName("ClassamentoT");
+                result = new StringBuffer();
+                for (int temp = 0; temp < nList1.getLength(); temp++) {
+                    Node nNodeInner = nList1.item(temp);
+                    String arg = getValueFromXML((Element) nNodeInner, element.getElementXML());
+                    if (!ValidationHelper.isNullOrEmpty(arg)) {
+                        result.append(arg);
+                        result.append("<br/>");
+                    }
+                }
+                value = result.toString();
                 break;
             default:
                 break;

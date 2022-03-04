@@ -163,11 +163,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     @Getter
     @Setter
     private ListPaginator paginator;
-    
-    @Getter
-    @Setter
-    private Integer multipleCreateRedirect;
-    
+
     private static final String KEY_CLIENT_ID = "KEY_CLIENT_ID_SESSION_KEY_NOT_COPY";
     private static final String KEY_STATES = "KEY_STATES_SESSION_KEY_NOT_COPY";
     private static final String KEY_REQUEST_TYPE = "KEY_REQUEST_TYPE_SESSION_KEY_NOT_COPY";
@@ -1037,7 +1033,15 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         getPaginator().setRowCount(getLazyModel().getRowCount());
         getPaginator().setTotalPages(totalPages);
         getPaginator().setPage(getPaginator().getCurrentPageNumber());
+    }
 
+    public void loadFilterData() throws PersistenceBeanException, IllegalAccessException {
+        if(ValidationHelper.isNullOrEmpty(getCities()))
+            populateCities(getFilterRestrictions());
+    }
+    private void populateCities(List<Criterion> restrictions)
+            throws PersistenceBeanException, IllegalAccessException {
+        System.out.println(">>>>>>>>>>>>>>> " + getCities());
         List<RequestView> requestList = DaoManager.load(RequestView.class, restrictions.toArray(new Criterion[0]));
 
         List<Long> cityIds = new ArrayList<>();
@@ -1054,7 +1058,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                     new Criterion[]{Restrictions.isNotNull("province.id")
                             , Restrictions.eq("external", Boolean.TRUE), Restrictions.in("id", cityIds)}, Boolean.FALSE));
         }
-
     }
 
     public void verifyRequests() throws PersistenceBeanException, InstantiationException, IllegalAccessException, IOException {
@@ -2053,19 +2056,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     public void createNewMultipleRequests() {
         String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE";
         RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT, queryParam);
-    }
-    
-    public void redirectPage() {
-    	if(getMultipleCreateRedirect().intValue() == 1) {
-    		RedirectHelper.goTo(PageTypes.REQUEST_EDIT);
-    	}
-    	if(getMultipleCreateRedirect().intValue() == 2) {
-    		RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT);
-    	}
-    	if(getMultipleCreateRedirect().intValue() == 3) {
-    		String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE";
-            RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT, queryParam);
-    	}
     }
 
     public Integer getRowsPerPage() {
