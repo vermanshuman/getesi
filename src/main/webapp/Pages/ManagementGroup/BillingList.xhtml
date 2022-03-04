@@ -421,7 +421,7 @@
 											<i class="ricavi-img"></i>
 										</div>
 										<div color="#fff" class="box_header">#{msg.billingListRevenues}</div>
-										<div class="cost">19.847 €</div>
+										<div class="cost">0 €</div>
 									</div>
 	
 									<div class="list_icon"
@@ -442,7 +442,7 @@
 											<i class="ricavi-img"></i>
 										</div>
 										<div color="#fff" class=" box_header">#{msg.billingListCosts}</div>
-										<div class="cost">30.000 €</div>
+										<div class="cost">0 €</div>
 									</div>
 									<div class="list_icon"
 										style="font-size: 17px; color: rgb(255, 255, 255);" title="">
@@ -462,7 +462,7 @@
 											<i class="incassi-bianco-img"></i>
 										</div>
 										<div color="#fff" class=" box_header">#{msg.billingListTributes}</div>
-										<div class="cost">40.000 €</div>
+										<div class="cost">0 €</div>
 									</div>
 	
 									<div class="list_icon"
@@ -506,9 +506,9 @@
 										<div class="sc-hcnlBt wHMuN">
 											<div>
 												<div color="#6e7a81" class="trimester"
-													style="float: left;">#{msg.billingListFirstTrimester}</div>
+													style="float: left;">#{msg.billingListFirstSemestre}</div>
 												<div class="list_icon_trimester">
-													<i class="fa fa-fw fa-list" style="font-size: inherit;"></i>
+													<i class="fa fa-fw fa-list11" style="font-size: inherit;"></i>
 												</div>
 											</div>
 	
@@ -517,30 +517,46 @@
 															direction-column-0-5 justifyContent-center-0-26 alignItems-stretch-0-14 alignContent-center-0-17">
 													<div class="month_div" style="border: 0px;">
 														<div class="month_outer">
-															<div class="month_inner">#{msg.january}</div>
+															<div class="month_inner">#{msg.january} - #{msg.february}</div>
 														</div>
 														<div class="cost_outer">
-															<div class="cost_inner">0,00</div>
+															<div class="cost_inner">
+																<h:outputText value="#{bean.monthJanFebAmount}">
+																	<f:convertNumber pattern="#0.00" />
+																</h:outputText> €
+															</div>
 														</div>
 													</div>
 													<div class="month_div">
 														<div class="month_outer">
-															<div class="month_inner">#{msg.february}</div>
+															<div class="month_inner">#{msg.march} - #{msg.april}</div>
 														</div>
 														<div class="cost_outer">
-															<div class="cost_inner">0,00</div>
+															<div class="cost_inner">
+																<h:outputText value="#{bean.monthMarAprAmount}">
+																	<f:convertNumber pattern="#0.00" />
+																</h:outputText> €
+															</div>
 														</div>
 													</div>
 													<div class="month_div">
 														<div class="month_outer">
-															<div class="month_inner">#{msg.march}</div>
+															<div class="month_inner">#{msg.may} - #{msg.june}</div>
 														</div>
 														<div class="cost_outer">
-															<div class="cost_inner">0,00</div>
+															<div class="cost_inner">
+																<h:outputText value="#{bean.monthMayJunAmount}">
+																	<f:convertNumber pattern="#0.00" />
+																</h:outputText> €
+															</div>
 														</div>
 													</div>
 												</div>
-												<div class="cost_total">0 €</div>
+												<div class="cost_total">
+													<h:outputText value="#{bean.monthJanFebAmount+bean.monthMarAprAmount+bean.monthMayJunAmount}">
+														<f:convertNumber pattern="#0.00" />
+													</h:outputText> €
+												</div>
 											</div>
 										</div>
 									</div>
@@ -552,9 +568,9 @@
 										<div class="sc-hcnlBt wHMuN">
 											<div>
 												<div color="#6e7a81" class="trimester"
-													style="float: left;">#{msg.billingListSecondTrimester}</div>
+													style="float: left;">#{msg.billingListSecondSemestre}</div>
 												<div class="list_icon_trimester">
-													<i class="fa fa-fw fa-list" style="font-size: inherit;"></i>
+													<i class="fa fa-fw fa-list11" style="font-size: inherit;"></i>
 												</div>
 											</div>
 	
@@ -563,30 +579,46 @@
 															direction-column-0-5 justifyContent-center-0-26 alignItems-stretch-0-14 alignContent-center-0-17">
 													<div class="month_div" style="border: 0px;">
 														<div class="month_outer">
-															<div class="month_inner">#{msg.april}</div>
+															<div class="month_inner">#{msg.july} - #{msg.august}</div>
 														</div>
 														<div class="cost_outer">
-															<div class="cost_inner">0,00</div>
+															<div class="cost_inner">
+																<h:outputText value="#{bean.monthJulAugAmount}">
+																	<f:convertNumber pattern="#0.00" />
+																</h:outputText> €
+															</div>
 														</div>
 													</div>
 													<div class="month_div">
 														<div class="month_outer">
-															<div class="month_inner">#{msg.may}</div>
+															<div class="month_inner">#{msg.september} - #{msg.october}</div>
 														</div>
 														<div class="cost_outer">
-															<div class="cost_inner">0,00</div>
+															<div class="cost_inner">
+																<h:outputText value="#{bean.monthSepOctAmount}">
+																	<f:convertNumber pattern="#0.00" />
+																</h:outputText> €
+															</div>
 														</div>
 													</div>
 													<div class="month_div">
 														<div class="month_outer">
-															<div class="month_inner">#{msg.june}</div>
+															<div class="month_inner">#{msg.november} - #{msg.december}</div>
 														</div>
 														<div class="cost_outer">
-															<div class="cost_inner">0,00</div>
+															<div class="cost_inner">
+																<h:outputText value="#{bean.monthNovDecAmount}">
+																	<f:convertNumber pattern="#0.00" />
+																</h:outputText> €
+															</div>
 														</div>
 													</div>
 												</div>
-												<div class="cost_total">0 €</div>
+												<div class="cost_total">
+													<h:outputText value="#{bean.monthJulAugAmount+bean.monthSepOctAmount+bean.monthNovDecAmount}">
+														<f:convertNumber pattern="#0.00" />
+													</h:outputText> €
+												</div>
 											</div>
 										</div>
 									</div>
