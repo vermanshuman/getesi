@@ -118,11 +118,24 @@
         body .ui-dialog .ui-dialog-content {
             padding: 0rem 0rem 0rem 0rem !important;
         }
+        
+        .ui-dialog-maximized {
+	        width: 90% !important;
+	    	height: 90% !important;
+	    	top: 5% !important;
+	    	left: 5% !important;
+	    	z-index: 1008;
+	    	display: block;
+	    }
+	    
+	    body .ui-dialog .ui-widget {
+    		font-size: 15px;
+    	}
 
     </style>
 
-    <p:dialog header="#{msg.databaseListSubjectDatabase}" modal="true" width="900" id="searchDlg" resizable="false" draggable="false"
-              dynamic="true" widgetVar="searchDlgWV">
+    <p:dialog header="#{msg.databaseListSubjectDatabase}" modal="true" id="searchDlg" resizable="false" draggable="false"
+              dynamic="true" widgetVar="searchDlgWV" onHide="PF('searchDlgWV').toggleMaximize();">
         <p:scrollPanel mode="native"  style="width: 100%; min-height: 300px; max-height: 600px;">
             <p:tabView dynamic="true" cache="true" id="subjectTabs"
                        activeIndex="#{bean.selectedSubjectWrapper.activeTabIndex}">

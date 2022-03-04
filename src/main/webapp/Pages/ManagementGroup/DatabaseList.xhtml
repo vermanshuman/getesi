@@ -442,7 +442,7 @@
 
                                     <td style="width: 0px !important;"
                                         class="ui-selection-column min_padding_margin icon_column">
-                                        <p:commandButton icon="ui-icon pi pi-search" update=":form" oncomplete="PF('searchDlgWV').show();"
+                                        <p:commandButton icon="ui-icon pi pi-search" update=":form" oncomplete="PF('searchDlgWV').show();PF('searchDlgWV').toggleMaximize();"
                                                          action="#{bean.loadSelectedSubject}">
                                             <f:setPropertyActionListener value="#{item.id}"
                                                                          target="#{bean.entityEditId}"/>
