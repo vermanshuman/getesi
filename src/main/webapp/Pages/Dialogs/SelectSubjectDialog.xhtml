@@ -130,14 +130,24 @@
             display: block;
         }
 
-        body .ui-dialog .ui-widget {
-            font-size: 15px;
+        #subjectTabs * {
+            font-size: 18px;
+        }
+
+        #subjectTabs .action_column {
+            width: 60px;
+        }
+        #subjectTabs .close_btn {
+            float: right;
+            bottom: 20px;
+            right: 40px;
+            position: absolute;
         }
     </style>
 
     <p:dialog header="#{msg.databaseListSubjectDatabase}" modal="true" id="searchDlg" resizable="false" draggable="false"
               dynamic="true" widgetVar="searchDlgWV" onHide="PF('searchDlgWV').toggleMaximize();">
-    <p:scrollPanel mode="native"  style="width: 100%; min-height: 300px; max-height: 600px;">
+    <p:scrollPanel mode="native"  style="width: 100%; min-height: 300px; max-height: 600px;border: 0;">
             <p:tabView dynamic="true" cache="true" id="subjectTabs"
                        activeIndex="#{bean.selectedSubjectWrapper.activeTabIndex}">
                 <!-- <p:ajax event="tabChange" listener="#{bean.selectedSubjectWrapper.onSubjectTabChange}" /> -->
