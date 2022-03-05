@@ -68,6 +68,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
                         )
                 ).sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList()), Boolean.TRUE));
         fillYears();
+        
     }
     
     private void fillYears() throws HibernateException, IllegalAccessException, PersistenceBeanException {

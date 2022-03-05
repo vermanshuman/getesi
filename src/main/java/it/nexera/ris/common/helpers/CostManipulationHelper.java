@@ -202,7 +202,7 @@ public class CostManipulationHelper extends PageBean {
                 Double stampcost = MARCHE_DA_BOLLO_DEFAULT;
                 newExtraCost.setPrice((getStampSpinnerNumber() == null ? 1 : getStampSpinnerNumber()) * (stampcost));
                 newExtraCost.setType(ExtraCostType.MARCA);
-                newExtraCost.setNote(ExtraCostType.MARCA.toString());
+                newExtraCost.setNote("Marca da bollo");
                 break;
             case POSTALE:
                 if (!ValidationHelper.isNullOrEmpty(getExtraCostPostalExpense())) {
@@ -215,7 +215,7 @@ public class CostManipulationHelper extends PageBean {
                     }
                     newExtraCost.setPrice(Double.valueOf(getExtraCostPostalExpense().replaceAll(",", ".")));
                     newExtraCost.setType(ExtraCostType.POSTALE);
-                    newExtraCost.setNote(ExtraCostType.POSTALE.toString());
+                    newExtraCost.setNote("Spese postali");
                     cleanValidation();
                 } else {
                     return;

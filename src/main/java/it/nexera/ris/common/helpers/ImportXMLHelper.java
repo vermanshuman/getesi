@@ -3077,6 +3077,20 @@ public class ImportXMLHelper extends BaseHelper {
             case PROPERTY_HISTORY_RESULT_DATA:
                 value = getValueFromXML(nNode, "DatiDerivantiDaMutazSogg");
                 break;
+
+            case PROPERTY_LAND_CONSISTENCY:
+                NodeList nList1 = nNode.getElementsByTagName("ClassamentoT");
+                result = new StringBuffer();
+                for (int temp = 0; temp < nList1.getLength(); temp++) {
+                    Node nNodeInner = nList1.item(temp);
+                    String arg = getValueFromXML((Element) nNodeInner, element.getElementXML());
+                    if (!ValidationHelper.isNullOrEmpty(arg)) {
+                        result.append(arg);
+                        result.append("<br/>");
+                    }
+                }
+                value = result.toString();
+                break;
             default:
                 break;
 

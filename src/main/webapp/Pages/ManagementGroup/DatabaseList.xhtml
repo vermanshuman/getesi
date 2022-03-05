@@ -115,6 +115,7 @@
             #tabs ul {
                 background-color: transparent !important;
                 text-transform: uppercase;
+                font-size: 15px !important;
             }
 
             #tabs ul::before {
@@ -138,6 +139,11 @@
             body .ui-datatable .ui-datatable-data > tr.ui-datatable-selectable {
                 cursor: default;
             }
+
+            body .ui-inputfield {
+                border: 1px solid #a8acb1;
+            }
+
         </style>
         <script>
 
@@ -437,18 +443,18 @@
 
                                     <td style="width: 0px !important;"
                                         class="ui-selection-column min_padding_margin icon_column">
-                                        <p:commandButton icon="ui-icon pi pi-search" update=":form" oncomplete="PF('searchDlgWV').show();"
+                                        <p:commandButton icon="ui-icon pi pi-search" update=":form" oncomplete="PF('searchDlgWV').show();PF('searchDlgWV').toggleMaximize();"
                                                          action="#{bean.loadSelectedSubject}">
                                             <f:setPropertyActionListener value="#{item.id}"
                                                                          target="#{bean.entityEditId}"/>
 
                                         </p:commandButton>
 
-                                        <p:commandButton icon="ui-icon pi pi-search" update=":form"
-                                                         action="#{bean.viewEntity}">
-                                            <f:setPropertyActionListener value="#{item.id}"
-                                                                         target="#{bean.entityEditId}"/>
-                                        </p:commandButton>
+<!--                                        <p:commandButton icon="ui-icon pi pi-search" update=":form"-->
+<!--                                                         action="#{bean.viewEntity}">-->
+<!--                                            <f:setPropertyActionListener value="#{item.id}"-->
+<!--                                                                         target="#{bean.entityEditId}"/>-->
+<!--                                        </p:commandButton>-->
                                     </td>
 
                                     <td style="width: 0px !important;"

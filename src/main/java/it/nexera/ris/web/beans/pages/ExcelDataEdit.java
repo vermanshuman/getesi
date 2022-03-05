@@ -133,7 +133,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
 
     private String costNote;
 
-    private Boolean showRequestCost = Boolean.FALSE;
+    private Boolean showRequestCost = Boolean.TRUE;
 
     @Override
     protected void onConstruct() {

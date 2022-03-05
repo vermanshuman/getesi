@@ -1023,7 +1023,7 @@
                                     </p:outputPanel>
                                     <br/>
                                     <p:graphicImage id="info" url="/resources/images/tooltip.png"
-                                                    style="height :25px;bottom: 5px;position: absolute;"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
+                                                    style="margin-top:2px;height :20px;position: absolute;margin-left: -10px"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
                                     <p:tooltip for="info" styleClass="custom-design-tooltip">
                                         <h:outputText value="#{ff:upper(msg.requestManagers)}" style="font-weight:bold;color:#003871;"/>
                                         <br />
@@ -1048,7 +1048,7 @@
                                         <h:outputText id="service" value="#{item.serviceName}" rendered="#{item.serviceName ne null}"/>
                                         <br/>
                                         <p:graphicImage id="multipleservice" url="/resources/images/tooltip.png"
-                                                        style="height :20px;margin-top: -9px;margin-left: -20px;position: absolute;"  rendered="#{not empty item.multipleServices}" />
+                                                        style="height :20px;;margin-left: -30px;position: absolute;"  rendered="#{not empty item.multipleServices}" />
                                         <p:tooltip for="multipleservice" styleClass="custom-design-tooltip" rendered="#{not empty item.multipleServices}">
                                             <ui:repeat var="ele" value="#{item.multipleServices}" varStatus="service">
                                                 <h:outputText value="#{ele}" escape="false" style="color:#003871;margin-left: 24px;"/>

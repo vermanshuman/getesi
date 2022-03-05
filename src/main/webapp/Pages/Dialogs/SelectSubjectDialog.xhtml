@@ -119,11 +119,25 @@
             padding: 0rem 0rem 0rem 0rem !important;
         }
 
+        .ui-dialog-maximized {
+            width: 95% !important;
+            height: 95% !important;
+            top: 2% !important;
+            left: 2% !important;
+
+            right: 2% !important;
+            z-index: 1008;
+            display: block;
+        }
+
+        body .ui-dialog .ui-widget {
+            font-size: 15px;
+        }
     </style>
 
-    <p:dialog header="#{msg.databaseListSubjectDatabase}" modal="true" width="900" id="searchDlg" resizable="false" draggable="false"
-              dynamic="true" widgetVar="searchDlgWV">
-        <p:scrollPanel mode="native"  style="width: 100%; min-height: 300px; max-height: 600px;">
+    <p:dialog header="#{msg.databaseListSubjectDatabase}" modal="true" id="searchDlg" resizable="false" draggable="false"
+              dynamic="true" widgetVar="searchDlgWV" onHide="PF('searchDlgWV').toggleMaximize();">
+    <p:scrollPanel mode="native"  style="width: 100%; min-height: 300px; max-height: 600px;">
             <p:tabView dynamic="true" cache="true" id="subjectTabs"
                        activeIndex="#{bean.selectedSubjectWrapper.activeTabIndex}">
                 <!-- <p:ajax event="tabChange" listener="#{bean.selectedSubjectWrapper.onSubjectTabChange}" /> -->
@@ -328,7 +342,6 @@
                             </p:panelGrid>
 
                             <p:tabView id="tabView" rendered="#{bean.selectedSubjectWrapper.isOnlyView() and not bean.selectedSubjectWrapper.entity.isNew}" binding="#{bean.selectedSubjectWrapper.componentTabView}"/>
-
                             <p:dialog id="documentDialog" widgetVar="documentDialog" modal="true" resizable="false" draggable="false"
                                       width="600">
                                 <p:dataTable value="#{bean.selectedSubjectWrapper.requestDocuments}" var="doc" id="requestDocs">

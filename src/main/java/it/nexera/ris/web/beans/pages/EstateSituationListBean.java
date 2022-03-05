@@ -68,7 +68,7 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
 
     private Long deletedSalesId;
 
-    private Boolean showRequestCost = Boolean.FALSE;
+    private Boolean showRequestCost = Boolean.TRUE;
 
     @Getter
     @Setter
