@@ -41,6 +41,18 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
     
     private Integer selectedYear;
 
+    private Double monthJanFebAmount = getRandomNumber(10, 50);
+
+    private Double monthMarAprAmount = getRandomNumber(100, 150);
+
+    private Double monthMayJunAmount = getRandomNumber(200, 250);
+
+    private Double monthJulAugAmount = getRandomNumber(100, 150);
+
+    private Double monthSepOctAmount = getRandomNumber(200, 250);
+
+    private Double monthNovDecAmount = getRandomNumber(50, 100);
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
@@ -75,6 +87,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
         setYears(yearList);
     }
 
-
-    
+    private double getRandomNumber(int min, int max) {
+        return Math.random()*(max-min+1)+min;
+    }
 }

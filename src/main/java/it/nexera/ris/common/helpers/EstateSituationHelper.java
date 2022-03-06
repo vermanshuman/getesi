@@ -765,8 +765,8 @@ public class EstateSituationHelper extends BaseHelper {
         List<Subject> difference;
         if (subject.getTypeIsPhysicalPerson()) {
             Calendar subjectBirthDate = Calendar.getInstance();
-            if(subject.getBirthDate() != null)
-            	subjectBirthDate.setTime(subject.getBirthDate());
+            if(!ValidationHelper.isNullOrEmpty(subject.getBirthDate()))
+                subjectBirthDate.setTime(subject.getBirthDate());
             difference = DaoManager.load(Subject.class, new CriteriaAlias[]{
                     new CriteriaAlias("birthCity", "city", JoinType.LEFT_OUTER_JOIN)
             }, new Criterion[]{

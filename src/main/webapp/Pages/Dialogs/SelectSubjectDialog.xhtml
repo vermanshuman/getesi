@@ -5,7 +5,6 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:ff="http://readytech.com/functions"
 >
-    <!-- <ui:param name="bean" value="#{subjectBean}"/> -->
     <ui:param name="edit_title"
               value="#{bean.selectedSubjectWrapper.entity.isNew ? msg.databaseListSubjectNew : msg.databaseListSubjectEdit}"/>
     <ui:param name="renderSideMenu" value="#{bean.selectedSubjectWrapper.renderHeader}"/>
@@ -46,12 +45,6 @@
             border-bottom: 2px solid #3366FF;
             font-weight: bold;
         }
-
-        /* body #searchDlg .ui-widget-header {
-            background-color: #ffffff !important;
-            color: #000000 !important;
-        } */
-
         #searchDlg_title {
             margin-left: 20px;
             line-height: 30px;
@@ -118,34 +111,46 @@
         body .ui-dialog .ui-dialog-content {
             padding: 0rem 0rem 0rem 0rem !important;
         }
-        
-        .ui-dialog-maximized {
-	        width: 90% !important;
-	    	height: 90% !important;
-	    	top: 5% !important;
-	    	left: 5% !important;
-	    	z-index: 1008;
-	    	display: block;
-	    }
-	    
-	    body .ui-dialog .ui-widget {
-    		font-size: 15px;
-    	}
 
+        .ui-dialog-maximized {
+            width: 95% !important;
+            height: 95% !important;
+            top: 2% !important;
+            left: 2% !important;
+
+            right: 2% !important;
+            z-index: 1008;
+            display: block;
+        }
+
+        #subjectTabs * {
+            font-size: 18px;
+        }
+
+        #subjectTabs .action_column {
+            width: 60px;
+        }
+        #subjectTabs .close_btn {
+            float: right;
+            bottom: 20px;
+            right: 40px;
+            position: absolute;
+        }
+
+        .btn-green {
+            background-color: #5ecc8a !important;
+        }
     </style>
 
     <p:dialog header="#{msg.databaseListSubjectDatabase}" modal="true" id="searchDlg" resizable="false" draggable="false"
               dynamic="true" widgetVar="searchDlgWV" onHide="PF('searchDlgWV').toggleMaximize();">
-        <p:scrollPanel mode="native"  style="width: 100%; min-height: 300px; max-height: 600px;">
+        <p:scrollPanel mode="native"  style="width: 100%; min-height: 300px; max-height: 600px;border: 0;">
             <p:tabView dynamic="true" cache="true" id="subjectTabs"
                        activeIndex="#{bean.selectedSubjectWrapper.activeTabIndex}">
-                <!-- <p:ajax event="tabChange" listener="#{bean.selectedSubjectWrapper.onSubjectTabChange}" /> -->
                 <p:tab title="#{msg.databaseListData}">
 
                     <div class="ui-g">
                         <div class="ui-g-12">
-                            <!-- <h:form id="form" prependId="false" enctype="multipart/form-data">  -->
-
                             <script>
                                 window.onload = function() {
                                     document.getElementById('hidden:link').onclick();
@@ -322,9 +327,6 @@
                                                      value="#{bean.selectedSubjectWrapper.entity.fiscalCode}" rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
                                         <h:outputText value="#{bean.selectedSubjectWrapper.entity.fiscalCode}"
                                                       rendered="#{bean.selectedSubjectWrapper.isOnlyView()}" style="font-weight: bold;"/>
-                                        <!-- <p:commandButton action="#{bean.selectedSubjectWrapper.generateFiscalCode}" disabled="true"
-                                                         update="fiscalCode" rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"
-                                                         value="#{msg.databaseListSubjectFiscalCodeGenerate}"/> -->
                                     </div>
                                 </ui:fragment>
                             </p:panelGrid>
@@ -342,36 +344,6 @@
 
                             <p:tabView id="tabView" rendered="#{bean.selectedSubjectWrapper.isOnlyView() and not bean.selectedSubjectWrapper.entity.isNew}" binding="#{bean.selectedSubjectWrapper.componentTabView}"/>
 
-                            <p:dialog widgetVar="templates" resizable="false"
-                                      header="#{msg.docTemplates}" modal="true">
-                                <p:selectOneMenu value="#{bean.selectedSubjectWrapper.selectedTemplateId}"
-                                                 style="width:150px;">
-                                    <f:selectItems value="#{bean.selectedSubjectWrapper.templates}"/>
-                                </p:selectOneMenu>
-
-                                <div class="btn_line">
-                                    <p:commandButton value="#{msg.ok}" ajax="false"
-                                                     actionListener="#{bean.selectedSubjectWrapper.generate}" onclick="PF('templates').hide()"
-                                                     update=":form:messages"/>
-                                    <p:commandButton value="#{msg.cancel}"
-                                                     onclick="PF('templates').hide()"/>
-                                </div>
-                            </p:dialog>
-
-                            <p:dialog id="documentDialog" widgetVar="documentDialog" modal="true" resizable="false" draggable="false"
-                                      width="600">
-                                <p:dataTable value="#{bean.selectedSubjectWrapper.requestDocuments}" var="doc" id="requestDocs">
-                                    <p:column headerText="#{msg.name}">
-                                        <h:outputText value="#{doc.title}"/>
-                                    </p:column>
-                                    <p:column styleClass="action_column">
-                                        <p:commandButton icon="fa fa-download" action="#{bean.selectedSubjectWrapper.downloadRequestFile}" ajax="false">
-                                            <f:setPropertyActionListener value="#{doc.id}" target="#{bean.selectedSubjectWrapper.selectedDocumentId}"/>
-                                        </p:commandButton>
-                                    </p:column>
-                                </p:dataTable>
-                            </p:dialog>
-
                             <script>
                                 function toggleAgency() {
                                     if (PF('showAgency').input[0].checked) {
@@ -379,17 +351,9 @@
                                         //$(document.getElementById('agency')).fadeIn();
                                     } else {
                                         alert("1 clicked");
-                                        //$(document.getElementById('agency')).fadeOut();
                                     }
                                 }
                             </script>
-
-                            <!-- <p:commandButton  action="#{bean.selectedSubjectWrapper.pageSave}"
-                                              style="margin-top: 10px"
-                                              value="#{empty save_button_text ? msg.save : save_button_text}"
-                                              icon="pi pi-save"
-                                              update=":messages"
-                                              styleClass="#{saveButtonStyle} p-mr-2 p-mb-2 ui-button-success"/> -->
 
                             <p:commandButton onclick="PF('searchDlgWV').hide();" styleClass="p-mr-2 p-mb-2 close_btn" style="float:right;"
                                              value="#{msg.close.toUpperCase()}" />
@@ -420,6 +384,7 @@
                     <div class="ui-g">
                         <div class="ui-g-12">
                             <p:accordionPanel multiple="false" activeIndex="#{bean.selectedSubjectWrapper.activePanelServicesIndex}" id="accordionPanelServicesFulfilled">
+                                <p:tab binding="#{bean.selectedSubjectWrapper.richiestaTab}"/>
                                 <p:tab binding="#{bean.selectedSubjectWrapper.servizioAnagraficoTab}"/>
                                 <p:tab binding="#{bean.selectedSubjectWrapper.servizioImmobiliareTab}"/>
                                 <p:tab binding="#{bean.selectedSubjectWrapper.servizioInvestigativoTab}"/>
@@ -441,5 +406,33 @@
                 </p:tab>
             </p:tabView>
         </p:scrollPanel>
+    </p:dialog>
+    <p:dialog widgetVar="templates" resizable="false"
+              header="#{msg.docTemplates}" modal="true">
+        <p:selectOneMenu value="#{bean.selectedSubjectWrapper.selectedTemplateId}"
+                         style="width:150px;">
+            <f:selectItems value="#{bean.selectedSubjectWrapper.templates}"/>
+        </p:selectOneMenu>
+
+        <div class="btn_line">
+            <p:commandButton value="#{msg.ok}" ajax="false"
+                             actionListener="#{bean.selectedSubjectWrapper.generate}" onclick="PF('templates').hide()"
+                             update=":form:messages"/>
+            <p:commandButton value="#{msg.cancel}"
+                             onclick="PF('templates').hide()"/>
+        </div>
+    </p:dialog>
+    <p:dialog id="documentDialog" widgetVar="documentDialog" modal="true" resizable="false" draggable="false"
+              width="600">
+        <p:dataTable value="#{bean.selectedSubjectWrapper.requestDocuments}" var="doc" id="requestDocs">
+            <p:column headerText="#{msg.name}">
+                <h:outputText value="#{doc.title}"/>
+            </p:column>
+            <p:column styleClass="action_column">
+                <p:commandButton icon="fa fa-download" action="#{bean.selectedSubjectWrapper.downloadRequestFile}" ajax="false">
+                    <f:setPropertyActionListener value="#{doc.id}" target="#{bean.selectedSubjectWrapper.selectedDocumentId}"/>
+                </p:commandButton>
+            </p:column>
+        </p:dataTable>
     </p:dialog>
 </ui:composition>
