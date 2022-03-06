@@ -124,6 +124,8 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 
     private Integer activePanelServicesIndex;
 
+    private UIComponent richiestaTab;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
             InstantiationException, IllegalAccessException {
@@ -175,6 +177,7 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
         loadSoggettiValidatiTab();
         loadVisureTestoTab();
         loadVisureDHTab();
+        loadRichiestaTab();
         loadServiziEvasiTabs();
     }
 
@@ -593,6 +596,17 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
         }
     }
 
+    public void loadRichiestaTab() throws IllegalAccessException, PersistenceBeanException {
+        RequestBindingWrapper requestBindingWrapper = new RequestBindingWrapper(listIds);
+        Tab richiestaTab = requestBindingWrapper.getTab();
+        richiestaTab.setDisabled(false);
+        if(requestBindingWrapper.getCountTable().longValue() == 0l) {
+            richiestaTab.setDisabled(true);
+        }
+        setRichiestaTab(richiestaTab);
+    }
+
+
     public boolean isOnlyView() {
         return onlyView;
     }
@@ -921,5 +935,13 @@ public class SelectedSubjectWrapper extends EntityEditPageBean<Subject> implemen
 
     public void setActivePanelServicesIndex(Integer activePanelServicesIndex) {
         this.activePanelServicesIndex = activePanelServicesIndex;
+    }
+
+    public UIComponent getRichiestaTab() {
+        return richiestaTab;
+    }
+
+    public void setRichiestaTab(UIComponent richiestaTab) {
+        this.richiestaTab = richiestaTab;
     }
 }
