@@ -140,6 +140,16 @@
                     }
                 });
             });
+            
+            var time;
+
+            function setTimer() {
+            	time=setTimeout(function(){ PF('saveDlgWV').hide()},5000);
+            }
+
+            function stopTimer() {
+            	clearTimeout(time);
+            }
         </script>
         <p:remoteCommand name="updateSubjects" update="form"/>
 
@@ -325,7 +335,7 @@
                 </div>
                 <div class="ui-g-5" style="margin-top:2%"></div>
                 <div class="ui-g-2" id="request-btns" style="margin-top:2%">
-                    <p:commandButton style="float: right" action="#{bean.validateMultipleRequest(false)}" value="#{msg.save.toUpperCase()}"
+                    <p:commandButton style="float: right" action="#{bean.validateMultipleRequest(true)}" value="#{msg.save.toUpperCase()}"
                                      icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left" update="saveMultipleRequest"
                                      rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1 and bean.multipleRequestCreate}"/>
                     <div style="clear: both"></div>
@@ -341,7 +351,11 @@
         </ui:fragment>
 
         <ui:include src="../Dialogs/RequestSubjectDialog.xhtml" />
-
+		<p:dialog id="saveDlg" widgetVar="saveDlgWV" modal="true" onShow="setTimer();" onHide="stopTimer();"
+                  resizable="false" draggable="false" effect="SLIDE">
+           <p:outputLabel value="#{msg.requestListSave}"/>       
+                  
+        </p:dialog>
         <p:dialog id="changeUserDlg" widgetVar="changeUserDlgWV" modal="true"
                   resizable="false" draggable="false" effect="SLIDE"
                   header="#{msg.requestUserChangeDlg}">

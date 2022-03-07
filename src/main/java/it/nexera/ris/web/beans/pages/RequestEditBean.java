@@ -2281,6 +2281,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if (isShowConfirm) {
             executeJS("PF('multipleRequestSave').show();");
         } else {
+        	executeJS("PF('saveDlgWV').show();");
+        	setRunAfterSave(false);
             pageSave();
         }
     }
