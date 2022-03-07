@@ -1871,7 +1871,7 @@ public class BillingListOldBean extends EntityLazyListPageBean<RequestView>
 
             if (!ValidationHelper.isNullOrEmpty(getVatCollectabilityId()))
                 invoice.setVatCollectability(VatCollectability.getById(getVatCollectabilityId()));
-            invoice.setNotes(getInvoiceNote());
+            invoice.setCausal(getInvoiceNote());
             invoice.setDocumentType(getDocumentType());
             invoice.setInvoiceNumber(getInvoiceNumber());
             InvoiceItem invoiceItem = new InvoiceItem();

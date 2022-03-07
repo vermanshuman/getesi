@@ -214,7 +214,7 @@ public class InvoiceListBean extends EntityLazyListPageBean<Invoice>
     		
     		invoiceObj.put("nome", invoice.getClient().toString());
     		invoiceObj.put("data", dateFormat.format(invoice.getDate()));
-    		invoiceObj.put("note", invoice.getNotes());
+    		invoiceObj.put("note", invoice.getCausal());
     		invoiceObj.put("split_payment", invoice.getSplitPayment());
     		
         	JSONArray articleArray = new JSONArray();

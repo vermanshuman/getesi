@@ -361,7 +361,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             String year = DateTimeHelper.toFormatedString(invoice.getDate(), DateTimeHelper.getXmlSecondDatePattertYear());
             setInvoiceNumber(invoice.getId() + "-" + year + "-FE");
             setInvoiceDate(invoice.getDate());
-            setInvoiceNote(invoice.getNotes());
+            setInvoiceNote(invoice.getCausal());
             if(!ValidationHelper.isNullOrEmpty(invoice.getVatCollectability()))
                 setVatCollectabilityId(invoice.getVatCollectability().getId());
             setSelectedPaymentTypeId(invoice.getPaymentType().getId());
@@ -1208,7 +1208,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
             if(!ValidationHelper.isNullOrEmpty(getVatCollectabilityId()))
                 invoice.setVatCollectability(VatCollectability.getById(getVatCollectabilityId()));
-            invoice.setNotes(getInvoiceNote());
+            invoice.setCausal(getInvoiceNote());
             InvoiceItem invoiceItem = new InvoiceItem();
             if(!ValidationHelper.isNullOrEmpty(getExamRequest())
                     && !ValidationHelper.isNullOrEmpty(getExamRequest().getSubject())){
