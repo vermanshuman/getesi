@@ -2,7 +2,7 @@ package it.nexera.ris.persistence.beans.entities.domain;
 
 import it.nexera.ris.common.enums.InvoiceStatus;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
-
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -25,7 +25,7 @@ public class Invoice extends IndexedEntity implements Serializable {
     private Date date;	
 	
 	@Column(name = "notes")
-    private String notes;	
+    private String causal;	
 	
     @ManyToOne
     @JoinColumn(name = "payment_type_id")
@@ -46,6 +46,24 @@ public class Invoice extends IndexedEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
 	private InvoiceStatus status;
+    
+    @ManyToOne
+    @JoinColumn(name = "manager_id")
+    private Client manager;
+    
+    @ManyToOne
+    @JoinColumn(name = "office_id")
+    private Office office;
+    
+    @Column(name = "ndg")
+    private String ndg;
+    
+    @Column(name = "pratica") 
+    private String practice;
+    
+    @ManyToOne
+    @JoinColumn(name = "mail_id")
+    private WLGInbox email;
     
 	public Long getCloudId() {
 		return cloudId;
@@ -87,14 +105,6 @@ public class Invoice extends IndexedEntity implements Serializable {
 		this.date = date;
 	}
 
-	public String getNotes() {
-		return notes;
-	}
-
-	public void setNotes(String notes) {
-		this.notes = notes;
-	}
-
 	public PaymentType getPaymentType() {
 		return paymentType;
 	}
@@ -126,6 +136,53 @@ public class Invoice extends IndexedEntity implements Serializable {
 	public void setStatus(InvoiceStatus status) {
 		this.status = status;
 	}
-	
+
+	public String getCausal() {
+		return causal;
+	}
+
+	public void setCausal(String causal) {
+		this.causal = causal;
+	}
+
+	public Client getManager() {
+		return manager;
+	}
+
+	public void setManager(Client manager) {
+		this.manager = manager;
+	}
+
+	public Office getOffice() {
+		return office;
+	}
+
+	public void setOffice(Office office) {
+		this.office = office;
+	}
+
+	public String getNdg() {
+		return ndg;
+	}
+
+	public void setNdg(String ndg) {
+		this.ndg = ndg;
+	}
+
+	public String getPractice() {
+		return practice;
+	}
+
+	public void setPractice(String practice) {
+		this.practice = practice;
+	}
+
+	public WLGInbox getEmail() {
+		return email;
+	}
+
+	public void setEmail(WLGInbox email) {
+		this.email = email;
+	}
 	
 }
