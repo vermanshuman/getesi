@@ -220,6 +220,8 @@ public class ClientEditBean extends EntityEditPageBean<Client>
 
     private Long paymentTypeId;
 
+    private List<SelectItem> taxRates;
+
     /*
      * (non-Javadoc)
      *
@@ -365,12 +367,20 @@ public class ClientEditBean extends EntityEditPageBean<Client>
         			.toArray(Long[] :: new)
         			);
         }
-//        if (!ValidationHelper.isNullOrEmpty(getEntity().getClient())) {
-//            setSelectedNonManagerOrFiduciaryClientId(getEntity().getClient().getId());
-//        }
         initAreasAndOffices();
         setSelectedOfficeAndArea();
         setNegativePriceList(null);
+        setTaxRates(new ArrayList<>());
+        getTaxRates().add(SelectItemHelper.getNotSelected());
+        List<TaxRate> activeTaxRates = DaoManager.load(TaxRate.class, new Criterion[]{
+                Restrictions.and(
+                        Restrictions.isNotNull("use"),
+                        Restrictions.eq("use", Boolean.TRUE)
+                )
+        });
+        activeTaxRates.forEach(tr -> {
+            getTaxRates().add(new SelectItem(tr.getId(), tr.getPercentage() +  "% - " + tr.getDescription()));
+        });
     }
 
     public void initAreasAndOffices() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -599,6 +609,11 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                     .findAny().orElse(null);
             if (service != null) {
                 service.fillPriceLists();
+                service.getPriceLists()
+                        .stream().filter(s -> !ValidationHelper.isNullOrEmpty(s.getTaxRate()))
+                        .forEach( s -> {
+                            s.setSelectedTaxRateId(s.getTaxRate().getId());
+                        });
                 setSelectedService(service);
                 try {
                     List<PriceList> priceLists = DaoManager.load(PriceList.class, new Criterion[]{
@@ -1139,7 +1154,13 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                 .filter(priceList -> !ValidationHelper.isNullOrEmpty(priceList.getPrice())
                         || !ValidationHelper.isNullOrEmpty(priceList.getFirstPrice())).collect(Collectors.toList())) {
             priceList.setClient(getEntity());
-
+            if(!ValidationHelper.isNullOrEmpty(priceList.getSelectedTaxRateId())){
+                try {
+                    priceList.setTaxRate(DaoManager.get(TaxRate.class, priceList.getSelectedTaxRateId()));
+                } catch (Exception e) {
+                    LogHelper.log(log, e);
+                }
+            }
             if (priceList.getConfigureDate() == null) {
                 priceList.setConfigureDate(new Date());
             }
@@ -2153,4 +2174,13 @@ public class ClientEditBean extends EntityEditPageBean<Client>
     public void setPaymentTypeId(Long paymentTypeId) {
         this.paymentTypeId = paymentTypeId;
     }
+
+    public List<SelectItem> getTaxRates() {
+        return taxRates;
+    }
+
+    public void setTaxRates(List<SelectItem> taxRates) {
+        this.taxRates = taxRates;
+    }
+
 }

@@ -245,8 +245,39 @@ public abstract class CreateReportHelper extends BaseHelper {
         }
         return result;
     }
-    
-    
+
+    protected Double getExtraCostRelated(Request request, ExtraCostType extraCostType) throws PersistenceBeanException, IllegalAccessException {
+        Double result = 0d;
+
+        List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
+                Restrictions.eq("requestId", request.getId()),
+                Restrictions.eq("type", extraCostType)});
+
+        if (!ValidationHelper.isNullOrEmpty(extraCosts)) {
+            for (ExtraCost cost : extraCosts) {
+                result += cost.getPrice();
+            }
+        }
+        return result.equals(0d) ? result : Math.round(result * 100000d) / 100000d;
+    }
+
+
+    public Double getSumOfExtraCost(List<Request> requests, ExtraCostType extraCostType) throws PersistenceBeanException, IllegalAccessException {
+        Double result = 0d;
+        for (Request request : requests) {
+            List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
+                    Restrictions.eq("requestId", request.getId()),
+                    Restrictions.eq("type", extraCostType)});
+
+            if (!ValidationHelper.isNullOrEmpty(extraCosts)) {
+                for (ExtraCost cost : extraCosts) {
+                    result += cost.getPrice();
+                }
+            }
+        }
+        return result.equals(0d) ? result : Math.round(result * 100000d) / 100000d;
+    }
+
     public Boolean isBillingClient(Request request) {
         if (!ValidationHelper.isNullOrEmpty(request.getBillingClient())) {
             return true;

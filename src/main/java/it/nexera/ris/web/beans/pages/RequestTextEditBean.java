@@ -155,6 +155,8 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
    private List<SalesEstateSituationEditTableWrapper> salesOtherEstateSituations;
 
+    private Boolean showRequestCost = Boolean.TRUE;
+
     @Getter
     @Setter
     private Long selectedFormalityId;
@@ -849,6 +851,35 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         setDateConfimed(null);
     }
 
+    public void checkFormalitiesYear() throws PersistenceBeanException, IllegalAccessException {
+        String group = TemplatePdfTableHelper.getEstateFormalityConservationDate(getExamRequest());
+        if (!ValidationHelper.isNullOrEmpty(group)) {
+            List<Formality> formalities = new ArrayList<>();
+            List<EstateSituation> estateSituationList = DaoManager.load(EstateSituation.class, new Criterion[]{
+                    Restrictions.eq("request.id", getRequestId())
+            });
+
+            estateSituationList.stream()
+                    .filter(es -> !ValidationHelper.isNullOrEmpty(es.getFormalityList()))
+                    .forEach(es -> formalities.addAll(es.getFormalityList()));
+
+
+            formalities.removeIf(f -> ValidationHelper.isNullOrEmpty(f.getPresentationDate()) ||
+                    ValidationHelper.isNullOrEmpty(f.getSectionA())
+                    || !ValidationHelper.isNullOrEmpty(f.getSectionA().getOtherData()));
+
+            Optional<Formality> ifExist = formalities
+                    .stream()
+                    .filter(f ->  f.getPresentationDate().after(DateTimeHelper.minusYears(DateTimeHelper.getNow(), 20)))
+                    .findFirst();
+
+            if(ifExist.isPresent()){
+                executeJS("PF('checkFormalityYearWV').show();");
+                return;
+            }
+        }
+        checkRelatedEstateFormalities();
+    }
     public void checkRelatedEstateFormalities() throws PersistenceBeanException, IllegalAccessException {
         List<EstateFormality> estateFormalities = getExamRequest().getEstateFormalityList();
         if (getExamRequest().getEstateFormalityList().stream()
@@ -2319,5 +2350,13 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     public void setPropertyEditInTableWrapper(PropertyEditInTableWrapper propertyEditInTableWrapper) {
         this.propertyEditInTableWrapper = propertyEditInTableWrapper;
+    }
+
+    public Boolean getShowRequestCost() {
+        return showRequestCost;
+    }
+
+    public void setShowRequestCost(Boolean showRequestCost) {
+        this.showRequestCost = showRequestCost;
     }
 }

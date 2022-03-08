@@ -294,9 +294,9 @@
             </p:dataTable>
         </p:overlayPanel>
 
-        <p:dataTable var="item" id="table"
+        <p:dataTable var="item" id="table"  first="#{bean.tablePage}"
                      emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyModel}"
-                     rowKey="#{item.id}" rows="10" lazy="true" paginator="true"
+                     rowKey="#{item.id}"  rows="#{bean.rowsPerPage}" lazy="true" paginator="true"
                      paginatorAlwaysVisible="true" rowIndexVar="rowId"
                      rowStyleClass="#{item.isInserted ? 'receive_new_mail_style':''}"
                      paginatorTemplate="&lt;span style='float: left;'&gt;Elementi visibili nella pagina&lt;/span&gt; {RowsPerPageDropdown}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {CurrentPageReport}"
@@ -308,6 +308,7 @@
 					style="color: red; font-weight: bold; font-size: 19px;" value="S" />
             </p:column>
 			 -->
+            <p:ajax event="page" listener="#{bean.onPageChange}"></p:ajax>
             <p:column headerText="#{ff:upper(msg.requestListDate)}" sortBy="#{item.createDate}" style="width: calc( 7vw + 30px );min-width: 154px;text-align: center;">
                 <p:outputPanel style="margin-left: 10px;text-align: left;max-height: 80px;">
                     <h:outputText value="#{item.createDate}" converter="dateTimeConverter" style="color:#003871;font-weight: bold !important;"/>

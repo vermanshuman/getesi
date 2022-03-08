@@ -63,6 +63,7 @@ public class ReportListBean extends EntityLazyListPageBean<Document> implements 
     
     private String costNote;
 
+    private Boolean showRequestCost = Boolean.FALSE;
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException, IllegalAccessException, IOException {
@@ -214,5 +215,13 @@ public class ReportListBean extends EntityLazyListPageBean<Document> implements 
     
     public Boolean getHideExtraCost() {
         return hideExtraCost;
+    }
+
+    public Boolean getShowRequestCost() {
+        return showRequestCost;
+    }
+
+    public void setShowRequestCost(Boolean showRequestCost) {
+        this.showRequestCost = showRequestCost;
     }
 }

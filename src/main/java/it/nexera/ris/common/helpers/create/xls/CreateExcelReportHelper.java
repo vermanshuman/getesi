@@ -68,6 +68,7 @@ public abstract class CreateExcelReportHelper extends CreateReportHelper {
         }
     }
 
+
     protected Row createRow() {
         return getSheet().createRow(getSheet().getLastRowNum() + 1);
     }

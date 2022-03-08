@@ -302,6 +302,10 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                                 DateTimeHelper.getMonthWordDatePattert(), Locale.ITALY)
                         : DateTimeHelper.toString(subject.getBirthDate()));
                 result.append(", codice fiscale ").append(subject.getFiscalCode());
+                if((i == subjects.size() - 1)
+                        && !ValidationHelper.isNullOrEmpty(cType)
+                        && cType.equals(SectionCType.DEBITORI_NON_DATORI_DI_IPOTECA))
+                    result.append(";");
             } else {
                 result.append(subject.getBusinessName());
                 result.append(" sede ");
@@ -310,6 +314,9 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                         str -> subjectCityCamelCase ? WordUtils.capitalizeFully(str) : str));
                 result.append(frmTxt(subject.getBirthProvince(), " (", ")", Dictionary::getCode));
                 result.append(", codice fiscale ").append(subject.getNumberVAT());
+                if((i == subjects.size() - 1)
+                        && !ValidationHelper.isNullOrEmpty(cType) && cType.equals(SectionCType.DEBITORI_NON_DATORI_DI_IPOTECA))
+                    result.append(";");
             }
 
             if (addRelationshipData) {
@@ -469,6 +476,7 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                 .thenComparing(Formality::getParticularRegister)
                 .thenComparing(Formality::getComparedDeathDate));
 
+        Collections.reverse(formalityList);
         sb.append(String.format("<br/> <br/> <center> <b> Il sottoscritto dott. %s </b> </center>" +
                         "<center> <b> CERTIFICA </b> </center>" +
                         "<b> CHE %s OGGETTO DELLA PRESENTE RELAZIONE %s DALLE SEGUENTI FORMALITA': </b>" +
@@ -564,6 +572,7 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                     .thenComparing(Formality::getParticularRegister)
             .thenComparing(Formality::getComparedDeathDate));
 
+            Collections.reverse(formalities);
             if (!ValidationHelper.isNullOrEmpty(formalities)) {
                 formalitiesFromOtherEstateSituations.addAll(formalities.stream().map(IndexedEntity::getId)
                         .collect(Collectors.toList()));
@@ -687,11 +696,15 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
             }
             if(!ValidationHelper.isNullOrEmpty(formality.getSectionA()) &&  
                     !ValidationHelper.isNullOrEmpty(formality.getSectionA().getTotal())){
-                sb.append(" Importo totale ").append(formality.getSectionA().getTotal());
+                sb.append(" - Importo totale ").append(formality.getSectionA().getTotal()).append(" - ");
             }
             if(!ValidationHelper.isNullOrEmpty(formality.getSectionA()) &&  
                     !ValidationHelper.isNullOrEmpty(formality.getSectionA().getCapital())){
-                sb.append(" Importo Capitale ").append(formality.getSectionA().getCapital());
+                if(ValidationHelper.isNullOrEmpty(formality.getSectionA()) ||
+                        ValidationHelper.isNullOrEmpty(formality.getSectionA().getTotal())){
+                    sb.append(" - ");
+                }
+                sb.append("Importo Capitale ").append(formality.getSectionA().getCapital()).append(" - ");
             }
             if(!ValidationHelper.isNullOrEmpty(formality.getSectionA()) && 
                     !ValidationHelper.isNullOrEmpty(formality.getSectionA().getDuration())){
@@ -736,15 +749,15 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                     .filter(x -> SectionCType.DEBITORI_NON_DATORI_DI_IPOTECA.getName().equals(x.getSectionCType()))
                     .sorted(Comparator.comparingInt(o -> -o.getSubject().size()))
                     .map(SectionC::getSubject).flatMap(List::stream).distinct().collect(Collectors.toList());
-            
+
             String result = manageSubjectsPart(formality, SectionCType.DEBITORI_NON_DATORI_DI_IPOTECA,
                     formality.isShouldReportRelationships(), true,
                     false, false, true);
             
             if(!ValidationHelper.isNullOrEmpty(result) && (!this.isSingularProperty || subjects != null && subjects.size() > 1))
-                sb.append(" e debitori non datori di ipoteca ").append(result);
+                sb.append("; Debitori non datori di ipoteca ").append(result);
             else if(!ValidationHelper.isNullOrEmpty(result))
-                sb.append(" e debitore non datore di ipoteca ").append(result);
+                sb.append("; Debitore non datore di ipoteca ").append(result);
             
             if (!ValidationHelper.isNullOrEmpty(getRequest().getDistraintFormality()) &&
                     !ValidationHelper.isNullOrEmpty(formality.getDistraintComment())) {

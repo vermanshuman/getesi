@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import it.nexera.ris.common.xml.wrappers.RequestWrapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -27,6 +28,8 @@ public class ExcelTableWrapper implements Serializable {
     private Map<String, String> footerValues;
     
     private List<Request> originalRequests;
+
+    List<ExcelRequestWrapper> requestWrappers;
 
     public String getRequestName() {
         return requestName;
@@ -81,5 +84,13 @@ public class ExcelTableWrapper implements Serializable {
      */
     public void setOriginalRequests(List<Request> originalRequests) {
         this.originalRequests = originalRequests;
+    }
+
+    public List<ExcelRequestWrapper> getRequestWrappers() {
+        return requestWrappers;
+    }
+
+    public void setRequestWrappers(List<ExcelRequestWrapper> requestWrappers) {
+        this.requestWrappers = requestWrappers;
     }
 }

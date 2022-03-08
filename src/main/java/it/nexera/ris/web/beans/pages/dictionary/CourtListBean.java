@@ -72,7 +72,9 @@ public class CourtListBean extends
                         Restrictions.isNull("isDeleted"))}, new Order[]
                 {Order.asc("name")});
         setCities(ComboboxHelper.fillList(City.class, Order.asc("description"), new Criterion[]{
-                Restrictions.eq("external", Boolean.TRUE)
+                Restrictions.eq("external", Boolean.TRUE),
+                Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                        Restrictions.isNull("isDeleted"))
         }));
         
     }

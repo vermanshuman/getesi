@@ -561,7 +561,9 @@ public class SubjectBean extends EntityEditPageBean<Subject>
             this.setAddressCities(ComboboxHelper.fillList(City.class,
                     Order.asc("description"), new Criterion[]{
                             Restrictions.eq("province.id",this.getAddressProvinceId()),
-                            Restrictions.eq("external", Boolean.TRUE)
+                            Restrictions.eq("external", Boolean.TRUE),
+                            Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                                    Restrictions.isNull("isDeleted"))
                     }));
         } else {
             this.setForeignCountry(Boolean.TRUE);

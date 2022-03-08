@@ -413,9 +413,9 @@ public class TemplatePdfTableHelper {
 
             optimizePropertyParameters(property);
             str.append("&nbsp;mq&nbsp;");
-            String landMQ= property.getTagLandMQ();
-            if(landMQ.endsWith(".00") || landMQ.endsWith(".0"))
-                landMQ = landMQ.substring(0, landMQ.lastIndexOf("."));
+            String landMQ= property.getFormattedMQ();
+//            if(landMQ.endsWith(".00") || landMQ.endsWith(".0"))
+//                landMQ = landMQ.substring(0, landMQ.lastIndexOf("."));
             if(!landMQ.contains(".") && !landMQ.contains(",")){
                 landMQ = GeneralFunctionsHelper.formatDoubleString(landMQ);
             }

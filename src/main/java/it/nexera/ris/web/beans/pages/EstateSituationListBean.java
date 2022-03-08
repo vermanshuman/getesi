@@ -68,6 +68,8 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
 
     private Long deletedSalesId;
 
+    private Boolean showRequestCost = Boolean.TRUE;
+
     @Getter
     @Setter
     private List<Document> requestNonSaleDocuments;
@@ -506,5 +508,13 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
 
     public void setDeletedSalesId(Long deletedSalesId) {
         this.deletedSalesId = deletedSalesId;
+    }
+
+    public Boolean getShowRequestCost() {
+        return showRequestCost;
+    }
+
+    public void setShowRequestCost(Boolean showRequestCost) {
+        this.showRequestCost = showRequestCost;
     }
 }

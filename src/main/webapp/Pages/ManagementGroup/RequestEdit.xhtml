@@ -13,8 +13,8 @@
 
     <ui:define name="view_body">
         <p:remoteCommand name="updateSubjects" update="form"/>
-        
-        <p:tabMenu activeIndex="#{bean.activeMenuTabNum}" model="#{bean.topMenuModel}" 
+
+        <p:tabMenu activeIndex="#{bean.activeMenuTabNum}" model="#{bean.topMenuModel}"
         	id="pageTabMenu" />
 
         <ui:fragment rendered="#{bean.multipleCreate and bean.activeMenuTabNum==0}">
@@ -65,7 +65,7 @@
                                        itemLabel="#{con.label}"/>
                         <p:ajax process="gestore"/>
                     </p:selectCheckboxMenu>
-                    
+
                      <span> #{msg.requestNotary}</span><br/>
                      <p:selectOneMenu id="requestNotary" styleClass="select-width"
                                      value="#{bean.selectedNotaryId}"
@@ -152,7 +152,7 @@
                                  styleClass="grey-btn"/>
             </p:panel>
         </ui:fragment>
-         
+
         <ui:fragment>
             <div class="ui-g">
                 <div class="ui-g-12" id="request-btns" style="margin-top:2%">
@@ -163,7 +163,7 @@
                 </div>
             </div>
         </ui:fragment>
-        
+
         <p:dialog id="changeUserDlg" widgetVar="changeUserDlgWV" modal="true"
                   resizable="false" draggable="false" effect="SLIDE"
                   header="#{msg.requestUserChangeDlg}">
@@ -464,7 +464,7 @@
                                  value="#{msg.databaseListSubjectFiscalCodeRestore}" immediate="true"/>
                         </p:outputPanel>
                     </p:column>
-                    
+
                    	<p:column rendered="#{not empty bean.subjectWrapper.typeId}">
                         <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_TIPO_RELAZIONE}"/><br/>
 						<p:selectOneMenu id="sectionCType" style="width: 92%"

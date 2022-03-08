@@ -220,7 +220,7 @@
                     <p:dataTable var="item" id="table" first="#{bean.tablePage}" dynamic="true"
                                  filteredValue="#{mailManagerListBean.filteredList}"
                                  emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyModel}"
-                                 rowKey="#{item.id}" rows="15" lazy="true" paginator="true"
+                                 rowKey="#{item.id}" rows="#{bean.rowsPerPage}" lazy="true" paginator="true"
                                  paginatorAlwaysVisible="true" disabledTextSelection="true"
                                  rowStyleClass="#{bean.mailManagerButtonSelectedId==2 ? (item.read? 'mail_style':'receive_new_mail_style'):'mail_style'} #{bean.isSendOrStorage() ? 'mail-tab-DELETE-SEND' :''}"
                                  paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"

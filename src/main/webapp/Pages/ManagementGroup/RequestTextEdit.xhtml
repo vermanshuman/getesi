@@ -554,6 +554,17 @@
                 </p:dataTable>
             </p:dialog>
 
+            <p:dialog widgetVar="checkFormalityYearWV" modal="true" draggable="false" position="center center">
+                <div class="ui-corner-all">
+                    <span >#{msg.requestTextEditYearFormalityCheck}</span>
+                </div>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.confirm}" action="#{bean.checkRelatedEstateFormalities}"
+                                     oncomplete="PF('checkFormalityYearWV').hide();"  update="btn_line checkEstateFormalitySalesDialog"/>
+                    <p:commandButton value="#{msg.cancel}" oncomplete="PF('checkFormalityYearWV').hide();"/>
+                </div>
+            </p:dialog>
+
             <ui:include src="../Dialogs/RequestDocumentListDialog.xhtml"/>
             <ui:include src="../Dialogs/RequestExtraCostDialog.xhtml"/>
             <ui:include src="../Dialogs/EstateFormalityCostDialog.xhtml"/>

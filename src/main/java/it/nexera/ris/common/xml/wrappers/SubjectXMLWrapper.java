@@ -87,7 +87,9 @@ public class SubjectXMLWrapper extends BaseXMLWrapper<Subject> {
 
         if (!ValidationHelper.isNullOrEmpty(getCityCode())) {
             List<City> cities  = ConnectionManager.load(City.class, new Criterion[]{
-                    Restrictions.eq("cfis", getCityCode())
+                    Restrictions.eq("cfis", getCityCode()),
+                    Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                            Restrictions.isNull("isDeleted"))
             }, session);
 
             if (cities != null && cities.size() > 0) {
@@ -99,7 +101,9 @@ public class SubjectXMLWrapper extends BaseXMLWrapper<Subject> {
         if (ValidationHelper.isNullOrEmpty(subject.getBirthCity())
                 && !ValidationHelper.isNullOrEmpty(getCityDescription())) {
             List<City> cityList = ConnectionManager.load(City.class, new Criterion[]{
-                    Restrictions.eq("description", getCityDescription())
+                    Restrictions.eq("description", getCityDescription()),
+                    Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                            Restrictions.isNull("isDeleted"))
             }, session);
 
             if (!ValidationHelper.isNullOrEmpty(cityList)) {

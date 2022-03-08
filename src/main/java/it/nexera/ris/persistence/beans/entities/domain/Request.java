@@ -29,6 +29,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -97,7 +98,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     private Client billingClient;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "request_type_id")
+    @JoinColumn(name = "request_type_id", nullable = false)
     private RequestType requestType;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -2040,5 +2041,9 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     public void setInvoice(Invoice invoice) {
         this.invoice = invoice;
+    }
+
+    public String getEvasionDateStr() {
+        return DateTimeHelper.toString(getEvasionDate());
     }
 }

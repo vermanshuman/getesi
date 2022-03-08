@@ -352,11 +352,24 @@ public class ClientListBean extends EntityLazyListPageBean<ClientShort> implemen
         if (!Province.FOREIGN_COUNTRY_ID.equals(getAddressProvinceId())) {
             if (!ValidationHelper.isNullOrEmpty(getAddressProvinceId())) {
                 setAddressCities(ComboboxHelper.fillList(City.class, Order.asc("description"),
-                        Restrictions.eq("province.id", getAddressProvinceId())));
+                        new Criterion[]{
+                                Restrictions.eq("province.id", getAddressProvinceId()),
+                                Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                                        Restrictions.isNull("isDeleted"))
+                        }));
             } else {
-                setAddressCities(ComboboxHelper.fillList(City.class, Order.asc("description")));
                 setAddressCities(ComboboxHelper.fillList(City.class, Order.asc("description"),
-                        Restrictions.eq("external", Boolean.TRUE)));
+                new Criterion[]{
+                        Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                                Restrictions.isNull("isDeleted"))
+                }));
+                setAddressCities(ComboboxHelper.fillList(City.class, Order.asc("description"),
+                        new Criterion[]{
+                                Restrictions.eq("external", Boolean.TRUE),
+                                Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                                        Restrictions.isNull("isDeleted"))
+                        }
+                        ));
             }
             setForeignCountry(Boolean.FALSE);
         } else {

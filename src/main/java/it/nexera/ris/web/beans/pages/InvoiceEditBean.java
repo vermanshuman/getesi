@@ -292,7 +292,7 @@ public class InvoiceEditBean extends EntityEditPageBean<Invoice> implements Seri
     		
     		if(!getEntity().isNew()) {
     			setSplitPayment(getEntity().getSplitPayment());
-    			setNotes(getEntity().getCausal());
+    			setNotes(getEntity().getNotes());
     			setDate(getEntity().getDate());
     			setFiscalCode(getEntity().getFiscalCode());
     			
@@ -337,7 +337,7 @@ public class InvoiceEditBean extends EntityEditPageBean<Invoice> implements Seri
 	public void onSave() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
 		getEntity().setClient(DaoManager.get(Client.class, selectedClientId));
 		getEntity().setPaymentType(DaoManager.get(PaymentType.class, selectedPaymentTypeId));
-		getEntity().setCausal(notes);
+		getEntity().setNotes(notes);
 		getEntity().setSplitPayment(splitPayment);
 		getEntity().setDate(date);
 		getEntity().setFiscalCode(fiscalCode);

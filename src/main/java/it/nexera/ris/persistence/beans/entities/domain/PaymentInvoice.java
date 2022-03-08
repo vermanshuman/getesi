@@ -14,19 +14,19 @@ import java.util.Date;
 @Setter
 public class PaymentInvoice extends IndexedEntity implements Serializable {
 
-	private static final long serialVersionUID = 7472873566335180619L;
+    private static final long serialVersionUID = -2859048180366332022L;
 
-	@Column(name = "payment_import ")
-    private Double paymentImport;	
-	
-	@Column(name = "date")
-    private Date date;	
-	
-	@Column(name = "description")
-    private String description;	
-	
-	@ManyToOne
+    @Column(name = "import")
+    private Double paymentImport;
+
+    @Column(name = "date")
+    private Date date;
+
+    @Column(name = "description")
+    private String description;
+
+    @ManyToOne
     @JoinColumn(name = "invoice_id")
     private Invoice invoice;
-	
+
 }

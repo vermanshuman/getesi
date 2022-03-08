@@ -973,14 +973,30 @@
                         </p:outputPanel>
                     </p:column>
                     <p:column>
-                        <span>#{msg.costConfigurationTotal} </span>
-                        <p:selectBooleanCheckbox value="#{itemR.taxable}"
-                                                 rendered="#{not bean.priceListDialogOnlyView}"/>
-                        <h:outputText value=" - #{itemR.taxable ? msg.yes : msg.no}"
-                                      rendered="#{bean.priceListDialogOnlyView}"/>
+                        <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group myclass">
+                            <h:panelGroup>
+                                <span>#{msg.costConfigurationTotal} </span>
+                                <p:selectBooleanCheckbox value="#{itemR.taxable}"
+                                                         rendered="#{not bean.priceListDialogOnlyView}"/>
+                                <h:outputText value=" - #{itemR.taxable ? msg.yes : msg.no}"
+                                              rendered="#{bean.priceListDialogOnlyView}"/>
+                            </h:panelGroup>
+                            <p:selectOneMenu value="#{itemR.selectedTaxRateId}"
+                                             label="#{msg.taxRate}"
+                                             rendered="#{!bean.onlyView}">
+                                <f:selectItems value="#{bean.taxRates}"/>
+                            </p:selectOneMenu>
+
+                        </p:panelGrid>
                     </p:column>
                     <p:column>
-                        <h:outputText value="&#8364;"/>
+                        <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group myclass">
+                            <h:outputText value="&#8364;"/>
+                            <h:outputText value=""/>
+                            <h:outputText value=""/>
+                            <h:outputText value=""/>
+                        </p:panelGrid>
+
                     </p:column>
                 </p:dataTable>
                 

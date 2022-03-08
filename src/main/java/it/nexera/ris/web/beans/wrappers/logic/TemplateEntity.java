@@ -1675,21 +1675,37 @@ public class TemplateEntity {
                                         inAppropriateProperties.add(property);
                                         continue;
                                     }
-                                    Double landMq = 0.0;
-                                    if((ValidationHelper.isNullOrEmpty(property.getCentiares())
-                                            || property.getCentiares().equals(0.0)) &&
-                                            (ValidationHelper.isNullOrEmpty(property.getAres()) || property.getAres().equals(0.0)) &&
-                                            (ValidationHelper.isNullOrEmpty(property.getHectares())
-                                                    || property.getHectares().equals(0.0))){
-
-                                        landMq =  !ValidationHelper.isNullOrEmpty(property.getConsistency()) ?
-                                                Double.parseDouble(property.getConsistencyNumber().replaceAll("\\.", "")) : 0.0;
-                                    }else {
-                                        landMq  = !ValidationHelper.isNullOrEmpty(
-                                                property.getMetersLand()) ? property.getMetersLand().doubleValue() : 0.0;
+                                    String landMQ= property.getTagLandMQ();
+                                    if(landMQ.endsWith(".00") || landMQ.endsWith(".0"))
+                                        landMQ = landMQ.substring(0, landMQ.lastIndexOf("."));
+                                    if(landMQ.contains(".")){
+                                        String [] toks = landMQ.split("\\.");
+                                        if(toks.length > 1 && toks[1].length() == 3){
+                                            landMQ = landMQ.replaceAll("\\.", "");
+                                        }else if(toks.length > 1 && toks[1].length() == 2){
+                                            landMQ = landMQ.replaceAll("\\.", "");
+                                            landMQ = landMQ + "0";
+                                        }else if(toks.length > 1 && toks[1].length() == 1){
+                                            landMQ = landMQ.replaceAll("\\.", "");
+                                            landMQ = landMQ + "00";
+                                        }
                                     }
+//                                    Double landMq = 0.0;
+//                                    if((ValidationHelper.isNullOrEmpty(property.getCentiares())
+//                                            || property.getCentiares().equals(0.0)) &&
+//                                            (ValidationHelper.isNullOrEmpty(property.getAres()) || property.getAres().equals(0.0)) &&
+//                                            (ValidationHelper.isNullOrEmpty(property.getHectares())
+//                                                    || property.getHectares().equals(0.0))){
+//
+//
+//                                        landMq =  !ValidationHelper.isNullOrEmpty(property.getConsistency()) ?
+//                                                Double.parseDouble(property.getConsistencyNumber().replaceAll("\\.", "")) : 0.0;
+//                                    }else {
+//                                        landMq  = !ValidationHelper.isNullOrEmpty(
+//                                                property.getMetersLand()) ? property.getMetersLand().doubleValue() : 0.0;
+//                                    }
 
-                                    extensionTotal += landMq;
+                                    extensionTotal += Double.parseDouble(landMQ);
                                     attachmentBuffer.append("<tr>"); // Property row
 
                                     attachmentBuffer.append("<td class=\"col-35 p6 txt-center\">");
@@ -1738,19 +1754,34 @@ public class TemplateEntity {
                                                                 && lov.getLandOmi().getCities().contains(entry.getKey()))
                                                         .collect(Collectors.toList());
                                                 if (!ValidationHelper.isNullOrEmpty(cityLandOmiValues)
-                                                        && !ValidationHelper.isNullOrEmpty(property.getLandMQ())) {
-                                                    Double landMqValue;
-                                                    if((ValidationHelper.isNullOrEmpty(property.getCentiares()) || property.getCentiares().equals(0.0)) &&
-                                                            (ValidationHelper.isNullOrEmpty(property.getAres()) || property.getAres().equals(0.0)) &&
-                                                            (ValidationHelper.isNullOrEmpty(property.getHectares()) || property.getHectares().equals(0.0))){
-
-                                                        landMqValue = !ValidationHelper.isNullOrEmpty(property.getConsistency()) ? Double.parseDouble(property.getConsistencyNumber().replaceAll("\\.","")) : 0.0;
-                                                        if(landMqValue > 0){
-                                                            landMqValue = Double.parseDouble(landMqValue.toString());
+                                                        && !ValidationHelper.isNullOrEmpty(property.getTagLandMQ())) {
+                                                    landMQ= property.getTagLandMQ();
+                                                    if(landMQ.endsWith(".00") || landMQ.endsWith(".0"))
+                                                        landMQ = landMQ.substring(0, landMQ.lastIndexOf("."));
+                                                    if(landMQ.contains(".")){
+                                                        String [] toks = landMQ.split("\\.");
+                                                        if(toks.length > 1 && toks[1].length() == 3){
+                                                            landMQ = landMQ.replaceAll("\\.", "");
+                                                        }else if(toks.length > 1 && toks[1].length() == 2){
+                                                            landMQ = landMQ.replaceAll("\\.", "");
+                                                            landMQ = landMQ + "0";
+                                                        }else if(toks.length > 1 && toks[1].length() == 1){
+                                                            landMQ = landMQ.replaceAll("\\.", "");
+                                                            landMQ = landMQ + "00";
                                                         }
-                                                    }else {
-                                                        landMqValue =  !ValidationHelper.isNullOrEmpty(property.getMetersLand()) ? property.getMetersLand().doubleValue() : 0.0;
                                                     }
+                                                    Double landMqValue =  Double.parseDouble(landMQ);
+//                                                    if((ValidationHelper.isNullOrEmpty(property.getCentiares()) || property.getCentiares().equals(0.0)) &&
+//                                                            (ValidationHelper.isNullOrEmpty(property.getAres()) || property.getAres().equals(0.0)) &&
+//                                                            (ValidationHelper.isNullOrEmpty(property.getHectares()) || property.getHectares().equals(0.0))){
+//
+//                                                        landMqValue = !ValidationHelper.isNullOrEmpty(property.getConsistency()) ? Double.parseDouble(property.getConsistencyNumber().replaceAll("\\.","")) : 0.0;
+//                                                        if(landMqValue > 0){
+//                                                            landMqValue = Double.parseDouble(landMqValue.toString());
+//                                                        }
+//                                                    }else {
+//                                                        landMqValue =  !ValidationHelper.isNullOrEmpty(property.getMetersLand()) ? property.getMetersLand().doubleValue() : 0.0;
+//                                                    }
                                                     Double omiValue = (cityLandOmiValues.get(0).getValue()/10000) * landMqValue;
                                                     BigDecimal value = new BigDecimal(omiValue);
                                                     String omiValueString = df.format(value.doubleValue());

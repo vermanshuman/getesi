@@ -175,7 +175,9 @@ public class LandOmiEditBean extends EntityEditPageBean<LandOmi>
                 this.setForeignCountry(Boolean.FALSE);
                 List<City> cities = DaoManager.load(City.class, new Criterion[]{
                         Restrictions.eq("province.id",getSelectedProvinceId()),
-                        Restrictions.eq("external", Boolean.TRUE)
+                        Restrictions.eq("external", Boolean.TRUE),
+                        Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                                Restrictions.isNull("isDeleted"))
                 },Order.asc("description"));
                 setCities(cities.stream().map(CitySelectItem::new).collect(Collectors.toList()));
             }else {

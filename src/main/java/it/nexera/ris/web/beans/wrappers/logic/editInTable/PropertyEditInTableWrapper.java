@@ -254,6 +254,8 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
     private void saveOmiValues(Property property) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         EstimateOMIHistory lastEstimateOMI = property.getLastEstimateOMI();
 
+        System.out.println(getLastOmi().getValue() + ":" + getCalculatedOmi().multipleCoordinates + "LL" +
+                "" + lastEstimateOMI);
         if (ValidationHelper.isNullOrEmpty(lastEstimateOMI)
                 && !ValidationHelper.isNullOrEmpty(getLastOmi().getValue())) {
             EstimateOMIHistory history = new EstimateOMIHistory();
@@ -265,7 +267,13 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
 
             property.getEstimateOMIHistory().add(history);
         } else if (!ValidationHelper.isNullOrEmpty(lastEstimateOMI)) {
-            lastEstimateOMI.setEstimateOMI(getLastOmi().getValue());
+            if(!ValidationHelper.isNullOrEmpty(getCalculatedOmi().multipleCoordinates)
+                && getCalculatedOmi().multipleCoordinates && !ValidationHelper.isNullOrEmpty(getLastOmi().getValue())){
+                lastEstimateOMI.setEstimateOMI(getLastOmi().getValue());
+            }else if(ValidationHelper.isNullOrEmpty(getCalculatedOmi().multipleCoordinates) ||
+                !getCalculatedOmi().multipleCoordinates ){
+                lastEstimateOMI.setEstimateOMI(getLastOmi().getValue());
+            }
             lastEstimateOMI.setPropertyAssessmentDate(new Date());
             DaoManager.save(lastEstimateOMI, true);
         }

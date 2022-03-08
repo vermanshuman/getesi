@@ -671,9 +671,9 @@ public class Property extends IndexedEntity implements BeforeSave {
         }
         if (addLandData ) {
             sb.append("&nbsp;mq&nbsp;");
-            String landMQ= getTagLandMQ();
-            if(landMQ.endsWith(".00") || landMQ.endsWith(".0"))
-                landMQ = landMQ.substring(0, landMQ.lastIndexOf("."));
+            String landMQ= getFormattedMQ();
+//            if(landMQ.endsWith(".00") || landMQ.endsWith(".0"))
+//                landMQ = landMQ.substring(0, landMQ.lastIndexOf("."));
             if(!landMQ.contains(".") && !landMQ.contains(",")){
                 landMQ = GeneralFunctionsHelper.formatDoubleString(landMQ);
             }
@@ -950,7 +950,9 @@ public class Property extends IndexedEntity implements BeforeSave {
             setEditCities(ComboboxHelper.fillList(City.class,
                     Order.asc("description"), new Criterion[]{
                             Restrictions.eq("province.id",getProvince().getId()),
-                            Restrictions.eq("external", Boolean.TRUE)
+                            Restrictions.eq("external", Boolean.TRUE),
+                            Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                                    Restrictions.isNull("isDeleted"))
                     }));
         }
 
@@ -1067,6 +1069,16 @@ public class Property extends IndexedEntity implements BeforeSave {
     	String landMQ= getTagLandMQ();
         if(landMQ.endsWith(".00") || landMQ.endsWith(".0"))
             landMQ = landMQ.substring(0, landMQ.lastIndexOf("."));
+        if(landMQ.contains(".")){
+            String [] toks = landMQ.split("\\.");
+            if(toks.length > 1 && toks[1].length() == 2){
+                landMQ = landMQ.replaceAll("\\.", "");
+                landMQ = landMQ + "0";
+            }else if(toks.length > 1 && toks[1].length() == 1){
+                landMQ = landMQ.replaceAll("\\.", "");
+                landMQ = landMQ + "00";
+            }
+        }
         if(!landMQ.contains(".") && !landMQ.contains(",")){
             landMQ = GeneralFunctionsHelper.formatDoubleString(landMQ);
         }
@@ -1527,6 +1539,25 @@ public class Property extends IndexedEntity implements BeforeSave {
             });
         }
         return cadastralCulture;
+    }
+
+    public String getFormattedMQ() {
+        String landMQ= getTagLandMQ();
+        if(landMQ.endsWith(".00") || landMQ.endsWith(".0"))
+            landMQ = landMQ.substring(0, landMQ.lastIndexOf("."));
+        if(landMQ.contains(".")){
+            String [] toks = landMQ.split("\\.");
+            if(toks.length > 1 && toks[1].length() == 3){
+                landMQ = landMQ.replaceAll("\\.", "");
+            }else if(toks.length > 1 && toks[1].length() == 2){
+                landMQ = landMQ.replaceAll("\\.", "");
+                landMQ = landMQ + "0";
+            }else if(toks.length > 1 && toks[1].length() == 1){
+                landMQ = landMQ.replaceAll("\\.", "");
+                landMQ = landMQ + "00";
+            }
+        }
+        return landMQ;
     }
 
     public LandCulture getLandCulture() {

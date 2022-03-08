@@ -71,6 +71,7 @@ import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import it.nexera.ris.web.beans.wrappers.logic.ExcelDataWrapper;
+import org.primefaces.extensions.component.slideout.SlideOut;
 
 public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
 
@@ -89,7 +90,10 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
             ResourcesHelper.getString("excelNote"),
             ResourcesHelper.getString("excelCDR"),
             ResourcesHelper.getString("excelNDG"),
-            ResourcesHelper.getString("excelPosition")};
+            ResourcesHelper.getString("excelPosition"),
+            ResourcesHelper.getString("excelStamps"),
+            ResourcesHelper.getString("excelPostalExpenses")};
+
 
     private static String[] requestsDefaultColumns = {
             ResourcesHelper.getString("requestedDate"),
@@ -124,7 +128,9 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
             ResourcesHelper.getString("excelNote"),
             ResourcesHelper.getString("excelCDR"),
             ResourcesHelper.getString("excelNDG"),
-            ResourcesHelper.getString("excelPosition")};
+            ResourcesHelper.getString("excelPosition"),
+            ResourcesHelper.getString("excelStamps"),
+            ResourcesHelper.getString("excelPostalExpenses")};
 
     private static String[] requestsEvasionDefaultColumns = {
             ResourcesHelper.getString("excelDate"),
@@ -243,7 +249,7 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                       excelColumns.add(getColumnNameByField(column.getField()));
                   }
                   setColumns(excelColumns.toArray(new String[0]));
-                  setRequestsColumns(excelColumns.toArray(new String[0]));
+                  setRequestsEvasionColumns(excelColumns.toArray(new String[0]));
               } else {
                   setColumns(requestsDefaultColumns);
                   setRequestsColumns(requestsDefaultColumns);
@@ -379,7 +385,8 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
         // if(!ValidationHelper.isNullOrEmpty(requests)) {
         Request firstRequest = requests.get(0);
         Client requestClient = firstRequest.getClient();
-        initStandardReport();
+        // initStandardReport();
+        initEvasionReport();
         CreationHelper createHelper = getWorkbook().getCreationHelper();
 
         Row row = createRow();
@@ -418,7 +425,7 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
 
         CellStyle dateCellStyle = getWorkbook().createCellStyle();
         dateCellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd-MM-yyyy"));
-        List<CellRangeAddress> cellRangeAddresses = new ArrayList<CellRangeAddress>();
+        List<CellRangeAddress> cellRangeAddresses = new ArrayList<>();
         addHeader(mainCellStyle,excelDataWrapper);
 
         Map<RequestType, List<Request>> sortedRequests = new HashMap<>();
@@ -442,36 +449,34 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                 if (!ValidationHelper.isNullOrEmpty(columns)) {
                     List<String> excelColumns = new ArrayList<String>();
                     for (ClientInvoiceManageColumn column : columns) {
-                        if(!excelColumns.contains(getColumnNameByField(column.getField())))
-                            excelColumns.add(getColumnNameByField(column.getField()));
+                        if(!excelColumns.contains(getExcelDataColumnNameByField(column.getField())))
+                            excelColumns.add(getExcelDataColumnNameByField(column.getField()));
                     }
                     setColumns(excelColumns.toArray(new String[0]));
                     setRequestsColumns(excelColumns.toArray(new String[0]));
                 } else {
-                    setColumns(requestsDefaultColumns);
-                    setRequestsColumns(requestsDefaultColumns);
+                    setColumns(requestsEvasionColumns);
+                    setRequestsColumns(requestsEvasionColumns);
                 }
             } else {
-                setColumns(requestsDefaultColumns);
-                setRequestsColumns(requestsDefaultColumns);
+                setColumns(requestsEvasionColumns);
+                setRequestsColumns(requestsEvasionColumns);
             }
-
             addShiftedSeparator(row, separatorCellStyle);
             int firstRowNum = row.getRowNum();
 
             addCosts(entry.getValue(), mainCellStyle, mainFont);
 
-            addFooter(entry.getValue(), headerCellStyle, headerFont);
+            addExcelFooter(entry.getValue(), headerCellStyle, headerFont);
             cellRangeAddresses.add(new CellRangeAddress(
                     firstRowNum, getSheet().getLastRowNum(), 0, getColumns().length-1));
-            resizeRequestColumns();
+            resizeExcelDataRequestColumns();
         }
-
-        int colIndex = getIndex(ResourcesHelper.getString("excelForm"), requestsColumns);
+        int colIndex = getIndex(BillingTypeFields.EXCEL_FORMALITY.toString(), requestsColumns);
         getSheet().setColumnWidth(colIndex, 12*256);
         
         
-        colIndex = getIndex(ResourcesHelper.getString("mortgageRights"), requestsColumns);
+        colIndex = getIndex(BillingTypeFields.EXCEL_MORTGAGE_EXPENSES.toString(), requestsColumns);
         getSheet().setColumnWidth(colIndex, 20*256);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -581,6 +586,49 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                 return (ResourcesHelper.getString("excelOffice"));
             case EXCEL_POSITION:
                 return (ResourcesHelper.getString("excelPosition"));
+            default:
+                return null;
+        }
+    }
+
+    private String getExcelDataColumnNameByField(BillingTypeFields field) {
+        switch (field) {
+            case EXCEL_DATE:
+                return (ResourcesHelper.getString("excelDate"));
+            case EXCEL_CONSERVATORIA:
+                return (ResourcesHelper.getString("requestPrintCorservatoryName"));
+            case EXCEL_NAME:
+                return (ResourcesHelper.getString("excelName"));
+            case EXCEL_CODE:
+                return (ResourcesHelper.getString("excelCode"));
+            case EXCEL_REQUEST_TYPE:
+                return (ResourcesHelper.getString("excelRequestType"));
+            case EXCEL_FORMALITY:
+                return (ResourcesHelper.getString("excelFormality"));
+            case EXCEL_MORTGAGE_EXPENSES:
+                return (ResourcesHelper.getString("excelMortgageExpenses"));
+            case EXCEL_CATASTAL_EXPENSES:
+                return (ResourcesHelper.getString("excelCatastalExpenses"));
+            case EXCEL_COMPENSATION:
+                return (ResourcesHelper.getString("excelCompensation"));
+            case EXCEL_TOTAL:
+                return (ResourcesHelper.getString("excelTotal"));
+            case EXCEL_NOTE:
+                return (BillingTypeFields.EXCEL_NOTE.toString());
+            case EXCEL_CDR:
+                return (BillingTypeFields.EXCEL_CDR.toString());
+            case EXCEL_NDG:
+                return (BillingTypeFields.EXCEL_NDG.toString());
+            case EXCEL_USER:
+                return (ResourcesHelper.getString("excelUser"));
+            case EXCEL_OFFICE:
+                return (ResourcesHelper.getString("excelOffice"));
+            case EXCEL_STAMPS:
+                return (BillingTypeFields.EXCEL_STAMPS.toString());
+            case EXCEL_POSTAL_EXPENSES:
+                return (BillingTypeFields.EXCEL_POSTAL_EXPENSES.toString());
+            case EXCEL_POSITION:
+                return (BillingTypeFields.EXCEL_POSITION.toString());
             default:
                 return null;
         }
@@ -815,13 +863,7 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                             Restrictions.eq("client.id", selectedClientId)
                     });
             if (!ValidationHelper.isNullOrEmpty(columns)) {
-                
-                columns.sort(new Comparator<ClientInvoiceManageColumn>() {
-                    @Override
-                    public int compare(ClientInvoiceManageColumn c1, ClientInvoiceManageColumn c2) {
-                        return c1.getPosition().compareTo(c2.getPosition());
-                    }
-                });
+                columns.sort(Comparator.comparing(ClientInvoiceManageColumn::getPosition));
                 requestsEvasionColumns = columns.stream()
                         .filter(c -> ValidationHelper.isNullOrEmpty(c.getRequestType()))
                         .map(c -> c.getField().toString())
@@ -968,6 +1010,20 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
         colIndex = getIndex(BillingTypeFields.EXCEL_CATASTAL_EXPENSES.toString(), requestsEvasionColumns);
         if (colIndex > -1) {
             row.createCell(colIndex, CellType.NUMERIC).setCellValue(getCatastalCost(request));
+            row.getCell(colIndex).setCellStyle(euroStyle);
+        }
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_STAMPS.toString(), requestsEvasionColumns);
+        Double extraCostSum = getRequestExtraCostSumByType(request.getId(), ExtraCostType.MARCA);
+        if (colIndex > -1) {
+            row.createCell(colIndex, CellType.NUMERIC).setCellValue(extraCostSum);
+            row.getCell(colIndex).setCellStyle(euroStyle);
+        }
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_POSTAL_EXPENSES.toString(), requestsEvasionColumns);
+        extraCostSum = getRequestExtraCostSumByType(request.getId(), ExtraCostType.POSTALE);
+        if (colIndex > -1) {
+            row.createCell(colIndex, CellType.NUMERIC).setCellValue(extraCostSum);
             row.getCell(colIndex).setCellStyle(euroStyle);
         }
 
@@ -1145,8 +1201,8 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
         row.getCell(2).setCellStyle(cellStyle);
     }
 
-    
-    private void addHeader(CellStyle cellStyle, 
+
+    private void addHeader(CellStyle cellStyle,
             ExcelDataWrapper excelDataWrapper) {
         String billingClient = "";
         String client = "";
@@ -1306,100 +1362,115 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
             }
         }
     }
-    
-     private void addCost(Request request, Service service, CellStyle cellStyle, Font font,
-             int index,double nationalCost) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+
+    private void addCost(Request request, Service service, CellStyle cellStyle, Font font,
+                         int index,double nationalCost) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         HSSFCellStyle euroStyle = getEuroStyle();
         euroStyle.setFont(font);
-        
+
         HSSFCellStyle currencyStyle = getCurrencyStyle();
         currencyStyle.setFont(font);
-        
+
         Row row = null;
         row = createRowAfterDefinedEmptyRows(1);
         Boolean billingClient = isBillingClient(request);
         boolean restrictionForPriceList = restrictionForPriceList(request);
-        int colIndex = getIndex(ResourcesHelper.getString("requestedDate"), requestsColumns);
+
+        int colIndex = getIndex(BillingTypeFields.EXCEL_DATE.toString() , getRequestsColumns());
         if (colIndex > -1) {
-            row.createCell(colIndex).setCellValue(request.getCreateDateStr());
+            row.createCell(colIndex).setCellValue(request.getEvasionDateStr());
             row.getCell(colIndex).setCellStyle(cellStyle);
         }
-        colIndex = getIndex(ResourcesHelper.getString("nominative"), requestsColumns);
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_NAME.toString(), getRequestsColumns());
         if (colIndex > -1) {
             row.createCell(colIndex)
                     .setCellValue(request.getSubject() != null ? (request.getSubject().getFullName() != null ? request.getSubject().getFullName().toUpperCase() : "") : "");
             row.getCell(colIndex).setCellStyle(cellStyle);
         }
-        colIndex = getIndex(ResourcesHelper.getString("codFiscIva"), requestsColumns);
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_USER.toString(), getRequestsColumns());
+        if (colIndex > -1) {
+            row.createCell(colIndex).setCellValue(request.getRequestExcelUserName());
+            row.getCell(colIndex).setCellStyle(cellStyle);
+        }
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_CODE.toString(), getRequestsColumns());
         if (colIndex > -1) {
             row.createCell(colIndex).setCellValue(request.getFiscalCodeVATNamber());
             row.getCell(colIndex).setCellStyle(cellStyle);
         }
 
-        colIndex = getIndex(ResourcesHelper.getString("permissionRequest"), requestsColumns);
+        colIndex = getIndex(BillingTypeFields.EXCEL_OFFICE.toString(), getRequestsColumns());
         if (colIndex > -1) {
-            //row.createCell(colIndex).setCellValue(service== null ? "" : service.toString().toUpperCase());
+            Office office = DaoManager.get(Office.class, request.getUserOfficeId());
+            if (!ValidationHelper.isNullOrEmpty(office)) {
+                row.createCell(colIndex).setCellValue( office.getCode() + " " + office.getDescription());
+                row.getCell(colIndex).setCellStyle(cellStyle);
+            }
+        }
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_REQUEST_TYPE.toString(), getRequestsColumns());
+        if (colIndex > -1) {
             String serviceName = request.getServiceName()!=null?request.getServiceName().toUpperCase():"";
             serviceName = service== null ? serviceName : service.toString().toUpperCase();
             row.createCell(colIndex).setCellValue(serviceName);
             row.getCell(colIndex).setCellStyle(cellStyle);
         }
-        
-        colIndex = getIndex(ResourcesHelper.getString("requestListCorservatoryName"), requestsColumns);
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_CONSERVATORIA.toString(), getRequestsColumns());
         if (colIndex > -1) {
             if(index != -2) {
                 row.createCell(colIndex).setCellValue(request.getAggregationLandChargesRegistryName());
             }else {
-                List<AggregationLandChargesRegistry> aggregationLandChargesRegistries = 
+                List<AggregationLandChargesRegistry> aggregationLandChargesRegistries =
                         DaoManager.load(AggregationLandChargesRegistry.class, new Criterion[]
-                        {Restrictions.eq("national", Boolean.TRUE)});
-                
+                                {Restrictions.eq("national", Boolean.TRUE)});
+
                 if(aggregationLandChargesRegistries.size() > 0) {
                     row.createCell(colIndex).setCellValue(aggregationLandChargesRegistries.get(0).getName());
                 }
             }
             row.getCell(colIndex).setCellStyle(cellStyle);
         }
-        colIndex = getIndex(ResourcesHelper.getString("requestPrintFormalityPresentationDate"), requestsColumns);
-        if (colIndex > -1) {
-            row.createCell(colIndex).setCellValue(DateTimeHelper.toString(request.getEvasionDate()));
-            row.getCell(colIndex).setCellStyle(cellStyle);
-        }
-        colIndex = getIndex(ResourcesHelper.getString("excelForm"), requestsColumns);
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_FORMALITY.toString(), getRequestsColumns());
         if (colIndex > -1 && index != -2) {
             row.createCell(colIndex)
                     .setCellValue(request.getNumberActOrSumOfEstateFormalitiesAndOther().longValue());
             row.getCell(colIndex).setCellStyle(cellStyle);
         }
-        colIndex = getIndex(ResourcesHelper.getString("mortgageRights"), requestsColumns);
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_MORTGAGE_EXPENSES.toString(), getRequestsColumns());
         if (colIndex > -1) {
-             Double cost = 0d;
+            Double cost = 0d;
             if(index != -2) {
-                 if(!ValidationHelper.isNullOrEmpty(service)) {
-                     cost = getCostEstateFormalityAndExtraCostRelated(
-                             request,service,billingClient, restrictionForPriceList);
-                 }else {
-                     cost = getCostEstateFormalityAndExtraCostRelated(request);
-                 }
+                if(!ValidationHelper.isNullOrEmpty(service)) {
+                    cost = getCostEstateFormalityAndExtraCostRelated(
+                            request,service,billingClient, restrictionForPriceList);
+                }else {
+                    cost = getCostEstateFormalityAndExtraCostRelated(request);
+                }
             }else {
                 cost += nationalCost;
             }
-           
+
             if(cost > 0) {
                 row.createCell(colIndex, CellType.NUMERIC).setCellValue(cost);
                 row.getCell(colIndex).setCellStyle(currencyStyle);
             }
         }
+
         if(index != -2) {
-            colIndex = getIndex(ResourcesHelper.getString("landRegistryRights"), requestsColumns);
+            colIndex = getIndex(BillingTypeFields.EXCEL_CATASTAL_EXPENSES.toString(), getRequestsColumns());
             if (colIndex > -1) {
                 Double cost = getCostCadastralAndExtraCostRelated(request);
                 if(cost > 0) {
                     row.createCell(colIndex, CellType.NUMERIC).setCellValue(cost);
-                    row.getCell(colIndex).setCellStyle(currencyStyle);    
+                    row.getCell(colIndex).setCellStyle(currencyStyle);
                 }
             }
-            colIndex = getIndex(ResourcesHelper.getString("compensation"), requestsColumns);
+            colIndex = getIndex(BillingTypeFields.EXCEL_COMPENSATION.toString(), getRequestsColumns());
             if (colIndex > -1) {
                 Double costpay = 0d;
                 if(!ValidationHelper.isNullOrEmpty(service)) {
@@ -1414,8 +1485,8 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                 }
             }
         }
-        
-        colIndex = getIndex(ResourcesHelper.getString("formalityTotal"), requestsColumns);
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_TOTAL.toString(), getRequestsColumns());
         if (colIndex > -1) {
             if(index != -2) {
                 Double result = 0d;
@@ -1431,19 +1502,21 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                     result = ValidationHelper.isNullOrEmpty(request.getTotalCost()) ? 0d
                             : Double.parseDouble(request.getTotalCost().replaceAll(",", "."));
                 }
-                
+
                 if(result > 0) {
                     row.createCell(colIndex, CellType.NUMERIC).setCellValue(result);
-                    row.getCell(colIndex).setCellStyle(currencyStyle);    
+                    row.getCell(colIndex).setCellStyle(currencyStyle);
                 }
             }else {
                 if(nationalCost > 0) {
                     row.createCell(colIndex, CellType.NUMERIC).setCellValue(nationalCost);
-                    row.getCell(colIndex).setCellStyle(currencyStyle);    
+                    row.getCell(colIndex).setCellStyle(currencyStyle);
                 }
             }
+
         }
-        colIndex = getIndex(ResourcesHelper.getString("excelNote"), requestsColumns);
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_NOTE.toString(), getRequestsColumns());
         if (colIndex > -1) {
             if(index == 0) {
                 Double result = 0d;
@@ -1451,7 +1524,7 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                         Restrictions.eq("requestId", request.getId())});
                 for (ExtraCost cost : extraCost) {
                     result += cost.getPrice();
-                }   
+                }
                 if(result > 0) {
                     row.createCell(colIndex, CellType.STRING).setCellValue("Costo aggiuntivo: " + result);
                     row.getCell(colIndex).setCellStyle(cellStyle);
@@ -1470,28 +1543,45 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                 row.getCell(colIndex).setCellStyle(cellStyle);
             }
         }
-        colIndex = getIndex(ResourcesHelper.getString("excelCDR"), requestsColumns);
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_CDR.toString(), getRequestsColumns());
         if (colIndex > -1) {
             row.createCell(colIndex, CellType.STRING).setCellValue(request.getCdr());
             row.getCell(colIndex).setCellStyle(cellStyle);
         }
 
-        colIndex = getIndex(ResourcesHelper.getString("excelNDG"), requestsColumns);
+        colIndex = getIndex(BillingTypeFields.EXCEL_NDG.toString(), getRequestsColumns());
         if (colIndex > -1) {
             row.createCell(colIndex, CellType.STRING).setCellValue(request.getNdg());
             row.getCell(colIndex).setCellStyle(cellStyle);
         }
 
-        colIndex = getIndex(ResourcesHelper.getString("excelUser"), requestsColumns);
-        if (colIndex > -1) {
-            row.createCell(colIndex).setCellValue(request.getRequestExcelUserName());
-            row.getCell(colIndex).setCellStyle(cellStyle);
-        }
-        
-        colIndex = getIndex(ResourcesHelper.getString("excelPosition"), requestsColumns);
+        colIndex = getIndex(BillingTypeFields.EXCEL_POSITION.toString(), getRequestsColumns());
         if (colIndex > -1 && !ValidationHelper.isNullOrEmpty(request.getPosition())) {
             row.createCell(colIndex, CellType.STRING).setCellValue(request.getPosition());
             row.getCell(colIndex).setCellStyle(cellStyle);
+        }
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_STAMPS.toString(), getRequestsColumns());
+        if (colIndex > -1) {
+            if(index == -1  || index == 0) {
+                Double extraCostSum = getRequestExtraCostSumByType(request.getId(), ExtraCostType.MARCA);
+                if(extraCostSum > 0) {
+                    row.createCell(colIndex, CellType.NUMERIC).setCellValue(extraCostSum);
+                    row.getCell(colIndex).setCellStyle(currencyStyle);
+                }
+            }
+        }
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_POSTAL_EXPENSES.toString(), getRequestsColumns());
+        if (colIndex > -1) {
+            if(index == -1  || index == 0) {
+                Double extraCostSum = getRequestExtraCostSumByType(request.getId(), ExtraCostType.POSTALE);
+                if(extraCostSum > 0) {
+                    row.createCell(colIndex, CellType.NUMERIC).setCellValue(extraCostSum);
+                    row.getCell(colIndex).setCellStyle(currencyStyle);
+                }
+            }
         }
     }
 
@@ -1512,7 +1602,7 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
             List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
                     Restrictions.in("requestId", ids)});
             for (ExtraCost cost : extraCost) {
-                if(cost.getType() != null && 
+                if(cost.getType() != null &&
                         ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
                     result += cost.getPrice();
                 }
@@ -1521,7 +1611,7 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
 //            for (Request request : requests) {
 //                List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
 //                        Restrictions.eq("requestId", request.getId())});
-//                
+//
 //                for (ExtraCost cost : extraCost) {
 //                    if(ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
 //                        result += cost.getPrice();
@@ -1544,6 +1634,61 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
         colIndex = getIndex(ResourcesHelper.getString("formalityTotal"), requestsColumns);
         if (colIndex > -1) {
             row.createCell(colIndex, CellType.NUMERIC).setCellValue(getSumOfCostTotalServices(requests));
+            row.getCell(colIndex).setCellStyle(euroStyle);
+        }
+    }
+
+    private void addExcelFooter(List<Request> requests, CellStyle cellStyle, Font font) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        HSSFCellStyle euroStyle = getEuroStyle();
+        euroStyle.setFont(font);
+
+        Row row = createRowAfterDefinedEmptyRows(2);
+
+        row.createCell(0).setCellValue(BillingTypeFields.EXCEL_TOTAL.toString().toUpperCase());
+        row.getCell(0).setCellStyle(cellStyle);
+        int colIndex = getIndex(BillingTypeFields.EXCEL_MORTGAGE_EXPENSES.toString(), getRequestsColumns());
+        if (colIndex > -1) {
+            Double result = getSumOfCostEstateFormalityService(requests);
+            /*Code Optimization Start. Making one db call to get data*/
+            List<Long> ids = requests.stream()
+                    .map(Request::getId).collect(Collectors.toList());
+            List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
+                    Restrictions.in("requestId", ids)});
+            for (ExtraCost cost : extraCost) {
+                if(cost.getType() != null &&
+                        ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
+                    result += cost.getPrice();
+                }
+            }
+            /*Code Optimization End.*/
+            row.createCell(colIndex, CellType.NUMERIC).setCellValue(result);
+            row.getCell(colIndex).setCellStyle(euroStyle);
+        }
+        colIndex = getIndex(BillingTypeFields.EXCEL_CATASTAL_EXPENSES.toString(), getRequestsColumns());
+        if (colIndex > -1) {
+            row.createCell(colIndex, CellType.NUMERIC).setCellValue(getSumOfCostCadastral(requests));
+            row.getCell(colIndex).setCellStyle(euroStyle);
+        }
+        colIndex = getIndex(BillingTypeFields.EXCEL_COMPENSATION.toString(), getRequestsColumns());
+        if (colIndex > -1) {
+            row.createCell(colIndex, CellType.NUMERIC).setCellValue(getSumOfCostPayServices(requests));
+            row.getCell(colIndex).setCellStyle(euroStyle);
+        }
+        colIndex = getIndex(BillingTypeFields.EXCEL_TOTAL.toString(), getRequestsColumns());
+        if (colIndex > -1) {
+            row.createCell(colIndex, CellType.NUMERIC).setCellValue(getSumOfCostTotalServices(requests));
+            row.getCell(colIndex).setCellStyle(euroStyle);
+        }
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_STAMPS.toString(), getRequestsColumns());
+        if (colIndex > -1) {
+            row.createCell(colIndex, CellType.NUMERIC).setCellValue(getSumOfExtraCost(requests, ExtraCostType.MARCA));
+            row.getCell(colIndex).setCellStyle(euroStyle);
+        }
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_POSTAL_EXPENSES.toString(), getRequestsColumns());
+        if (colIndex > -1) {
+            row.createCell(colIndex, CellType.NUMERIC).setCellValue(getSumOfExtraCost(requests, ExtraCostType.POSTALE));
             row.getCell(colIndex).setCellStyle(euroStyle);
         }
     }
@@ -1578,7 +1723,7 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
         return getRequestExtraCostSumByType(request.getId(), ExtraCostType.ALTRO);
     }
 
-    private Double getRequestExtraCostSumByType(Long requestId, ExtraCostType type)
+    public Double getRequestExtraCostSumByType(Long requestId, ExtraCostType type)
             throws PersistenceBeanException, IllegalAccessException {
         Double extraCostSum = 0d;
         List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
@@ -1636,7 +1781,9 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
             }
 
             for (Map.Entry<String, ExtraCost> entry : extraCostMap.entrySet()) {
-                if (ExtraCostType.NAZIONALEPOSITIVA.equals(entry.getValue().getType()))
+                if (ExtraCostType.NAZIONALEPOSITIVA.equals(entry.getValue().getType()) ||
+                        ExtraCostType.MARCA.equals(entry.getValue().getType()) ||
+                        ExtraCostType.POSTALE.equals(entry.getValue().getType()))
                     continue;
                 
                 if (ExtraCostType.IPOTECARIO.equals(entry.getValue().getType())) {
@@ -1712,6 +1859,45 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
         }
     }
 
+    private void resizeExcelDataRequestColumns() {
+        autoSizeColumnsAndSetSizeToAnotherByDefault(COLUMNS_WITHOUT_COSTS);
+
+        int colIndex = getIndex(BillingTypeFields.EXCEL_NAME.toString(), getRequestsColumns());
+        if(colIndex>-1) {
+            getSheet().setColumnWidth(colIndex, 7200);
+        }
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_CODE.toString(), getRequestsColumns());
+        if(colIndex>-1) {
+            getSheet().setColumnWidth(colIndex, 6000);
+        }
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_CONSERVATORIA.toString(), getRequestsColumns());
+        if(colIndex>-1) {
+            getSheet().setColumnWidth(colIndex, 6000);
+        }
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_NOTE.toString(), getRequestsColumns());
+        if(colIndex>-1) {
+            getSheet().setColumnWidth(colIndex, 6000);
+        }
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_COMPENSATION.toString(), getRequestsColumns());
+        if(colIndex>-1) {
+            getSheet().setColumnWidth(colIndex, 5000);
+        }
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_TOTAL.toString(), getRequestsColumns());
+        if(colIndex>-1) {
+            getSheet().setColumnWidth(colIndex, 3000);
+        }
+
+        colIndex = getIndex(BillingTypeFields.EXCEL_DATE.toString(), getRequestsColumns());
+        if(colIndex>-1) {
+            getSheet().setColumnWidth(colIndex, 4000);
+        }
+    }
+
 
     public static void setRequestsEvasionColumns(String[] requestsEvasionColumns) {
         CreateExcelRequestsReportHelper.requestsEvasionColumns = requestsEvasionColumns;
@@ -1731,5 +1917,9 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
 
     public static String[] getRequestsColumns() {
         return requestsColumns;
+    }
+
+    public static String[] getRequestsEvasionColumns() {
+        return requestsEvasionColumns;
     }
 }

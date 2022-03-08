@@ -18,8 +18,11 @@ import java.util.stream.Collectors;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 
+import it.nexera.ris.persistence.SessionManager;
+import it.nexera.ris.web.beans.session.SessionBean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
@@ -80,6 +83,7 @@ import it.nexera.ris.web.beans.wrappers.logic.RequestStateWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.RequestTypeFilterWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.ServiceFilterWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.UserFilterWrapper;
+import org.primefaces.event.data.PageEvent;
 
 @ManagedBean(name = "requestListBean")
 @ViewScoped
@@ -188,6 +192,9 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     
     private Integer expirationDays;
 
+    private Integer tablePage;
+
+    private Integer rowsPerPage;
 
     private static final String KEY_CLIENT_ID = "KEY_CLIENT_ID_SESSION_KEY_NOT_COPY";
     private static final String KEY_STATES = "KEY_STATES_SESSION_KEY_NOT_COPY";
@@ -201,12 +208,24 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     private static final String KEY_DATE_TO_REQ = "KEY_DATE_TO_REQ_SESSION_KEY_NOT_COPY";
     private static final String KEY_DATE_FROM_EVASION = "KEY_DATE_FROM_EVASION_SESSION_KEY_NOT_COPY";
     private static final String KEY_DATE_TO_EVASION = "KEY_DATE_TO_EVASION_SESSION_KEY_NOT_COPY";
+    private static final String KEY_PAGE_NUMBER = "KEY_REQUEST_PAGE_NUMBER_SESSION_KEY_NOT_COPY";
+    private static final String KEY_ROWS_PER_PAGE = "KEY_REQUEST_ROWS_PER_PAGE_SESSION_KEY_NOT_COPY";
+
+    @Override
+    protected void onConstruct() {
+        super.onConstruct();
+        if(ValidationHelper.isNullOrEmpty(SessionHelper.get("loadRequestFilters"))){
+            clearFilterValueFromSession();
+        }
+    }
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
             IllegalAccessException, IOException {
 
+        setRowsPerPage(10);
+        setTablePage(0);
         setSearchLastName((String) SessionHelper.get("searchLastName"));
         setSearchFiscalCode((String) SessionHelper.get("searchFiscalCode"));
         setSearchCreateUser((String) SessionHelper.get("searchCreateUser"));
@@ -326,9 +345,10 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                 });
                 requestTypes.forEach(r -> getRequestTypeWrappers().add(new RequestTypeFilterWrapper(r)));
             }
-
         }
-        loadFilterValueFromSession();
+        if(!ValidationHelper.isNullOrEmpty(SessionHelper.get("loadRequestFilters"))){
+            loadFilterValueFromSession();
+        }
         filterTableFromPanel();
     }
 
@@ -1016,7 +1036,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             restrictions.add(Restrictions.eq("fiduciaryId",
             		getFiduciaryClientFilterId()));
         }
-        
+
 
         if (!ValidationHelper.isNullOrEmpty(getManagerClientFilterid())) {
             restrictions.add(Restrictions.eq("managerId",
@@ -1028,7 +1048,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                 new Order[]{Order.desc("createDate")});
         
         List<RequestView> requestList = DaoManager.load(RequestView.class, restrictions.toArray(new Criterion[0]));
-        
+
         List<Long> cityIds = new ArrayList<Long>();
         
         
@@ -1705,11 +1725,29 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         this.expirationDays = expirationDays;
     }
 
+
+    public Integer getTablePage() {
+        return tablePage;
+    }
+
+    public void setTablePage(Integer tablePage) {
+        this.tablePage = tablePage;
+    }
+
+    public Integer getRowsPerPage() {
+        return rowsPerPage;
+    }
+
+    public void setRowsPerPage(Integer rowsPerPage) {
+        this.rowsPerPage = rowsPerPage;
+    }
+
     private void updateFilterValueInSession(){
 
         if(!ValidationHelper.isNullOrEmpty(getSelectedClientId()) ){
             SessionHelper.put(KEY_CLIENT_ID, getSelectedClientId());
         }
+
         if(!ValidationHelper.isNullOrEmpty(getStateWrappers()) ){
             SessionHelper.put(KEY_STATES, getStateWrappers());
         }
@@ -1743,8 +1781,17 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         if(!ValidationHelper.isNullOrEmpty(getDateToEvasion()) ){
             SessionHelper.put(KEY_DATE_TO_EVASION, getDateToEvasion());
         }
+        if (!ValidationHelper.isNullOrEmpty(getTablePage())) {
+            SessionHelper.put(KEY_PAGE_NUMBER, Long.toString(getTablePage()));
+        }else {
+            SessionHelper.put(KEY_PAGE_NUMBER, null);
+        }
 
-
+        if (!ValidationHelper.isNullOrEmpty(getRowsPerPage())) {
+            SessionHelper.put(KEY_ROWS_PER_PAGE, Long.toString(getRowsPerPage()));
+        }else {
+            SessionHelper.put(KEY_ROWS_PER_PAGE, null);
+        }
     }
 
     private void loadFilterValueFromSession(){
@@ -1752,9 +1799,11 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_ID))){
             setSelectedClientId((Long) SessionHelper.get(KEY_CLIENT_ID));
         }
+
         if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_STATES))){
             setStateWrappers((List<RequestStateWrapper>) SessionHelper.get(KEY_STATES));
         }
+
         if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_REQUEST_TYPE))){
             setRequestTypeWrappers((List<RequestTypeFilterWrapper>) SessionHelper.get(KEY_REQUEST_TYPE));
         }
@@ -1786,5 +1835,56 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             setDateToEvasion((Date) SessionHelper.get(KEY_DATE_TO_EVASION));
         }
 
+        if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_PAGE_NUMBER)) ){
+            setTablePage(Integer.parseInt(SessionHelper.get(KEY_PAGE_NUMBER).toString()));
+        }else
+            setTablePage(0);
+        executeJS("if (PF('tableWV').getPaginator() != null ) " +
+                "PF('tableWV').getPaginator().setPage(" + getTablePage() + ");");
+
+        if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_ROWS_PER_PAGE)) ){
+            setRowsPerPage(Integer.parseInt(SessionHelper.get(KEY_ROWS_PER_PAGE).toString()));
+        }else
+            setRowsPerPage(10);
+        if(getRowsPerPage() == 0)
+            setRowsPerPage(10);
+    }
+
+    private void clearFilterValueFromSession() {
+
+        SessionHelper.removeObject(KEY_CLIENT_ID);
+        SessionHelper.removeObject(KEY_STATES);
+        SessionHelper.removeObject(KEY_REQUEST_TYPE);
+        SessionHelper.removeObject(KEY_SERVICES);
+        SessionHelper.removeObject(KEY_CLIENT_MANAGER_ID);
+        SessionHelper.removeObject(KEY_CLIENT_FIDUCIARY_ID);
+        SessionHelper.removeObject(KEY_AGGREAGATION);
+        SessionHelper.removeObject(KEY_DATE_EXPIRATION);
+        SessionHelper.removeObject(KEY_DATE_FROM_REQ);
+        SessionHelper.removeObject(KEY_DATE_TO_REQ);
+        SessionHelper.removeObject(KEY_DATE_FROM_EVASION);
+        SessionHelper.removeObject(KEY_DATE_TO_EVASION);
+        SessionHelper.removeObject(KEY_DATE_TO_REQ);
+        SessionHelper.removeObject(KEY_DATE_TO_REQ);
+        SessionHelper.removeObject(KEY_PAGE_NUMBER);
+        SessionHelper.removeObject(KEY_ROWS_PER_PAGE);
+    }
+
+    public void onPageChange(PageEvent event) {
+        if (event != null)
+            setTablePage(event.getPage());
+        SessionHelper.put(KEY_PAGE_NUMBER, Long.toString(getTablePage()));
+        Map<String, String> params = FacesContext.getCurrentInstance().
+                getExternalContext().getRequestParameterMap();
+        if (!params.isEmpty()) {
+            String rows = params.get("table_rows");
+            if (!ValidationHelper.isNullOrEmpty(rows)) {
+                try {
+                    setRowsPerPage(Integer.parseInt(rows));
+                    SessionHelper.put(KEY_ROWS_PER_PAGE, Long.toString(getRowsPerPage()));
+                } catch (NumberFormatException e) {
+                }
+            }
+        }
     }
 }

@@ -308,28 +308,36 @@ public class RequestWrapper {
     public void onChangeProvince() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
         setCities(ComboboxHelper.fillList(City.class, Order.asc("description"), new Criterion[]{
                 Restrictions.eq("province.id", getSelectProvinceId()),
-                Restrictions.eq("external", Boolean.TRUE)
+                Restrictions.eq("external", Boolean.TRUE),
+                Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                        Restrictions.isNull("isDeleted"))
         }));
     }
 
     public void onChangeResidenceProvince() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         setResidenceCities(ComboboxHelper.fillList(City.class, Order.asc("id"), new Criterion[]{
                 Restrictions.eq("province.id", getSelectedResidenceProvinceId()),
-                Restrictions.eq("external", Boolean.TRUE)
+                Restrictions.eq("external", Boolean.TRUE),
+                Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                        Restrictions.isNull("isDeleted"))
         }));
     }
 
     public void onChangePropertyProvince() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         setPropertyCities(ComboboxHelper.fillList(City.class, Order.asc("id"), new Criterion[]{
                 Restrictions.eq("province.id", getSelectedProvincePropertyId()),
-                Restrictions.eq("external", Boolean.TRUE)
+                Restrictions.eq("external", Boolean.TRUE),
+                Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                        Restrictions.isNull("isDeleted"))
         }));
     }
 
     public void onChangeDomicleProvince() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         setDomicleCities(ComboboxHelper.fillList(City.class, Order.asc("id"), new Criterion[]{
                 Restrictions.eq("province.id", getSelectedDomicileProvinceId()),
-                Restrictions.eq("external", Boolean.TRUE)
+                Restrictions.eq("external", Boolean.TRUE),
+                Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                        Restrictions.isNull("isDeleted"))
         }));
     }
 
