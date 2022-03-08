@@ -273,7 +273,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private Map<Long , Request>  multiRequestMap;
 
     private List<RequestView> regSubjectList;
-
+    
     @Override
     protected void preLoad() throws PersistenceBeanException {
         setMultiRequestMap(new HashMap());
@@ -330,6 +330,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 LogHelper.log(log, e);
             }
         }
+        
 
     }
 
@@ -523,6 +524,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 setSelectedClientId(mail.getClient().getId());
             }
         }
+        
+        openRequestSubjectDialog();
     }
 
     private void fillRequestEnumTypes() {
@@ -895,7 +898,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     }
 
     public boolean goNextTab() throws PersistenceBeanException, IllegalAccessException {
-        if (!valid()) {
+    	if (!valid()) {
             return false;
         }
         setActiveMenuTabNum(getActiveMenuTabNum() + 1);
@@ -2284,6 +2287,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         	executeJS("PF('saveDlgWV').show();");
         	setRunAfterSave(false);
             pageSave();
+            openRequestSubjectDialog();
         }
     }
 
@@ -3056,4 +3060,5 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     public void setRegSubjectList(List<RequestView> regSubjectList) {
         this.regSubjectList = regSubjectList;
     }
+
 }
