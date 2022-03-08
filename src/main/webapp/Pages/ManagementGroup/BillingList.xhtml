@@ -5,7 +5,8 @@
 	  xmlns:ff="http://readytech.com/functions"
 	  xmlns:h="http://java.sun.com/jsf/html"
 	  xmlns:f="http://java.sun.com/jsf/core"
-	  xmlns:p="http://primefaces.org/ui">
+	  xmlns:p="http://primefaces.org/ui"
+	  xmlns:c="http://java.sun.com/jsp/jstl/core">
 <ui:composition template="/resources/tpl/Admin/LazyListTabBase.xhtml">
 	<ui:param name="bean" value="#{billingListBean}" />
 	<ui:param name="renderTitle" value="false" />
@@ -369,6 +370,34 @@
 						background-position-y: 10px;
 					}
 
+					.column_outer {
+						display: flex;
+						gap: 10px;
+						width: 100%;
+					}
+
+					.column_outer .month_inner {
+						width: 25%;
+					}
+
+					.color-white * {
+						color: #fff;
+					}
+
+					.dot {
+					  height: 12px;
+					  width: 12px !important;
+					  background-color: #bbb !important;
+					  border-radius: 50% !important;
+					  display: inline-block;
+					  margin-left: 5px !important;
+					  margin-top: 5px !important;
+					}
+
+					.dot.selected {
+						background-color: #fff !important;
+					}
+
 					@media screen and (min-width: 1400px) {
 						.cost_total {
 							font-size: 35px;
@@ -408,7 +437,7 @@
 						</p:selectOneMenu>
 					</p:panelGrid>
 
-					<div class="react-grid-layout" style="height: 540px;">
+					<div class="react-grid-layout" style="height: 600px;">
 						<p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"
 									 cellpadding="3" cellspacing="0"
 									 columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3"
@@ -499,7 +528,7 @@
 						</p:panelGrid>
 
 						<div class="layout-dashboard" style="max-width: 98%;">
-							<h:panelGroup id="slides1" layout="block" styleClass="p-grid" style="margin-top: 7% !important;">
+							<h:panelGroup id="slides1" layout="block" styleClass="p-grid" style="margin-top: 7% !important;height: 210px;">
 								<div style="width: calc(25% - 8px);position: absolute;transform: translate(16px, 0px);">
 									<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
 										 style="height: 210px; border-radius: 5px;">
@@ -626,6 +655,57 @@
 							</h:panelGroup>
 						</div>
 
+						<div class="layout-dashboard" style="max-width: 98%;">
+							<h:panelGroup id="slides3" layout="block" styleClass="p-grid" style="margin-top: 1% !important;">
+								<div style="width: calc(25% - 8px);position: absolute;transform: translate(16px, 0px);">
+									<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
+										 style="height: 210px; border-radius: 5px;">
+										<div class="sc-hcnlBt wHMuN color-white" style="background-color: #81C784;">
+											<div>
+												<div color="#6e7a81" class="trimester"
+													 style="float: left;">#{msg.subjectTurnoverPerMonth}</div>
+												<div class="list_icon_trimester">
+													<i class="fa fa-fw fa-list11" style="font-size: inherit;"></i>
+												</div>
+											</div>
+
+											<div style="margin-top: 38px;">
+												<h:panelGroup id="turnoverPerMonthWidget" layout="block" styleClass="flexBox-0-0 fullWidth-0-2 wrap-nowrap-0-7
+															direction-column-0-5 justifyContent-center-0-26 alignItems-stretch-0-14 alignContent-center-0-17">
+													<div class="month_div" style="border: 0px;border-bottom: 1px solid rgb(221, 221, 221);">
+														<div class="month_outer column_outer">
+															<div class="month_inner"></div>
+															<div class="month_inner">Imp.</div>
+															<div class="month_inner">Non Imp.</div>
+															<div class="month_inner">Tot.</div>
+														</div>
+													</div>
+													<c:forEach var="item" items="#{bean.getTestTurnoverPerMonth()}" varStatus="loop">
+														<c:if test="${loop.index ge bean.quadrimesterStartIdx and loop.index le bean.quadrimesterEndIdx}">
+															<div class="month_div" style="border: 0px;padding-bottom: 0px;#{(loop.index eq 0 or loop.index eq 4 or loop.index eq 8) ? '' : 'padding-top: 0px;'}">
+																<div class="month_outer column_outer">
+																	<div class="month_inner">#{bean.months[loop.index]}</div>
+																	<div class="month_inner">10.00</div>
+																	<div class="month_inner">5.00</div>
+																	<div class="month_inner">15.00</div>
+																</div>
+															</div>
+														</c:if>
+													</c:forEach>
+												</h:panelGroup>
+												<div style="padding: 5px 20px;">
+													<div style="float: right;">
+														<p:commandButton icon="test" update="@this turnoverPerMonthWidget" action="#{bean.setQuadrimesterIdx(0, 3)}" styleClass="dot #{bean.quadrimesterStartIdx eq 0 ? 'selected' : ''}"/>
+														<p:commandButton icon="test" update="@this turnoverPerMonthWidget" action="#{bean.setQuadrimesterIdx(4, 7)}" styleClass="dot #{bean.quadrimesterStartIdx eq 4 ? 'selected' : ''}"/>
+														<p:commandButton icon="test" update="@this turnoverPerMonthWidget" action="#{bean.setQuadrimesterIdx(8, 11)}" styleClass="dot #{bean.quadrimesterStartIdx eq 8 ? 'selected' : ''}"/>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</h:panelGroup>
+						</div>
 					</div>
 				</div>
 				<div id="content_tab2" class="hide" style="display: none;">Content area2</div>
