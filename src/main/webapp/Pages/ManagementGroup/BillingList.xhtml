@@ -656,7 +656,7 @@
 						</div>
 
 						<div class="layout-dashboard" style="max-width: 98%;">
-							<h:panelGroup id="slides3" layout="block" styleClass="p-grid" style="margin-top: 1% !important;">
+							<h:panelGroup id="turnoverPerMonthWidget" layout="block" styleClass="p-grid" style="margin-top: 1% !important;">
 								<div style="width: calc(25% - 8px);position: absolute;transform: translate(16px, 0px);">
 									<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
 										 style="height: 210px; border-radius: 5px;">
@@ -670,7 +670,7 @@
 											</div>
 
 											<div style="margin-top: 38px;">
-												<h:panelGroup id="turnoverPerMonthWidget" layout="block" styleClass="flexBox-0-0 fullWidth-0-2 wrap-nowrap-0-7
+												<h:panelGroup layout="block" styleClass="flexBox-0-0 fullWidth-0-2 wrap-nowrap-0-7
 															direction-column-0-5 justifyContent-center-0-26 alignItems-stretch-0-14 alignContent-center-0-17">
 													<div class="month_div" style="border: 0px;border-bottom: 1px solid rgb(221, 221, 221);">
 														<div class="month_outer column_outer">
@@ -695,9 +695,9 @@
 												</h:panelGroup>
 												<div style="padding: 5px 20px;">
 													<div style="float: right;">
-														<p:commandButton icon="test" update="@this turnoverPerMonthWidget" action="#{bean.setQuadrimesterIdx(0, 3)}" styleClass="dot #{bean.quadrimesterStartIdx eq 0 ? 'selected' : ''}"/>
-														<p:commandButton icon="test" update="@this turnoverPerMonthWidget" action="#{bean.setQuadrimesterIdx(4, 7)}" styleClass="dot #{bean.quadrimesterStartIdx eq 4 ? 'selected' : ''}"/>
-														<p:commandButton icon="test" update="@this turnoverPerMonthWidget" action="#{bean.setQuadrimesterIdx(8, 11)}" styleClass="dot #{bean.quadrimesterStartIdx eq 8 ? 'selected' : ''}"/>
+														<p:commandButton icon="test" update="turnoverPerMonthWidget" action="#{bean.setQuadrimesterIdx(0, 3)}" styleClass="dot #{bean.quadrimesterStartIdx eq 0 ? 'selected' : ''}"/>
+														<p:commandButton icon="test" update="turnoverPerMonthWidget" action="#{bean.setQuadrimesterIdx(4, 7)}" styleClass="dot #{bean.quadrimesterStartIdx eq 4 ? 'selected' : ''}"/>
+														<p:commandButton icon="test" update="turnoverPerMonthWidget" action="#{bean.setQuadrimesterIdx(8, 11)}" styleClass="dot #{bean.quadrimesterStartIdx eq 8 ? 'selected' : ''}"/>
 													</div>
 												</div>
 											</div>
