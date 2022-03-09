@@ -120,6 +120,12 @@
             .dynamic-fields input{
                 width : 98% !important;
             }
+            #requestSaved .ui-dialog-titlebar.ui-widget-header {
+                display: none;
+            }
+            #requestSaved .ui-dialog-content.ui-widget-content {
+                    padding-top: 25px;
+            }
         </style>
         <script>
             function next(activeMenu, totalTabs) {
@@ -442,6 +448,12 @@
             <div class="btn_line">
                 <p:commandButton value="#{msg.submit}" oncomplete="PF('diffFiscalCodeWV').hide()"/>
             </div>
+        </p:dialog>
+        <p:dialog id="requestSaved" widgetVar="requestSaved" modal="true" closable="false"
+                  resizable="false" draggable="false" effect="SLIDE">
+            <span>
+                <h:outputText value="#{msg.requestSavedDlg}"/>
+            </span>
         </p:dialog>
     </ui:define>
 

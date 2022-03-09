@@ -2269,6 +2269,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     }
 
     public void validateMultipleRequest(boolean redirect) throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+        executeJS("PF('requestSaved').show();");
         boolean isShowConfirm = false;
         setRedirected(redirect);
         if (multipleCreate && getEntity().isNew()) {
@@ -2290,6 +2291,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                                 DateTimeHelper.getDatePatternWithSeconds())));
             }
         }
+        executeJS("setTimeout(function(){PF('requestSaved').hide();}, 2000);");
         if (isShowConfirm) {
             executeJS("PF('multipleRequestSave').show();");
         } else {
