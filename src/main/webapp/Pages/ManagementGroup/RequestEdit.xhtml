@@ -255,7 +255,7 @@
                             <span> #{msg.requestRequestType}<span class="red">*</span>:</span><br/>
                             <p:selectCheckboxMenu id="servicerequestType" value="#{bean.selectedRequestTypes}"
                                                   label="#{msg.requestRequestType}" styleClass="select-width">
-                                <p:ajax delay="2000" event="change" listener="#{bean.onRequestTypeChange}"
+                                <p:ajax delay="500" event="change" listener="#{bean.onRequestTypeChange}"
                                         update="multipleServiceRequest"/>
                                 <f:selectItems value="#{bean.requestTypes}"/>
                             </p:selectCheckboxMenu>
@@ -265,7 +265,7 @@
                             <p:selectCheckboxMenu value="#{bean.selectedServiceIds}" id="multipleServiceRequest"
                                                   label="#{msg.requestService}"
                                                   styleClass="select-width"   >
-                                <p:ajax delay="2000" event="change" listener="#{bean.onMultipleServiceChange()}" update="form" />
+                                <p:ajax delay="500" event="change" listener="#{bean.onMultipleServiceChange()}" update="form" />
                                 <f:selectItems value="#{bean.services}"/>
                             </p:selectCheckboxMenu>
                         </div>
