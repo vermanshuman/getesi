@@ -323,10 +323,10 @@
                     <div class="ui-g">
                         <div class="ui-g-3" style="padding: 1%">
                             <span> #{msg.requestRequestType}<span class="red">*</span>:</span><br/>
-                            <p:selectCheckboxMenu id="servicerequestType" value="#{bean.selectedRequestTypes}"
+                            <p:selectCheckboxMenu id="servicerequestType" value="#{bean.selectedRequestTypes}" multiple="true"
                                                   label="#{msg.requestRequestType}" styleClass="select-width">
                                 <p:ajax delay="2000" event="change" listener="#{bean.onRequestTypeChange}"  onstart="showLoader();" oncomplete="hideLoader();"
-                                        update="multipleServiceRequest"/>
+                                        update="multipleServiceRequest @this"/>
                                 <f:selectItems value="#{bean.requestTypes}"/>
                             </p:selectCheckboxMenu>
                         </div>
@@ -334,10 +334,10 @@
                        
                         <div class="ui-g-3" style="padding: 1%">
                             <span> #{msg.requestService}<span class="red">*</span>:</span><br/>
-                            <p:selectCheckboxMenu value="#{bean.selectedServiceIds}" id="multipleServiceRequest"
+                            <p:selectCheckboxMenu value="#{bean.selectedServiceIds}" id="multipleServiceRequest" multiple="true"
                                                   label="#{msg.requestService}"
                                                   styleClass="select-width"   >
-                                <p:ajax delay="2000" event="change" listener="#{bean.onMultipleServiceChange()}" update="form" />
+                                <p:ajax delay="2000" event="change" listener="#{bean.onMultipleServiceChange()}" update="form @this" />
                                 <f:selectItems value="#{bean.services}"/>
                             </p:selectCheckboxMenu>
                         </div>

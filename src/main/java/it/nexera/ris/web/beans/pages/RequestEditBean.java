@@ -3,6 +3,7 @@ package it.nexera.ris.web.beans.pages;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -118,13 +119,13 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private Long selectedRequestTypeId;
 
-    private List<String> selectedRequestTypes;
+    private Long[] selectedRequestTypes;
 
     private List<SelectItem> requestTypes;
 
     private Long selectedServiceId;
 
-    private List<String> selectedServiceIds;
+    private Long[] selectedServiceIds;
 
     private List<SelectItem> services;
 
@@ -456,8 +457,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         setRequestTypes(ComboboxHelper.fillList(RequestType.class));
         if(isMultipleRequestCreate()){
             if(getEntity().getRequestType() != null){
-                setSelectedRequestTypes(new ArrayList());
-                getSelectedRequestTypes().add(getEntity().getRequestType().getId().toString());
+            	Long[] requestTypes = {getEntity().getRequestType().getId()};
+                setSelectedRequestTypes(requestTypes);
                 getMultiRequestMap().put(getEntity().getRequestType().getId(),getEntity());
             }
         }else{
@@ -467,16 +468,20 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         onRequestTypeChange();
 
         setSelectedServiceId(getEntity().getService() != null ? getEntity().getService().getId() : null);
-
-        setSelectedServiceIds(getEntity().getMultipleServices() != null
+        
+        List<Long> serviceIdsList = getEntity().getMultipleServices() != null
                 ? getEntity().getMultipleServices().stream()
-                .map(Service::getId).map(i -> Long.toString(i)).collect(Collectors.toList()) : null);
+                .map(Service::getId).collect(Collectors.toList()) : null;
+        if(serviceIdsList != null && !serviceIdsList.isEmpty())        
+        	setSelectedServiceIds(serviceIdsList.toArray(new Long[serviceIdsList.size()]));
+        else
+        	setSelectedServiceIds(new Long[1]);
 
         if(isMultipleRequestCreate()
                 && ValidationHelper.isNullOrEmpty(getEntity().getMultipleServices()) &&
                 !ValidationHelper.isNullOrEmpty(getEntity().getService())){
-            setSelectedServiceIds(new ArrayList<>());
-            getSelectedServiceIds().add(getEntity().getService().getId().toString());
+        	Long [] serviceId = {getEntity().getService().getId()};
+        	setSelectedServiceIds(serviceId);
         }
         onServiceChange();
         fillRequestEnumTypes();
@@ -840,8 +845,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void onRequestTypeChange() throws IllegalAccessException, PersistenceBeanException {
         if(isMultipleRequestCreate() && !ValidationHelper.isNullOrEmpty(getSelectedRequestTypes())){
-            List<Long> reqTypeIds = getSelectedRequestTypes().stream().map(Long::parseLong)
-                    .collect(Collectors.toList());
+            List<Long> reqTypeIds = Arrays.asList(getSelectedRequestTypes());
             setServices(RequestHelper.onRequestTypeChange(reqTypeIds, isMultipleCreate()));
         }else{
             setServices(RequestHelper.onRequestTypeChange(getSelectedRequestTypeId(), isMultipleCreate()));
@@ -855,8 +859,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void onMultipleServiceChange() throws PersistenceBeanException, IllegalAccessException {
         if(!ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
-            setInputCardList(RequestHelper.onMultipleServiceChange(getSelectedServiceIds().stream().map(Long::parseLong)
-                    .collect(Collectors.toList()),isMultipleRequestCreate()));
+            setInputCardList(RequestHelper.onMultipleServiceChange(Arrays.asList(getSelectedServiceIds()),isMultipleRequestCreate()));
         }
         if(isMultipleRequestCreate()){
             generateTab();
@@ -1314,8 +1317,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     public void onSave() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         List<Long> selectedServiceReqType = new ArrayList();
         if(isMultipleRequestCreate()){
-            selectedServiceReqType = getSelectedRequestTypes().stream().map(Long::parseLong)
-                    .collect(Collectors.toList());
+            selectedServiceReqType = Arrays.asList(getSelectedRequestTypes());
         }else{
             selectedServiceReqType.add(getSelectedRequestTypeId());
         }
@@ -1374,8 +1376,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             getEntity().setRequestType(DaoManager.get(RequestType.class, requestTypeId));
             if (isMultipleCreate()) {
                 List<Service> serviceList = DaoManager.load(Service.class, new Criterion[]{
-                        Restrictions.in("id", getSelectedServiceIds().stream()
-                                .map(Long::parseLong).collect(Collectors.toList()))
+                        Restrictions.in("id", Arrays.asList(getSelectedServiceIds()).stream().collect(Collectors.toList()))
                 });
                 if(isMultipleRequestCreate()){
                     serviceList = serviceList.stream().filter(service -> requestTypeId.equals(service.getRequestType().getId())).collect(Collectors.toList());
@@ -2270,7 +2271,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                     }, Order.desc("createDate"));
             for(Request req : emptyIfNull(listRequestBySubject)){
                 if(!ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
-                    isShowConfirm = emptyIfNull(req.getMultipleServices()).stream().anyMatch(s -> getSelectedServiceIds().contains(s.getId().toString()));
+                    isShowConfirm = emptyIfNull(req.getMultipleServices()).stream().anyMatch(s -> Arrays.asList(getSelectedServiceIds()).contains(s.getId()));
                     if(isShowConfirm)
                         break;
                 }
@@ -2660,15 +2661,15 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         this.multipleCreate = multipleCreate;
     }
 
-    public List<String> getSelectedServiceIds() {
-        return selectedServiceIds;
-    }
+    public Long[] getSelectedServiceIds() {
+		return selectedServiceIds;
+	}
 
-    public void setSelectedServiceIds(List<String> selectedServiceIds) {
-        this.selectedServiceIds = selectedServiceIds;
-    }
+	public void setSelectedServiceIds(Long[] selectedServiceIds) {
+		this.selectedServiceIds = selectedServiceIds;
+	}
 
-    public String getMultipleTabPath() {
+	public String getMultipleTabPath() {
         return multipleTabPath;
     }
 
@@ -2981,21 +2982,15 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         this.mutipleRequestObjTabPath = mutipleRequestObjTabPath;
     }
 
-    /**
-     * @return the selectedRequestTypes
-     */
-    public List<String> getSelectedRequestTypes() {
-        return selectedRequestTypes;
-    }
+    public Long[] getSelectedRequestTypes() {
+		return selectedRequestTypes;
+	}
 
-    /**
-     * @param selectedRequestTypes the selectedRequestTypes to set
-     */
-    public void setSelectedRequestTypes(List<String> selectedRequestTypes) {
-        this.selectedRequestTypes = selectedRequestTypes;
-    }
+	public void setSelectedRequestTypes(Long[] selectedRequestTypes) {
+		this.selectedRequestTypes = selectedRequestTypes;
+	}
 
-    /**
+	/**
      * @return the multiRequestMap
      */
     public Map<Long , Request> getMultiRequestMap() {
