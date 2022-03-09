@@ -835,6 +835,12 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     }
 
+    public void onRequestTypeChangeBlock() throws IllegalAccessException, PersistenceBeanException {
+        RequestContext.getCurrentInstance().execute("jQuery('.layout-mask')[0].style.display = 'block';");
+        onRequestTypeChange();
+        RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 2000);");
+    }
+
     public void onRequestTypeChange() throws IllegalAccessException, PersistenceBeanException {
         if(isMultipleRequestCreate() && !ValidationHelper.isNullOrEmpty(getSelectedRequestTypes())){
             List<Long> reqTypeIds = getSelectedRequestTypes().stream().map(Long::parseLong)
@@ -848,6 +854,12 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     public void onServiceChange() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         setInputCardList(RequestHelper.onServiceChange(getSelectedServiceId()));
         generateMenuModel();
+    }
+
+    public void onMultipleServiceChangeBlock() throws PersistenceBeanException, IllegalAccessException {
+        RequestContext.getCurrentInstance().execute("jQuery('.layout-mask')[0].style.display = 'block';");
+        onMultipleServiceChange();
+        RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 2000);");
     }
 
     public void onMultipleServiceChange() throws PersistenceBeanException, IllegalAccessException {
