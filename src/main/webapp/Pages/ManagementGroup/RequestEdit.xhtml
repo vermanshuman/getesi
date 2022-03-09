@@ -121,6 +121,52 @@
             .dynamic-fields input{
                 width : 98% !important;
             }
+            
+            #loader {
+				position: fixed;
+				top: 0; left: 0; z-index: 9999;
+				background: rgba(0, 0, 0, 0.7);
+				transition: opacity 0.2s;
+				visibility: hidden;
+				opacity: 0; 
+				z-index: 999;
+				height: 2em;
+				width: 2em; 
+				overflow: show;
+				margin: auto;
+				top: 0;
+				left: 0;
+				bottom: 0;
+				right: 0;
+			}
+			 
+			#loader img {
+				position: absolute;
+  				top: 50%; 
+  				left: 50%;
+				transform: translate(-50%);
+				background-color: transparent;
+				width: 100px;
+				height: 100px;
+			}
+			 
+			#loader.show {
+				visibility: visible;
+				opacity: 1;
+			}
+			
+			#loader:before {
+				content: '';
+				display: block;
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: radial-gradient(rgba(20, 20, 20,.8), rgba(0, 0, 0, .8));
+				background: -webkit-radial-gradient(rgba(20, 20, 20,.8), rgba(0, 0, 0,.8));
+			}
+			
         </style>
         <script>
             function next(activeMenu, totalTabs) {
@@ -151,8 +197,20 @@
             function stopTimer() {
             	clearTimeout(time);
             }
+            
+            function showLoader() {
+            	$("#loader").addClass("show");
+            }
+            
+            function hideLoader() {
+            	$("#loader").removeClass("show");
+            }
         </script>
         <p:remoteCommand name="updateSubjects" update="form"/>
+        
+        <div id='loader'>
+			<img src="#{request.contextPath}/resources/images/blue-loader.gif"  />
+		</div>
 
         <p:tabMenu activeIndex="#{bean.activeMenuTabNum}" model="#{bean.topMenuModel}" style="background-color:#FFFFFF !important;"
                    id="pageTabMenu"  />
@@ -228,9 +286,10 @@
                     <span> #{msg.requestService}<span class="red">*</span>:</span><br/>
                     <p:selectOneMenu value="#{bean.selectedServiceId}" rendered="#{!bean.multipleCreate}"
                                      label="#{msg.requestService}" styleClass="select-width" id="service">
-                        <p:ajax listener="#{bean.onServiceChange}" update="form"/>
+                        <p:ajax listener="#{bean.onServiceChange}" update="form" />
                         <f:selectItems value="#{bean.services}"/>
                     </p:selectOneMenu>
+                   
                     <p:selectCheckboxMenu value="#{bean.selectedServiceIds}" id="multipleService"
                                           rendered="#{bean.multipleCreate}" label="#{msg.requestService}"
                                           styleClass="select-width">
@@ -244,7 +303,6 @@
                         </div>
                     </c:forEach>
                 </p:column>
-
             </p:panelGrid>
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" id="requstType">
                 <p:selectOneRadio value="#{bean.selectedRequestEnumTypeFirst}" styleClass="request-select-radio">
@@ -261,16 +319,19 @@
         <ui:fragment id="dynamicFragment" rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size() - 1 ) or (!bean.multipleRequestCreate and not empty bean.shownFields)}">
             <div class="dynamic-fields">
                 <c:if test="#{bean.multipleRequestCreate}">
+                	
                     <div class="ui-g">
                         <div class="ui-g-3" style="padding: 1%">
                             <span> #{msg.requestRequestType}<span class="red">*</span>:</span><br/>
                             <p:selectCheckboxMenu id="servicerequestType" value="#{bean.selectedRequestTypes}"
                                                   label="#{msg.requestRequestType}" styleClass="select-width">
-                                <p:ajax delay="2000" event="change" listener="#{bean.onRequestTypeChange}"
+                                <p:ajax delay="2000" event="change" listener="#{bean.onRequestTypeChange}"  onstart="showLoader();" oncomplete="hideLoader();"
                                         update="multipleServiceRequest"/>
                                 <f:selectItems value="#{bean.requestTypes}"/>
                             </p:selectCheckboxMenu>
                         </div>
+                        
+                       
                         <div class="ui-g-3" style="padding: 1%">
                             <span> #{msg.requestService}<span class="red">*</span>:</span><br/>
                             <p:selectCheckboxMenu value="#{bean.selectedServiceIds}" id="multipleServiceRequest"
