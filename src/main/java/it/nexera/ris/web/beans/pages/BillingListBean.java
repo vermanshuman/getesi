@@ -55,6 +55,8 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
 
     private List<Integer> turnoverPerMonth = new ArrayList<>();
 
+    private List<String> turnoverPerCustomer = new ArrayList<>();
+
     public String[] months = new String[]{"Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"};
 
     private int quadrimesterStartIdx = 0;
@@ -118,5 +120,21 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
         turnoverPerMonth.add(11);
         turnoverPerMonth.add(12);
         return turnoverPerMonth;
+    }
+
+    public List<String> getTestTurnoverPerCustomer() {
+        turnoverPerCustomer.add("BCP");
+        turnoverPerCustomer.add("Banca Sella");
+        turnoverPerCustomer.add("Intrum");
+        turnoverPerCustomer.add("Penelope SR");
+        turnoverPerCustomer.add("BCP1");
+        turnoverPerCustomer.add("Banca Sella1");
+        turnoverPerCustomer.add("Intrum1");
+        turnoverPerCustomer.add("Penelope SR1");
+        turnoverPerCustomer.add("BCP2");
+        turnoverPerCustomer.add("Banca Sella2");
+        turnoverPerCustomer.add("Intrum2");
+        turnoverPerCustomer.add("Penelope SR2");
+        return turnoverPerCustomer;
     }
 }
