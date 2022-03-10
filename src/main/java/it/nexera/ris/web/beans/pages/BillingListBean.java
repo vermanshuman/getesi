@@ -173,7 +173,8 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
         model.addSeries(q4);
         model.setTitle("Accumulation of sales per quarter");
         model.setLegendPosition("ne");
-        model.setSeriesColors("4477AA, 117733, DDCC77, CC6677");
+        model.setSeriesColors("11773340");
+        model.setShadow(false);
         Axis xAxis = model.getAxis(AxisType.X);
         xAxis.setLabel("");
         Axis yAxis = model.getAxis(AxisType.Y);
