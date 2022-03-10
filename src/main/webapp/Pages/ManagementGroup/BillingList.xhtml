@@ -398,6 +398,16 @@
 						background-color: #fff !important;
 					}
 
+					.excel-img {
+						background-image: url('../../resources/images/excel.png') !important;
+						background-position-x: -20px;
+						margin-top: 24px;
+						height: 76px;
+						width: 100px;
+						background-size: 100px;
+						background-repeat: no-repeat;
+					}
+
 					@media screen and (min-width: 1400px) {
 						.cost_total {
 							font-size: 35px;
@@ -653,6 +663,13 @@
 									</div>
 								</div>
 							</h:panelGroup>
+							<h:panelGroup id="barChartWidget" layout="block" styleClass="p-grid" style="margin-top: -217px !important;margin-left: calc(51% - 11px);max-height: 437px;position: absolute;width: calc(50% + 5px);">
+								<div class="p-col-12" style="max-height: 437px;">
+									<div class="card" style="max-height: 437px;">
+										<p:chart type="bar" model="#{bean.model}" style="height: 437px;" />
+									</div>
+								</div>
+							</h:panelGroup>
 						</div>
 
 						<div class="layout-dashboard" style="max-width: 98%;">
@@ -694,6 +711,9 @@
 													</c:forEach>
 												</h:panelGroup>
 												<div style="padding: 5px 20px;">
+													<div>
+														<i class="excel-img"></i>
+													</div>
 													<div style="float: right;">
 														<p:commandButton icon="test" update="turnoverPerMonthWidget" action="#{bean.setQuadrimesterIdx(0, 3)}" styleClass="dot #{bean.quadrimesterStartIdx eq 0 ? 'selected' : ''}"/>
 														<p:commandButton icon="test" update="turnoverPerMonthWidget" action="#{bean.setQuadrimesterIdx(4, 7)}" styleClass="dot #{bean.quadrimesterStartIdx eq 4 ? 'selected' : ''}"/>

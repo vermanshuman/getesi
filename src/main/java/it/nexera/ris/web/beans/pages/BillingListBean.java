@@ -13,6 +13,11 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
+import org.primefaces.model.chart.Axis;
+import org.primefaces.model.chart.AxisType;
+import org.primefaces.model.chart.BarChartModel;
+import org.primefaces.model.chart.ChartSeries;
+
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
@@ -62,6 +67,8 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
     private int quadrimesterStartIdx = 0;
 
     private int quadrimesterEndIdx = 3;
+
+    private BarChartModel model;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -136,5 +143,42 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
         turnoverPerCustomer.add("Intrum2");
         turnoverPerCustomer.add("Penelope SR2");
         return turnoverPerCustomer;
+    }
+
+    public BillingListBean() {
+        model = new BarChartModel();
+        ChartSeries q1 = new ChartSeries();
+        q1.setLabel("Q1");
+        q1.set("1", 120);
+        q1.set("2", 100);
+        q1.set("3", 44);
+        ChartSeries q2 = new ChartSeries();
+        q2.setLabel("Q2");
+        q2.set("4", 120);
+        q2.set("5", 44);
+        q2.set("6", 100);
+        ChartSeries q3 = new ChartSeries();
+        q3.setLabel("Q3");
+        q3.set("7", 80);
+        q3.set("8", 44);
+        q3.set("9", 120);
+        ChartSeries q4 = new ChartSeries();
+        q4.setLabel("Q4");
+        q4.set("10", 44);
+        q4.set("12", 100);
+        q4.set("12", 80);
+        model.addSeries(q1);
+        model.addSeries(q2);
+        model.addSeries(q3);
+        model.addSeries(q4);
+        model.setTitle("Accumulation of sales per quarter");
+        model.setLegendPosition("ne");
+        model.setSeriesColors("4477AA, 117733, DDCC77, CC6677");
+        Axis xAxis = model.getAxis(AxisType.X);
+        xAxis.setLabel("");
+        Axis yAxis = model.getAxis(AxisType.Y);
+        yAxis.setLabel("Sales");
+        yAxis.setMin(0);
+        yAxis.setMax(200);
     }
 }
