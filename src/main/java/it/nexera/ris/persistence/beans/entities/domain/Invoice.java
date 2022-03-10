@@ -5,6 +5,7 @@ import it.nexera.ris.common.enums.VatCollectability;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
 
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -25,8 +26,8 @@ public class Invoice extends IndexedEntity implements Serializable {
 	@Column(name = "date")
     private Date date;	
 	
-	@Column(name = "notes")
-    private String causal;	
+	@Column(name = "causal")
+    private String notes;	
 	
     @ManyToOne
     @JoinColumn(name = "payment_type_id")
@@ -54,26 +55,26 @@ public class Invoice extends IndexedEntity implements Serializable {
 	@Column(name = "status")
 	private InvoiceStatus status;
 
+	@ManyToOne
+	@JoinColumn(name = "manager_id")
+	private Client manager;
+
+	@ManyToOne
+	@JoinColumn(name = "office_id")
+	private Office office;
+
+	@Column(name = "ndg")
+	private String ndg;
+
+	@Column(name = "pratica")
+	private String practice;
+
+	@ManyToOne
+	@JoinColumn(name = "mail_id")
+	private WLGInbox email;
+
 	@Transient
 	private String documentType;
-	
-	@ManyToOne
-    @JoinColumn(name = "manager_id")
-    private Client manager;
-    
-    @ManyToOne
-    @JoinColumn(name = "office_id")
-    private Office office;
-    
-    @Column(name = "ndg")
-    private String ndg;
-    
-    @Column(name = "pratica") 
-    private String practice;
-    
-    @ManyToOne
-    @JoinColumn(name = "mail_id")
-    private WLGInbox email;
 
 	public Long getCloudId() {
 		return cloudId;
@@ -113,6 +114,14 @@ public class Invoice extends IndexedEntity implements Serializable {
 
 	public void setDate(Date date) {
 		this.date = date;
+	}
+
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
 	}
 
 	public PaymentType getPaymentType() {
@@ -169,14 +178,6 @@ public class Invoice extends IndexedEntity implements Serializable {
 
 	public void setStatus(InvoiceStatus status) {
 		this.status = status;
-	}
-	
-	public String getCausal() {
-		return causal;
-	}
-
-	public void setCausal(String causal) {
-		this.causal = causal;
 	}
 
 	public Client getManager() {

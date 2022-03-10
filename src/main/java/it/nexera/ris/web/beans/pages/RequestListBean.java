@@ -283,8 +283,8 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                     getRequestTypeWrappers().add(new RequestTypeFilterWrapper(r.getId().equals(dueRequestTypeId), r));
                 });
             }
-            for (RequestState rs : RequestState.values()) {
-                getStateWrappers().add(new RequestStateWrapper(!RequestState.EVADED.equals(rs), rs));
+            for(RequestState rs: RequestState.values()) {
+                getStateWrappers().add(new RequestStateWrapper(!RequestState.EVADED.equals(rs) , rs));
             }
             Integer expirationDays = (Integer) SessionHelper.get("expirationDays");
             if (!ValidationHelper.isNullOrEmpty(expirationDays)) {
@@ -322,7 +322,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         }
         loadFilterValueFromSession();
         filterTableFromPanel();
-
     }
 
     public void loadRequestDocuments() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -1041,7 +1040,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
     private void populateCities(List<Criterion> restrictions)
             throws PersistenceBeanException, IllegalAccessException {
-        System.out.println(">>>>>>>>>>>>>>> " + getCities());
         List<RequestView> requestList = DaoManager.load(RequestView.class, restrictions.toArray(new Criterion[0]));
 
         List<Long> cityIds = new ArrayList<>();

@@ -91,22 +91,29 @@ public class RequestWrapper {
     private List<SelectItem> notaries;
     
     private Long selectedNotaryId;
-    
-    public RequestWrapper(Request request, boolean multiple) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        this(request);
+
+    private boolean reset;
+
+
+    public RequestWrapper(Request request, boolean multiple, boolean reset) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        this(request, reset);
         if (multiple) {
             InputCardManageField field = new InputCardManageField();
             field.setField(ManageTypeFields.SUBJECT_MASTERY);
             setLists(Collections.singletonList(field));
         }
     }
+    public RequestWrapper(Request request)
+            throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        this(request, false);
+    }
 
-    public RequestWrapper(Request request) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+    public RequestWrapper(Request request, boolean reset) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         if (!request.isNew()) {
             setSelectedConservatoryItemId(new LinkedList<>());
             setSelectedTaloreItemId(new LinkedList<>());
             setSelectedConserItemId(new LinkedList<>());
-            if (request.getAggregationLandChargesRegistry() != null) {
+            if (!reset && request.getAggregationLandChargesRegistry() != null) {
                 if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getLandChargesRegistries())) {
                     for (LandChargesRegistry registry : request.getAggregationLandChargesRegistry().getLandChargesRegistries()) {
                         if (!ValidationHelper.isNullOrEmpty(registry.getType())) {
@@ -126,15 +133,17 @@ public class RequestWrapper {
                     }
                 }
             }
-            setSelectedBuildingId(request.getPropertyTypeId());
-            setSelectedProvincePropertyId(request.getProvince() != null ? request.getProvince().getId() : null);
-            
-            if (request.getNotary() != null)
-            setSelectedNotaryId(request.getNotary().getId());
-            
-            if (!ValidationHelper.isNullOrEmpty(getSelectedProvincePropertyId())) {
-                onChangePropertyProvince();
-                setSelectedCityPropertyId(request.getCity() != null ? request.getCity().getId() : null);
+            if(!reset){
+                setSelectedBuildingId(request.getPropertyTypeId());
+                setSelectedProvincePropertyId(request.getProvince() != null ? request.getProvince().getId() : null);
+
+                if (request.getNotary() != null)
+                    setSelectedNotaryId(request.getNotary().getId());
+
+                if (!ValidationHelper.isNullOrEmpty(getSelectedProvincePropertyId())) {
+                    onChangePropertyProvince();
+                    setSelectedCityPropertyId(request.getCity() != null ? request.getCity().getId() : null);
+                }
             }
             setSubjectFields(request);
             setResidenceFields(request);
@@ -653,4 +662,12 @@ public class RequestWrapper {
 	public void setSelectedNotaryId(Long selectedNotaryId) {
 		this.selectedNotaryId = selectedNotaryId;
 	}
+
+    public boolean isReset() {
+        return reset;
+    }
+
+    public void setReset(boolean reset) {
+        this.reset = reset;
+    }
 }

@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -30,4 +31,15 @@ public class TaxRate extends IndexedEntity implements Serializable {
 
     @Column(name = "uso")
     private Boolean use;
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        if(getPercentage() != null){
+            sb.append(getPercentage());
+            sb.append("% - ");
+        }
+        if(!ValidationHelper.isNullOrEmpty(getDescription()))
+            sb.append(getDescription());
+        return sb.toString();
+    }
 }

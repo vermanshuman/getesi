@@ -53,6 +53,16 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
 
     private Double monthNovDecAmount = getRandomNumber(50, 100);
 
+    private List<Integer> turnoverPerMonth = new ArrayList<>();
+
+    public String[] months = new String[]{"Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"};
+
+    private int quadrimesterStartIdx = 0;
+
+    private int quadrimesterEndIdx = 3;
+
+    private List<String> turnoverPerCustomer = new ArrayList<>();
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
@@ -87,7 +97,44 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
         setYears(yearList);
     }
 
+    public void setQuadrimesterIdx(int startIdx, int endIdx) {
+        quadrimesterStartIdx = startIdx;
+        quadrimesterEndIdx = endIdx;
+    }
+
     private double getRandomNumber(int min, int max) {
         return Math.random()*(max-min+1)+min;
+    }
+
+    public List<Integer> getTestTurnoverPerMonth() {
+        turnoverPerMonth.add(1);
+        turnoverPerMonth.add(2);
+        turnoverPerMonth.add(3);
+        turnoverPerMonth.add(4);
+        turnoverPerMonth.add(5);
+        turnoverPerMonth.add(6);
+        turnoverPerMonth.add(7);
+        turnoverPerMonth.add(8);
+        turnoverPerMonth.add(9);
+        turnoverPerMonth.add(10);
+        turnoverPerMonth.add(11);
+        turnoverPerMonth.add(12);
+        return turnoverPerMonth;
+    }
+
+    public List<String> getTestTurnoverPerCustomer() {
+        turnoverPerCustomer.add("BCP");
+        turnoverPerCustomer.add("Banca Sella");
+        turnoverPerCustomer.add("Intrum");
+        turnoverPerCustomer.add("Penelope SR");
+        turnoverPerCustomer.add("BCP1");
+        turnoverPerCustomer.add("Banca Sella1");
+        turnoverPerCustomer.add("Intrum1");
+        turnoverPerCustomer.add("Penelope SR1");
+        turnoverPerCustomer.add("BCP2");
+        turnoverPerCustomer.add("Banca Sella2");
+        turnoverPerCustomer.add("Intrum2");
+        turnoverPerCustomer.add("Penelope SR2");
+        return turnoverPerCustomer;
     }
 }

@@ -290,8 +290,8 @@
                     </div>
                     <div class="p-col-4">
                         <h:outputText value="#{msg.requestTextEditVat}"></h:outputText>
-                        <p:selectOneMenu id="invoiceVat" value="#{bean.invoiceItemVat}"
-                        label="#{msg.invoiceVat}" styleClass="#{bean.invoiceItemVat ne null ? 'select-one-menu' : 'select-one-menu-width'}" disabled="#{bean.invoiceSentStatus}">
+                        <p:selectOneMenu id="invoiceVat" value="#{bean.selectedTaxRateId}"
+                        label="#{msg.invoiceVat}" styleClass="#{bean.selectedTaxRateId ne null ? 'select-one-menu' : 'select-one-menu-width'}" disabled="#{bean.invoiceSentStatus}">
                             <f:selectItems value="#{bean.vatAmounts}"/>
                             <p:ajax event="change" update="totalGrossAmount invoiceTotalAmount invoiceToVAT totalGA"/>
                         </p:selectOneMenu>

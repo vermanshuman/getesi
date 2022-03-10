@@ -179,7 +179,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
     private Double invoiceItemAmount;
 
-    private Double invoiceItemVat;
+    // private Double invoiceItemVat;
 
     private Double invoiceTotalCost;
 
@@ -212,6 +212,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private boolean sendInvoice;
 
     private Boolean billinRequest;
+
+    private Long selectedTaxRateId;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
@@ -338,11 +340,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     .mapToDouble(r -> Double.parseDouble(r.getTotalCostDouble())).sum();
         }
         setInvoiceTotalCost(invoiceTotalCost);
-        vatAmounts = new ArrayList<>();
-        vatAmounts.add(new SelectItem(0D, "0%"));
-        vatAmounts.add(new SelectItem(4D, "4%"));
-        vatAmounts.add(new SelectItem(10D, "10%"));
-        vatAmounts.add(new SelectItem(22D, "22%"));
+        setVatAmounts(ComboboxHelper.fillList(TaxRate.class, Order.asc("description"), new CriteriaAlias[]{}, new Criterion[]{
+                Restrictions.eq("use", Boolean.TRUE)
+        }, true, false));
 
         docTypes = new ArrayList<>();
         docTypes.add(new SelectItem("FE", "FATTURA"));
@@ -361,14 +361,16 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             String year = DateTimeHelper.toFormatedString(invoice.getDate(), DateTimeHelper.getXmlSecondDatePattertYear());
             setInvoiceNumber(invoice.getId() + "-" + year + "-FE");
             setInvoiceDate(invoice.getDate());
-            setInvoiceNote(invoice.getCausal());
+            setInvoiceNote(invoice.getNotes());
             if(!ValidationHelper.isNullOrEmpty(invoice.getVatCollectability()))
                 setVatCollectabilityId(invoice.getVatCollectability().getId());
             setSelectedPaymentTypeId(invoice.getPaymentType().getId());
             List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
             for(InvoiceItem invoiceItem : invoiceItems) {
                 setInvoiceItemAmount(invoiceItem.getAmount());
-                setInvoiceItemVat(invoiceItem.getVat());
+                if(!ValidationHelper.isNullOrEmpty(invoiceItem.getTaxRate()))
+                    setSelectedTaxRateId(invoiceItem.getTaxRate().getId());
+                //  setInvoiceItemVat(invoiceItem.getVat());
             }
         }
         if(!ValidationHelper.isNullOrEmpty(getExamRequest()) &&
@@ -1157,22 +1159,39 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     }
 
     public Double getTotalGrossAmount() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+
         Double totalGrossAmount = 0D;
+
         if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost())){
             totalGrossAmount += getInvoiceTotalCost();
-            if(!ValidationHelper.isNullOrEmpty(getInvoiceItemVat())){
-                totalGrossAmount += (getInvoiceTotalCost() * (getInvoiceItemVat()/100));
+            if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateId())){
+                TaxRate taxrate = DaoManager.get(TaxRate.class, getSelectedTaxRateId());
+                if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
+                    totalGrossAmount += (getInvoiceTotalCost() * (taxrate.getPercentage().doubleValue()/100));
+                }
             }
+//            if(!ValidationHelper.isNullOrEmpty(getInvoiceItemVat())){
+//                totalGrossAmount += (getInvoiceTotalCost() * (getInvoiceItemVat()/100));
+//            }
         }
         return totalGrossAmount;
     }
 
     public Double getTotalVat() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         Double totalVat = 0D;
-        if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost()) &&
-                !ValidationHelper.isNullOrEmpty(getInvoiceItemVat()) && getInvoiceItemVat() > 0)
-            totalVat += getInvoiceTotalCost() * (getInvoiceItemVat()/100);
 
+        if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost())){
+            if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateId())){
+                TaxRate taxrate = DaoManager.get(TaxRate.class, getSelectedTaxRateId());
+                if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
+                    totalVat += getInvoiceTotalCost() * (taxrate.getPercentage().doubleValue()/100);
+                }
+            }
+        }
+//
+//        if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost()) &&
+//                !ValidationHelper.isNullOrEmpty(getInvoiceItemVat()) && getInvoiceItemVat() > 0)
+//            totalVat += getInvoiceTotalCost() * (getInvoiceItemVat()/100);
         return totalVat;
     }
 
@@ -1188,7 +1207,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             setValidationFailed(true);
         }
 
-        if(ValidationHelper.isNullOrEmpty(getInvoiceItemVat())){
+        if(ValidationHelper.isNullOrEmpty(getSelectedTaxRateId())){
             addRequiredFieldException("form:invoiceVat");
             setValidationFailed(true);
         }
@@ -1208,13 +1227,16 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
             if(!ValidationHelper.isNullOrEmpty(getVatCollectabilityId()))
                 invoice.setVatCollectability(VatCollectability.getById(getVatCollectabilityId()));
-            invoice.setCausal(getInvoiceNote());
+            invoice.setNotes(getInvoiceNote());
             InvoiceItem invoiceItem = new InvoiceItem();
             if(!ValidationHelper.isNullOrEmpty(getExamRequest())
                     && !ValidationHelper.isNullOrEmpty(getExamRequest().getSubject())){
                 invoiceItem.setSubject(getExamRequest().getSubject().toString());
                 invoiceItem.setAmount(getInvoiceItemAmount());
-                invoiceItem.setVat(getInvoiceItemVat());
+                if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateId())){
+                    invoiceItem.setTaxRate(DaoManager.get(TaxRate.class, getSelectedTaxRateId()));
+                }
+                // invoiceItem.setVat(getInvoiceItemVat());
                 invoiceItem.setInvoiceTotalCost(getInvoiceTotalCost());
             }
             List<InvoiceItem> invoiceItems = new ArrayList<>();
@@ -1307,5 +1329,13 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         if (!ValidationHelper.isNullOrEmpty(getEntity())) {
             RedirectHelper.goToMailEdit(getEntity().getId(), MailEditType.SEND_INVOICE);
         }
+    }
+
+    public Long getSelectedTaxRateId() {
+        return selectedTaxRateId;
+    }
+
+    public void setSelectedTaxRateId(Long selectedTaxRateId) {
+        this.selectedTaxRateId = selectedTaxRateId;
     }
 }

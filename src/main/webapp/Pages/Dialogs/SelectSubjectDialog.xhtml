@@ -140,17 +140,6 @@
         .btn-green {
             background-color: #5ecc8a !important;
         }
-        
-        #template_title {
-            margin-left: 20px;
-            line-height: 30px;
-        }
-        
-        .template_menu{
-        	width:190px; 
-        	margin-left:40px; 
-        	margin-top:15px;
-        }
     </style>
 
     <p:dialog header="#{msg.databaseListSubjectDatabase}" modal="true" id="searchDlg" resizable="false" draggable="false"
@@ -418,23 +407,21 @@
             </p:tabView>
         </p:scrollPanel>
     </p:dialog>
-    
-    <p:dialog widgetVar="templates" resizable="false" draggable="false" width="270" id="template"
+    <p:dialog widgetVar="templates" resizable="false"
               header="#{msg.docTemplates}" modal="true">
         <p:selectOneMenu value="#{bean.selectedSubjectWrapper.selectedTemplateId}"
-                         styleClass="template_menu">
+                         style="width:150px;">
             <f:selectItems value="#{bean.selectedSubjectWrapper.templates}"/>
         </p:selectOneMenu>
 
         <div class="btn_line">
-            <p:commandButton value="#{msg.ok}" ajax="false" styleClass="btn-green p-mr-2 p-mb-2"
+            <p:commandButton value="#{msg.ok}" ajax="false"
                              actionListener="#{bean.selectedSubjectWrapper.generate}" onclick="PF('templates').hide()"
                              update=":form:messages"/>
-            <p:commandButton value="#{msg.cancel}" icon="pi pi-times-circle" styleClass="red-btn"
+            <p:commandButton value="#{msg.cancel}"
                              onclick="PF('templates').hide()"/>
         </div>
     </p:dialog>
-    
     <p:dialog id="documentDialog" widgetVar="documentDialog" modal="true" resizable="false" draggable="false"
               width="600">
         <p:dataTable value="#{bean.selectedSubjectWrapper.requestDocuments}" var="doc" id="requestDocs">
