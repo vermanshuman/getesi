@@ -126,6 +126,9 @@
             #requestSaved .ui-dialog-content.ui-widget-content {
                     padding-top: 25px;
             }
+            #requestSaved_modal {
+                background: rgba(255, 255, 255, 0.6) !important;
+            }
         </style>
         <script>
             function next(activeMenu, totalTabs) {
@@ -450,7 +453,7 @@
             </div>
         </p:dialog>
         <p:dialog id="requestSaved" widgetVar="requestSaved" modal="true" closable="false"
-                  resizable="false" draggable="false" effect="SLIDE">
+                  resizable="false" draggable="false" effect="SLIDE" style="border: 1px solid #00CC52;">
             <span>
                 <h:outputText value="#{msg.requestSavedDlg}"/>
             </span>
