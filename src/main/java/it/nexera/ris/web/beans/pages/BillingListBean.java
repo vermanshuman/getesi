@@ -4,6 +4,8 @@ import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.*;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.*;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
+import it.nexera.ris.persistence.view.ClientView;
 import it.nexera.ris.web.beans.EntityLazyListPageBean;
 import lombok.Getter;
 import lombok.Setter;
@@ -65,7 +67,27 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private List<Invoice> invoices;
     
     private Long filterInvoiceNumber;
+    
+    private Date dateFrom;
 
+    private Date dateTo;
+    
+    private String filterAll;
+    
+    private List<SelectItem> managerClients;
+
+    private Long managerClientFilterid;
+    
+    private List<SelectItem> landAggregations;
+
+    private Long aggregationFilterId;
+    
+    private String filterNotes;
+    
+    private String filterNdg;
+    
+    private String filterPractice;
+    
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
@@ -83,6 +105,12 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         fillYears();
         
         filterTableFromPanel();
+        
+        setManagerClients(ComboboxHelper.fillList(ClientView.class, Order.asc("name"), new Criterion[]{
+                Restrictions.eq("manager", Boolean.TRUE),
+        }, Boolean.FALSE));
+        
+        setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.TRUE));
     }
     
     private void fillYears() throws HibernateException, IllegalAccessException, PersistenceBeanException {
@@ -156,8 +184,32 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             restrictionsLike.add(r);
         }
     	
-    	if(restrictionsLike.size()>0) {
-            if(restrictionsLike.size()>1) {
+    	if (!ValidationHelper.isNullOrEmpty(getDateFrom())) {
+            restrictions.add(Restrictions.ge("date", DateTimeHelper.getDayStart(getDateFrom())));
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(getDateTo())) {
+            restrictions.add(Restrictions.le("date", DateTimeHelper.getDayEnd(getDateTo())));
+        }
+        
+        if (!ValidationHelper.isNullOrEmpty(getManagerClientFilterid())) {
+            restrictions.add(Restrictions.eq("managerId",  getManagerClientFilterid()));
+        }
+        
+        if (!ValidationHelper.isNullOrEmpty(getFilterNotes())) {
+            restrictions.add(Restrictions.eq("notes", getFilterNotes()));
+        }
+        
+        if (!ValidationHelper.isNullOrEmpty(getFilterNdg())) {
+            restrictions.add(Restrictions.eq("ndg", getFilterNdg()));
+        }
+        
+        if (!ValidationHelper.isNullOrEmpty(getFilterPractice())) {
+            restrictions.add(Restrictions.eq("practice", getFilterPractice()));
+        }
+    	
+    	if(restrictionsLike.size() > 0) {
+            if(restrictionsLike.size() > 1) {
                 restrictions.add(Restrictions.or(restrictionsLike.toArray(new Criterion[restrictionsLike.size()])));
             }else {
                 restrictions.add(restrictionsLike.get(0));
@@ -167,5 +219,29 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         loadList(Invoice.class, restrictions.toArray(new Criterion[0]), new Order[]{
                 Order.desc("number")});
         
+    }
+    
+    public void clearFiltraPanel() {
+        setDateFrom(null);
+        setDateTo(null);
+        setSelectedClientId(null);
+        setManagerClientFilterid(null);
+        setAggregationFilterId(null);
+        setFilterNotes(null);
+        setFilterNdg(null);
+        setFilterPractice(null);
+        setFilterAll(null);
+    }
+    
+    public void reset() throws NumberFormatException, HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException, IOException  {
+    	setDateFrom(null);
+        setDateTo(null);
+    	setSelectedClientId(null);
+        setManagerClientFilterid(null);
+        setAggregationFilterId(null);
+        setFilterNotes(null);
+        setFilterNdg(null);
+        setFilterPractice(null);
+        this.onLoad();
     }
 }

@@ -456,6 +456,83 @@
 						border-right: none !important;
     					 
 					}
+					
+					#settingPanel {
+					    position: absolute;
+					    z-index: 1;
+					    margin-top: 40px;
+					    max-width: 460px;
+					    right: 50px;
+					    border: 1px solid #547ac4;
+					}
+					
+					.input-width-100 {
+						width: 100%;
+					}
+					
+					.calender-filled input, .select-checkbox, .select-one-menu {
+		                border: 1px solid #009900 !important;
+		            }
+		            body .ui-inputfield.ui-state-focus {
+		                box-shadow: 0 0 0 0.2em #57c279 !important;
+		            }
+		
+		            body .ui-selectonemenu.ui-state-focus:not(.ui-state-error) {
+		                box-shadow: 0 0 0 0.2em #57c279 !important;
+		            }
+            
+					#settingPanel input {
+						background-color: #F0F3F5 !important;
+						border: none !important;;
+						border-radius: 7px !important;
+						min-height: 36px;
+					}
+					
+					.ui-calendar:not(#currentDay) .ui-datepicker-trigger {
+						color: #003871 !important;;
+					}
+					
+					body .ui-calendar:not(#currentDay) .ui-button {
+						background-color: transparent !important;
+						margin-left: -37px;
+					}
+					
+					#settingPanel .ui-selectonemenu {
+						background-color: #F0F3F5 !important;
+						border: none !important;
+						border-radius: 7px !important;
+					}
+					
+					#settingPanel .ui-selectonemenu-label {
+						background-color: #F0F3F5 !important;
+						border-radius: 7px !important;
+						color: #003871;
+						margin-top: 4px;
+						margin-bottom: 4px;
+					}
+					
+					#filterInvoiceNumber {
+					    width: 200px;
+					    border: 1px solid #a8acb1 !important;
+					}
+					
+					.ui-selectonemenu {
+						border: 1px solid #a8acb1 !important;
+					}
+					
+					#filterDateFrom_input {
+						width: 100%;
+					}
+					
+					#filterDateTo_input {
+						width: 100%;
+					}
+					
+					.search-panel-btns {
+						gap: 30px;
+						display: flex;
+						justify-content: center;
+					}
 		</style>
 		<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
@@ -830,58 +907,102 @@
 		                                    <div class="p-field">
 		                                        <p:inputText id="filterInvoiceNumber" value="#{bean.filterInvoiceNumber}" placeholder="#{msg.billingListNumber}"/>
 		                                    </div>
-		                                    <!-- <div class="p-field">
-		                                        <p:inputText id="filterEmailBody"  placeholder="#{msg.mailManagerEmailBody}"/>
-		                                    </div> -->
+		                                    
 		                                    <p:selectOneMenu id="filterClient" value="#{bean.selectedClientId}" style="margin-right: 20px;"
 															 styleClass="#{bean.selectedClientId ne null ? 'select-one-menu' : ''}">
 												<f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}" itemValue="#{null}" noSelectionOption="true" />
 												<f:selectItems value="#{bean.clients}" />
 												<p:ajax event="itemSelect" update="@this" />
 											</p:selectOneMenu>
+											
 		                                    <div class="p-field">
 		                                        <p:commandButton id="cercaButton" onclick="filterTableFromPanel();"
 		                                                    styleClass="ui-button-warning-icon" update="searchPanel" icon="ui-icon ui-icon-search pi pi-search"/>
 		                                    </div>
 		                                    <p:commandButton id="settingButton" onclick="resetData(); PF('panelSetting').toggle()" type="button"
 		                                                   styleClass="ui-button-warning-icon"  icon="ui-icon ui-icon-search pi pi-sliders-h"/>
-		                                    <!-- <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" collapsed="true">
+		                                    <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" collapsed="true">
 		                                        <div class="p-grid">
 		                                            <div class="p-col-12" style="text-align: center;">
 		                                                <h2>Filtra per</h2>
 		                                            </div>
 		                                            <div class="p-col-12">
-		                                                Data:
-		                                                <p:calendar id="filterDateFrom" readonlyInput="false" showOn="button"
+                                                		<div style="">
+                                                    		<h:outputText style="color: #003871;"
+                                                                  	value="#{ff:upper(msg.billingListDate)}:"/>
+                                                		</div>
+                                            		</div>
+                                            		<div class="p-col-6">
+		                                                <p:calendar id="filterDateFrom" readonlyInput="false"
+		                                                            showOn="button"
 		                                                            onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
-		                                                            pattern="dd/MM/yyyy" mask="true" style="margin-right: 10px;"
-		                                                            locale="it" navigator="true" popupIconOnly="true"
+		                                                            pattern="dd/MM/yyyy" mask="true" locale="it"
+		                                                            navigator="true"
+		                                                            popupIconOnly="true"
 		                                                            onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
-		                                                            value="#{bean.dateFrom}" placeholder="#{msg.mailManagerDateFrom}" />
+		                                                            value="#{bean.dateFrom}"
+		                                                            placeholder="#{msg.billingListDateFrom}" 
+		                                                            styleClass="#{bean.dateFrom ne null ? 'calender-filled' : ''}">
+		                                                    <p:ajax event="dateSelect" update="@this" />
+		                                                </p:calendar>
 		                                                <div id="hyphen"></div>
+		                                            </div>
+		                                            <div class="p-col-6">
 		                                                <p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
 		                                                            onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
-		                                                            pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateTo}"
-		                                                            onblur="check_date(this)" value="#{bean.dateTo}" />
+		                                                            pattern="dd/MM/yyyy" mask="true"
+		                                                            locale="it" navigator="true" popupIconOnly="true"
+		                                                            placeholder="#{msg.billingListDateTo}"
+		                                                            onblur="check_date(this)" value="#{bean.dateTo}" 
+		                                                            styleClass="#{bean.dateTo ne null ? 'calender-filled' : ''}">
+		                                                    <p:ajax event="dateSelect" update="@this" />
+		                                                </p:calendar>
 		                                            </div>
-		                                            <div class="p-col-12">
-		                                                <p:selectCheckboxMenu id="selectCheckboxMenu"  value="#{bean.selectedSearchStateIds}"
-		                                                                      label="#{msg.mailManagerStates}" widgetVar="checkBoxMenuWidget"
-		                                                                      style="margin-right: 15px!important;width: 40%;">
-		                                                    <f:selectItems value="#{bean.searchStates}"/>
-		                                                </p:selectCheckboxMenu>
+		                                            <div class="p-col-6">
+		                                                <p:selectOneMenu id="manager" value="#{bean.managerClientFilterid}"
+		                                                                 style="width: 100%;" 
+		                                                                 styleClass="#{bean.managerClientFilterid ne null ? 'select-one-menu' : ''}">
+		                                                    <f:selectItem itemLabel="#{ff:upper(msg.clientManager)}"
+		                                                                  itemValue="#{null}"
+		                                                                  noSelectionOption="true"/>
+		                                                    <f:selectItems value="#{bean.managerClients}"/>
+		                                                    <p:ajax event="itemSelect" update="@this"/>
+		                                                </p:selectOneMenu>
 		                                            </div>
-		                                            <div class="p-col-12">
-		                                                <p:inputText id="emailFile" value="#{bean.filterAll}" style="width: 81%;"
-		                                                             placeholder="#{msg.mailManagerEmailFrom}/#{msg.mailManagerEmailTo}/#{msg.mailManagerEmailSubject}/#{msg.mailManagerEmailBody}/#{msg.mailManagerEmailFile}"/>
+		                                            <div class="p-col-6">
+		                                                <p:selectOneMenu id="office" value="#{bean.aggregationFilterId}"
+		                                                                 style="width: 100%;" 
+		                                                                 styleClass="#{bean.aggregationFilterId ne null ? 'select-one-menu' : ''}">
+		                                                    <f:selectItem itemLabel="#{msg.subjectViewFormalityConservatoryCap}"
+		                                                                  itemValue="#{null}"
+		                                                                  noSelectionOption="true"/>
+		                                                    <f:selectItems value="#{bean.landAggregations}"/>
+		                                                    <p:ajax event="itemSelect" update="@this"/>
+		                                                </p:selectOneMenu>
 		                                            </div>
-		                                            <div class="p-col-12" style="text-align: center;">
-		                                                <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFiltraPanel}" update="settingPanel" oncomplete="PF('panelSetting').toggle()"/>
-		                                                <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #009900;" id="searchButton"
-		                                                                 onclick="checkDates(); filterTableFromPanel();" update="searchPanel" oncomplete="PF('panelSetting').toggle()"/>
+		                                            <div class="p-col-6">
+		                                            	<p:inputText id="filterNotes" value="#{bean.filterNotes}" 
+		                                            					placeholder="#{msg.billingListNotes}" styleClass="input-width-100"/>
+		                                            </div>
+		                                            <div class="p-col-6">
+		                                            	<p:inputText id="filterNdg" value="#{bean.filterNdg}" 
+		                                            					placeholder="#{msg.billingListNdg}" styleClass="input-width-100"/>
+		                                            </div>
+		                                            <div class="p-col-6">
+		                                            	<p:inputText id="filterPractice" value="#{bean.filterPractice}" 
+		                                            					placeholder="#{msg.billingListPractice}" styleClass="input-width-100"/>
+		                                            </div>
+		                                            
+		                                            <div class="p-col-12 search-panel-btns" style="text-align: center;">
+		                                                <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #00CC52;" id="searchButton"
+		                                                                 onclick="checkDates(); filterTableFromPanel();" update="searchPanel" 
+		                                                                 oncomplete="PF('panelSetting').toggle()"/>
+		                                                <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" 
+		                                                				actionListener="#{bean.clearFiltraPanel}" update="settingPanel" 
+		                                                				oncomplete="PF('panelSetting').toggle()"/>
 		                                            </div>
 		                                        </div>
-		                                    </p:panel> -->
+		                                    </p:panel> 
 		                                </div>
 		                            </div>
 		                            <div class="p-col-12">
@@ -897,6 +1018,10 @@
                     		<div class="button_group">
                         		<p:remoteCommand name="filterTableFromPanel" action="#{bean.filterTableFromPanel}"
                                          	update=":invoiceTable"/>
+                                <p:remoteCommand name="updateCalendarTo" update=":form:filterDateTo"/>
+                                <p:remoteCommand name="resetTableData"
+                         			action="#{bean.reset}" update=":invoiceTable"/>
+            					
                             </div>
                         </ui:fragment>
 				
@@ -952,6 +1077,35 @@
 				$(".hide").hide();
 				$("#content_" + elementId).show();
 			});
+			
+			function checkDates() {
+                var dateFrom = $('#filterDateFrom_input').val();
+                var dateTo = $('#filterDateTo_input').val();
+
+                var dFrom = new Date(dateFrom.substring(6) + '-'
+                    + dateFrom.substring(3, 5) + '-'
+                    + dateFrom.substring(0, 2));
+                var dTo = new Date(dateTo.substring(6) + '-'
+                    + dateTo.substring(3, 5) + '-' + dateTo.substring(0, 2));
+
+                if (dFrom > dTo) {
+                    $('#filterDateTo_input').val(
+                        $('#filterDateFrom_input').val());
+                    updateCalendarTo();
+                }
+            }
+			
+			function resetData() {
+            	$("#filterDateFrom_input").val("");
+            	$("#filterDateTo_input").val("");
+            	$("#manager_label").text("#{ff:upper(msg.clientManager)}");
+            	$("#office_label").text("#{msg.subjectViewFormalityConservatoryCap}");
+            	$("#filterNotes").val("");
+            	$("#filterNdg").val("");
+            	$("#filterPractice").val("");
+            	resetTableData();
+            	return true;
+            }
 		</script>
 	</ui:define>
 </ui:composition>
