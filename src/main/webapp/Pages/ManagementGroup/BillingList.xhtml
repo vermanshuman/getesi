@@ -403,6 +403,59 @@
 							font-size: 35px;
 						}
 					}
+					
+					.orange-button{
+						background: orange !important;
+					}
+					
+					.green-button {
+						background: #00CC52 !important;
+					}
+					
+					.red-button {
+						background: red !important;
+					}
+					
+					body .ui-button.ui-button-warning-icon, body .ui-splitbutton.ui-button-warning-icon > .ui-button {
+					    background: #fb6e51;
+					    color: #FFFFFF;
+					    border: 1px solid #fb6e51 !important;
+					}
+					
+					body .ui-button.ui-button-warning-icon.ui-state-focus, body .ui-splitbutton.ui-button-warning-icon > .ui-button.ui-state-focus {
+						box-shadow: 0 0 0 0.2rem orange !important;
+					}
+					
+					body .ui-button.ui-button-warning-icon.ui-state-active, body .ui-splitbutton.ui-button-warning-icon.ui-state-active > .ui-button.ui-state-active {
+						background-color: #ff8b00 !important;
+					    color: #FFFFFF;
+					    border: 1px solid #ff8b00 !important;
+					}
+					
+					#table_div_content {
+						border: none !important; 
+						padding-top:0px !important; 
+						padding-bottom:0px !important;
+					}
+					
+					body .ui-datatable .ui-datatable-data > tr > td {
+						border-top: none !important;
+						border-left: none !important;
+						border-right: none !important;
+    					border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    				}
+    				
+    				.ui-datatable thead th, .ui-datatable tfoot td {
+    					text-align: left !important;
+					}
+					
+					.ui-datatable:not(.borderless) thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+					    border-width: 1px!important;
+					    border-top: none !important;
+						border-left: none !important;
+						border-right: none !important;
+    					 
+					}
 		</style>
 		<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
@@ -757,7 +810,135 @@
 						</div>
 					</div>
 				</div>
-				<div id="content_tab2" class="hide" style="display: none;">Content area2</div>
+				
+				<!-- FATTURE TAB -->
+				<div id="content_tab2" class="hide" style="display: none;">
+					<div class="p-grid">
+		                <div class="p-col-12 p-md-12">
+		                    <div class="card" style="border: none !important; padding-top:0px; padding-bottom:0px; margin-top:10px;">
+		                        <div class="p-grid">
+		                            <div class="p-col-3">
+		                                <div class="p-formgroup-inline">
+		                                    <div class="p-field">
+		                                        <p:commandButton value="#{msg.billingListCreateInvoice}"
+		                                                         actionListener="#{bean.createNewMail}" update="@form" styleClass="ui-button-success p-mr-2 p-mb-2"/>
+		                                    </div>
+		                                </div>
+		                            </div>
+		                            <div class="p-col-9">
+		                                <div class="p-formgroup-inline alignEnd">
+		                                    <div class="p-field">
+		                                        <p:inputText id="filterInvoiceNumber" value="#{bean.filterInvoiceNumber}" placeholder="#{msg.billingListNumber}"/>
+		                                    </div>
+		                                    <!-- <div class="p-field">
+		                                        <p:inputText id="filterEmailBody"  placeholder="#{msg.mailManagerEmailBody}"/>
+		                                    </div> -->
+		                                    <p:selectOneMenu id="filterClient" value="#{bean.selectedClientId}" style="margin-right: 20px;"
+															 styleClass="#{bean.selectedClientId ne null ? 'select-one-menu' : ''}">
+												<f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}" itemValue="#{null}" noSelectionOption="true" />
+												<f:selectItems value="#{bean.clients}" />
+												<p:ajax event="itemSelect" update="@this" />
+											</p:selectOneMenu>
+		                                    <div class="p-field">
+		                                        <p:commandButton id="cercaButton" onclick="filterTableFromPanel();"
+		                                                    styleClass="ui-button-warning-icon" update="searchPanel" icon="ui-icon ui-icon-search pi pi-search"/>
+		                                    </div>
+		                                    <p:commandButton id="settingButton" onclick="resetData(); PF('panelSetting').toggle()" type="button"
+		                                                   styleClass="ui-button-warning-icon"  icon="ui-icon ui-icon-search pi pi-sliders-h"/>
+		                                    <!-- <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" collapsed="true">
+		                                        <div class="p-grid">
+		                                            <div class="p-col-12" style="text-align: center;">
+		                                                <h2>Filtra per</h2>
+		                                            </div>
+		                                            <div class="p-col-12">
+		                                                Data:
+		                                                <p:calendar id="filterDateFrom" readonlyInput="false" showOn="button"
+		                                                            onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+		                                                            pattern="dd/MM/yyyy" mask="true" style="margin-right: 10px;"
+		                                                            locale="it" navigator="true" popupIconOnly="true"
+		                                                            onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+		                                                            value="#{bean.dateFrom}" placeholder="#{msg.mailManagerDateFrom}" />
+		                                                <div id="hyphen"></div>
+		                                                <p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
+		                                                            onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+		                                                            pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateTo}"
+		                                                            onblur="check_date(this)" value="#{bean.dateTo}" />
+		                                            </div>
+		                                            <div class="p-col-12">
+		                                                <p:selectCheckboxMenu id="selectCheckboxMenu"  value="#{bean.selectedSearchStateIds}"
+		                                                                      label="#{msg.mailManagerStates}" widgetVar="checkBoxMenuWidget"
+		                                                                      style="margin-right: 15px!important;width: 40%;">
+		                                                    <f:selectItems value="#{bean.searchStates}"/>
+		                                                </p:selectCheckboxMenu>
+		                                            </div>
+		                                            <div class="p-col-12">
+		                                                <p:inputText id="emailFile" value="#{bean.filterAll}" style="width: 81%;"
+		                                                             placeholder="#{msg.mailManagerEmailFrom}/#{msg.mailManagerEmailTo}/#{msg.mailManagerEmailSubject}/#{msg.mailManagerEmailBody}/#{msg.mailManagerEmailFile}"/>
+		                                            </div>
+		                                            <div class="p-col-12" style="text-align: center;">
+		                                                <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFiltraPanel}" update="settingPanel" oncomplete="PF('panelSetting').toggle()"/>
+		                                                <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #009900;" id="searchButton"
+		                                                                 onclick="checkDates(); filterTableFromPanel();" update="searchPanel" oncomplete="PF('panelSetting').toggle()"/>
+		                                            </div>
+		                                        </div>
+		                                    </p:panel> -->
+		                                </div>
+		                            </div>
+		                            <div class="p-col-12">
+		                            	<p:commandButton value="#{msg.billingListExcel}" style="float: right"/>
+		                            </div>
+		                        </div>
+		                    </div>
+		                </div>
+		            </div>
+				
+					<p:panel id="table_div">
+                		<ui:fragment id="searchPanel">
+                    		<div class="button_group">
+                        		<p:remoteCommand name="filterTableFromPanel" action="#{bean.filterTableFromPanel}"
+                                         	update=":invoiceTable"/>
+                            </div>
+                        </ui:fragment>
+				
+						<p:dataTable id="invoiceTable" value="#{bean.lazyModel}" emptyMessage="#{msg.noRecordsFound}"
+							var="invoice" rows="10" lazy="true"
+							paginator="true" paginatorAlwaysVisible="true" rowIndexVar="rowId"
+							paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+							rowsPerPageTemplate="10,20,50">
+							<p:column headerText="#{msg.billingListNumber}" sortBy="#{invoice.number}">
+	                        	<h:outputText value="#{invoice.number}"/>
+	                    	</p:column>
+	                    	<p:column headerText="#{msg.billingListDate}" sortBy="#{invoice.dateString}">
+	                        	<h:outputText value="#{invoice.dateString}"/>
+	                    	</p:column>
+	                    	<p:column headerText="#{msg.billingListClient}" sortBy="#{invoice.client.nameOfTheCompany}">
+	                        	<h:outputText value="#{invoice.client.nameOfTheCompany}"/>
+	                    	</p:column>
+	                    	<p:column headerText="#{msg.billingListNotes}" sortBy="#{invoice.notes}">
+	                        	<h:outputText value="#{invoice.notes}"/>
+	                    	</p:column>
+	                    	<p:column headerText="#{msg.billingListStatus}">
+	                    		<p:commandButton value="#{invoice.status.toString()}" style="width: 142px;"
+	                    		 			styleClass="#{invoice.status.getId() == 1 ? 'orange-button' : (invoice.status.getId() == 3 ? 'green-button' : (invoice.status.getId() == 4 ? 'red-button' : 'button'))  }">
+	                    		</p:commandButton>
+	                    	</p:column>
+	                    	<p:column headerText="#{msg.billingListAmount}" sortBy="#{invoice.totalAmount}">
+	                        	<h:outputText value="#{invoice.totalAmount}"/>
+	                    	</p:column>
+	                    	<p:column headerText="#{msg.billingListOnBalance}" sortBy="#{invoice.onBalance}">
+	                        	<h:outputText value="#{invoice.onBalance}"/>
+	                    	</p:column>
+	                    	<p:column rendered="#{invoice.email.id == null}">
+	                    		<i class="email-icon-new"></i>
+	                    	</p:column>
+	                    	<p:column rendered="#{invoice.email.id != null}">
+	                    		<i class="email-icon-new"></i>
+	                    		<i class="correct-email-icon" style="position: relative; margin-left: 11%; margin-top: -31%;"></i>
+	                    	</p:column>
+						</p:dataTable>
+					</p:panel>
+				</div>
+				<!-- FATTURE TAB -->
 				<div id="content_tab3" class="hide" style="display: none;">Content area3</div>
 				<div id="content_tab4" class="hide" style="display: none;">Content area4</div>
 			</main>

@@ -4,7 +4,6 @@ import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.*;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.*;
-import it.nexera.ris.persistence.view.RequestView;
 import it.nexera.ris.web.beans.EntityLazyListPageBean;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,13 +11,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 import java.io.IOException;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,7 +25,7 @@ import java.util.stream.Collectors;
 @ViewScoped
 @Getter
 @Setter
-public class BillingListBean extends EntityLazyListPageBean<RequestView>
+public class BillingListBean extends EntityLazyListPageBean<Invoice>
         implements Serializable {
 
 	private static transient final Log log = LogFactory.getLog(BillingListBean.class);
@@ -62,6 +61,10 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
     private int quadrimesterEndIdx = 3;
 
     private List<String> turnoverPerCustomer = new ArrayList<>();
+    
+    private List<Invoice> invoices;
+    
+    private Long filterInvoiceNumber;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -79,6 +82,7 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
                 ).sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList()), Boolean.TRUE));
         fillYears();
         
+        filterTableFromPanel();
     }
     
     private void fillYears() throws HibernateException, IllegalAccessException, PersistenceBeanException {
@@ -136,5 +140,32 @@ public class BillingListBean extends EntityLazyListPageBean<RequestView>
         turnoverPerCustomer.add("Intrum2");
         turnoverPerCustomer.add("Penelope SR2");
         return turnoverPerCustomer;
+    }
+    
+    public void filterTableFromPanel() throws IllegalAccessException, PersistenceBeanException {
+    	List<Criterion> restrictions = new ArrayList<>();
+    	List<Criterion> restrictionsLike = new ArrayList<>();
+    	
+    	if(!ValidationHelper.isNullOrEmpty(getFilterInvoiceNumber())) {
+            Criterion r = Restrictions.eq("number", getFilterInvoiceNumber());
+            restrictionsLike.add(r);
+        }
+    	
+    	if(!ValidationHelper.isNullOrEmpty(getSelectedClientId())) {
+            Criterion r = Restrictions.eq("client.id", getSelectedClientId());
+            restrictionsLike.add(r);
+        }
+    	
+    	if(restrictionsLike.size()>0) {
+            if(restrictionsLike.size()>1) {
+                restrictions.add(Restrictions.or(restrictionsLike.toArray(new Criterion[restrictionsLike.size()])));
+            }else {
+                restrictions.add(restrictionsLike.get(0));
+            }
+        }
+    	
+        loadList(Invoice.class, restrictions.toArray(new Criterion[0]), new Order[]{
+                Order.desc("number")});
+        
     }
 }
