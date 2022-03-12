@@ -2,16 +2,7 @@ package it.nexera.ris.web.beans.pages;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.faces.application.FacesMessage;
@@ -118,13 +109,13 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private Long selectedRequestTypeId;
 
-    private List<String> selectedRequestTypes;
+    private Long[] selectedRequestTypes;
 
     private List<SelectItem> requestTypes;
 
     private Long selectedServiceId;
 
-    private List<String> selectedServiceIds;
+    private Long[] selectedServiceIds;
 
     private List<SelectItem> services;
 
@@ -274,6 +265,12 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private List<RequestView> regSubjectList;
 
+    private String cdr;
+
+    private String ndg;
+
+    private String position;
+
     @Override
     protected void preLoad() throws PersistenceBeanException {
         setMultiRequestMap(new HashMap());
@@ -363,8 +360,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         boolean dataFromEmail = false;
         setClientSelectItemWrapperConverter(new SelectItemWrapperConverter<>(Client.class));
         if (!ValidationHelper.isNullOrEmpty(getMail())) {
-            getEntity().setNdg(!ValidationHelper.isNullOrEmpty(getMail().getNdg()) ? getMail().getNdg() : null);
-            getEntity().setCdr(!ValidationHelper.isNullOrEmpty(getMail().getCdr()) ? getMail().getCdr() : null);
+//            setNdg(!ValidationHelper.isNullOrEmpty(getMail().getNdg()) ? getMail().getNdg() : null);
+//            setCdr(!ValidationHelper.isNullOrEmpty(getMail().getCdr()) ? getMail().getCdr() : null);
             if ((!ValidationHelper.isNullOrEmpty(getMail().getManagers()) ||
                     !ValidationHelper.isNullOrEmpty(getMail().getClientFiduciary()))) {
                 presetParamsFromMail(getMail());
@@ -444,6 +441,21 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             setSelectedNotaryId(getEntity().getNotary().getId());
         }
 
+
+        if (getEntity().getCdr() != null) {
+            setCdr(getEntity().getCdr());
+        }
+
+
+        if (getEntity().getNdg() != null) {
+            setNdg(getEntity().getNdg());
+        }
+
+
+        if (getEntity().getPosition() != null) {
+            setPosition(getEntity().getPosition());
+        }
+
         onClientChange(dataFromEmail);
         setSelectedAgencyId(getEntity().getAgency() != null ? getEntity().getAgency().getId() : null);
         setSelectedAgencyOfficeId(getEntity().getOffice() != null ? getEntity().getOffice().getId() : null);
@@ -455,8 +467,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         setRequestTypes(ComboboxHelper.fillList(RequestType.class));
         if(isMultipleRequestCreate()){
             if(getEntity().getRequestType() != null){
-                setSelectedRequestTypes(new ArrayList());
-                getSelectedRequestTypes().add(getEntity().getRequestType().getId().toString());
+                Long[] requestTypes = {getEntity().getRequestType().getId()};
+                setSelectedRequestTypes(requestTypes);
                 getMultiRequestMap().put(getEntity().getRequestType().getId(),getEntity());
             }
         }else{
@@ -467,15 +479,21 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
         setSelectedServiceId(getEntity().getService() != null ? getEntity().getService().getId() : null);
 
-        setSelectedServiceIds(getEntity().getMultipleServices() != null
+        List<Long> serviceIdsList = getEntity().getMultipleServices() != null
                 ? getEntity().getMultipleServices().stream()
-                .map(Service::getId).map(i -> Long.toString(i)).collect(Collectors.toList()) : null);
+                .map(Service::getId).collect(Collectors.toList()) : null;
+
+        if(serviceIdsList != null && !serviceIdsList.isEmpty())
+            setSelectedServiceIds(serviceIdsList.toArray(new Long[serviceIdsList.size()]));
+        else
+            setSelectedServiceIds(new Long[1]);
+
 
         if(isMultipleRequestCreate()
                 && ValidationHelper.isNullOrEmpty(getEntity().getMultipleServices()) &&
                 !ValidationHelper.isNullOrEmpty(getEntity().getService())){
-            setSelectedServiceIds(new ArrayList<>());
-            getSelectedServiceIds().add(getEntity().getService().getId().toString());
+            Long [] serviceId = {getEntity().getService().getId()};
+            setSelectedServiceIds(serviceId);
         }
         onServiceChange();
         fillRequestEnumTypes();
@@ -501,7 +519,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 getAttachments().add(attachment);
             }
         }
-        setWrapper(new RequestWrapper(getEntity(), isMultipleCreate()));
+        setWrapper(new RequestWrapper(getEntity(), isMultipleCreate(), false));
         setSubject(getEntity().getSubject() != null ? getEntity().getSubject() : new Subject());
         setResidence(getEntity().getResidence() != null ? getEntity().getResidence() : new Residence());
         setDomicile(getEntity().getDomicile() != null ? getEntity().getDomicile() : new Residence());
@@ -523,6 +541,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 setSelectedClientId(mail.getClient().getId());
             }
         }
+        openRequestSubjectDialog();
     }
 
     private void fillRequestEnumTypes() {
@@ -596,8 +615,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             if(isMultipleRequestCreate()){
                 addMenuItem(ResourcesHelper.getString("requestSubjectTab"));
                 addMenuItem(ResourcesHelper.getString("requestFirstTab"));
-                addMenuItem(ResourcesHelper.getString("requestLastTab"));
                 addMenuItem(ResourcesHelper.getString("requestServiceTab"));
+                addMenuItem(ResourcesHelper.getString("requestLastTab"));
             }else{
                 addMenuItem(ResourcesHelper.getString("requestSubjectTab"));
                 addMenuItem(ResourcesHelper.getString("requestFirstTab"));
@@ -835,16 +854,9 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     }
 
-    public void onRequestTypeChangeBlock() throws IllegalAccessException, PersistenceBeanException {
-        RequestContext.getCurrentInstance().execute("jQuery('.layout-mask')[0].style.display = 'block';");
-        onRequestTypeChange();
-        RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 2000);");
-    }
-
     public void onRequestTypeChange() throws IllegalAccessException, PersistenceBeanException {
         if(isMultipleRequestCreate() && !ValidationHelper.isNullOrEmpty(getSelectedRequestTypes())){
-            List<Long> reqTypeIds = getSelectedRequestTypes().stream().map(Long::parseLong)
-                    .collect(Collectors.toList());
+            List<Long> reqTypeIds = Arrays.asList(getSelectedRequestTypes());
             setServices(RequestHelper.onRequestTypeChange(reqTypeIds, isMultipleCreate()));
         }else{
             setServices(RequestHelper.onRequestTypeChange(getSelectedRequestTypeId(), isMultipleCreate()));
@@ -856,16 +868,9 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         generateMenuModel();
     }
 
-    public void onMultipleServiceChangeBlock() throws PersistenceBeanException, IllegalAccessException {
-        RequestContext.getCurrentInstance().execute("jQuery('.layout-mask')[0].style.display = 'block';");
-        onMultipleServiceChange();
-        RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 2000);");
-    }
-
     public void onMultipleServiceChange() throws PersistenceBeanException, IllegalAccessException {
         if(!ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
-            setInputCardList(RequestHelper.onMultipleServiceChange(getSelectedServiceIds().stream().map(Long::parseLong)
-                    .collect(Collectors.toList()),isMultipleRequestCreate()));
+            setInputCardList(RequestHelper.onMultipleServiceChange(Arrays.asList(getSelectedServiceIds()),isMultipleRequestCreate()));
         }
         if(isMultipleRequestCreate()){
             generateTab();
@@ -1185,11 +1190,11 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 checkSubjectMastery();
                 break;
             case CDR:
-                if (ValidationHelper.isNullOrEmpty(getEntity().getCdr()))
+                if (ValidationHelper.isNullOrEmpty(getCdr()))
                     addRequiredFieldException(DocumentValidation.CDR.name());
                 break;
             case NDG:
-                if (ValidationHelper.isNullOrEmpty(getEntity().getNdg()))
+                if (ValidationHelper.isNullOrEmpty(getNdg()))
                     addRequiredFieldException(DocumentValidation.NDG.name());
                 break;
             case ULTIMA_RESIDENZA:
@@ -1323,8 +1328,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     public void onSave() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         List<Long> selectedServiceReqType = new ArrayList();
         if(isMultipleRequestCreate()){
-            selectedServiceReqType = getSelectedRequestTypes().stream().map(Long::parseLong)
-                    .collect(Collectors.toList());
+            selectedServiceReqType = Arrays.asList(getSelectedRequestTypes());
         }else{
             selectedServiceReqType.add(getSelectedRequestTypeId());
         }
@@ -1361,6 +1365,22 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 getEntity().setBillingClient(null);
             }
 
+            if (!ValidationHelper.isNullOrEmpty(this.getCdr()))
+                getEntity().setCdr(this.getCdr());
+            else
+                getEntity().setCdr(null);
+
+            if (!ValidationHelper.isNullOrEmpty(this.getNdg()))
+                getEntity().setNdg(this.getNdg());
+            else
+                getEntity().setNdg(null);
+
+            if (!ValidationHelper.isNullOrEmpty(this.getPosition()))
+                getEntity().setPosition(this.getPosition());
+            else
+                getEntity().setPosition(null);
+
+
             if (!ValidationHelper.isNullOrEmpty(getFiduciaryClientsSelected())) {
                 getEntity().setRequestMangerList(new ArrayList<>());
                 List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
@@ -1383,8 +1403,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             getEntity().setRequestType(DaoManager.get(RequestType.class, requestTypeId));
             if (isMultipleCreate()) {
                 List<Service> serviceList = DaoManager.load(Service.class, new Criterion[]{
-                        Restrictions.in("id", getSelectedServiceIds().stream()
-                                .map(Long::parseLong).collect(Collectors.toList()))
+                        Restrictions.in("id", Arrays.asList(getSelectedServiceIds()).stream().collect(Collectors.toList()))
                 });
                 if(isMultipleRequestCreate()){
                     serviceList = serviceList.stream().filter(service -> requestTypeId.equals(service.getRequestType().getId())).collect(Collectors.toList());
@@ -1971,6 +1990,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         getWrapper().saveFields(entity);
         saveMultipleSubjects(entity);
         List<Request> sameRequestList = getSameRequestsIfExist(entity);
+        System.out.println(">>>>>>>>>>>>>>>>. " + entity.getCdr());
         if (!findAppropriateRequest(sameRequestList)) {
             saveToDB(entity, false);
         } else {
@@ -2269,7 +2289,6 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     }
 
     public void validateMultipleRequest(boolean redirect) throws IllegalAccessException, PersistenceBeanException, InstantiationException {
-        executeJS("PF('requestSaved').show();");
         boolean isShowConfirm = false;
         setRedirected(redirect);
         if (multipleCreate && getEntity().isNew()) {
@@ -2280,7 +2299,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                     }, Order.desc("createDate"));
             for(Request req : emptyIfNull(listRequestBySubject)){
                 if(!ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
-                    isShowConfirm = emptyIfNull(req.getMultipleServices()).stream().anyMatch(s -> getSelectedServiceIds().contains(s.getId().toString()));
+                    isShowConfirm = emptyIfNull(req.getMultipleServices()).stream().anyMatch(s -> Arrays.asList(getSelectedServiceIds()).contains(s.getId()));
                     if(isShowConfirm)
                         break;
                 }
@@ -2291,14 +2310,35 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                                 DateTimeHelper.getDatePatternWithSeconds())));
             }
         }
-        executeJS("setTimeout(function(){PF('requestSaved').hide();}, 2000);");
         if (isShowConfirm) {
             executeJS("PF('multipleRequestSave').show();");
         } else {
+            executeJS("PF('requestSaved').show();");
+            executeJS("setTimeout(function(){PF('requestSaved').hide();}, 2000);");
+            setRunAfterSave(redirect);
             pageSave();
+            openRequestSubjectDialog();
+            setShownFields(null);
+            setSelectedRequestTypes(new Long[]{});
+            onRequestTypeChangeBlock();
+            setSelectedServiceIds(new Long[]{});
+            setInputCardList(null);
+            setWrapper(new RequestWrapper(getEntity(), isMultipleCreate(), true));
+
         }
     }
 
+    public void onRequestTypeChangeBlock() throws IllegalAccessException, PersistenceBeanException {
+        RequestContext.getCurrentInstance().execute("jQuery('.layout-mask')[0].style.display = 'block';");
+        onRequestTypeChange();
+        RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 2000);");
+    }
+
+    public void onMultipleServiceChangeBlock() throws PersistenceBeanException, IllegalAccessException {
+        RequestContext.getCurrentInstance().execute("jQuery('.layout-mask')[0].style.display = 'block';");
+        onMultipleServiceChange();
+        RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 2000);");
+    }
 
     public Long getSelectedClientId() {
         return selectedClientId;
@@ -2668,11 +2708,11 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         this.multipleCreate = multipleCreate;
     }
 
-    public List<String> getSelectedServiceIds() {
+    public Long[] getSelectedServiceIds() {
         return selectedServiceIds;
     }
 
-    public void setSelectedServiceIds(List<String> selectedServiceIds) {
+    public void setSelectedServiceIds(Long[] selectedServiceIds) {
         this.selectedServiceIds = selectedServiceIds;
     }
 
@@ -2992,16 +3032,17 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     /**
      * @return the selectedRequestTypes
      */
-    public List<String> getSelectedRequestTypes() {
+    public Long[] getSelectedRequestTypes() {
         return selectedRequestTypes;
     }
 
     /**
      * @param selectedRequestTypes the selectedRequestTypes to set
      */
-    public void setSelectedRequestTypes(List<String> selectedRequestTypes) {
+    public void setSelectedRequestTypes(Long[] selectedRequestTypes) {
         this.selectedRequestTypes = selectedRequestTypes;
     }
+
 
     /**
      * @return the multiRequestMap
@@ -3067,5 +3108,29 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
      */
     public void setRegSubjectList(List<RequestView> regSubjectList) {
         this.regSubjectList = regSubjectList;
+    }
+
+    public String getCdr() {
+        return cdr;
+    }
+
+    public void setCdr(String cdr) {
+        this.cdr = cdr;
+    }
+
+    public String getNdg() {
+        return ndg;
+    }
+
+    public void setNdg(String ndg) {
+        this.ndg = ndg;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
     }
 }

@@ -2,12 +2,19 @@ package it.nexera.ris.persistence.beans.entities.domain;
 
 import it.nexera.ris.common.enums.InvoiceStatus;
 import it.nexera.ris.common.enums.VatCollectability;
+import it.nexera.ris.common.exceptions.PersistenceBeanException;
+import it.nexera.ris.common.helpers.DateTimeHelper;
+import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
+import it.nexera.ris.persistence.beans.entities.PaymentInvoice;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
+import org.hibernate.criterion.Restrictions;
 
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "invoice")
@@ -25,7 +32,7 @@ public class Invoice extends IndexedEntity implements Serializable {
 	@Column(name = "date")
     private Date date;	
 	
-	@Column(name = "notes")
+	@Column(name = "causal")
     private String notes;	
 	
     @ManyToOne
@@ -54,8 +61,36 @@ public class Invoice extends IndexedEntity implements Serializable {
 	@Column(name = "status")
 	private InvoiceStatus status;
 
+	@ManyToOne
+	@JoinColumn(name = "manager_id")
+	private Client manager;
+
+	@ManyToOne
+	@JoinColumn(name = "office_id")
+	private Office office;
+
+	@Column(name = "ndg")
+	private String ndg;
+
+	@Column(name = "pratica")
+	private String practice;
+
+	@ManyToOne
+	@JoinColumn(name = "mail_id")
+	private WLGInbox email;
+
 	@Transient
 	private String documentType;
+
+	@Transient
+	private Double totalAmount;
+
+	@Transient
+	private Double onBalance;
+
+	@Transient
+	private String dateString;
+
 
 	public Long getCloudId() {
 		return cloudId;
@@ -160,4 +195,74 @@ public class Invoice extends IndexedEntity implements Serializable {
 	public void setStatus(InvoiceStatus status) {
 		this.status = status;
 	}
+
+	public Client getManager() {
+		return manager;
+	}
+
+	public void setManager(Client manager) {
+		this.manager = manager;
+	}
+
+	public Office getOffice() {
+		return office;
+	}
+
+	public void setOffice(Office office) {
+		this.office = office;
+	}
+
+	public String getNdg() {
+		return ndg;
+	}
+
+	public void setNdg(String ndg) {
+		this.ndg = ndg;
+	}
+
+	public String getPractice() {
+		return practice;
+	}
+
+	public void setPractice(String practice) {
+		this.practice = practice;
+	}
+
+	public WLGInbox getEmail() {
+		return email;
+	}
+
+	public void setEmail(WLGInbox email) {
+		this.email = email;
+	}
+
+	public Double getTotalAmount() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+		List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, Restrictions.eq("invoice.id", this.getId()));
+		double totalAmount = 0.0;
+		for(InvoiceItem invoiceItem : invoiceItems) {
+			Double total = invoiceItem.getAmount().doubleValue() + invoiceItem.getVatAmount().doubleValue();
+			totalAmount = totalAmount + total;
+		}
+		return totalAmount;
+	}
+
+	public Double getOnBalance() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+		List<PaymentInvoice> paymentInvoices = DaoManager.load(PaymentInvoice.class, Restrictions.eq("invoice.id", this.getId()));
+		double paymentImportTotal = 0.0;
+		for(PaymentInvoice invoiceItem : paymentInvoices) {
+			Double total = invoiceItem.getPaymentImport().doubleValue();
+			paymentImportTotal = paymentImportTotal + total;
+		}
+		Double onBalance = getTotalAmount().doubleValue() - paymentImportTotal;
+		return onBalance;
+	}
+
+	public String getDateString() {
+		if(getDate() != null) {
+			return DateTimeHelper.toFormatedStringLocal(getDate(),
+					DateTimeHelper.getDatePattern(), null);
+		}
+		return dateString;
+	}
+
 }

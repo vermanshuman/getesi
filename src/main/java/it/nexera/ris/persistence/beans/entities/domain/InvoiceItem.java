@@ -25,12 +25,16 @@ public class InvoiceItem extends IndexedEntity implements Serializable {
 	
 	@Column(name = "amount")
     private Double amount;
-	
-	@Column(name = "vat")
-	private Double vat;
+
+	@ManyToOne
+	@JoinColumn(name = "tax_rate_id")
+	private TaxRate taxRate;
 
 	@Transient
 	private Double invoiceTotalCost;
+
+	@Transient
+	private Double vat;
 
 	public Invoice getInvoice() {
 		return invoice;
@@ -64,20 +68,14 @@ public class InvoiceItem extends IndexedEntity implements Serializable {
 		this.amount = amount;
 	}
 
-	public Double getVat() {
-		return vat;
-	}
-
-	public void setVat(Double vat) {
-		this.vat = vat;
-	}	
-
 	public Double getVatAmount() {
-		if(!ValidationHelper.isNullOrEmpty(getAmount()) && !ValidationHelper.isNullOrEmpty(getVat()) &&
-				getVat() > 0){
-			return getAmount() * (getVat() / 100);
+
+		Double vat = 0.0;
+		if(!ValidationHelper.isNullOrEmpty(getTaxRate())
+				&& !ValidationHelper.isNullOrEmpty(getTaxRate().getPercentage())) {
+			vat = getTaxRate().getPercentage().doubleValue();
 		}
-		return 0.0D;
+		return getAmount() * (vat / 100);
 	}
 	
 	public Double getGrossAmount() {
@@ -91,4 +89,19 @@ public class InvoiceItem extends IndexedEntity implements Serializable {
 	public void setInvoiceTotalCost(Double invoiceTotalCost) {
 		this.invoiceTotalCost = invoiceTotalCost;
 	}
+
+	public TaxRate getTaxRate() {
+		return taxRate;
+	}
+
+	public void setTaxRate(TaxRate taxRate) {
+		this.taxRate = taxRate;
+	}
+
+	public Double getVat() {
+		if(!ValidationHelper.isNullOrEmpty(getTaxRate()) && !ValidationHelper.isNullOrEmpty(getTaxRate().getPercentage()))
+			return getTaxRate().getPercentage().doubleValue();
+		return 0.0;
+	}
+
 }

@@ -371,7 +371,7 @@
                                             update="form:table searchPanel,editAndPrintDialog printPanel" />
                                 </div>
                                 <div class="settingsBlock">
-                                    <p:commandButton id="settingButton" onclick="loadFilterData();"
+                                    <p:commandButton id="settingButton" onclick="togglePanel();"
                                                      type="button"
                                                      styleClass="ui-button-warning-icon"
                                                      icon="ui-icon ui-icon-search pi pi-sliders-h"/>
@@ -447,7 +447,7 @@
 
                                             <div class="p-col-6">
                                                 <p:selectCheckboxMenu id="statuses" style="width: 100%;min-height: 38px;" multiple="true" label="" value="#{bean.selectedStates}"
-                                                                      onclick="PF('stateSelectCheckboxWV').show();applyBorder('statuses');" styleClass="#{bean.getStateSelected() gt 0 ? ' select-checkbox' : ''}">
+                                                                      onclick="applyBorder('statuses');" styleClass="#{bean.getStateSelected() gt 0 ? ' select-checkbox' : ''}">
                                                     <f:selectItems value="#{bean.stateWrappers}" var="state" itemValue="#{state}"
                                                                    itemLabel="#{state.value}"/>
                                                 </p:selectCheckboxMenu>
@@ -1023,7 +1023,7 @@
                                     </p:outputPanel>
                                     <br/>
                                     <p:graphicImage id="info" url="/resources/images/tooltip.png"
-                                                    style="margin-top:2px;height :20px;position: absolute;margin-left: -10px"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
+                                                    style="margin-top:2px;height :20px;position: absolute;margin-left: -7px"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
                                     <p:tooltip for="info" styleClass="custom-design-tooltip">
                                         <h:outputText value="#{ff:upper(msg.requestManagers)}" style="font-weight:bold;color:#003871;"/>
                                         <br />
@@ -1048,7 +1048,7 @@
                                         <h:outputText id="service" value="#{item.serviceName}" rendered="#{item.serviceName ne null}"/>
                                         <br/>
                                         <p:graphicImage id="multipleservice" url="/resources/images/tooltip.png"
-                                                        style="height :20px;;margin-left: -30px;position: absolute;"  rendered="#{not empty item.multipleServices}" />
+                                                        style="height :20px;;margin-left: -27px;position: absolute;"  rendered="#{not empty item.multipleServices}" />
                                         <p:tooltip for="multipleservice" styleClass="custom-design-tooltip" rendered="#{not empty item.multipleServices}">
                                             <ui:repeat var="ele" value="#{item.multipleServices}" varStatus="service">
                                                 <h:outputText value="#{ele}" escape="false" style="color:#003871;margin-left: 24px;"/>

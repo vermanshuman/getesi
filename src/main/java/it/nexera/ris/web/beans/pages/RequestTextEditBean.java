@@ -196,7 +196,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     private Double invoiceItemAmount;
 
-    private Double invoiceItemVat;
+   // private Double invoiceItemVat;
 
     private Double invoiceTotalCost;
 
@@ -229,6 +229,8 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     private Boolean billinRequest;
 
     private Boolean showRequestCost = Boolean.TRUE;
+
+    private Long selectedTaxRateId;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
@@ -311,11 +313,9 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         setMaxInvoiceNumber();
         if(!ValidationHelper.isNullOrEmpty(getExamRequest().getTotalCostDouble()))
             setInvoiceTotalCost(Double.parseDouble(getExamRequest().getTotalCostDouble()));
-        vatAmounts = new ArrayList<>();
-        vatAmounts.add(new SelectItem(0D, "0%"));
-        vatAmounts.add(new SelectItem(4D, "4%"));
-        vatAmounts.add(new SelectItem(10D, "10%"));
-        vatAmounts.add(new SelectItem(22D, "22%"));
+        setVatAmounts(ComboboxHelper.fillList(TaxRate.class, Order.asc("description"), new CriteriaAlias[]{}, new Criterion[]{
+                Restrictions.eq("use", Boolean.TRUE)
+        }, true, false));
 
         docTypes = new ArrayList<>();
         docTypes.add(new SelectItem("FE", "FATTURA"));
@@ -343,7 +343,9 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
             for(InvoiceItem invoiceItem : invoiceItems) {
                 setInvoiceItemAmount(invoiceItem.getAmount());
-                setInvoiceItemVat(invoiceItem.getVat());
+                if(!ValidationHelper.isNullOrEmpty(invoiceItem.getTaxRate()))
+                    setSelectedTaxRateId(invoiceItem.getTaxRate().getId());
+              //  setInvoiceItemVat(invoiceItem.getVat());
             }
         }
         if(getExamRequest().getStateId().equals(RequestState.SENT_TO_SDI.getId()))
@@ -2422,7 +2424,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             setValidationFailed(true);
         }
 
-        if(ValidationHelper.isNullOrEmpty(getInvoiceItemVat())){
+        if(ValidationHelper.isNullOrEmpty(getSelectedTaxRateId())){
             addRequiredFieldException("form:invoiceVat");
             setValidationFailed(true);
         }
@@ -2450,7 +2452,10 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                     && !ValidationHelper.isNullOrEmpty(getExamRequest().getSubject())){
                 invoiceItem.setSubject(getExamRequest().getSubject().toString());
                 invoiceItem.setAmount(getInvoiceItemAmount());
-                invoiceItem.setVat(getInvoiceItemVat());
+                if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateId())){
+                    invoiceItem.setTaxRate(DaoManager.get(TaxRate.class, getSelectedTaxRateId()));
+                }
+                // invoiceItem.setVat(getInvoiceItemVat());
                 invoiceItem.setInvoiceTotalCost(getInvoiceTotalCost());
             }
             List<InvoiceItem> invoiceItems = new ArrayList<>();
@@ -2536,13 +2541,13 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         this.invoiceItemAmount = invoiceItemAmount;
     }
 
-    public Double getInvoiceItemVat() {
-        return invoiceItemVat;
-    }
+//    public Double getInvoiceItemVat() {
+//        return invoiceItemVat;
+//    }
 
-    public void setInvoiceItemVat(Double invoiceItemVat) {
-        this.invoiceItemVat = invoiceItemVat;
-    }
+   // public void setInvoiceItemVat(Double invoiceItemVat) {
+      //  this.invoiceItemVat = invoiceItemVat;
+   // }
 
     public Double getInvoiceTotalCost() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         if(!ValidationHelper.isNullOrEmpty(getExamRequest())){
@@ -2573,9 +2578,15 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
         if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost())){
             totalGrossAmount += getInvoiceTotalCost();
-            if(!ValidationHelper.isNullOrEmpty(getInvoiceItemVat())){
-                totalGrossAmount += (getInvoiceTotalCost() * (getInvoiceItemVat()/100));
+            if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateId())){
+                TaxRate taxrate = DaoManager.get(TaxRate.class, getSelectedTaxRateId());
+                if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
+                    totalGrossAmount += (getInvoiceTotalCost() * (taxrate.getPercentage().doubleValue()/100));
+                }
             }
+//            if(!ValidationHelper.isNullOrEmpty(getInvoiceItemVat())){
+//                totalGrossAmount += (getInvoiceTotalCost() * (getInvoiceItemVat()/100));
+//            }
         }
         return totalGrossAmount;
     }
@@ -2638,10 +2649,19 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     public Double getTotalVat() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         Double totalVat = 0D;
-        if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost()) &&
-                !ValidationHelper.isNullOrEmpty(getInvoiceItemVat()) && getInvoiceItemVat() > 0)
-            totalVat += getInvoiceTotalCost() * (getInvoiceItemVat()/100);
 
+        if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost())){
+            if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateId())){
+                TaxRate taxrate = DaoManager.get(TaxRate.class, getSelectedTaxRateId());
+                if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
+                    totalVat += getInvoiceTotalCost() * (taxrate.getPercentage().doubleValue()/100);
+                }
+            }
+        }
+//
+//        if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost()) &&
+//                !ValidationHelper.isNullOrEmpty(getInvoiceItemVat()) && getInvoiceItemVat() > 0)
+//            totalVat += getInvoiceTotalCost() * (getInvoiceItemVat()/100);
         return totalVat;
     }
 
@@ -2700,5 +2720,13 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     public void setShowRequestCost(Boolean showRequestCost) {
         this.showRequestCost = showRequestCost;
+    }
+
+    public Long getSelectedTaxRateId() {
+        return selectedTaxRateId;
+    }
+
+    public void setSelectedTaxRateId(Long selectedTaxRateId) {
+        this.selectedTaxRateId = selectedTaxRateId;
     }
 }

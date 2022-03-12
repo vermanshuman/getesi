@@ -242,6 +242,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         String tablePage = getRequestParameter(RedirectHelper.TABLE_PAGE);
         if (!ValidationHelper.isNullOrEmpty(tablePage) && !"null".equalsIgnoreCase(tablePage)) {
             setTablePage(Integer.parseInt(tablePage));
+            setCurrentPageNumber(getTablePage());
         }
         setAvailableStates(new ArrayList<>());
         setSelectedInboxes(new ArrayList<>());
@@ -360,12 +361,18 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         if(getRowsPerPage() == 0)
             setRowsPerPage(15);
 
-        value = getSessionValue(KEY_PAGE_NUMBER);
-        if (!ValidationHelper.isNullOrEmpty(value)) {
-            setTablePage(Integer.parseInt(value));
-        } else {
-            setTablePage(0);
+        if(ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.TABLE_PAGE))){
+           value = getSessionValue(KEY_PAGE_NUMBER);
+        }else {
+            String tablePage = getRequestParameter(RedirectHelper.TABLE_PAGE);
+            if (!ValidationHelper.isNullOrEmpty(tablePage) && !"null".equalsIgnoreCase(tablePage)) {
+                value = tablePage;
+            }
         }
+        if(!ValidationHelper.isNullOrEmpty(value))
+            setTablePage(Integer.parseInt(value));
+        else
+            setTablePage(0);
 //        executeJS("if (PF('tableWV').getPaginator() != null ) " +
 //                "PF('tableWV').getPaginator().setPage(" + getTablePage() + ");");
     }
@@ -1433,7 +1440,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
 //                        pageEnd = getTotalPages();
 //                    System.out.println("Current page " + currentPage + " pageEnd " + pageEnd);
 //                    for(int i = currentPage; i <= pageEnd;i++ ){
-//                        builder.append("<a class=\"ui-paginator-page ui-state-default ui-corner-all page_" + i + "\"");
+//                        builder.append("<a class=\"ui-Tapaginator-page ui-state-default ui-corner-all page_" + i + "\"");
 //                        builder.append("tabindex=\"0\" href=\"#\" onclick=\"changePage(" + i + ")\">" + i +"</a>");
 //                    }
 //                    setPaginatorString(builder.toString());

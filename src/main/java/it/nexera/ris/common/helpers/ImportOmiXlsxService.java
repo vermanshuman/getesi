@@ -143,12 +143,13 @@ public class ImportOmiXlsxService extends BaseService {
             omiValue.setCategoryCode((long) codeCell.getNumericCellValue());
             omiValue.setCityDescription(cityDescriptionCell.getStringCellValue());
             omiValue.setZone(zoneCell.getStringCellValue());
-            omiValue.setComprMin((long) comprMinCell.getNumericCellValue());
-            omiValue.setComprMax((long) comprMaxCell.getNumericCellValue());
             if(stateCell != null)
             	omiValue.setState(stateCell.getStringCellValue());
-            result.add(omiValue);
-
+            if(!ValidationHelper.isNullOrEmpty(comprMinCell) && !ValidationHelper.isNullOrEmpty(comprMaxCell.getNumericCellValue())){
+                omiValue.setComprMin((long) comprMinCell.getNumericCellValue());
+                omiValue.setComprMax((long) comprMaxCell.getNumericCellValue());
+                result.add(omiValue);
+            }
             getProcessMonitor().setStartValue(++i);
             if (i % step == 0) {
                 socketPush();

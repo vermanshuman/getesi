@@ -171,7 +171,7 @@ public class BillingListOldBean extends EntityLazyListPageBean<RequestView>
 
     private Double invoiceItemAmount;
 
-    private Double invoiceItemVat;
+   // private Double invoiceItemVat;
 
     private Double invoiceTotalCost;
 
@@ -208,6 +208,8 @@ public class BillingListOldBean extends EntityLazyListPageBean<RequestView>
     String invoiceErrorMessage;
 
     private boolean invoiceSentStatus;
+
+    private Long selectedTaxRateId;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -1821,22 +1823,33 @@ public class BillingListOldBean extends EntityLazyListPageBean<RequestView>
 
 
     public Double getTotalGrossAmount() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+
         Double totalGrossAmount = 0D;
-        if (!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost())) {
+
+        if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost())){
             totalGrossAmount += getInvoiceTotalCost();
-            if (!ValidationHelper.isNullOrEmpty(getInvoiceItemVat())) {
-                totalGrossAmount += (getInvoiceTotalCost() * (getInvoiceItemVat() / 100));
+            if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateId())){
+                TaxRate taxrate = DaoManager.get(TaxRate.class, getSelectedTaxRateId());
+                if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
+                    totalGrossAmount += (getInvoiceTotalCost() * (taxrate.getPercentage().doubleValue()/100));
+                }
             }
+//            if(!ValidationHelper.isNullOrEmpty(getInvoiceItemVat())){
+//                totalGrossAmount += (getInvoiceTotalCost() * (getInvoiceItemVat()/100));
+//            }
         }
         return totalGrossAmount;
     }
-
     public Double getTotalVat() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         Double totalVat = 0D;
-        if (!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost()) &&
-                !ValidationHelper.isNullOrEmpty(getInvoiceItemVat()) && getInvoiceItemVat() > 0)
-            totalVat += getInvoiceTotalCost() * (getInvoiceItemVat() / 100);
-
+        if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost())){
+            if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateId())){
+                TaxRate taxrate = DaoManager.get(TaxRate.class, getSelectedTaxRateId());
+                if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
+                    totalVat += getInvoiceTotalCost() * (taxrate.getPercentage().doubleValue()/100);
+                }
+            }
+        }
         return totalVat;
     }
 
@@ -1852,7 +1865,7 @@ public class BillingListOldBean extends EntityLazyListPageBean<RequestView>
             setValidationFailed(true);
         }
 
-        if (ValidationHelper.isNullOrEmpty(getInvoiceItemVat())) {
+        if(ValidationHelper.isNullOrEmpty(getSelectedTaxRateId())){
             addRequiredFieldException("form:invoiceVat");
             setValidationFailed(true);
         }
@@ -1879,7 +1892,9 @@ public class BillingListOldBean extends EntityLazyListPageBean<RequestView>
                     && !ValidationHelper.isNullOrEmpty(getExamRequest().getSubject())) {
                 invoiceItem.setSubject(getExamRequest().getSubject().toString());
                 invoiceItem.setAmount(getInvoiceItemAmount());
-                invoiceItem.setVat(getInvoiceItemVat());
+                if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateId())){
+                    invoiceItem.setTaxRate(DaoManager.get(TaxRate.class, getSelectedTaxRateId()));
+                }
                 invoiceItem.setInvoiceTotalCost(getInvoiceTotalCost());
                 invoiceItem.setDescription(getInvoiceNote());
             }
@@ -1929,5 +1944,13 @@ public class BillingListOldBean extends EntityLazyListPageBean<RequestView>
             LogHelper.log(log, e);
             executeJS("PF('sendInvoiceErrorDialogWV').show();");
         }
+    }
+
+    public Long getSelectedTaxRateId() {
+        return selectedTaxRateId;
+    }
+
+    public void setSelectedTaxRateId(Long selectedTaxRateId) {
+        this.selectedTaxRateId = selectedTaxRateId;
     }
 }

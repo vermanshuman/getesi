@@ -13,168 +13,168 @@
 
     <ui:define name="view_body">
         <ui:fragment>
-        	<h:form>
-        
-            <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group" layout="grid" id="initialTab"
-                         style="margin-top: 1%">
-              <p:column>
-                    <span> #{msg.invoiceClient}<span class="red">*</span>:</span><br/>
-                    <p:selectOneMenu id="client" value="#{bean.selectedClientId}"
-                                     label="#{msg.invoiceClient}" styleClass="select-width">
-                       <p:ajax listener="#{bean.onClientChange}"
-                                update="paymentType"/>
-                        <f:selectItems value="#{bean.clients}"/>
-                    </p:selectOneMenu>
-              </p:column>
-              
-               <p:column>
-                    <span> #{msg.invoicePaymentType}<span class="red">*</span>:</span><br/>
-                    <p:selectOneMenu id="paymentType" value="#{bean.selectedPaymentTypeId}"
-                                     label="#{msg.invoicePaymentType}" styleClass="select-width">
-                       <!-- <p:ajax listener="#{bean.onClientChange}"
-                                update="invoicesRecipient, :form:branchPanel, :form:officePanel"/> -->
-                        <f:selectItems value="#{bean.paymentTypes}"/>
-                    </p:selectOneMenu>
-              </p:column>
-              
-            <p:column>  
-            <span> #{msg.invoiceSplitPayment}:<span class="red">*</span>:</span><br/>
-            <p:selectBooleanCheckbox value="#{bean.splitPayment}"/>
-			</p:column>
+            <h:form>
 
-			<p:column>
-		     <span> #{msg.invoiceDate}:<span class="red">*</span>:</span><br/>
-            <p:calendar id="date" value="#{bean.date}" pattern="dd/MM/yyyy"  
-            />
-            </p:column>
-              
-              <p:column>
-                    <span> #{msg.fiscalCode}<span class="red">*</span>:</span><br/>
-			<p:inputText value="#{bean.fiscalCode}" />
-              </p:column>
-              
-  			<p:column>
-  
-   			<span> #{msg.invoiceNotes}:<span class="red">*</span>:</span><br/>
-            <p:inputTextarea rows="6" cols="33" value="#{bean.notes}" />
-            
-            </p:column>
-            
-            
-            
-            <p:column>
-            
-            <p:commandButton style="float: right"
-             action="#{bean.pageSave}" value="#{msg.save.toUpperCase()}" />
-            
-            </p:column>
-            
-            
-             
-    		</p:panelGrid>
-		
-			</h:form>
-		
-		 		<p:commandButton value="#{msg.invoiceAddNewItem}" action="#{bean.showNewInvoiceItemDialog}" 
-		 			oncomplete="PF('itemDialogWV').show();" update="itemDialog"/>
-		
-		        <p:dataTable var="item" id="table"
-                     emptyMessage="#{msg.noRecordsFound}" value="#{bean.invoiceItems}"
-                     rowKey="#{item.id}" rows="10" paginator="true"
-                     paginatorAlwaysVisible="true" rowIndexVar="rowId"
-                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                     rowsPerPageTemplate="10,20,50" widgetVar="tableWV">
-		     
-			<p:column headerText="#{msg.subject}" sortBy="#{item.subject}" style="width: 144px; text-align: center;">
-				<h:outputText value="#{item.subject}" />
-			</p:column>
-		     
-			<p:column headerText="#{msg.description}" sortBy="#{item.description}" style="width: 144px; text-align: center;">
-				<h:outputText value="#{item.description}" />
-			</p:column>
-			
-			<p:column headerText="#{msg.invoiceItemAmount}" sortBy="#{item.amount}" style="width: 144px; text-align: center;">
-				<h:outputText value="#{item.amount}" />
-			</p:column>
-			
-			<p:column headerText="#{msg.invoiceItemVat}" sortBy="#{item.vat}" style="width: 144px; text-align: center;">
-				<h:outputText value="#{item.vat}" />
-			</p:column>
-		     
-			<p:column>
-				<p:commandButton value="#{msg.edit}" action="#{bean.showEditInvoiceItemDialog}" update="table, itemDialog"
-				 oncomplete="PF('itemDialogWV').show();">
-					<f:setPropertyActionListener value="#{item}" target="#{bean.selectedItem}"/>
-				</p:commandButton>
-			</p:column>
-			
-			<p:column>
-				<p:commandButton value="#{msg.delete}" action="#{bean.deleteInvoiceItem}" update="table, totalAmount, totalVat, totalGrossAmount">
-					<f:setPropertyActionListener value="#{item}" target="#{bean.selectedItem}"/>
-				</p:commandButton>
-			</p:column>
-		     
-		     </p:dataTable>
-		     
-		     <br/>
-		     
-		     <h:outputText id="totalAmount" value="#{msg.invoiceTotalAmount}: #{bean.totalAmount}" /><br/>
-		     <h:outputText id="totalVat" value="#{msg.invoiceTotalVat}: #{bean.totalVat}" /><br/>
-		     <h:outputText id="totalGrossAmount" value="#{msg.invoiceTotalGrossAmount}: #{bean.totalGrossAmount}" /><br/>   
-		      
-		     
-    	</ui:fragment>
+                <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group" layout="grid" id="initialTab"
+                             style="margin-top: 1%">
+                    <p:column>
+                        <span> #{msg.invoiceClient}<span class="red">*</span>:</span><br/>
+                        <p:selectOneMenu id="client" value="#{bean.selectedClientId}"
+                                         label="#{msg.invoiceClient}" styleClass="select-width">
+                            <p:ajax listener="#{bean.onClientChange}"
+                                    update="paymentType"/>
+                            <f:selectItems value="#{bean.clients}"/>
+                        </p:selectOneMenu>
+                    </p:column>
 
-	<p:dialog widgetVar="itemErrorDialogWV" modal="true" draggable="false"
+                    <p:column>
+                        <span> #{msg.invoicePaymentType}<span class="red">*</span>:</span><br/>
+                        <p:selectOneMenu id="paymentType" value="#{bean.selectedPaymentTypeId}"
+                                         label="#{msg.invoicePaymentType}" styleClass="select-width">
+                            <!-- <p:ajax listener="#{bean.onClientChange}"
+                                     update="invoicesRecipient, :form:branchPanel, :form:officePanel"/> -->
+                            <f:selectItems value="#{bean.paymentTypes}"/>
+                        </p:selectOneMenu>
+                    </p:column>
+
+                    <p:column>
+                        <span> #{msg.invoiceSplitPayment}:<span class="red">*</span>:</span><br/>
+                        <p:selectBooleanCheckbox value="#{bean.splitPayment}"/>
+                    </p:column>
+
+                    <p:column>
+                        <span> #{msg.invoiceDate}:<span class="red">*</span>:</span><br/>
+                        <p:calendar id="date" value="#{bean.date}" pattern="dd/MM/yyyy"
+                        />
+                    </p:column>
+
+                    <p:column>
+                        <span> #{msg.fiscalCode}<span class="red">*</span>:</span><br/>
+                        <p:inputText value="#{bean.fiscalCode}" />
+                    </p:column>
+
+                    <p:column>
+
+                        <span> #{msg.invoiceNotes}:<span class="red">*</span>:</span><br/>
+                        <p:inputTextarea rows="6" cols="33" value="#{bean.notes}" />
+
+                    </p:column>
+
+
+
+                    <p:column>
+
+                        <p:commandButton style="float: right"
+                                         action="#{bean.pageSave}" value="#{msg.save.toUpperCase()}" />
+
+                    </p:column>
+
+
+
+                </p:panelGrid>
+
+            </h:form>
+
+            <p:commandButton value="#{msg.invoiceAddNewItem}" action="#{bean.showNewInvoiceItemDialog}"
+                             oncomplete="PF('itemDialogWV').show();" update="itemDialog"/>
+
+            <p:dataTable var="item" id="table"
+                         emptyMessage="#{msg.noRecordsFound}" value="#{bean.invoiceItems}"
+                         rowKey="#{item.id}" rows="10" paginator="true"
+                         paginatorAlwaysVisible="true" rowIndexVar="rowId"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,20,50" widgetVar="tableWV">
+
+                <p:column headerText="#{msg.subject}" sortBy="#{item.subject}" style="width: 144px; text-align: center;">
+                    <h:outputText value="#{item.subject}" />
+                </p:column>
+
+                <p:column headerText="#{msg.description}" sortBy="#{item.description}" style="width: 144px; text-align: center;">
+                    <h:outputText value="#{item.description}" />
+                </p:column>
+
+                <p:column headerText="#{msg.invoiceItemAmount}" sortBy="#{item.amount}" style="width: 144px; text-align: center;">
+                    <h:outputText value="#{item.amount}" />
+                </p:column>
+
+                <p:column headerText="#{msg.invoiceItemVat}" sortBy="#{item.taxRate}" style="width: 144px; text-align: center;">
+                    <h:outputText value="#{item.taxRate}" />
+                </p:column>
+
+                <p:column>
+                    <p:commandButton value="#{msg.edit}" action="#{bean.showEditInvoiceItemDialog}" update="table, itemDialog"
+                                     oncomplete="PF('itemDialogWV').show();">
+                        <f:setPropertyActionListener value="#{item}" target="#{bean.selectedItem}"/>
+                    </p:commandButton>
+                </p:column>
+
+                <p:column>
+                    <p:commandButton value="#{msg.delete}" action="#{bean.deleteInvoiceItem}" update="table, totalAmount, totalVat, totalGrossAmount">
+                        <f:setPropertyActionListener value="#{item}" target="#{bean.selectedItem}"/>
+                    </p:commandButton>
+                </p:column>
+
+            </p:dataTable>
+
+            <br/>
+
+            <h:outputText id="totalAmount" value="#{msg.invoiceTotalAmount}: #{bean.totalAmount}" /><br/>
+            <h:outputText id="totalVat" value="#{msg.invoiceTotalVat}: #{bean.totalVat}" /><br/>
+            <h:outputText id="totalGrossAmount" value="#{msg.invoiceTotalGrossAmount}: #{bean.totalGrossAmount}" /><br/>
+
+
+        </ui:fragment>
+
+        <p:dialog widgetVar="itemErrorDialogWV" modal="true" draggable="false"
                   position="center center">
             <div class="ui-messages-error ui-corner-all">
                 <span class="ui-messages-error-summary">#{msg.invalidDataMsg}</span><br/>
             </div>
-	   <p:commandButton oncomplete="PF('itemErrorDialogWV').hide();" 
-	    value="#{msg.close}" /> 
-    </p:dialog>
-    
-    <p:dialog widgetVar="invoiceErrorDialogWV"  modal="true" draggable="false"
+            <p:commandButton oncomplete="PF('itemErrorDialogWV').hide();"
+                             value="#{msg.close}" />
+        </p:dialog>
+
+        <p:dialog widgetVar="invoiceErrorDialogWV"  modal="true" draggable="false"
                   position="center center">
             <div class="ui-messages-error ui-corner-all">
                 <span class="ui-messages-error-summary">#{msg.invalidDataMsg}</span><br/>
             </div>
-	    <p:commandButton oncomplete="PF('invoiceErrorDialogWV').hide();"
-	     value="#{msg.close}" /> 
-    </p:dialog>
-    
-    <p:dialog widgetVar="itemDialogWV" modal="true" minHeight="40" id="itemDialog">
-	<p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group" layout="grid" id="initialTab2"
+            <p:commandButton oncomplete="PF('invoiceErrorDialogWV').hide();"
+                             value="#{msg.close}" />
+        </p:dialog>
+
+        <p:dialog widgetVar="itemDialogWV" modal="true" minHeight="40" id="itemDialog">
+            <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group" layout="grid" id="initialTab2"
                          style="margin-top: 1%">
-              <p:column>
+                <p:column>
                     <span> #{msg.invoiceItemSubject}<span class="red">*</span>:</span><br/>
-			<p:inputText value="#{bean.invoiceItemSubject}" />
-              </p:column>
-	      
-		<p:column>
+                    <p:inputText value="#{bean.invoiceItemSubject}" />
+                </p:column>
+
+                <p:column>
                     <span> #{msg.description}<span class="red">*</span>:</span><br/>
-			<p:inputText value="#{bean.invoiceItemDescription}" />
-              </p:column>
-	
-	
-		<p:column>
+                    <p:inputText value="#{bean.invoiceItemDescription}" />
+                </p:column>
+
+
+                <p:column>
                     <span> #{msg.invoiceItemAmount}<span class="red">*</span>:</span><br/>
-			<p:inputNumber value="#{bean.invoiceItemAmount}" />
-              </p:column>
-              
-        <p:column>
-        	<span>#{msg.invoiceItemVat}<span class="red">*</span>:</span><br/>
-        	<p:selectOneMenu id="invoiceVat" value="#{bean.invoiceItemVat}"
-                label="#{msg.invoiceVat}" styleClass="select-width">
-                   <f:selectItems value="#{bean.vatAmounts}"/>
-            </p:selectOneMenu>
-        </p:column>      
-	
-	<p:commandButton action="#{bean.completeEditInvoiceItemDialog}" value="#{msg.save}" update="table, totalAmount, totalVat, totalGrossAmount" />
-	<p:commandButton oncomplete="PF('itemDialogWV').hide();" value="#{msg.close}" update="table"/>
-				</p:panelGrid>
-            </p:dialog>
-    
+                    <p:inputNumber value="#{bean.invoiceItemAmount}" />
+                </p:column>
+
+                <p:column>
+                    <span>#{msg.invoiceItemVat}<span class="red">*</span>:</span><br/>
+                    <p:selectOneMenu id="invoiceVat" value="#{bean.selectedTaxRateId}"
+                                     label="#{msg.invoiceVat}" styleClass="select-width">
+                        <f:selectItems value="#{bean.vatAmounts}"/>
+                    </p:selectOneMenu>
+                </p:column>
+
+                <p:commandButton action="#{bean.completeEditInvoiceItemDialog}" value="#{msg.save}" update="table, totalAmount, totalVat, totalGrossAmount" />
+                <p:commandButton oncomplete="PF('itemDialogWV').hide();" value="#{msg.close}" update="table"/>
+            </p:panelGrid>
+        </p:dialog>
+
 
     </ui:define>
 </ui:composition>

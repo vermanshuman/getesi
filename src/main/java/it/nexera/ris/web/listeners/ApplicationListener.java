@@ -87,8 +87,6 @@ public class ApplicationListener implements ServletContextListener, IConnectionL
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         Locale.setDefault(Locale.ITALIAN);
 
-        System.out.println("Using JSF: " + FacesContext.class.getPackage().getImplementationVersion());
-
         initializeProps();
 
         FileHelper.setRealPath(servletContextEvent.getServletContext().getRealPath("/"));

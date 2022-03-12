@@ -232,7 +232,8 @@ public class InvoiceListBean extends EntityLazyListPageBean<Invoice>
         		article.put("descrizione", item.getDescription());
         		article.put("prezzo_lordo", item.getGrossAmount());
         		article.put("prezzo_netto", item.getAmount());
-        		article.put("cod_iva", item.getVat());
+				if(!ValidationHelper.isNullOrEmpty(item.getTaxRate()) && !ValidationHelper.isNullOrEmpty(item.getTaxRate().getPercentage()))
+					article.put("cod_iva", item.getTaxRate().getPercentage());
         		
         		articleArray.put(article);
         	}

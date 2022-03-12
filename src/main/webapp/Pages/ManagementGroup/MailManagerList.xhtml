@@ -567,13 +567,19 @@
 
                                         $(document ).ready(function() {
                                             var value = $("[name='pageNumber']").val();
-                                            if(value == 1) {
-                                                $('.page_1').addClass("ui-state-active");
-                                                $('#page_bottom_1').addClass("ui-state-active");
-                                            }else{
-                                                $('.page_1').removeClass("ui-state-active");
-                                                $('#page_bottom_1').removeClass("ui-state-active");
-                                            }
+                                            $("div[class^='page_']").each(function(i, obj) {
+                                                obj.removeClass("ui-state-active");
+                                            });
+
+                                            $('.page_' + value).addClass("ui-state-active");
+                                            $('#page_bottom_' + + value).addClass("ui-state-active");
+                                            // if(value == 1) {
+                                            //     $('.page_1').addClass("ui-state-active");
+                                            //     $('#page_bottom_1').addClass("ui-state-active");
+                                            // }else{
+                                            //     $('.page_1').removeClass("ui-state-active");
+                                            //     $('#page_bottom_1').removeClass("ui-state-active");
+                                            // }
                                         });
 
                                         function setPageNumber(){
