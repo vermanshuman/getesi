@@ -1078,9 +1078,11 @@
 								<h:outputText value="#{invoice.onBalance}"/>
 							</p:column>
 							<p:column rendered="#{invoice.email.id == null}">
-								<i class="email-icon-new"></i>
-								<i class="email-check-icon"></i>
-								<i class="menu-dots-icon"></i>
+								<div class="icon-block">
+									<i class="email-icon-new"></i>
+									<i class="email-check-icon"></i>
+									<i class="menu-dots-icon"></i>
+								</div>
 							</p:column>
 							<p:column rendered="#{invoice.email.id != null}">
 								<i class="email-icon-new"></i>

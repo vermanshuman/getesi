@@ -927,6 +927,7 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
     height: 42px;
     display: block;
     background-position-x: calc(50% + 3px);
+    background-position-y: calc(50% - 2px);
 }
 
 .menu-dots-icon {
@@ -936,4 +937,14 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
     background-size: 30px;
     height: 42px;
     display: block;
+}
+
+.icon-block {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+
+.icon-block i {
+    width: 50px;
 }
