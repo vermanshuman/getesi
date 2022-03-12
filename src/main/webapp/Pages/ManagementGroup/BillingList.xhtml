@@ -913,15 +913,15 @@
 		                <div class="p-col-12 p-md-12">
 		                    <div class="card" style="border: none !important; padding-top:0px; padding-bottom:0px; margin-top:10px;">
 		                        <div class="p-grid">
-		                            <div class="p-col-3">
+		                            <div class="p-col-3" style="padding-bottom: 0px !important;">
 		                                <div class="p-formgroup-inline">
 		                                    <div class="p-field">
 		                                        <p:commandButton value="#{msg.billingListCreateInvoice}"
-		                                                         actionListener="#{bean.createNewMail}" update="@form" styleClass="ui-button-success p-mr-2 p-mb-2"/>
+		                                                         styleClass="ui-button-success p-mr-2 p-mb-2"/>
 		                                    </div>
 		                                </div>
 		                            </div>
-		                            <div class="p-col-9">
+		                            <div class="p-col-9" style="padding-bottom: 0px !important;">
 		                                <div class="p-formgroup-inline alignEnd">
 		                                    <div class="p-field">
 		                                        <p:inputText id="filterInvoiceNumber" value="#{bean.filterInvoiceNumber}" placeholder="#{msg.billingListNumber}"/>
@@ -938,7 +938,7 @@
 		                                        <p:commandButton id="cercaButton" onclick="filterTableFromPanel();"
 		                                                    styleClass="ui-button-warning-icon" update="searchPanel" icon="ui-icon ui-icon-search pi pi-search"/>
 		                                    </div>
-		                                    <p:commandButton id="settingButton" onclick="resetData(); PF('panelSetting').toggle()" type="button"
+		                                    <p:commandButton id="settingButton" onclick="PF('panelSetting').toggle()" type="button"
 		                                                   styleClass="ui-button-warning-icon"  icon="ui-icon ui-icon-search pi pi-sliders-h"/>
 		                                    <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" collapsed="true">
 		                                        <div class="p-grid">
@@ -1024,7 +1024,7 @@
 		                                    </p:panel> 
 		                                </div>
 		                            </div>
-		                            <div class="p-col-12">
+		                            <div class="p-col-12" style="margin-top: -15px; margin-bottom: -15px;">
 		                            	<p:commandButton value="#{msg.billingListExcel}" style="float: right"/>
 		                            </div>
 		                        </div>
@@ -1062,7 +1062,7 @@
 	                        	<h:outputText value="#{invoice.notes}"/>
 	                    	</p:column>
 	                    	<p:column headerText="#{msg.billingListStatus}">
-	                    		<p:commandButton value="#{invoice.status != null ? invoice.status.toString() : ff:upper(msg.billingListDraft)}" style="width: 142px;" 
+	                    		<p:commandButton value="#{invoice.status != null ? invoice.status.toString() : ff:upper(msg.billingListDraft)}" style="width: 150px;" 
 	                    		 			styleClass="#{invoice.status == null ? 'orange-button' : (invoice.status.getId() == 1 ? 'orange-button' : (invoice.status.getId() == 3 ? 'green-button' : (invoice.status.getId() == 4 ? 'red-button' : 'button')))  }">
 	                    		</p:commandButton>
 	                    	</p:column>
@@ -1122,7 +1122,6 @@
             	$("#filterNotes").val("");
             	$("#filterNdg").val("");
             	$("#filterPractice").val("");
-            	resetTableData();
             	return true;
             }
 		</script>
