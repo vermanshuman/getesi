@@ -404,12 +404,11 @@
 
 			.excel-img {
 				background-image: url('../../resources/images/excel.png') !important;
-				background-position-x: -20px;
-				margin-top: 24px;
-				height: 76px;
-				width: 100px;
-				background-size: 100px;
+				height: 25px;
+				width: 25px;
+				background-size: cover;
 				background-repeat: no-repeat;
+				position: absolute;
 			}
 
 			@media screen and (min-width: 1400px) {
@@ -810,7 +809,7 @@
 							<h:panelGroup id="turnoverPerMonthWidget" layout="block" styleClass="p-grid" style="margin-top: 1% !important;">
 								<div style="width: calc(25% - 8px);position: absolute;transform: translate(16px, 0px);">
 									<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
-										 style="height: 210px; border-radius: 5px;">
+										 style="height: 220px; border-radius: 5px;">
 										<div class="sc-hcnlBt wHMuN color-white" style="background-color: #81C784;">
 											<div>
 												<div color="#6e7a81" class="trimester"
@@ -862,7 +861,7 @@
 							<h:panelGroup id="turnoverPerCustomerWidget" layout="block" styleClass="p-grid" style="margin-top: 0px !important;margin-left: calc(25% + 4px);">
 								<div style="width: calc(25% - 8px);position: absolute;transform: translate(16px, 0px);">
 									<div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
-										 style="height: 210px; border-radius: 5px;">
+										 style="height: 220px; border-radius: 5px;">
 										<div class="sc-hcnlBt wHMuN color-white" style="background-color: #FAB544;">
 											<div>
 												<div color="#6e7a81" class="trimester"
@@ -897,6 +896,9 @@
 													</c:forEach>
 												</h:panelGroup>
 												<div style="padding: 5px 20px;">
+													<div>
+														<i class="excel-img"></i>
+													</div>
 													<div style="float: right;">
 														<p:commandButton icon="test" update="turnoverPerCustomerWidget" action="#{bean.setQuadrimesterIdx(0, 3)}" styleClass="dot #{bean.quadrimesterStartIdx eq 0 ? 'selected' : ''}"/>
 														<p:commandButton icon="test" update="turnoverPerCustomerWidget" action="#{bean.setQuadrimesterIdx(4, 7)}" styleClass="dot #{bean.quadrimesterStartIdx eq 4 ? 'selected' : ''}"/>
