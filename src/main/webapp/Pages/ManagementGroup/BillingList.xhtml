@@ -1043,8 +1043,8 @@
 	                        	<h:outputText value="#{invoice.notes}"/>
 	                    	</p:column>
 	                    	<p:column headerText="#{msg.billingListStatus}">
-	                    		<p:commandButton value="#{invoice.status.toString()}" style="width: 142px;" rendered="#{invoice.status != null}"
-	                    		 			styleClass="#{invoice.status.getId() == 1 ? 'orange-button' : (invoice.status.getId() == 3 ? 'green-button' : (invoice.status.getId() == 4 ? 'red-button' : 'button'))  }">
+	                    		<p:commandButton value="#{invoice.status != null ? invoice.status.toString() : ff:upper(msg.billingListDraft)}" style="width: 142px;" 
+	                    		 			styleClass="#{invoice.status == null ? 'orange-button' : (invoice.status.getId() == 1 ? 'orange-button' : (invoice.status.getId() == 3 ? 'green-button' : (invoice.status.getId() == 4 ? 'red-button' : 'button')))  }">
 	                    		</p:commandButton>
 	                    	</p:column>
 	                    	<p:column headerText="#{msg.billingListAmount}" sortBy="#{invoice.totalAmount}">
