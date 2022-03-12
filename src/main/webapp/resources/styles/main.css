@@ -918,3 +918,22 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
     height: 42px;
     display: block;
 }
+
+.email-check-icon {
+    background-image: url("../images/email-check.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 38px;
+    height: 42px;
+    display: block;
+    background-position-x: calc(50% + 3px);
+}
+
+.menu-dots-icon {
+    background-image: url("../images/menu-dots.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 30px;
+    height: 42px;
+    display: block;
+}
