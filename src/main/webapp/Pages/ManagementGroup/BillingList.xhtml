@@ -1043,7 +1043,7 @@
 	                        	<h:outputText value="#{invoice.notes}"/>
 	                    	</p:column>
 	                    	<p:column headerText="#{msg.billingListStatus}">
-	                    		<p:commandButton value="#{invoice.status.toString()}" style="width: 142px;"
+	                    		<p:commandButton value="#{invoice.status.toString()}" style="width: 142px;" rendered="#{invoice.status != null}"
 	                    		 			styleClass="#{invoice.status.getId() == 1 ? 'orange-button' : (invoice.status.getId() == 3 ? 'green-button' : (invoice.status.getId() == 4 ? 'red-button' : 'button'))  }">
 	                    		</p:commandButton>
 	                    	</p:column>
