@@ -949,7 +949,7 @@
                             <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group myclass"
                                          rendered="#{itemR.costConfiguration.typeId == bean.SALARY_COST_TYPE_ID}">
                                 <h:outputText value=""/>
-                                <p:inputText id="price" value="#{itemR.price}"><p:keyFilter mask="num"/></p:inputText>
+                                <p:inputText value="#{itemR.price}"><p:keyFilter mask="num"/></p:inputText>
                                 <p:inputText value="#{itemR.payNumberBlock}"/>
                                 <p:inputText value="#{itemR.payNextPrice}"><p:keyFilter mask="num"/></p:inputText>
                             </p:panelGrid>
