@@ -935,23 +935,23 @@
                         <p:outputPanel rendered="#{not bean.priceListDialogOnlyView}">
                             <p:inputText value="#{itemR.price}" rendered="#{!itemR.isFixedOrSalaryCost}"
                                          styleClass="myclass"
-                                         style="padding-left: 20px;"/>
+                                         style="padding-left: 20px;"><p:keyFilter mask="num" /></p:inputText>
                             <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group myclass"
                                          rendered="#{itemR.costConfiguration.typeId == bean.FIXED_COST_TYPE_ID}">
                                 <h:outputText value=""/>
                                 <p:inputText value="#{itemR.numberFirstBlock}"/>
-                                <p:inputText value="#{itemR.firstPrice}"/>
+                                <p:inputText value="#{itemR.firstPrice}"><p:keyFilter mask="num"/></p:inputText>
                                 <p:inputText value="#{itemR.numberNextBlock}"/>
-                                <p:inputText value="#{itemR.nextPrice}"/>
+                                <p:inputText value="#{itemR.nextPrice}"><p:keyFilter mask="num"/></p:inputText>
                                 <p:selectBooleanCheckbox value="#{itemR.requestEstimate}"/>
                                 <p:inputText value="#{itemR.numberFormalityEstimate}"/>
                             </p:panelGrid>
                             <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group myclass"
                                          rendered="#{itemR.costConfiguration.typeId == bean.SALARY_COST_TYPE_ID}">
                                 <h:outputText value=""/>
-                                <p:inputText value="#{itemR.price}"/>
+                                <p:inputText id="price" value="#{itemR.price}"><p:keyFilter mask="num"/></p:inputText>
                                 <p:inputText value="#{itemR.payNumberBlock}"/>
-                                <p:inputText value="#{itemR.payNextPrice}"/>
+                                <p:inputText value="#{itemR.payNextPrice}"><p:keyFilter mask="num"/></p:inputText>
                             </p:panelGrid>
                         </p:outputPanel>
                         <p:outputPanel rendered="#{bean.priceListDialogOnlyView}">
@@ -962,7 +962,7 @@
                                          rendered="#{itemR.costConfiguration.typeId == bean.FIXED_COST_TYPE_ID}">
                                 <h:outputText value=""/>
                                 <h:outputText value="#{itemR.numberFirstBlock}"/>
-                                <h:outputText value="#{itemR.firstPrice}"/>
+                                <h:outputText value="#{itemR.firstPrice}">
                                 <h:outputText value="#{itemR.numberNextBlock}"/>
                                 <h:outputText value="#{itemR.nextPrice}"/>
                                 <h:outputText value="#{itemR.requestEstimate ? msg.yes : msg.no}"/>
