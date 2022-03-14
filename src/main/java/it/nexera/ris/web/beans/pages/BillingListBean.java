@@ -5,6 +5,7 @@ import it.nexera.ris.common.helpers.*;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
 import it.nexera.ris.persistence.view.ClientView;
 import it.nexera.ris.web.beans.EntityLazyListPageBean;
 import lombok.Getter;
@@ -13,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import javax.faces.bean.ManagedBean;
@@ -78,9 +80,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     private Long managerClientFilterid;
     
-    private List<SelectItem> landAggregations;
+    private List<SelectItem> offices;
 
-    private Long aggregationFilterId;
+    private Long selectedOfficeId;
     
     private String filterNotes;
     
@@ -88,15 +90,18 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     
     private String filterPractice;
     
+    private List<SelectItem> companies;
+    
+    private Long selectedCompanyId;
+    
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
             IllegalAccessException, IOException {
-
-        setClients(ComboboxHelper.fillList(DaoManager.load(Client.class, new Criterion[]{
-                Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
-                        Restrictions.isNull("deleted"))
-        }).stream()
+    	List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
+    			Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE), 
+    					Restrictions.isNull("deleted"))});
+        setClients(ComboboxHelper.fillList(clients.stream()
                 .filter(c -> (
                                 (ValidationHelper.isNullOrEmpty(c.getManager()) || !c.getManager()) &&
                                         (ValidationHelper.isNullOrEmpty(c.getFiduciary()) || !c.getFiduciary())
@@ -110,7 +115,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 Restrictions.eq("manager", Boolean.TRUE),
         }, Boolean.FALSE));
         
-        setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.TRUE));
+        setOffices(ComboboxHelper.fillList(Office.class, Boolean.TRUE));
+        loadCompanies(clients);
     }
     
     private void fillYears() throws HibernateException, IllegalAccessException, PersistenceBeanException {
@@ -178,10 +184,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             Criterion r = Restrictions.eq("number", getFilterInvoiceNumber());
             restrictionsLike.add(r);
         }
-    	
-    	if(!ValidationHelper.isNullOrEmpty(getSelectedClientId())) {
-            Criterion r = Restrictions.eq("client.id", getSelectedClientId());
-            restrictionsLike.add(r);
+
+    	if (!ValidationHelper.isNullOrEmpty(getSelectedCompanyId())) {
+    		restrictions.add(Restrictions.eq("client.id", getSelectedCompanyId()));
         }
     	
     	if (!ValidationHelper.isNullOrEmpty(getDateFrom())) {
@@ -193,7 +198,11 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
         
         if (!ValidationHelper.isNullOrEmpty(getManagerClientFilterid())) {
-            restrictions.add(Restrictions.eq("managerId",  getManagerClientFilterid()));
+            restrictions.add(Restrictions.eq("manager.id",  getManagerClientFilterid()));
+        }
+        
+        if (!ValidationHelper.isNullOrEmpty(getSelectedOfficeId())) {
+            restrictions.add(Restrictions.eq("office.id",  getSelectedOfficeId()));
         }
         
         if (!ValidationHelper.isNullOrEmpty(getFilterNotes())) {
@@ -226,7 +235,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setDateTo(null);
         setSelectedClientId(null);
         setManagerClientFilterid(null);
-        setAggregationFilterId(null);
+        setSelectedOfficeId(null);
         setFilterNotes(null);
         setFilterNdg(null);
         setFilterPractice(null);
@@ -238,10 +247,24 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setDateTo(null);
     	setSelectedClientId(null);
         setManagerClientFilterid(null);
-        setAggregationFilterId(null);
+        setSelectedOfficeId(null);
         setFilterNotes(null);
         setFilterNdg(null);
         setFilterPractice(null);
         this.onLoad();
+    }
+    
+    private void loadCompanies(List<Client> clients) throws HibernateException, IllegalAccessException, PersistenceBeanException {
+    	List<SelectItem> companies = new ArrayList<SelectItem>();
+    	for(Client client: clients) {
+        	if(client.getNameOfTheCompany() != null && !client.getNameOfTheCompany().isEmpty())
+        		companies.add(new SelectItem(client.getId(), client.getNameOfTheCompany()));
+        	else
+        		companies.add(new SelectItem(client.getId(), client.getNameProfessional()));
+        }
+    	
+    	setCompanies(companies.stream()
+    	        .sorted(Comparator.comparing(SelectItem::getLabel))
+    	        .collect(Collectors.toList()));
     }
 }

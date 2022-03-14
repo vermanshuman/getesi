@@ -927,10 +927,10 @@
 		                                        <p:inputText id="filterInvoiceNumber" value="#{bean.filterInvoiceNumber}" placeholder="#{msg.billingListNumber}"/>
 		                                    </div>
 		                                    
-		                                    <p:selectOneMenu id="filterClient" value="#{bean.selectedClientId}" style="margin-right: 20px;"
-															 styleClass="#{bean.selectedClientId ne null ? 'select-one-menu' : ''}">
+		                                    <p:selectOneMenu id="filterClient" value="#{bean.selectedCompanyId}" style="margin-right: 20px;"
+															 styleClass="#{bean.selectedCompanyId ne null ? 'select-one-menu' : ''}">
 												<f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}" itemValue="#{null}" noSelectionOption="true" />
-												<f:selectItems value="#{bean.clients}" />
+												<f:selectItems value="#{bean.companies}" />
 												<p:ajax event="itemSelect" update="@this" />
 											</p:selectOneMenu>
 											
@@ -989,13 +989,13 @@
 		                                                </p:selectOneMenu>
 		                                            </div>
 		                                            <div class="p-col-6">
-		                                                <p:selectOneMenu id="office" value="#{bean.aggregationFilterId}"
+		                                                <p:selectOneMenu id="office" value="#{bean.selectedOfficeId}"
 		                                                                 style="width: 100%;" 
-		                                                                 styleClass="#{bean.aggregationFilterId ne null ? 'select-one-menu' : ''}">
+		                                                                 styleClass="#{bean.selectedOfficeId ne null ? 'select-one-menu' : ''}">
 		                                                    <f:selectItem itemLabel="#{msg.subjectViewFormalityConservatoryCap}"
 		                                                                  itemValue="#{null}"
 		                                                                  noSelectionOption="true"/>
-		                                                    <f:selectItems value="#{bean.landAggregations}"/>
+		                                                    <f:selectItems value="#{bean.offices}"/>
 		                                                    <p:ajax event="itemSelect" update="@this"/>
 		                                                </p:selectOneMenu>
 		                                            </div>
@@ -1055,8 +1055,8 @@
 	                    	<p:column headerText="#{msg.billingListDate}" sortBy="#{invoice.dateString}">
 	                        	<h:outputText value="#{invoice.dateString}"/>
 	                    	</p:column>
-	                    	<p:column headerText="#{msg.billingListClient}" sortBy="#{invoice.client.nameOfTheCompany}">
-	                        	<h:outputText value="#{invoice.client.nameOfTheCompany}"/>
+	                    	<p:column headerText="#{msg.billingListClient}" sortBy="#{invoice.client.nameProfessional}">
+	                        	<h:outputText value="#{invoice.client.nameOfTheCompany != null ? invoice.client.nameOfTheCompany : invoice.client.nameProfessional}"/>
 	                    	</p:column>
 	                    	<p:column headerText="#{msg.billingListNotes}" sortBy="#{invoice.notes}">
 	                        	<h:outputText value="#{invoice.notes}"/>
