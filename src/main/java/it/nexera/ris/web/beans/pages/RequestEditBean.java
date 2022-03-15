@@ -277,6 +277,10 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private String position;
 
     private boolean editRequest;
+    
+    @Getter
+    @Setter
+    private Boolean showConfirmButton;
 
     @Override
     protected void preLoad() throws PersistenceBeanException {
@@ -879,9 +883,6 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     public void onMultipleServiceChange() throws PersistenceBeanException, IllegalAccessException {
         if(!ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
             setInputCardList(RequestHelper.onMultipleServiceChange(Arrays.asList(getSelectedServiceIds()),isMultipleRequestCreate()));
-        }
-        if(isMultipleRequestCreate()){
-            generateTab();
         }
     }
 
@@ -2350,12 +2351,29 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         RequestContext.getCurrentInstance().execute("jQuery('.layout-mask')[0].style.display = 'block';");
         onRequestTypeChange();
         setSelectedServiceIds(new Long[]{});
+        setShownFields(null);
         RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 2000);");
     }
 
     public void onMultipleServiceChangeBlock() throws PersistenceBeanException, IllegalAccessException {
         RequestContext.getCurrentInstance().execute("jQuery('.layout-mask')[0].style.display = 'block';");
         onMultipleServiceChange();
+        RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 2000);");
+    }
+    
+    public void onMultipleServiceChanges() throws IllegalAccessException, PersistenceBeanException {
+    	onMultipleServiceChange();
+    	if(isMultipleRequestCreate() && !ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
+        	setShowConfirmButton(Boolean.TRUE);
+        }
+    }
+    
+    public void generateDynamicContent() throws PersistenceBeanException, IllegalAccessException {
+        RequestContext.getCurrentInstance().execute("jQuery('.layout-mask')[0].style.display = 'block';");
+        if(isMultipleRequestCreate() && !ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
+            generateTab();
+            setShowConfirmButton(Boolean.FALSE);
+        }
         RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 2000);");
     }
 
