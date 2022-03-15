@@ -118,15 +118,90 @@
             border-radius: 7px !important;
             min-height: 28px;
         }
+        
+        #tabs ul {
+            background-color: transparent !important;
+            text-transform: uppercase;
+            font-size: 15px !important;
+        }
 
+        #tabs ul::before {
+            border-bottom: none;
+        }
+
+        #tabs ul li:not(.ui-tabs-selected.ui-state-active) a {
+            color: gray !important;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        #tabs ul li.ui-tabs-selected.ui-state-active {
+            background-color: transparent !important;
+        }
+
+        #tabs ul li.ui-tabs-selected.ui-state-active a {
+            color: #000 !important;
+            border-bottom: 2px solid #3366FF;
+        }
+		
+		#tabs .ui-datatable .ui-paginator.ui-paginator-top {
+			display: none !important;
+		}
+		
+		#tabs .ui-datatable .ui-paginator.ui-paginator-bottom {
+			display: none !important;
+		}
+		
+		#tabs .ui-datatable .ui-datatable-data tr.ui-datatable-even {
+            background-color: #f0f3f5 !important;
+        }
+
+        #tabs .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+             border: 1px solid #c9cdd2 !important;
+             color: #4c5156;
+        }
+           
+        #tabs .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+        	background: #FFF !important;
+			color: #000000 !important;
+		}
+   		
+   		#tabs .ui-datatable:not(.borderless) thead th {
+		    padding: 12px 6px 12px 6px !important;
+		    border-left: none !important;
+		    border-right: none !important;
+		}
+
+       	#tabs .ui-datatable thead th {
+        	background-color: #f8f9fa !important;
+           	color: #495057 !important;
+       	}
+
+       	#tabs .ui-datatable .ui-datatable-data tr td {
+        	padding: 12px 6px 12px 6px !important;
+           	border-left: none !important;
+  		   	border-right: none !important;
+       	}
+
+       	#tabs .ui-datatable thead th.ui-state-active {
+           	color: #2196F3 !important;
+       	}
+
+       	#tabs .ui-datatable .ui-datatable-data > tr:hover {
+           	background: #e9ecef !important;
+       	}
+       
+       	#tabs .ui-datatable thead th, .ui-datatable tfoot td {
+			text-align: left !important;
+		}
 
     </style>
 
     <p:dialog widgetVar="invoiceDialogWV" modal="true" width="1150" draggable="false"
               header="#{msg.requestTextEditElectronicSalesInvoice} (n. #{bean.invoiceNumber})">
         <div style="margin-top:20px; overflow-x:hidden; overflow-y:auto; height: 600px;" class="invoiceDialog">
-        <p:tabMenu activeIndex="#{bean.activeMenuTabNum}" model="#{bean.topMenuModel}" style="background-color:#FFFFFF !important;" id="pageTabMenu"  />
-            <ui:fragment>
+		<p:tabView dynamic="true" cache="true" id="tabs" activeIndex="#{bean.activeTabIndex}">
+            <p:ajax event="tabChange" listener="#{bean.onTabChange}"/>
+            <p:tab title="#{msg.requestTextEditDataTab}">
                 <div class="p-grid invoiceDialog" style="margin-right:20px;">
                     <div class="p-col-1 vertical-center">
                         <p:outputLabel value="#{msg.requestTextEditNumber}"/>
@@ -407,7 +482,42 @@
                                          value="#{msg.save.toUpperCase()}" styleClass="btn-green" style="margin-left:5px;"/>
                     </div>
                 </div>
-            </ui:fragment>
+            </p:tab>
+                
+            <p:tab title="#{msg.requestTextEditPaymentsTab}">
+				<div class="p-grid">
+					<div class="p-col-12">
+						<p:commandButton value=" #{msg.addPayment}" icon="fa fa-plus" style="width:175px;"
+								styleClass="ui-button-success p-mr-2 p-mb-2"/>
+					</div>
+					<div class="p-col-12">
+						<p:outputLabel value="#{msg.amountToBeCollected} : #{bean.amountToBeCollected}" style="font-weight: 700 !important; float:right;"/>
+					</div>
+					<p:panel id="table_div">
+						<p:dataTable id="paymentInvoiceTable" value="#{bean.paymentInvoices}" emptyMessage="#{msg.noRecordsFound}"
+									var="paymentInvoice"  lazy="true"
+									paginator="true" paginatorAlwaysVisible="true" rowIndexVar="rowId">
+							<p:column headerText="#{msg.importAmount}">
+	                        	<h:outputText value="#{paymentInvoice.paymentImport}"/>
+	                    	</p:column>
+							<p:column headerText="#{msg.date}">
+	                        	<h:outputText value="#{paymentInvoice.dateString}"/>
+	                    	</p:column>
+	                    	<p:column headerText="#{msg.description}">
+	                        	<h:outputText value="#{paymentInvoice.description}"/>
+	                    	</p:column>
+	                    	<p:column style="text-align: right;">
+	                        	<p:commandButton icon="pi pi-pencil">
+								</p:commandButton>
+	                    	</p:column>
+	                    </p:dataTable>
+					</p:panel>
+					<div class="p-col-12">
+						<p:outputLabel value="#{msg.totalPayments} : #{bean.totalPayments} #{msg.outOf}" style="font-weight: 700 !important; float:right;"/>
+					</div>
+				</div>
+			</p:tab>
+          </p:tabView>
         </div>
 
     </p:dialog>

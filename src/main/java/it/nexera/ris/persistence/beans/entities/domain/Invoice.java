@@ -6,7 +6,6 @@ import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.DateTimeHelper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
-import it.nexera.ris.persistence.beans.entities.PaymentInvoice;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
 import org.hibernate.criterion.Restrictions;
 

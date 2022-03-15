@@ -426,9 +426,9 @@
                                                      styleClass="#{bean.entity.emailOpened? '':'btn-green'}"/>
 
                                     <p:commandButton value="#{bean.examRequest.stateId == 7 ? msg.requestTextEditSentToSdi : msg.requestTextEditCreateInvoice}"
-                                                     id="createInvoice"
+                                                     id="createInvoice" action="#{bean.loadInvoiceDialogData}"
                                                      styleClass="#{bean.examRequest.stateId == 7 ? '' : 'btn-green'}"
-                                                     update="btn_line :form:invoiceTotalCost" rendered="#{bean.billinRequest}"
+                                                     update="btn_line :form" rendered="#{bean.billinRequest}"
                                                      oncomplete="PF('invoiceDialogWV').show();"/>
 
                                    <!-- <p:commandButton action="#{bean.goBack}" value="#{msg.cancel}" style="width:122px;"

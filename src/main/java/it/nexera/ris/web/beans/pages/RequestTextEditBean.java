@@ -10,6 +10,7 @@ import it.nexera.ris.common.helpers.omi.OMIHelper;
 import it.nexera.ris.common.helpers.tableGenerator.CertificazioneTableGenerator;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
+import it.nexera.ris.persistence.beans.entities.domain.PaymentInvoice;
 import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.CadastralCategory;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.LandChargesRegistry;
@@ -35,11 +36,10 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.jsoup.Jsoup;
+import org.primefaces.component.tabview.TabView;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.LazyDataModel;
-import org.primefaces.model.menu.DefaultMenuItem;
-import org.primefaces.model.menu.DefaultMenuModel;
-import org.primefaces.model.menu.MenuModel;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -186,9 +186,9 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     private boolean multipleCreate;
 
-    private MenuModel topMenuModel;
+    //private MenuModel topMenuModel;
 
-    private int activeMenuTabNum;
+    //private int activeMenuTabNum;
 
     private List<InputCard> inputCardList;
 
@@ -231,10 +231,27 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     private Boolean showRequestCost = Boolean.TRUE;
 
     private Long selectedTaxRateId;
+    
+    @Getter
+    @Setter
+    private int activeTabIndex;
+    
+    @Getter
+    @Setter
+    private List<PaymentInvoice> paymentInvoices;
+    
+    @Getter
+    @Setter
+    private Double amountToBeCollected;
+    
+    @Getter
+    @Setter
+    private Double totalPayments;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
             InstantiationException, IllegalAccessException {
+    	setActiveTabIndex(0);
         setShowSalesSection(Boolean.FALSE);
         String parameter = getRequestParameter(RedirectHelper.ID_PARAMETER);
         setEntityId(null);
@@ -309,7 +326,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
         updateConservatoryList();
 
-        generateMenuModel();
+        //generateMenuModel();
         setMaxInvoiceNumber();
         if(!ValidationHelper.isNullOrEmpty(getExamRequest().getTotalCostDouble()))
             setInvoiceTotalCost(Double.parseDouble(getExamRequest().getTotalCostDouble()));
@@ -354,7 +371,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         setBillinRequest(AccessBean.canViewPage(PageTypes.BILLING_LIST));
 
     }
-
+    
     public void onErrorClose() throws PersistenceBeanException {
         cleanValidation();
         getEntity().setNeedValidateCadastral(false);
@@ -1981,7 +1998,23 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             }
         }
     }
-
+    
+    public final void onTabChange(final TabChangeEvent event) {
+        TabView tv = (TabView) event.getComponent();
+        this.activeTabIndex = tv.getActiveIndex();
+        //SessionHelper.put("activeTabIndex", activeTabIndex);
+    }
+    
+    public void loadInvoiceDialogData() throws IllegalAccessException, PersistenceBeanException  {
+    	List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[] {Restrictions.isNotNull("date")}, new Order[]{
+                Order.desc("date")});
+    	setPaymentInvoices(paymentInvoicesList);
+    	double totalImport = 0.0;
+    	for(PaymentInvoice paymentInvoice : paymentInvoicesList) {
+    		totalImport = totalImport + paymentInvoice.getPaymentImport().doubleValue();
+    	}
+    }
+    
     public String getEditText() {
         return editText;
     }
@@ -2362,7 +2395,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         this.salesOtherEstateSituations = salesOtherEstateSituations;
     }
 
-    private void addMenuItem(String value) {
+   /* private void addMenuItem(String value) {
         DefaultMenuItem menuItem = new DefaultMenuItem(value);
 
         menuItem.setCommand("#{requestTextEditBean.goToTab(" +
@@ -2370,15 +2403,15 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         menuItem.setUpdate("form");
 
         getTopMenuModel().addElement(menuItem);
-    }
+    }*/
 
 
-    private void generateMenuModel() {
+    /*private void generateMenuModel() {
         setTopMenuModel(new DefaultMenuModel());
         if (isMultipleCreate()) {
             addMenuItem(ResourcesHelper.getString("requestTextEditDataTab"));
 //            addMenuItem(ResourcesHelper.getString("requestTextEditNoteTab"));
-//            addMenuItem(ResourcesHelper.getString("requestTextEditPaymentsTab"));
+            addMenuItem(ResourcesHelper.getString("requestTextEditPaymentsTab"));
 //            addMenuItem(ResourcesHelper.getString("requestTextEditAttachmentsTab"));
 //            addMenuItem(ResourcesHelper.getString("requestTextEditEmailTab"));
         } else {
@@ -2388,11 +2421,11 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                         .forEach(card -> addMenuItem(card.getName().toUpperCase()));
             }
 //            addMenuItem(ResourcesHelper.getString("requestTextEditNoteTab"));
-//            addMenuItem(ResourcesHelper.getString("requestTextEditPaymentsTab"));
+            addMenuItem(ResourcesHelper.getString("requestTextEditPaymentsTab"));
 //            addMenuItem(ResourcesHelper.getString("requestTextEditAttachmentsTab"));
 //            addMenuItem(ResourcesHelper.getString("requestTextEditEmailTab"));
         }
-    }
+    }*/
 
     public void setMaxInvoiceNumber() throws HibernateException, IllegalAccessException, PersistenceBeanException {
         LocalDate currentdate = LocalDate.now();
@@ -2493,13 +2526,13 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         }
     }
 
-    public MenuModel getTopMenuModel() {
+    /*public MenuModel getTopMenuModel() {
         return topMenuModel;
     }
 
     public void setTopMenuModel(MenuModel topMenuModel) {
         this.topMenuModel = topMenuModel;
-    }
+    }*/
 
     public List<InputCard> getInputCardList() {
         return inputCardList;
@@ -2509,13 +2542,13 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         this.inputCardList = inputCardList;
     }
 
-    public int getActiveMenuTabNum() {
+    /*public int getActiveMenuTabNum() {
         return activeMenuTabNum;
     }
 
     public void setActiveMenuTabNum(int activeMenuTabNum) {
         this.activeMenuTabNum = activeMenuTabNum;
-    }
+    }*/
 
     public boolean isMultipleCreate() {
         return multipleCreate;
