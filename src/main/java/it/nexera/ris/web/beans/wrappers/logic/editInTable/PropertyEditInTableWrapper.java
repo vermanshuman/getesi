@@ -1,23 +1,5 @@
 package it.nexera.ris.web.beans.wrappers.logic.editInTable;
 
-import java.io.File;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import it.nexera.ris.common.enums.ApplicationSettingsKeys;
-import it.nexera.ris.common.helpers.create.xls.XlsxHelper;
-import it.nexera.ris.persistence.beans.entities.domain.*;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.OmiValue;
-import it.nexera.ris.settings.ApplicationSettingsHolder;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.hibernate.Hibernate;
-
 import it.nexera.ris.common.enums.RelationshipType;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.LogHelper;
@@ -27,10 +9,22 @@ import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.common.helpers.omi.OMIHelper;
 import it.nexera.ris.persistence.UserHolder;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
+import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.CadastralCategory;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.Hibernate;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static it.nexera.ris.common.helpers.TemplatePdfTableHelper.distinctByKey;
 
 @Getter
 @Setter
@@ -79,7 +73,10 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
             this.selectedCategoryId = property.getCategory().getId();
         }
         this.address = property.getAddress();
-        this.cadastralData = property.getCadastralData().stream().map(CadastralDataEditInTableWrapper::new)
+        this.cadastralData = CollectionUtils.emptyIfNull(property.getCadastralData())
+                .stream()
+                .filter(distinctByKey(x -> x.getId()))
+                .map(CadastralDataEditInTableWrapper::new)
                 .collect(Collectors.toList());
 
         initOmi(property);
@@ -87,7 +84,7 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
         this.lastCommercial = PropertyEntityHelper.getEstimateLastCommercialValueRequestText(property)
                 .replaceAll(",", ".");
 
-        if(ValidationHelper.isNullOrEmpty(this.lastCommercial) &&
+        if (ValidationHelper.isNullOrEmpty(this.lastCommercial) &&
                 !ValidationHelper.isNullOrEmpty(this.calculatedCommercial)) {
 
             this.lastCommercial = this.calculatedCommercial;
@@ -100,9 +97,9 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
         }
         this.estateSituationId = situation.getId();
 
-        if(!ValidationHelper.isNullOrEmpty(this.calculatedCommercial)) {
-            if( this.calculatedCommercial.endsWith(".0")) {
-                this.calculatedCommercial =  Optional.ofNullable(this.calculatedCommercial)
+        if (!ValidationHelper.isNullOrEmpty(this.calculatedCommercial)) {
+            if (this.calculatedCommercial.endsWith(".0")) {
+                this.calculatedCommercial = Optional.ofNullable(this.calculatedCommercial)
                         .filter(sStr -> sStr.length() != 0)
                         .map(sStr -> sStr.substring(0, sStr.length() - 2))
                         .orElse(this.calculatedCommercial);
@@ -110,15 +107,15 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
             this.calculatedCommercial.replaceAll("\\.", ",");
         }
 
-        if(!ValidationHelper.isNullOrEmpty(this.lastCommercial)) {
-            if( this.lastCommercial.endsWith(".0")) {
-                this.lastCommercial =  Optional.ofNullable(this.lastCommercial)
+        if (!ValidationHelper.isNullOrEmpty(this.lastCommercial)) {
+            if (this.lastCommercial.endsWith(".0")) {
+                this.lastCommercial = Optional.ofNullable(this.lastCommercial)
                         .filter(sStr -> sStr.length() != 0)
                         .map(sStr -> sStr.substring(0, sStr.length() - 2))
                         .orElse(this.lastCommercial);
             }
             this.lastCommercial.replaceAll("\\.", ",");
-            if(!ValidationHelper.isNullOrEmpty(this.calculatedCommercial)) {
+            if (!ValidationHelper.isNullOrEmpty(this.calculatedCommercial)) {
                 String value = this.lastCommercial;
                 this.lastCommercial = this.calculatedCommercial;
                 this.calculatedCommercial = value;
@@ -133,15 +130,15 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
         String lastOmi = PropertyEntityHelper.getEstimateOMIRequestText(property);
         this.lastOmi = new Omi(lastOmi,
                 lastOmi.equals(ResourcesHelper.getString("estateLocationOMINotInappropriate")),
-                false, false,false,false);
+                false, false, false, false);
 
-        this.calculatedOmi = new Omi("", false, false, false, false,false);
+        this.calculatedOmi = new Omi("", false, false, false, false, false);
         if (!ValidationHelper.isNullOrEmpty(property.getCategoryCode())
                 && (property.getCategoryCode().startsWith("A") || property.getCategoryCode().startsWith("C"))) {
             try {
                 OMIHelper.CalculatedOmi calculatedOmi = OMIHelper.calculateOMI(property, true);
                 this.calculatedOmi.setMultipleCoordinates(calculatedOmi.isMultipleCoordinates());
-                if(!ValidationHelper.isNullOrEmpty(calculatedOmi.isMultipleCoordinates()) &&
+                if (!ValidationHelper.isNullOrEmpty(calculatedOmi.isMultipleCoordinates()) &&
                         calculatedOmi.isMultipleCoordinates())
                     this.lastOmi.setValue(null);
 
@@ -154,24 +151,24 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
                     this.calculatedCommercial = String.valueOf(OMIHelper.calculateCommercialOmi(property, calculatedOmi.getValue()));
                 }
                 this.calculatedOmi.setCategoryCodeMissing(calculatedOmi.isCategoryCodeMissing());
-                if(this.calculatedOmi.categoryCodeMissing){
+                if (this.calculatedOmi.categoryCodeMissing) {
                     setCalculateOmiValue(Boolean.TRUE);
-                }else
+                } else
                     setCalculateOmiValue(Boolean.FALSE);
             } catch (Exception e) {
                 LogHelper.log(log, e);
             }
         }
-        
-        if(!ValidationHelper.isNullOrEmpty(this.getLastOmi()) && 
-                ValidationHelper.isNullOrEmpty(this.lastOmi.getValue()) && 
+
+        if (!ValidationHelper.isNullOrEmpty(this.getLastOmi()) &&
+                ValidationHelper.isNullOrEmpty(this.lastOmi.getValue()) &&
                 !ValidationHelper.isNullOrEmpty(this.calculatedOmi.getValue())) {
             this.lastOmi.setValue(this.calculatedOmi.getValue());
         }
-        
-        if(!ValidationHelper.isNullOrEmpty(this.calculatedOmi.getValue())){
+
+        if (!ValidationHelper.isNullOrEmpty(this.calculatedOmi.getValue())) {
             String value = this.calculatedOmi.getValue();
-            if(value.endsWith(".0")) {
+            if (value.endsWith(".0")) {
                 value = Optional.ofNullable(this.calculatedOmi.getValue())
                         .filter(sStr -> sStr.length() != 0)
                         .map(sStr -> sStr.substring(0, sStr.length() - 2))
@@ -180,21 +177,21 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
             value = value.replaceAll("\\.", ",");
             this.calculatedOmi.setValue(value);
         }
-        
-        if(!ValidationHelper.isNullOrEmpty(this.lastOmi.getValue())){
+
+        if (!ValidationHelper.isNullOrEmpty(this.lastOmi.getValue())) {
             String value = this.lastOmi.getValue();
-            if(value.endsWith(".0")) {
+            if (value.endsWith(".0")) {
                 value = Optional.ofNullable(this.lastOmi.getValue())
                         .filter(sStr -> sStr.length() != 0)
                         .map(sStr -> sStr.substring(0, sStr.length() - 2))
                         .orElse(this.lastOmi.getValue());
             }
             value = value.replaceAll("\\.", ",");
-            if(!ValidationHelper.isNullOrEmpty(this.calculatedOmi.value)) {
+            if (!ValidationHelper.isNullOrEmpty(this.calculatedOmi.value)) {
                 this.lastOmi.setValue(this.calculatedOmi.getValue());
-               this.calculatedOmi.setValue(value);
-            }else {
-               this.lastOmi.setValue(value);
+                this.calculatedOmi.setValue(value);
+            } else {
+                this.lastOmi.setValue(value);
             }
         }
     }
@@ -226,7 +223,7 @@ public class PropertyEditInTableWrapper extends BaseEditInTableWrapper {
             property.setCadastralArea(getCadastralArea());
             property.setRevenue(getRevenue());
             DaoManager.save(property, true);
-           
+
         }
         if (ValidationHelper.isNullOrEmpty(property.getLastCommercialValue())
                 || !ValidationHelper.isNullOrEmpty(getLastCommercial())

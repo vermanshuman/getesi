@@ -265,6 +265,14 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private List<RequestView> regSubjectList;
 
+    private String cdr;
+
+    private String ndg;
+
+    private String position;
+
+    private boolean editRequest;
+
     @Override
     protected void preLoad() throws PersistenceBeanException {
         setMultiRequestMap(new HashMap());
@@ -351,11 +359,13 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
             InstantiationException, IllegalAccessException {
+        if(getEntity().isNew())
+            setEditRequest(false);
+        else
+            setEditRequest(true);
         boolean dataFromEmail = false;
         setClientSelectItemWrapperConverter(new SelectItemWrapperConverter<>(Client.class));
         if (!ValidationHelper.isNullOrEmpty(getMail())) {
-            getEntity().setNdg(!ValidationHelper.isNullOrEmpty(getMail().getNdg()) ? getMail().getNdg() : null);
-            getEntity().setCdr(!ValidationHelper.isNullOrEmpty(getMail().getCdr()) ? getMail().getCdr() : null);
             if ((!ValidationHelper.isNullOrEmpty(getMail().getManagers()) ||
                     !ValidationHelper.isNullOrEmpty(getMail().getClientFiduciary()))) {
                 presetParamsFromMail(getMail());
@@ -433,6 +443,21 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
         if (getEntity().getNotary() != null) {
             setSelectedNotaryId(getEntity().getNotary().getId());
+        }
+
+
+        if (getEntity().getCdr() != null) {
+            setCdr(getEntity().getCdr());
+        }
+
+
+        if (getEntity().getNdg() != null) {
+            setNdg(getEntity().getNdg());
+        }
+
+
+        if (getEntity().getPosition() != null) {
+            setPosition(getEntity().getPosition());
         }
 
         onClientChange(dataFromEmail);
@@ -1169,11 +1194,11 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 checkSubjectMastery();
                 break;
             case CDR:
-                if (ValidationHelper.isNullOrEmpty(getEntity().getCdr()))
+                if (ValidationHelper.isNullOrEmpty(getCdr()))
                     addRequiredFieldException(DocumentValidation.CDR.name());
                 break;
             case NDG:
-                if (ValidationHelper.isNullOrEmpty(getEntity().getNdg()))
+                if (ValidationHelper.isNullOrEmpty(getNdg()))
                     addRequiredFieldException(DocumentValidation.NDG.name());
                 break;
             case ULTIMA_RESIDENZA:
@@ -1300,6 +1325,13 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     @Override
     public void onValidate() throws PersistenceBeanException, HibernateException, IllegalAccessException {
+        if (isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedRequestTypes())) {
+            addRequiredFieldException("form:servicerequestType");
+        }
+
+        if (isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
+            addRequiredFieldException("form:multipleServiceRequest");
+        }
 
     }
 
@@ -1314,7 +1346,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         for (Long requestTypeId : selectedServiceReqType) {
 
             if(isMultipleRequestCreate()){
-                if(getMultiRequestMap().containsKey(requestTypeId)){
+                if(getEditRequest() && getMultiRequestMap().containsKey(requestTypeId)){
                     setEntity(getMultiRequestMap().get(requestTypeId));
                 }else{
                     setEntity(new Request());
@@ -1343,6 +1375,22 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             } else {
                 getEntity().setBillingClient(null);
             }
+
+            if (!ValidationHelper.isNullOrEmpty(this.getCdr()))
+                getEntity().setCdr(this.getCdr());
+            else
+                getEntity().setCdr(null);
+
+            if (!ValidationHelper.isNullOrEmpty(this.getNdg()))
+                getEntity().setNdg(this.getNdg());
+            else
+                getEntity().setNdg(null);
+
+            if (!ValidationHelper.isNullOrEmpty(this.getPosition()))
+                getEntity().setPosition(this.getPosition());
+            else
+                getEntity().setPosition(null);
+
 
             if (!ValidationHelper.isNullOrEmpty(getFiduciaryClientsSelected())) {
                 getEntity().setRequestMangerList(new ArrayList<>());
@@ -2251,6 +2299,11 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     }
 
     public void validateMultipleRequest(boolean redirect) throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+        this.cleanValidation();
+        this.onValidate();
+        if (this.getValidationFailed()) {
+            return;
+        }
         boolean isShowConfirm = false;
         setRedirected(redirect);
         if (multipleCreate && getEntity().isNew()) {
@@ -2275,10 +2328,10 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if (isShowConfirm) {
             executeJS("PF('multipleRequestSave').show();");
         } else {
-            executeJS("PF('requestSaved').show();");
-            executeJS("setTimeout(function(){PF('requestSaved').hide();}, 2000);");
             setRunAfterSave(redirect);
             pageSave();
+            executeJS("PF('requestSaved').show();");
+            executeJS("setTimeout(function(){PF('requestSaved').hide();}, 2000);");
             openRequestSubjectDialog();
             setShownFields(null);
             setSelectedRequestTypes(new Long[]{});
@@ -3070,5 +3123,37 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
      */
     public void setRegSubjectList(List<RequestView> regSubjectList) {
         this.regSubjectList = regSubjectList;
+    }
+
+    public String getCdr() {
+        return cdr;
+    }
+
+    public void setCdr(String cdr) {
+        this.cdr = cdr;
+    }
+
+    public String getNdg() {
+        return ndg;
+    }
+
+    public void setNdg(String ndg) {
+        this.ndg = ndg;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
+    public boolean getEditRequest() {
+        return editRequest;
+    }
+
+    public void setEditRequest(boolean editRequest) {
+        this.editRequest = editRequest;
     }
 }

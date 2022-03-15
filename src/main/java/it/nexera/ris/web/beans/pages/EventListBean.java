@@ -113,7 +113,6 @@ public class EventListBean extends EntityLazyInListEditPageBean<Event> implement
 
     public void onEventSelect(SelectEvent selectEvent) {
         eventSelect = (ScheduleEvent) selectEvent.getObject();
-        System.out.println(">>>>>>>>>>>>>>>> " + eventSelect);
     }
 
     private Date setTimeToDate(Date date, Date time) {

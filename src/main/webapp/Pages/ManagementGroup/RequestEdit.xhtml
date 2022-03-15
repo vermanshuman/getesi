@@ -148,7 +148,11 @@
             #requestSaved .ui-dialog-content.ui-widget-content {
                 padding-top: 25px;
             }
+            #requestSaved_modal {
+                background: rgba(255, 255, 255, 0.6) !important;
+            }
         </style>
+
         <script>
             function next(activeMenu, totalTabs) {
                 var nextMenu = activeMenu + 1;
@@ -237,8 +241,6 @@
                                      label="#{msg.requestNotary}">
                         <f:selectItems value="#{bean.notaryList}"/>
                     </p:selectOneMenu>
-
-
 
                 </p:column>
                 <p:column rendered="#{!bean.multipleRequestCreate}">
@@ -650,7 +652,7 @@
             </div>
         </p:dialog>
         <p:dialog id="requestSaved" widgetVar="requestSaved" modal="true" closable="false"
-                  resizable="false" draggable="false" effect="SLIDE">
+                  resizable="false" draggable="false" effect="SLIDE" style="border: 1px solid #00CC52;">
             <span>
                 <h:outputText value="#{msg.requestListSave}"/>
             </span>

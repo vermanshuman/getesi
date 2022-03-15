@@ -389,7 +389,8 @@
                                             // <![CDATA[
                                             $("body").click(function(e){
                                                 var target = $(e.target);
-                                                if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('.ui-selectcheckboxmenu-panel').length) {
+                                                if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('.ui-selectcheckboxmenu-panel').length
+                                                    && !target.parents('#ui-datepicker-div').length) {
                                                     PF('panelSetting').getJQ().hide();
                                                 }
                                                 if(target.closest('.ui-selectcheckboxmenu-item').length) {
@@ -454,8 +455,8 @@
                                                 </div>
                                                 <div class="p-col-12" style="text-align: center;">
                                                     <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #00CC52;margin-right: 20px;" id="searchButton"
-                                                                     onclick="checkDates(); filterTableFromPanel();" update="searchPanel" oncomplete="PF('panelSetting').getJQ().hide()"/>
-                                                    <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFiltraPanel}" update="settingPanel" oncomplete="PF('panelSetting').getJQ().hide()"/>
+                                                                     onclick="checkDates(); filterTableFromPanel();PF('panelSetting').getJQ().hide()" update="searchPanel"/>
+                                                    <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFiltraPanel}" update="settingPanel" onclick="PF('panelSetting').getJQ().hide()"/>
                                                 </div>
                                             </div>
                                         </p:panel>
@@ -567,13 +568,19 @@
 
                                         $(document ).ready(function() {
                                             var value = $("[name='pageNumber']").val();
-                                            if(value == 1) {
-                                                $('.page_1').addClass("ui-state-active");
-                                                $('#page_bottom_1').addClass("ui-state-active");
-                                            }else{
-                                                $('.page_1').removeClass("ui-state-active");
-                                                $('#page_bottom_1').removeClass("ui-state-active");
-                                            }
+                                            $("div[class^='page_']").each(function(i, obj) {
+                                                obj.removeClass("ui-state-active");
+                                            });
+
+                                            $('.page_' + value).addClass("ui-state-active");
+                                            $('#page_bottom_' + + value).addClass("ui-state-active");
+                                            // if(value == 1) {
+                                            //     $('.page_1').addClass("ui-state-active");
+                                            //     $('#page_bottom_1').addClass("ui-state-active");
+                                            // }else{
+                                            //     $('.page_1').removeClass("ui-state-active");
+                                            //     $('#page_bottom_1').removeClass("ui-state-active");
+                                            // }
                                         });
 
                                         function setPageNumber(){

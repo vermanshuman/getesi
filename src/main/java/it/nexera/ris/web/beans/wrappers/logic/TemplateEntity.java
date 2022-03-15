@@ -1,6 +1,38 @@
 package it.nexera.ris.web.beans.wrappers.logic;
 
-import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import it.nexera.ris.common.enums.ApplicationSettingsKeys;
+import it.nexera.ris.common.enums.DocumentGenerationTags;
+import it.nexera.ris.common.enums.RealEstateType;
+import it.nexera.ris.common.enums.SectionCType;
+import it.nexera.ris.common.exceptions.CannotProcessException;
+import it.nexera.ris.common.exceptions.PersistenceBeanException;
+import it.nexera.ris.common.exceptions.TypeFormalityNotConfigureException;
+import it.nexera.ris.common.helpers.*;
+import it.nexera.ris.common.helpers.tableGenerator.*;
+import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
+import it.nexera.ris.persistence.beans.dao.DaoManager;
+import it.nexera.ris.persistence.beans.entities.domain.*;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.LandChargesRegistry;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.Regime;
+import it.nexera.ris.settings.ApplicationSettingsHolder;
+import it.nexera.ris.web.beans.pages.RequestTextEditBean;
+import it.nexera.ris.web.beans.wrappers.Pair;
+import it.nexera.ris.web.beans.wrappers.PartedPairsByCityWrapper;
+import static it.nexera.ris.common.helpers.TemplatePdfTableHelper.distinctByKey;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
@@ -14,44 +46,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import it.nexera.ris.common.helpers.*;
-import it.nexera.ris.persistence.beans.entities.domain.*;
-import it.nexera.ris.web.beans.pages.RequestTextEditBean;
-import it.nexera.ris.web.beans.wrappers.Pair;
-import it.nexera.ris.web.beans.wrappers.PartedPairsByCityWrapper;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
-import org.springframework.validation.annotation.Validated;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import it.nexera.ris.common.enums.ApplicationSettingsKeys;
-import it.nexera.ris.common.enums.DocumentGenerationTags;
-import it.nexera.ris.common.enums.RealEstateType;
-import it.nexera.ris.common.enums.SectionCType;
-import it.nexera.ris.common.exceptions.CannotProcessException;
-import it.nexera.ris.common.exceptions.PersistenceBeanException;
-import it.nexera.ris.common.exceptions.TypeFormalityNotConfigureException;
-import it.nexera.ris.common.helpers.tableGenerator.AlienatedTableGenerator;
-import it.nexera.ris.common.helpers.tableGenerator.CertificazioneTableGenerator;
-import it.nexera.ris.common.helpers.tableGenerator.DeceasedTableGenerator;
-import it.nexera.ris.common.helpers.tableGenerator.NegativeTableGenerator;
-import it.nexera.ris.common.helpers.tableGenerator.NoAssetsTableGenerator;
-import it.nexera.ris.common.helpers.tableGenerator.RealEstateRelationshipTableGenerator;
-import it.nexera.ris.common.helpers.tableGenerator.TagTableGenerator;
-import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
-import it.nexera.ris.persistence.beans.dao.DaoManager;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.LandChargesRegistry;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Regime;
-import it.nexera.ris.settings.ApplicationSettingsHolder;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 public class TemplateEntity {
 
@@ -1170,7 +1165,11 @@ public class TemplateEntity {
                                     da.append("&lt;ImmobileU&gt;");
                                     if (!ValidationHelper.isNullOrEmpty(property.getCadastralData())) {
                                         int counter = 1;
-                                        for (CadastralData cadastralData : property.getCadastralData()) {
+                                        for (CadastralData cadastralData :
+                                                CollectionUtils.emptyIfNull(property.getCadastralData())
+                                                        .stream()
+                                                        .filter(distinctByKey(x -> x.getId()))
+                                                        .collect(Collectors.toList())) {
                                             if (property.getCadastralData().size() > 1) {
                                                 da.append("<br/>");
                                                 da.append("&lt;Graffati&gt;");
@@ -1267,7 +1266,10 @@ public class TemplateEntity {
                                     da.append("&lt;ImmobileT&gt;");
                                     if (!ValidationHelper.isNullOrEmpty(property.getCadastralData())) {
                                         int counter = 1;
-                                        for (CadastralData cadastralData : property.getCadastralData()) {
+                                        for (CadastralData cadastralData : CollectionUtils.emptyIfNull(property.getCadastralData())
+                                                .stream()
+                                                .filter(distinctByKey(x -> x.getId()))
+                                                .collect(Collectors.toList())) {
                                             if (property.getCadastralData().size() > 1) {
                                                 da.append("<br/>");
                                                 da.append("&lt;Graffati&gt;");
@@ -1527,7 +1529,7 @@ public class TemplateEntity {
                                 !ValidationHelper.isNullOrEmpty(landProperty)) {
                             showEstateSituationTag = Boolean.TRUE;
                         }
-                        if(showEstateSituationTag){
+                        if (showEstateSituationTag) {
                             attachmentBuffer.append("Sono presenti:<br/>");
                         }
                         if (showEstateSituationTag) {
@@ -1659,9 +1661,9 @@ public class TemplateEntity {
                                     attachmentBuffer.append("<td class=\"col-25 p10 txt-center\">");
                                     String landBlock = terrenoData.get(property.getId());
                                     String landClass = "";
-                                    if(landBlock.contains("foglio")){
+                                    if (landBlock.contains("foglio")) {
                                         landClass = "datiterrenomain";
-                                    }else
+                                    } else
                                         landClass = "datiterreno";
 
                                     attachmentBuffer.append("<p class=\"");
@@ -1699,9 +1701,9 @@ public class TemplateEntity {
                                                         .collect(Collectors.toList());
                                                 if (!ValidationHelper.isNullOrEmpty(cityLandOmiValues)
                                                         && !ValidationHelper.isNullOrEmpty(property.getLandMQ())) {
-                                                    Double omiValue = (cityLandOmiValues.get(0).getValue()/10000) * property.getLandMQ();
-                                                        BigDecimal value = new BigDecimal(omiValue);
-                                                        String omiValueString = df.format(value.doubleValue());
+                                                    Double omiValue = (cityLandOmiValues.get(0).getValue() / 10000) * property.getLandMQ();
+                                                    BigDecimal value = new BigDecimal(omiValue);
+                                                    String omiValueString = df.format(value.doubleValue());
                                                     attachmentBuffer.append(omiValueString);
                                                     omiValueTotal += omiValue;
                                                 }
@@ -1722,9 +1724,9 @@ public class TemplateEntity {
                                 attachmentBuffer.append("</td>");
                                 attachmentBuffer.append("<td class=\"col-20 p10 txt-center\"><b>");
                                 String extensionTotalValue = extensionTotal.toString();
-                                if(extensionTotalValue.endsWith(".00") || extensionTotalValue.endsWith(".0"))
+                                if (extensionTotalValue.endsWith(".00") || extensionTotalValue.endsWith(".0"))
                                     extensionTotalValue = extensionTotalValue.substring(0, extensionTotalValue.lastIndexOf("."));
-                                if(!extensionTotalValue.contains(".") && !extensionTotalValue.contains(",")){
+                                if (!extensionTotalValue.contains(".") && !extensionTotalValue.contains(",")) {
                                     extensionTotalValue = GeneralFunctionsHelper.formatDoubleString(extensionTotalValue);
                                 }
                                 attachmentBuffer.append(extensionTotalValue);
@@ -1740,14 +1742,14 @@ public class TemplateEntity {
                                 attachmentBuffer.append("</tbody>"); // tbody
                                 attachmentBuffer.append("</table>"); // table1
 
-                                if(!ValidationHelper.isNullOrEmpty(inAppropriateProperties)){
+                                if (!ValidationHelper.isNullOrEmpty(inAppropriateProperties)) {
                                     terrenoData = landPropertyBlock(inAppropriateProperties);
-                                    attachmentBuffer.append("<br/><table style=\"margin-top: 50px;\" class=\"allegatoa\">" ); // table2
+                                    attachmentBuffer.append("<br/><table style=\"margin-top: 50px;\" class=\"allegatoa\">"); // table2
                                     attachmentBuffer.append("<tbody>"); // tbody2
 
 
                                     extensionTotal = 0.0;
-                                    for(Property property: inAppropriateProperties){
+                                    for (Property property : inAppropriateProperties) {
                                         extensionTotal += property.getLandMQ();
                                         attachmentBuffer.append("<tr>");
 
@@ -1756,11 +1758,10 @@ public class TemplateEntity {
                                         attachmentBuffer.append("</td>");
                                         attachmentBuffer.append("<td class=\"col-25 p10 txt-center\">");
                                         String landBlock = terrenoData.get(property.getId());
-                                        System.out.println(">>>>>>>>>>>>>>> " + landBlock);
                                         String landClass = "";
-                                        if(landBlock.contains("foglio")){
+                                        if (landBlock.contains("foglio")) {
                                             landClass = "datiterrenomain";
-                                        }else
+                                        } else
                                             landClass = "datiterreno";
 
                                         attachmentBuffer.append("<p class=\"");
@@ -1863,12 +1864,12 @@ public class TemplateEntity {
                                 sb.append(" ");
                             }
                             if (sb.length() > 0) {
-                                String prefix = sb.toString().toUpperCase() ;
+                                String prefix = sb.toString().toUpperCase();
                                 sb.setLength(0);
                                 sb.append("<div style=\"text-align: justify;font-weight: bold;\">");
                                 sb.append(prefix);
                                 String textInVisura = partedPairsByCityWrapper.getFormality().getDicTypeFormalityText();
-                                if(!ValidationHelper.isNullOrEmpty(textInVisura)){
+                                if (!ValidationHelper.isNullOrEmpty(textInVisura)) {
                                     sb.append(" - " + textInVisura);
                                 }
                                 sb.append("</div>");
@@ -1933,7 +1934,10 @@ public class TemplateEntity {
         Map<Long, String> map = new HashMap<>();
         List<Pair<CadastralData, Property>> dataList = new ArrayList<>();
         for (Property property : propertyList) {
-            for (CadastralData cadastralData : property.getCadastralData()) {
+            for (CadastralData cadastralData : CollectionUtils.emptyIfNull(property.getCadastralData())
+                    .stream()
+                    .filter(distinctByKey(x -> x.getId()))
+                    .collect(Collectors.toList())) {
                 dataList.add(new Pair<>(cadastralData, property));
             }
         }

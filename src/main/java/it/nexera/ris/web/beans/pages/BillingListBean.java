@@ -6,17 +6,22 @@ import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
-import it.nexera.ris.persistence.view.ClientView;
 import it.nexera.ris.web.beans.EntityLazyListPageBean;
+import it.nexera.ris.persistence.view.ClientView;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.primefaces.model.chart.Axis;
+import org.primefaces.model.chart.AxisType;
+import org.primefaces.model.chart.BarChartModel;
+import org.primefaces.model.chart.ChartSeries;
+
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
@@ -32,16 +37,16 @@ import java.util.stream.Collectors;
 public class BillingListBean extends EntityLazyListPageBean<Invoice>
         implements Serializable {
 
-	private static transient final Log log = LogFactory.getLog(BillingListBean.class);
-	
-	private static final long serialVersionUID = -7955389068518829670L;
+    private static transient final Log log = LogFactory.getLog(BillingListBean.class);
+
+    private static final long serialVersionUID = -7955389068518829670L;
 
     private List<SelectItem> clients;
-    
+
     private Long selectedClientId;
-    
+
     private List<SelectItem> years;
-    
+
     private Integer selectedYear;
 
     private Double monthJanFebAmount = getRandomNumber(10, 50);
@@ -58,49 +63,52 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     private List<Integer> turnoverPerMonth = new ArrayList<>();
 
+    private List<String> turnoverPerCustomer = new ArrayList<>();
+
     public String[] months = new String[]{"Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"};
 
     private int quadrimesterStartIdx = 0;
 
     private int quadrimesterEndIdx = 3;
 
-    private List<String> turnoverPerCustomer = new ArrayList<>();
-    
+    private BarChartModel model;
+
     private List<Invoice> invoices;
-    
+
     private Long filterInvoiceNumber;
-    
+
     private Date dateFrom;
 
     private Date dateTo;
-    
+
     private String filterAll;
-    
+
     private List<SelectItem> managerClients;
 
     private Long managerClientFilterid;
-    
+
     private List<SelectItem> offices;
 
     private Long selectedOfficeId;
-    
+
     private String filterNotes;
-    
+
     private String filterNdg;
-    
+
     private String filterPractice;
-    
+
     private List<SelectItem> companies;
-    
+
     private Long selectedCompanyId;
-    
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
             IllegalAccessException, IOException {
-    	List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
-    			Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE), 
-    					Restrictions.isNull("deleted"))});
+
+        List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
+                Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
+                        Restrictions.isNull("deleted"))});
         setClients(ComboboxHelper.fillList(clients.stream()
                 .filter(c -> (
                                 (ValidationHelper.isNullOrEmpty(c.getManager()) || !c.getManager()) &&
@@ -108,29 +116,29 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                         )
                 ).sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList()), Boolean.TRUE));
         fillYears();
-        
+
         filterTableFromPanel();
-        
+
         setManagerClients(ComboboxHelper.fillList(ClientView.class, Order.asc("name"), new Criterion[]{
                 Restrictions.eq("manager", Boolean.TRUE),
         }, Boolean.FALSE));
-        
+
         setOffices(ComboboxHelper.fillList(Office.class, Boolean.TRUE));
         loadCompanies(clients);
     }
-    
+
     private void fillYears() throws HibernateException, IllegalAccessException, PersistenceBeanException {
-    	List<Invoice> invoices = DaoManager.load(Invoice.class, new Criterion[] {Restrictions.or(Restrictions.isNotNull("date"))});
+        List<Invoice> invoices = DaoManager.load(Invoice.class, new Criterion[] {Restrictions.or(Restrictions.isNotNull("date"))});
         Set<Integer> tempInvoices = new HashSet<>();
         for(Invoice invoice : invoices) {
-        	Calendar calendar = new GregorianCalendar();
-        	calendar.setTime(invoice.getDate());
-        	int year = calendar.get(Calendar.YEAR);
-        	tempInvoices.add(year);
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(invoice.getDate());
+            int year = calendar.get(Calendar.YEAR);
+            tempInvoices.add(year);
         }
         List<SelectItem> yearList = new ArrayList<SelectItem>();
         for(Integer year : tempInvoices) {
-        	yearList.add(new SelectItem(year));
+            yearList.add(new SelectItem(year));
         }
         setYears(yearList);
     }
@@ -175,62 +183,98 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         turnoverPerCustomer.add("Penelope SR2");
         return turnoverPerCustomer;
     }
-    
+
+    public BillingListBean() {
+        model = new BarChartModel();
+        ChartSeries q1 = new ChartSeries();
+        q1.setLabel("Q1");
+        q1.set("1", 120);
+        q1.set("2", 100);
+        q1.set("3", 44);
+        ChartSeries q2 = new ChartSeries();
+        q2.setLabel("Q2");
+        q2.set("4", 120);
+        q2.set("5", 44);
+        q2.set("6", 100);
+        ChartSeries q3 = new ChartSeries();
+        q3.setLabel("Q3");
+        q3.set("7", 80);
+        q3.set("8", 44);
+        q3.set("9", 120);
+        ChartSeries q4 = new ChartSeries();
+        q4.setLabel("Q4");
+        q4.set("10", 44);
+        q4.set("12", 100);
+        q4.set("12", 80);
+        model.addSeries(q1);
+        model.addSeries(q2);
+        model.addSeries(q3);
+        model.addSeries(q4);
+        model.setTitle("Accumulation of sales per quarter");
+        model.setLegendPosition("ne");
+        model.setSeriesColors("11773340");
+        model.setShadow(false);
+        Axis xAxis = model.getAxis(AxisType.X);
+        xAxis.setLabel("");
+        Axis yAxis = model.getAxis(AxisType.Y);
+        yAxis.setLabel("Sales");
+        yAxis.setMin(0);
+        yAxis.setMax(200);
+    }
+
     public void filterTableFromPanel() throws IllegalAccessException, PersistenceBeanException {
-    	List<Criterion> restrictions = new ArrayList<>();
-    	List<Criterion> restrictionsLike = new ArrayList<>();
-    	
-    	if(!ValidationHelper.isNullOrEmpty(getFilterInvoiceNumber())) {
+        List<Criterion> restrictions = new ArrayList<>();
+        List<Criterion> restrictionsLike = new ArrayList<>();
+
+        if(!ValidationHelper.isNullOrEmpty(getFilterInvoiceNumber())) {
             Criterion r = Restrictions.eq("number", getFilterInvoiceNumber());
             restrictionsLike.add(r);
         }
 
-    	if (!ValidationHelper.isNullOrEmpty(getSelectedCompanyId())) {
-    		restrictions.add(Restrictions.eq("client.id", getSelectedCompanyId()));
+        if (!ValidationHelper.isNullOrEmpty(getSelectedCompanyId())) {
+            restrictions.add(Restrictions.eq("client.id", getSelectedCompanyId()));
         }
-    	
-    	if (!ValidationHelper.isNullOrEmpty(getDateFrom())) {
+
+        if (!ValidationHelper.isNullOrEmpty(getDateFrom())) {
             restrictions.add(Restrictions.ge("date", DateTimeHelper.getDayStart(getDateFrom())));
         }
 
         if (!ValidationHelper.isNullOrEmpty(getDateTo())) {
             restrictions.add(Restrictions.le("date", DateTimeHelper.getDayEnd(getDateTo())));
         }
-        
+
         if (!ValidationHelper.isNullOrEmpty(getManagerClientFilterid())) {
-            restrictions.add(Restrictions.eq("manager.id",  getManagerClientFilterid()));
+            restrictions.add(Restrictions.eq("managerId",  getManagerClientFilterid()));restrictions.add(Restrictions.eq("manager.id",  getManagerClientFilterid()));
         }
-        
+
         if (!ValidationHelper.isNullOrEmpty(getSelectedOfficeId())) {
-            restrictions.add(Restrictions.eq("office.id",  getSelectedOfficeId()));
+            restrictions.add(Restrictions.eq("office.id", getSelectedOfficeId()));
         }
-        
-        if (!ValidationHelper.isNullOrEmpty(getFilterNotes())) {
+
+            if (!ValidationHelper.isNullOrEmpty(getFilterNotes())) {
             restrictions.add(Restrictions.eq("notes", getFilterNotes()));
         }
-        
+
         if (!ValidationHelper.isNullOrEmpty(getFilterNdg())) {
             restrictions.add(Restrictions.eq("ndg", getFilterNdg()));
         }
-        
+
         if (!ValidationHelper.isNullOrEmpty(getFilterPractice())) {
             restrictions.add(Restrictions.eq("practice", getFilterPractice()));
         }
-    	
-    	if(restrictionsLike.size() > 0) {
+
+        if(restrictionsLike.size() > 0) {
             if(restrictionsLike.size() > 1) {
                 restrictions.add(Restrictions.or(restrictionsLike.toArray(new Criterion[restrictionsLike.size()])));
             }else {
                 restrictions.add(restrictionsLike.get(0));
             }
         }
-    	
         loadList(Invoice.class, restrictions.toArray(new Criterion[0]), new Order[]{
                 Order.desc("number")});
-        
     }
-    
-    public void clearFiltraPanel() {
+
+    public void clearFilterPanel() throws PersistenceBeanException, IllegalAccessException {
         setDateFrom(null);
         setDateTo(null);
         setSelectedClientId(null);
@@ -240,12 +284,13 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setFilterNdg(null);
         setFilterPractice(null);
         setFilterAll(null);
+        filterTableFromPanel();
     }
-    
+
     public void reset() throws NumberFormatException, HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException, IOException  {
-    	setDateFrom(null);
+        setDateFrom(null);
         setDateTo(null);
-    	setSelectedClientId(null);
+        setSelectedClientId(null);
         setManagerClientFilterid(null);
         setSelectedOfficeId(null);
         setFilterNotes(null);
@@ -253,18 +298,19 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setFilterPractice(null);
         this.onLoad();
     }
-    
+
     private void loadCompanies(List<Client> clients) throws HibernateException, IllegalAccessException, PersistenceBeanException {
-    	List<SelectItem> companies = new ArrayList<SelectItem>();
-    	for(Client client: clients) {
-        	if(client.getNameOfTheCompany() != null && !client.getNameOfTheCompany().isEmpty())
-        		companies.add(new SelectItem(client.getId(), client.getNameOfTheCompany()));
-        	else
-        		companies.add(new SelectItem(client.getId(), client.getNameProfessional()));
+        List<SelectItem> companies = new ArrayList<SelectItem>();
+        for(Client client: clients) {
+            if(client.getNameOfTheCompany() != null && !client.getNameOfTheCompany().isEmpty())
+                companies.add(new SelectItem(client.getId(), client.getNameOfTheCompany()));
+            else
+                companies.add(new SelectItem(client.getId(), client.getNameProfessional()));
         }
-    	
-    	setCompanies(companies.stream()
-    	        .sorted(Comparator.comparing(SelectItem::getLabel))
-    	        .collect(Collectors.toList()));
+
+        setCompanies(companies.stream()
+                .sorted(Comparator.comparing(SelectItem::getLabel))
+                .collect(Collectors.toList()));
     }
+
 }
