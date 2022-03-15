@@ -292,12 +292,12 @@
                     <div class="ui-g">
                         <div class="ui-g-3" style="padding: 1%">
                             <span> #{msg.requestRequestType}<span class="red">*</span>:</span><br/>
-                            <p:selectCheckboxMenu id="servicerequestType" value="#{bean.selectedRequestTypes}" multiple="true"
-                                                  label="#{msg.requestRequestType}" styleClass="select-width">
-                                <p:ajax delay="500" event="change" listener="#{bean.onRequestTypeChangeBlock}"
+                            <p:selectOneMenu id="servicerequestType" value="#{bean.selectedRequestTypesIdMultiple}"
+                                     label="#{msg.requestRequestType}" styleClass="select-width">
+                        		<p:ajax delay="500" event="change" listener="#{bean.onRequestTypeChangeBlock}"
                                         update="multipleServiceRequest @this"/>
-                                <f:selectItems value="#{bean.requestTypes}"/>
-                            </p:selectCheckboxMenu>
+                        		<f:selectItems value="#{bean.requestTypes}"/>
+                    		</p:selectOneMenu>
                         </div>
                         <div class="ui-g-3" style="padding: 1%">
                             <span> #{msg.requestService}<span class="red">*</span>:</span><br/>

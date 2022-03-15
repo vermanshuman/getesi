@@ -82,6 +82,9 @@ import it.nexera.ris.web.beans.EntityEditPageBean;
 import it.nexera.ris.web.beans.base.AccessBean;
 import it.nexera.ris.web.beans.wrappers.logic.SubjectWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.UploadDocumentWrapper;
+import lombok.Getter;
+import lombok.Setter;
+
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 @ManagedBean(name = "requestEditBean")
@@ -109,7 +112,9 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private Long selectedRequestTypeId;
 
-    private Long[] selectedRequestTypes;
+    @Getter
+    @Setter
+    private Long selectedRequestTypesIdMultiple;
 
     private List<SelectItem> requestTypes;
 
@@ -471,9 +476,9 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         setRequestTypes(ComboboxHelper.fillList(RequestType.class));
         if(isMultipleRequestCreate()){
             if(getEntity().getRequestType() != null){
-                Long[] requestTypes = {getEntity().getRequestType().getId()};
-                setSelectedRequestTypes(requestTypes);
+                setSelectedRequestTypesIdMultiple(getEntity().getRequestType().getId());
                 getMultiRequestMap().put(getEntity().getRequestType().getId(),getEntity());
+                
             }
         }else{
             setSelectedRequestTypeId(getEntity().getRequestType() != null ? getEntity().getRequestType().getId() : null);
@@ -859,9 +864,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     }
 
     public void onRequestTypeChange() throws IllegalAccessException, PersistenceBeanException {
-        if(isMultipleRequestCreate() && !ValidationHelper.isNullOrEmpty(getSelectedRequestTypes())){
-            List<Long> reqTypeIds = Arrays.asList(getSelectedRequestTypes());
-            setServices(RequestHelper.onRequestTypeChange(reqTypeIds, isMultipleCreate()));
+        if(isMultipleRequestCreate() && !ValidationHelper.isNullOrEmpty(getSelectedRequestTypesIdMultiple())){
+        	setServices(RequestHelper.onRequestTypeChange(getSelectedRequestTypesIdMultiple(), isMultipleCreate()));
         }else{
             setServices(RequestHelper.onRequestTypeChange(getSelectedRequestTypeId(), isMultipleCreate()));
         }
@@ -1325,7 +1329,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     @Override
     public void onValidate() throws PersistenceBeanException, HibernateException, IllegalAccessException {
-        if (isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedRequestTypes())) {
+    	if (isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedRequestTypesIdMultiple())) {	
             addRequiredFieldException("form:servicerequestType");
         }
 
@@ -1339,7 +1343,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     public void onSave() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         List<Long> selectedServiceReqType = new ArrayList();
         if(isMultipleRequestCreate()){
-            selectedServiceReqType = Arrays.asList(getSelectedRequestTypes());
+        	selectedServiceReqType.add(getSelectedRequestTypesIdMultiple());
         }else{
             selectedServiceReqType.add(getSelectedRequestTypeId());
         }
@@ -2334,7 +2338,6 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             executeJS("setTimeout(function(){PF('requestSaved').hide();}, 2000);");
             openRequestSubjectDialog();
             setShownFields(null);
-            setSelectedRequestTypes(new Long[]{});
             onRequestTypeChangeBlock();
             setSelectedServiceIds(new Long[]{});
             setInputCardList(null);
@@ -2346,6 +2349,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     public void onRequestTypeChangeBlock() throws IllegalAccessException, PersistenceBeanException {
         RequestContext.getCurrentInstance().execute("jQuery('.layout-mask')[0].style.display = 'block';");
         onRequestTypeChange();
+        setSelectedServiceIds(new Long[]{});
         RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 2000);");
     }
 
@@ -3043,21 +3047,6 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     public void setMutipleRequestObjTabPath(List<String> mutipleRequestObjTabPath) {
         this.mutipleRequestObjTabPath = mutipleRequestObjTabPath;
     }
-
-    /**
-     * @return the selectedRequestTypes
-     */
-    public Long[] getSelectedRequestTypes() {
-        return selectedRequestTypes;
-    }
-
-    /**
-     * @param selectedRequestTypes the selectedRequestTypes to set
-     */
-    public void setSelectedRequestTypes(Long[] selectedRequestTypes) {
-        this.selectedRequestTypes = selectedRequestTypes;
-    }
-
 
     /**
      * @return the multiRequestMap
