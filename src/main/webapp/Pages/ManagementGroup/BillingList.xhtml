@@ -941,7 +941,9 @@
 									<div class="p-col-3" style="padding-bottom: 0px !important;">
 										<div class="p-formgroup-inline">
 											<div class="p-field">
-												<p:commandButton value="#{msg.billingListCreateInvoice}"
+												<p:commandButton value="#{msg.billingListCreateInvoice}" id="createInvoice" action="#{bean.loadInvoiceDialogData}"
+                                                     update=":form" 
+                                                     oncomplete="PF('invoiceDialogBillingWV').show();"
 																 styleClass="ui-button-success p-mr-2 p-mb-2"/>
 											</div>
 										</div>
@@ -1116,6 +1118,8 @@
 				<div id="content_tab3" class="hide" style="display: none;">Content area3</div>
 				<div id="content_tab4" class="hide" style="display: none;">Content area4</div>
 			</main>
+			
+			<ui:include src="../Dialogs/InvoiceDialogBilling.xhtml"/>
 		</div>
 		<script>
 			$(".tab").on("click", function(event) {

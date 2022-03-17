@@ -1,22 +1,26 @@
 package it.nexera.ris.web.beans.pages;
 
+import it.nexera.ris.common.enums.VatCollectability;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.*;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.*;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
 import it.nexera.ris.web.beans.EntityLazyListPageBean;
 import it.nexera.ris.persistence.view.ClientView;
-
+import it.nexera.ris.persistence.view.RequestView;
 import lombok.Getter;
 import lombok.Setter;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.primefaces.component.tabview.TabView;
+import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.chart.Axis;
 import org.primefaces.model.chart.AxisType;
 import org.primefaces.model.chart.BarChartModel;
@@ -27,6 +31,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 import java.io.IOException;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -100,6 +105,71 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private List<SelectItem> companies;
 
     private Long selectedCompanyId;
+    
+    private int activeTabIndex;
+    
+    private List<PaymentInvoice> paymentInvoices;
+    
+    private Double amountToBeCollected;
+    
+    private Double totalPayments;
+    
+    private Long number;
+    
+    private String invoiceNumber;
+    
+    private Request examRequest;
+
+    private boolean multipleCreate;
+
+    //private MenuModel topMenuModel;
+
+    //private int activeMenuTabNum;
+
+    private List<InputCard> inputCardList;
+
+    private Double invoiceItemAmount;
+
+   // private Double invoiceItemVat;
+
+    private Double invoiceTotalCost;
+
+    private List<SelectItem> vatAmounts;
+
+    private List<SelectItem> docTypes;
+
+    private Date competence;
+
+    private List<SelectItem> ums;
+
+    private Long vatCollectabilityId;
+
+    private List<SelectItem> vatCollectabilityList;
+
+    private List<SelectItem> paymentTypes;
+
+    private Long selectedPaymentTypeId;
+
+    private Date invoiceDate;
+
+    private String invoiceNote;
+
+    private String apiError;
+
+    private boolean sendInvoice;
+
+    private Boolean billinRequest;
+
+    private String documentType;
+
+    List<RequestView> filteredRequest;
+
+    String invoiceErrorMessage;
+
+    private boolean invoiceSentStatus;
+
+    private Long selectedTaxRateId;
+    
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -125,6 +195,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
         setOffices(ComboboxHelper.fillList(Office.class, Boolean.TRUE));
         loadCompanies(clients);
+        
+        setActiveTabIndex(0);
+        
     }
 
     private void fillYears() throws HibernateException, IllegalAccessException, PersistenceBeanException {
@@ -311,6 +384,92 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setCompanies(companies.stream()
                 .sorted(Comparator.comparing(SelectItem::getLabel))
                 .collect(Collectors.toList()));
+    }
+    
+    public final void onTabChange(final TabChangeEvent event) {
+        TabView tv = (TabView) event.getComponent();
+        this.activeTabIndex = tv.getActiveIndex();
+        //SessionHelper.put("activeTabIndex", activeTabIndex);
+    }
+    
+    public void loadInvoiceDialogData() throws IllegalAccessException, PersistenceBeanException  {
+    	List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[] {Restrictions.isNotNull("date")}, new Order[]{
+                Order.desc("date")});
+    	setPaymentInvoices(paymentInvoicesList);
+    	double totalImport = 0.0;
+    	for(PaymentInvoice paymentInvoice : paymentInvoicesList) {
+    		totalImport = totalImport + paymentInvoice.getPaymentImport().doubleValue();
+    	}
+    	setMaxInvoiceNumber();
+    	docTypes = new ArrayList<>();
+        docTypes.add(new SelectItem("FE", "FATTURA"));
+        setDocumentType("FE");
+        competence = new Date();
+        setVatCollectabilityList(ComboboxHelper.fillList(VatCollectability.class,
+                false, false));
+        paymentTypes = ComboboxHelper.fillList(PaymentType.class);
+        setInvoiceTotalCost(CollectionUtils.emptyIfNull(getFilteredRequest())
+                .stream()
+                .filter(r -> !ValidationHelper.isNullOrEmpty(r.getTotalCost()))
+                .mapToDouble(r -> Double.parseDouble(r.getTotalCostDouble())).sum());
+        ums = new ArrayList<>();
+        ums.add(new SelectItem("pz", "pz"));
+
+        vatAmounts = new ArrayList<>();
+        vatAmounts.add(new SelectItem(0D, "0%"));
+        vatAmounts.add(new SelectItem(4D, "4%"));
+        vatAmounts.add(new SelectItem(10D, "10%"));
+        vatAmounts.add(new SelectItem(22D, "22%"));
+    }
+    
+    public void setMaxInvoiceNumber() throws HibernateException {
+        LocalDate currentdate = LocalDate.now();
+        int currentYear = currentdate.getYear();
+
+        Long lastInvoiceNumber = 0l;
+        try {
+            lastInvoiceNumber = (Long) DaoManager.getMax(Invoice.class, "id",
+                    new Criterion[]{});
+        } catch (PersistenceBeanException | IllegalAccessException e) {
+            LogHelper.log(log, e);
+        }
+        if(lastInvoiceNumber == null)
+            lastInvoiceNumber = 0l;
+        String invoiceNumber = (lastInvoiceNumber + 1) + "-" + currentYear + "-FE";
+        setInvoiceNumber(invoiceNumber);
+        setNumber(lastInvoiceNumber + 1);
+    }
+    
+    public Double getTotalVat() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+        Double totalVat = 0D;
+        if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost())){
+            if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateId())){
+                TaxRate taxrate = DaoManager.get(TaxRate.class, getSelectedTaxRateId());
+                if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
+                    totalVat += getInvoiceTotalCost() * (taxrate.getPercentage().doubleValue()/100);
+                }
+            }
+        }
+        return totalVat;
+    }
+    
+    public Double getTotalGrossAmount() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+
+        Double totalGrossAmount = 0D;
+
+        if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost())){
+            totalGrossAmount += getInvoiceTotalCost();
+            if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateId())){
+                TaxRate taxrate = DaoManager.get(TaxRate.class, getSelectedTaxRateId());
+                if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
+                    totalGrossAmount += (getInvoiceTotalCost() * (taxrate.getPercentage().doubleValue()/100));
+                }
+            }
+//            if(!ValidationHelper.isNullOrEmpty(getInvoiceItemVat())){
+//                totalGrossAmount += (getInvoiceTotalCost() * (getInvoiceItemVat()/100));
+//            }
+        }
+        return totalGrossAmount;
     }
 
 }
