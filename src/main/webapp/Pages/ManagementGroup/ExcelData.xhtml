@@ -11,7 +11,6 @@
 	<ui:param name="bean" value="#{excelDataEdit}" />
 
 	<ui:define name="view_body">
-		<style></style>
 		<p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group">
 			<h:outputText value="#{msg.client}:"/>
 			<p:selectOneMenu id="client_not_manger_or_fiduciary_id"
@@ -70,7 +69,7 @@
 		<ui:repeat value="#{bean.dataTable}" var="key">
 			<p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
 				<h:outputText value="#{key.requestName}" style="font-weight:bold;font-size: 20px;" />
-				<p:dataTable value="#{key.requestWrappers}" var="req" rowIndexVar="row">
+				<p:dataTable value="#{key.requests}" var="req" rowIndexVar="row">
 					<p:columns value="#{key.columnNames}" var="column">
 						<f:facet name="header">
 							<h:outputText value="#{column}" />
@@ -82,7 +81,7 @@
 					</p:columns>
 					<p:column exportable="false" styleClass="action_midle_column">
 						<p:commandButton icon="fa fa-pencil-square-o" action="#{bean.viewExtraCost()}">
-							<f:setPropertyActionListener value="#{req.requestId}" target="#{bean.requestId}"/>
+							<f:setPropertyActionListener value="#{req.id ne null ? req.id : req.referenceId}" target="#{bean.requestId}"/>
 						</p:commandButton>
 					</p:column>
 				</p:dataTable>
@@ -103,7 +102,7 @@
 			</p:panelGrid>
 		</ui:remove>
 		<p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group additional_button">
-			<p:commandButton id="generate_xls"
+			<p:commandButton id="generateExcel"
 							 action="#{bean.generateXlsRequestCost}"
 							 value="#{msg.submit}"
 							 icon="ui-icon-disk"

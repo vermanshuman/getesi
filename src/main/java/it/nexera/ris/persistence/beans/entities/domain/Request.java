@@ -452,6 +452,9 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     @Transient
     private Boolean salesDevelopment;
 
+    @Transient
+    private Long referenceId;
+
     public Boolean getHaveRequestReport() {
         if (haveRequestReport == null) {
             try {
@@ -555,6 +558,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
             request.setRequestMangerList(new ArrayList<Client>());
             request.getRequestMangerList().addAll(getRequestMangerList());
         }
+        request.setEvasionDate(getEvasionDate());
         return request;
     }
 
@@ -2045,5 +2049,13 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     public String getEvasionDateStr() {
         return DateTimeHelper.toString(getEvasionDate());
+    }
+
+    public Long getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(Long referenceId) {
+        this.referenceId = referenceId;
     }
 }

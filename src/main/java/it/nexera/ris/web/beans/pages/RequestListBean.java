@@ -196,6 +196,8 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     private Integer rowsPerPage;
 
+    private boolean stateWrapperSelected;
+
     private static final String KEY_CLIENT_ID = "KEY_CLIENT_ID_SESSION_KEY_NOT_COPY";
     private static final String KEY_STATES = "KEY_STATES_SESSION_KEY_NOT_COPY";
     private static final String KEY_REQUEST_TYPE = "KEY_REQUEST_TYPE_SESSION_KEY_NOT_COPY";
@@ -965,6 +967,12 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     public void manageRequest() {
 
+        if(!isStateWrapperSelected()){
+            setStateWrappers(new ArrayList<>());
+            Arrays.asList(RequestState.values()).forEach(st -> getStateWrappers()
+                    .add(new RequestStateWrapper(PageTypes.REPORT_LIST.equals(getCurrentPage())
+                            ? RequestState.EVADED.equals(st) : st.isNeedShow(), st)));
+        }
         SessionHelper.put("searchLastName", getSearchLastName());
         SessionHelper.put("searchFiscalCode", getSearchFiscalCode());
         SessionHelper.put("searchCreateUser", getSearchCreateUser());
@@ -975,6 +983,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public void filterTableFromPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        setStateWrapperSelected(Boolean.TRUE);
         updateFilterValueInSession();
         List<Criterion> restrictions = RequestHelper.filterTableFromPanel(getDateFrom(), getDateTo(), getDateFromEvasion(),
                 getDateToEvasion(), getSelectedClientId(), getRequestTypeWrappers(), getStateWrappers(), getUserWrappers(),
@@ -1130,6 +1139,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public void selectStateForFilter() {
+        setStateWrapperSelected(Boolean.TRUE);
         if (!ValidationHelper.isNullOrEmpty(this.getStateWrappers())) {
             for (RequestStateWrapper wkrsw : this.getStateWrappers()) {
                 if (wkrsw.getId()
@@ -1871,6 +1881,13 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public void onPageChange(PageEvent event) {
+
+        getStateWrappers().stream()
+                .forEach(s -> {
+                    System.out.println(">>>>>>>>>>>>put> " + s.getSelected());
+                });
+
+
         if (event != null)
             setTablePage(event.getPage());
         SessionHelper.put(KEY_PAGE_NUMBER, Long.toString(getTablePage()));
@@ -1886,5 +1903,13 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                 }
             }
         }
+    }
+
+    public boolean isStateWrapperSelected() {
+        return stateWrapperSelected;
+    }
+
+    public void setStateWrapperSelected(boolean stateWrapperSelected) {
+        this.stateWrapperSelected = stateWrapperSelected;
     }
 }

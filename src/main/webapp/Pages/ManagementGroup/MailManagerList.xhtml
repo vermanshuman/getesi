@@ -217,7 +217,7 @@
                 </ui:fragment>
 
                 <ui:fragment id="table_panel">
-                    <p:dataTable var="item" id="table" first="#{bean.tablePage}" dynamic="true"
+                    <p:dataTable var="item" id="table" first="#{bean.tablePage}"
                                  filteredValue="#{mailManagerListBean.filteredList}"
                                  emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyModel}"
                                  rowKey="#{item.id}" rows="#{bean.rowsPerPage}" lazy="true" paginator="true"

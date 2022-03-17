@@ -12,7 +12,7 @@ import it.nexera.ris.persistence.beans.entities.domain.EstateSituation;
 import it.nexera.ris.persistence.beans.entities.domain.Formality;
 import it.nexera.ris.persistence.beans.entities.domain.Request;
 import it.nexera.ris.web.beans.pages.RequestTextEditBean;
-import org.hibernate.HibernateException;
+import org.apache.commons.collections4.CollectionUtils;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 
@@ -24,6 +24,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static it.nexera.ris.common.helpers.TemplatePdfTableHelper.distinctByKey;
 
 public class RealEstateRelationshipTableGenerator extends TagTableGenerator {
 
@@ -76,7 +78,12 @@ public class RealEstateRelationshipTableGenerator extends TagTableGenerator {
                 showAgriculturalIncome = estateSituation.getRequest().getClient().getShowAgriculturalIncome();
             }
 
-            List<String> property = TemplatePdfTableHelper.groupPropertiesByQuoteTypeList(estateSituation.getPropertyList(),
+
+
+            List<String> property = TemplatePdfTableHelper.groupPropertiesByQuoteTypeList(
+                    CollectionUtils.emptyIfNull(estateSituation.getPropertyList())
+                            .stream().filter(distinctByKey(x -> x.getId()))
+                            .collect(Collectors.toList()),
                     estateSituation.getRequest().getSubject(), estateSituation.getRequest(), true, showCadastralIncome, showAgriculturalIncome);
             if (!ValidationHelper.isNullOrEmpty(property)) {
                 wrapper.descriptionRows.addAll(property);

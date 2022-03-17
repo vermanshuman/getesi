@@ -174,6 +174,24 @@ public class EntityLazyListModel<T extends IEntity> extends LazyDataModel<T> {
             Long rowCount = (Long) countCriteria.uniqueResult();
             end = System.currentTimeMillis();
             if (WLGInboxShort.class.getName().equals(clazz.getName())) {
+//
+//                CriteriaImpl criteriaImpl = (CriteriaImpl)countCriteria;
+//                SessionImplementor session = criteriaImpl.getSession();
+//                SessionFactoryImplementor factory = session.getFactory();
+//                CriteriaQueryTranslator translator=new CriteriaQueryTranslator(factory,criteriaImpl,criteriaImpl.getEntityOrClassName(),CriteriaQueryTranslator.ROOT_SQL_ALIAS);
+//                String[] implementors = factory.getImplementors( criteriaImpl.getEntityOrClassName() );
+//
+//                CriteriaJoinWalker walker = new CriteriaJoinWalker((OuterJoinLoadable)factory.getEntityPersister(implementors[0]),
+//                        translator,
+//                        factory,
+//                        criteriaImpl,
+//                        criteriaImpl.getEntityOrClassName(),
+//                        session.getLoadQueryInfluencers()   );
+//
+//                String sql=walker.getSQLString();
+//
+//                System.out.println(">>>>>>>>>>>>>>>>> " + sql);
+
                 log.info("Execution time for rowCount is " + formatter.format((end - start) / 1000d) + " seconds");
             }else  if (RequestView.class.getName().equals(clazz.getName())) {
                 log.info("Execution time for rowCount(Request list) is " + formatter.format((end - start) / 1000d) + " seconds");

@@ -16,6 +16,7 @@ import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
 import it.nexera.ris.web.beans.EntityEditPageBean;
 import it.nexera.ris.web.beans.wrappers.logic.SubjectRelationshipWrapper;
+import org.apache.commons.collections4.CollectionUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
@@ -35,6 +36,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
+
+import static it.nexera.ris.common.helpers.TemplatePdfTableHelper.distinctByKey;
 
 @ManagedBean(name = "realEstateEditBean")
 @ViewScoped
@@ -135,7 +138,9 @@ public class RealEstateEditBean extends EntityEditPageBean<Property> implements 
         setNewCadastralDataDlg(new CadastralData());
         setCadastralDataList(new ArrayList<>());
         if (!getEntity().isNew()) {
-            for (CadastralData cd : getEntity().getCadastralData()) {
+            for (CadastralData cd : CollectionUtils.emptyIfNull(getEntity().getCadastralData())
+                    .stream().filter(distinctByKey(x -> x.getId()))
+                    .collect(Collectors.toList())) {
                 addCadastralData(cd);
             }
         }

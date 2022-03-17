@@ -57,8 +57,10 @@ public class PropertyEntityHelper {
     }
 
     public static String getEstimateOMIRequestText(Property property) {
-        List<EstimateOMIHistory> list = managePropertyListOMIComm(property).stream().map(Property::getEstimateOMIHistory)
-                .flatMap(List::stream).sorted(new EstimateOMIComparator()).collect(Collectors.toList());
+        // https://trello.com/c/Bd1LZQoJ/674-omi-value-error
+        List<EstimateOMIHistory> list = property.getEstimateOMIHistory();
+//                managePropertyListOMIComm(property).stream().map(Property::getEstimateOMIHistory)
+//                .flatMap(List::stream).sorted(new EstimateOMIComparator()).collect(Collectors.toList());
 
         return ValidationHelper.isNullOrEmpty(list) ? "" : list.get(0).getEstimateOMI();
     }
@@ -80,8 +82,10 @@ public class PropertyEntityHelper {
     }
 
     public static String getEstimateLastCommercialValueRequestText(Property property) {
-        List<CommercialValueHistory> list = managePropertyListOMIComm(property).stream().map(Property::getCommercialValueHistory)
-                .flatMap(List::stream).sorted(new CommercialValueHistoryComparator()).collect(Collectors.toList());
+        // https://trello.com/c/Bd1LZQoJ/674-omi-value-error
+        List<CommercialValueHistory> list = property.getCommercialValueHistory();
+//        List<CommercialValueHistory> list = managePropertyListOMIComm(property).stream().map(Property::getCommercialValueHistory)
+//                .flatMap(List::stream).sorted(new CommercialValueHistoryComparator()).collect(Collectors.toList());
 
         return ValidationHelper.isNullOrEmpty(list) ? "" : list.get(0).getCommercialValue();
     }

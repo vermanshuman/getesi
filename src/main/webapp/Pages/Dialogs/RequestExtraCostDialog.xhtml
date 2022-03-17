@@ -11,7 +11,7 @@
         }
     </style>
     <p:dialog widgetVar="requestExtraCostDlg" modal="true" width="600" id="requestExtraCostDialog" resizable="false">
-<!--        <p:scrollPanel mode="native" id="restoreRequestSubjectTableScrollBar" style="width: 100%; min-height: 600px; max-height: 800px;">-->
+        <!--        <p:scrollPanel mode="native" id="restoreRequestSubjectTableScrollBar" style="width: 100%; min-height: 600px; max-height: 800px;">-->
         <div class="cost_titles">
             <c:if test="#{bean.costManipulationHelper.isEditable()}">
                 <p:panelGrid rendered="#{bean.examRequest!=null}" columns="2" columnClasses="cost_form_column"
@@ -22,13 +22,13 @@
                     <h:outputText styleClass="bold_text" value="#{bean.examRequest.serviceName}"/>
                     <h3>#{msg.requestTextEditNumberFormalities}</h3>
                     <p:inputText value="#{bean.costManipulationHelper.numberActOrSumOfEstateFormalitiesAndOtherTemp}"
-                                   onkeypress="return numbers_only(this, event, 9, 0)" onkeyup="check_numbers(this, 9, 0);">
+                                 onkeypress="return numbers_only(this, event, 9, 0)" onkeyup="check_numbers(this, 9, 0);">
                         <p:ajax event="change" listener="#{bean.updateCosts()}"/>
                     </p:inputText>
                     <c:if test="#{bean.examRequest.showAuthorizedQuote()}">
-	                	<h3>#{msg.requestTextEditAuthorizedEstimate}</h3>
-			        	<p:selectBooleanCheckbox id="authorizedEstimate" value="#{bean.examRequest.authorizedQuote}"/>
-		        	</c:if>
+                        <h3>#{msg.requestTextEditAuthorizedEstimate}</h3>
+                        <p:selectBooleanCheckbox id="authorizedEstimate" value="#{bean.examRequest.authorizedQuote}"/>
+                    </c:if>
                     <h3>#{msg.requestTextEditNumberSummaryList}</h3>
                     <h:outputText value="#{bean.examRequest.numberOfGroupsByDocumentOfEstateFormality}"/>
                     <h3>#{msg.requestTextEditMortgageExpenses}</h3>
@@ -37,17 +37,17 @@
                     <p:inputNumber value="#{bean.costManipulationHelper.costCadastralTemp}"/>
                     <h3>#{msg.requestTextEditCompensation}</h3>
                     <p:inputNumber value="#{bean.costManipulationHelper.costPayTemp}"/>
-                     <h3>#{msg.requestTaxableCost}</h3>
+                    <h3>#{msg.requestTaxableCost}</h3>
                     <p:inputNumber id="requestTaxableCost" value="#{bean.costManipulationHelper.taxableCostTemp}"/>
                     <h3>#{msg.requestIncludeNationalCost} </h3>
-                     <p:selectBooleanCheckbox id="includeNationalCost" value="#{bean.costManipulationHelper.includeNationalCost}">
-                     	<p:ajax listener="#{bean.updateNationalCost()}" update="@this requestExtraCostTable includeNationalCostDialog"/>
-                     </p:selectBooleanCheckbox>
+                    <p:selectBooleanCheckbox id="includeNationalCost" value="#{bean.costManipulationHelper.includeNationalCost}">
+                        <p:ajax listener="#{bean.updateNationalCost()}" update="@this requestExtraCostTable includeNationalCostDialog"/>
+                    </p:selectBooleanCheckbox>
                     <h3>#{msg.requestExtraCostInit}</h3>
                     <p:inputNumber id="requestExtraCostInit" value="#{bean.costManipulationHelper.initCostTemp}"/>
                     <c:if test="#{bean.hideExtraCost ne null and bean.hideExtraCost}">
-                    	<h3>#{msg.requestCostNote}</h3> 
-            			<p:inputText value="#{bean.costNote}"/>
+                        <h3>#{msg.requestCostNote}</h3>
+                        <p:inputText value="#{bean.costNote}"/>
                     </c:if>
                 </p:panelGrid>
             </c:if>
@@ -55,33 +55,33 @@
                 <h3>#{msg.estateSituationEditClientName}    <h:outputText value="#{bean.examRequest.clientName}"/></h3>
                 <h3>#{msg.estateSituationEditRequestType}   <h:outputText value="#{bean.examRequest.serviceName}"/></h3>
                 <h3>#{msg.requestTextEditNumberFormalities} <h:outputText value="#{bean.costManipulationHelper.numberActOrSumOfEstateFormalitiesAndOtherTemp}"/></h3>
-                 <c:if test="#{bean.examRequest.showAuthorizedQuote()}">
-                	<h3>#{msg.requestTextEditAuthorizedEstimate}
-		            	<p:selectBooleanCheckbox id="authorizedEstimate" value="#{bean.examRequest.authorizedQuote}"/>
-		            </h3>
-		        </c:if>          
+                <c:if test="#{bean.examRequest.showAuthorizedQuote()}">
+                    <h3>#{msg.requestTextEditAuthorizedEstimate}
+                        <p:selectBooleanCheckbox id="authorizedEstimate" value="#{bean.examRequest.authorizedQuote}"/>
+                    </h3>
+                </c:if>
                 <h3>#{msg.requestTextEditNumberSummaryList} <h:outputText value="#{bean.examRequest.numberOfGroupsByDocumentOfEstateFormality}"/></h3>
                 <h3>#{msg.requestTextEditMortgageExpenses}  <h:outputText value="#{bean.costManipulationHelper.costEstateFormalityTemp}"/></h3>
                 <h3>#{msg.requestTextEditLandRegistryFees}  <h:outputText value="#{bean.costManipulationHelper.costCadastralTemp}"/></h3>
                 <h3>#{msg.requestTextEditCompensation}      <h:outputText value="#{bean.costManipulationHelper.costPayTemp}"/></h3>
                 <h3>#{msg.requestTaxableCost}             <h:outputText id="requestTaxableCost" value="#{bean.costManipulationHelper.taxableCostTemp}"/> </h3>
-                 <h3>#{msg.requestIncludeNationalCost} 
-                     <p:selectBooleanCheckbox id="includeNationalCost" value="#{bean.costManipulationHelper.includeNationalCost}">
-                          <p:ajax listener="#{bean.updateNationalCost()}" update="@this requestExtraCostTable includeNationalCostDialog"/>
-                     </p:selectBooleanCheckbox>
-                 </h3> 
+                <h3>#{msg.requestIncludeNationalCost}
+                    <p:selectBooleanCheckbox id="includeNationalCost" value="#{bean.costManipulationHelper.includeNationalCost}">
+                        <p:ajax listener="#{bean.updateNationalCost()}" update="@this requestExtraCostTable includeNationalCostDialog"/>
+                    </p:selectBooleanCheckbox>
+                </h3>
                 <h3>#{msg.requestExtraCostInit}             <h:outputText id="requestExtraCostInit" value="#{bean.costManipulationHelper.initCostTemp}"/> </h3>
                 <c:if test="#{bean.hideExtraCost ne null and bean.hideExtraCost}">
-                	<h3>#{msg.requestCostNote} <h:outputText value="#{bean.costNote}"/></h3>  
+                    <h3>#{msg.requestCostNote} <h:outputText value="#{bean.costNote}"/></h3>
                 </c:if>
                 <c:if test="#{bean.hideExtraCost eq null or not bean.hideExtraCost}">
-                	<h3>#{msg.requestExtraCost}</h3>
-            	</c:if>
+                    <h3>#{msg.requestExtraCost}</h3>
+                </c:if>
             </c:if>
         </div>
 
-            <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" id="extraCostArea" 
-	        	rendered="#{bean.hideExtraCost eq null or not bean.hideExtraCost}">
+        <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" id="extraCostArea"
+                     rendered="#{bean.hideExtraCost eq null or not bean.hideExtraCost}">
             <span> #{msg.requestExtraCostMortgage.toUpperCase()}</span>
             <p:column>
                 <p:selectOneMenu id="mortgageType" value="#{bean.costManipulationHelper.selectedMortgageNote}" style="width:82%">
@@ -102,30 +102,30 @@
             <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('CATASTO')}"
                              update="extraCostArea, requestExtraCostTable"/>
 
-                <c:if test="#{bean.showRequestCost ne null and bean.showRequestCost}">
-                    <span> #{msg.requestExtraCostStamps.toUpperCase()}</span>
-                    <p:column>
-                        <p:spinner id="minMaxStamp" value="#{bean.costManipulationHelper.stampSpinnerNumber}" min="0" max="1000" size="1"/>
-                    </p:column>
-                    <p:column/>
-                    <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('MARCA')}"
-                                     update="extraCostArea, requestExtraCostTable"/>
+            <c:if test="#{bean.showRequestCost ne null and bean.showRequestCost}">
+                <span> #{msg.requestExtraCostStamps.toUpperCase()}</span>
+                <p:column>
+                    <p:spinner id="minMaxStamp" value="#{bean.costManipulationHelper.stampSpinnerNumber}" min="0" max="1000" size="1"/>
+                </p:column>
+                <p:column/>
+                <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('MARCA')}"
+                                 update="extraCostArea, requestExtraCostTable"/>
 
-                    <span> #{msg.requestExtraCostPostalExpense.toUpperCase()}</span>
-                    <p:column>
-                        <p:inputText id="inputCostPostalExp" value="#{bean.costManipulationHelper.extraCostPostalExpense}"/>
-                    </p:column>
-                    <p:column/>
-                    <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('POSTALE')}"
-                                     update="extraCostArea, requestExtraCostTable"/>
+                <span> #{msg.requestExtraCostPostalExpense.toUpperCase()}</span>
+                <p:column>
+                    <p:inputText id="inputCostPostalExp" value="#{bean.costManipulationHelper.extraCostPostalExpense}"/>
+                </p:column>
+                <p:column/>
+                <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('POSTALE')}"
+                                 update="extraCostArea, requestExtraCostTable"/>
 
-                    <span> #{msg.requestExtraCostOther.toUpperCase()}</span>
-                </c:if>
+                <span> #{msg.requestExtraCostOther.toUpperCase()}</span>
+            </c:if>
 
             <p:column>
                 <p:inputText id="inputCostOther" value="#{bean.costManipulationHelper.extraCostOther}" placeholder="Costo" />
             </p:column>
-           	<p:column>
+            <p:column>
                 <p:inputText id="inputCostOtherNote" value="#{bean.costManipulationHelper.extraCostOtherNote}" placeholder="Descrizione" />
             </p:column>
             <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('ALTRO')}"
@@ -134,7 +134,7 @@
 
 
         <p:dataTable scrollable="true" scrollHeight="200" value="#{bean.costManipulationHelper.requestExtraCosts}"
-                      var="extraCost" id="requestExtraCostTable" rendered="#{bean.hideExtraCost eq null or not bean.hideExtraCost}">
+                     var="extraCost" id="requestExtraCostTable" rendered="#{bean.hideExtraCost eq null or not bean.hideExtraCost}">
 
             <p:column headerText="#{msg.requestExtraCostPrice}">
                 <h:outputText value="#{extraCost.price}"/>
@@ -151,37 +151,37 @@
         <div class="btn_line">
             <p:commandButton value="#{msg.confirm}" update="@form"
                              action="#{bean.saveRequestExtraCost}" oncomplete="PF('requestExtraCostDlg').hide();"/>
-            
+
             <p:commandButton value="#{msg.cancel}" oncomplete="PF('requestExtraCostDlg').hide();"/>
         </div>
-         <p:dialog id="includeNationalCostDialog" header="Note!" widgetVar="includeNationalCostDialogWV"
-	              height="100px">
-	        #{msg.requestIncludeNationalCostMessage} <br/>
-	        <div class="btn_line">
-		        <p:commandButton
-		                  value="#{msg.ok}" oncomplete="PF('includeNationalCostDialogWV').hide()"/>
-		    </div>
-	    </p:dialog>
-         <p:dialog id="includeNationalCost2Dialog" header="Note!" widgetVar="includeNationalCost2DialogWV"
-	              height="100px">
-	        #{msg.requestAlreadyIncludeNationalCostMessage} <br/>
-	        <div class="btn_line">
-		        <p:commandButton
-		                  value="#{msg.ok}" oncomplete="PF('includeNationalCost2DialogWV').hide()"/>
-		    </div>
-	    </p:dialog>
-<!--        </p:scrollPanel>-->
+        <p:dialog id="includeNationalCostDialog" header="Note!" widgetVar="includeNationalCostDialogWV"
+                  height="100px">
+            #{msg.requestIncludeNationalCostMessage} <br/>
+            <div class="btn_line">
+                <p:commandButton
+                        value="#{msg.ok}" oncomplete="PF('includeNationalCostDialogWV').hide()"/>
+            </div>
+        </p:dialog>
+        <p:dialog id="includeNationalCost2Dialog" header="Note!" widgetVar="includeNationalCost2DialogWV"
+                  height="100px">
+            #{msg.requestAlreadyIncludeNationalCostMessage} <br/>
+            <div class="btn_line">
+                <p:commandButton
+                        value="#{msg.ok}" oncomplete="PF('includeNationalCost2DialogWV').hide()"/>
+            </div>
+        </p:dialog>
+        <!--        </p:scrollPanel>-->
 
-	</p:dialog>
-	<p:dialog id="reloadPageDialog" header="Note!"
-			widgetVar="reloadPageDialogWV" height="100px">
-	     #{msg.reloadPageMessage} <br />
-			<div class="btn_line">
-				<p:commandButton value="#{msg.confirm}" update="@form"
-					action="#{bean.reloadPage}"
-					oncomplete="PF('reloadPageDialogWV').hide();" />
-				<p:commandButton value="#{msg.cancel}"
-					oncomplete="PF('reloadPageDialogWV').hide();" />
-			</div>
-		</p:dialog>
+    </p:dialog>
+    <p:dialog id="reloadPageDialog" header="Note!"
+              widgetVar="reloadPageDialogWV" height="100px">
+        #{msg.reloadPageMessage} <br />
+        <div class="btn_line">
+            <p:commandButton value="#{msg.confirm}" update="@form"
+                             action="#{bean.reloadPage}"
+                             oncomplete="PF('reloadPageDialogWV').hide();" />
+            <p:commandButton value="#{msg.cancel}"
+                             oncomplete="PF('reloadPageDialogWV').hide();" />
+        </div>
+    </p:dialog>
 </ui:composition>

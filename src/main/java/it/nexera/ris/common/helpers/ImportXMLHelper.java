@@ -108,7 +108,7 @@ public class ImportXMLHelper extends BaseHelper {
 
     private static final String PERSON_PATTERN_ALT_COMUNE = "(([A-Z]{2,}\\s?){1,3})\\s(([a-zA-Z]{3,}\\s?){1,3})\\s(\\d*\\/\\d*\\/\\d*);\\sComune\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
 
-    private static final String PERSON_PATTERN_ALT_COMUNE_QUOTE = "(([A-Z']{2,}\\s?){1,3})\\s(([a-zA-Z]{3,}\\s?){1,3})\\s(\\d*\\/\\d*\\/\\d*);\\sComune\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
+    private static final String PERSON_PATTERN_ALT_COMUNE_QUOTE = "(([A-Z']{2,}\\s?){1,3})\\s(([a-zA-Z]{3,}\\s?){1,3})\\s(\\d*\\/\\d*\\/\\d*);\\sComune\\s(([A-Z']{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
 
     //private static final String PERSON_PATTERN_ALT_NO_DATE = "(([A-Z]{2,}\\s?){1,5});\\sComune\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
 

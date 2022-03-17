@@ -1,5 +1,6 @@
 package it.nexera.ris.web.beans.wrappers.logic;
 
+import static it.nexera.ris.common.helpers.TemplatePdfTableHelper.distinctByKey;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 import java.lang.reflect.Method;
@@ -19,6 +20,7 @@ import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.web.beans.pages.RequestTextEditBean;
 import it.nexera.ris.web.beans.wrappers.Pair;
 import it.nexera.ris.web.beans.wrappers.PartedPairsByCityWrapper;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1170,7 +1172,11 @@ public class TemplateEntity {
                                     da.append("&lt;ImmobileU&gt;");
                                     if (!ValidationHelper.isNullOrEmpty(property.getCadastralData())) {
                                         int counter = 1;
-                                        for (CadastralData cadastralData : property.getCadastralData()) {
+                                        for (CadastralData cadastralData :
+                                                CollectionUtils.emptyIfNull(property.getCadastralData())
+                                                        .stream()
+                                                        .filter(distinctByKey(x -> x.getId()))
+                                        .collect(Collectors.toList())) {
                                             if (property.getCadastralData().size() > 1) {
                                                 da.append("<br/>");
                                                 da.append("&lt;Graffati&gt;");
@@ -1267,7 +1273,10 @@ public class TemplateEntity {
                                     da.append("&lt;ImmobileT&gt;");
                                     if (!ValidationHelper.isNullOrEmpty(property.getCadastralData())) {
                                         int counter = 1;
-                                        for (CadastralData cadastralData : property.getCadastralData()) {
+                                        for (CadastralData cadastralData : CollectionUtils.emptyIfNull(property.getCadastralData())
+                                                .stream()
+                                                .filter(distinctByKey(x -> x.getId()))
+                                                .collect(Collectors.toList())) {
                                             if (property.getCadastralData().size() > 1) {
                                                 da.append("<br/>");
                                                 da.append("&lt;Graffati&gt;");
@@ -2029,7 +2038,9 @@ public class TemplateEntity {
         Map<Long, String> map = new HashMap<>();
         List<Pair<CadastralData, Property>> dataList = new ArrayList<>();
         for (Property property : propertyList) {
-            for (CadastralData cadastralData : property.getCadastralData()) {
+            for (CadastralData cadastralData : CollectionUtils.emptyIfNull(property.getCadastralData())
+            .stream().filter(distinctByKey(x -> x.getId()))
+            .collect(Collectors.toList())) {
                 dataList.add(new Pair<>(cadastralData, property));
             }
         }

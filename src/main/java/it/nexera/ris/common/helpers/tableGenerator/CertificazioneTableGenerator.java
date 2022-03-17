@@ -1,37 +1,6 @@
 package it.nexera.ris.common.helpers.tableGenerator;
 
-import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import it.nexera.ris.common.enums.*;
-import it.nexera.ris.common.exceptions.TypeFormalityNotConfigureException;
-import it.nexera.ris.persistence.beans.entities.domain.*;
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
-import org.hibernate.HibernateException;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
-
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.DateTimeHelper;
 import it.nexera.ris.common.helpers.ResourcesHelper;
@@ -39,8 +8,26 @@ import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.Dictionary;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
+import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.CadastralCategory;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.TypeFormality;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 public class CertificazioneTableGenerator extends InterlayerTableGenerator {
 
@@ -175,7 +162,11 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                 sb.append(frmTxt(property.getInterno(), ", interno "));
 
                 sb.append("<br/>");
-                sb.append(addCadastralDataToReport(property.getCadastralData()));
+                sb.append(addCadastralDataToReport(
+                        CollectionUtils.emptyIfNull(property.getCadastralData())
+                                .stream().filter(distinctByKey(x -> x.getId()))
+                                .collect(Collectors.toList())
+                ));
                 if (property.getCategoryCode().equals(CADASTRAL_CATEGORY_CODE)) {
                     sb.append(getLandData(property));
                 }
@@ -532,8 +523,10 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
     private Map<String, List<Formality>> getGroupedBySituationPropertyNotPrejudicialFormalitiesMap() {
         Map<String, List<Formality>> groupedFormalities = new LinkedHashMap<>();
         long order = 0;
+
         for (SituationProperty situationProperty : getRequest().getSituationEstateLocations().stream()
-                .map(EstateSituation::getSituationProperties).flatMap(List::stream)
+                .map(EstateSituation::getSituationProperties)
+                .flatMap(Set::stream)
                 .sorted(Comparator.comparing(IndexedEntity::getId)).collect(Collectors.toList())) {
             situationProperty.setOrderNumber(++order);
         }
@@ -968,7 +961,11 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
             for (EstateSituation estateSituation : situationEstateLocations) {
                 if(!ValidationHelper.isNullOrEmpty(estateSituation.getSalesDevelopment()) && estateSituation.getSalesDevelopment())
                     continue;
-                List<Property> propertyList = estateSituation.getPropertyList();
+             //   List<Property> propertyList = estateSituation.getPropertyList();
+                List<Property> propertyList =  CollectionUtils.emptyIfNull(estateSituation.getPropertyList())
+                        .stream().filter(distinctByKey(x -> x.getId()))
+                        .collect(Collectors.toList());
+
                 sortPropertiesByDistraintActIdProperties(propertyList);
 
                 if (!ValidationHelper.isNullOrEmpty(propertyList)) {
@@ -1037,7 +1034,9 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
 
             sb.append(getSubjectsRelationshipData(property));
 
-            addCadastralDataToReportCertificated(sb, property.getCadastralData());
+            addCadastralDataToReportCertificated(sb, CollectionUtils.emptyIfNull(property.getCadastralData())
+                    .stream().filter(distinctByKey(x -> x.getId()))
+                    .collect(Collectors.toList()));
             if(!ValidationHelper.isNullOrEmpty(property.getArea()) && !property.getArea().equals("0")) {
             	 sb.append(frmTxt(property.getArea(), ", zona censuaria "));
             }
