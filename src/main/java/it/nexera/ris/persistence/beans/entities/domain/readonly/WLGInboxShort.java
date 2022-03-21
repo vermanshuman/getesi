@@ -78,6 +78,9 @@ public class WLGInboxShort extends IndexedEntity {
     @JoinColumn(name = "change_state_user_id")
     private User userChangedState;
 
+    @Column(name = "email_cc", length = 400)
+    private String emailCC;
+
     @Transient
     private String[] emailFromStr;
 
@@ -305,5 +308,13 @@ public class WLGInboxShort extends IndexedEntity {
 
     public void setUserChangedState(User userChangedState) {
         this.userChangedState = userChangedState;
+    }
+
+    public String getEmailCC() {
+        return emailCC == null ? "" : emailCC;
+    }
+
+    public void setEmailCC(String emailCC) {
+        this.emailCC = emailCC;
     }
 }

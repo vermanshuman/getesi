@@ -451,24 +451,12 @@
 				padding-bottom:0px !important;
 			}
 
-			body .ui-datatable .ui-datatable-data > tr > td {
-				border-top: none !important;
-				border-left: none !important;
-				border-right: none !important;
-				border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+			#table_div_content .ui-widget, #table_div_content .ui-widget .ui-widget {
+				font-family: "Open Sans","Helvetica Neue",sans-serif !important;
+				text-decoration: none !important;
+				font-size: 14px !important;
 			}
 
-			.ui-datatable thead th, .ui-datatable tfoot td {
-				text-align: left !important;
-			}
-
-			.ui-datatable:not(.borderless) thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
-				border-width: 1px!important;
-				border-top: none !important;
-				border-left: none !important;
-				border-right: none !important;
-
-			}
 			#settingPanel {
 				position: absolute;
 				z-index: 1;
@@ -546,6 +534,37 @@
 				justify-content: center;
 			}
 
+			body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
+				background-color: #f0f3f5 !important;
+			}
+
+			.ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+				border: 1px solid #c9cdd2 !important;
+				color: #4c5156;
+			}
+
+			body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+				background: #FFF !important;
+				color: #000000 !important;
+			}
+
+			body .ui-datatable thead th {
+				background-color: #f8f9fa !important;
+				color: #495057 !important;
+				padding: 6px 6px !important;
+			}
+
+			body .ui-datatable .ui-datatable-data tr td {
+				padding: 6px 6px !important;
+			}
+
+			body .ui-datatable thead th.ui-state-active {
+				color: #2196F3 !important;
+			}
+
+			body .ui-datatable .ui-datatable-data > tr:hover {
+				background: #e9ecef !important;
+			}
 		</style>
 		<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
@@ -919,23 +938,23 @@
 						<div class="p-col-12 p-md-12">
 							<div class="card" style="border: none !important; padding-top:0px; padding-bottom:0px; margin-top:10px;">
 								<div class="p-grid">
-									<div class="p-col-3">
+									<div class="p-col-3" style="padding-bottom: 0px !important;">
 										<div class="p-formgroup-inline">
 											<div class="p-field">
 												<p:commandButton value="#{msg.billingListCreateInvoice}"
-																 actionListener="#{bean.createNewMail}" update="@form" styleClass="ui-button-success p-mr-2 p-mb-2"/>
+																 styleClass="ui-button-success p-mr-2 p-mb-2"/>
 											</div>
 										</div>
 									</div>
-									<div class="p-col-9">
+									<div class="p-col-9" style="padding-bottom: 0px !important;">
 										<div class="p-formgroup-inline alignEnd">
 											<div class="p-field">
 												<p:inputText id="filterInvoiceNumber" value="#{bean.filterInvoiceNumber}" placeholder="#{msg.billingListNumber}"/>
 											</div>
-											<p:selectOneMenu id="filterClient" value="#{bean.selectedClientId}" style="margin-right: 20px;"
-															 styleClass="#{bean.selectedClientId ne null ? 'select-one-menu' : ''}">
-												<f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}" itemValue="#{null}" noSelectionOption="true" />
-												<f:selectItems value="#{bean.clients}" />
+											<p:selectOneMenu id="filterClient" value="#{bean.selectedCompanyId}" style="margin-right: 20px;"
+															 styleClass="#{bean.selectedCompanyId ne null ? 'select-one-menu' : ''}">
+											<f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}" itemValue="#{null}" noSelectionOption="true" />
+												<f:selectItems value="#{bean.companies}" />
 												<p:ajax event="itemSelect" update="@this" />
 											</p:selectOneMenu>
 
@@ -943,7 +962,7 @@
 												<p:commandButton id="cercaButton" onclick="filterTableFromPanel();"
 																 styleClass="ui-button-warning-icon" update="searchPanel" icon="ui-icon ui-icon-search pi pi-search"/>
 											</div>
-											<p:commandButton id="settingButton" onclick="resetData(); PF('panelSetting').toggle()" type="button"
+											<p:commandButton id="settingButton" onclick="PF('panelSetting').toggle()" type="button"
 															 styleClass="ui-button-warning-icon"  icon="ui-icon ui-icon-search pi pi-sliders-h"/>
 											<p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" collapsed="true">
 												<div class="p-grid">
@@ -994,13 +1013,13 @@
 														</p:selectOneMenu>
 													</div>
 													<div class="p-col-6">
-														<p:selectOneMenu id="office" value="#{bean.aggregationFilterId}"
+														<p:selectOneMenu id="office" value="#{bean.selectedOfficeId}"
 																		 style="width: 100%;"
-																		 styleClass="#{bean.aggregationFilterId ne null ? 'select-one-menu' : ''}">
+																		 styleClass="#{bean.selectedOfficeId ne null ? 'select-one-menu' : ''}">
 															<f:selectItem itemLabel="#{msg.subjectViewFormalityConservatoryCap}"
 																		  itemValue="#{null}"
 																		  noSelectionOption="true"/>
-															<f:selectItems value="#{bean.landAggregations}"/>
+															<f:selectItems value="#{bean.offices}"/>
 															<p:ajax event="itemSelect" update="@this"/>
 														</p:selectOneMenu>
 													</div>
@@ -1022,14 +1041,14 @@
 																		 onclick="checkDates(); filterTableFromPanel();" update="searchPanel"
 																		 oncomplete="PF('panelSetting').toggle()"/>
 														<p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}"
-																		 actionListener="#{bean.clearFiltraPanel}" update="settingPanel"
+																		 actionListener="#{bean.clearFilterPanel}" update="settingPanel invoiceTable"
 																		 oncomplete="PF('panelSetting').toggle()"/>
 													</div>
 												</div>
 											</p:panel>
 										</div>
 									</div>
-									<div class="p-col-12">
+									<div class="p-col-12" style="margin-top: -15px; margin-bottom: -15px;">
 										<p:commandButton value="#{msg.billingListExcel}" style="float: right"/>
 									</div>
 								</div>
@@ -1050,25 +1069,25 @@
 						</ui:fragment>
 
 						<p:dataTable id="invoiceTable" value="#{bean.lazyModel}" emptyMessage="#{msg.noRecordsFound}"
-									 var="invoice" rows="10" lazy="true"
+									 var="invoice" rows="15" lazy="true"
 									 paginator="true" paginatorAlwaysVisible="true" rowIndexVar="rowId"
 									 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-									 rowsPerPageTemplate="10,20,50">
+									 rowsPerPageTemplate="15, 30, 45, 60">
 							<p:column headerText="#{msg.billingListNumber}" sortBy="#{invoice.number}">
 								<h:outputText value="#{invoice.number}"/>
 							</p:column>
 							<p:column headerText="#{msg.billingListDate}" sortBy="#{invoice.dateString}">
 								<h:outputText value="#{invoice.dateString}"/>
 							</p:column>
-							<p:column headerText="#{msg.billingListClient}" sortBy="#{invoice.client.nameOfTheCompany}">
-								<h:outputText value="#{invoice.client.nameOfTheCompany}"/>
+							<p:column headerText="#{msg.billingListClient}" sortBy="#{invoice.client}">
+								<h:outputText value="#{invoice.client}"/>
 							</p:column>
 							<p:column headerText="#{msg.billingListNotes}" sortBy="#{invoice.notes}">
 								<h:outputText value="#{invoice.notes}"/>
 							</p:column>
 							<p:column headerText="#{msg.billingListStatus}">
-								<p:commandButton value="#{invoice.status.toString()}" style="width: 142px;"
-												 styleClass="#{invoice.status.getId() == 1 ? 'orange-button' : (invoice.status.getId() == 3 ? 'green-button' : (invoice.status.getId() == 4 ? 'red-button' : 'button'))  }">
+								<p:commandButton value="#{invoice.status != null ? invoice.status.toString() : ff:upper(msg.billingListDraft)}" style="width: 150px;"
+												 styleClass="#{invoice.status == null ? 'orange-button' : (invoice.status.getId() == 1 ? 'orange-button' : (invoice.status.getId() == 3 ? 'green-button' : (invoice.status.getId() == 4 ? 'red-button' : 'button')))  }">
 								</p:commandButton>
 							</p:column>
 							<p:column headerText="#{msg.billingListAmount}" sortBy="#{invoice.totalAmount}">
@@ -1080,13 +1099,14 @@
 							<p:column rendered="#{invoice.email.id == null}">
 								<div class="icon-block">
 									<i class="email-icon-new"></i>
-									<i class="email-check-icon"></i>
 									<i class="menu-dots-icon"></i>
 								</div>
 							</p:column>
 							<p:column rendered="#{invoice.email.id != null}">
-								<i class="email-icon-new"></i>
-								<i class="correct-email-icon" style="position: relative; margin-left: 11%; margin-top: -31%;"></i>
+								<div class="icon-block">
+									<i class="email-check-icon"></i>
+									<i class="menu-dots-icon"></i>
+								</div>
 							</p:column>
 						</p:dataTable>
 					</p:panel>
@@ -1132,7 +1152,6 @@
 				$("#filterNotes").val("");
 				$("#filterNdg").val("");
 				$("#filterPractice").val("");
-				resetTableData();
 				return true;
 			}
 		</script>

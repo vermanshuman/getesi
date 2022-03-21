@@ -1017,26 +1017,28 @@
                                         <br/>
                                     </p:outputPanel>
                                 </td>
-                                <td  style="width: 9vw;min-width: 159px;position: relative">
-                                    <p:outputPanel>
+                                <td  style="width: 9vw;min-width: 159px; position:relative;">
+                                    <p:outputPanel style="text-align:center;">
                                         <h:outputText value="#{item.clientName}"/>
                                     </p:outputPanel>
                                     <br/>
-                                    <p:graphicImage id="info" url="/resources/images/tooltip.png"
-                                                    style="margin-top:2px;height :20px;position: absolute;margin-left: -7px"  rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
-                                    <p:tooltip for="info" styleClass="custom-design-tooltip">
-                                        <h:outputText value="#{ff:upper(msg.requestManagers)}" style="font-weight:bold;color:#003871;"/>
-                                        <br />
-                                        <h:outputText value="#{item.haveManagers()}" escape="false" rendered="#{not empty item.haveManagers()}"/>
-                                        <br />
-                                        <h:outputText value="#{ff:upper(msg.requestTrustees)}" style="font-weight:bold;color:#003871;" />
-                                        <br />
-                                        <h:outputText value="#{item.getClientNameProfessional(item.fiduciaryId)}" escape="false"
-                                                      rendered="#{not empty item.fiduciaryId}" style="color:#003871;"/>
-                                    </p:tooltip>
+                                    <div style="height :20px; position:absolute; left: 2px; bottom: 2px;">
+                                        <p:graphicImage id="info" url="/resources/images/tooltip.png" style="width:20px; height:20px;"
+                                                        rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
+                                        <p:tooltip for="info" styleClass="custom-design-tooltip">
+                                            <h:outputText value="#{ff:upper(msg.requestManagers)}" style="font-weight:bold;color:#003871;"/>
+                                            <br />
+                                            <h:outputText value="#{item.haveManagers()}" escape="false" rendered="#{not empty item.haveManagers()}"/>
+                                            <br />
+                                            <h:outputText value="#{ff:upper(msg.requestTrustees)}" style="font-weight:bold;color:#003871;" />
+                                            <br />
+                                            <h:outputText value="#{item.getClientNameProfessional(item.fiduciaryId)}" escape="false"
+                                                          rendered="#{not empty item.fiduciaryId}" style="color:#003871;"/>
+                                        </p:tooltip>
+                                    </div>
                                 </td>
 
-                                <td style="width: 13.1vw;min-width: 180px;" class="min_padding_margin">
+                                <td style="width: 13.1vw;min-width: 180px; position:relative;" class="min_padding_margin">
                                     <p:outputPanel style="margin-left: 20px;text-align: left;">
                                         <p:outputPanel id="servicesColumn"
                                                        rendered="#{item.serviceName eq null}"
@@ -1047,14 +1049,16 @@
                                         </p:outputPanel>
                                         <h:outputText id="service" value="#{item.serviceName}" rendered="#{item.serviceName ne null}"/>
                                         <br/>
-                                        <p:graphicImage id="multipleservice" url="/resources/images/tooltip.png"
-                                                        style="height :20px;;margin-left: -27px;position: absolute;"  rendered="#{not empty item.multipleServices}" />
-                                        <p:tooltip for="multipleservice" styleClass="custom-design-tooltip" rendered="#{not empty item.multipleServices}">
-                                            <ui:repeat var="ele" value="#{item.multipleServices}" varStatus="service">
-                                                <h:outputText value="#{ele}" escape="false" style="color:#003871;margin-left: 24px;"/>
-                                                <br />
-                                            </ui:repeat>
-                                        </p:tooltip>
+                                        <div style="height :20px; position:absolute; left: 2px; bottom: 2px;">
+                                            <p:graphicImage id="multipleservice" url="/resources/images/tooltip.png"
+                                                            style="width:20px; height:20px;"  rendered="#{not empty item.multipleServices}" />
+                                            <p:tooltip for="multipleservice" styleClass="custom-design-tooltip" rendered="#{not empty item.multipleServices}">
+                                                <ui:repeat var="ele" value="#{item.multipleServices}" varStatus="service">
+                                                    <h:outputText value="#{ele}" escape="false" style="color:#003871;margin-left: 24px;"/>
+                                                    <br />
+                                                </ui:repeat>
+                                            </p:tooltip>
+                                        </div>
                                     </p:outputPanel>
                                 </td>
 

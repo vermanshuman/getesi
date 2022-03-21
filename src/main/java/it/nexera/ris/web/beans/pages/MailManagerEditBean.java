@@ -760,7 +760,7 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
                             td(div().withStyle(" border-radius: 50%; width: 5px; height: 5px; background: #000;"))
                                     .withStyle("border: none; padding-left: 50px; padding-right: 5px;"),
                             td().withStyle("border: none; width:15px;"),
-                            td(i.getSubject().getFullNameCapitalize()).withStyle("border: none;"),
+                            td(i.getSubject().getFullNameCapitalize().toUpperCase()).withStyle("border: none;"),
                             td().withStyle("border: none; width:15px;"),
                             td(i.getFiscalCodeVATNamber()).withStyle("border: none;"),
                             td().withStyle("border: none; width:15px;"),

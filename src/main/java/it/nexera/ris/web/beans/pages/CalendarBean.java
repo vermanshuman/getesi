@@ -60,7 +60,6 @@ public class CalendarBean extends EntityLazyInListEditPageBean<CalendarEvent> im
 
     public void onEventSelect(SelectEvent selectEvent) {
         event = (ScheduleEvent) selectEvent.getObject();
-        System.out.println(event + ">>>>>>>>>>>>>>>>>>" + selectEvent.getObject());
     }
 
     public void onDateSelect(SelectEvent selectEvent) {

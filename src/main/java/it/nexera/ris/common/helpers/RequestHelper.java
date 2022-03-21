@@ -333,12 +333,23 @@ public class RequestHelper {
                     inputCardOutput.setFields(new LinkedList<>());
                     for (InputCardManageField field : inputCardList.stream().map(InputCard::getFields)
                             .flatMap(List::stream).distinct().collect(Collectors.toList())) {
-                        if ((field.getField() == ManageTypeFields.SUBJECT_MASTERY)
+
+                        if ((field.getField() == ManageTypeFields.CONSERVATORY_TALOVARE) ||
+                                (field.getField() == ManageTypeFields.SUBJECT_MASTERY)
                                 || (isMultiple && (field.getField()==ManageTypeFields.CDR
                                 || field.getField()== ManageTypeFields.NDG
                                 || field.getField()== ManageTypeFields.POSITION_PRACTICE))){
                             continue;
                         }
+
+                        if ((field.getField().equals(ManageTypeFields.MANAGER)
+                                && field.getField().equals(ManageTypeFields.MANAGER))
+                                || (field.getField().equals(ManageTypeFields.URGENT) &&
+                                field.getField().equals(ManageTypeFields.URGENT))
+                        ){
+                            continue;
+                        }
+
                         InputCardManageField existingField = inputCardOutput.getFields().stream()
                                 .filter(f -> f.getField() == field.getField()).findAny().orElse(null);
                         if (existingField == null) {

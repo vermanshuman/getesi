@@ -50,7 +50,7 @@
                 <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_BIRTHDAY}"/><br/>
                 <p:calendar id="SUBJECT_MASTERY_BIRTHDAY" value="#{bean.subject.birthDate}"
                             pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
-                            converter="fullDateTimeConverter" maxdate="today">
+                            converter="fullDateTimeConverter" maxdate="today" yearRange="#{bean.yearRange}">
                     <p:ajax event="dateSelect" listener="#{bean.handleDateSelect}" update="SUBJECT_MASTERY_BIRTHDAY"/>
                 </p:calendar>
             </p:column>

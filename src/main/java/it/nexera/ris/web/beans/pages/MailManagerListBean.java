@@ -646,6 +646,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
                     restrictions.add(Restrictions.or(
                             Restrictions.like("emailTo", getFilterEmail(), MatchMode.ANYWHERE),
                             Restrictions.like("emailFrom", getFilterEmail(), MatchMode.ANYWHERE),
+                            Restrictions.like("emailCC", getFilterEmail(), MatchMode.ANYWHERE),
                             Restrictions.in("id", listId)));
                 }
             } else {
@@ -660,7 +661,8 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
                 }else {
                     restrictions.add(Restrictions.or(
                             Restrictions.like("emailTo", getFilterEmail(), MatchMode.ANYWHERE),
-                            Restrictions.like("emailFrom", getFilterEmail(), MatchMode.ANYWHERE)
+                            Restrictions.like("emailFrom", getFilterEmail(), MatchMode.ANYWHERE),
+                            Restrictions.like("emailCC", getFilterEmail(), MatchMode.ANYWHERE)
                             )
                     );
                 }
@@ -1100,6 +1102,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         setDateTo(null);
         setSelectedSearchStateIds(null);
         setFilterAll(null);
+        filterTableFromPanel();
     }
 
     public Date getDateFrom() {
