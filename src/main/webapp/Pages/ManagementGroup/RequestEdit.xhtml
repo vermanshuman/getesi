@@ -316,15 +316,15 @@
                                 <f:selectItems value="#{bean.services}"/>
                             </p:selectCheckboxMenu>
                         </div>
-                        <div>
+                        <div style="padding-top: 1%;">
                             <p:commandButton id="confirmButton" value="#{msg.submit}"
-                                             update="form @this" style="margin-top: 42px;"
+                                             update="form @this" style="margin-top: 16px;"
                                              styleClass="ui-button-success"
                                              action="#{bean.generateDynamicContent(true)}"
                                              rendered="#{bean.showConfirmButton}"/>
                         </div>
-                        <div id="request-btns">
-                            <p:commandButton style="margin-top: 42px;"
+                        <div id="request-btns" style="padding-top: 1%;">
+                            <p:commandButton style="margin-top: 16px;"
                                              id="addRequestService"
                                              action="#{bean.validateMultipleRequest(false)}"
                                              value="#{msg.addRequestService.toUpperCase()}"
