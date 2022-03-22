@@ -159,6 +159,105 @@
                 border: none !important;
             }
 
+            #table_paginator_top, #table_paginator_bottom {
+                text-align: center;
+                padding-bottom: 4px !important;
+                padding: 8px 35px;
+            }
+
+            .ui-paginator-rpp-options {
+                float: left;
+                margin-top: 6px !important;
+            }
+
+            .ui-paginator-current {
+                margin-top: 2px !important;
+            }
+
+            body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+                background: #FFF !important;
+                color: #000000 !important;
+            }
+
+            #table table {
+                margin-top: 20px;
+                padding-left: 13px;
+                border-collapse: separate;
+                border-spacing: 0 0.6em;
+            }
+
+            body .ui-datatable:not(.borderless) thead th {
+                background-color: #D9E0E7 !important;
+                border-color: #808080 !important;
+                color: #5f666c !important;
+                padding: 8px 2px !important;
+                border-width: 1px!important;
+                border-style: solid!important;
+            }
+
+
+            #table_data td {
+                color: #003871;
+                border-top: none;
+                border-bottom: none;
+                background-color: #ffffff !important;
+            }
+
+            #table_data td:nth-child(1) {
+                border-left: none;
+                border-top-left-radius: 5px;
+                border-bottom-left-radius: 5px;
+                vertical-align: top;
+            }
+
+            #table_data td:last-child {
+                border-right: none;
+                border-top-right-radius: 5px;
+                border-bottom-right-radius: 5px;
+                -webkit-box-shadow: 4px 0px 7px -2px rgba(0, 0, 0, 0.75);
+                -moz-box-shadow: 4px 0px 7px -2px rgba(0, 0, 0, 0.75);
+                box-shadow: 4px 0px 7px -2px rgba(0, 0, 0, 0.75);
+            }
+
+            #table_data tr {
+                background-color: transparent !important;
+                border-top: none;
+                -webkit-box-shadow: 0px 4px 7px -2px rgba(0, 0, 0, 0.75);
+                -moz-box-shadow: 0px 4px 7px -2px rgba(0, 0, 0, 0.75);
+                box-shadow: 0px 4px 7px -2px rgba(0, 0, 0, 0.75);
+            }
+
+            #table_data tr {
+                margin-bottom: 8px;
+                border-left: none;
+            }
+
+            #table_data {
+                border: none;
+                background: transparent;
+            }
+
+            body .ui-widget, body .ui-widget .ui-widget {
+                font-weight: 400 !important;
+            }
+
+            .status-icon {
+                height: 24px;
+                width: 142px;
+                padding-right: 4px;
+                padding-left: 4px;
+                border-radius: 10px;
+                text-align: center;
+                box-sizing: border-box;
+                font-size: 12px;
+                font-weight: 600;
+                font-family: 'Mukta', sans-serif;
+            }
+
+            .status-green {
+                border: 2px solid #00C347;
+                color: #00C347;
+            }
         </style>
 
         <script>
@@ -607,8 +706,7 @@
                              emptyMessage="#{msg.noRecordsFound}" value="#{bean.regSubjectList}"
                              rowKey="#{item.id}" rows="10" lazy="true" paginator="true"
                              paginatorAlwaysVisible="true" rowIndexVar="rowId"
-                             rowStyleClass="#{item.isInserted ? 'receive_new_mail_style':''}"
-                             paginatorTemplate="&lt;span style='float: left;'&gt;Elementi visibili nella pagina&lt;/span&gt; {RowsPerPageDropdown}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {CurrentPageReport}"
+                             paginatorTemplate="&lt;span style='float: left;margin-top: 7px;'&gt;Elementi visibili nella pagina&lt;/span&gt; {RowsPerPageDropdown}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {CurrentPageReport}"
                              currentPageReportTemplate="Pagina {currentPage} di {totalPages}"
                              rowsPerPageTemplate="10,20,50" widgetVar="tableWV" styleClass="request-table">
 
