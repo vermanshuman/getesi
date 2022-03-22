@@ -1023,9 +1023,9 @@
                                     </p:outputPanel>
                                     <br/>
                                     <div style="height :20px; position:absolute; left: 2px; bottom: 2px;">
-                                        <p:graphicImage id="info" url="/resources/images/tooltip.png" style="width:20px; height:20px;"
+                                        <p:graphicImage id="info-#{loop.index}" url="/resources/images/tooltip.png" style="width:20px; height:20px;"
                                                         rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
-                                        <p:tooltip for="info" styleClass="custom-design-tooltip">
+                                        <p:tooltip for="info-#{loop.index}" styleClass="custom-design-tooltip">
                                             <h:outputText value="#{ff:upper(msg.requestManagers)}" style="font-weight:bold;color:#003871;"/>
                                             <br />
                                             <h:outputText value="#{item.haveManagers()}" escape="false" rendered="#{not empty item.haveManagers()}"/>
@@ -1050,9 +1050,9 @@
                                         <h:outputText id="service" value="#{item.serviceName}" rendered="#{item.serviceName ne null}"/>
                                         <br/>
                                         <div style="height :20px; position:absolute; left: 2px; bottom: 2px;">
-                                            <p:graphicImage id="multipleservice" url="/resources/images/tooltip.png"
+                                            <p:graphicImage id="multipleservice-#{loop.index}" url="/resources/images/tooltip.png"
                                                             style="width:20px; height:20px;"  rendered="#{not empty item.multipleServices}" />
-                                            <p:tooltip for="multipleservice" styleClass="custom-design-tooltip" rendered="#{not empty item.multipleServices}">
+                                            <p:tooltip for="multipleservice-#{loop.index}" styleClass="custom-design-tooltip" rendered="#{not empty item.multipleServices}">
                                                 <ui:repeat var="ele" value="#{item.multipleServices}" varStatus="service">
                                                     <h:outputText value="#{ele}" escape="false" style="color:#003871;margin-left: 24px;"/>
                                                     <br />
