@@ -56,6 +56,8 @@ import lombok.Getter;
 @ViewScoped
 public class ClientListBean extends EntityLazyListPageBean<ClientShort> implements Serializable {
 
+    private int tab = 1;
+
     @Getter
     private enum ClientKind {
         USUAL(ResourcesHelper.getString("client")),
@@ -123,6 +125,11 @@ public class ClientListBean extends EntityLazyListPageBean<ClientShort> implemen
      */
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException {
+        try {
+            tab = Integer.valueOf(getRequestParameter(RedirectHelper.TAB));
+        } catch (NumberFormatException e) {
+            log.info(e.getMessage());
+        }
         if (getSession().containsKey("clientSaved")) {
             MessageHelper.addGlobalMessage(FacesMessage.SEVERITY_INFO, "",
                     ResourcesHelper.getString("clientSavedCorrectly"));
@@ -638,5 +645,13 @@ public class ClientListBean extends EntityLazyListPageBean<ClientShort> implemen
 
     public void setClientOffices(List<SelectItem> clientOffices) {
         this.clientOffices = clientOffices;
+    }
+
+    public int getTab() {
+        return tab;
+    }
+
+    public void setTab(int tab) {
+        this.tab = tab;
     }
 }

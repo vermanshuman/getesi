@@ -54,6 +54,8 @@ public class RedirectHelper extends BaseHelper {
 
     public static final String SALES = "sales";
 
+    public static final String TAB = "tab";
+
     public static void goTo(PageTypes type) {
         try {
             if (type != null) {

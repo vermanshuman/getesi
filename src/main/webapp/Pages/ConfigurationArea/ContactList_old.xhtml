@@ -7,167 +7,192 @@
       xmlns:p="http://primefaces.org/ui">
 
 <ui:composition template="/resources/tpl/Admin/LazyListTabBase.xhtml">
-    <ui:param name="bean" value="#{clientListBean}"/>
+    <ui:param name="bean" value="#{contactListBean}"/>
     <ui:param name="list_header" value="#{msg.client}"/>
     <ui:param name="excludeColumns" value="0,1,2"/>
     <ui:define name="list_body">
-        <style>
-            .row {
-                display: flex;
-                gap: 5%;
-            }
-            .title-txt {
-                font-size: 40px;
-                margin-left: 5px;
-            }
-            .row {
-                display: flex;
-            }
-        </style>
         <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/client.css"
               media="all" rel="stylesheet" type="text/css"/>
-        <div class="row title-txt">
-            #{msg.clients}
-        </div>
-        <p:outputPanel style="margin-top: 20px;" rendered="#{bean.tab eq 1}">
-                <p:outputPanel style="margin-top: 20px;">
-                    <p:panelGrid columns="3"
-                                 columnClasses="ui-g-12 ui-md-4 row,ui-g-12 ui-md-4 row,ui-g-12 ui-md-4 row"
-                                 styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
-                        <p:column>
-                            <p:outputPanel style="width: 150px;margin-top: 8px;">#{msg.clientType}:</p:outputPanel>
-                            <p:selectOneMenu id="clientType" value="#{bean.selectedClientTypeId}"
-                                             styleClass="select-width" label="#{msg.clientType}">
-                                <p:ajax listener="#{bean.searchClients}" update="table" />
+        <p:panelGrid styleClass="ui-panelgrid-blank form-group fiend-panel" style="width: 100%">
+            <p:row>
+                <p:column style="width: 20%!important;">
+                    <p:inputText value="#{bean.nameOfTheCompany}" placeholder="#{msg.clientShortNameOfTheCompany}"
+                                 maxlength="100"
+                                 styleClass="input-width"
+                                 id="nameOfTheCompany" label="#{msg.clientShortNameOfTheCompany}"/>
+                </p:column>
+                <p:column style="width: 20%!important;">
+                    <p:inputText value="#{bean.numberVAT}" maxlength="11" placeholder="#{msg.clientVATNumber}"
+                                 id="numberVAT" styleClass="input-width"
+                                 label="#{msg.clientVATNumber}"/>
+                </p:column>
+                <p:column style="width: 20%!important;">
+                    <p:selectOneMenu id="province" value="#{bean.addressProvinceId}"
+                                     label="#{msg.clientAddressProvince}"
+                                     styleClass="selectOneLabel">
+                        <p:ajax update="province, city, country"
+                                listener="#{clientListBean.handleAddressProvinceChange}"/>
+                        <f:selectItems value="#{bean.provinces}"/>
+                    </p:selectOneMenu>
+                </p:column>
+                <p:column style="width: 20%!important;">
+                    <p:selectOneMenu id="city" value="#{bean.addressCityId}" styleClass="selectOneLabel"
+                                     style="display: #{bean.foreignCountry ? 'none' : ''};"
+                                     label="#{msg.clientAddressCity}">
+                        <f:selectItems value="#{bean.addressCities}"/>
+                    </p:selectOneMenu>
+
+                    <p:selectOneMenu id="country" value="#{bean.selectedCountryId}" styleClass="selectOneLabel"
+                                     style="display: #{bean.foreignCountry ? '' : 'none'};"
+                                     label="#{msg.databaseListSubjectCity}:">
+                        <f:selectItems value="#{bean.countries}"/>
+                    </p:selectOneMenu>
+                </p:column>
+                <p:column style="width: 1%!important;">
+                    <p:commandButton value="#{msg.search.toUpperCase()}" styleClass="grey-button right-side"
+                                     action="#{bean.searchClients}" update=":form:tabs"/>
+                </p:column>
+            </p:row>
+        </p:panelGrid>
+
+        <p:commandButton disabled="#{!bean.canCreate}" styleClass="green-button"
+                         value="#{msg.newClient.toUpperCase()}"
+                         action="#{bean.addEntity}"/>
+
+        <p:tabView dynamic="true" cache="true" id="tabs" activeIndex="#{bean.activeClientListIndex}">
+            <p:ajax event="tabChange" listener="#{bean.onTabChange}"/>
+            <p:tab title="#{msg.clients}">
+				<p:outputPanel style="margin-top: 20px;">
+					<p:panelGrid columns="3"
+						columnClasses="ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3"
+						styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
+						<p:column style="width: 10%!important;">
+							<h:outputText value="#{msg.clientType}:" />
+							<p:selectOneMenu id="clientType" value="#{bean.selectedClientTypeId}" 
+								styleClass="select-width" label="#{msg.clientType}">
+								<p:ajax listener="#{bean.searchClients}" update="table" />
                                 <f:selectItems value="#{bean.clientTypes}"/>
                             </p:selectOneMenu>
-                        </p:column>
-                        <p:column>
-                            <p:outputPanel style="width: 150px;margin-top: 8px;">Denominazione:</p:outputPanel>
-                            <p:inputText style="width: 100%;"/>
-                        </p:column>
-                        <p:column>
-                            <p:commandButton style="width: 70px" value="Search"/>
-                        </p:column>
-                    </p:panelGrid>
-                    <p:dataTable var="item" id="table" styleClass="table-client-list"
-                                 emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyModel}"
-                                 paginator="true" lazy="true" rowKey="#{item.id}" rows="10"
-                                 paginatorAlwaysVisible="true"
-                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                 rowsPerPageTemplate="10,20,50" widgetVar="table">
+						</p:column>
+					</p:panelGrid>
+					<p:dataTable var="item" id="table" styleClass="table-client-list"
+						emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyModel}"
+						paginator="true" lazy="true" rowKey="#{item.id}" rows="10"
+						paginatorAlwaysVisible="true"
+						paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rowsPerPageTemplate="10,20,50" widgetVar="table">
 
-                        <p:column sortBy="#{item.clientName}"
-                                  filterBy="#{item.clientName}">
-                            <f:facet name="header">
-                                <h:outputText
-                                        value="#{msg.clientNameOfTheCompany.toUpperCase()}" />
-                            </f:facet>
-                            <h:outputText value="#{item}" />
-                        </p:column>
+						<p:column sortBy="#{item.clientName}"
+							filterBy="#{item.clientName}">
+							<f:facet name="header">
+								<h:outputText
+									value="#{msg.clientNameOfTheCompany.toUpperCase()}" />
+							</f:facet>
+							<h:outputText value="#{item}" />
+						</p:column>
 
-                        <p:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.clientAddressCity.toUpperCase()}" />
-                            </f:facet>
-                            <h:outputText value="#{item.addressCityId}" />
-                        </p:column>
+						<p:column>
+							<f:facet name="header">
+								<h:outputText value="#{msg.clientAddressCity.toUpperCase()}" />
+							</f:facet>
+							<h:outputText value="#{item.addressCityId}" />
+						</p:column>
 
-                        <p:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.clientMail.toUpperCase()}" />
-                            </f:facet>
-                            <!-- <h:outputText value="#{item.emails}"/> -->
-                            <ui:repeat value="#{item.emails}" var="email">
-                                <h:outputText value="#{email.email}" />
-                                <h:outputText value="&lt;br /&gt;" escape="false" />
-                            </ui:repeat>
-                        </p:column>
+						<p:column>
+							<f:facet name="header">
+								<h:outputText value="#{msg.clientMail.toUpperCase()}" />
+							</f:facet>
+							<!-- <h:outputText value="#{item.emails}"/> -->
+							<ui:repeat value="#{item.emails}" var="email">
+								<h:outputText value="#{email.email}" />
+								<h:outputText value="&lt;br /&gt;" escape="false" />
+							</ui:repeat>
+						</p:column>
 
-                        <p:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.clientPhone.toUpperCase()}" />
-                            </f:facet>
-                            <h:outputText value="#{item.phone}" />
-                        </p:column>
+						<p:column>
+							<f:facet name="header">
+								<h:outputText value="#{msg.clientPhone.toUpperCase()}" />
+							</f:facet>
+							<h:outputText value="#{item.phone}" />
+						</p:column>
 
-                        <p:column>
-                            <f:facet name="header">
-                                <p:selectCheckboxMenu value="#{bean.selectedKindList}"
-                                                      label="#{msg.roleType.toUpperCase()}"
-                                                      style="background: none !important; border: none !important;">
-                                    <f:selectItems value="#{bean.kindList}" var="kind"
-                                                   itemValue="#{kind.value}" itemLabel="#{kind.label}" />
-                                    <p:ajax event="change" listener="#{bean.searchClients}"
-                                            update="table" />
-                                    <p:ajax event="toggleSelect" listener="#{bean.searchClients}"
-                                            update="table" />
-                                </p:selectCheckboxMenu>
-                            </f:facet>
-                            <h:outputText value="#{item.kind}" />
-                        </p:column>
+						<p:column>
+							<f:facet name="header">
+								<p:selectCheckboxMenu value="#{bean.selectedKindList}"
+									label="#{msg.roleType.toUpperCase()}"
+									style="background: none !important; border: none !important;">
+									<f:selectItems value="#{bean.kindList}" var="kind"
+										itemValue="#{kind.value}" itemLabel="#{kind.label}" />
+									<p:ajax event="change" listener="#{bean.searchClients}"
+										update="table" />
+									<p:ajax event="toggleSelect" listener="#{bean.searchClients}"
+										update="table" />
+								</p:selectCheckboxMenu>
+							</f:facet>
+							<h:outputText value="#{item.kind}" />
+						</p:column>
 
-                        <p:column styleClass="action_column" exportable="false">
-                            <p:commandButton disabled="#{!bean.canDelete}"
+						<p:column styleClass="action_column" exportable="false">
+							<p:commandButton disabled="#{!bean.canDelete}"
                                              styleClass="red-btn"
                                              icon="ui-icon pi pi-times" oncomplete="PF('dlg2').show()">
-                                <f:setPropertyActionListener value="#{item.id}"
-                                                             target="#{bean.entityDeleteId}" />
-                            </p:commandButton>
-                        </p:column>
+								<f:setPropertyActionListener value="#{item.id}"
+									target="#{bean.entityDeleteId}" />
+							</p:commandButton>
+						</p:column>
 
-                        <p:column styleClass="action_column" exportable="false">
+						<p:column styleClass="action_column" exportable="false">
 
-                            <p:commandButton icon="ui-icon pi pi-pencil" update=":form"
+							<p:commandButton icon="ui-icon pi pi-pencil" update=":form"
                                              style="border: none !important;"
-                                             action="#{bean.editEntity}" disabled="#{!bean.canEdit}">
-                                <f:setPropertyActionListener value="#{item.id}"
-                                                             target="#{bean.entityEditId}" />
-                            </p:commandButton>
-                        </p:column>
-                    </p:dataTable>
+								action="#{bean.editEntity}" disabled="#{!bean.canEdit}">
+								<f:setPropertyActionListener value="#{item.id}"
+									target="#{bean.entityEditId}" />
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
 
-                    <p:commandButton value="#{msg.newDownloadExel.toUpperCase()}"
-                                     icon="fa fa-file-excel-o"
-                                     style="margin-top: 20px;  left: 100%;
+					<p:commandButton value="#{msg.newDownloadExel.toUpperCase()}"
+						icon="fa fa-file-excel-o"
+						style="margin-top: 20px;  left: 100%;
                                     transform:translate(-100%, 0);"
-                                     styleClass="grey-button" ajax="false">
-                        <p:dataExporter type="xls" target="table" fileName="#{list_title}"
-                                        excludeColumns="#{excludeColumns}" />
-                    </p:commandButton>
-                </p:outputPanel>
-        </p:outputPanel>
-
-            <!--<p:tab title="#{msg.clientManager}">
+						styleClass="grey-button" ajax="false">
+						<p:dataExporter type="xls" target="table" fileName="#{list_title}"
+							excludeColumns="#{excludeColumns}" />
+					</p:commandButton>
+				</p:outputPanel>
+			</p:tab>
+            
+            <p:tab title="#{msg.clientManager}">
                 <p:outputPanel style="margin-top: 20px;">
-                    <p:panelGrid columns="3" id="gestorepanel"
-                                 columnClasses="ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3"
-                                 styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
-                        <p:column style="width: 10%!important;" >
-                            <h:outputText value="#{msg.invoiceClient}:"/>
-                            <p:selectOneMenu id="client" value="#{bean.selectedClientId}"
-                                             label="#{msg.invoiceClient}"
-                                             filter="true"
-                                             filterMatchMode="startsWith"
-                                             styleClass="select-width">
-                                <p:ajax listener="#{bean.onClientSelect}"
-                                        update="managerClientsTable gestorepanel"/>
-                                <f:selectItems value="#{bean.clients}"/>
-                            </p:selectOneMenu>
-                        </p:column>
-                        <p:column style="width: 10%!important;" rendered="#{bean.selectedClientId > 0}">
-                            <h:outputText value="#{msg.titleOffice}:"/>
-                            <p:selectOneMenu id="office" value="#{bean.selectedClientOfficeId}"
-                                             label="#{msg.titleOffice}:"
-                                             filter="true"
-                                             filterMatchMode="startsWith"
-                                             styleClass="select-width">
-                                <p:ajax listener="#{bean.onClientOfficeSelect}"
-                                        update="managerClientsTable"/>
-                                <f:selectItems value="#{bean.clientOffices}"/>
-                            </p:selectOneMenu>
-                        </p:column>
-                    </p:panelGrid>
+                <p:panelGrid columns="3" id="gestorepanel"
+						columnClasses="ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3"
+						styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
+		                <p:column style="width: 10%!important;" >
+		                <h:outputText value="#{msg.invoiceClient}:"/>
+		                    <p:selectOneMenu id="client" value="#{bean.selectedClientId}"
+		                                     label="#{msg.invoiceClient}"
+		                                     filter="true"
+		                                     filterMatchMode="startsWith" 
+		                                     styleClass="select-width">
+		                       <p:ajax listener="#{bean.onClientSelect}"
+		                                update="managerClientsTable gestorepanel"/>
+		                        <f:selectItems value="#{bean.clients}"/>
+		                    </p:selectOneMenu>
+		                 </p:column> 
+		                  <p:column style="width: 10%!important;" rendered="#{bean.selectedClientId > 0}">
+		                  <h:outputText value="#{msg.titleOffice}:"/>
+		                    <p:selectOneMenu id="office" value="#{bean.selectedClientOfficeId}"
+		                                     label="#{msg.titleOffice}:"
+		                                     filter="true"
+		                                     filterMatchMode="startsWith" 
+		                                     styleClass="select-width">
+		                           <p:ajax listener="#{bean.onClientOfficeSelect}"
+		                                update="managerClientsTable"/>
+		                        <f:selectItems value="#{bean.clientOffices}"/>
+		                    </p:selectOneMenu>
+		                 </p:column> 
+                </p:panelGrid>  
                     <p:dataTable var="item" id="managerClientsTable"
                                  styleClass="table-client-list"
                                  emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyManagerClientModel}"
@@ -194,7 +219,7 @@
                             <f:facet name="header">
                                 <h:outputText value="#{msg.clientMail.toUpperCase()}"/>
                             </f:facet>
-                            &lt;!&ndash; <h:outputText value="#{item.emails}"/> &ndash;&gt;
+                            <!-- <h:outputText value="#{item.emails}"/> -->
                             <ui:repeat value="#{item.emails}" var="email">
                                 <h:outputText value="#{email.email}"/>
                                 <h:outputText value="&lt;br /&gt;" escape="false"/>
@@ -208,7 +233,7 @@
                             <h:outputText value="#{item.phone}"/>
                         </p:column>
 
-                        <p:column >
+  						<p:column >
                             <f:facet name="header">
                                 <h:outputText value="#{msg.client}"/>
                             </f:facet>
@@ -233,25 +258,25 @@
 
                 </p:outputPanel>
             </p:tab>
-
+            
             <p:tab title="#{msg.clientTypeTrust}">
                 <p:outputPanel style="margin-top: 20px;">
-                    <p:panelGrid columns="3"
-                                 columnClasses="ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3"
-                                 styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
-                        <p:column style="width: 10%!important;" >
-                            <h:outputText value="#{msg.invoiceClient}:"/>
-                            <p:selectOneMenu id="clientTypeTrustDropdown" value="#{bean.selectedClientTrustId}"
-                                             label="#{msg.invoiceClient}"
-                                             filter="true"
-                                             filterMatchMode="startsWith"
-                                             styleClass="select-width">
-                                <p:ajax listener="#{bean.onClientTrustSelect}"
-                                        update="clientTypeTrustTable"/>
-                                <f:selectItems value="#{bean.clients}"/>
-                            </p:selectOneMenu>
-                        </p:column>
-                    </p:panelGrid>
+	                <p:panelGrid columns="3"
+							columnClasses="ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3,ui-g-12 ui-md-3"
+							styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
+			                <p:column style="width: 10%!important;" >
+			                <h:outputText value="#{msg.invoiceClient}:"/>
+			                    <p:selectOneMenu id="clientTypeTrustDropdown" value="#{bean.selectedClientTrustId}"
+			                                     label="#{msg.invoiceClient}"
+			                                     filter="true"
+			                                     filterMatchMode="startsWith" 
+			                                     styleClass="select-width">
+			                       <p:ajax listener="#{bean.onClientTrustSelect}"
+			                                update="clientTypeTrustTable"/>
+			                        <f:selectItems value="#{bean.clients}"/>
+			                    </p:selectOneMenu>
+			                 </p:column> 
+	                </p:panelGrid>  
                     <p:dataTable var="item" id="clientTypeTrustTable"
                                  styleClass="table-client-list"
                                  emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyClientTrustModel}"
@@ -278,7 +303,7 @@
                             <f:facet name="header">
                                 <h:outputText value="#{msg.clientMail.toUpperCase()}"/>
                             </f:facet>
-                            &lt;!&ndash; <h:outputText value="#{item.emails}"/> &ndash;&gt;
+                            <!-- <h:outputText value="#{item.emails}"/> -->
                             <ui:repeat value="#{item.emails}" var="email">
                                 <h:outputText value="#{email.email}"/>
                                 <h:outputText value="&lt;br /&gt;" escape="false"/>
@@ -291,7 +316,7 @@
                             </f:facet>
                             <h:outputText value="#{item.phone}"/>
                         </p:column>
-                        <p:column >
+						<p:column >
                             <f:facet name="header">
                                 <h:outputText value="#{msg.client}"/>
                             </f:facet>
@@ -344,7 +369,7 @@
                             <f:facet name="header">
                                 <h:outputText value="#{msg.clientMail.toUpperCase()}"/>
                             </f:facet>
-                            &lt;!&ndash; <h:outputText value="#{item.emails}"/> &ndash;&gt;
+                            <!-- <h:outputText value="#{item.emails}"/> -->
                             <ui:repeat value="#{item.emails}" var="email">
                                 <h:outputText value="#{email.email}"/>
                                 <h:outputText value="&lt;br /&gt;" escape="false"/>
@@ -381,8 +406,8 @@
 
                 </p:outputPanel>
             </p:tab>
-
-        </p:tabView>-->
+            
+        </p:tabView>
 
         <p:dialog header="#{msg.deleteConfirmationHeader}" widgetVar="dlg2"
                   modal="true" resizable="false" effect="SLIDE">

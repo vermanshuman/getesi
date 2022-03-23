@@ -220,7 +220,7 @@
                                     action="#{sessionBean.getBillingListPage()}"
                                     rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/BillingList.jsf')}"
                                     actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>
-                        <p:menuitem id="contactPage" styleClass="main" value="#{msg.headerContact}" icon="topbar-icon contact-icon" outcome="/Pages/ManagementGroup/ContactList.jsf"/>
+                        <p:menuitem id="contactPage" styleClass="main" value="#{msg.headerContact}" icon="topbar-icon contact-icon" outcome="/Pages/ConfigurationArea/ContactList.jsf"/>
                         <p:submenu id="amministrazione" label="#{msg.menuConfiguration}" icon="pi pi-align-left">
                             <p:menuitem id="utenti" value="#{msg.user_list}" icon="fa fa-fw fa-users" outcome="/Pages/Configuration/UserList.jsf"
                                         rendered="#{sessionBean.canViewPageUrl('/Pages/Configuration/UserList.jsf')}" />
