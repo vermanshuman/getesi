@@ -91,11 +91,16 @@
                                  action="#{bean.newInvoiceMail}" update=":form"/>
 
 
-            <p:commandButton style="margin-left: 2px;"
+            <!-- <p:commandButton style="margin-left: 2px;"
                              value="#{msg.requestTextEditCreateInvoice}" rendered="#{not bean.invoiceSentStatus and bean.invoiceRequests.size() != 0 and bean.billinRequest}"
                              id="createInvoice" styleClass="grey-button"
                              action="#{bean.setMaxInvoiceNumber()}" update="@widgetVar(invoiceDialogWV)"
-                             oncomplete="PF('invoiceDialogWV').show();"/>
+                             oncomplete="PF('invoiceDialogWV').show();"/> -->
+         	<p:commandButton style="margin-left: 2px;"
+                             value="#{msg.requestTextEditCreateInvoice}" rendered="#{not bean.invoiceSentStatus and bean.invoiceRequests.size() != 0 and bean.billinRequest}"
+                             id="createInvoice" styleClass="grey-button"
+                             action="#{bean.setMaxInvoiceNumber()}" update="@widgetVar(mailManagerViewRequestsForInvoiceDlg)"
+                             oncomplete="PF('mailManagerViewRequestsForInvoiceDlg').show();"/>
 
             <!--  <p:commandButton icon="ui-icon fa fa-pencil" update=":form" styleClass="right-side"
                               action="#{bean.editEntity}"

@@ -454,6 +454,12 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     @Transient
     private Boolean salesDevelopment;
+    
+    @Transient
+	private String dateEvasionString;
+    
+    @Transient
+    private boolean selectedForInvoice = true;
 
     public Boolean getHaveRequestReport() {
         if (haveRequestReport == null) {
@@ -1977,8 +1983,20 @@ public class Request extends DocumentTagEntity implements BeforeSave {
             return true;
         }
     }
+    
+    @Transient
+    private Boolean selectedRequest;
+    
 
-    public String getTempId() {
+    public Boolean isSelectedRequest() {
+		return selectedRequest;
+	}
+
+	public void setSelectedRequest(Boolean selectedRequest) {
+		this.selectedRequest = selectedRequest;
+	}
+
+	public String getTempId() {
         return tempId;
     }
 
@@ -2067,4 +2085,22 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     public void setRequestCreationType(RequestCreationType requestCreationType) {
         this.requestCreationType = requestCreationType;
     }
+    
+    public String getDateEvasionString() {
+		if(getEvasionDate() != null) {
+			return DateTimeHelper.toFormatedStringLocal(getEvasionDate(),
+					DateTimeHelper.getDatePattern(), null);
+		}
+		return dateEvasionString;
+	}
+
+	public boolean isSelectedForInvoice() {
+		return selectedForInvoice;
+	}
+
+	public void setSelectedForInvoice(boolean selectedForInvoice) {
+		this.selectedForInvoice = selectedForInvoice;
+	}
+    
+    
 }

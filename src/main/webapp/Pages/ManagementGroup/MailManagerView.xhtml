@@ -254,9 +254,10 @@
             <p:commandButton oncomplete="PF('sendInvoiceErrorDialogWV').hide();"
                              value="#{msg.close}" />
         </p:dialog>
-
+        
         <ui:include src="../ConfigurationArea/ClientCreate.xhtml"/>
         <ui:include src="../Dialogs/MailManagerViewRequestsDialog.xhtml"/>
-        <ui:include src="../Dialogs/InvoiceDialog.xhtml"/>
+        <ui:include src="../Dialogs/InvoiceDialogBilling.xhtml"/>
+        <ui:include src="../Dialogs/MailManagerViewRequestsForInvoiceDialog.xhtml"></ui:include>
     </ui:define>
 </ui:composition>

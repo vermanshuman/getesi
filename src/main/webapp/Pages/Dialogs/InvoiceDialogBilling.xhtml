@@ -188,7 +188,7 @@
        	}
        
        	#dialogTab .ui-datatable thead th, .ui-datatable tfoot td {
-			text-align: left !important;
+			text-align: center !important;
 		}
 		
 		#dialogTab .ui-panel .ui-panel-content {
@@ -202,6 +202,31 @@
         <div style="margin-top:20px; overflow-x:hidden; overflow-y:auto; height: 600px;" class="invoiceDialog">
 		<p:tabView dynamic="true" cache="true" id="dialogTab" activeIndex="#{bean.activeTabIndex}">
             <p:ajax event="tabChange" listener="#{bean.onTabChange}"/>
+            <p:tab title="#{msg.requestTab}">
+            	<p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
+			        <p:dataTable value="#{bean.invoicedRequests}" styleClass="simple-table" var="item"
+			                     rendered="#{not empty bean.entity.validRequests}"  scrollable="true"
+								 scrollHeight="300" style="margin-top:20px;">
+			            
+			            
+			            <p:column headerText="#{msg.requestListRequestType}">
+			                <h:outputText value="#{item.requestTypeName}"/>
+			            </p:column>
+			            <p:column headerText="#{msg.requestListService}">
+			                <h:outputText value="#{item.service ne null ? item.serviceName : (item.multipleServices ne null ? item.multipleServiceNames : '')}"/>
+			            </p:column>
+			            <p:column headerText="#{msg.requestEditSubjectListName}">
+			            	<h:outputText value="#{item.nameStr}"/>
+			            </p:column>
+			            <p:column headerText="#{msg.requestListCorservatoryName}">
+			                <h:outputText value="#{item.aggregationLandCharRegNameOrCity}"/>
+			            </p:column>
+			            <p:column headerText="#{msg.dateEvasion}">
+			                <h:outputText value="#{item.dateEvasionString}"/>
+			            </p:column>
+			        </p:dataTable>
+		        </p:panelGrid>
+            </p:tab>
             <p:tab title="#{msg.requestTextEditDataTab}">
                 <div class="p-grid invoiceDialog" style="margin-right:20px;">
                     <!-- ROW 1 -->
