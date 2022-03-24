@@ -2,7 +2,8 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:h="http://java.sun.com/jsf/html">
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:pe="http://primefaces.org/ui/extensions">
 
     <style>
         #invoiceDialogBilling .ui-widget-header {
@@ -195,6 +196,10 @@
     		border: none !important;
     		padding: 0px !important;
 		}
+		
+		#dialogTab .ui-button.ui-button-icon-only .ui-icon {
+    		font-size: 18px !important;
+    	}
     </style>
 
     <p:dialog widgetVar="invoiceDialogBillingWV" modal="true" width="1150" draggable="false" id="invoiceDialogBilling"
@@ -569,6 +574,209 @@
 					</div>
 				</div>
 			</p:tab>
+			
+			<p:tab title="#{msg.emailTab}">
+            	<div class="p-grid" style="border: none; background-color: #f0f2f5;">
+            		<div class="p-col-6">
+            			<div class="p-grid">
+            				<div class="p-col-2 vertical-center">
+            					<h:outputText value="#{msg.mailManagerEmailFrom}:"/>
+            				</div>
+            				<div class="p-col-10">
+								<p:autoComplete maxResults="6" multiple="true" 
+											inputStyle="width: 80%;"
+                                        	style="width: 80%; background: #FFF;"
+											onkeydown="return lockValue(event);" 
+											immediate="false">
+									<p:column>
+										<h:outputText value="#{dest}" escape="false" />
+									</p:column>
+									<p:column style="width: 32px;">
+										<p:commandButton icon="fa fa-times"
+											onclick="removeEmailAddressTo([{name:'param', value:'#{dest}'}]);" />
+									</p:column>
+								</p:autoComplete>
+							</div>
+							
+							<div class="p-col-2 vertical-center">
+								<h:outputText value="#{msg.mailManagerEditMailTo}:"/>
+							</div>
+							<div class="p-col-10">
+								<p:autoComplete 
+                                        	inputStyle="width: 80%;" 
+                                        	style="width: 80%; background: #FFF;"
+                                         	maxResults="6" id="mailTo"
+                                        	multiple="true"
+                                        	onkeydown="return lockValue(event);" immediate="false">
+		                            <p:column>
+		                                <h:outputText value="#{dest}" escape="false"/>
+		                            </p:column>
+		                            <p:column style="width: 32px;">
+		                                <p:commandButton icon="fa fa-times"
+		                                                 onclick="removeEmailAddressTo([{name:'param', value:'#{dest}'}]);"/>
+		                            </p:column>
+		                        </p:autoComplete>
+							</div>
+							
+							<div class="p-col-2 vertical-center">
+								<h:outputText value="#{msg.mailManagerEmailInCopy}:"/>
+							</div>
+							<div class="p-col-10">
+								<p:autoComplete multiple="true" inputStyle="width: 80%;"
+                                       		style="width: 80%; background: #FFF;"
+	                                        immediate="false"
+	                                        var="dest" itemLabel="#{dest}" itemValue="#{dest}" id="mailCC"
+	                                        maxResults="6">
+		                            <p:column>
+		                                <h:outputText value="#{dest}" escape="false"/>
+		                            </p:column>
+		                            <p:column style="width: 32px;">
+		                                <p:commandButton icon="fa fa-times"
+		                                                 onclick="removeEmailAddressCC([{name:'param', value:'#{dest}'}]);"/>
+		                            </p:column>
+		                        </p:autoComplete>
+							</div>
+            			</div>
+            		</div>
+            		
+            		<div class="p-col-6">
+            			<div class="p-grid">
+            				<div class="p-col-12">
+            					<h:outputText value="#{msg.mailManagerEmailAttachmentMessage}"/>
+            				</div>
+            				<div class="p-col-12">
+            					<p:outputPanel id="listFile">
+            						<p:dataTable value="#{bean.invoiceEmailAttachedFiles}" styleClass="simple-table" var="file" 
+			                     					rendered="#{not empty bean.invoiceEmailAttachedFiles}"  scrollable="true"
+								 					scrollHeight="150" style="border: 1px solid #a8acb1;">
+			            				<p:column styleClass="action_column">
+	                						<p:selectBooleanCheckbox/>
+	            						</p:column>
+							            <p:column headerText="#{msg.mailManagerEmailFile}" style="width: 280px !important;">
+							                <h:outputText value="#{file.fileName}"/>
+							            </p:column>
+							            <p:column>
+							            	<p:commandButton icon="fa fa-cloud-download" title="#{msg.download}" update=":form, messages"
+		                                                 ajax="false"
+		                                                 action="#{bean.downloadFile}" 
+		                                                 style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+		                                    <f:setPropertyActionListener value="#{file.id}" target="#{bean.downloadFileIndex}"/>
+		                                	</p:commandButton>
+							            </p:column>
+			            			</p:dataTable>
+		                            
+		                        </p:outputPanel>
+            				</div>
+            			</div>
+            		</div>
+            		
+            		<div class="p-col-1 vertical-center">
+            			<h:outputText value="#{msg.mailManagerEditMailSubject}:"/>
+            		</div>
+            		<div class="p-col-11">
+            			<p:inputTextarea value="#{bean.entity.emailSubject}" rows="1" style="width: 78%;"/>
+            		</div>
+            		
+            		<div class="p-col-1">
+            			<h:outputText value="#{msg.mailManagerEmailText}"/>
+            		</div>
+            		<div class="p-col-11">
+            			<pe:ckEditor id="body"
+		                         value="#{bean.entity.emailBodyToEditor}"
+		                         styleClass="for_editor" width="auto" height="200"
+		                         contentsCss="#{facesContext.externalContext.requestContextPath}/resources/javascript/CKEditorStyles.css"
+		                         customConfig="#{facesContext.externalContext.requestContextPath}/resources/javascript/configCKEditorMailManager.js"
+		                         widgetVar="ckEditorWV">
+		                <p:ajax event="initialize" onstart="onInitCkEditor();"/>
+		            	</pe:ckEditor>
+            		</div>
+            	</div>
+            	
+            	<div class="p-grid">
+            		<div class="p-col-8"></div>
+            		<div class="p-col-4">
+            			<p:commandButton value="#{msg.cancel}" oncomplete="PF('invoiceDialogBillingWV').hide()"/>
+                        <p:commandButton value="#{msg.saveInDraft}" styleClass="ui-button-success p-mr-2 p-mb-2" style="margin-left:5px;"/>
+                        <p:commandButton value="#{msg.sendEmail}" styleClass="ui-button-success p-mr-2 p-mb-2"></p:commandButton>
+            		</div>
+            	</div>
+		                    <!-- <p:column>
+		                        <p:commandButton value="#{msg.mailManagerEditMailAttachedFiles}"
+		                                         oncomplete="PF('attachFielDlgWV').show();" icon="fa fa-paperclip"
+		                                         styleClass="grey-button" style="margin-bottom: 10px"/>
+		                    </p:column>
+		                    <p:column>
+		                        <p:outputPanel id="listFile">
+		                            <ui:repeat value="#{bean.attachedFiles}" var="file">
+		                                <p:commandButton icon="fa fa-paperclip" title="#{msg.download}" update=":form, messages"
+		                                                 ajax="false"
+		                                                 action="#{bean.downloadFile}" value="&nbsp;#{file.fileName}"
+		                                                 style="background-color: transparent!important;color: #5f666c!important; padding-right: 5px;">
+		                                    <f:setPropertyActionListener value="#{file.id}" target="#{bean.downloadFileIndex}"/>
+		                                </p:commandButton>
+		                            </ui:repeat>
+		                        </p:outputPanel>
+		                    </p:column> -->
+		            
+        <script>
+            function onInitCkEditor() {
+                console.log("start init CKEditor");
+                CKEDITOR.timestamp='17.07.2018';
+                CKEDITOR.env.isCompatible = true;
+                removeAllTooltips('#bodyPanel');
+                CKEDITOR.instances.body.on('fixWidth', function () {
+                    fixWidthCKEditorBody();
+                });
+                CKEDITOR.instances.body.ui.editor.toolbar[3].items[0].onClick('Times New Roman');
+                CKEDITOR.instances.body.ui.editor.toolbar[3].items[1].onClick('16');
+                CKEDITOR.instances.body.ui.editor.on('change', function () {
+                    $("#changeVar").val("change");
+                    change = true;
+                });
+
+                CKEDITOR.instances.body.ui.editor.on('key', HandleTabEvent, null, null, 0);
+
+                console.log("init success");
+            }
+
+            function fixWidthCKEditorBody() {
+                var newWidth = parseInt(($("#bodyPanel").width() - 27) / (CKEDITOR.instances.body.ui.editor.toolbar[8].items[0].lastValue / 100), 10);
+                $("#bodyPanel").find(".cke_wysiwyg_frame").contents().find("body").css('width', newWidth + 'px');
+            }
+
+            // Custom Key Events function
+            function HandleTabEvent(e) {
+                if (e.data.keyCode == 9){
+                    var selection = CKEDITOR.instances.body.ui.editor.getSelection();
+                    var startElement = selection.getStartElement();
+                    if (e.data.keyCode == 9){
+                        var handleTab = false;
+                        var x = $(".cke_button__bulletedlist");
+                        if(x &amp;&amp; x.attr('class') == 'cke_button cke_button__bulletedlist cke_button_on'){
+                            handleTab = true;
+                        }else {
+                            x = $(".cke_button__numberedlist");
+                            if(x &amp;&amp; x.attr('class') == 'cke_button cke_button__numberedlist cke_button_on'){
+                                handleTab = true;
+                            }
+                        }
+                        if(handleTab){
+                            var element = selection.getStartElement();
+                            var sText = element.getHtml();
+                            var text = jQuery('&lt;div&gt;').html(sText).text();
+                            var result = text.replace(/[^ -~]+/g, "");
+                            if(!result || 0 === result.length){
+                            }else {
+                                e.cancel();
+                                e.stop();
+                                CKEDITOR.instances.body.ui.editor.insertText('    ');
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
+            </p:tab>
           </p:tabView>
         </div>
 

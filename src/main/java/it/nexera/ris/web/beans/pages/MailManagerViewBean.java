@@ -241,7 +241,11 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     @Getter
     @Setter
     private List<Request> invoicedRequests;
-
+    
+    @Getter
+    @Setter
+    private List<FileWrapper> invoiceEmailAttachedFiles;
+    
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
     	setActiveTabIndex(0);
@@ -1347,6 +1351,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         vatAmounts.add(new SelectItem(4D, "4%"));
         vatAmounts.add(new SelectItem(10D, "10%"));
         vatAmounts.add(new SelectItem(22D, "22%"));
+        loadInvoiceEmailAttachedFiles();
     }
     
     public void createInvoice() throws IllegalAccessException, PersistenceBeanException, HibernateException, InstantiationException {
@@ -1442,6 +1447,28 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         	}
         }
         return invoiceItems;
+    }
+    
+    public void loadInvoiceEmailAttachedFiles() {
+    	FileWrapper wrapper1 = new FileWrapper(1l, "test.pdf", "D:/");
+    	FileWrapper wrapper2 = new FileWrapper(2l, "test.pdf", "D:/");
+    	FileWrapper wrapper3 = new FileWrapper(3l, "test.pdf", "D:/");
+    	FileWrapper wrapper4 = new FileWrapper(4l, "test.pdf", "D:/");
+    	List<FileWrapper> files = new ArrayList<>();
+    	files.add(wrapper1);
+    	files.add(wrapper2);
+    	files.add(wrapper3);
+    	files.add(wrapper4);
+        setInvoiceEmailAttachedFiles(files);
+        /*setFileIndex(new AtomicLong());
+        getEntity().setFiles(null);
+        getEntity().setImgFiles(null);
+        if (getEntity().getFiles() != null) {
+            getEntity().getFiles().forEach(file -> {
+                getAttachedFiles().add(new FileWrapper(getFileIndex().getAndIncrement(),
+                        file.getFileName(), file.getDestinationPath()));
+            });
+        }*/
     }
     
     public Long getClientTypeId() {
