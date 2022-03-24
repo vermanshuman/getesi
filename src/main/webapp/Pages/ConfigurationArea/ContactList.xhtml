@@ -88,7 +88,7 @@
 			}
 	
 	       	body .ui-accordion .ui-accordion-content .ui-datatable thead th {
-	        	background-color: #f8f9fa !important;
+	        	background-color: #FFFFFF !important;
 	           	color: #495057 !important;
 	       	}
 	
@@ -113,6 +113,10 @@
 			body .ui-accordion .ui-accordion-content .ui-datatable thead th .ui-column-title {
 	    		color: #495057 !important;
 			}
+			
+			.action_column {
+    			width: 50px;
+    		}
         </style>
         <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/client.css"
               media="all" rel="stylesheet" type="text/css"/>
@@ -165,24 +169,24 @@
                              paginatorAlwaysVisible="true"
                              paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                              rowsPerPageTemplate="10,20,50" widgetVar="table">
-	                    <p:column sortBy="#{item.clientName}">
+	                    <p:column>
 	                        <f:facet name="header">
 	                            <h:outputText
-	                                    value="#{msg.clientNameOfTheCompany.toUpperCase()}" />
+	                                    value="#{msg.businessName}" />
 	                        </f:facet>
 	                        <h:outputText value="#{item}" />
 	                    </p:column>
 	
 	                    <p:column>
 	                        <f:facet name="header">
-	                            <h:outputText value="#{msg.clientAddressCity.toUpperCase()}" />
+	                            <h:outputText value="#{msg.clientAddressCity}" />
 	                        </f:facet>
 	                        <h:outputText value="#{item.addressCityId}" />
 	                    </p:column>
 	
 	                    <p:column>
 	                        <f:facet name="header">
-	                            <h:outputText value="#{msg.clientMail.toUpperCase()}" />
+	                            <h:outputText value="#{msg.clientMail}" />
 	                        </f:facet>
 	                        <!-- <h:outputText value="#{item.emails}"/> -->
 	                        <ui:repeat value="#{item.emails}" var="email">
@@ -193,12 +197,15 @@
 	
 	                    <p:column>
 	                        <f:facet name="header">
-	                            <h:outputText value="#{msg.clientPhone.toUpperCase()}" />
+	                            <h:outputText value="#{msg.clientPhone}" />
 	                        </f:facet>
 	                        <h:outputText value="#{item.phone}" />
 	                    </p:column>
 	
 	                    <p:column styleClass="action_column" exportable="false">
+	                    	<f:facet name="header">
+	                            <h:outputText value="#{msg.actions}" />
+	                        </f:facet>
 	                        <p:commandButton icon="ui-icon ui-icon-search pi pi-search"/>
 	                    </p:column>
 	
@@ -217,23 +224,23 @@
                          paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                          rowsPerPageTemplate="10,20,50" widgetVar="managerClientsTable">
 
-		                <p:column sortBy="#{item.clientName}">
+		                <p:column>
 		                    <f:facet name="header">
-		                        <h:outputText value="#{msg.clientNameOfTheCompany.toUpperCase()}"/>
+		                        <h:outputText value="#{msg.businessName}"/>
 		                    </f:facet>
 		                    <h:outputText value="#{item}"/>
 		                </p:column>
 		
 		                <p:column>
 		                    <f:facet name="header">
-		                        <h:outputText value="#{msg.titleOffice.toUpperCase()}"/>
+		                        <h:outputText value="#{msg.titleOffice}"/>
 		                    </f:facet>
 		                    <h:outputText value="#{item.office}"/>
 		                </p:column>
 		
 		                <p:column >
 		                    <f:facet name="header">
-		                        <h:outputText value="#{msg.clientMail.toUpperCase()}"/>
+		                        <h:outputText value="#{msg.clientMail}"/>
 		                    </f:facet>
 		                    <!-- <h:outputText value="#{item.emails}"/> -->
 		                    <ui:repeat value="#{item.emails}" var="email">
@@ -244,7 +251,7 @@
 		
 		                <p:column >
 		                    <f:facet name="header">
-		                        <h:outputText value="#{msg.clientPhone.toUpperCase()}"/>
+		                        <h:outputText value="#{msg.clientPhone}"/>
 		                    </f:facet>
 		                    <h:outputText value="#{item.phone}"/>
 		                </p:column>
@@ -255,26 +262,13 @@
 		                    </f:facet>
 		                    <h:outputText value="#{item.clients}"/>
 		                </p:column>
-		                <!-- <p:column styleClass="action_column" exportable="false">
-		                    <p:commandButton disabled="#{!bean.canDelete}" styleClass="red-btn"
-		                                     icon="ui-icon pi pi-times"
-		                                     oncomplete="PF('dlg2').show()">
-		                        <f:setPropertyActionListener value="#{item.id}"
-		                                                     target="#{bean.entityDeleteId}"/>
-		                    </p:commandButton>
-		                </p:column> -->
 		
 		                <p:column styleClass="action_column" exportable="false">
+		                	<f:facet name="header">
+	                            <h:outputText value="#{msg.actions}" />
+	                        </f:facet>
 		                    <p:commandButton icon="ui-icon ui-icon-search pi pi-search"/>
 		                </p:column>
-		
-		                <!-- <p:column styleClass="action_column" exportable="false">
-		                    <p:commandButton icon="ui-icon pi pi-pencil" update=":form"   style="border: none !important;"
-		                                     action="#{bean.editEntity}" disabled="#{!bean.canEdit}">
-		                        <f:setPropertyActionListener value="#{item.id}"
-		                                                     target="#{bean.entityEditId}"/>
-		                    </p:commandButton>
-		                </p:column> -->
             		</p:dataTable>
         		</p:tab>
         		
@@ -287,23 +281,23 @@
                              paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                              rowsPerPageTemplate="10,20,50" widgetVar="trusteesClientsTable">
 
-	                    <p:column sortBy="#{item.clientName}">
+	                    <p:column>
 	                        <f:facet name="header">
-	                            <h:outputText value="#{msg.clientNameOfTheCompany.toUpperCase()}"/>
+	                            <h:outputText value="#{msg.businessName}"/>
 	                        </f:facet>
 	                        <h:outputText value="#{item}"/>
 	                    </p:column>
 	
 	                    <p:column>
 	                        <f:facet name="header">
-	                            <h:outputText value="#{msg.clientAddressCity.toUpperCase()}"/>
+	                            <h:outputText value="#{msg.clientAddressCity}"/>
 	                        </f:facet>
 	                        <h:outputText value="#{item.addressCityId}"/>
 	                    </p:column>
 	
 	                    <p:column >
 	                        <f:facet name="header">
-	                            <h:outputText value="#{msg.clientMail.toUpperCase()}"/>
+	                            <h:outputText value="#{msg.clientMail}"/>
 	                        </f:facet>
 	                        <!-- <h:outputText value="#{item.emails}"/> -->
 	                        <ui:repeat value="#{item.emails}" var="email">
@@ -314,7 +308,7 @@
 	
 	                    <p:column >
 	                        <f:facet name="header">
-	                            <h:outputText value="#{msg.clientPhone.toUpperCase()}"/>
+	                            <h:outputText value="#{msg.clientPhone}"/>
 	                        </f:facet>
 	                        <h:outputText value="#{item.phone}"/>
 	                    </p:column>
@@ -324,24 +318,12 @@
 	                        </f:facet>
 	                        <h:outputText value="#{item.clients}"/>
 	                    </p:column>
-	                    <!-- <p:column styleClass="action_column" exportable="false">
-	                        <p:commandButton disabled="#{!bean.canDelete}"
-	                                         icon="ui-icon pi pi-times" styleClass="red-btn"
-	                                         oncomplete="PF('dlg2').show()">
-	                            <f:setPropertyActionListener value="#{item.id}"
-	                                                         target="#{bean.entityDeleteId}"/>
-	                        </p:commandButton>
-	                    </p:column> -->
 	                    <p:column styleClass="action_column" exportable="false">
+	                    	<f:facet name="header">
+	                            <h:outputText value="#{msg.actions}" />
+	                        </f:facet>
 	                        <p:commandButton icon="ui-icon ui-icon-search pi pi-search"/>
 	                    </p:column>
-	                    <!-- <p:column styleClass="action_column" exportable="false">
-	                        <p:commandButton icon="ui-icon pi pi-pencil" style="border: none !important;" update=":form"
-	                                         action="#{bean.editEntity}" disabled="#{!bean.canEdit}">
-	                            <f:setPropertyActionListener value="#{item.id}"
-	                                                         target="#{bean.entityEditId}"/>
-	                        </p:commandButton>
-	                    </p:column> -->
 	                </p:dataTable>
         		</p:tab>
         	</p:accordionPanel>
