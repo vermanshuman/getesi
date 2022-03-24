@@ -48,10 +48,6 @@ public class ContactListBean extends EntityLazyListPageBean<ClientShort> impleme
     
     private List<ClientShort> trusteesList;
     
-    private LazyDataModel<ClientShort> lazyManagerClientModel;
-    
-    private LazyDataModel<ClientShort> lazyClientTrustModel;
-    
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException, IOException {
         setShowSearch(Boolean.FALSE);
@@ -126,13 +122,6 @@ public class ContactListBean extends EntityLazyListPageBean<ClientShort> impleme
                 Restrictions.isNull("deleted")));
         criterions.add(Restrictions.and(Restrictions.isNotNull("fiduciary"),
                 Restrictions.eq("fiduciary", Boolean.TRUE)));
-        /*setLazyClientTrustModel(new EntityLazyListModel<>(ClientShort.class, criterions.toArray(new Criterion[0]),
-                new Order[]{
-                        Order.asc("clientName")
-                },
-                new CriteriaAlias[]{
-                        new CriteriaAlias("referenceClients", "rc", JoinType.INNER_JOIN)
-                }));*/
         setTrusteesList(DaoManager.load(ClientShort.class, new CriteriaAlias[] {
                 new CriteriaAlias("referenceClients", "rc", JoinType.INNER_JOIN)
         		}, criterions.toArray(new Criterion[0]), new Order[]{
