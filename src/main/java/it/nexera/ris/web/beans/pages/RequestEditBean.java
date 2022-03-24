@@ -341,6 +341,9 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }
         if (getMail() != null) {
             try {
+                setNdg(getMail().getNdg());
+                setCdr(getMail().getCdr());
+                setPosition(getMail().getReferenceRequest());
                 List<String> onlyEmails = MailHelper.getOnlyEmails(getMail().getEmailFrom());
                 if (!ValidationHelper.isNullOrEmpty(onlyEmails)) {
                     List<Client> clients = DaoManager.load(Client.class, new CriteriaAlias[]{
@@ -474,16 +477,18 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             setSelectedNotaryId(getEntity().getNotary().getId());
         }
 
-        if (getEntity().getCdr() != null) {
-            setCdr(getEntity().getCdr());
-        }
+        if(!getEntity().isNew()){
+            if (getEntity().getCdr() != null) {
+                setCdr(getEntity().getCdr());
+            }
 
-        if (getEntity().getNdg() != null) {
-            setNdg(getEntity().getNdg());
-        }
+            if (getEntity().getNdg() != null) {
+                setNdg(getEntity().getNdg());
+            }
 
-        if (getEntity().getPosition() != null) {
-            setPosition(getEntity().getPosition());
+            if (getEntity().getPosition() != null) {
+                setPosition(getEntity().getPosition());
+            }
         }
 
         if (getEntity().getUrgent() != null) {
@@ -524,7 +529,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             setShowConfirmButton(Boolean.TRUE);
             generateDynamicContent(false);
         } else {
-            setShowConfirmButton(Boolean.TRUE);
+            setShowConfirmButton(Boolean.FALSE);
             setSelectedServiceIds(new Long[1]);
         }
 

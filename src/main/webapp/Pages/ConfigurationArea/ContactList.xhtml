@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
 
 <ui:composition template="/resources/tpl/Admin/LazyListTabBase.xhtml">
-    <ui:param name="bean" value="#{clientListBean}"/>
+    <ui:param name="bean" value="#{contactListBean}"/>
     <ui:param name="list_header" value="#{msg.client}"/>
     <ui:param name="excludeColumns" value="0,1,2"/>
     <ui:define name="list_body">
@@ -47,37 +47,42 @@
             Rubrica
         </div>
         <div class="row search-bar">
-            <p:inputText placeholder="Ricerca avanzata" style="width: 25%;"/>
-            <p:commandButton icon="pi pi-search"/>
+            <p:inputText placeholder="Ricerca avanzata" value="#{bean.searchValue}" style="width: 25%;"/>
+            <p:commandButton icon="pi pi-search"  action="#{bean.search}"
+                             update="@form"/>
         </div>
-        <div class="row">
-            <div class="col">
-                <p:link href="/Pages/ConfigurationArea/ClientList.jsf?tab=1" styleClass="text-link">#{msg.clients}</p:link>
+
+        <p:outputPanel style="margin-top: 20px;" rendered="#{not bean.showSearch}"  id="boxes">
+            <div class="row">
+                <div class="col">
+                    <p:link href="/Pages/ConfigurationArea/ClientList.jsf?tab=1" styleClass="text-link">#{msg.clients}</p:link>
+                </div>
+                <div class="col">
+                    FORNITORI
+                </div>
+                <div class="col">
+                    <p:link href="/Pages/ConfigurationArea/ClientList.jsf?tab=2" styleClass="text-link">#{msg.requestManagers.toUpperCase()}</p:link>
+                </div>
+                <div class="col">
+                    <p:link href="/Pages/ConfigurationArea/ClientList.jsf?tab=3" styleClass="text-link">#{msg.requestTrustees.toUpperCase()}</p:link>
+                </div>
             </div>
-            <div class="col">
-                FORNITORI
+            <div class="row">
+                <div class="col">
+                    CONSERVATORIE
+                </div>
+                <div class="col">
+                    COMUNI
+                </div>
+                <div class="col">
+                    TRIBUNALI
+                </div>
+                <div class="col">
+                    NOTAI
+                </div>
             </div>
-            <div class="col">
-                GESTORI
-            </div>
-            <div class="col">
-                FIDUCIARI
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                CONSERVATORIE
-            </div>
-            <div class="col">
-                COMUNI
-            </div>
-            <div class="col">
-                TRIBUNALI
-            </div>
-            <div class="col">
-                NOTAI
-            </div>
-        </div>
+        </p:outputPanel>
+
     </ui:define>
 
 </ui:composition>

@@ -922,11 +922,11 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         DaoManager.save(getEntity(), true);
 
         if (redirectToCreateRequest) {
-            RedirectHelper.goToCreateRequestFromMail(getEntity().getId(), false, isMultipleCreateRedirect());
+            RedirectHelper.goToCreateMultipleRequestFromMail(getEntity().getId(), false, isMultipleCreateRedirect());
         }
     }
 
-    public void checkFieldsBeforeProcessManagedStateCheck() {
+    public void checkFieldsBeforeProcessManagedStateCheck() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         List<String> notSetFields = new ArrayList<>();
         if (ValidationHelper.isNullOrEmpty(getEntity().getClient())) {
             notSetFields.add(ResourcesHelper.getString("client"));
@@ -941,6 +941,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             notSetFields.add(ResourcesHelper.getString("clientManager"));
         }
 
+        getEntity().setNdg(getNdg());
+        getEntity().setCdr(getCdr());
+        getEntity().setReferenceRequest(getReferencePractice());
         if (notSetFields.size() == 0) {
             processManagedStateCheck();
         } else {
@@ -951,14 +954,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
     }
 
-    public void processManagedStateCheck() {
+    public void processManagedStateCheck() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+
         setConfirmButtonIsClicked(Boolean.TRUE);
-        executeJS("PF('chooseSingleOrMultipleRequestCreateWV').show();");
-//        if (ValidationHelper.isNullOrEmpty(getEntity().getRequests())) {
-//            executeJS("PF('enterPracticeReferenceWV').show();");
-//        } else {
-//            executeJS("PF('chooseSingleOrMultipleRequestCreateWV').show();");
-//        }
+        // executeJS("PF('chooseSingleOrMultipleRequestCreateWV').show();");]
+        setMultipleCreateRedirect(Boolean.TRUE);
+        saveReference(true);
     }
 
     public void generatePdfRequestCost() {
@@ -1027,9 +1028,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     getEntity().setManagers(clients);
                 }
             }
-            getEntity().setReferenceRequest(getReferencePractice());
-            getEntity().setNdg(getNdg());
-            getEntity().setCdr(getCdr());
+//            getEntity().setReferenceRequest(getReferencePractice());
+//            getEntity().setNdg(getNdg());
+//            getEntity().setCdr(getCdr());
 
             if (!ValidationHelper.isNullOrEmpty(getSelectedNotManagerOrFiduciaryClientId())) {
                 getEntity().setClient(DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()));
