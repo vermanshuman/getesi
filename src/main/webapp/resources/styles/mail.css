@@ -121,6 +121,14 @@ td.ui-panelgrid-cell {
     border-top: 2px solid #000;
 }
 
+#subjecthyphen {
+    display: inline-block;
+    width: 20px;
+    height: 5px;
+    margin-right: 12px;
+    border-top: 2px solid #000;
+}
+
 .one_mail_letter {
     line-height: 36px;
     font-size: 34pt;

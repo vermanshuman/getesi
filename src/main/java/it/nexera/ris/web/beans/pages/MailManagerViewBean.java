@@ -71,7 +71,9 @@ import it.nexera.ris.web.beans.base.AccessBean;
 import it.nexera.ris.web.beans.wrappers.logic.FileWrapper;
 import lombok.Getter;
 import lombok.Setter;
+import org.primefaces.component.tabview.TabView;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.menu.DefaultMenuItem;
 import org.primefaces.model.menu.DefaultMenuModel;
 import org.primefaces.model.menu.MenuModel;
@@ -169,9 +171,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
     private boolean multipleCreate;
 
-    private MenuModel topMenuModel;
+    // private MenuModel topMenuModel;
 
-    private int activeMenuTabNum;
+    // private int activeMenuTabNum;
 
     private List<InputCard> inputCardList;
 
@@ -215,8 +217,26 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
     private Long selectedTaxRateId;
 
+    @Getter
+    @Setter
+    private int activeTabIndex;
+
+    @Getter
+    @Setter
+    private List<PaymentInvoice> paymentInvoices;
+
+    @Getter
+    @Setter
+    private Double amountToBeCollected;
+
+    @Getter
+    @Setter
+    private Double totalPayments;
+
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
+        setActiveTabIndex(0);
         setOnlyView(Boolean.parseBoolean(getRequestParameter(RedirectHelper.ONLY_VIEW)));
         SessionHelper.removeObject("isFromMailView");
         String tablePage = getRequestParameter(RedirectHelper.TABLE_PAGE);
@@ -313,7 +333,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
 
         // Changes for invoice
-        generateMenuModel();
+//        generateMenuModel();
         setMaxInvoiceNumber();
 
         List<Request> requestList =
@@ -922,11 +942,11 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         DaoManager.save(getEntity(), true);
 
         if (redirectToCreateRequest) {
-            RedirectHelper.goToCreateRequestFromMail(getEntity().getId(), false, isMultipleCreateRedirect());
+            RedirectHelper.goToCreateMultipleRequestFromMail(getEntity().getId(), false, isMultipleCreateRedirect());
         }
     }
 
-    public void checkFieldsBeforeProcessManagedStateCheck() {
+    public void checkFieldsBeforeProcessManagedStateCheck() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         List<String> notSetFields = new ArrayList<>();
         if (ValidationHelper.isNullOrEmpty(getEntity().getClient())) {
             notSetFields.add(ResourcesHelper.getString("client"));
@@ -941,6 +961,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             notSetFields.add(ResourcesHelper.getString("clientManager"));
         }
 
+        getEntity().setNdg(getNdg());
+        getEntity().setCdr(getCdr());
+        getEntity().setReferenceRequest(getReferencePractice());
         if (notSetFields.size() == 0) {
             processManagedStateCheck();
         } else {
@@ -951,14 +974,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
     }
 
-    public void processManagedStateCheck() {
+    public void processManagedStateCheck() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+
         setConfirmButtonIsClicked(Boolean.TRUE);
-        executeJS("PF('chooseSingleOrMultipleRequestCreateWV').show();");
-//        if (ValidationHelper.isNullOrEmpty(getEntity().getRequests())) {
-//            executeJS("PF('enterPracticeReferenceWV').show();");
-//        } else {
-//            executeJS("PF('chooseSingleOrMultipleRequestCreateWV').show();");
-//        }
+        // executeJS("PF('chooseSingleOrMultipleRequestCreateWV').show();");]
+        setMultipleCreateRedirect(Boolean.TRUE);
+        saveReference(true);
     }
 
     public void generatePdfRequestCost() {
@@ -1027,9 +1048,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     getEntity().setManagers(clients);
                 }
             }
-            getEntity().setReferenceRequest(getReferencePractice());
-            getEntity().setNdg(getNdg());
-            getEntity().setCdr(getCdr());
+//            getEntity().setReferenceRequest(getReferencePractice());
+//            getEntity().setNdg(getNdg());
+//            getEntity().setCdr(getCdr());
 
             if (!ValidationHelper.isNullOrEmpty(getSelectedNotManagerOrFiduciaryClientId())) {
                 getEntity().setClient(DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()));
@@ -1118,28 +1139,28 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     }
 
 
-    private void generateMenuModel() {
-        setTopMenuModel(new DefaultMenuModel());
-        if (isMultipleCreate()) {
-            addMenuItem(ResourcesHelper.getString("requestTextEditDataTab"));
-        } else {
-            addMenuItem(ResourcesHelper.getString("requestTextEditDataTab"));
-            if (!ValidationHelper.isNullOrEmpty(getInputCardList())) {
-                getInputCardList()
-                        .forEach(card -> addMenuItem(card.getName().toUpperCase()));
-            }
-        }
-    }
+//    private void generateMenuModel() {
+//        setTopMenuModel(new DefaultMenuModel());
+//        if (isMultipleCreate()) {
+//            addMenuItem(ResourcesHelper.getString("requestTextEditDataTab"));
+//        } else {
+//            addMenuItem(ResourcesHelper.getString("requestTextEditDataTab"));
+//            if (!ValidationHelper.isNullOrEmpty(getInputCardList())) {
+//                getInputCardList()
+//                        .forEach(card -> addMenuItem(card.getName().toUpperCase()));
+//            }
+//        }
+//    }
 
-    private void addMenuItem(String value) {
-        DefaultMenuItem menuItem = new DefaultMenuItem(value);
-
-        menuItem.setCommand("#{mailManagerViewBean.goToTab(" +
-                getTopMenuModel().getElements().size() + ")}");
-        menuItem.setUpdate("form");
-
-        getTopMenuModel().addElement(menuItem);
-    }
+//    private void addMenuItem(String value) {
+//        DefaultMenuItem menuItem = new DefaultMenuItem(value);
+//
+//        menuItem.setCommand("#{mailManagerViewBean.goToTab(" +
+//                getTopMenuModel().getElements().size() + ")}");
+//        menuItem.setUpdate("form");
+//
+//        getTopMenuModel().addElement(menuItem);
+//    }
 
     public void setMaxInvoiceNumber() throws HibernateException {
         LocalDate currentdate = LocalDate.now();
@@ -1283,6 +1304,23 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             executeJS("PF('sendInvoiceErrorDialogWV').show();");
         }
     }
+
+    public final void onTabChange(final TabChangeEvent event) {
+        TabView tv = (TabView) event.getComponent();
+        this.activeTabIndex = tv.getActiveIndex();
+        //SessionHelper.put("activeTabIndex", activeTabIndex);
+    }
+
+    public void loadInvoiceDialogData() throws IllegalAccessException, PersistenceBeanException  {
+        List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[] {Restrictions.isNotNull("date")}, new Order[]{
+                Order.desc("date")});
+        setPaymentInvoices(paymentInvoicesList);
+        double totalImport = 0.0;
+        for(PaymentInvoice paymentInvoice : paymentInvoicesList) {
+            totalImport = totalImport + paymentInvoice.getPaymentImport().doubleValue();
+        }
+    }
+
 
     public Long getClientTypeId() {
         return clientTypeId;

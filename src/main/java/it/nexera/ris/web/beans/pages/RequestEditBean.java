@@ -12,6 +12,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 
 import it.nexera.ris.common.enums.*;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
 import it.nexera.ris.persistence.view.RequestView;
 import lombok.Getter;
 import lombok.Setter;
@@ -72,13 +73,6 @@ import it.nexera.ris.persistence.beans.entities.domain.SectionC;
 import it.nexera.ris.persistence.beans.entities.domain.Subject;
 import it.nexera.ris.persistence.beans.entities.domain.User;
 import it.nexera.ris.persistence.beans.entities.domain.WLGInbox;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Country;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.LandChargesRegistry;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import it.nexera.ris.persistence.view.ClientView;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.beans.EntityEditPageBean;
@@ -341,6 +335,9 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }
         if (getMail() != null) {
             try {
+                setNdg(getMail().getNdg());
+                setCdr(getMail().getCdr());
+                setPosition(getMail().getReferenceRequest());
                 List<String> onlyEmails = MailHelper.getOnlyEmails(getMail().getEmailFrom());
                 if (!ValidationHelper.isNullOrEmpty(onlyEmails)) {
                     List<Client> clients = DaoManager.load(Client.class, new CriteriaAlias[]{
@@ -474,16 +471,18 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             setSelectedNotaryId(getEntity().getNotary().getId());
         }
 
-        if (getEntity().getCdr() != null) {
-            setCdr(getEntity().getCdr());
-        }
+        if(!getEntity().isNew()){
+            if (getEntity().getCdr() != null) {
+                setCdr(getEntity().getCdr());
+            }
 
-        if (getEntity().getNdg() != null) {
-            setNdg(getEntity().getNdg());
-        }
+            if (getEntity().getNdg() != null) {
+                setNdg(getEntity().getNdg());
+            }
 
-        if (getEntity().getPosition() != null) {
-            setPosition(getEntity().getPosition());
+            if (getEntity().getPosition() != null) {
+                setPosition(getEntity().getPosition());
+            }
         }
 
         if (getEntity().getUrgent() != null) {
@@ -524,7 +523,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             setShowConfirmButton(Boolean.TRUE);
             generateDynamicContent(false);
         } else {
-            setShowConfirmButton(Boolean.TRUE);
+            setShowConfirmButton(Boolean.FALSE);
             setSelectedServiceIds(new Long[1]);
         }
 
@@ -1483,7 +1482,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 getEntity().setAgency(null);
             }
             if (!ValidationHelper.isNullOrEmpty(getSelectedAgencyOfficeId())) {
-                getEntity().setOffice(DaoManager.get(Agency.class, getSelectedAgencyOfficeId()));
+                getEntity().setOffice(DaoManager.get(Office.class, getSelectedAgencyOfficeId()));
             } else {
                 getEntity().setOffice(null);
             }

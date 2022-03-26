@@ -30,7 +30,9 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
+import org.primefaces.component.tabview.TabView;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.menu.DefaultMenuItem;
 import org.primefaces.model.menu.DefaultMenuModel;
 import org.primefaces.model.menu.MenuModel;
@@ -210,6 +212,23 @@ public class BillingListOldBean extends EntityLazyListPageBean<RequestView>
     private boolean invoiceSentStatus;
 
     private Long selectedTaxRateId;
+
+    @Getter
+    @Setter
+    private int activeTabIndex;
+
+    @Getter
+    @Setter
+    private List<PaymentInvoice> paymentInvoices;
+
+    @Getter
+    @Setter
+    private Double amountToBeCollected;
+
+    @Getter
+    @Setter
+    private Double totalPayments;
+
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -1755,7 +1774,7 @@ public class BillingListOldBean extends EntityLazyListPageBean<RequestView>
         setShowPrintButton(null);
     }
 
-    public void openInvoiceDialog() throws HibernateException {
+    public void openInvoiceDialog() throws HibernateException, IllegalAccessException, PersistenceBeanException {
         if(ValidationHelper.isNullOrEmpty(getSelectedClientId())){
             setInvoiceErrorMessage(ResourcesHelper.getString("clientNotSelectedError"));
             RequestContext.getCurrentInstance().update("requestInvoiceErrorDialogId");
@@ -1777,6 +1796,7 @@ public class BillingListOldBean extends EntityLazyListPageBean<RequestView>
 
             setMaxInvoiceNumber();
             RequestContext.getCurrentInstance().update("propertyErrorDialogId");
+            loadInvoiceDialogData();
             executeJS("PF('invoiceDialogWV').show();");
         }
     }
@@ -1797,29 +1817,29 @@ public class BillingListOldBean extends EntityLazyListPageBean<RequestView>
         String invoiceNumber = (lastInvoiceNumber + 1) + "-" + currentYear + "-FE";
         setInvoiceNumber(invoiceNumber);
     }
+//
+//    private void generateMenuModel() {
+//        setTopMenuModel(new DefaultMenuModel());
+//        if (isMultipleCreate()) {
+//            addMenuItem(ResourcesHelper.getString("requestTextEditDataTab"));
+//        } else {
+//            addMenuItem(ResourcesHelper.getString("requestTextEditDataTab"));
+//            if (!ValidationHelper.isNullOrEmpty(getInputCardList())) {
+//                getInputCardList()
+//                        .forEach(card -> addMenuItem(card.getName().toUpperCase()));
+//            }
+//        }
+//    }
 
-    private void generateMenuModel() {
-        setTopMenuModel(new DefaultMenuModel());
-        if (isMultipleCreate()) {
-            addMenuItem(ResourcesHelper.getString("requestTextEditDataTab"));
-        } else {
-            addMenuItem(ResourcesHelper.getString("requestTextEditDataTab"));
-            if (!ValidationHelper.isNullOrEmpty(getInputCardList())) {
-                getInputCardList()
-                        .forEach(card -> addMenuItem(card.getName().toUpperCase()));
-            }
-        }
-    }
-
-    private void addMenuItem(String value) {
-        DefaultMenuItem menuItem = new DefaultMenuItem(value);
-
-        menuItem.setCommand("#{mailManagerViewBean.goToTab(" +
-                getTopMenuModel().getElements().size() + ")}");
-        menuItem.setUpdate("form");
-
-        getTopMenuModel().addElement(menuItem);
-    }
+//    private void addMenuItem(String value) {
+//        DefaultMenuItem menuItem = new DefaultMenuItem(value);
+//
+//        menuItem.setCommand("#{mailManagerViewBean.goToTab(" +
+//                getTopMenuModel().getElements().size() + ")}");
+//        menuItem.setUpdate("form");
+//
+//        getTopMenuModel().addElement(menuItem);
+//    }
 
 
     public Double getTotalGrossAmount() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
@@ -1943,6 +1963,23 @@ public class BillingListOldBean extends EntityLazyListPageBean<RequestView>
             e.printStackTrace();
             LogHelper.log(log, e);
             executeJS("PF('sendInvoiceErrorDialogWV').show();");
+        }
+    }
+
+
+    public final void onTabChange(final TabChangeEvent event) {
+        TabView tv = (TabView) event.getComponent();
+        this.activeTabIndex = tv.getActiveIndex();
+        //SessionHelper.put("activeTabIndex", activeTabIndex);
+    }
+
+    public void loadInvoiceDialogData() throws IllegalAccessException, PersistenceBeanException  {
+        List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[] {Restrictions.isNotNull("date")}, new Order[]{
+                Order.desc("date")});
+        setPaymentInvoices(paymentInvoicesList);
+        double totalImport = 0.0;
+        for(PaymentInvoice paymentInvoice : paymentInvoicesList) {
+            totalImport = totalImport + paymentInvoice.getPaymentImport().doubleValue();
         }
     }
 

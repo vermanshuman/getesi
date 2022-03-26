@@ -35,7 +35,9 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.jsoup.Jsoup;
+import org.primefaces.component.tabview.TabView;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.menu.DefaultMenuItem;
 import org.primefaces.model.menu.DefaultMenuModel;
@@ -186,9 +188,9 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     private boolean multipleCreate;
 
-    private MenuModel topMenuModel;
+    // private MenuModel topMenuModel;
 
-    private int activeMenuTabNum;
+//    private int activeMenuTabNum;
 
     private List<InputCard> inputCardList;
 
@@ -232,9 +234,26 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     private Long selectedTaxRateId;
 
+    @Getter
+    @Setter
+    private int activeTabIndex;
+
+    @Getter
+    @Setter
+    private List<PaymentInvoice> paymentInvoices;
+
+    @Getter
+    @Setter
+    private Double amountToBeCollected;
+
+    @Getter
+    @Setter
+    private Double totalPayments;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
             InstantiationException, IllegalAccessException {
+        setActiveTabIndex(0);
         setShowSalesSection(Boolean.FALSE);
         String parameter = getRequestParameter(RedirectHelper.ID_PARAMETER);
         setEntityId(null);
@@ -309,7 +328,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
         updateConservatoryList();
 
-        generateMenuModel();
+      //  generateMenuModel();
         setMaxInvoiceNumber();
         if(!ValidationHelper.isNullOrEmpty(getExamRequest().getTotalCostDouble()))
             setInvoiceTotalCost(Double.parseDouble(getExamRequest().getTotalCostDouble()));
@@ -1982,6 +2001,22 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         }
     }
 
+    public final void onTabChange(final TabChangeEvent event) {
+        TabView tv = (TabView) event.getComponent();
+        this.activeTabIndex = tv.getActiveIndex();
+        //SessionHelper.put("activeTabIndex", activeTabIndex);
+    }
+
+    public void loadInvoiceDialogData() throws IllegalAccessException, PersistenceBeanException  {
+        List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[] {Restrictions.isNotNull("date")}, new Order[]{
+                Order.desc("date")});
+        setPaymentInvoices(paymentInvoicesList);
+        double totalImport = 0.0;
+        for(PaymentInvoice paymentInvoice : paymentInvoicesList) {
+            totalImport = totalImport + paymentInvoice.getPaymentImport().doubleValue();
+        }
+    }
+
     public String getEditText() {
         return editText;
     }
@@ -2362,37 +2397,37 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         this.salesOtherEstateSituations = salesOtherEstateSituations;
     }
 
-    private void addMenuItem(String value) {
-        DefaultMenuItem menuItem = new DefaultMenuItem(value);
+//    private void addMenuItem(String value) {
+//        DefaultMenuItem menuItem = new DefaultMenuItem(value);
+//
+//        menuItem.setCommand("#{requestTextEditBean.goToTab(" +
+//                getTopMenuModel().getElements().size() + ")}");
+//        menuItem.setUpdate("form");
+//
+//        getTopMenuModel().addElement(menuItem);
+//    }
 
-        menuItem.setCommand("#{requestTextEditBean.goToTab(" +
-                getTopMenuModel().getElements().size() + ")}");
-        menuItem.setUpdate("form");
 
-        getTopMenuModel().addElement(menuItem);
-    }
-
-
-    private void generateMenuModel() {
-        setTopMenuModel(new DefaultMenuModel());
-        if (isMultipleCreate()) {
-            addMenuItem(ResourcesHelper.getString("requestTextEditDataTab"));
-//            addMenuItem(ResourcesHelper.getString("requestTextEditNoteTab"));
-//            addMenuItem(ResourcesHelper.getString("requestTextEditPaymentsTab"));
-//            addMenuItem(ResourcesHelper.getString("requestTextEditAttachmentsTab"));
-//            addMenuItem(ResourcesHelper.getString("requestTextEditEmailTab"));
-        } else {
-            addMenuItem(ResourcesHelper.getString("requestTextEditDataTab"));
-            if (!ValidationHelper.isNullOrEmpty(getInputCardList())) {
-                getInputCardList()
-                        .forEach(card -> addMenuItem(card.getName().toUpperCase()));
-            }
-//            addMenuItem(ResourcesHelper.getString("requestTextEditNoteTab"));
-//            addMenuItem(ResourcesHelper.getString("requestTextEditPaymentsTab"));
-//            addMenuItem(ResourcesHelper.getString("requestTextEditAttachmentsTab"));
-//            addMenuItem(ResourcesHelper.getString("requestTextEditEmailTab"));
-        }
-    }
+//    private void generateMenuModel() {
+//        setTopMenuModel(new DefaultMenuModel());
+//        if (isMultipleCreate()) {
+//            addMenuItem(ResourcesHelper.getString("requestTextEditDataTab"));
+////            addMenuItem(ResourcesHelper.getString("requestTextEditNoteTab"));
+////            addMenuItem(ResourcesHelper.getString("requestTextEditPaymentsTab"));
+////            addMenuItem(ResourcesHelper.getString("requestTextEditAttachmentsTab"));
+////            addMenuItem(ResourcesHelper.getString("requestTextEditEmailTab"));
+//        } else {
+//            addMenuItem(ResourcesHelper.getString("requestTextEditDataTab"));
+//            if (!ValidationHelper.isNullOrEmpty(getInputCardList())) {
+//                getInputCardList()
+//                        .forEach(card -> addMenuItem(card.getName().toUpperCase()));
+//            }
+////            addMenuItem(ResourcesHelper.getString("requestTextEditNoteTab"));
+////            addMenuItem(ResourcesHelper.getString("requestTextEditPaymentsTab"));
+////            addMenuItem(ResourcesHelper.getString("requestTextEditAttachmentsTab"));
+////            addMenuItem(ResourcesHelper.getString("requestTextEditEmailTab"));
+//        }
+//    }
 
     public void setMaxInvoiceNumber() throws HibernateException, IllegalAccessException, PersistenceBeanException {
         LocalDate currentdate = LocalDate.now();
@@ -2493,13 +2528,13 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         }
     }
 
-    public MenuModel getTopMenuModel() {
-        return topMenuModel;
-    }
-
-    public void setTopMenuModel(MenuModel topMenuModel) {
-        this.topMenuModel = topMenuModel;
-    }
+//    public MenuModel getTopMenuModel() {
+//        return topMenuModel;
+//    }
+//
+//    public void setTopMenuModel(MenuModel topMenuModel) {
+//        this.topMenuModel = topMenuModel;
+//    }
 
     public List<InputCard> getInputCardList() {
         return inputCardList;
@@ -2509,13 +2544,13 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         this.inputCardList = inputCardList;
     }
 
-    public int getActiveMenuTabNum() {
-        return activeMenuTabNum;
-    }
-
-    public void setActiveMenuTabNum(int activeMenuTabNum) {
-        this.activeMenuTabNum = activeMenuTabNum;
-    }
+//    public int getActiveMenuTabNum() {
+//        return activeMenuTabNum;
+//    }
+//
+//    public void setActiveMenuTabNum(int activeMenuTabNum) {
+//        this.activeMenuTabNum = activeMenuTabNum;
+//    }
 
     public boolean isMultipleCreate() {
         return multipleCreate;

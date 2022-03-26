@@ -431,4 +431,19 @@ public class RedirectHelper extends BaseHelper {
             LogHelper.log(log, e);
         }
     }
+
+    public static void goToCreateMultipleRequestFromMail(Serializable id, boolean needArchive, boolean isMultipleCreate) {
+        goToCreateMultipleRequestFromMail(id, "", needArchive, isMultipleCreate);
+    }
+
+    public static void goToCreateMultipleRequestFromMail(Serializable id, Serializable requestId, boolean needArchive, boolean isMultipleCreate) {
+        try {
+            sendRedirect(PageTypes.REQUEST_EDIT.getPagesContext() + "?"
+                    + ID_PARAMETER + "=" + requestId + "&"
+                    + (needArchive ? ARCHIVE_MAIL : MAIL) + "=" + id
+                    + (isMultipleCreate ? "&" + MULTIPLE + "=true" : "") + "&"+ RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE");
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
 }

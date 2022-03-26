@@ -781,7 +781,7 @@
 
                     <h:outputText id="externalUserIcon" rendered="#{item.external and not item.haveAllegatiDocuments}"
                                   style="margin: 0 auto;" styleClass="richiesta-da-clienti-icon" />
-                    <p:tooltip for="externalUserIcon" value="#{item.createUserFullName}" escape="false"/>
+                    <p:tooltip for="externalUserIcon" value="#{item.createUserFullName}" escape="false" rendered="#{item.external and not item.haveAllegatiDocuments}"/>
 
                     <p:outputPanel rendered="#{item.external and item.haveAllegatiDocuments}" style="display: flex;margin-left: calc( 50% - 15px );">
                         <p:commandButton id="externalUserIconA"  styleClass="richiesta-da-clienti-icon" action="#{bean.loadAllegatiDocuments}" update="requestDocs"
