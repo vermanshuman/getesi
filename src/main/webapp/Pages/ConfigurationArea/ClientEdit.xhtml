@@ -27,7 +27,149 @@
             #configurePriceList .ui-dialog-titlebar{
                 padding: 5px !important;
             }
+
+            #wizard ul {
+                background-color: transparent !important;
+                text-transform: uppercase;
+            }
+
+            #wizard ul::before {
+                border-bottom: none;
+            }
+
+            #wizard ul li:not(.ui-tabs-selected.ui-state-active ) a {
+                color: gray !important;
+                border-bottom: 2px solid #dee2e6;
+            }
+
+            #wizard ul li.ui-tabs-selected.ui-state-active {
+                background-color: transparent !important;
+            }
+
+            #wizard ul li.ui-tabs-selected.ui-state-active a {
+                color: #000 !important;
+                border-bottom: 3px solid #4872F2;
+                font-weight: bold;
+            }
+
+            #wizard *:not(.ui-icon) {
+                font-size: 18px;
+            }
+
+            #wizard .action_column {
+                width: 60px;
+            }
+            #wizard .close_btn {
+                float: right;
+                bottom: 20px;
+                right: 40px;
+                position: absolute;
+            }
+            div[id*='wizard:paymentMode'] {
+                min-width: 300px !important;
+                min-height: 50px;
+                vertical-align: middle;
+                margin-left: 20px;
+                margin-top: -5px;
+            }
+            div[id*='wizard:paymentMode'] .ui-selectonemenu-label, div[id*='wizard:paymentMode_panel'] * {
+                  font-size: 23px !important;
+            }
+            div[id*='wizard:paymentMode'] .ui-selectonemenu-trigger {
+                width: 50px;
+                background-color: #DBDBDA;
+            }
+
+            #table_paginator_top, #table_paginator_bottom {
+                text-align: center;
+                padding-bottom: 4px !important;
+                padding: 8px 35px;
+            }
+
+            .ui-paginator-rpp-options {
+                margin-top: 6px !important;
+            }
+
+            .ui-paginator-current {
+                margin-top: 2px !important;
+            }
+
+            body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+                background: #FFF !important;
+                color: #000000 !important;
+            }
+
+            table {
+                margin-top: 20px;
+                padding-left: 13px;
+                border-collapse: separate;
+                border-spacing: 0 0.6em;
+            }
+
+            body .ui-datatable:not(.borderless) thead th {
+                background-color: #CCCCCC !important;
+                border-color: #000 !important;
+                color: #5f666c !important;
+                padding: 8px 2px !important;
+                border-width: 1px!important;
+                border-style: solid!important;
+            }
+
+
+            table .ui-datatable-data td {
+                color: #003871;
+                border-top: none;
+                border-bottom: none;
+                background-color: #ffffff !important;
+            }
+
+            table .ui-datatable-data td:last-child {
+                border-right: none;
+                border-top-right-radius: 5px;
+                border-bottom-right-radius: 5px;
+                -webkit-box-shadow: 4px 0px 7px -2px rgba(0, 0, 0, 0.75);
+                -moz-box-shadow: 4px 0px 7px -2px rgba(0, 0, 0, 0.75);
+                box-shadow: 4px 0px 7px -2px rgba(0, 0, 0, 0.75);
+            }
+
+            table .ui-datatable-data tr {
+                background-color: transparent !important;
+                border-top: none;
+                -webkit-box-shadow: 0px 4px 7px -2px rgba(0, 0, 0, 0.75);
+                -moz-box-shadow: 0px 4px 7px -2px rgba(0, 0, 0, 0.75);
+                box-shadow: 0px 4px 7px -2px rgba(0, 0, 0, 0.75);
+            }
+
+            table .ui-datatable-data tr {
+                margin-bottom: 8px;
+                border-left: none;
+            }
+
+            table .ui-datatable-data {
+                border: none;
+                background: transparent;
+            }
+
+            body .ui-widget, body .ui-widget .ui-widget {
+                font-weight: 400 !important;
+            }
+
+            body .ui-datatable .ui-datatable-data > tr > td {
+                border: 1px solid #000 !important;
+            }
+
+            .action_column-header {
+                width: 150px !important;
+            }
         </style>
+        <script type="text/javascript">
+            // <![CDATA[
+            jQuery(document).ready(function() {
+                jQuery('table th .ui-column-title').attr('style', 'color: #000 !important');
+                jQuery('table td').attr('style', 'color: #000 !important');
+            });
+            // ]]>
+        </script>
         <p:remoteCommand name="valid" action="#{bean.validTab()}"/>
         <p:remoteCommand name="updateRedStarFroms" action="#{bean.updateForms()}"
                          update=":form:wizard:secondPanel, :form:wizard:fifthPanel, :form:wizard:firstPanel"/>
@@ -274,7 +416,7 @@
                     </p:row>
                     <p:row>
                         <p:column style="padding-right: 20px">
-                            <span>#{msg.invoicePaymentType}: </span><br/>
+                            <div style="font-size: 25px;min-height: 50px;display: inline-block;">#{msg.invoicePaymentType}: </div>
                             <p:selectOneMenu id="paymentMode" value="#{bean.paymentTypeId}"
                                              label="#{msg.invoicePaymentType}"
                                              rendered="#{!bean.onlyView}">
@@ -297,7 +439,7 @@
                                  paginator="true" paginatorAlwaysVisible="true" rowIndexVar="rowId"
                                  paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                  rowsPerPageTemplate="10,20,50">
-                        <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
+                        <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
 
                         <p:column headerText="#{msg.clientMailDescription.toUpperCase()}">
                             <h:outputText value="#{item.clientEmail.description}"/>

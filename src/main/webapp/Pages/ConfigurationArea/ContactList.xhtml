@@ -125,11 +125,11 @@
         </div>
         <div class="row search-bar">
             <p:inputText placeholder="Ricerca avanzata" value="#{bean.nameOfTheCompany}" style="width: 25%;"/>
-            <p:commandButton icon="pi pi-search"  action="#{bean.search}"
+            <p:commandButton icon="pi pi-search"  action="#{bean.search}" oncomplete="PF('searchResult').show()"
                              update="@form"/>
         </div>
 
-        <p:outputPanel style="margin-top: 20px;" rendered="#{not bean.showSearch}"  id="boxes">
+        <p:outputPanel style="margin-top: 20px;"  id="boxes">
             <div class="row">
                 <div class="col">
                     <p:link href="/Pages/ConfigurationArea/ClientList.jsf?tab=1" styleClass="text-link">#{msg.clients}</p:link>
@@ -159,173 +159,175 @@
                 </div>
             </div>
         </p:outputPanel>
-        <p:outputPanel rendered="#{bean.showSearch}"  id="searchResultPanel">
-            <p:accordionPanel multiple="false" activeIndex="0" id="accordionPanel">
-                <p:tab title="#{msg.clients} (#{bean.clientList.size()})" disabled="#{bean.clientList.size() == 0}">
-                    <p:dataTable var="item" id="clientTable" styleClass="table-client-list"
-                                 emptyMessage="#{msg.noRecordsFound}" value="#{bean.clientList}"
-                                 paginator="true" lazy="true" rowKey="#{item.id}" rows="10"
-                                 paginatorAlwaysVisible="true"
-                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                 rowsPerPageTemplate="10,20,50" widgetVar="table">
-                        <p:column>
-                            <f:facet name="header">
-                                <h:outputText
-                                        value="#{msg.clientNameOfTheCompany.toUpperCase()}" />
-                            </f:facet>
-                            <h:outputText value="#{item}" />
-                        </p:column>
+        <p:dialog header="Search" widgetVar="searchResult" width="80%"
+                  modal="true" resizable="false" effect="SLIDE">
+            <p:outputPanel rendered="#{bean.showSearch}"  id="searchResultPanel">
+                <p:accordionPanel multiple="false" activeIndex="0" id="accordionPanel">
+                    <p:tab title="#{msg.clients} (#{bean.clientList.size()})" disabled="#{bean.clientList.size() == 0}">
+                        <p:dataTable var="item" id="clientTable" styleClass="table-client-list"
+                                     emptyMessage="#{msg.noRecordsFound}" value="#{bean.clientList}"
+                                     paginator="true" lazy="true" rowKey="#{item.id}" rows="10"
+                                     paginatorAlwaysVisible="true"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="10,20,50" widgetVar="table">
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText
+                                            value="#{msg.clientNameOfTheCompany.toUpperCase()}" />
+                                </f:facet>
+                                <h:outputText value="#{item}" />
+                            </p:column>
 
-                        <p:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.clientAddressCity}" />
-                            </f:facet>
-                            <h:outputText value="#{item.addressCityId}" />
-                        </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.clientAddressCity}" />
+                                </f:facet>
+                                <h:outputText value="#{item.addressCityId}" />
+                            </p:column>
 
-                        <p:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.clientMail}" />
-                            </f:facet>
-                            <ui:repeat value="#{item.emails}" var="email">
-                                <h:outputText value="#{email.email}" />
-                                <h:outputText value="&lt;br /&gt;" escape="false" />
-                            </ui:repeat>
-                        </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.clientMail}" />
+                                </f:facet>
+                                <ui:repeat value="#{item.emails}" var="email">
+                                    <h:outputText value="#{email.email}" />
+                                    <h:outputText value="&lt;br /&gt;" escape="false" />
+                                </ui:repeat>
+                            </p:column>
 
-                        <p:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.clientPhone}" />
-                            </f:facet>
-                            <h:outputText value="#{item.phone}" />
-                        </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.clientPhone}" />
+                                </f:facet>
+                                <h:outputText value="#{item.phone}" />
+                            </p:column>
 
-                        <p:column styleClass="action_column" exportable="false">
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.actions}" />
-                            </f:facet>
-                            <p:commandButton icon="ui-icon ui-icon-search pi pi-search"/>
-                        </p:column>
+                            <p:column styleClass="action_column" exportable="false">
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.actions}" />
+                                </f:facet>
+                                <p:commandButton icon="ui-icon ui-icon-search pi pi-search"/>
+                            </p:column>
 
-                    </p:dataTable>
-                </p:tab>
+                        </p:dataTable>
+                    </p:tab>
 
-                <p:tab title="#{msg.providers}" disabled="true">
-                </p:tab>
+                    <p:tab title="#{msg.providers}" disabled="true">
+                    </p:tab>
 
-                <p:tab title="#{msg.requestManagers} (#{bean.managerList.size()})" disabled="#{bean.managerList.size() == 0}">
-                    <p:dataTable var="item" id="gestoreTable"
-                                 styleClass="table-client-list"
-                                 emptyMessage="#{msg.noRecordsFound}" value="#{bean.managerList}"
-                                 paginator="true" lazy="true" rowKey="#{item.id}" rows="10"
-                                 paginatorAlwaysVisible="true"
-                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                 rowsPerPageTemplate="10,20,50" widgetVar="managerClientsTable">
+                    <p:tab title="#{msg.requestManagers} (#{bean.managerList.size()})" disabled="#{bean.managerList.size() == 0}">
+                        <p:dataTable var="item" id="gestoreTable"
+                                     styleClass="table-client-list"
+                                     emptyMessage="#{msg.noRecordsFound}" value="#{bean.managerList}"
+                                     paginator="true" lazy="true" rowKey="#{item.id}" rows="10"
+                                     paginatorAlwaysVisible="true"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="10,20,50" widgetVar="managerClientsTable">
 
-                        <p:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.businessName}"/>
-                            </f:facet>
-                            <h:outputText value="#{item}"/>
-                        </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.businessName}"/>
+                                </f:facet>
+                                <h:outputText value="#{item}"/>
+                            </p:column>
 
-                        <p:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.titleOffice}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.office}"/>
-                        </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.titleOffice}"/>
+                                </f:facet>
+                                <h:outputText value="#{item.office}"/>
+                            </p:column>
 
-                        <p:column >
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.clientMail}"/>
-                            </f:facet>
-                            <!-- <h:outputText value="#{item.emails}"/> -->
-                            <ui:repeat value="#{item.emails}" var="email">
-                                <h:outputText value="#{email.email}"/>
-                                <h:outputText value="&lt;br /&gt;" escape="false"/>
-                            </ui:repeat>
-                        </p:column>
+                            <p:column >
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.clientMail}"/>
+                                </f:facet>
+                                <!-- <h:outputText value="#{item.emails}"/> -->
+                                <ui:repeat value="#{item.emails}" var="email">
+                                    <h:outputText value="#{email.email}"/>
+                                    <h:outputText value="&lt;br /&gt;" escape="false"/>
+                                </ui:repeat>
+                            </p:column>
 
-                        <p:column >
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.clientPhone}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.phone}"/>
-                        </p:column>
+                            <p:column >
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.clientPhone}"/>
+                                </f:facet>
+                                <h:outputText value="#{item.phone}"/>
+                            </p:column>
 
-                        <p:column >
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.client}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.clients}"/>
-                        </p:column>
-                        <p:column styleClass="action_column" exportable="false">
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.actions}" />
-                            </f:facet>
-                            <p:commandButton icon="ui-icon ui-icon-search pi pi-search"/>
-                        </p:column>
-                    </p:dataTable>
-                </p:tab>
+                            <p:column >
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.client}"/>
+                                </f:facet>
+                                <h:outputText value="#{item.clients}"/>
+                            </p:column>
+                            <p:column styleClass="action_column" exportable="false">
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.actions}" />
+                                </f:facet>
+                                <p:commandButton icon="ui-icon ui-icon-search pi pi-search"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:tab>
 
-                <p:tab title="#{msg.requestTrustees} (#{bean.trusteesList.size()})" disabled="#{bean.trusteesList.size() == 0}">
-                    <p:dataTable var="item" id="fiduciaryTable"
-                                 styleClass="table-client-list"
-                                 emptyMessage="#{msg.noRecordsFound}" value="#{bean.trusteesList}"
-                                 paginator="true" lazy="true" rowKey="#{item.id}" rows="10"
-                                 paginatorAlwaysVisible="true"
-                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                 rowsPerPageTemplate="10,20,50" widgetVar="trusteesClientsTable">
+                    <p:tab title="#{msg.requestTrustees} (#{bean.trusteesList.size()})" disabled="#{bean.trusteesList.size() == 0}">
+                        <p:dataTable var="item" id="fiduciaryTable"
+                                     styleClass="table-client-list"
+                                     emptyMessage="#{msg.noRecordsFound}" value="#{bean.trusteesList}"
+                                     paginator="true" lazy="true" rowKey="#{item.id}" rows="10"
+                                     paginatorAlwaysVisible="true"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="10,20,50" widgetVar="trusteesClientsTable">
 
-                        <p:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.businessName}"/>
-                            </f:facet>
-                            <h:outputText value="#{item}"/>
-                        </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.businessName}"/>
+                                </f:facet>
+                                <h:outputText value="#{item}"/>
+                            </p:column>
 
-                        <p:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.clientAddressCity}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.addressCityId}"/>
-                        </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.clientAddressCity}"/>
+                                </f:facet>
+                                <h:outputText value="#{item.addressCityId}"/>
+                            </p:column>
 
-                        <p:column >
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.clientMail}"/>
-                            </f:facet>
-                            <!-- <h:outputText value="#{item.emails}"/> -->
-                            <ui:repeat value="#{item.emails}" var="email">
-                                <h:outputText value="#{email.email}"/>
-                                <h:outputText value="&lt;br /&gt;" escape="false"/>
-                            </ui:repeat>
-                        </p:column>
+                            <p:column >
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.clientMail}"/>
+                                </f:facet>
+                                <!-- <h:outputText value="#{item.emails}"/> -->
+                                <ui:repeat value="#{item.emails}" var="email">
+                                    <h:outputText value="#{email.email}"/>
+                                    <h:outputText value="&lt;br /&gt;" escape="false"/>
+                                </ui:repeat>
+                            </p:column>
 
-                        <p:column >
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.clientPhone}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.phone}"/>
-                        </p:column>
-                        <p:column >
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.client}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.clients}"/>
-                        </p:column>
-                        <p:column styleClass="action_column" exportable="false">
-                            <f:facet name="header">
-                                <h:outputText value="#{msg.actions}" />
-                            </f:facet>
-                            <p:commandButton icon="ui-icon ui-icon-search pi pi-search"/>
-                        </p:column>
-                    </p:dataTable>
-                </p:tab>
-            </p:accordionPanel>
-        </p:outputPanel>
-
+                            <p:column >
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.clientPhone}"/>
+                                </f:facet>
+                                <h:outputText value="#{item.phone}"/>
+                            </p:column>
+                            <p:column >
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.client}"/>
+                                </f:facet>
+                                <h:outputText value="#{item.clients}"/>
+                            </p:column>
+                            <p:column styleClass="action_column" exportable="false">
+                                <f:facet name="header">
+                                    <h:outputText value="#{msg.actions}" />
+                                </f:facet>
+                                <p:commandButton icon="ui-icon ui-icon-search pi pi-search"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:tab>
+                </p:accordionPanel>
+            </p:outputPanel>
+        </p:dialog>
     </ui:define>
 
 </ui:composition>
