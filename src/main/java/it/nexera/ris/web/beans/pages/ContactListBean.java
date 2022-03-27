@@ -1,6 +1,9 @@
 package it.nexera.ris.web.beans.pages;
 
+import it.nexera.ris.common.enums.PageTypes;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
+import it.nexera.ris.common.helpers.RedirectHelper;
+import it.nexera.ris.common.helpers.SessionHelper;
 import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
@@ -14,7 +17,6 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
-import org.primefaces.model.LazyDataModel;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -41,6 +43,9 @@ public class ContactListBean extends EntityLazyListPageBean<ClientShort> impleme
 
     private List<ClientShort> trusteesList;
 
+    private Long selectedClientId;
+
+    private static final String ONLY_VIEW_CLIENT = "ONLY_VIEW_CLIENT";
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException, IOException {
@@ -125,4 +130,8 @@ public class ContactListBean extends EntityLazyListPageBean<ClientShort> impleme
         }));
     }
 
+    public void viewEntity() {
+        SessionHelper.put(ONLY_VIEW_CLIENT, Boolean.TRUE);
+        RedirectHelper.goTo(PageTypes.CLIENT_EDIT, getSelectedClientId());
+    }
 }

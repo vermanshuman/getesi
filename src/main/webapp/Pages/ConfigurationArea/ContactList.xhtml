@@ -135,27 +135,27 @@
                     <p:link href="/Pages/ConfigurationArea/ClientList.jsf?tab=1" styleClass="text-link">#{msg.clients}</p:link>
                 </div>
                 <div class="col">
+                    &nbsp;#{msg.providers.toUpperCase()}
+                </div>
+                <div class="col">
                     <p:link href="/Pages/ConfigurationArea/ClientList.jsf?tab=2" styleClass="text-link">#{msg.requestManagers.toUpperCase()}</p:link>
                 </div>
                 <div class="col">
                     <p:link href="/Pages/ConfigurationArea/ClientList.jsf?tab=3" styleClass="text-link">#{msg.requestTrustees.toUpperCase()}</p:link>
                 </div>
-                <div class="col">
-                    &nbsp;
-                </div>
             </div>
             <div class="row">
                 <div class="col">
-                    &nbsp;
+                    #{msg.aggregationLandChargesRegistryLands.toUpperCase()}
                 </div>
                 <div class="col">
-                    &nbsp;
+                    &nbsp;#{msg.omiLandValueCity.toUpperCase()}
                 </div>
                 <div class="col">
-                    &nbsp;
+                    &nbsp;&nbsp;#{msg.court_list.toUpperCase()}
                 </div>
                 <div class="col">
-                    &nbsp;
+                    &nbsp;&nbsp;#{msg.notaryList.toUpperCase()}
                 </div>
             </div>
         </p:outputPanel>
@@ -206,7 +206,12 @@
                                 <f:facet name="header">
                                     <h:outputText value="#{msg.actions}" />
                                 </f:facet>
-                                <p:commandButton icon="ui-icon ui-icon-search pi pi-search"/>
+                                <p:commandButton icon="ui-icon pi pi-search" update=":form"
+                                                 action="#{bean.viewEntity}">
+                                    <f:setPropertyActionListener value="#{item.id}"
+                                                                 target="#{bean.selectedClientId}"/>
+                                </p:commandButton>
+
                             </p:column>
 
                         </p:dataTable>

@@ -254,7 +254,11 @@
                     </p:column>
 
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton icon="ui-icon ui-icon-search pi pi-search"/>
+                        <p:commandButton icon="ui-icon ui-icon-search pi pi-search"
+                                         action="#{bean.viewEntity}" disabled="#{!bean.canView}" update=":form">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.entityEditId}"/>
+                        </p:commandButton>
                     </p:column>
 
                     <p:column styleClass="action_column" exportable="false">
@@ -364,7 +368,11 @@
                 </p:column>
 
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon ui-icon-search pi pi-search"/>
+                    <p:commandButton icon="ui-icon ui-icon-search pi pi-search"
+                                     action="#{bean.viewEntity}" disabled="#{!bean.canView}" update=":form">
+                        <f:setPropertyActionListener value="#{item.id}"
+                                                     target="#{bean.entityEditId}"/>
+                    </p:commandButton>
                 </p:column>
 
                 <p:column styleClass="action_column" exportable="false">
@@ -462,7 +470,11 @@
                         </p:commandButton>
                     </p:column>
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton icon="ui-icon ui-icon-search pi pi-search"/>
+                        <p:commandButton icon="ui-icon ui-icon-search pi pi-search"
+                                         action="#{bean.viewEntity}" disabled="#{!bean.canView}" update=":form">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.entityEditId}"/>
+                        </p:commandButton>
                     </p:column>
                     <p:column styleClass="action_column" exportable="false">
                         <p:commandButton icon="ui-icon pi pi-pencil" style="border: none !important;" update=":form"
