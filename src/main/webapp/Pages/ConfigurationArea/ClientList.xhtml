@@ -107,6 +107,22 @@
             .action_column {
                 width: 50px;
             }
+
+            body .ui-button.ui-button-warning-icon, body .ui-splitbutton.ui-button-warning-icon > .ui-button {
+                background: #fb6e51;
+                color: #FFFFFF;
+                border: 1px solid #fb6e51 !important;
+            }
+
+            body .ui-button.ui-button-warning-icon.ui-state-focus, body .ui-splitbutton.ui-button-warning-icon > .ui-button.ui-state-focus {
+                box-shadow: 0 0 0 0.2rem orange !important;
+            }
+
+            body .ui-button.ui-button-warning-icon.ui-state-active, body .ui-splitbutton.ui-button-warning-icon.ui-state-active > .ui-button.ui-state-active {
+                background-color: #ff8b00 !important;
+                color: #FFFFFF;
+                border: 1px solid #ff8b00 !important;
+            }
         </style>
         <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/client.css"
               media="all" rel="stylesheet" type="text/css"/>
@@ -160,35 +176,90 @@
             </p:row>
         </p:panelGrid>
 
-        <p:commandButton disabled="#{!bean.canCreate}" styleClass="green-button"
-                         value="#{msg.newClient.toUpperCase()}"
-                         action="#{bean.addEntity}" style="#{bean.tab ne null ? 'margin-top:20px' : ''}"/>
-
-        <p:outputPanel style="margin-top: 20px;" rendered="#{bean.tab eq 1}">
-            <p:outputPanel style="margin-top: 20px;">
-                <p:panelGrid columns="3"
-                             columnClasses="ui-g-12 ui-md-3 row,ui-g-12 ui-md-3 row,ui-g-12 ui-md-4 row"
-                             styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
-                    <p:column>
-                        <p:outputPanel style="width: 250px;margin-top: 8px;font-size: 20px;">#{msg.clientType}:</p:outputPanel>
-                        <p:selectOneMenu id="contactClientType" value="#{bean.selectedClientTypeId}" style="height: 42px;border: 2px solid #ced4da;"
-                                         styleClass="select-width" label="#{msg.clientType}">
+        <div class="p-grid">
+            <div class="p-col-6">
+                <div class="p-formgroup-inline">
+                    <div class="p-field">
+                        <p:commandButton disabled="#{!bean.canCreate}" styleClass="green-button"
+                                         value="#{msg.newClient.toUpperCase()}"
+                                         action="#{bean.addEntity}" style="#{bean.tab ne null ? 'margin-top:20px' : ''}"/>
+                    </div>
+                </div>
+            </div>
+            <p:outputPanel styleClass="p-col-6" rendered="#{bean.tab eq 1}">
+                <div class="p-formgroup-inline alignEnd">
+                    <div class="p-field">
+                        <p:selectOneMenu id="contactClientType" value="#{bean.selectedClientTypeId}" style="border: 2px solid #ced4da;"
+                                         styleClass="select-width" label="#{msg.clientType}" placeholder="#{msg.clientType}">
                             <p:ajax update="@this"/>
                             <f:selectItems value="#{bean.clientTypes}"/>
                         </p:selectOneMenu>
-                    </p:column>
-                    <p:column>
-                        <p:outputPanel style="width: 150px;margin-top: 8px;font-size: 20px;">Denominazione:</p:outputPanel>
+                    </div>
+                    <div class="p-field">
                         <p:inputText value="#{bean.nameOfTheCompany}"
-                                     maxlength="100"
+                                     maxlength="100" placeholder="Denominazione"
                                      styleClass="input-width"
                                      id="contactNameOfTheCompany" label="#{msg.clientShortNameOfTheCompany}"/>
-                    </p:column>
-                    <p:column>
-                        <p:commandButton style="width: 100px" value="#{msg.search}" action="#{bean.searchClients}"
+                    </div>
+
+                    <div class="p-field">
+                        <p:commandButton icon="ui-icon ui-icon-search pi pi-search" styleClass="ui-button-warning-icon"
+                                         action="#{bean.searchClients}"
                                          update="contactTable"/>
-                    </p:column>
-                </p:panelGrid>
+                    </div>
+                </div>
+            </p:outputPanel>
+            <p:outputPanel styleClass="p-col-6" rendered="#{bean.tab eq 2}">
+                <div class="p-formgroup-inline alignEnd">
+                    <div class="p-field">
+                        <p:selectOneMenu value="#{bean.selectedClientId}"
+                                         label="#{msg.invoiceClient}"
+                                         filter="true" placeholder="#{msg.client}"
+                                         filterMatchMode="startsWith"
+                                         styleClass="select-width">
+                            <p:ajax listener="#{bean.onClientSelect}"
+                                    update="@this"/>
+                            <f:selectItems value="#{bean.clients}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="p-field">
+                        <p:inputText value="#{bean.nameOfTheCompany}"
+                                     maxlength="100" placeholder="Denominazione"
+                                     styleClass="input-width"  label="#{msg.clientShortNameOfTheCompany}"/>
+                    </div>
+
+                    <div class="p-field">
+                        <p:commandButton icon="ui-icon ui-icon-search pi pi-search" styleClass="ui-button-warning-icon" action="#{bean.searchClients}" update="gestoreTable"/>
+                    </div>
+                </div>
+            </p:outputPanel>
+            <p:outputPanel styleClass="p-col-6" rendered="#{bean.tab eq 3}">
+                <div class="p-formgroup-inline alignEnd">
+                    <div class="p-field">
+                        <p:selectOneMenu value="#{bean.selectedClientId}"
+                                         label="#{msg.invoiceClient}"
+                                         filter="true" placeholder="#{msg.client}"
+                                         filterMatchMode="startsWith"
+                                         styleClass="select-width">
+                            <p:ajax listener="#{bean.onClientSelect}"
+                                    update="@this"/>
+                            <f:selectItems value="#{bean.clients}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="p-field">
+                        <p:inputText value="#{bean.nameOfTheCompany}"
+                                     maxlength="100" placeholder="Denominazione"
+                                     styleClass="input-width"  label="#{msg.clientShortNameOfTheCompany}"/>
+                    </div>
+
+                    <div class="p-field">
+                        <p:commandButton icon="ui-icon ui-icon-search pi pi-search" styleClass="ui-button-warning-icon" action="#{bean.searchClients}" update="fiduciaryTable"/>
+                    </div>
+                </div>
+            </p:outputPanel>
+        </div>
+        <p:outputPanel style="margin-top: 20px;" rendered="#{bean.tab eq 1}">
+            <p:outputPanel style="margin-top: 20px;">
                 <p:dataTable var="item" id="contactTable" styleClass="table-client-list"
                              emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyModel}"
                              paginator="true" lazy="true" rowKey="#{item.id}" rows="10"
@@ -285,33 +356,6 @@
 
         <p:outputPanel style="margin-top: 20px;" rendered="#{bean.tab eq 2}">
         <p:outputPanel style="margin-top: 20px;">
-            <p:panelGrid columns="3"
-                         columnClasses="ui-g-12 ui-md-3 row,ui-g-12 ui-md-3 row,ui-g-12 ui-md-4 row"
-                         styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
-                <p:column>
-                    <p:outputPanel style="width: 250px;margin-top: 8px;font-size: 20px;">#{msg.client}:</p:outputPanel>
-                    <p:selectOneMenu value="#{bean.selectedClientId}"
-                                     label="#{msg.invoiceClient}"
-                                     filter="true"
-                                     filterMatchMode="startsWith"
-                                     styleClass="select-width">
-                        <p:ajax listener="#{bean.onClientSelect}"
-                                update="@this"/>
-                        <f:selectItems value="#{bean.clients}"/>
-                    </p:selectOneMenu>
-                </p:column>
-
-                <p:column>
-                    <p:outputPanel style="width: 150px;margin-top: 8px;font-size: 20px;">Denominazione:</p:outputPanel>
-                    <p:inputText value="#{bean.nameOfTheCompany}"
-                                 maxlength="100"
-                                 styleClass="input-width"  label="#{msg.clientShortNameOfTheCompany}"/>
-                </p:column>
-                <p:column>
-                    <p:commandButton style="width: 100px" value="#{msg.search}" action="#{bean.searchClients}" update="gestoreTable"/>
-                </p:column>
-            </p:panelGrid>
-
             <p:dataTable var="item" id="gestoreTable"
                          styleClass="table-client-list"
                          emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyManagerClientModel}"
@@ -389,33 +433,6 @@
 
         <p:outputPanel style="margin-top: 20px;" rendered="#{bean.tab eq 3}">
             <p:outputPanel style="margin-top: 20px;">
-                <p:panelGrid columns="3"
-                             columnClasses="ui-g-12 ui-md-3 row,ui-g-12 ui-md-3 row,ui-g-12 ui-md-4 row"
-                             styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
-                    <p:column>
-                        <p:outputPanel style="width: 250px;margin-top: 8px;font-size: 20px;">#{msg.client}:</p:outputPanel>
-                        <p:selectOneMenu value="#{bean.selectedClientId}"
-                                         label="#{msg.invoiceClient}"
-                                         filter="true"
-                                         filterMatchMode="startsWith"
-                                         styleClass="select-width">
-                            <p:ajax listener="#{bean.onClientSelect}"
-                                    update="@this"/>
-                            <f:selectItems value="#{bean.clients}"/>
-                        </p:selectOneMenu>
-                    </p:column>
-
-                    <p:column>
-                        <p:outputPanel style="width: 150px;margin-top: 8px;font-size: 20px;">Denominazione:</p:outputPanel>
-                        <p:inputText value="#{bean.nameOfTheCompany}"
-                                     maxlength="100"
-                                     styleClass="input-width"  label="#{msg.clientShortNameOfTheCompany}"/>
-                    </p:column>
-                    <p:column>
-                        <p:commandButton style="width: 100px" value="#{msg.search}" action="#{bean.searchClients}" update="fiduciaryTable"/>
-                    </p:column>
-                </p:panelGrid>
-
                 <p:dataTable var="item" id="fiduciaryTable"
                              styleClass="table-client-list"
                              emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyClientTrustModel}"
