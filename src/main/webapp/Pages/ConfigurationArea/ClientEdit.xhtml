@@ -161,6 +161,10 @@
             .action_column-header {
                 width: 150px !important;
             }
+
+            .card.card-w-title {
+                border: none !important;
+            }
         </style>
         <script type="text/javascript">
             // <![CDATA[
@@ -989,10 +993,12 @@
         </p:tabView>
         <p:outputPanel id="nextButton" style="margin-top: 15px; position: relative;">
             <p:commandButton value="#{msg.save.toUpperCase()}" styleClass="green-button"
-                             iconPos="right"
-                             style="position: absolute; right: 0;"
+                             iconPos="right" rendered="#{not bean.onlyView}"
+                             style="position: absolute; right: 10px;bottom: 0px;"
                              actionListener="#{bean.pageSave}"
                              icon="ui-icon-disk"/>
+            <p:commandButton value="#{msg.edit}" rendered="#{bean.onlyView}" style="position: absolute; right: 10px;bottom: 10px;"
+                             update=":form" action="#{bean.editClient}"/>
         </p:outputPanel>
 
         <script>
@@ -1022,12 +1028,6 @@
 
 
         </script>
-    </ui:define>
-
-    <ui:define name="additional_buttons">
-        <p:commandButton value="#{msg.edit}" rendered="#{bean.onlyView}"
-                         update=":form" action="#{bean.editClient}"
-                         icon="ui-icon ui-icon-pencil"/>
     </ui:define>
 
     <ui:define name="dialog_body">
