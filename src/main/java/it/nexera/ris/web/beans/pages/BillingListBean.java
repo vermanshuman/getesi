@@ -7,6 +7,7 @@ import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
 import it.nexera.ris.web.beans.EntityLazyListPageBean;
+import it.nexera.ris.web.beans.wrappers.logic.FileWrapper;
 import it.nexera.ris.persistence.view.ClientView;
 import it.nexera.ris.persistence.view.RequestView;
 import lombok.Getter;
@@ -170,6 +171,23 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     private Long selectedTaxRateId;
     
+    
+    @Getter
+    @Setter
+    private List<Request> invoicedRequests;
+    
+    @Getter
+    @Setter
+    private List<FileWrapper> invoiceEmailAttachedFiles;
+    
+    @Getter
+    @Setter
+    private boolean printPdf;
+    
+    @Getter
+    @Setter
+    private String mailPdf;
+    
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -293,6 +311,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         yAxis.setLabel("Sales");
         yAxis.setMin(0);
         yAxis.setMax(200);
+        yAxis.setTickInterval("20.000");
+        yAxis.setTickFormat("%'.3f");
     }
 
     public void filterTableFromPanel() throws IllegalAccessException, PersistenceBeanException {

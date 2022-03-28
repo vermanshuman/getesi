@@ -27,10 +27,10 @@
 				text-decoration: none;
 				margin: 0 -4px;
 				width: 210px;
-				font-family: Roboto;
+				font-family: "Open Sans","Helvetica Neue",sans-serif !important;
 				font-size: 18px;
 			}
-
+			
 			nav a::before, main {
 				border: 1px solid #dddfe2;
 			}
@@ -579,12 +579,12 @@
 			<main>
 				<div id="content_tab1" class="hide">
 					<p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" cellpadding="3" cellspacing="0"
-								 columnClasses="ui-grid-col-4,ui-grid-col-6,ui-grid-col-1,ui-grid-col-1" layout="grid">
+								 columnClasses="ui-grid-col-4,ui-grid-col-5,ui-grid-col-2,ui-grid-col-1" layout="grid">
 						<p:commandButton value="#{ff:upper(msg.billingListUpdate)}" />
 
 						<p:outputLabel></p:outputLabel>
 
-						<p:selectOneMenu id="client" value="#{bean.selectedClientId}" style="width: calc( 100% - 5px);"
+						<p:selectOneMenu id="client" value="#{bean.selectedClientId}" style="width: 250px;"
 										 styleClass="#{bean.selectedClientId ne null ? 'select-one-menu' : ''}">
 							<f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}" itemValue="#{null}" noSelectionOption="true" />
 							<f:selectItems value="#{bean.clients}" />
