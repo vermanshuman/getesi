@@ -301,16 +301,16 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         model.addSeries(q2);
         model.addSeries(q3);
         model.addSeries(q4);
-        model.setTitle("Accumulation of sales per quarter");
+        model.setTitle("Indice di redditività");
         model.setLegendPosition("ne");
         model.setSeriesColors("11773340");
         model.setShadow(false);
         Axis xAxis = model.getAxis(AxisType.X);
         xAxis.setLabel("");
         Axis yAxis = model.getAxis(AxisType.Y);
-        yAxis.setLabel("Sales");
+        //yAxis.setLabel("Sales");
         yAxis.setMin(0);
-        yAxis.setMax(200);
+        yAxis.setMax(160);
         yAxis.setTickInterval("20.000");
         yAxis.setTickFormat("%'.3f");
     }
