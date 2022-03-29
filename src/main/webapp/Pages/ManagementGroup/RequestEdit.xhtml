@@ -382,7 +382,7 @@
                 </p:column>
 
             </p:panelGrid>
-            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" id="requstType">
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" id="requstType" rendered="#{bean.requestType eq null || bean.requestType eq -1}">
                 <p:selectOneRadio value="#{bean.selectedRequestEnumTypeFirst}" styleClass="request-select-radio">
                     <p:ajax update="requstType"/>
                     <f:selectItems value="#{bean.requestEnumTypesFirst}"/>
@@ -1142,6 +1142,21 @@
                                              oncomplete="PF('subjectRestoreDlg').hide()"
                                              action="#{bean.subjectWrapper.selectRestoredSubject}" />
                         </f:facet>
+                    </p:dataTable>
+                </p:scrollPanel>
+            </p:dialog>
+            <p:dialog id="documentDialog" widgetVar="documentDialog" modal="true" resizable="false" draggable="false"
+                      width="700">
+                <p:scrollPanel mode="native"  style="width: 100%; min-height: 300px; max-height: 600px;">
+                    <p:dataTable value="#{bean.requestDocuments}" var="doc" id="requestDocs">
+                        <p:column headerText="#{msg.name}">
+                            <h:outputText value="#{doc.title}#{not empty doc.fileExtension ? doc.fileExtension : '' }"/>
+                        </p:column>
+                        <p:column styleClass="action_column">
+                            <p:commandButton icon="fa fa-download" action="#{bean.downloadRequestFile}" ajax="false">
+                                <f:setPropertyActionListener value="#{doc.id}" target="#{bean.entityEditId}"/>
+                            </p:commandButton>
+                        </p:column>
                     </p:dataTable>
                 </p:scrollPanel>
             </p:dialog>

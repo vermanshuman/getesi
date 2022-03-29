@@ -14,6 +14,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 
+import it.nexera.ris.common.helpers.*;
 import org.hibernate.HibernateException;
 import org.hibernate.StaleObjectStateException;
 import org.hibernate.criterion.Criterion;
@@ -32,19 +33,6 @@ import it.nexera.ris.common.enums.PropertyWrapperType;
 import it.nexera.ris.common.enums.SexTypes;
 import it.nexera.ris.common.enums.SubjectType;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
-import it.nexera.ris.common.helpers.CalcoloCodiceFiscale;
-import it.nexera.ris.common.helpers.ComboboxHelper;
-import it.nexera.ris.common.helpers.EstateSituationHelper;
-import it.nexera.ris.common.helpers.FileHelper;
-import it.nexera.ris.common.helpers.GeneralFunctionsHelper;
-import it.nexera.ris.common.helpers.LogHelper;
-import it.nexera.ris.common.helpers.MessageHelper;
-import it.nexera.ris.common.helpers.PrintPDFHelper;
-import it.nexera.ris.common.helpers.RedirectHelper;
-import it.nexera.ris.common.helpers.ResourcesHelper;
-import it.nexera.ris.common.helpers.SessionHelper;
-import it.nexera.ris.common.helpers.ValidationHelper;
-import it.nexera.ris.common.helpers.VisureManageHelper;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.Document;
@@ -671,7 +659,7 @@ public class SubjectBean extends EntityEditPageBean<Subject>
     
     public void downloadPdfFile() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         try {
-            String body = RequestListBean.getPdfRequestBody(null, this.getEntity());
+            String body = RequestHelper.getPdfRequestBody(null, this.getEntity());
             
             FileHelper.sendFile("soggetto-" + this.getEntityId() + ".pdf",
                     PrintPDFHelper.convertToPDF(null, body, null,

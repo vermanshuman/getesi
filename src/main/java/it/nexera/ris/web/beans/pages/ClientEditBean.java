@@ -222,6 +222,8 @@ public class ClientEditBean extends EntityEditPageBean<Client>
 
     private List<SelectItem> taxRates;
 
+    private Boolean fromContactList;
+
     /*
      * (non-Javadoc)
      *
@@ -235,6 +237,12 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                 && ((Boolean) SessionHelper.get(ONLY_VIEW_CLIENT))) {
             SessionHelper.removeObject(ONLY_VIEW_CLIENT);
             this.setOnlyView(true);
+        }
+
+        if (!ValidationHelper.isNullOrEmpty((Boolean) SessionHelper.get("REDIRECT_FROM_CONTACT_LIST"))
+                && ((Boolean) SessionHelper.get("REDIRECT_FROM_CONTACT_LIST"))) {
+            SessionHelper.removeObject("REDIRECT_FROM_CONTACT_LIST");
+            this.setFromContactList(true);
         }
 
         if (this.getSession().get("fromPatientSearchList") == Boolean.TRUE) {
@@ -1119,6 +1127,9 @@ public class ClientEditBean extends EntityEditPageBean<Client>
             this.saveEmails();
             this.saveInvoiceColumns();
             this.saveRequestTypeInvoicecolumns();
+            if(!ValidationHelper.isNullOrEmpty(this.getFromContactList()) && this.getFromContactList()){
+                    RedirectHelper.goTo(PageTypes.CONTACT_LIST);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -2184,4 +2195,11 @@ public class ClientEditBean extends EntityEditPageBean<Client>
         this.taxRates = taxRates;
     }
 
+    public Boolean getFromContactList() {
+        return fromContactList;
+    }
+
+    public void setFromContactList(Boolean fromContactList) {
+        this.fromContactList = fromContactList;
+    }
 }

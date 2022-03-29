@@ -181,7 +181,7 @@
                 <div class="p-formgroup-inline">
                     <div class="p-field">
                         <p:commandButton disabled="#{!bean.canCreate}" styleClass="green-button"
-                                         value="#{msg.newClient.toUpperCase()}"
+                                         value="#{msg.newItem.toUpperCase()}"
                                          action="#{bean.addEntity}" style="#{bean.tab ne null ? 'margin-top:20px' : ''}"/>
                     </div>
                 </div>
@@ -191,13 +191,13 @@
                     <div class="p-field">
                         <p:selectOneMenu id="contactClientType" value="#{bean.selectedClientTypeId}" style="border: 2px solid #ced4da;"
                                          styleClass="select-width" label="#{msg.clientType}" placeholder="#{msg.clientType}">
-                            <p:ajax update="@this"/>
+                        <p:ajax update="@this"/>
                             <f:selectItems value="#{bean.clientTypes}"/>
                         </p:selectOneMenu>
                     </div>
                     <div class="p-field">
-                        <p:inputText value="#{bean.nameOfTheCompany}"
-                                     maxlength="100" placeholder="Denominazione"
+                    <p:inputText value="#{bean.nameOfTheCompany}"
+                                 maxlength="100" placeholder="Denominazione"
                                      styleClass="input-width"
                                      id="contactNameOfTheCompany" label="#{msg.clientShortNameOfTheCompany}"/>
                     </div>
@@ -260,7 +260,7 @@
         </div>
         <p:outputPanel style="margin-top: 20px;" rendered="#{bean.tab eq 1}">
             <p:outputPanel style="margin-top: 20px;">
-                <p:dataTable var="item" id="contactTable" styleClass="table-client-list"
+            <p:dataTable var="item" id="contactTable" styleClass="table-client-list"
                              emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyModel}"
                              paginator="true" lazy="true" rowKey="#{item.id}" rows="10"
                              paginatorAlwaysVisible="true"

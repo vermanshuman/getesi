@@ -423,7 +423,7 @@ public class CostCalculationHelper {
         if (!ValidationHelper.isNullOrEmpty(priceList)) {
             for (PriceList price : priceList) {
                 if (!ValidationHelper.isNullOrEmpty(price.getPrice())) {
-                    result += Double.parseDouble(price.getPrice());
+                    result += Double.parseDouble(price.getPrice().replaceAll("\\,", "."));
                 }
             }
         }

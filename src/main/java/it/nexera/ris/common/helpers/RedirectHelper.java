@@ -56,6 +56,8 @@ public class RedirectHelper extends BaseHelper {
 
     public static final String TAB = "tab";
 
+    public static final String REQUEST_TYPE_PARAM = "type";
+
     public static void goTo(PageTypes type) {
         try {
             if (type != null) {
@@ -432,15 +434,16 @@ public class RedirectHelper extends BaseHelper {
         }
     }
 
-    public static void goToCreateMultipleRequestFromMail(Serializable id, boolean needArchive, boolean isMultipleCreate) {
-        goToCreateMultipleRequestFromMail(id, "", needArchive, isMultipleCreate);
+    public static void goToCreateMultipleRequestFromMail(Serializable id, boolean needArchive, boolean isMultipleCreate, Integer requestType) {
+        goToCreateMultipleRequestFromMail(id, "", needArchive, isMultipleCreate, requestType);
     }
 
-    public static void goToCreateMultipleRequestFromMail(Serializable id, Serializable requestId, boolean needArchive, boolean isMultipleCreate) {
+    public static void goToCreateMultipleRequestFromMail(Serializable id, Serializable requestId, boolean needArchive, boolean isMultipleCreate, Integer requestType) {
         try {
             sendRedirect(PageTypes.REQUEST_EDIT.getPagesContext() + "?"
                     + ID_PARAMETER + "=" + requestId + "&"
-                    + (needArchive ? ARCHIVE_MAIL : MAIL) + "=" + id
+                    + (needArchive ? ARCHIVE_MAIL : MAIL) + "=" + id + "&"
+                    + REQUEST_TYPE_PARAM + "=" + requestType + "&"
                     + (isMultipleCreate ? "&" + MULTIPLE + "=true" : "") + "&"+ RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE");
         } catch (Exception e) {
             LogHelper.log(log, e);

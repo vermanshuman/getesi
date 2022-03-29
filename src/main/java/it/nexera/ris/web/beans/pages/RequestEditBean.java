@@ -294,16 +294,29 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private Map<Long, List<SelectItem>> subjectListServices;
 
 
+    @Getter
+    @Setter
+    private List<Document> requestDocuments;
+
+    private Integer requestType;
+
     @Override
     protected void preLoad() throws PersistenceBeanException {
         setMultiRequestMap(new HashMap());
         setYearRange("1930:" + (DateTimeHelper.getYearOfNow()+ 10));
+        setRequestType(-1);
         if (!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.MULTIPLE)) &&
                 Boolean.parseBoolean(getRequestParameter(RedirectHelper.MULTIPLE))) {
             setMultipleCreate(true);
             if(!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.FROM_PARAMETER)) &&
                     getRequestParameter(RedirectHelper.FROM_PARAMETER).equalsIgnoreCase(MULTIPLE_REQUEST)){
                 setMultipleRequestCreate(true);
+            }
+            if(!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.REQUEST_TYPE_PARAM))){
+                Integer requestType = Integer.parseInt(getRequestParameter(RedirectHelper.REQUEST_TYPE_PARAM));
+                if(requestType > -1){
+                    setRequestType(requestType);
+                }
             }
         }
         if (getRequestParameter(RedirectHelper.MAIL) != null) {
@@ -354,7 +367,6 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 LogHelper.log(log, e);
             }
         }
-
     }
 
     private void presetParamsFromMail(WLGInbox mail) {
@@ -1442,7 +1454,15 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             if (getEntity().getStateId() == null) {
                 getEntity().setStateId(RequestState.INSERTED.getId());
             }
-            if (!ValidationHelper.isNullOrEmpty(getSelectedRequestEnumTypeFirst())) {
+            if (!ValidationHelper.isNullOrEmpty(getRequestType())) {
+                if(getRequestType().equals(0)) {
+                    getEntity().setType(RequestEnumTypes.SUBJECT);
+                }else if(getRequestType().equals(1)) {
+                    getEntity().setType(RequestEnumTypes.MADE);
+                }else if(getRequestType().equals(2)) {
+                    getEntity().setType(RequestEnumTypes.COMMON);
+                }
+            } else if (!ValidationHelper.isNullOrEmpty(getSelectedRequestEnumTypeFirst())) {
                 if (getSelectedRequestEnumTypeFirst().equals(RequestEnumTypes.SUBJECT.getId())) {
                     getEntity().setType(RequestEnumTypes.SUBJECT);
                 } else {
@@ -3253,5 +3273,13 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void setUrgent(Boolean urgent) {
         this.urgent = urgent;
+    }
+
+    public Integer getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(Integer requestType) {
+        this.requestType = requestType;
     }
 }

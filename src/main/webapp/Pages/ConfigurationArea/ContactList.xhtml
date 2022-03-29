@@ -30,6 +30,9 @@
                 padding: 20px 0px;
                 justify-content: center;
                 gap: 1%;
+                height: 50px;
+                display: flex;
+                align-items: center
             }
             .title-txt {
                 font-size: 40px;
@@ -117,16 +120,20 @@
             .action_column {
                 width: 50px;
             }
+
+            body .ui-button.searchIcon {
+                background: #063971;
+            }
         </style>
         <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/client.css"
               media="all" rel="stylesheet" type="text/css"/>
         <div class="row title-txt">
             Rubrica
         </div>
-        <div class="row search-bar">
-            <p:inputText placeholder="Ricerca avanzata" value="#{bean.nameOfTheCompany}" style="width: 25%;"/>
-            <p:commandButton icon="pi pi-search"  action="#{bean.search}" oncomplete="PF('searchResult').show()"
-                             update="@form"/>
+        <div class="row search-bar" style="height: 140px;">
+            <p:inputText placeholder="Ricerca avanzata" value="#{bean.nameOfTheCompany}" style="width: 45%;height: 40px;"/>
+            <p:commandButton icon="pi pi-search" action="#{bean.search}" oncomplete="PF('searchResult').show()"
+                             update="@form" styleClass="searchIcon"/>
         </div>
 
         <p:outputPanel style="margin-top: 20px;"  id="boxes">

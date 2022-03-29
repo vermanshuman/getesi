@@ -132,6 +132,7 @@ public class ContactListBean extends EntityLazyListPageBean<ClientShort> impleme
 
     public void viewEntity() {
         SessionHelper.put(ONLY_VIEW_CLIENT, Boolean.TRUE);
+        SessionHelper.put("REDIRECT_FROM_CONTACT_LIST", Boolean.TRUE);
         RedirectHelper.goTo(PageTypes.CLIENT_EDIT, getSelectedClientId());
     }
 }
