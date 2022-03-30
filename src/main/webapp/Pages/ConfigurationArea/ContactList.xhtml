@@ -137,7 +137,7 @@
         </div>
 
         <p:outputPanel style="margin-top: 20px;"  id="boxes">
-            <div class="row">
+            <div class="row" style="justify-content: center;">
                 <div class="col">
                     <p:link href="/Pages/ConfigurationArea/ClientList.jsf?tab=1" styleClass="text-link">#{msg.clients}</p:link>
                 </div>
@@ -151,7 +151,7 @@
                     <p:link href="/Pages/ConfigurationArea/ClientList.jsf?tab=3" styleClass="text-link">#{msg.requestTrustees.toUpperCase()}</p:link>
                 </div>
             </div>
-            <div class="row">
+            <div class="row" style="justify-content: center;">
                 <div class="col">
                     #{msg.aggregationLandChargesRegistryLands.toUpperCase()}
                 </div>
@@ -166,7 +166,7 @@
                 </div>
             </div>
         </p:outputPanel>
-        <p:dialog header="Search" widgetVar="searchResult" width="80%"
+        <p:dialog header="Risultati ricerca #{bean.nameOfTheCompany}" widgetVar="searchResult" width="80%"
                   modal="true" resizable="false" effect="SLIDE">
             <p:outputPanel rendered="#{bean.showSearch}"  id="searchResultPanel">
                 <p:accordionPanel multiple="false" activeIndex="0" id="accordionPanel">
