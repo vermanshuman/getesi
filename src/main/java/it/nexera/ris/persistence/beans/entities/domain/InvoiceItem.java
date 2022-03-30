@@ -30,7 +30,7 @@ public class InvoiceItem extends IndexedEntity implements Serializable {
 	@JoinColumn(name = "tax_rate_id")
 	private TaxRate taxRate;
 
-	@Transient
+	@Column(name = "total_cost")
 	private Double invoiceTotalCost;
 
 	@Transient
