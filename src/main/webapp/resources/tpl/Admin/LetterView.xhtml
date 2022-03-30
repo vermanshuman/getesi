@@ -234,7 +234,7 @@
         <br/>
         <div class="btn_line">
             <p:commandButton value="#{msg.confirm}" style="margin-right: 1cm;background-color: #00CC52!important;"
-                             action="#{bean.processManagedStateCheck}" oncomplete="PF('fieldsNotSetDialogWV').hide();" update=":form, messages" />
+                             action="#{bean.processManagedStateCheck}" oncomplete="PF('fieldsNotSetDialogWV').hide();"/>
             <p:commandButton value="#{msg.cancel}" oncomplete="PF('fieldsNotSetDialogWV').hide();" style="background-color: #F3362B !important;"/>
         </div>
     </p:dialog>

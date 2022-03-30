@@ -235,9 +235,10 @@
         <p:dialog id="chooseSingleOrMultipleRequestCreate" widgetVar="chooseSingleOrMultipleRequestCreateWV" modal="true" >
             <h3>#{msg.mailManagerViewSingleOrMultipleRequest}:</h3>
             <p:outputPanel style="justify-content: center; display: flex">
-                <p:selectOneRadio value="#{bean.multipleCreateRedirect}" unselectable="false">
-                    <f:selectItem itemLabel="#{msg.mailManagerViewSingleRequestCreate}" itemValue="#{false}"/>
-                    <f:selectItem itemLabel="#{msg.mailManagerViewMultipleRequestCreate}" itemValue="#{true}"/>
+                <p:selectOneRadio value="#{bean.requestType}" unselectable="false">
+                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestBySubject}" itemValue="0"/>
+                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestForBuilding}" itemValue="1"/>
+                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestForLand}" itemValue="2"/>
                 </p:selectOneRadio>
             </p:outputPanel>
             <br/>

@@ -24,22 +24,119 @@
             .row {
                 display: flex;
             }
-            #clientType_label {
-                font-size: 20px;
+            body .ui-panel .ui-panel-content {
+                border: none !important;
             }
 
-            #table_paginator_top, #table_paginator_bottom {
-                text-align: center;
-                padding-bottom: 4px !important;
-                padding: 8px 35px;
+            body .ui-datatable .ui-paginator.ui-paginator-top {
+                background-color: #788FA7 !important;
+                color: #ffffff !important;
+            }
+            .mail-button {
+                background: #00CC52 !important;
             }
 
-            .ui-paginator-rpp-options {
-                margin-top: 6px !important;
+            .searchPanelButton {
+                background: #fb6e51 !important;
+            }
+            .cartelle-btn {
+                background:  #ff8b00 !important;
+            }
+            .ui-chkbox.ui-chkbox-all.ui-widget {
+                display: none;
             }
 
-            .ui-paginator-current {
-                margin-top: 2px !important;
+            .table-demo {
+                margin-right: 0rem;
+                margin-left: 0rem;
+                margin-top: 0rem;
+            }
+
+            body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
+                background-color: #f0f3f5 !important;
+            }
+
+            .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+                border: 1px solid #c9cdd2 !important;
+            }
+
+            .ui-datatable tbody td, .ui-datatable tfoot td {
+                border-width: 0 1px 1px 0 !important;
+            }
+
+            body .ui-datatable #contactTable_head th, body .ui-datatable #gestoreTable_head th,
+            body .ui-datatable #fiduciaryTable_head th {
+                background-color: #f8f9fa !important;
+                color: #495057 !important;
+            }
+
+            body .ui-datatable #contactTable_head th .ui-column-title, body .ui-datatable #gestoreTable_head th .ui-column-title,
+            body .ui-datatable #fiduciaryTable_head th .ui-column-title {
+                color: #5f666c !important;
+            }
+
+            body .ui-datatable .ui-datatable-data tr td {
+                padding: 6px 6px !important;
+            }
+
+            body .table-client-list.ui-datatable #contactTable_data tr td, body .table-client-list.ui-datatable #gestoreTable_data tr td,
+            body .table-client-list.ui-datatable #fiduciaryTable_data tr td {
+                color: #4c5156 !important;
+            }
+
+            body .ui-datatable thead th.ui-state-active {
+                color: #2196F3 !important;
+            }
+
+            body .ui-datatable .ui-datatable-data > tr:hover {
+                background: #e9ecef !important;
+            }
+
+            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page, body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev, body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last {
+                color: #6c757d !important;
+            }
+
+            body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+                background: #2196F3 !important;
+                color: #ffffff !important;
+            }
+            .table-demo .p-col-12, .table-demo .card {
+                padding: 0;
+                border: none;
+            }
+            .ui-datatable-gridlines.td {
+                border-width: 1px !important;
+            }
+
+            body .ui-datatable .ui-datatable-header {
+                border-top: 2px solid #c9cdd2 !important;
+            }
+
+            .card {
+                border: none !important;
+                padding-bottom: 0px !important;
+                margin-bottom: 0px !important;
+                padding-top: 0px !important;
+            }
+
+            #table_div_content{
+                padding-top: 0px !important;
+            }
+            .ui-datatable-header {
+                padding-top: 5px !important;
+                padding-bottom: 5px !important;
+            }
+
+            body {
+                font-family: "cabin", sans-serif !important;
+                font-size: 1rem !important;
+                text-decoration: none;
+            }
+
+            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page,
+            body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev,
+            body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last {
+                color: #FFFFFF !important;
             }
 
             body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
@@ -47,67 +144,127 @@
                 color: #000000 !important;
             }
 
-            #contactTable table, #gestoreTable table, #fiduciaryTable table {
-                margin-top: 20px;
-                padding-left: 13px;
+
+            .layout-wrapper .route-bar {
+                border-bottom: 1px solid #c9cdd2;
             }
 
-            body .ui-datatable:not(.borderless) thead th {
-                background-color: #D9E0E7 !important;
-                border-color: #808080 !important;
-                color: #5f666c !important;
-                padding: 8px 2px !important;
-                border-width: 1px!important;
-                border-style: solid!important;
+            .layout-footer {
+                border-top: 1px solid #c9cdd2;
             }
 
-
-            #contactTable_data td, #gestoreTable_data td, #fiduciaryTable_data td  {
-                color: #003871;
-                border: none;
-                border-bottom: none;
-                background-color: #ffffff !important;
+            .ui-datatable tbody.ui-datatable-data {
+                border-left: 1px solid #c9cdd2;
             }
 
-            #contactTable_data td:nth-child(1),#gestoreTable_data td:nth-child(1),
-            #fiduciaryTable_data td:nth-child {
-                border-left: none;
-                border-top-left-radius: 5px;
-                border-bottom-left-radius: 5px;
+            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-rpp-options {
+                margin: 0;
             }
-
-            #contactTable_data td:last-child, #gestoreTable_data td:last-child,
-            #fiduciaryTable_data td:last-child {
-                border-right: none;
-                border-top-right-radius: 5px;
-                border-bottom-right-radius: 5px;
-                -webkit-box-shadow: 4px 0px 7px -2px rgba(0, 0, 0, 0.75);
-                -moz-box-shadow: 4px 0px 7px -2px rgba(0, 0, 0, 0.75);
-                box-shadow: 4px 0px 7px -2px rgba(0, 0, 0, 0.75);
-            }
-
-            #contactTable_data, #gestoreTable_data, #fiduciaryTable_data  {
-                border: none;
-                background: transparent;
-            }
-
             body .ui-widget, body .ui-widget .ui-widget {
-                font-weight: 400 !important;
+                font-family: "Open Sans","Helvetica Neue",sans-serif !important;
+                text-decoration: none !important;
+                font-size: 14px !important;
+                /*font-weight: normal !important;*/
             }
 
-            body #contactTable_head th, body #gestoreTable_head th,
-            #fiduciaryTable_head th{
-                background-color: #CCCCCC !important;
+            #states_panel {
+                background: #ffffff;
+                color: #495057;
+                padding: 0;
+                border: 0 none;
+                box-shadow: 0px 11px 15px -7px rgb(0 0 0 / 20%), 0px 24px 38px 3px rgb(0 0 0 / 14%), 0px 9px 46px 8px rgb(0 0 0 / 12%);
+                border-radius: 4px;
             }
 
-            body #contactTable_head th, body #gestoreTable_head th,  #fiduciaryTable_head th ,.table-client-list span.ui-column-title {
-                color: #000 !important;
+            #states_panel .ui-selectcheckboxmenu-items-wrapper {
+                padding: 0px 1rem 1rem 1rem;
             }
 
-            .action_column {
-                width: 50px;
+            #states_panel .ui-selectcheckboxmenu-header {
+                margin: 1rem 1rem 0px 1rem;
+                border: 1px solid #808080 ;
+                background-color: #D9E0E7 !important;
+                color: #000000 !important;
+            }
+
+            #states_panel .ui-selectcheckboxmenu-list-item {
+                border: 1px solid #c9cdd2;
+                border-top: none;
+            }
+
+            #states_panel .ui-selectcheckboxmenu-close {
+                display: none;
+            }
+
+            .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item label {
+                color: #295887;
+                font-weight: 600;
+            }
+
+            .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item {
+                border: 1px solid;
+            }
+
+            .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item .ui-chkbox .ui-chkbox-box.ui-state-hover {
+                border: 2px solid #4D759D;
+            }
+
+            body .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-items {
+                padding: 0 0;
+            }
+
+            body .ui-chkbox .ui-chkbox-box.ui-state-active {
+                border-color: #4D759D;
+                color: #5f666c !important;
+                background-color: transparent !important;
+            }
+
+            #filterDateFrom_input {
+                width: 160px;
+            }
+
+            #filterDateTo_input {
+                width: 160px;
+            }
+            body .ui-datatable thead th {
+                border-color: #c9cdd2 !important;
+            }
+
+            body .ui-inputfield {
+                border: 1px solid #a8acb1;
+            }
+
+            body .ui-chkbox .ui-chkbox-box .ui-chkbox-icon.ui-icon-check {
+                font-weight: bolder;
+            }
+            .calender-filled input, .select-checkbox {
+                border: 0.2em  solid #57c279 !important;
+            }
+            body .ui-inputfield.ui-state-focus {
+                box-shadow: 0 0 0 0.2em #57c279 !important;
+            }
+
+            body .ui-selectcheckboxmenu.ui-state-focus:not(.ui-state-error) {
+                box-shadow: 0 0 0 0.2em #57c279 !important;
+            }
+
+            .border_class{
+                border: 0.2em solid #57c279 !important; border-radius: 7px !important;
+            }
+
+            #filterEmailsender.ui-state-focus {
+                box-shadow: 0 0 0 0.2em #a6d5fa !important;
+            }
+
+            #filterEmailSubject.ui-state-focus {
+                box-shadow: 0 0 0 0.2em #a6d5fa !important;
+            }
+
+            #filterEmailBody.ui-state-focus {
+                box-shadow: 0 0 0 0.2em #a6d5fa !important;
             }
         </style>
+
         <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/client.css"
               media="all" rel="stylesheet" type="text/css"/>
         <div class="row title-txt">
@@ -160,36 +317,91 @@
             </p:row>
         </p:panelGrid>
 
-        <p:commandButton disabled="#{!bean.canCreate}" styleClass="green-button"
-                         value="#{msg.newClient.toUpperCase()}"
-                         action="#{bean.addEntity}" style="#{bean.tab ne null ? 'margin-top:20px' : ''}"/>
-
-        <p:outputPanel style="margin-top: 20px;" rendered="#{bean.tab eq 1}">
-            <p:outputPanel style="margin-top: 20px;">
-                <p:panelGrid columns="3"
-                             columnClasses="ui-g-12 ui-md-3 row,ui-g-12 ui-md-3 row,ui-g-12 ui-md-4 row"
-                             styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
-                    <p:column>
-                        <p:outputPanel style="width: 250px;margin-top: 8px;font-size: 20px;">#{msg.clientType}:</p:outputPanel>
-                        <p:selectOneMenu id="contactClientType" value="#{bean.selectedClientTypeId}" style="height: 42px;border: 2px solid #ced4da;"
-                                         styleClass="select-width" label="#{msg.clientType}">
-                            <p:ajax update="@this"/>
+        <div class="p-grid">
+            <div class="p-col-6">
+                <div class="p-formgroup-inline">
+                    <div class="p-field">
+                        <p:commandButton disabled="#{!bean.canCreate}" styleClass="green-button"
+                                         value="#{msg.newItem.toUpperCase()}"
+                                         action="#{bean.addEntity}" style="#{bean.tab ne null ? 'margin-top:20px' : ''}"/>
+                    </div>
+                </div>
+            </div>
+            <p:outputPanel styleClass="p-col-6" rendered="#{bean.tab eq 1}">
+                <div class="p-formgroup-inline alignEnd">
+                    <div class="p-field">
+                        <p:selectOneMenu id="contactClientType" value="#{bean.selectedClientTypeId}" style="border: 2px solid #ced4da;"
+                                         styleClass="select-width" label="#{msg.clientType}" placeholder="#{msg.clientType}">
+                        <p:ajax update="@this"/>
                             <f:selectItems value="#{bean.clientTypes}"/>
                         </p:selectOneMenu>
-                    </p:column>
-                    <p:column>
-                        <p:outputPanel style="width: 150px;margin-top: 8px;font-size: 20px;">Denominazione:</p:outputPanel>
-                        <p:inputText value="#{bean.nameOfTheCompany}"
-                                     maxlength="100"
+                    </div>
+                    <div class="p-field">
+                    <p:inputText value="#{bean.nameOfTheCompany}"
+                                 maxlength="100" placeholder="Denominazione"
                                      styleClass="input-width"
                                      id="contactNameOfTheCompany" label="#{msg.clientShortNameOfTheCompany}"/>
-                    </p:column>
-                    <p:column>
-                        <p:commandButton style="width: 100px" value="#{msg.search}" action="#{bean.searchClients}"
+                    </div>
+
+                    <div class="p-field">
+                        <p:commandButton icon="ui-icon ui-icon-search pi pi-search" styleClass="ui-button-warning-icon"
+                                         action="#{bean.searchClients}"
                                          update="contactTable"/>
-                    </p:column>
-                </p:panelGrid>
-                <p:dataTable var="item" id="contactTable" styleClass="table-client-list"
+                    </div>
+                </div>
+            </p:outputPanel>
+            <p:outputPanel styleClass="p-col-6" rendered="#{bean.tab eq 2}">
+                <div class="p-formgroup-inline alignEnd">
+                    <div class="p-field">
+                        <p:selectOneMenu value="#{bean.selectedClientId}"
+                                         label="#{msg.invoiceClient}"
+                                         filter="true" placeholder="#{msg.client}"
+                                         filterMatchMode="startsWith"
+                                         styleClass="select-width">
+                            <p:ajax listener="#{bean.onClientSelect}"
+                                    update="@this"/>
+                            <f:selectItems value="#{bean.clients}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="p-field">
+                        <p:inputText value="#{bean.nameOfTheCompany}"
+                                     maxlength="100" placeholder="Denominazione"
+                                     styleClass="input-width"  label="#{msg.clientShortNameOfTheCompany}"/>
+                    </div>
+
+                    <div class="p-field">
+                        <p:commandButton icon="ui-icon ui-icon-search pi pi-search" styleClass="ui-button-warning-icon" action="#{bean.searchClients}" update="gestoreTable"/>
+                    </div>
+                </div>
+            </p:outputPanel>
+            <p:outputPanel styleClass="p-col-6" rendered="#{bean.tab eq 3}">
+                <div class="p-formgroup-inline alignEnd">
+                    <div class="p-field">
+                        <p:selectOneMenu value="#{bean.selectedClientId}"
+                                         label="#{msg.invoiceClient}"
+                                         filter="true" placeholder="#{msg.client}"
+                                         filterMatchMode="startsWith"
+                                         styleClass="select-width">
+                            <p:ajax listener="#{bean.onClientSelect}"
+                                    update="@this"/>
+                            <f:selectItems value="#{bean.clients}"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="p-field">
+                        <p:inputText value="#{bean.nameOfTheCompany}"
+                                     maxlength="100" placeholder="Denominazione"
+                                     styleClass="input-width"  label="#{msg.clientShortNameOfTheCompany}"/>
+                    </div>
+
+                    <div class="p-field">
+                        <p:commandButton icon="ui-icon ui-icon-search pi pi-search" styleClass="ui-button-warning-icon" action="#{bean.searchClients}" update="fiduciaryTable"/>
+                    </div>
+                </div>
+            </p:outputPanel>
+        </div>
+        <p:outputPanel style="margin-top: 20px;" rendered="#{bean.tab eq 1}">
+            <p:outputPanel style="margin-top: 20px;">
+            <p:dataTable var="item" id="contactTable" styleClass="table-client-list"
                              emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyModel}"
                              paginator="true" lazy="true" rowKey="#{item.id}" rows="10"
                              paginatorAlwaysVisible="true"
@@ -254,7 +466,11 @@
                     </p:column>
 
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton icon="ui-icon ui-icon-search pi pi-search"/>
+                        <p:commandButton icon="ui-icon ui-icon-search pi pi-search"
+                                         action="#{bean.viewEntity}" disabled="#{!bean.canView}" update=":form">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.entityEditId}"/>
+                        </p:commandButton>
                     </p:column>
 
                     <p:column styleClass="action_column" exportable="false">
@@ -281,33 +497,6 @@
 
         <p:outputPanel style="margin-top: 20px;" rendered="#{bean.tab eq 2}">
         <p:outputPanel style="margin-top: 20px;">
-            <p:panelGrid columns="3"
-                         columnClasses="ui-g-12 ui-md-3 row,ui-g-12 ui-md-3 row,ui-g-12 ui-md-4 row"
-                         styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
-                <p:column>
-                    <p:outputPanel style="width: 250px;margin-top: 8px;font-size: 20px;">#{msg.client}:</p:outputPanel>
-                    <p:selectOneMenu value="#{bean.selectedClientId}"
-                                     label="#{msg.invoiceClient}"
-                                     filter="true"
-                                     filterMatchMode="startsWith"
-                                     styleClass="select-width">
-                        <p:ajax listener="#{bean.onClientSelect}"
-                                update="@this"/>
-                        <f:selectItems value="#{bean.clients}"/>
-                    </p:selectOneMenu>
-                </p:column>
-
-                <p:column>
-                    <p:outputPanel style="width: 150px;margin-top: 8px;font-size: 20px;">Denominazione:</p:outputPanel>
-                    <p:inputText value="#{bean.nameOfTheCompany}"
-                                 maxlength="100"
-                                 styleClass="input-width"  label="#{msg.clientShortNameOfTheCompany}"/>
-                </p:column>
-                <p:column>
-                    <p:commandButton style="width: 100px" value="#{msg.search}" action="#{bean.searchClients}" update="gestoreTable"/>
-                </p:column>
-            </p:panelGrid>
-
             <p:dataTable var="item" id="gestoreTable"
                          styleClass="table-client-list"
                          emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyManagerClientModel}"
@@ -364,7 +553,11 @@
                 </p:column>
 
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon ui-icon-search pi pi-search"/>
+                    <p:commandButton icon="ui-icon ui-icon-search pi pi-search"
+                                     action="#{bean.viewEntity}" disabled="#{!bean.canView}" update=":form">
+                        <f:setPropertyActionListener value="#{item.id}"
+                                                     target="#{bean.entityEditId}"/>
+                    </p:commandButton>
                 </p:column>
 
                 <p:column styleClass="action_column" exportable="false">
@@ -381,33 +574,6 @@
 
         <p:outputPanel style="margin-top: 20px;" rendered="#{bean.tab eq 3}">
             <p:outputPanel style="margin-top: 20px;">
-                <p:panelGrid columns="3"
-                             columnClasses="ui-g-12 ui-md-3 row,ui-g-12 ui-md-3 row,ui-g-12 ui-md-4 row"
-                             styleClass="ui-panelgrid-blank ui-fluid" layout="grid">
-                    <p:column>
-                        <p:outputPanel style="width: 250px;margin-top: 8px;font-size: 20px;">#{msg.client}:</p:outputPanel>
-                        <p:selectOneMenu value="#{bean.selectedClientId}"
-                                         label="#{msg.invoiceClient}"
-                                         filter="true"
-                                         filterMatchMode="startsWith"
-                                         styleClass="select-width">
-                            <p:ajax listener="#{bean.onClientSelect}"
-                                    update="@this"/>
-                            <f:selectItems value="#{bean.clients}"/>
-                        </p:selectOneMenu>
-                    </p:column>
-
-                    <p:column>
-                        <p:outputPanel style="width: 150px;margin-top: 8px;font-size: 20px;">Denominazione:</p:outputPanel>
-                        <p:inputText value="#{bean.nameOfTheCompany}"
-                                     maxlength="100"
-                                     styleClass="input-width"  label="#{msg.clientShortNameOfTheCompany}"/>
-                    </p:column>
-                    <p:column>
-                        <p:commandButton style="width: 100px" value="#{msg.search}" action="#{bean.searchClients}" update="fiduciaryTable"/>
-                    </p:column>
-                </p:panelGrid>
-
                 <p:dataTable var="item" id="fiduciaryTable"
                              styleClass="table-client-list"
                              emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyClientTrustModel}"
@@ -462,7 +628,11 @@
                         </p:commandButton>
                     </p:column>
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton icon="ui-icon ui-icon-search pi pi-search"/>
+                        <p:commandButton icon="ui-icon ui-icon-search pi pi-search"
+                                         action="#{bean.viewEntity}" disabled="#{!bean.canView}" update=":form">
+                            <f:setPropertyActionListener value="#{item.id}"
+                                                         target="#{bean.entityEditId}"/>
+                        </p:commandButton>
                     </p:column>
                     <p:column styleClass="action_column" exportable="false">
                         <p:commandButton icon="ui-icon pi pi-pencil" style="border: none !important;" update=":form"

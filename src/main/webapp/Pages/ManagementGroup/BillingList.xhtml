@@ -28,8 +28,8 @@
                 color: inherit;
                 text-decoration: none;
                 margin: 0 -4px;
-                width: 210px;
-                font-family: Roboto;
+                width: 267px;
+                font-family: "Open Sans","Helvetica Neue",sans-serif !important;
                 font-size: 18px;
             }
 
@@ -573,9 +573,21 @@
                 font-family: "Open Sans","Helvetica Neue",sans-serif;
                 text-decoration: none;
             }
-            
+            #statuses_panel, #requestTypes_panel, #services_panel {
+                display: none !important;
+            }
+            .actionPnl-tooltip {
+                text-align:center; width:140px; background-color: #6688AA !important;border-radius: 7px !important; border: 1px solid #FFFFFF; opacity: 0.8;
+            }
+
+            .actionPnl-panel {
+                text-align:center; background-color: #6688AA !important; margin-left:-5px; margin-right: -5px; border-radius: 7px !important;
+            }
+            #subjectSettingPanel_content {
+                display: block !important;
+            }
             .jqplot-table-legend {
-            	display: none;
+                display: none;
             }
         </style>
         <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
@@ -583,25 +595,25 @@
               href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
         <div style="margin-left: 20px;">
             <nav class="left" style="margin-left:20px;">
-                <a href="#" id="tab1" class="tab selected">#{msg.billingListDashboard}</a>
-                <a href="#" id="tab2" class="tab">#{msg.billingListInvoices}</a>
-                <a href="#" id="tab3" class="tab">#{msg.billingListCreditNotes}</a>
-                <a href="#" id="tab4" class="tab">#{msg.billingListSubjectsToBeInvoiced}</a>
+                <a href="#" id="tab1" class="tab selected">#{ff:upper(msg.billingListDashboard)}</a>
+                <a href="#" id="tab2" class="tab">#{ff:upper(msg.billingListInvoices)}</a>
+                <a href="#" id="tab3" class="tab">#{ff:upper(msg.billingListCreditNotes)}</a>
+                <a href="#" id="tab4" class="tab">#{ff:upper(msg.billingListSubjectsToBeInvoiced)}</a>
             </nav>
 
             <main>
                 <div id="content_tab1" class="hide">
                     <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" cellpadding="3" cellspacing="0"
-                                 columnClasses="ui-grid-col-4,ui-grid-col-6,ui-grid-col-1,ui-grid-col-1" layout="grid">
+                                 columnClasses="ui-grid-col-4,ui-grid-col-4,ui-grid-col-3,ui-grid-col-1" layout="grid">
                         <p:commandButton value="#{ff:upper(msg.billingListUpdate)}"/>
 
                         <p:outputLabel></p:outputLabel>
 
-                        <p:selectOneMenu id="client" value="#{bean.selectedClientId}" style="width: calc( 100% - 5px);"
+                        <p:selectOneMenu id="client" value="#{bean.selectedClientId}" style="width: 300px; float:right;"
                                          styleClass="#{bean.selectedClientId ne null ? 'select-one-menu' : ''}">
                             <f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}" itemValue="#{null}"
                                           noSelectionOption="true"/>
-                            <f:selectItems value="#{bean.clients}"/>
+                            <f:selectItems style="width:300px;" value="#{bean.clients}" />
                             <p:ajax event="itemSelect" update="@this"/>
                         </p:selectOneMenu>
 
@@ -982,7 +994,9 @@
                                     <div class="p-col-3" style="padding-bottom: 0px !important;">
                                         <div class="p-formgroup-inline">
                                             <div class="p-field">
-                                                <p:commandButton value="#{msg.billingListCreateInvoice}"
+                                                <p:commandButton value="#{msg.billingListCreateInvoice}" id="createInvoice" action="#{bean.loadInvoiceDialogData}"
+                                                                 update=":form"
+                                                                 oncomplete="PF('invoiceDialogBillingWV').show();"
                                                                  styleClass="ui-button-success p-mr-2 p-mb-2"/>
                                             </div>
                                         </div>
@@ -1198,26 +1212,83 @@
                                             <div class="p-field">
                                                 <p:inputText value="#{bean.nameFilter}" id="nominativo"
                                                              placeholder="#{msg.databaseListName}"
-                                                             style=" width: 300px !important;"/>
+                                                             style="width: 300px !important;height: 46px;"/>
                                             </div>
                                             <div class="p-field">
                                                 <div class="p-field">
-                                                    <p:inputText value="#{bean.searchFiscalCode}"
-                                                                 placeholder="#{ff:upper(msg.requestFiscalCodeCap)}"
-                                                                 id="searchFiscalCode"/>
+                                                    <p:selectOneMenu id="subjectClient"
+                                                                     value="#{bean.selectedSubjectClientId}"
+                                                                     label="#{msg.requestClient}"
+                                                                     style="width: 300px !important;"
+                                                                     styleClass="#{bean.selectedSubjectClientId ne null ? 'select-one-menu' : ''}">
+                                                        <f:selectItem itemLabel="#{ff:upper(msg.requestListClient)}"
+                                                                      itemValue="#{null}"
+                                                                      noSelectionOption="true"/>
+                                                        <f:selectItems value="#{bean.clients}"/>
+                                                        <p:ajax event="itemSelect" update="@this"/>
+                                                    </p:selectOneMenu>
+<!--                                                    -->
+<!--                                                    <p:inputText value="#{bean.searchFiscalCode}"-->
+<!--                                                                 placeholder="#{ff:upper(msg.requestFiscalCodeCap)}"-->
+<!--                                                                 id="searchFiscalCode"/>-->
                                                 </div>
                                             </div>
                                             <div class="p-field">
                                                 <p:commandButton id="subjectSearch" onclick="filterRequestTableFromPanel();"
                                                                  action="#{bean.prepareToModify}"
                                                                  styleClass="ui-button-warning-icon"
-                                                                 update="subjectSearchPanel printPanel"
+                                                                 update="subjectSearchPanel editAndPrintDialog printPanel"
                                                                  icon="ui-icon ui-icon-search pi pi-search"/>
                                             </div>
+
                                             <p:commandButton id="subjectSettingButton"
-                                                             onclick="PF('subjectPanelSetting').toggle()" type="button"
+                                                             onclick="togglePanel();" type="button"
                                                              styleClass="ui-button-warning-icon"
                                                              icon="ui-icon ui-icon-search pi pi-sliders-h"/>
+
+        <script type="text/javascript">
+            // <![CDATA[
+            $("body").click(function(e){
+                var target = $(e.target);
+                if (!target.parents('#subjectSettingButton').length && !target.parents('#subjectSettingPanel').length && !target.parents('#client_panel').length
+                    && !target.parents('#requestTypeSelectCheckboxPanel').length && !target.parents('#manager_panel').length && !target.parents('#office_panel').length
+                    && !target.parents('#stateSelectCheckboxPanel').length && !target.parents('#serviceSelectCheckboxPanel').length && !target.parents('#fiduciario_panel').length) {
+                  PF('subjectPanelSetting').getJQ().hide();
+                }
+                if(target.closest('#statuses').length || target.closest('#stateSelectCheckboxPanelDataTable').length) {
+                    $("#statuses").addClass("border_class");
+                } else {
+                    $("#statuses").removeClass("border_class");
+                }
+
+                if(target.closest('#requestTypes').length || target.closest('#requestTypeSelectCheckboxPanel').length) {
+                    $("#requestTypes").addClass("border_class");
+                } else {
+                    $("#requestTypes").removeClass("border_class");
+                }
+
+                if(target.closest('#services').length || target.closest('#serviceSelectCheckboxPanel').length) {
+                    $("#services").addClass("border_class");
+                } else {
+                    $("#services").removeClass("border_class");
+                }
+            });
+            function applyClickListener(id, wv) {
+                $("#"+id).click(function() {
+                    PF(wv).show();
+                });
+            }
+            function applyBorder(id) {
+                $("#"+id).addClass("border_class");
+            }
+            function togglePanel() {
+                PF('subjectPanelSetting').getJQ().toggle();
+            }
+            jQuery(document).ready(function() {
+                PF('subjectPanelSetting').getJQ().hide();
+            });
+            // ]]>
+        </script>
                                             <p:panel id="subjectSettingPanel" widgetVar="subjectPanelSetting"
                                                      closable="true" toggleable="true" collapsed="true">
                                                 <div class="p-grid">
@@ -1226,28 +1297,16 @@
                                                     </div>
                                                     <div class="p-col-6">
                                                         <div style="">
-                                                            <h:outputText style="color: #003871;"
-                                                                          value=""/>
+                                                            <div style="">
+                                                                <h:outputText style="color: #003871;"
+                                                                              value="#{ff:upper(msg.status)}:"/>
+                                                            </div>
+
                                                         </div>
                                                     </div>
                                                     <div class="p-col-6">
-                                                        <div style="">
-                                                            <h:outputText style="color: #003871;"
-                                                                          value="#{ff:upper(msg.status)}:"/>
-                                                        </div>
-                                                    </div>
-                                                    <div class="p-col-6">
-                                                        <p:selectOneMenu id="subjectClient"
-                                                                         value="#{bean.selectedSubjectClientId}"
-                                                                         label="#{msg.requestClient}"
-                                                                         style="width: calc( 100% - 5px);"
-                                                                         styleClass="#{bean.selectedSubjectClientId ne null ? 'select-one-menu' : ''}">
-                                                            <f:selectItem itemLabel="#{ff:upper(msg.requestListClient)}"
-                                                                          itemValue="#{null}"
-                                                                          noSelectionOption="true"/>
-                                                            <f:selectItems value="#{bean.clients}"/>
-                                                            <p:ajax event="itemSelect" update="@this"/>
-                                                        </p:selectOneMenu>
+                                                        <h:outputText style="color: #003871;"
+                                                                      value=""/>
                                                     </div>
                                                     <div class="p-col-6">
                                                         <p:selectCheckboxMenu id="statuses"
@@ -1261,6 +1320,8 @@
                                                                            itemValue="#{state}"
                                                                            itemLabel="#{state.value}"/>
                                                         </p:selectCheckboxMenu>
+                                                    </div>
+                                                    <div class="p-col-6">
                                                     </div>
 
                                                     <div class="p-col-6">
@@ -1281,7 +1342,7 @@
                                                                               multiple="true"
                                                                               label="#{msg.requestType}"
                                                                               value="#{bean.selectedRequestTypes}"
-                                                                              onclick="applyBorder('requestTypes');"
+                                                                              onclick="PF('requestTypeSelectCheckboxWV').show();applyBorder('requestTypes');"
                                                                               styleClass="#{bean.getRequestTypeSelected() gt 0 ? ' select-checkbox' : ''}">
                                                             <f:selectItems value="#{bean.requestTypeWrappers}"
                                                                            var="requestType" itemValue="#{requestType}"
@@ -1422,13 +1483,14 @@
                                                                 value="#{ff:upper(msg.requestPrintSelectTemplate)}"
                                                                 style="background: #00CC52;"
                                                                 id="searchButtonFilter"
+                                                                update="subjectSearchPanel printPanel editAndPrintDialog"
                                                                 action="#{bean.prepareToModify}"
-                                                                onclick="checkDates(); filterTableFromPanel();"
-                                                                oncomplete="PF('panelSetting').getJQ().hide();"/>
+                                                                onclick="checkDates(); filterRequestTableFromPanel();PF('subjectPanelSetting').getJQ().hide()"/>
                                                         <p:commandButton style="width: auto;"
                                                                          value="#{ff:upper(msg.mailManageReestablish)}"
                                                                          actionListener="#{bean.clearFiltraPanel}"
-                                                                         oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').getJQ().hide();"/>
+                                                                         update="subjectSettingPanel subjectSearchPanel"
+                                                                         oncomplete="resetData();checkDates();filterTableFromPanel();PF('subjectPanelSetting').getJQ().hide();"/>
                                                     </div>
 
                                                 </div>
@@ -1437,9 +1499,12 @@
                                     </div>
                                     <div class="p-col-12" style="margin-top: -15px; margin-bottom: -15px;">
                                         <p:outputPanel id="printPanel">
-                                            <p:commandButton value="#{msg.billingListExcel}" rendered="#{bean.showPrintButton}" styleClass="p-mr-2 p-mb-2"/>
-                                            <p:commandButton value="#{msg.requestEditAndPrint}" rendered="#{bean.showPrintButton}" styleClass="p-mr-2 p-mb-2"/>
-                                            <p:commandButton value="#{msg.mailManagerDelivery}" styleClass="p-mr-2 p-mb-2"/>
+                                            <p:commandButton value="#{msg.billingListExcel}" rendered="#{bean.showPrintButton}" styleClass="p-mr-2 p-mb-2"
+                                                             oncomplete="PF('createTotalCosthDocumentDialogWV').show()"/>
+                                            <p:commandButton value="#{msg.requestEditAndPrint}" rendered="#{bean.showPrintButton}" styleClass="p-mr-2 p-mb-2"
+                                                             oncomplete="PF('editAndPrintDialogWV').show();"  process="printPanel"/>
+                                            <p:commandButton value="#{msg.mailManagerDelivery}" styleClass="p-mr-2 p-mb-2" action="#{bean.editExcelData}"
+                                                rendered="false"/>
                                             <p:commandButton value="#{msg.biilingIssueInvoice}"
                                                              style="float: right;background:#00CC52 !important;"/>
                                         </p:outputPanel>
@@ -1454,8 +1519,66 @@
                                                  action="#{bean.filterRequestTableFromPanel}"
                                                  update=":subjectTable"/>
                                 <p:remoteCommand name="updateCalendarTo" update=":form:filterSubjectDateTo"/>
+                                <p:remoteCommand name="handleRowsChange"
+                                                 action="#{bean.handleRowsChange()}" update="subjectTable" oncomplete="setPageNumber()"/>
+                                <p:remoteCommand name="onPageChange"
+                                                 action="#{bean.onPageChange()}" update="subjectTable" oncomplete="setPageNumber()"/>
                             </div>
                         </ui:fragment>
+
+                    <p:overlayPanel id="requestTypeSelectCheckboxPanel" my="left top" at="left bottom"
+                                    widgetVar="requestTypeSelectCheckboxWV" for="requestTypes" dynamic="true" style="width:300px;">
+                        <p:dataTable id="requestTypeSelectCheckboxPanelDataTable" var="requestType"
+                                     value="#{bean.requestTypeWrappers}" selectionMode="single"
+                                     selection="#{bean.selectedRequestTypeForFilter}" rowKey="#{requestType.value}">
+                            <p:ajax event="rowSelect"
+                                    listener="#{bean.selectRequestTypeForFilter}"
+                                    update="requestTypeSelectCheckboxPanelDataTable"/>
+                            <p:column style="width:18px">
+                                <f:facet name="header">
+                                    <p:selectBooleanCheckbox value="#{bean.selectedAllRequestTypesOnPanel}">
+                                        <p:ajax update="requestTypeSelectCheckboxPanelDataTable" event="change"/>
+                                        <p:ajax event="change" update="requestTypes" oncomplete="applyClickListener('requestTypes', 'requestTypeSelectCheckboxWV');"/>
+                                    </p:selectBooleanCheckbox>
+                                </f:facet>
+                                <p:selectBooleanCheckbox value="#{requestType.selected}">
+                                    <p:ajax update="requestTypeSelectCheckboxPanelDataTable" event="change"/>
+                                    <p:ajax event="change" update="requestTypes" oncomplete="applyClickListener('requestTypes', 'requestTypeSelectCheckboxWV');"/>
+                                </p:selectBooleanCheckbox>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{requestType.value}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:overlayPanel>
+
+                    <p:overlayPanel id="userSelectCheckboxPanel" my="left top" at="left bottom"
+                                    widgetVar="userSelectCheckboxWV" for="userSelectCheckboxShow"
+                                    onHide="filterRequestTableFromPanel();" dynamic="true" style="width:300px">
+                        <p:dataTable id="userSelectCheckboxPanelDataTable" var="state"
+                                     value="#{bean.userWrappers}" selectionMode="single"
+                                     selection="#{bean.selectedUserForFilter}" rowKey="#{state.value}">
+
+                            <p:ajax event="rowSelect"
+                                    listener="#{requestListBean.selectUserForFilter}"
+                                    update="userSelectCheckboxPanelDataTable"/>
+
+                            <p:column style="width:18px">
+                                <f:facet name="header">
+                                    <p:selectBooleanCheckbox value="#{bean.selectedAllUsersOnPanel}">
+                                        <p:ajax update="userSelectCheckboxPanelDataTable" event="change"/>
+                                    </p:selectBooleanCheckbox>
+                                </f:facet>
+                                <p:selectBooleanCheckbox value="#{state.selected}">
+                                    <p:ajax update="userSelectCheckboxPanelDataTable" event="change"/>
+                                </p:selectBooleanCheckbox>
+                            </p:column>
+
+                            <p:column headerText="#{msg.mailManagerStates}">
+                                <h:outputText value="#{state.value}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:overlayPanel>
 
                         <p:panel id="subjectTable" styleClass="ui-datatable ui-widget" widgetVar="subjectTableWV">
 
@@ -1573,9 +1696,9 @@
                                                     </p:outputPanel>
                                                     <br/>
                                                     <div style="height :20px; position:absolute; left: 2px; bottom: 2px;">
-                                                        <p:graphicImage id="info" url="/resources/images/tooltip.png" style="width:20px; height:20px;"
+                                                        <p:graphicImage id="info-#{loop.index}" url="/resources/images/tooltip.png" style="width:20px; height:20px;"
                                                                         rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}" />
-                                                        <p:tooltip for="info" styleClass="custom-design-tooltip">
+                                                        <p:tooltip for="info-#{loop.index}" styleClass="custom-design-tooltip">
                                                             <h:outputText value="#{ff:upper(msg.requestManagers)}" style="font-weight:bold;color:#003871;"/>
                                                             <br />
                                                             <h:outputText value="#{item.haveManagers()}" escape="false" rendered="#{not empty item.haveManagers()}"/>
@@ -1600,9 +1723,9 @@
                                                         <h:outputText id="service" value="#{item.serviceName}" rendered="#{item.serviceName ne null}"/>
                                                         <br/>
                                                         <div style="height :20px; position:absolute; left: 2px; bottom: 2px;">
-                                                            <p:graphicImage id="multipleservice" url="/resources/images/tooltip.png"
+                                                            <p:graphicImage id="multipleservice-#{loop.index}" url="/resources/images/tooltip.png"
                                                                             style="width:20px; height:20px;"  rendered="#{not empty item.multipleServices}" />
-                                                            <p:tooltip for="multipleservice" styleClass="custom-design-tooltip" rendered="#{not empty item.multipleServices}">
+                                                            <p:tooltip for="multipleservice-#{loop.index}" styleClass="custom-design-tooltip" rendered="#{not empty item.multipleServices}">
                                                                 <ui:repeat var="ele" value="#{item.multipleServices}" varStatus="service">
                                                                     <h:outputText value="#{ele}" escape="false" style="color:#003871;margin-left: 24px;"/>
                                                                     <br />
@@ -1704,11 +1827,11 @@
                                                         <p:commandButton id="table_#{item.id}_gestisci-btn" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
                                                                          disabled="#{!bean.canEdit}" action="#{bean.manageRequest}">
                                                             <f:setPropertyActionListener value="#{item.id}"
-                                                                                         target="#{bean.entityEditId}"/>
+                                                                                         target="#{bean.selectedRequestId}"/>
                                                         </p:commandButton>
                                                         <p:commandButton id="table_#{item.id}_banca-btn" value="#{ff:upper(msg.headerDatabase)}" rendered="#{item.subjectId ne null}" style="display: none;"
                                                                          action="#{bean.openRequestSubject}" class="action-btn">
-                                                            <f:setPropertyActionListener value="#{item.subjectId}" target="#{bean.entityEditId}"/>
+                                                            <f:setPropertyActionListener value="#{item.subjectId}" target="#{bean.selectedRequestId}"/>
                                                         </p:commandButton>
                                                         <p:commandButton id="table_#{item.id}_pdf-btn" value="#{msg.pdf}" rendered="#{!bean.getCurrentUser().isExternal()}" class="action-btn" style="display: none;"
                                                                          action="#{bean.downloadPdfFile}" ajax="false" update="@form">
@@ -1718,7 +1841,7 @@
                                                         <p:commandButton id="table_#{item.id}_elimina-btn" value="#{ff:upper(msg.roleCanDelete)}" class="action-btn" style="display: none;"
                                                                          oncomplete="PF('dlg2').show()" disabled="#{!bean.canDelete}">
                                                             <f:setPropertyActionListener value="#{item.id}"
-                                                                                         target="#{bean.entityDeleteId}"/>
+                                                                                         target="#{bean.selectedRequestId}"/>
                                                         </p:commandButton>
 
 
@@ -1757,6 +1880,7 @@
 
                 </div>
             </main>
+            <ui:include src="../Dialogs/InvoiceDialogBilling.xhtml"/>
         </div>
         <script>
             $(".tab").on("click", function (event) {
@@ -1820,6 +1944,37 @@
             </p:scrollPanel>
         </p:dialog>
 
+        <p:dialog id="editAndPrintDialog" widgetVar="editAndPrintDialogWV" modal="true" resizable="false"
+                  draggable="false">
+            <h3>#{msg.requestEditAndPrintDialogHeader}:</h3>
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" id="editArea">
+                <span>#{msg.status}:</span>
+                <p:column>
+                    <p:selectOneMenu value="#{bean.selectedState}" label="#{msg.status}"
+                                     styleClass="select-width">
+                        <f:selectItems value="#{bean.statesForSelect}"/>
+                    </p:selectOneMenu>
+                </p:column>
+
+                <span>#{msg.requestListCurrentOperator}:</span>
+                <p:column>
+                    <p:selectOneMenu value="#{bean.selectedUser}" label="#{msg.requestListCurrentOperator}"
+                                     styleClass="select-width">
+                        <f:selectItems value="#{bean.usersForSelect}"/>
+                    </p:selectOneMenu>
+                </p:column>
+            </p:panelGrid>
+
+            <div class="btn_line">
+                <p:commandButton value="#{msg.requestPrint}"
+                                 action="#{bean.loadRequestsPdf}" styleClass="p-mr-2 p-mb-2"/>
+                <p:commandButton value="#{msg.ok}"
+                                 action="#{bean.modifyRequests}"
+                                 oncomplete="PF('editAndPrintDialogWV').hide(); filterTableFromPanel();"/>
+            </div>
+        </p:dialog>
+
+        <ui:include src="../Dialogs/TotalCostDocumentDialog.xhtml"/>
     </ui:define>
 </ui:composition>
 </html>

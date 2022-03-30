@@ -6,7 +6,6 @@ import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.DateTimeHelper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
-import it.nexera.ris.persistence.beans.entities.PaymentInvoice;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
 import org.hibernate.criterion.Restrictions;
 
@@ -240,8 +239,10 @@ public class Invoice extends IndexedEntity implements Serializable {
 		List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, Restrictions.eq("invoice.id", this.getId()));
 		double totalAmount = 0.0;
 		for(InvoiceItem invoiceItem : invoiceItems) {
-			Double total = invoiceItem.getAmount().doubleValue() + invoiceItem.getVatAmount().doubleValue();
-			totalAmount = totalAmount + total;
+			if(invoiceItem.getAmount() != null) {
+				Double total = invoiceItem.getAmount().doubleValue() + invoiceItem.getVatAmount().doubleValue();
+				totalAmount = totalAmount + total;
+			}
 		}
 		return totalAmount;
 	}

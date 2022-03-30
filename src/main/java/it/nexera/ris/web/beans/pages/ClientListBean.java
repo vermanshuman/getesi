@@ -128,7 +128,7 @@ public class ClientListBean extends EntityLazyListPageBean<ClientShort> implemen
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException {
         try {
-            tab = Integer.valueOf(getRequestParameter(RedirectHelper.TAB));
+            setTab(Integer.valueOf(getRequestParameter(RedirectHelper.TAB)));
         } catch (NumberFormatException e) {
             log.info(e.getMessage());
         }

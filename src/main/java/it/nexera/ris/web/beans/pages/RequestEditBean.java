@@ -12,6 +12,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 
 import it.nexera.ris.common.enums.*;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
 import it.nexera.ris.persistence.view.RequestView;
 import lombok.Getter;
 import lombok.Setter;
@@ -72,13 +73,6 @@ import it.nexera.ris.persistence.beans.entities.domain.SectionC;
 import it.nexera.ris.persistence.beans.entities.domain.Subject;
 import it.nexera.ris.persistence.beans.entities.domain.User;
 import it.nexera.ris.persistence.beans.entities.domain.WLGInbox;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Country;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.LandChargesRegistry;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import it.nexera.ris.persistence.view.ClientView;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.beans.EntityEditPageBean;
@@ -300,16 +294,29 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private Map<Long, List<SelectItem>> subjectListServices;
 
 
+    @Getter
+    @Setter
+    private List<Document> requestDocuments;
+
+    private Integer requestType;
+
     @Override
     protected void preLoad() throws PersistenceBeanException {
         setMultiRequestMap(new HashMap());
         setYearRange("1930:" + (DateTimeHelper.getYearOfNow()+ 10));
+        setRequestType(-1);
         if (!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.MULTIPLE)) &&
                 Boolean.parseBoolean(getRequestParameter(RedirectHelper.MULTIPLE))) {
             setMultipleCreate(true);
             if(!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.FROM_PARAMETER)) &&
                     getRequestParameter(RedirectHelper.FROM_PARAMETER).equalsIgnoreCase(MULTIPLE_REQUEST)){
                 setMultipleRequestCreate(true);
+            }
+            if(!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.REQUEST_TYPE_PARAM))){
+                Integer requestType = Integer.parseInt(getRequestParameter(RedirectHelper.REQUEST_TYPE_PARAM));
+                if(requestType > -1){
+                    setRequestType(requestType);
+                }
             }
         }
         if (getRequestParameter(RedirectHelper.MAIL) != null) {
@@ -360,7 +367,6 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 LogHelper.log(log, e);
             }
         }
-
     }
 
     private void presetParamsFromMail(WLGInbox mail) {
@@ -1448,7 +1454,15 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             if (getEntity().getStateId() == null) {
                 getEntity().setStateId(RequestState.INSERTED.getId());
             }
-            if (!ValidationHelper.isNullOrEmpty(getSelectedRequestEnumTypeFirst())) {
+            if (!ValidationHelper.isNullOrEmpty(getRequestType())) {
+                if(getRequestType().equals(0)) {
+                    getEntity().setType(RequestEnumTypes.SUBJECT);
+                }else if(getRequestType().equals(1)) {
+                    getEntity().setType(RequestEnumTypes.MADE);
+                }else if(getRequestType().equals(2)) {
+                    getEntity().setType(RequestEnumTypes.COMMON);
+                }
+            } else if (!ValidationHelper.isNullOrEmpty(getSelectedRequestEnumTypeFirst())) {
                 if (getSelectedRequestEnumTypeFirst().equals(RequestEnumTypes.SUBJECT.getId())) {
                     getEntity().setType(RequestEnumTypes.SUBJECT);
                 } else {
@@ -1488,7 +1502,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 getEntity().setAgency(null);
             }
             if (!ValidationHelper.isNullOrEmpty(getSelectedAgencyOfficeId())) {
-                getEntity().setOffice(DaoManager.get(Agency.class, getSelectedAgencyOfficeId()));
+                getEntity().setOffice(DaoManager.get(Office.class, getSelectedAgencyOfficeId()));
             } else {
                 getEntity().setOffice(null);
             }
@@ -3259,5 +3273,13 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void setUrgent(Boolean urgent) {
         this.urgent = urgent;
+    }
+
+    public Integer getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(Integer requestType) {
+        this.requestType = requestType;
     }
 }
