@@ -590,11 +590,11 @@
                 display: none;
             }
             #client_items {
-                width: 267px !important;
+                width: 305px !important;
             }
 
             #filterClient_items {
-                width: 267px !important;
+                width: 305px !important;
             }
         </style>
         <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
@@ -616,7 +616,7 @@
 
                         <p:outputLabel></p:outputLabel>
 
-                        <p:selectOneMenu id="client" value="#{bean.selectedClientId}" style="width: 300px; float:right;"
+                        <p:selectOneMenu id="client" value="#{bean.selectedClientId}" style="width: 325px; float:right;"
                                          styleClass="#{bean.selectedClientId ne null ? 'select-one-menu' : ''}">
                             <f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}" itemValue="#{null}"
                                           noSelectionOption="true"/>
@@ -1015,7 +1015,7 @@
                                                              value="#{bean.filterInvoiceNumber}"
                                                              placeholder="#{msg.billingListNumber}"/>
                                             </div>
-                                            <p:selectOneMenu id="filterClient" value="#{bean.selectedCompanyId}" style="width: 300px; margin-right: 20px;"
+                                            <p:selectOneMenu id="filterClient" value="#{bean.selectedCompanyId}" style="width: 325px; margin-right: 20px;"
                                                              styleClass="#{bean.selectedCompanyId ne null ? 'select-one-menu' : ''}">
                                                 <f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}"
                                                               itemValue="#{null}" noSelectionOption="true"/>
