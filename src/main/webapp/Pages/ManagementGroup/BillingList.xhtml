@@ -589,6 +589,13 @@
             .jqplot-table-legend {
                 display: none;
             }
+            #client_items {
+                width: 267px !important;
+            }
+
+            #filterClient_items {
+                width: 267px !important;
+            }
         </style>
         <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
         <link rel="stylesheet"
@@ -613,7 +620,7 @@
                                          styleClass="#{bean.selectedClientId ne null ? 'select-one-menu' : ''}">
                             <f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}" itemValue="#{null}"
                                           noSelectionOption="true"/>
-                            <f:selectItems style="width:300px;" value="#{bean.clients}" />
+                            <f:selectItems value="#{bean.clients}" />
                             <p:ajax event="itemSelect" update="@this"/>
                         </p:selectOneMenu>
 
@@ -1008,8 +1015,7 @@
                                                              value="#{bean.filterInvoiceNumber}"
                                                              placeholder="#{msg.billingListNumber}"/>
                                             </div>
-                                            <p:selectOneMenu id="filterClient" value="#{bean.selectedCompanyId}"
-                                                             style="margin-right: 20px;"
+                                            <p:selectOneMenu id="filterClient" value="#{bean.selectedCompanyId}" style="width: 300px; margin-right: 20px;"
                                                              styleClass="#{bean.selectedCompanyId ne null ? 'select-one-menu' : ''}">
                                                 <f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}"
                                                               itemValue="#{null}" noSelectionOption="true"/>
