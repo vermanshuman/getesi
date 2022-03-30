@@ -583,7 +583,9 @@
             .actionPnl-panel {
                 text-align:center; background-color: #6688AA !important; margin-left:-5px; margin-right: -5px; border-radius: 7px !important;
             }
-
+            #subjectSettingPanel_content {
+                display: block !important;
+            }
         </style>
         <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
         <link rel="stylesheet"
@@ -1237,7 +1239,7 @@
                                             </div>
 
                                             <p:commandButton id="subjectSettingButton"
-                                                             onclick="PF('subjectPanelSetting').toggle()" type="button"
+                                                             onclick="togglePanel();" type="button"
                                                              styleClass="ui-button-warning-icon"
                                                              icon="ui-icon ui-icon-search pi pi-sliders-h"/>
 
@@ -1248,7 +1250,7 @@
                 if (!target.parents('#subjectSettingButton').length && !target.parents('#subjectSettingPanel').length && !target.parents('#client_panel').length
                     && !target.parents('#requestTypeSelectCheckboxPanel').length && !target.parents('#manager_panel').length && !target.parents('#office_panel').length
                     && !target.parents('#stateSelectCheckboxPanel').length && !target.parents('#serviceSelectCheckboxPanel').length && !target.parents('#fiduciario_panel').length) {
-                 //  PF('subjectPanelSetting').getJQ().hide();
+                    PF('subjectPanelSetting').getJQ().hide();
                 }
                 if(target.closest('#statuses').length || target.closest('#stateSelectCheckboxPanelDataTable').length) {
                     $("#statuses").addClass("border_class");
@@ -1279,7 +1281,9 @@
             function togglePanel() {
                 PF('subjectPanelSetting').getJQ().toggle();
             }
-
+            jQuery(document).ready(function() {
+                PF('subjectPanelSetting').getJQ().hide();
+            });
             // ]]>
         </script>
                                             <p:panel id="subjectSettingPanel" widgetVar="subjectPanelSetting"
@@ -1478,8 +1482,7 @@
                                                                 id="searchButtonFilter"
                                                                 update="subjectSearchPanel printPanel editAndPrintDialog"
                                                                 action="#{bean.prepareToModify}"
-                                                                onclick="checkDates(); filterRequestTableFromPanel();"
-                                                                oncomplete="PF('subjectPanelSetting').getJQ().hide();"/>
+                                                                onclick="checkDates(); filterRequestTableFromPanel();PF('subjectPanelSetting').getJQ().hide()"/>
                                                         <p:commandButton style="width: auto;"
                                                                          value="#{ff:upper(msg.mailManageReestablish)}"
                                                                          actionListener="#{bean.clearFiltraPanel}"
