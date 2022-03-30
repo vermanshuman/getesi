@@ -565,6 +565,14 @@
 			body .ui-datatable .ui-datatable-data > tr:hover {
 				background: #e9ecef !important;
 			}
+			
+			#client_items {
+				width: 267px !important;
+			}
+			
+			#filterClient_items {
+				width: 267px !important;
+			}
 		</style>
 		<script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
@@ -587,7 +595,7 @@
 						<p:selectOneMenu id="client" value="#{bean.selectedClientId}" style="width: 300px; float:right;"
 										 styleClass="#{bean.selectedClientId ne null ? 'select-one-menu' : ''}">
 							<f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}" itemValue="#{null}" noSelectionOption="true" />
-							<f:selectItems style="width:300px;" value="#{bean.clients}" />
+							<f:selectItems value="#{bean.clients}" />
 							<p:ajax event="itemSelect" update="@this" />
 						</p:selectOneMenu>
 
@@ -953,7 +961,7 @@
 											<div class="p-field">
 												<p:inputText id="filterInvoiceNumber" value="#{bean.filterInvoiceNumber}" placeholder="#{msg.billingListNumber}"/>
 											</div>
-											<p:selectOneMenu id="filterClient" value="#{bean.selectedCompanyId}" style="margin-right: 20px;"
+											<p:selectOneMenu id="filterClient" value="#{bean.selectedCompanyId}" style="width: 300px; margin-right: 20px;"
 															 styleClass="#{bean.selectedCompanyId ne null ? 'select-one-menu' : ''}">
 											<f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}" itemValue="#{null}" noSelectionOption="true" />
 												<f:selectItems value="#{bean.companies}" />
