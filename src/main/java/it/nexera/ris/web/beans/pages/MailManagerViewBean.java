@@ -237,6 +237,10 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     
     private boolean printPdf;
     
+    private Long selectedInvoiceClientId;
+    
+    private Client selectedInvoiceClient;
+    
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
     	setActiveTabIndex(0);
