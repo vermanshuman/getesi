@@ -235,14 +235,14 @@
             </p:tab>
             <p:tab title="#{msg.requestTextEditDataTab}" id="dataTab">
                 <div class="p-grid invoiceDialog" style="margin-right:20px;">
-                	<p:outputPanel id="mainPanel" style="width: 100%;">
+                	<p:panel id="mainPanel" style="width: 100%;" widgetVar="mainPanelVW">
 	                    <div class="p-grid">
 		                    <!-- ROW 1 -->
 		                    <div class="p-col-1 vertical-center">
 		                        <p:outputLabel value="#{msg.number}"/>
 		                    </div>
 		                    <div class="p-col-2">
-		                        <p:inputText value="#{bean.number}"/>
+		                        <p:inputText value="#{bean.number}" id="number"/>
 		                    </div>
 		                    <div class="p-col-1 vertical-center" >
 		                        <p:outputLabel value="#{msg.data}"/>
@@ -419,14 +419,14 @@
 		                    <div class="p-col-3">
 		                    </div>
 	                	</div>
-	              	</p:outputPanel>
+	              	</p:panel>
                 </div>
 
                 <h3>#{msg.requestTextEditGoodsServices}</h3>
                 <hr/>
 
                 <div class="p-grid" style="margin-right:20px;">
-                    <p:outputPanel id="goodsServicesPanel" style="width: 100%;">
+                    <p:panel id="goodsServicesPanel" style="width: 100%;" widgetVar="goodsServicesPanelVW">
 	                    <div class="p-grid">
 		                    <ui:repeat value="#{bean.goodsServicesFields}" var="key" >
 			                    <div class="p-col-2">
@@ -502,7 +502,7 @@
 			                    <hr style="width:100%; margin-top: 15px; margin-bottom: 15px;"/>
 		                    </ui:repeat>
 	                    </div>
-                    </p:outputPanel>
+                    </p:panel>
                     <div class="p-col-12">
 						<p:commandButton value="#{msg.addGoodService}" icon="fa fa-plus" style="width:190px;" action="#{bean.createNewGoodsServicesFields}"
 								styleClass="ui-button-success p-mr-2 p-mb-2" update="goodsServicesPanel"/>
@@ -513,7 +513,7 @@
                 <hr/>
 
                 <div class="p-grid" style="margin-right:20px;">
-	                <p:outputPanel id="countsSummaryPanel" style="width: 100%;">
+	                <p:panel id="countsSummaryPanel" style="width: 100%;" widgetVar="countsSummaryPanelVW">
 		                <div class="p-grid">
 		                    <div class="p-col-8" ></div>
 		                    <div class="p-col-2 vertical-center" style="padding-left:4%;">
@@ -577,21 +577,31 @@
 		                        <h:outputText value="#{msg.updateTheCounts}"></h:outputText>
 		                    </div>
 		                </div>
-					</p:outputPanel>
+					</p:panel>
 				</div>
                 <hr/>
 
                 <div class="p-grid" style="margin-right:20px;">
-                    <div class="p-col-8">
-                    	<p:commandButton value="#{msg.downloadInvoice}" >
-        				</p:commandButton>
-                    </div>
-                    <div class="p-col-4" style="text-align:right;">
-                        <p:commandButton value="#{msg.cancel.toUpperCase()}" oncomplete="PF('invoiceDialogBillingWV').hide()"/>
-                        <p:commandButton value="#{msg.saveInDraft}" styleClass="ui-button-success p-mr-2 p-mb-2" style="margin-left:5px;"
-                        				action="#{bean.saveInvoiceInDraft}" update="mainPanel goodsServicesPanel countsSummaryPanel"/>
-                        <p:commandButton value="#{msg.confirm}" styleClass="ui-button-success p-mr-2 p-mb-2" oncomplete="PF('invoiceConfirmWV').show();"></p:commandButton>
-                    </div>
+                    <p:panel widgetVar="buttonsPanelWV" style="width: 100%;">
+		                <div class="p-grid">
+		                    <div class="p-col-8">
+		                    	<p:commandButton value="#{msg.downloadInvoice}" >
+		        				</p:commandButton>
+		                    </div>
+		                    <div class="p-col-4" style="text-align:right;">
+		                        <p:commandButton value="#{msg.cancel.toUpperCase()}" oncomplete="PF('invoiceDialogBillingWV').hide()" 
+		                        				rendered="#{!bean.invoiceSentStatus}"/>
+		                        <p:commandButton value="#{msg.saveInDraft}" styleClass="ui-button-success p-mr-2 p-mb-2" style="margin-left:5px;"
+		                        				action="#{bean.saveInvoiceInDraft}" update="mainPanel goodsServicesPanel countsSummaryPanel"
+		                        				rendered="#{!bean.invoiceSentStatus}"/>
+		                        <p:commandButton value="#{msg.confirm}" styleClass="ui-button-success p-mr-2 p-mb-2" 
+		                        				action="#{bean.confirmInvoice}" update="mainPanel goodsServicesPanel countsSummaryPanel" 
+		                        				rendered="#{!bean.invoiceSentStatus}" />
+		                        <p:commandButton value="#{msg.close}" oncomplete="PF('invoiceDialogBillingWV').hide()"
+		                        				rendered="#{bean.invoiceSentStatus}"/>
+		                    </div>
+		               	</div>
+		          	</p:panel>
                 </div>
             </p:tab>
                 
@@ -844,7 +854,6 @@
         <p:commandButton oncomplete="PF('invoiceErrorDialogWV').hide();"
                          value="#{msg.close}" />
     </p:dialog>
-    
     <p:dialog widgetVar="invoiceConfirmWV"  modal="true" draggable="false" header="#{msg.invoiceDelivery}"
               position="center center" width="500">
         <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
@@ -856,8 +865,10 @@
                              oncomplete="PF('invoiceConfirmWV').hide();"/>
             <p:commandButton value="#{msg.delivery}" styleClass="ui-button-success p-mr-2 p-mb-2"
                              action="#{bean.sendInvoice}" style="margin-left: 10px;"  
+                             update="@widgetVar(buttonsPanelWV) @widgetVar(countsSummaryPanelVW) @widgetVar(goodsServicesPanelVW) @widgetVar(mainPanelVW)" 
                              oncomplete="PF('invoiceConfirmWV').hide();"/>
         </div>
     </p:dialog>
+    
 
 </ui:composition>
