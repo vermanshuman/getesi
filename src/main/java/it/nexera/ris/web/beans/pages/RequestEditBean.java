@@ -191,8 +191,6 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private boolean hasAgencyOfficeList;
 
-    private Long selectedAgencyOfficeId;
-
     private List<SelectItem> notaryList;
 
     private Long selectedNotaryId;
@@ -259,7 +257,11 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private final String MULTIPLE_REQUEST = "RICHESTE_MULTIPLE";
 
+    private List<String> mutipleRequestFirstObjTabPath;
+
     private List<String> mutipleRequestObjTabPath;
+
+    private List<String> mutipleRequestNDGPath;
 
     private Map<Long , Request>  multiRequestMap;
 
@@ -277,6 +279,16 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private Boolean urgent;
 
+    private Integer requestType;
+
+    private Long selectedOfficeId;
+
+    private List<SelectItem> officeList;
+
+    private Long selectedFiduciaryId;
+
+    private List<SelectItem> fiduciaryList;
+
     @Getter
     @Setter
     private Boolean showConfirmButton;
@@ -293,12 +305,9 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     @Setter
     private Map<Long, List<SelectItem>> subjectListServices;
 
-
     @Getter
     @Setter
     private List<Document> requestDocuments;
-
-    private Integer requestType;
 
     @Override
     protected void preLoad() throws PersistenceBeanException {
@@ -396,10 +405,21 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
             InstantiationException, IllegalAccessException {
+        setOfficeList(ComboboxHelper.fillList(Office.class, Order.asc("description")));
+        setFiduciaryList(ComboboxHelper.fillList(ClientView.class, Order.asc("name"), new Criterion[]{
+                Restrictions.and(Restrictions.eq("fiduciary", Boolean.TRUE),
+                        Restrictions.isNotNull("fiduciary"))
+        }));
+
         if(getEntity().isNew())
             setEditRequest(false);
-        else
+        else{
             setEditRequest(true);
+            if(!ValidationHelper.isNullOrEmpty(getEntity().getRequestType())){
+                setRequestType(getEntity().getRequestType().getId().intValue());
+            }
+        }
+
         boolean dataFromEmail = false;
         setClientSelectItemWrapperConverter(new SelectItemWrapperConverter<>(Client.class));
         if (!ValidationHelper.isNullOrEmpty(getMail())) {
@@ -427,13 +447,15 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         validateRequestCreationType();
         if (isMultipleCreate()) {
             if(isMultipleRequestCreate()){
+                setMutipleRequestFirstObjTabPath(new ArrayList<>());
+                getMutipleRequestFirstObjTabPath().add(ManageTypeFields.POSITION_PRACTICE.getPath());
+                getMutipleRequestFirstObjTabPath().add(ManageTypeFields.NOTE.getPath());
+                getMutipleRequestFirstObjTabPath().add(ManageTypeFields.URGENT.getPath());
+                setMutipleRequestNDGPath(new ArrayList<>());
+                getMutipleRequestNDGPath().add(ManageTypeFields.NDG.getPath());
                 setMutipleRequestObjTabPath(new ArrayList<>());
                 //mutipleRequestObjTabPath = new ArrayList<>();
                 getMutipleRequestObjTabPath().add(ManageTypeFields.CDR.getPath());
-                getMutipleRequestObjTabPath().add(ManageTypeFields.NDG.getPath());
-                getMutipleRequestObjTabPath().add(ManageTypeFields.POSITION_PRACTICE.getPath());
-                getMutipleRequestObjTabPath().add(ManageTypeFields.URGENT.getPath());
-
             }
             setMultipleTabPath("requestComponents/SUBJECT_MASTERY.xhtml");
         } else {
@@ -503,7 +525,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
         onClientChange(dataFromEmail);
         setSelectedAgencyId(getEntity().getAgency() != null ? getEntity().getAgency().getId() : null);
-        setSelectedAgencyOfficeId(getEntity().getOffice() != null ? getEntity().getOffice().getId() : null);
+        setSelectedOfficeId(getEntity().getOffice() != null ? getEntity().getOffice().getId() : null);
+        setSelectedFiduciaryId(getEntity().getClientFiduciary() != null ? getEntity().getClientFiduciary().getId() : null);
 
         if (!dataFromEmail) {
             setSelectedBillingClientId(getEntity().getBillingClient() != null ? getEntity().getBillingClient().getId() : null);
@@ -594,6 +617,9 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             }
         }
         openRequestSubjectDialog();
+        if(ValidationHelper.isNullOrEmpty(this.getEntity().getUser())) {
+            this.getEntity().setUser(DaoManager.get(User.class, getCurrentUser().getId()));
+        }
     }
 
     private void fillRequestEnumTypes() {
@@ -1501,10 +1527,16 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             } else {
                 getEntity().setAgency(null);
             }
-            if (!ValidationHelper.isNullOrEmpty(getSelectedAgencyOfficeId())) {
-                getEntity().setOffice(DaoManager.get(Office.class, getSelectedAgencyOfficeId()));
+            if (!ValidationHelper.isNullOrEmpty(getSelectedOfficeId())) {
+                getEntity().setOffice(DaoManager.get(Office.class, getSelectedOfficeId()));
             } else {
                 getEntity().setOffice(null);
+            }
+
+            if (!ValidationHelper.isNullOrEmpty(getSelectedFiduciaryId())) {
+                getEntity().setClientFiduciary(DaoManager.get(Client.class, getSelectedFiduciaryId()));
+            } else {
+                getEntity().setClientFiduciary(null);
             }
 
             if (getSubject() != null) {
@@ -2428,6 +2460,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         onMultipleServiceChange();
         if(isMultipleRequestCreate() && !ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
             setShowConfirmButton(Boolean.TRUE);
+            generateDynamicContent(true);
         }else {
             setShowConfirmButton(Boolean.FALSE);
             setShownFields(null);
@@ -2770,14 +2803,6 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void setHasAgencyOfficeList(boolean hasAgencyOfficeList) {
         this.hasAgencyOfficeList = hasAgencyOfficeList;
-    }
-
-    public Long getSelectedAgencyOfficeId() {
-        return selectedAgencyOfficeId;
-    }
-
-    public void setSelectedAgencyOfficeId(Long selectedAgencyOfficeId) {
-        this.selectedAgencyOfficeId = selectedAgencyOfficeId;
     }
 
     public Subject getSubject() {
@@ -3281,5 +3306,53 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void setRequestType(Integer requestType) {
         this.requestType = requestType;
+    }
+
+    public Long getSelectedOfficeId() {
+        return selectedOfficeId;
+    }
+
+    public void setSelectedOfficeId(Long selectedOfficeId) {
+        this.selectedOfficeId = selectedOfficeId;
+    }
+
+    public List<SelectItem> getOfficeList() {
+        return officeList;
+    }
+
+    public void setOfficeList(List<SelectItem> officeList) {
+        this.officeList = officeList;
+    }
+
+    public List<String> getMutipleRequestFirstObjTabPath() {
+        return mutipleRequestFirstObjTabPath;
+    }
+
+    public void setMutipleRequestFirstObjTabPath(List<String> mutipleRequestFirstObjTabPath) {
+        this.mutipleRequestFirstObjTabPath = mutipleRequestFirstObjTabPath;
+    }
+
+    public List<String> getMutipleRequestNDGPath() {
+        return mutipleRequestNDGPath;
+    }
+
+    public void setMutipleRequestNDGPath(List<String> mutipleRequestNDGPath) {
+        this.mutipleRequestNDGPath = mutipleRequestNDGPath;
+    }
+
+    public Long getSelectedFiduciaryId() {
+        return selectedFiduciaryId;
+    }
+
+    public void setSelectedFiduciaryId(Long selectedFiduciaryId) {
+        this.selectedFiduciaryId = selectedFiduciaryId;
+    }
+
+    public List<SelectItem> getFiduciaryList() {
+        return fiduciaryList;
+    }
+
+    public void setFiduciaryList(List<SelectItem> fiduciaryList) {
+        this.fiduciaryList = fiduciaryList;
     }
 }

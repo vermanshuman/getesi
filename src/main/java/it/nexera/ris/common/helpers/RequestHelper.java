@@ -337,7 +337,8 @@ public class RequestHelper {
                                 (field.getField() == ManageTypeFields.SUBJECT_MASTERY)
                                 || (isMultiple && (field.getField()==ManageTypeFields.CDR
                                 || field.getField()== ManageTypeFields.NDG
-                                || field.getField()== ManageTypeFields.POSITION_PRACTICE))){
+                                || field.getField()== ManageTypeFields.POSITION_PRACTICE
+                                || field.getField()== ManageTypeFields.NOTE))){
                             continue;
                         }
 

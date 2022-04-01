@@ -160,6 +160,8 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     private Integer pageNumber;
 
+    private Integer requestType;
+
     @Getter
     @Setter
     private ListPaginator paginator;
@@ -1696,7 +1698,13 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public void createNewMultipleRequests() {
-        String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE";
+        executeJS("PF('chooseSingleOrMultipleRequestCreateWV').show();");
+//        String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE";
+//        RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT, queryParam);
+    }
+
+    public void redirectToNewMultipleRequests() {
+        String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE&" +RedirectHelper.REQUEST_TYPE_PARAM + "=" + getRequestType();
         RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT, queryParam);
     }
 
@@ -1714,5 +1722,13 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     public void setPageNumber(Integer pageNumber) {
         this.pageNumber = pageNumber;
+    }
+
+    public Integer getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(Integer requestType) {
+        this.requestType = requestType;
     }
 }

@@ -443,7 +443,7 @@ public class RedirectHelper extends BaseHelper {
             sendRedirect(PageTypes.REQUEST_EDIT.getPagesContext() + "?"
                     + ID_PARAMETER + "=" + requestId + "&"
                     + (needArchive ? ARCHIVE_MAIL : MAIL) + "=" + id + "&"
-                    + REQUEST_TYPE_PARAM + "=" + requestType + "&"
+                    + REQUEST_TYPE_PARAM + "=" + requestType
                     + (isMultipleCreate ? "&" + MULTIPLE + "=true" : "") + "&"+ RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE");
         } catch (Exception e) {
             LogHelper.log(log, e);

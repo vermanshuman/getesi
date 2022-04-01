@@ -532,10 +532,10 @@ public class CostCalculationHelper {
 
         List<Double> numberOfGroupedEstateFormality = getRequest().getSumOfGroupedEstateFormalities();
         Integer numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
-        if (!ValidationHelper.isNullOrEmpty(getRequest().getNumberActUpdate())) {
-            numberOfGroupedEstateFormality = Collections.singletonList(getRequest().getNumberActUpdate());
-            numberOfGroupsByDocumentOfEstateFormality = getRequest().getNumberOfGroupsByDocumentOfEstateFormality();
-        }
+//        if (!ValidationHelper.isNullOrEmpty(getRequest().getNumberActUpdate())) {
+//            numberOfGroupedEstateFormality = Collections.singletonList(getRequest().getNumberActUpdate());
+//            numberOfGroupsByDocumentOfEstateFormality = getRequest().getNumberOfGroupsByDocumentOfEstateFormality();
+//        }
         boolean isPriceList = Boolean.FALSE;
         if(!ValidationHelper.isNullOrEmpty(getRequest().getService())) {
             List<PriceList> priceList = loadPriceList(billingClient, restrictionForPriceList, getRequest().getService());  
