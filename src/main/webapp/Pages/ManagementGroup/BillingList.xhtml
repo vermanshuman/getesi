@@ -28,7 +28,7 @@
                 color: inherit;
                 text-decoration: none;
                 margin: 0 -4px;
-                width: 210px;
+                width: 267px;
                 font-family: "Open Sans","Helvetica Neue",sans-serif !important;
                 font-size: 18px;
             }
@@ -586,31 +586,41 @@
             #subjectSettingPanel_content {
                 display: block !important;
             }
+            .jqplot-table-legend {
+                display: none;
+            }
+            #client_items {
+                width: 305px !important;
+            }
+
+            #filterClient_items {
+                width: 305px !important;
+            }
         </style>
         <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
         <link rel="stylesheet"
               href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
         <div style="margin-left: 20px;">
             <nav class="left" style="margin-left:20px;">
-                <a href="#" id="tab1" class="tab selected">#{msg.billingListDashboard}</a>
-                <a href="#" id="tab2" class="tab">#{msg.billingListInvoices}</a>
-                <a href="#" id="tab3" class="tab">#{msg.billingListCreditNotes}</a>
-                <a href="#" id="tab4" class="tab">#{msg.billingListSubjectsToBeInvoiced}</a>
+                <a href="#" id="tab1" class="tab selected">#{ff:upper(msg.billingListDashboard)}</a>
+                <a href="#" id="tab2" class="tab">#{ff:upper(msg.billingListInvoices)}</a>
+                <a href="#" id="tab3" class="tab">#{ff:upper(msg.billingListCreditNotes)}</a>
+                <a href="#" id="tab4" class="tab">#{ff:upper(msg.billingListSubjectsToBeInvoiced)}</a>
             </nav>
 
             <main>
                 <div id="content_tab1" class="hide">
                     <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" cellpadding="3" cellspacing="0"
-                                 columnClasses="ui-grid-col-4,ui-grid-col-5,ui-grid-col-2,ui-grid-col-1" layout="grid">
+                                 columnClasses="ui-grid-col-4,ui-grid-col-4,ui-grid-col-3,ui-grid-col-1" layout="grid">
                         <p:commandButton value="#{ff:upper(msg.billingListUpdate)}"/>
 
                         <p:outputLabel></p:outputLabel>
 
-                        <p:selectOneMenu id="client" value="#{bean.selectedClientId}" style="width: 250px;"
+                        <p:selectOneMenu id="client" value="#{bean.selectedClientId}" style="width: 325px; float:right;"
                                          styleClass="#{bean.selectedClientId ne null ? 'select-one-menu' : ''}">
                             <f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}" itemValue="#{null}"
                                           noSelectionOption="true"/>
-                            <f:selectItems value="#{bean.clients}"/>
+                            <f:selectItems value="#{bean.clients}" />
                             <p:ajax event="itemSelect" update="@this"/>
                         </p:selectOneMenu>
 
@@ -847,7 +857,7 @@
                                           style="margin-top: -217px !important;margin-left: calc(51% - 11px);max-height: 437px;position: absolute;width: calc(50% + 5px);">
                                 <div class="p-col-12" style="max-height: 437px;">
                                     <div class="card" style="max-height: 437px;">
-                                        <p:chart type="bar" model="#{bean.model}" style="height: 437px;"/>
+                                        <p:chart type="bar" model="#{bean.model}"  style="height: 437px;"/>
                                     </div>
                                 </div>
                             </h:panelGroup>
@@ -1005,8 +1015,7 @@
                                                              value="#{bean.filterInvoiceNumber}"
                                                              placeholder="#{msg.billingListNumber}"/>
                                             </div>
-                                            <p:selectOneMenu id="filterClient" value="#{bean.selectedCompanyId}"
-                                                             style="margin-right: 20px;"
+                                            <p:selectOneMenu id="filterClient" value="#{bean.selectedCompanyId}" style="width: 325px; margin-right: 20px;"
                                                              styleClass="#{bean.selectedCompanyId ne null ? 'select-one-menu' : ''}">
                                                 <f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}"
                                                               itemValue="#{null}" noSelectionOption="true"/>
@@ -1250,7 +1259,7 @@
                 if (!target.parents('#subjectSettingButton').length && !target.parents('#subjectSettingPanel').length && !target.parents('#client_panel').length
                     && !target.parents('#requestTypeSelectCheckboxPanel').length && !target.parents('#manager_panel').length && !target.parents('#office_panel').length
                     && !target.parents('#stateSelectCheckboxPanel').length && !target.parents('#serviceSelectCheckboxPanel').length && !target.parents('#fiduciario_panel').length) {
-                    PF('subjectPanelSetting').getJQ().hide();
+                  PF('subjectPanelSetting').getJQ().hide();
                 }
                 if(target.closest('#statuses').length || target.closest('#stateSelectCheckboxPanelDataTable').length) {
                     $("#statuses").addClass("border_class");

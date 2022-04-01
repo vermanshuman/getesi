@@ -47,6 +47,8 @@ public class ContactListBean extends EntityLazyListPageBean<ClientShort> impleme
 
     private static final String ONLY_VIEW_CLIENT = "ONLY_VIEW_CLIENT";
 
+    private String searchHeader;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException, IOException {
         setShowSearch(Boolean.FALSE);
@@ -58,6 +60,7 @@ public class ContactListBean extends EntityLazyListPageBean<ClientShort> impleme
         loadClientTabOnSearch();
         loadManagersTabOnSearch();
         loadTrusteesTabOnSearch();
+        setSearchHeader("\"" + getNameOfTheCompany() + "\"");
 
     }
 

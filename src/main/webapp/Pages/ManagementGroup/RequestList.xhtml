@@ -1329,6 +1329,23 @@
             </div>
         </p:dialog>
 
+
+        <p:dialog id="chooseSingleOrMultipleRequestCreate" widgetVar="chooseSingleOrMultipleRequestCreateWV" modal="true" >
+            <h3>#{msg.mailManagerViewSingleOrMultipleRequest}:</h3>
+            <p:outputPanel style="justify-content: center; display: flex">
+                <p:selectOneRadio value="#{bean.requestType}" unselectable="false">
+                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestBySubject}" itemValue="0"/>
+                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestForBuilding}" itemValue="1"/>
+                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestForLand}" itemValue="2"/>
+                </p:selectOneRadio>
+            </p:outputPanel>
+            <br/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" update="@form" styleClass="confirm-button"
+                                 action="#{bean.redirectToNewMultipleRequests()}" oncomplete="PF('chooseSingleOrMultiplerequestCreateWV').hide();"/>
+            </div>
+        </p:dialog>
+
         <ui:include src="../Dialogs/TotalCostDocumentDialog.xhtml"/>
     </ui:define>
 </ui:composition>

@@ -398,7 +398,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         m1.set("Nov", 90);
         m1.set("Dec", 100);
         model.addSeries(m1);
-        model.setTitle("Accumulation of sales per quarter");
+        model.setTitle("Indice di redditività");
         model.setLegendPosition("ne");
         model.setSeriesColors("DDDDDD60");
         model.setShadow(false);
@@ -406,9 +406,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         Axis xAxis = model.getAxis(AxisType.X);
         xAxis.setLabel("");
         Axis yAxis = model.getAxis(AxisType.Y);
-        yAxis.setLabel("Sales");
+     //   yAxis.setLabel("Sales");
         yAxis.setMin(0);
-        yAxis.setMax(200);
+        yAxis.setMax(160);
         yAxis.setTickInterval("20.000");
         yAxis.setTickFormat("%'.3f");
     }
