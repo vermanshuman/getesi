@@ -262,6 +262,22 @@
             #newRequestList_content .ui-panelgrid-cell.ui-grid-col-12 {
                 padding: 1rem 0px;
             }
+            .h35.ui-selectcheckboxmenu-multiple .ui-selectcheckboxmenu-multiple-container {
+                height: 35px !important;
+            }
+            .h38 {
+                height: 38px;
+            }
+            .h38 .ui-selectonemenu-label {
+                padding: 0.6rem 0.5rem !important;
+            }
+            .ih36 .ui-inputfield.ui-inputtext{
+                height: 36px;
+                width: 100% !important;
+            }
+            .select-width, .ih36 {
+                margin-bottom: 20px;
+            }
         </style>
 
         <script>
@@ -312,7 +328,7 @@
                 <p:column>
                     <span> #{msg.requestClient}<span class="red">*</span>:</span><br/>
                     <p:selectOneMenu id="client" value="#{bean.selectedClientId}"
-                                     label="#{msg.requestClient}" styleClass="select-width" style="height: 37px;">
+                                     label="#{msg.requestClient}" styleClass="select-width h38">
                         <p:ajax listener="#{bean.onClientChange(false)}"
                                 update="invoicesRecipient, branchPanel, officePanel, gestore"/>
                         <f:selectItems value="#{bean.clients}"/>
@@ -331,14 +347,14 @@
                     </p:selectOneMenu>
                     <br/>
                     <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
-                        <div class="#{(objItem.contains('NOTE') or objItem.contains('POSITION_PRACTICE')) ? 'ui-g-12' :'ui-g-6'}" style="padding: 1%">
+                        <div class="#{(objItem.contains('NOTE') or objItem.contains('POSITION_PRACTICE')) ? 'ui-g-12' :'ui-g-6'} ih36" style="padding: 0">
                             <ui:include src="#{objItem}"/>
                         </div>
                     </c:forEach>
                 </p:column>
                 <p:column>
                     <span>#{msg.requestInvoicesRecipient}:</span><br/>
-                    <p:selectOneMenu id="invoicesRecipient" styleClass="select-width"
+                    <p:selectOneMenu id="invoicesRecipient" styleClass="select-width h38"
                                      value="#{bean.selectedBillingClientId}"
                                      label="#{msg.requestInvoicesRecipient}">
                         <f:selectItems value="#{bean.billingClients}"/>
@@ -348,7 +364,7 @@
 
                     <span>#{msg.clientManager}</span>
                     <p:selectCheckboxMenu id="gestore" value="#{bean.fiduciaryClientsSelected}"
-                                          styleClass="select-width" style="height: 37px;"
+                                          styleClass="select-width h35"
                                           label="#{enums.documentGenerationTagsMANAGER}"
                                           converter="#{bean.clientSelectItemWrapperConverter}"
                                           multiple="true" filter="true" filterMatchMode="startsWith" >
@@ -357,7 +373,7 @@
                         <p:ajax process="gestore"/>
                     </p:selectCheckboxMenu>
                     <c:forEach items="#{bean.mutipleRequestNDGPath}" var="objItem">
-                        <div style="padding: 1%">
+                        <div class="ih36" style="padding: 0">
                             <ui:include src="#{objItem}"/>
                         </div>
                     </c:forEach>
@@ -375,31 +391,31 @@
                 <p:column rendered="#{!bean.multipleRequestCreate}">
                     <span> #{msg.requestService}<span class="red">*</span>:</span><br/>
                     <p:selectOneMenu value="#{bean.selectedServiceId}" rendered="#{!bean.multipleCreate}"
-                                     label="#{msg.requestService}" styleClass="select-width" id="service">
+                                     label="#{msg.requestService}" styleClass="select-width h38" id="service">
                         <p:ajax listener="#{bean.onServiceChange}" update="form"/>
                         <f:selectItems value="#{bean.services}"/>
                     </p:selectOneMenu>
                     <p:selectCheckboxMenu value="#{bean.selectedServiceIds}" id="multipleService"
                                           rendered="#{bean.multipleCreate}" label="#{msg.requestService}"
-                                          styleClass="select-width">
+                                          styleClass="select-width h38">
                         <f:selectItems value="#{bean.services}"/>
                     </p:selectCheckboxMenu>
                 </p:column>
                 <p:column rendered="#{bean.multipleRequestCreate}">
                     <span> #{msg.requestNotary}</span><br/>
-                    <p:selectOneMenu id="requestNotary" styleClass="select-width"
+                    <p:selectOneMenu id="requestNotary" styleClass="select-width h38"
                                      value="#{bean.selectedNotaryId}"
                                      label="#{msg.requestNotary}">
                         <f:selectItems value="#{bean.notaryList}"/>
                     </p:selectOneMenu>
                     <span> #{msg.clientTypeTrust}</span><br/>
-                    <p:selectOneMenu id="clientTypeTrust" styleClass="select-width"
+                    <p:selectOneMenu id="clientTypeTrust" styleClass="select-width h38"
                                      value="#{bean.selectedFiduciaryId}"
                                      label="#{msg.clientTypeTrust}">
                         <f:selectItems value="#{bean.fiduciaryList}"/>
                     </p:selectOneMenu>
                     <c:forEach items="#{bean.mutipleRequestObjTabPath}" var="objItem">
-                        <div class="ui-g-12" style="padding: 1%">
+                        <div class="ui-g-12 ih36" style="padding: 0">
                             <ui:include src="#{objItem}"/>
                         </div>
                     </c:forEach>
