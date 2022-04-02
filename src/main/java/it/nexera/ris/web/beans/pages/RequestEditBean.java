@@ -309,9 +309,14 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     @Setter
     private List<Document> requestDocuments;
 
+    @Getter
+    @Setter
+    private Boolean requestTypeMultiple;
+
     @Override
     protected void preLoad() throws PersistenceBeanException {
         setMultiRequestMap(new HashMap());
+        setRequestTypeMultiple(Boolean.FALSE);
         setYearRange("1930:" + (DateTimeHelper.getYearOfNow()+ 10));
         setRequestType(-1);
         if (!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.MULTIPLE)) &&
@@ -547,11 +552,18 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
         onRequestTypeChange();
 
-        setSelectedServiceId(getEntity().getService() != null ? getEntity().getService().getId() : null);
-
-        List<Long> serviceIdsList = getEntity().getMultipleServices() != null
-                ? getEntity().getMultipleServices().stream()
-                .map(Service::getId).collect(Collectors.toList()) : null;
+        List<Long> serviceIdsList = null;
+        if(!ValidationHelper.isNullOrEmpty(getEntity().getRequestType())
+                && !ValidationHelper.isNullOrEmpty(getEntity().getRequestType().getMultiselectionOperation()) &&
+            getEntity().getRequestType().getMultiselectionOperation()){
+            serviceIdsList = getEntity().getMultipleServices() != null
+                    ? getEntity().getMultipleServices().stream()
+                    .map(Service::getId).collect(Collectors.toList()) : null;
+        }else {
+            setSelectedServiceId(getEntity().getService() != null ? getEntity().getService().getId() : null);
+            serviceIdsList = new ArrayList<>();
+            serviceIdsList.add(getSelectedServiceId());
+        }
 
         if(serviceIdsList != null && !serviceIdsList.isEmpty()) {
             setSelectedServiceIds(serviceIdsList.toArray(new Long[serviceIdsList.size()]));
@@ -562,14 +574,13 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             setSelectedServiceIds(new Long[1]);
         }
 
+//        if(isMultipleRequestCreate()
+//                && ValidationHelper.isNullOrEmpty(getEntity().getMultipleServices()) &&
+//                !ValidationHelper.isNullOrEmpty(getEntity().getService())){
+//            Long [] serviceId = {getEntity().getService().getId()};
+//            setSelectedServiceIds(serviceId);
+//        }
 
-
-        if(isMultipleRequestCreate()
-                && ValidationHelper.isNullOrEmpty(getEntity().getMultipleServices()) &&
-                !ValidationHelper.isNullOrEmpty(getEntity().getService())){
-            Long [] serviceId = {getEntity().getService().getId()};
-            setSelectedServiceIds(serviceId);
-        }
         onServiceChange();
         fillRequestEnumTypes();
 
@@ -947,7 +958,10 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void onMultipleServiceChange() throws PersistenceBeanException, IllegalAccessException {
         if(!ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
-            setInputCardList(RequestHelper.onMultipleServiceChange(Arrays.asList(getSelectedServiceIds()),isMultipleRequestCreate()));
+            setInputCardList(RequestHelper.onMultipleServiceChange(Arrays.asList(getSelectedServiceIds()), isMultipleRequestCreate()));
+        }else if(!ValidationHelper.isNullOrEmpty(getSelectedServiceId())){
+            setInputCardList(RequestHelper.onMultipleServiceChange(Stream.of(getSelectedServiceId()).collect(Collectors.toList()),
+                    isMultipleRequestCreate()));
         }
 //        if(isMultipleRequestCreate()){
 //            generateTab();
@@ -1377,6 +1391,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if (isMultipleCreate() && !isMultipleRequestCreate() && ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
             addRequiredFieldException("form:multipleService");
         }
+
         return !getValidationFailed();
     }
 
@@ -1402,10 +1417,26 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             if (isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedRequestTypesIdMultiple())) {
                 addRequiredFieldException("form:servicerequestType");
             }
-
-            if (isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
-                addRequiredFieldException("form:multipleServiceRequest");
+            if(!ValidationHelper.isNullOrEmpty(getSelectedRequestTypesIdMultiple())){
+                try {
+                    if(!ValidationHelper.isNullOrEmpty(getRequestTypeMultiple())
+                            && getRequestTypeMultiple()){
+                        if (isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
+                            addRequiredFieldException("form:multipleServiceRequest");
+                        }
+                    }else {
+                        if (isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedServiceId())) {
+                            addRequiredFieldException("form:singleServiceRequest");
+                        }
+                    }
+                } catch (Exception e) {
+                    LogHelper.log(log, e);
+                }
             }
+
+//            if (isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
+//                addRequiredFieldException("form:multipleServiceRequest");
+//            }
         }
     }
 
@@ -1516,8 +1547,6 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                         getEntity().setMultipleServices(serviceList);
                     }
                 }
-
-
             } else {
                 if(!ValidationHelper.isNullOrEmpty(getSelectedServiceId()))
                     getEntity().setService(DaoManager.get(Service.class, getSelectedServiceId()));
@@ -2435,12 +2464,20 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }
     }
 
-    public void onRequestTypeChangeBlock() throws IllegalAccessException, PersistenceBeanException {
+    public void onRequestTypeChangeBlock() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
         setShownFields(null);
         setShowConfirmButton(Boolean.FALSE);
         if(!ValidationHelper.isNullOrEmpty(getSelectedRequestTypesIdMultiple())){
+          //  RequestType requestType = DaoManager.get(RequestType.class, getSelectedRequestTypesIdMultiple());
+            if(!ValidationHelper.isNullOrEmpty(getRequestTypeMultiple())
+                    && getRequestTypeMultiple()) {
+                setRequestTypeMultiple(Boolean.TRUE);
+            }else {
+                setRequestTypeMultiple(Boolean.FALSE);
+            }
             setShowAddServiceButton(Boolean.TRUE);
         }else {
+            setRequestTypeMultiple(Boolean.FALSE);
             setShowAddServiceButton(Boolean.FALSE);
         }
         RequestContext.getCurrentInstance().execute("jQuery('.layout-mask')[0].style.display = 'block';");
@@ -2458,7 +2495,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void onMultipleServiceChanges() throws IllegalAccessException, PersistenceBeanException {
         onMultipleServiceChange();
-        if(isMultipleRequestCreate() && !ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
+        if(isMultipleRequestCreate() && (!ValidationHelper.isNullOrEmpty(getSelectedServiceIds()) ||
+                !ValidationHelper.isNullOrEmpty(getSelectedServiceId()))){
             setShowConfirmButton(Boolean.TRUE);
             generateDynamicContent(true);
         }else {
@@ -2470,7 +2508,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     public void generateDynamicContent(Boolean showLoader) throws PersistenceBeanException, IllegalAccessException {
         if(showLoader)
             RequestContext.getCurrentInstance().execute("jQuery('.layout-mask')[0].style.display = 'block';");
-        if(isMultipleRequestCreate() && !ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
+        if(isMultipleRequestCreate() && (!ValidationHelper.isNullOrEmpty(getSelectedServiceIds()) ||
+                !ValidationHelper.isNullOrEmpty(getSelectedServiceId()))){
             generateTab();
         }
         if(showLoader)
