@@ -2468,7 +2468,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         setShownFields(null);
         setShowConfirmButton(Boolean.FALSE);
         if(!ValidationHelper.isNullOrEmpty(getSelectedRequestTypesIdMultiple())){
-          //  RequestType requestType = DaoManager.get(RequestType.class, getSelectedRequestTypesIdMultiple());
+            RequestType requestType = DaoManager.get(RequestType.class, getSelectedRequestTypesIdMultiple());
             if(!ValidationHelper.isNullOrEmpty(getRequestTypeMultiple())
                     && getRequestTypeMultiple()) {
                 setRequestTypeMultiple(Boolean.TRUE);
