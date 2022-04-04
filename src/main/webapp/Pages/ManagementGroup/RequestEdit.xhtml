@@ -458,6 +458,7 @@
                                              label="#{msg.requestRequestType}" styleClass="select-width" style="min-height: 37px;">
                                 <p:ajax delay="2000" event="change" listener="#{bean.onMultipleServiceChanges()}"
                                         update="form @this" />
+                                <f:selectItem itemValue="" itemLabel="- Non selezionato -" />
                                 <f:selectItems value="#{bean.services}"/>
                             </p:selectOneMenu>
 
