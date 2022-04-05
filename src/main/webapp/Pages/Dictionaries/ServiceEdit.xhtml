@@ -95,9 +95,11 @@
                                      id="estimate" disabled="#{bean.onlyView}"/>
 
             <span>#{msg.serviceSalesDevelopment}: </span>
-            <p:selectBooleanCheckbox value="#{bean.entity.salesDevelopment}"
+            <p:selectBooleanCheckbox value="#{bean.salesDevelopment}"
                                      id="salesDevelopment" disabled="#{bean.onlyView}"/>
 
+            <span>#{msg.serviceLandOmiValues}: </span>
+            <p:selectBooleanCheckbox id="serviceLandOmiValues" value="#{bean.landOmi}"  disabled="#{bean.onlyView}"/>
 
             <span>#{msg.serviceUpdate}: </span>
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">

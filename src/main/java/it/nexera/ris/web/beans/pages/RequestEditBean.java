@@ -974,8 +974,6 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                     isMultipleRequestCreate(), true));
         }
 
-        getHiddenInputCardList()
-                .forEach(s -> System.out.println(">>>>>>>>>>>>>>>>>>> " + s.getFields().size()));
 //        if(isMultipleRequestCreate()){
 //            generateTab();
 //        }
@@ -1009,6 +1007,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }
         if (getActiveMenuTabNum() > 0) {
             generateTab();
+            generateHiddenFields();
         } else {
             setShownFields(null);
             setHiddenFields(null);
@@ -1028,11 +1027,13 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if ((isMultipleCreate() && getActiveMenuTabNum() == 2) ) {
             onMultipleServiceChange();
             generateTab();
+            generateHiddenFields();
         }
         else if ((isMultipleRequestCreate() && getActiveMenuTabNum() == 3) ) {
             if(!ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
                 onMultipleServiceChange();
                 generateTab();
+                generateHiddenFields();
             }
         } else if (getInputCardList() != null && (getActiveMenuTabNum() <= getInputCardList().size() || (isMultipleRequestCreate() && getActiveMenuTabNum() == 3) )) {
             generateTab();

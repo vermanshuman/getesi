@@ -151,7 +151,16 @@
 
                                 <ui:fragment
                                         rendered="#{empty displayControlPanel ? true : displayControlPanel}">
-                                    <ui:insert name="back_buttons_panel"></ui:insert>
+                                    <div class="">
+                                        <ui:insert name="buttons_panel"></ui:insert>
+                                        <p:commandButton disabled="#{!bean.canCreate}" id="buttonCreate"
+                                                         icon="ui-icon-circle-plus"
+                                                         styleClass="ui-button-success p-mr-2 p-mb-2 mail-button"
+                                                         value="#{not empty addButtonTitle ? addButtonTitle : msg.newItem}"
+                                                         update=":form"
+                                                         action="#{bean.addEntity}"/>
+                                        <ui:insert name="back_buttons_panel"></ui:insert>
+                                    </div>
                                     <br/>
                                 </ui:fragment>
 
@@ -161,7 +170,7 @@
                             <p:fieldset rendered="#{empty tableInsideField ? false : tableInsideField}" legend="#{msg.viewCreation}" toggleable="true" toggleSpeed="500">
                                 <div class="">
                                     <ui:insert name="buttons_panel"></ui:insert>
-                                    <p:commandButton disabled="#{!bean.canCreate}" id="buttonCreate"
+                                    <p:commandButton disabled="#{!bean.canCreate}" id="buttonCreateTable"
                                                      icon="pi pi-plus-circle"
                                                      style="#{empty renderCss ? '' : renderCss}"
                                                      styleClass="ui-button-success p-mr-2 p-mb-2"
