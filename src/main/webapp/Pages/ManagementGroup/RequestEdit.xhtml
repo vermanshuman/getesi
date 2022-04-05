@@ -294,7 +294,14 @@
                 display: initial;
                 margin-left: 10px;
             }
-
+            body .ui-fieldset .ui-fieldset-legend {
+                background-color: #dee2e6 !important;
+                color: #495057; !important;
+            }
+            fieldset div {
+                font-size: 14px;
+                text-align: left;
+            }
         </style>
 
         <script>
@@ -577,29 +584,31 @@
                 </p:outputPanel>
 
                 <p:outputPanel id="dynamicHiddenPanel">
-                    <c:forEach rendered="#{not empty bean.hiddenFields}" items="#{bean.hiddenFields}" var="item">
-                        <div class="ui-g" style="#{item.getLineEven()?'background-color: #F5F5F5;':''}">
-                            <c:if test="#{item.field != null}">
-                                <div class="ui-g-12" style="padding: 1%; background: transparent">
-                                    <ui:include src="#{item.field.field.getPath()}"/>
-                                </div>
-                            </c:if>
-                            <c:if test="#{(item.fields != null) and item.isAttachedDocumentsBlock()}">
-                                <c:forEach items="#{item.fields}" var="block">
-                                    <div class="ui-g-6" style="padding: 1%">
-                                        <ui:include src="#{block.field.getPath()}"/>
+                    <p:fieldset rendered="#{not empty bean.hiddenFields}" legend="Legend" toggleable="true" toggleSpeed="500">
+                        <c:forEach items="#{bean.hiddenFields}" var="item">
+                            <div class="ui-g" style="#{item.getLineEven()?'background-color: #F5F5F5;':''}">
+                                <c:if test="#{item.field != null}">
+                                    <div class="ui-g-12" style="padding: 1%; background: transparent">
+                                        <ui:include src="#{item.field.field.getPath()}"/>
                                     </div>
-                                </c:forEach>
-                            </c:if >
-                            <c:if test="#{(item.fields != null) and !item.isAttachedDocumentsBlock()}">
-                                <c:forEach items="#{item.fields}" var="block">
-                                    <div class="ui-g-3" style="padding: 1%">
-                                        <ui:include src="#{block.field.getPath()}"/>
-                                    </div>
-                                </c:forEach>
-                            </c:if>
-                        </div>
-                    </c:forEach>
+                                </c:if>
+                                <c:if test="#{(item.fields != null) and item.isAttachedDocumentsBlock()}">
+                                    <c:forEach items="#{item.fields}" var="block">
+                                        <div class="ui-g-6" style="padding: 1%">
+                                            <ui:include src="#{block.field.getPath()}"/>
+                                        </div>
+                                    </c:forEach>
+                                </c:if >
+                                <c:if test="#{(item.fields != null) and !item.isAttachedDocumentsBlock()}">
+                                    <c:forEach items="#{item.fields}" var="block">
+                                        <div class="ui-g-3" style="padding: 1%">
+                                            <ui:include src="#{block.field.getPath()}"/>
+                                        </div>
+                                    </c:forEach>
+                                </c:if>
+                            </div>
+                        </c:forEach>
+                    </p:fieldset>
                 </p:outputPanel>
             </div>
         </ui:fragment>
