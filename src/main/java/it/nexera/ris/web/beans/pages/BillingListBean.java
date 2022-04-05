@@ -265,25 +265,25 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private Long selectedInvoiceClientId;
 
     private Client selectedInvoiceClient;
-    
+
     private String changeVar;
-    
+
     private List<String> sendTo;
-    
+
     private List<String> sendCC;
-    
+
     private List<String> sendFrom;
-    
+
     private String emailTo;
-    
+
     private String emailCC;
-    
+
     private String emailFrom;
-    
+
     private String emailSubject;
-    
+
     private String emailBodyToEditor;
-    
+
     private static final String DELIM = ", ";
 
 
@@ -438,7 +438,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         Axis xAxis = model.getAxis(AxisType.X);
         xAxis.setLabel("");
         Axis yAxis = model.getAxis(AxisType.Y);
-     //   yAxis.setLabel("Sales");
+        //   yAxis.setLabel("Sales");
         yAxis.setMin(0);
         yAxis.setMax(160);
         yAxis.setTickInterval("20.000");
@@ -1408,7 +1408,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             SessionHelper.put("selectedRequestIds", requestIdList);
             SessionHelper.put("selectedRequestClientId", getSelectedSubjectClientId());
         }
-         RedirectHelper.goTo(PageTypes.EXCEL_DATA,null);
+        RedirectHelper.goTo(PageTypes.EXCEL_DATA,null);
     }
 
     public boolean getSelectedAllUsersOnPanel() {
@@ -1454,19 +1454,19 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setFiduciaryClientFilterId(null);
         setAggregationFilterId(null);
     }
-    
+
     public List<String> completeMailFrom(String query) {
         return completeField(query, "email_from");
     }
-    
+
     public List<String> completeDestinations(String query) {
         return completeField(query, "email_to");
     }
-    
+
     public List<String> completeMailCC(String query) {
         return completeField(query, "email_cc");
     }
-    
+
     private List<String> completeField(String query, String field) {
         try {
             List<String> filterList = new ArrayList<>();
@@ -1487,7 +1487,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
         return Collections.emptyList();
     }
-    
+
     public void deleteEmailTo() throws PersistenceBeanException {
         String email = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("param");
         if (!ValidationHelper.isNullOrEmpty(email)) {
@@ -1495,7 +1495,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             getSendTo().remove(getSendTo().size() - 1);
         }
     }
-    
+
     public void deleteEmailCC() throws PersistenceBeanException {
         String email = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("param");
         if (!ValidationHelper.isNullOrEmpty(email)) {
@@ -1503,7 +1503,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             getSendCC().remove(getSendCC().size() - 1);
         }
     }
-    
+
     public void deleteEmailFrom() throws PersistenceBeanException {
         String email = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("param");
         if (!ValidationHelper.isNullOrEmpty(email)) {
@@ -1511,22 +1511,22 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             getSendFrom().remove(getSendFrom().size() - 1);
         }
     }
-    
+
     public void deleteEmail(String email) throws PersistenceBeanException {
         EmailRemove remove = new EmailRemove();
         remove.setEmail(email);
         DaoManager.save(remove, true);
     }
-    
+
     public void updateFrom() {
         if (!ValidationHelper.isNullOrEmpty(getSendCC())) {
             setEmailFrom(getSendFrom().stream()
                     .map(MailHelper::prepareEmailToSend).collect(Collectors.joining(DELIM)));
         } else {
-        	setEmailFrom(null);
+            setEmailFrom(null);
         }
     }
-    
+
     public void updateDestination() {
         if (!ValidationHelper.isNullOrEmpty(getSendTo())) {
             setEmailTo(getSendTo().stream()
@@ -1544,21 +1544,21 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             setEmailCC(null);
         }
     }
-    
+
     public void saveMailInDraft() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
-    	updateFrom();
-    	updateDestination();
-    	updateCC();
-    	
-    	saveMail(MailManagerStatuses.NEW.getId());
+        updateFrom();
+        updateDestination();
+        updateCC();
+
+        saveMail(MailManagerStatuses.NEW.getId());
     }
-    
+
     public WLGInbox saveMail(Long mailManagerStatus) throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException  {
-    	Invoice invoice = DaoManager.get(Invoice.class, getNumber());
-    	WLGInbox inbox = new WLGInbox();
-    	if(!ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
-    		inbox = DaoManager.get(WLGInbox.class, invoice.getEmail().getId());
-    	} 
+        Invoice invoice = DaoManager.get(Invoice.class, getNumber());
+        WLGInbox inbox = new WLGInbox();
+        if(!ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
+            inbox = DaoManager.get(WLGInbox.class, invoice.getEmail().getId());
+        }
         inbox.setEmailFrom(getEmailFrom());
         inbox.setEmailTo(getEmailTo());
         inbox.setEmailCC(getEmailCC());
@@ -1576,46 +1576,46 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         loadDraftEmail();
         return inbox;
     }
-    
-	public void loadDraftEmail() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
-		Invoice invoice = DaoManager.get(Invoice.class, getNumber());
-		if (!ValidationHelper.isNullOrEmpty(invoice) && !ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
-			WLGInbox inbox = DaoManager.get(WLGInbox.class, invoice.getEmail().getId());
-			
-			if (!ValidationHelper.isNullOrEmpty(inbox.getEmailFrom()))
-				setEmailFrom(inbox.getEmailFrom());
-			if (!ValidationHelper.isNullOrEmpty(inbox.getEmailTo()))
-				setEmailTo(inbox.getEmailTo());
-			if (!ValidationHelper.isNullOrEmpty(inbox.getEmailCC()))
-				setEmailCC(inbox.getEmailCC());
-			
-			if (!ValidationHelper.isNullOrEmpty(getEmailFrom())) 
-				setSendFrom(Arrays.asList(getEmailFrom().split(",")));
-			
-			if (!ValidationHelper.isNullOrEmpty(getEmailTo())) 
-				setSendTo(Arrays.asList(getEmailTo().split(",")));
-			
-			if (!ValidationHelper.isNullOrEmpty(getEmailCC()))
-				setSendCC(Arrays.asList(getEmailCC().split(",")));
-			
-			if(!ValidationHelper.isNullOrEmpty(inbox.getEmailBodyHtml()))
-				setEmailBodyToEditor(inbox.getEmailBodyHtml());
-			
-			if(!ValidationHelper.isNullOrEmpty(inbox.getEmailSubject()))
-				setEmailSubject(inbox.getEmailSubject());
-		}
-	}
-	
-	public void sendMail() throws PersistenceBeanException, IllegalAccessException, HibernateException, InstantiationException {
+
+    public void loadDraftEmail() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        Invoice invoice = DaoManager.get(Invoice.class, getNumber());
+        if (!ValidationHelper.isNullOrEmpty(invoice) && !ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
+            WLGInbox inbox = DaoManager.get(WLGInbox.class, invoice.getEmail().getId());
+
+            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailFrom()))
+                setEmailFrom(inbox.getEmailFrom());
+            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailTo()))
+                setEmailTo(inbox.getEmailTo());
+            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailCC()))
+                setEmailCC(inbox.getEmailCC());
+
+            if (!ValidationHelper.isNullOrEmpty(getEmailFrom()))
+                setSendFrom(Arrays.asList(getEmailFrom().split(",")));
+
+            if (!ValidationHelper.isNullOrEmpty(getEmailTo()))
+                setSendTo(Arrays.asList(getEmailTo().split(",")));
+
+            if (!ValidationHelper.isNullOrEmpty(getEmailCC()))
+                setSendCC(Arrays.asList(getEmailCC().split(",")));
+
+            if(!ValidationHelper.isNullOrEmpty(inbox.getEmailBodyHtml()))
+                setEmailBodyToEditor(inbox.getEmailBodyHtml());
+
+            if(!ValidationHelper.isNullOrEmpty(inbox.getEmailSubject()))
+                setEmailSubject(inbox.getEmailSubject());
+        }
+    }
+
+    public void sendMail() throws PersistenceBeanException, IllegalAccessException, HibernateException, InstantiationException {
         cleanValidation();
         if (getValidationFailed()) {
             return;
         }
         updateFrom();
-    	updateDestination();
-    	updateCC();
-    	
-    	WLGInbox wlgInbox = saveMail(MailManagerStatuses.ASSIGNED.getId());
+        updateDestination();
+        updateCC();
+
+        WLGInbox wlgInbox = saveMail(MailManagerStatuses.ASSIGNED.getId());
 
         try {
             MailHelper.sendMail(wlgInbox, null, null);
@@ -1625,12 +1625,10 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             LogHelper.log(log, e);
             executeJS("showNotSendMsg();");
             return;
-        } 
+        }
 
-	}  
-       
-        
-        
-} 
-    
-    
+    }
+
+
+
+}

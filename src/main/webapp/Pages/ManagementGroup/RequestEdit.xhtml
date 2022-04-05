@@ -278,6 +278,23 @@
             .select-width, .ih36 {
                 margin-bottom: 20px;
             }
+            .input-width {
+                width: 100% !important;
+            }
+            .extended-note {
+                width: 45.55%;
+                overflow: visible;
+                position: absolute;
+                margin-top: 70px;
+            }
+            .mt-95 {
+                margin-top: 95px;
+            }
+            #URGENT {
+                display: initial;
+                margin-left: 10px;
+            }
+
         </style>
 
         <script>
@@ -347,9 +364,11 @@
                     </p:selectOneMenu>
                     <br/>
                     <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
-                        <div class="#{(objItem.contains('NOTE') or objItem.contains('POSITION_PRACTICE')) ? 'ui-g-12' :'ui-g-6'} ih36" style="padding: 0">
-                            <ui:include src="#{objItem}"/>
-                        </div>
+                        <c:if test="#{objItem.contains('POSITION_PRACTICE')}">
+                            <div class="ui-g-12 ih36" style="padding: 0">
+                                <ui:include src="#{objItem}"/>
+                            </div>
+                        </c:if>
                     </c:forEach>
                 </p:column>
                 <p:column>
@@ -423,6 +442,20 @@
 
             </p:panelGrid>
 
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" id="initialTab1"
+                         style="margin-top: -30px">
+                <p:column>
+                    <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
+                        <c:if test="#{not (objItem.contains('POSITION_PRACTICE'))}">
+                            <div class="#{objItem.contains('NOTE') ? 'ui-g-12' :'ui-g-6'} ih36" style="padding: 0">
+                                <ui:include src="#{objItem}"/>
+                            </div>
+                        </c:if>
+                    </c:forEach>
+                </p:column>
+                <p:column styleClass="test123"></p:column>
+            </p:panelGrid>
+
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" id="requstType" rendered="#{bean.requestType eq null || bean.requestType eq -1}">
                 <p:selectOneRadio value="#{bean.selectedRequestEnumTypeFirst}" styleClass="request-select-radio">
                     <p:ajax update="requstType"/>
@@ -448,7 +481,20 @@
                                 <f:selectItems value="#{bean.requestTypes}"/>
                             </p:selectOneMenu>
                         </div>
-                        <div class="ui-g-3" style="padding: 1%">
+
+                        <h:panelGroup styleClass="ui-g-3" style="padding: 1%" rendered="#{!bean.requestTypeMultiple}">
+                            <span> #{msg.requestService}<span class="red">*</span>:</span><br/>
+                            <p:selectOneMenu id="singleServiceRequest" value="#{bean.selectedServiceId}"
+                                             label="#{msg.requestRequestType}" styleClass="select-width" style="min-height: 37px;">
+                                <p:ajax delay="2000" event="change" listener="#{bean.onMultipleServiceChanges()}"
+                                        update="form @this" />
+                                <f:selectItem itemValue="" itemLabel="- Non selezionato -" />
+                                <f:selectItems value="#{bean.services}"/>
+                            </p:selectOneMenu>
+
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="ui-g-3" style="padding: 1%" rendered="#{bean.requestTypeMultiple}">
                             <span> #{msg.requestService}<span class="red">*</span>:</span><br/>
                             <p:selectCheckboxMenu value="#{bean.selectedServiceIds}" id="multipleServiceRequest" multiple="true"
                                                   label="#{msg.requestService}"
@@ -456,7 +502,10 @@
                                 <p:ajax delay="2000" event="change" listener="#{bean.onMultipleServiceChanges()}" update="form @this" />
                                 <f:selectItems value="#{bean.services}"/>
                             </p:selectCheckboxMenu>
-                        </div>
+                        </h:panelGroup>
+<!--                        <div class="ui-g-3" style="padding: 1%">-->
+
+<!--                        </div>-->
                         <div style="padding-top: 1%;">
 <!--                            <p:commandButton id="confirmButton" value="#{msg.submit}"-->
 <!--                                             update="form @this" style="margin-top: 16px;"-->
