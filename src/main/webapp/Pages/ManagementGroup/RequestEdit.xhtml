@@ -281,6 +281,19 @@
             .input-width {
                 width: 100% !important;
             }
+            .extended-note {
+                width: 45.55%;
+                overflow: visible;
+                position: absolute;
+                margin-top: 70px;
+            }
+            .mt-95 {
+                margin-top: 95px;
+            }
+            #URGENT {
+                display: initial;
+                margin-left: 10px;
+            }
         </style>
 
         <script>
@@ -350,9 +363,11 @@
                     </p:selectOneMenu>
                     <br/>
                     <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
-                        <div class="#{(objItem.contains('NOTE') or objItem.contains('POSITION_PRACTICE')) ? 'ui-g-12' :'ui-g-6'} ih36" style="padding: 0">
-                            <ui:include src="#{objItem}"/>
-                        </div>
+                        <c:if test="#{objItem.contains('POSITION_PRACTICE')}">
+                            <div class="ui-g-12 ih36" style="padding: 0">
+                                <ui:include src="#{objItem}"/>
+                            </div>
+                        </c:if>
                     </c:forEach>
                 </p:column>
                 <p:column>
@@ -423,7 +438,19 @@
                         </div>
                     </c:forEach>
                 </p:column>
-
+            </p:panelGrid>
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" id="initialTab1"
+                         style="margin-top: -30px">
+                <p:column>
+                    <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
+                        <c:if test="#{not (objItem.contains('POSITION_PRACTICE'))}">
+                            <div class="#{objItem.contains('NOTE') ? 'ui-g-12' :'ui-g-6'} ih36" style="padding: 0">
+                                <ui:include src="#{objItem}"/>
+                            </div>
+                        </c:if>
+                    </c:forEach>
+                </p:column>
+                <p:column styleClass="test123"></p:column>
             </p:panelGrid>
 
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" id="requstType" rendered="#{bean.requestType eq null || bean.requestType eq -1}">
