@@ -201,6 +201,90 @@
         #dialogTab .ui-button.ui-button-icon-only .ui-icon {
             font-size: 18px !important;
         }
+        
+        div.dataTab input {
+		    background-color: #FFFFFF !important;
+		    border: 1px solid #ced4da !important; 
+    		border-radius: 3px !important;
+    		min-height: min-content;
+		}
+		
+		div.dataTab .ui-selectonemenu-label {
+		    background-color: #FFFFFF !important;
+		    border-radius: 7px !important;
+		    color: #000000;
+		    margin-top: 0px;
+		    margin-bottom: 0px; 
+		}
+		
+		div.goodsServicesPanel input {
+		    background-color: #FFFFFF !important;
+		    border: 1px solid #ced4da !important; 
+    		border-radius: 3px !important;
+    		min-height: min-content;
+		}
+		
+		div.goodsServicesPanel .ui-selectonemenu-label {
+		    background-color: #FFFFFF !important;
+		    border-radius: 7px !important;
+		    color: #000000;
+		    margin-top: 0px;
+		    margin-bottom: 0px; 
+		}
+		
+		div.countsSummaryPanel input {
+		    background-color: #FFFFFF !important;
+		    border: 1px solid #ced4da !important; 
+    		border-radius: 3px !important;
+    		min-height: min-content;
+		}
+		
+		div.emailTab input {
+		    background-color: #FFFFFF !important;
+		    border: none !important; 
+    		border-radius: 3px !important;
+    		min-height: min-content;
+		}
+        
+        body .ui-autocomplete-panel .ui-autocomplete-items .ui-autocomplete-item.ui-autocomplete-row > td {
+            padding: 0.5rem 0.5rem !important;
+        }
+        body .ui-autocomplete-panel .ui-autocomplete-items .ui-autocomplete-item.ui-autocomplete-row {
+            font-size: 19px !important;
+            border-color: #A7A8AB;
+        }
+        .ui-icon-close{
+            background: none repeat scroll 0 0 transparent!important;
+            display: inline-block;
+            font: normal normal normal 14px/1 FontAwesome !important;
+            font-size: inherit;
+            color: #FFF;
+            text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* .fa-times{
+            color: #FFFFFF !important;
+        } */
+
+        .ui-autocomplete-item .ui-button{
+            background: red !important;
+        }
+
+        .ui-autocomplete-item > td{
+            font-size: 14px !important;
+        }
+
+        .ui-state-highlight{
+            background: lightgray !important;
+            color: black !important;
+        }
+
+        .ui-icon-close:before{
+            content: "\f00d" !important;
+        }
+            
+            
     </style>
 
     <p:dialog widgetVar="invoiceDialogBillingWV" modal="true" width="1150" draggable="false" id="invoiceDialogBilling"
@@ -233,8 +317,8 @@
                         </p:dataTable>
                     </p:panelGrid>
                 </p:tab>
-                <p:tab title="#{msg.requestTextEditDataTab}" id="dataTab">
-                    <div class="p-grid invoiceDialog" style="margin-right:20px;">
+                <p:tab title="#{msg.requestTextEditDataTab}" id="dataTab" >
+                    <div class="p-grid dataTab" style="margin-right:20px;">
                         <p:panel id="mainPanel" style="width: 100%;" widgetVar="mainPanelVW">
                             <div class="p-grid">
                                 <!-- ROW 1 -->
@@ -425,7 +509,7 @@
                     <h3>#{msg.requestTextEditGoodsServices}</h3>
                     <hr/>
 
-                    <div class="p-grid" style="margin-right:20px;">
+                    <div class="p-grid goodsServicesPanel" style="margin-right:20px;">
                         <p:panel id="goodsServicesPanel" style="width: 100%;" widgetVar="goodsServicesPanelVW">
                             <div class="p-grid">
                                 <ui:repeat value="#{bean.goodsServicesFields}" var="key" >
@@ -512,7 +596,7 @@
                     <h3>#{msg.requestTextEditCountsSummary}</h3>
                     <hr/>
 
-                    <div class="p-grid" style="margin-right:20px;">
+                    <div class="p-grid countsSummaryPanel" style="margin-right:20px;">
                         <p:panel id="countsSummaryPanel" style="width: 100%;" widgetVar="countsSummaryPanelVW">
                             <div class="p-grid">
                                 <div class="p-col-8" ></div>
@@ -639,16 +723,23 @@
                     </div>
                 </p:tab>
 
-                <p:tab title="#{msg.emailTab}">
-                    <div class="p-grid" style="border: none; background-color: #f0f2f5;">
+                <p:tab title="#{msg.emailTab}" id="emailTab">
+                    <div class="p-grid emailTab" style="border: none; background-color: #f0f2f5;">
+                    	<p:remoteCommand action="#{bean.deleteEmailFrom}" name="removeEmailAddressFrom" update="mailFrom"/>
+                    	<p:remoteCommand action="#{bean.deleteEmailTo}" name="removeEmailAddressTo" update="mailTo"/>
+                    	<p:remoteCommand action="#{bean.deleteEmailCC}" name="removeEmailAddressCC" update="mailCC"/>
+                    	<p:remoteCommand name="showNotSendMsg" onstart="PF('showSendErrorDialog').show();" />
+                    	<h:inputHidden id="changeVar" value="#{bean.changeVar}"/>
                         <div class="p-col-6">
                             <div class="p-grid">
                                 <div class="p-col-2 vertical-center">
                                     <h:outputText value="#{msg.mailManagerEmailFrom}:"/>
                                 </div>
                                 <div class="p-col-10">
-                                    <p:autoComplete maxResults="6" multiple="true"
-                                                    inputStyle="width: 80%;"
+                                    <p:autoComplete maxResults="6" multiple="true" value="#{bean.sendFrom}"
+                                    				completeMethod="#{bean.completeMailFrom}"
+                                                    inputStyle="width: 80%;" id="mailFrom"
+                                                    var="dest" itemLabel="#{dest}" itemValue="#{dest}"
                                                     style="width: 80%; background: #FFF;"
                                                     onkeydown="return lockValue(event);"
                                                     immediate="false">
@@ -657,7 +748,7 @@
                                         </p:column>
                                         <p:column style="width: 32px;">
                                             <p:commandButton icon="fa fa-times"
-                                                             onclick="removeEmailAddressTo([{name:'param', value:'#{dest}'}]);" />
+                                                             onclick="removeEmailAddressFrom([{name:'param', value:'#{dest}'}]);" />
                                         </p:column>
                                     </p:autoComplete>
                                 </div>
@@ -666,12 +757,14 @@
                                     <h:outputText value="#{msg.mailManagerEditMailTo}:"/>
                                 </div>
                                 <div class="p-col-10">
-                                    <p:autoComplete
-                                            inputStyle="width: 80%;"
+                                    <p:autoComplete value="#{bean.sendTo}"
+                                        	completeMethod="#{bean.completeDestinations}"
+                                        	var="dest" itemLabel="#{dest}" itemValue="#{dest}"
+                                            inputStyle="width: 80%;" styleClass="mailTo"
                                             style="width: 80%; background: #FFF;"
                                             maxResults="6" id="mailTo"
                                             multiple="true"
-                                            onkeydown="return lockValue(event);" immediate="false">
+                                            onkeydown="return lockValue(event);" immediate="false" >
                                         <p:column>
                                             <h:outputText value="#{dest}" escape="false"/>
                                         </p:column>
@@ -686,7 +779,8 @@
                                     <h:outputText value="#{msg.mailManagerEmailInCopy}:"/>
                                 </div>
                                 <div class="p-col-10">
-                                    <p:autoComplete multiple="true" inputStyle="width: 80%;"
+                                    <p:autoComplete value="#{bean.sendCC}" multiple="true" inputStyle="width: 80%;"
+                                    				completeMethod="#{bean.completeMailCC}"
                                                     style="width: 80%; background: #FFF;"
                                                     immediate="false"
                                                     var="dest" itemLabel="#{dest}" itemValue="#{dest}" id="mailCC"
@@ -738,21 +832,22 @@
                             <h:outputText value="#{msg.mailManagerEditMailSubject}:"/>
                         </div>
                         <div class="p-col-11">
-                            <p:inputTextarea value="#{bean.entity.emailSubject}" rows="1" style="width: 78%;"/>
+                            <p:inputTextarea rows="1" style="width: 78%;" value="#{bean.emailSubject}"/>
                         </div>
 
                         <div class="p-col-1">
                             <h:outputText value="#{msg.mailManagerEmailText}"/>
                         </div>
                         <div class="p-col-11">
-                            <pe:ckEditor id="body"
-                                         value="#{bean.entity.emailBodyToEditor}"
-                                         styleClass="for_editor" width="auto" height="200"
-                                         contentsCss="#{facesContext.externalContext.requestContextPath}/resources/javascript/CKEditorStyles.css"
-                                         customConfig="#{facesContext.externalContext.requestContextPath}/resources/javascript/configCKEditorMailManager.js"
-                                         widgetVar="ckEditorWV">
-                                <p:ajax event="initialize" onstart="onInitCkEditor();"/>
-                            </pe:ckEditor>
+                        	<div id="bodyPanel">
+	                            <pe:ckEditor id="body" value="#{bean.emailBodyToEditor}"
+	                                         styleClass="for_editor" width="auto" height="200"
+	                                         contentsCss="#{facesContext.externalContext.requestContextPath}/resources/javascript/CKEditorStyles.css"
+	                                         customConfig="#{facesContext.externalContext.requestContextPath}/resources/javascript/configCKEditorMailManager.js"
+	                                         widgetVar="ckEditorWV">
+	                                <p:ajax event="initialize" onstart="onInitCkEditor();"/>
+	                            </pe:ckEditor>
+                            </div>
                         </div>
                     </div>
 
@@ -760,8 +855,9 @@
                         <div class="p-col-8"></div>
                         <div class="p-col-4">
                             <p:commandButton value="#{msg.cancel}" oncomplete="PF('invoiceDialogBillingWV').hide()"/>
-                            <p:commandButton value="#{msg.saveInDraft}" styleClass="ui-button-success p-mr-2 p-mb-2" style="margin-left:5px;"/>
-                            <p:commandButton value="#{msg.sendEmail}" styleClass="ui-button-success p-mr-2 p-mb-2"></p:commandButton>
+                            <p:commandButton value="#{msg.saveInDraft}" styleClass="ui-button-success p-mr-2 p-mb-2" 
+                            			style="margin-left:5px;" action="#{bean.saveMailInDraft}"/>
+                            <p:commandButton value="#{msg.sendEmail}" action="#{bean.sendMail}" styleClass="ui-button-success p-mr-2 p-mb-2"/>
                         </div>
                     </div>
                     <!-- <p:column>
@@ -788,17 +884,17 @@
                             CKEDITOR.timestamp='17.07.2018';
                             CKEDITOR.env.isCompatible = true;
                             removeAllTooltips('#bodyPanel');
-                            CKEDITOR.instances.body.on('fixWidth', function () {
+                            /* CKEDITOR.instances.body.on('fixWidth', function () {
                                 fixWidthCKEditorBody();
-                            });
+                            }); 
                             CKEDITOR.instances.body.ui.editor.toolbar[3].items[0].onClick('Times New Roman');
-                            CKEDITOR.instances.body.ui.editor.toolbar[3].items[1].onClick('16');
+                            CKEDITOR.instances.body.ui.editor.toolbar[3].items[1].onClick('16'); 
                             CKEDITOR.instances.body.ui.editor.on('change', function () {
                                 $("#changeVar").val("change");
                                 change = true;
-                            });
+                            }); 
 
-                            CKEDITOR.instances.body.ui.editor.on('key', HandleTabEvent, null, null, 0);
+                            CKEDITOR.instances.body.ui.editor.on('key', HandleTabEvent, null, null, 0); */
 
                             console.log("init success");
                         }
@@ -839,6 +935,60 @@
                                 }
                             }
                         }
+                        
+                        function lockValue(event) {
+                            if (event.keyCode == 32 || event.key == ',') {
+                                if (event.srcElement.value != null &amp;&amp; event.srcElement.value.trim() != '') {
+                                    var valueLi = event.srcElement.value;
+                                    event.srcElement.value = '';
+                                    var liel = document.createElement("LI");
+                                    liel.className = 'ui-autocomplete-token ui-state-active ui-corner-all ui-helper-hidden';
+                                    liel.style = 'display: list-item;';
+                                    liel.setAttribute('data-token-value', valueLi);
+                                    var closeNode = document.createElement("SPAN");
+                                    closeNode.className = 'ui-autocomplete-token-icon ui-icon ui-icon-close';
+                                    var liNode = document.createElement("SPAN");
+                                    liNode.className = 'ui-autocomplete-token-label';
+                                    liNode.innerHTML = valueLi;
+                                    liel.appendChild(closeNode);
+                                    liel.appendChild(liNode);
+                                    event.srcElement.parentElement.parentElement.insertBefore(liel, event.srcElement.parentElement);
+                                    event.srcElement.value = event.srcElement.value.substring(0, event.srcElement.value.length - 2);
+                                    var optionTag = document.createElement("OPTION");
+                                    optionTag.value = valueLi;
+                                    optionTag.setAttribute('selected', 'selected');
+                                    document.getElementById("mailTo_hinput").appendChild(optionTag);
+                                }
+                                return false;
+                            }
+                            return true;
+                        }
+
+                        var change = false;
+                        $(function () {
+                            // Set the unload message whenever any input element get changed.
+                            $(':input').on('change', function () {
+                                change = true;
+                                $("#changeVar").val("change");
+                            });
+                            // Turn off the unload message whenever a form get submitted properly.
+                            $('form').on('submit', function () {
+                                change = false;
+                                $("#changeVar").val("change");
+                            });
+                            $( "#mailTo .ui-autocomplete-multiple-container .ui-autocomplete-input-token input" ).focusout(function() {
+                                emailHeightAdjust();
+                            }).focus(function() {
+                                $( "#mailTo .ui-autocomplete-multiple-container" ).css("height", "auto");
+                            });
+                            emailHeightAdjust();
+                        });
+                        function emailHeightAdjust() {
+                            var noOfEmail = $( "#mailTo .ui-autocomplete-multiple-container li" ).length - 1;
+                            if(noOfEmail != 0 &amp;&amp; noOfEmail%2==0) {
+                                $( "#mailTo .ui-autocomplete-multiple-container" ).css("height", (((noOfEmail/2)*38)+'px'));
+                            }
+                        }
                     </script>
                 </p:tab>
             </p:tabView>
@@ -869,6 +1019,8 @@
                              oncomplete="PF('invoiceConfirmWV').hide();"/>
         </div>
     </p:dialog>
-
+	<p:dialog widgetVar="showSendErrorDialog" modal="true" resizable="false" draggable="false">
+	 	<h:outputText value="#{val.errorSendMail}"/>
+    </p:dialog>
 
 </ui:composition>
