@@ -141,6 +141,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private List<InputCard> inputCardList;
 
+    private List<InputCard> hiddenInputCardList;
+
     private RequestWrapper wrapper;
 
     private List<Document> documents;
@@ -169,6 +171,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private List<RequestViewWrapper> shownFields;
 
+    private List<RequestViewWrapper> hiddenFields;
     private WLGInbox mail;
 
     private Long selectedOldRequestId;
@@ -559,10 +562,12 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             serviceIdsList = getEntity().getMultipleServices() != null
                     ? getEntity().getMultipleServices().stream()
                     .map(Service::getId).collect(Collectors.toList()) : null;
+            setRequestTypeMultiple(Boolean.TRUE);
         }else {
             setSelectedServiceId(getEntity().getService() != null ? getEntity().getService().getId() : null);
             serviceIdsList = new ArrayList<>();
             serviceIdsList.add(getSelectedServiceId());
+            setRequestTypeMultiple(Boolean.FALSE);
         }
 
         if(serviceIdsList != null && !serviceIdsList.isEmpty()) {
@@ -958,11 +963,19 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void onMultipleServiceChange() throws PersistenceBeanException, IllegalAccessException {
         if(!ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
-            setInputCardList(RequestHelper.onMultipleServiceChange(Arrays.asList(getSelectedServiceIds()), isMultipleRequestCreate()));
+            setInputCardList(RequestHelper.onMultipleServiceChange(
+                    Arrays.asList(getSelectedServiceIds()), isMultipleRequestCreate()));
+            setHiddenInputCardList(RequestHelper.onMultipleServiceChange(
+                    Arrays.asList(getSelectedServiceIds()), isMultipleRequestCreate(), true));
         }else if(!ValidationHelper.isNullOrEmpty(getSelectedServiceId())){
             setInputCardList(RequestHelper.onMultipleServiceChange(Stream.of(getSelectedServiceId()).collect(Collectors.toList()),
                     isMultipleRequestCreate()));
+            setHiddenInputCardList(RequestHelper.onMultipleServiceChange(Stream.of(getSelectedServiceId()).collect(Collectors.toList()),
+                    isMultipleRequestCreate(), true));
         }
+
+        getHiddenInputCardList()
+                .forEach(s -> System.out.println(">>>>>>>>>>>>>>>>>>> " + s.getFields().size()));
 //        if(isMultipleRequestCreate()){
 //            generateTab();
 //        }
@@ -988,6 +1001,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         setActiveMenuTabNum(getActiveMenuTabNum() - 1);
         if (isMultipleCreate() && getActiveMenuTabNum() == 1) {
             setShownFields(null);
+            setHiddenFields(null);
             return;
         }
         if (isMultipleCreate() && getActiveMenuTabNum() == 2) {
@@ -997,6 +1011,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             generateTab();
         } else {
             setShownFields(null);
+            setHiddenFields(null);
         }
 
         updateForm();
@@ -1023,6 +1038,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             generateTab();
         } else {
             setShownFields(null);
+            setHiddenFields(null);
         }
 
         updateForm();
@@ -1127,6 +1143,92 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 getWrapper().setLists(getInputCardList().get(0).getFields());
             } else if(!ValidationHelper.isNullOrEmpty(getInputCardList())){
                 getWrapper().setLists(getInputCardList().get(getActiveMenuTabNum() - 1).getFields());
+            }
+        }
+    }
+
+    public void generateHiddenFields() throws PersistenceBeanException, IllegalAccessException {
+        List<InputCardManageField> listWithPos;
+        List<InputCardManageField> listNoPos;
+        if(!ValidationHelper.isNullOrEmpty(getHiddenInputCardList())){
+            if (isMultipleCreate()) {
+                listWithPos = new ArrayList<>();
+                listNoPos = new ArrayList<>(getHiddenInputCardList().get(0).getFields());
+            } else {
+                listWithPos = new ArrayList<>(getHiddenInputCardList()
+                        .get(getActiveMenuTabNum() - 1).getFields().stream()
+                        .filter(f -> f.getPosition() != null).collect(Collectors.toList()));
+
+                listNoPos = new ArrayList<>(getHiddenInputCardList()
+                        .get(getActiveMenuTabNum() - 1).getFields().stream()
+                        .filter(f -> f.getPosition() == null).collect(Collectors.toList()));
+            }
+
+            List<RequestViewWrapper> wrappers = new ArrayList<>();
+            for (int i = 0; ; i++) {
+                if (listWithPos.isEmpty()) {
+                    break;
+                }
+                RequestViewWrapper wrapper = new RequestViewWrapper();
+                wrapper.setLineNum(i);
+                wrapper.setFields(new ArrayList<>());
+                for (int j = 1; j <= 4; j++) {
+                    int pos = i * 4 + j;
+                    InputCardManageField field = listWithPos
+                            .stream().filter(f -> f.getPosition() != null && f.getPosition().equals(pos))
+                            .findFirst().orElse(null);
+                    if (field != null) {
+                        listWithPos.remove(field);
+                    }
+                    if (field == null || !field.getField().getEnumPropsWrapper().isHasManyFields()) {
+                        wrapper.getFields().add(field);
+                    } else {
+                        wrapper.setOneElement(true);
+                        wrapper.setField(field);
+                        // break;
+                    }
+                }
+                wrappers.add(wrapper);
+            }
+            for (int i = wrappers.size(); ; i++) {
+                if (listNoPos.isEmpty()) {
+                    break;
+                }
+                RequestViewWrapper wrapper = new RequestViewWrapper();
+                RequestViewWrapper additional = null;
+                wrapper.setLineNum(i);
+                wrapper.setFields(new ArrayList<>());
+                for (int j = 0; j < 4; j++) {
+                    if (!listNoPos.isEmpty()) {
+                        InputCardManageField field = listNoPos.get(0);
+                        listNoPos.remove(field);
+                        if (field == null || !field.getField().getEnumPropsWrapper().isHasManyFields()) {
+                            wrapper.getFields().add(field);
+                        } else {
+                            i++;
+                            j--;
+                            additional = new RequestViewWrapper();
+                            additional.setLineNum(i);
+                            additional.setOneElement(true);
+                            additional.setField(field);
+                            break;
+                        }
+                    }
+                }
+                if (!ValidationHelper.isNullOrEmpty(wrapper.getFields())) {
+                    wrappers.add(wrapper);
+                } else {
+                    additional.setLineNum(additional.getLineNum() - 1);
+                }
+                if (additional != null) {
+                    wrappers.add(additional);
+                }
+            }
+            setHiddenFields(wrappers);
+            if (isMultipleCreate() && !ValidationHelper.isNullOrEmpty(getHiddenInputCardList())) {
+                getWrapper().setLists(getHiddenInputCardList().get(0).getFields());
+            } else if(!ValidationHelper.isNullOrEmpty(getHiddenInputCardList())){
+                getWrapper().setLists(getHiddenInputCardList().get(getActiveMenuTabNum() - 1).getFields());
             }
         }
     }
@@ -2455,10 +2557,12 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             executeJS("setTimeout(function(){PF('requestSaved').hide();}, 2000);");
             openRequestSubjectDialog();
             setShownFields(null);
+            setHiddenFields(null);
             setSelectedRequestTypesIdMultiple(null);
             onRequestTypeChangeBlock();
             setSelectedServiceIds(new Long[]{});
             setInputCardList(null);
+            setHiddenInputCardList(null);
             setWrapper(new RequestWrapper(getEntity(), isMultipleCreate(), true));
 
         }
@@ -2466,6 +2570,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void onRequestTypeChangeBlock() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
         setShownFields(null);
+        setHiddenFields(null);
         setShowConfirmButton(Boolean.FALSE);
         if(!ValidationHelper.isNullOrEmpty(getSelectedRequestTypesIdMultiple())){
             RequestType requestType = DaoManager.get(RequestType.class, getSelectedRequestTypesIdMultiple());
@@ -2485,6 +2590,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         onRequestTypeChange();
         setSelectedServiceIds(new Long[]{});
         setShownFields(null);
+        setHiddenFields(null);
         RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 2000);");
     }
 
@@ -2503,6 +2609,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }else {
             setShowConfirmButton(Boolean.FALSE);
             setShownFields(null);
+            setHiddenFields(null);
         }
     }
 
@@ -2512,6 +2619,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if(isMultipleRequestCreate() && (!ValidationHelper.isNullOrEmpty(getSelectedServiceIds()) ||
                 !ValidationHelper.isNullOrEmpty(getSelectedServiceId()))){
             generateTab();
+            generateHiddenFields();
         }
         if(showLoader)
             RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 2000);");
@@ -2627,6 +2735,14 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void setInputCardList(List<InputCard> inputCardList) {
         this.inputCardList = inputCardList;
+    }
+
+    public List<InputCard> getHiddenInputCardList() {
+        return hiddenInputCardList;
+    }
+
+    public void setHiddenInputCardList(List<InputCard> hiddenInputCardList) {
+        this.hiddenInputCardList = hiddenInputCardList;
     }
 
     public int getActiveMenuTabNum() {
@@ -2755,6 +2871,14 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void setShownFields(List<RequestViewWrapper> shownFields) {
         this.shownFields = shownFields;
+    }
+
+    public List<RequestViewWrapper> getHiddenFields() {
+        return hiddenFields;
+    }
+
+    public void setHiddenFields(List<RequestViewWrapper> hiddenFields) {
+        this.hiddenFields = hiddenFields;
     }
 
     public WLGInbox getMail() {

@@ -312,7 +312,11 @@ public class RequestHelper {
         return null;
     }
 
-    public static List<InputCard> onMultipleServiceChange(List<Long> serviceId , boolean isMultiple)
+    public static List<InputCard> onMultipleServiceChange(List<Long> serviceId , boolean isMultiple) throws PersistenceBeanException, IllegalAccessException {
+
+         return onMultipleServiceChange(serviceId, isMultiple, false);
+    }
+    public static List<InputCard> onMultipleServiceChange(List<Long> serviceId , boolean isMultiple, boolean isHidden)
             throws PersistenceBeanException, IllegalAccessException {
         if (!ValidationHelper.isNullOrEmpty(serviceId)) {
             List<Service> serviceList = DaoManager.load(Service.class, new Criterion[]{
@@ -333,7 +337,8 @@ public class RequestHelper {
                     for (InputCardManageField field : inputCardList.stream().map(InputCard::getFields)
                             .flatMap(List::stream).distinct().collect(Collectors.toList())) {
 
-                        if ((field.getField() == ManageTypeFields.CONSERVATORY_TALOVARE) ||
+                        if ((!isHidden && field.getState() == ManageTypeFieldsState.HIDDEN)
+                                || (field.getField() == ManageTypeFields.CONSERVATORY_TALOVARE) ||
                                 (field.getField() == ManageTypeFields.SUBJECT_MASTERY)
                                 || (isMultiple && (field.getField()==ManageTypeFields.CDR
                                 || field.getField()== ManageTypeFields.NDG
@@ -350,19 +355,33 @@ public class RequestHelper {
                             continue;
                         }
 
-                        InputCardManageField existingField = inputCardOutput.getFields().stream()
-                                .filter(f -> f.getField() == field.getField()).findAny().orElse(null);
-                        if (existingField == null) {
-                            inputCardOutput.getFields().add(field);
-                        } else {
-                            if ((existingField.getState() == ManageTypeFieldsState.ENABLE
-                                    || existingField.getState() == ManageTypeFieldsState.HIDDEN)
-                                    && (field.getState() == ManageTypeFieldsState.ENABLE
-                                    || field.getState() == ManageTypeFieldsState.ENABLE_AND_MANDATORY)) {
-                                inputCardOutput.getFields().remove(existingField);
+                        if(!isHidden){
+                            InputCardManageField existingField = inputCardOutput.getFields().stream()
+                                    .filter(f -> f.getField() == field.getField()).findAny().orElse(null);
+                            if (existingField == null) {
                                 inputCardOutput.getFields().add(field);
+                            } else {
+                                if ((existingField.getState() == ManageTypeFieldsState.ENABLE
+                                        || existingField.getState() == ManageTypeFieldsState.HIDDEN)
+                                        && (field.getState() == ManageTypeFieldsState.ENABLE
+                                        || field.getState() == ManageTypeFieldsState.ENABLE_AND_MANDATORY)) {
+                                    inputCardOutput.getFields().remove(existingField);
+                                    inputCardOutput.getFields().add(field);
+                                }
+                            }
+                        }else {
+                            InputCardManageField existingField = inputCardOutput.getFields().stream()
+                                    .filter(f -> f.getField() == field.getField()).findAny().orElse(null);
+                            if (existingField == null && field.getState() == ManageTypeFieldsState.HIDDEN) {
+                                inputCardOutput.getFields().add(field);
+                            } else {
+                                if (existingField != null && existingField.getState() == ManageTypeFieldsState.HIDDEN) {
+                                    inputCardOutput.getFields().remove(existingField);
+                                    inputCardOutput.getFields().add(field);
+                                }
                             }
                         }
+
                     }
                     return Collections.singletonList(inputCardOutput);
                 }
