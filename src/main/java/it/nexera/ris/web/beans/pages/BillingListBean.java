@@ -285,6 +285,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private String emailBodyToEditor;
 
     private static final String DELIM = ", ";
+    
+    private Boolean showRequestTab;
 
 
     @Override
@@ -839,6 +841,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     }
 
     public void loadInvoiceDialogData() throws IllegalAccessException, PersistenceBeanException, HibernateException, InstantiationException  {
+    	setShowRequestTab(false);
         List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[] {Restrictions.isNotNull("date")}, new Order[]{
                 Order.desc("date")});
         setPaymentInvoices(paymentInvoicesList);
@@ -883,10 +886,17 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             setSelectedPaymentTypeId(invoice.getPaymentType().getId());
             setVatCollectabilityId(invoice.getVatCollectability().getId());
             setInvoiceNote(invoice.getNotes());
+            setInvoiceDate(invoice.getDate());
+            if(!ValidationHelper.isNullOrEmpty(invoice.getNumber()))
+            	setNumber(invoice.getNumber());
+            if(!ValidationHelper.isNullOrEmpty(invoice.getInvoiceNumber()))
+            	setInvoiceNumber(invoice.getInvoiceNumber());
             List<GoodsServicesFieldWrapper> wrapperList = new ArrayList<>();
             List<InvoiceItem> invoiceItemsDb = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
+            int counter = 1;
             for(InvoiceItem invoiceItem: invoiceItemsDb) {
                 GoodsServicesFieldWrapper wrapper = createGoodsServicesFieldWrapper();
+                wrapper.setCounter(counter);
                 wrapper.setInvoiceItemId(invoiceItem.getId());
                 wrapper.setInvoiceTotalCost(invoiceItem.getInvoiceTotalCost());
                 wrapper.setSelectedTaxRateId(invoiceItem.getTaxRate().getId());
@@ -898,6 +908,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 if(!ValidationHelper.isNullOrEmpty(invoiceItem.getDescription()))
                     wrapper.setDescription(invoiceItem.getDescription());
                 wrapperList.add(wrapper);
+                counter = counter + 1;
             }
             setGoodsServicesFields(wrapperList);
             setSameInvoiceNumber(invoice.getId());
@@ -906,8 +917,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             }
         } else {
             setGoodsServicesFields(new ArrayList<>());
-            getGoodsServicesFields().add(createGoodsServicesFieldWrapper());
+            createNewGoodsServicesFields();
             setMaxInvoiceNumber();
+            setInvoiceDate(new Date());
         }
         loadDraftEmail();
     }
@@ -955,15 +967,17 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     public Double getTotalVat() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         Double total = 0D;
-        for(GoodsServicesFieldWrapper wrapper: getGoodsServicesFields()) {
-            if(!ValidationHelper.isNullOrEmpty(wrapper.getTotalLine())) {
-                if(!ValidationHelper.isNullOrEmpty(wrapper.getSelectedTaxRateId())) {
-                    TaxRate taxrate = DaoManager.get(TaxRate.class, wrapper.getSelectedTaxRateId());
-                    if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
-                        total += wrapper.getTotalLine().doubleValue() * (taxrate.getPercentage().doubleValue()/100);
-                    }
-                }
-            }
+        if(!ValidationHelper.isNullOrEmpty(getGoodsServicesFields())) {
+	        for(GoodsServicesFieldWrapper wrapper: getGoodsServicesFields()) {
+	            if(!ValidationHelper.isNullOrEmpty(wrapper.getTotalLine())) {
+	                if(!ValidationHelper.isNullOrEmpty(wrapper.getSelectedTaxRateId())) {
+	                    TaxRate taxrate = DaoManager.get(TaxRate.class, wrapper.getSelectedTaxRateId());
+	                    if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
+	                        total += wrapper.getTotalLine().doubleValue() * (taxrate.getPercentage().doubleValue()/100);
+	                    }
+	                }
+	            }
+	        }
         }
         return total;
     }
@@ -992,16 +1006,18 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     public Double getTotalGrossAmount() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         Double totalGrossAmount = 0D;
-        for(GoodsServicesFieldWrapper wrapper: getGoodsServicesFields()) {
-            if(!ValidationHelper.isNullOrEmpty(wrapper.getTotalLine())){
-                totalGrossAmount += wrapper.getTotalLine();
-                if(!ValidationHelper.isNullOrEmpty(wrapper.getSelectedTaxRateId())){
-                    TaxRate taxrate = DaoManager.get(TaxRate.class, wrapper.getSelectedTaxRateId());
-                    if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
-                        totalGrossAmount += (wrapper.getTotalLine() * (taxrate.getPercentage().doubleValue()/100));
-                    }
-                }
-            }
+        if(!ValidationHelper.isNullOrEmpty(getGoodsServicesFields())) {
+	        for(GoodsServicesFieldWrapper wrapper: getGoodsServicesFields()) {
+	            if(!ValidationHelper.isNullOrEmpty(wrapper.getTotalLine())){
+	                totalGrossAmount += wrapper.getTotalLine();
+	                if(!ValidationHelper.isNullOrEmpty(wrapper.getSelectedTaxRateId())){
+	                    TaxRate taxrate = DaoManager.get(TaxRate.class, wrapper.getSelectedTaxRateId());
+	                    if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
+	                        totalGrossAmount += (wrapper.getTotalLine() * (taxrate.getPercentage().doubleValue()/100));
+	                    }
+	                }
+	            }
+	        }
         }
         return totalGrossAmount;
     }
@@ -1028,6 +1044,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     public void createNewGoodsServicesFields() throws IllegalAccessException, PersistenceBeanException {
         GoodsServicesFieldWrapper wrapper = createGoodsServicesFieldWrapper();
+        int size = getGoodsServicesFields().size();
+        wrapper.setCounter(size + 1);
         getGoodsServicesFields().add(wrapper);
     }
 
@@ -1068,7 +1086,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
 
         try {
-            saveInvoice(InvoiceStatus.DRAFT, false);
+            saveInvoice(InvoiceStatus.DRAFT, true);
             loadInvoiceDialogData();
         }catch(Exception e) {
             e.printStackTrace();
@@ -1083,10 +1101,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     public void confirmInvoice() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         cleanValidation();
-        if(ValidationHelper.isNullOrEmpty(getNumber())){
-            addRequiredFieldException("form:number");
-            setValidationFailed(true);
-        }
+        
 
         if(ValidationHelper.isNullOrEmpty(getInvoiceDate())){
             addRequiredFieldException("form:date");
@@ -1105,10 +1120,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
         for(GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
             if(ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceTotalCost())){
-                setValidationFailed(true);
-            }
-
-            if(ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemAmount())){
                 setValidationFailed(true);
             }
 

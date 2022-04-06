@@ -292,7 +292,7 @@
         <div style="margin-top:20px; overflow-x:hidden; overflow-y:auto; height: 600px;" class="invoiceDialog">
             <p:tabView dynamic="true" cache="true" id="dialogTab" activeIndex="#{bean.activeTabIndex}">
                 <p:ajax event="tabChange" listener="#{bean.onTabChange}"/>
-                <p:tab title="#{msg.requestTab}">
+                <p:tab title="#{msg.requestTab}" rendered="#{bean.showRequestTab}">
                     <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
                         <p:dataTable value="#{bean.invoicedRequests}" styleClass="simple-table" var="item" rendered="#{bean.invoicedRequests.size() > 0}"
                                      scrollable="true"
@@ -326,7 +326,7 @@
                                     <p:outputLabel value="#{msg.number}"/>
                                 </div>
                                 <div class="p-col-2">
-                                    <p:inputText value="#{bean.number}" id="number"/>
+                                	<p:inputText value="#{bean.number}" id="number" readonly="true"/>
                                 </div>
                                 <div class="p-col-1 vertical-center" >
                                     <p:outputLabel value="#{msg.data}"/>
@@ -348,7 +348,7 @@
                                     <p:outputLabel value="#{msg.codifica}"/>
                                 </div>
                                 <div class="p-col-2">
-                                    <p:inputText value="#{bean.invoiceNumber}"/>
+                                	<p:inputText value="#{bean.invoiceNumber}" readonly="true"/>
                                 </div>
                                 <div class="p-col-1 vertical-center">
                                     <h:outputText value="#{msg.client}"/>
@@ -515,16 +515,17 @@
                                 <ui:repeat value="#{bean.goodsServicesFields}" var="key" >
                                     <div class="p-col-2">
                                         <h:outputText value="#{msg.netAmount}"></h:outputText>
-                                        <p:inputText id="total_cost" value="#{key.invoiceTotalCost}" disabled="#{bean.invoiceSentStatus}">
+                                        <p:inputText id="total_cost" value="#{key.invoiceTotalCost}" disabled="#{bean.invoiceSentStatus}" 
+                                        		styleClass="total_cost_#{key.counter}" onchange="updateTotalLine(this);" >
                                             <p:keyFilter mask="num" />
-                                            <p:ajax event="blur" update="totalGrossAmount"/>
                                         </p:inputText>
                                     </div>
                                     <div class="p-col-1">
                                         <h:outputText value="#{msg.qty}"></h:outputText>
-                                        <p:inputText id="quantita" value="#{key.invoiceItemAmount}" label="#{msg.qty}" disabled="#{bean.invoiceSentStatus}">
+                                        <p:inputText id="quantita" value="#{key.invoiceItemAmount}" label="#{msg.qty}" 
+                                        		disabled="#{bean.invoiceSentStatus}" onchange="updateItemAmount(this);"
+                                        		styleClass="item_amount_#{key.counter}">
                                             <p:keyFilter mask="num" />
-                                            <p:ajax event="blur" update="totalGrossAmount"/>
                                         </p:inputText>
                                     </div>
                                     <div class="p-col-1">
@@ -539,15 +540,15 @@
                                     </div>
                                     <div class="p-col-4">
                                         <h:outputText value="#{msg.vat}"></h:outputText>
-                                        <p:selectOneMenu id="invoiceVat" value="#{key.selectedTaxRateId}" style="width:100%;"
+                                        <p:selectOneMenu id="invoiceVat" value="#{key.selectedTaxRateId}" style="width:100%;" onchange="updateVat();" 
                                                          label="#{msg.invoiceVat}" styleClass="#{key.selectedTaxRateId ne null ? 'select-one-menu' : 'select-one-menu-width'}" disabled="#{bean.invoiceSentStatus}">
                                             <f:selectItems value="#{key.vatAmounts}"/>
-                                            <p:ajax event="change" update="totalGrossAmount"/>
+                                            <!-- <p:ajax event="change" /> -->
                                         </p:selectOneMenu>
                                     </div>
                                     <div class="p-col-3">
-                                        <h:outputText value="#{msg.totalLine}"></h:outputText>
-                                        <p:inputText id="totalGrossAmount" value="#{key.totalLine}" disabled="true">
+                                        <h:outputText value="#{msg.totalLine}#{key.counter}"></h:outputText>
+                                        <p:inputText id="total_line" value="#{key.totalLine}" styleClass="total_line_#{key.counter}" >
                                             <p:keyFilter mask="num" />
                                         </p:inputText>
                                         <p:selectBooleanCheckbox style="margin-top: 5px;"></p:selectBooleanCheckbox>
@@ -687,6 +688,51 @@
                             </div>
                         </p:panel>
                     </div>
+                    <script>
+                    	function updateTotalLine(element) {
+                    		var elementClass = $(element).attr("class");
+                    		var totalCost = $(element).val();
+                    		const myArray = elementClass.split(" ");
+                    		const startsWith = myArray.filter((value) => value.startsWith("total_cost_"));
+                    		var totalCostVar = startsWith[0];
+                    		var index = totalCostVar.replace("total_cost_","");
+                    		var itemAmount = $(".item_amount_"+index).val();
+                    		var totalLine = totalCost;
+                    		if(itemAmount != null) {
+                    			totalLine = (+totalCost)+(+itemAmount);
+                    		}
+                    		totalLine = roundNumber(totalLine, 12);
+                    		$(".total_line_"+index).val(totalLine);
+                    		updateCountsSummaryPanel(); 
+                    	}
+                    	
+                    	function roundNumber(number, decimals) {
+                    	    var newnumber = new Number(number+'').toFixed(parseInt(decimals));
+                    	    return parseFloat(newnumber); 
+                    	}
+                    	
+                    	function updateItemAmount(element) {
+                    		var elementClass = $(element).attr("class");
+                    		var itemAmount = $(element).val();
+                    		const myArray = elementClass.split(" ");
+                    		const startsWith = myArray.filter((value) => value.startsWith("item_amount_"));
+                    		var totalCostVar = startsWith[0];
+                    		var index = totalCostVar.replace("item_amount_","");
+                    		var totalCost = $(".total_cost_"+index).val();
+                    		var totalLine = totalCost;
+                    		if(itemAmount != null) {
+                    			totalLine = (+totalCost)+(+itemAmount);
+                    		}
+                    		totalLine = roundNumber(totalLine, 12);
+                    		$(".total_line_"+index).val(totalLine);
+                    		updateCountsSummaryPanel();
+                    	}
+                    	
+                    	function updateVat() {
+                    		updateCountsSummaryPanel();
+                    	}
+                    </script>
+                    <p:remoteCommand name="updateCountsSummaryPanel" update="@widgetVar(countsSummaryPanelVW) @widgetVar(goodsServicesPanelVW)"/>
                 </p:tab>
 
                 <p:tab title="#{msg.requestTextEditPaymentsTab}">
@@ -905,7 +951,7 @@
                         }
 
                         // Custom Key Events function
-                        function HandleTabEvent(e) {
+                       /*  function HandleTabEvent(e) {
                             if (e.data.keyCode == 9){
                                 var selection = CKEDITOR.instances.body.ui.editor.getSelection();
                                 var startElement = selection.getStartElement();
@@ -934,7 +980,7 @@
                                     }
                                 }
                             }
-                        }
+                        } */
 
                         function lockValue(event) {
                             if (event.keyCode == 32 || event.key == ',') {

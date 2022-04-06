@@ -29,6 +29,7 @@ public class GoodsServicesFieldWrapper implements Serializable {
     private String description;
 
     private Double totalLine;
-
-
+    
+    private Integer counter;
+    
 }

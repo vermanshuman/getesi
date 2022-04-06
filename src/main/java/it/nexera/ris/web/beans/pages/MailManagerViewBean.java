@@ -258,6 +258,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private String emailBodyToEditor;
 
     private static final String DELIM = ", ";
+    
+    private boolean showRequestTab;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
@@ -1336,7 +1338,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     }
 
     public void loadInvoiceDialogData() throws IllegalAccessException, PersistenceBeanException, HibernateException, InstantiationException  {
-        List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[] {Restrictions.isNotNull("date")}, new Order[]{
+    	setShowRequestTab(true);
+    	List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[] {Restrictions.isNotNull("date")}, new Order[]{
                 Order.desc("date")});
         setPaymentInvoices(paymentInvoicesList);
         double totalImport = 0.0;
@@ -1367,10 +1370,16 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         if(invoiceDb.getStatus().equals(InvoiceStatus.DELIVERED)) {
             setInvoiceSentStatus(true);
         }
+        if(!ValidationHelper.isNullOrEmpty(invoiceDb.getNumber()))
+        	setNumber(invoiceDb.getNumber());
+        if(!ValidationHelper.isNullOrEmpty(invoiceDb.getInvoiceNumber()))
+        	setInvoiceNumber(invoiceDb.getInvoiceNumber());
 
         List<InvoiceItem> invoiceItemsDb = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoiceDb)});
+        int counter = 1;
         for(InvoiceItem invoiceItem: invoiceItemsDb) {
             GoodsServicesFieldWrapper wrapper = createGoodsServicesFieldWrapper();
+            wrapper.setCounter(counter);
             wrapper.setInvoiceItemId(invoiceItem.getId());
             wrapper.setInvoiceTotalCost(invoiceItem.getInvoiceTotalCost());
             wrapper.setSelectedTaxRateId(invoiceItem.getTaxRate().getId());
@@ -1504,6 +1513,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
     public void createNewGoodsServicesFields() throws IllegalAccessException, PersistenceBeanException {
         GoodsServicesFieldWrapper wrapper = createGoodsServicesFieldWrapper();
+        int size = getGoodsServicesFields().size();
+        wrapper.setCounter(size + 1);
         getGoodsServicesFields().add(wrapper);
     }
 
@@ -1524,10 +1535,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 setValidationFailed(true);
             }
 
-            if(ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemAmount())){
-                setValidationFailed(true);
-            }
-
             if(ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getSelectedTaxRateId())){
                 setValidationFailed(true);
             }
@@ -1539,7 +1546,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
 
         try {
-            saveInvoice(InvoiceStatus.DRAFT, false);
+            saveInvoice(InvoiceStatus.DRAFT, true);
             loadInvoiceDialogData();
         }catch(Exception e) {
             e.printStackTrace();
@@ -1551,10 +1558,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
     public void confirmInvoice() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         cleanValidation();
-        if(ValidationHelper.isNullOrEmpty(getNumber())){
-            addRequiredFieldException("form:number");
-            setValidationFailed(true);
-        }
+        
 
         if(ValidationHelper.isNullOrEmpty(getInvoiceDate())){
             addRequiredFieldException("form:date");
@@ -1568,10 +1572,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
         for(GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
             if(ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceTotalCost())){
-                setValidationFailed(true);
-            }
-
-            if(ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemAmount())){
                 setValidationFailed(true);
             }
 
