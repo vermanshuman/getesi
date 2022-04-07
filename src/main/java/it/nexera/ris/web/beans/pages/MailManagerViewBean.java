@@ -1206,38 +1206,44 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     }
 
     public Double getAllTotalLine() {
-        Double total = getGoodsServicesFields().stream().collect(
-                Collectors.summingDouble(GoodsServicesFieldWrapper::getTotalLine));
+    	Double total = 0D;
+        if(!ValidationHelper.isNullOrEmpty(getGoodsServicesFields()))
+            total = getGoodsServicesFields().stream().collect(
+                    Collectors.summingDouble(GoodsServicesFieldWrapper::getTotalLine));
         return total;
     }
 
     public Double getTotalGrossAmount() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         Double totalGrossAmount = 0D;
-        for(GoodsServicesFieldWrapper wrapper: getGoodsServicesFields()) {
-            if(!ValidationHelper.isNullOrEmpty(wrapper.getTotalLine())){
-                totalGrossAmount += wrapper.getTotalLine();
-                if(!ValidationHelper.isNullOrEmpty(wrapper.getSelectedTaxRateId())){
-                    TaxRate taxrate = DaoManager.get(TaxRate.class, wrapper.getSelectedTaxRateId());
-                    if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
-                        totalGrossAmount += (wrapper.getTotalLine() * (taxrate.getPercentage().doubleValue()/100));
-                    }
-                }
-            }
+        if(!ValidationHelper.isNullOrEmpty(getGoodsServicesFields())) {
+	        for(GoodsServicesFieldWrapper wrapper: getGoodsServicesFields()) {
+	            if(!ValidationHelper.isNullOrEmpty(wrapper.getTotalLine())){
+	                totalGrossAmount += wrapper.getTotalLine();
+	                if(!ValidationHelper.isNullOrEmpty(wrapper.getSelectedTaxRateId())){
+	                    TaxRate taxrate = DaoManager.get(TaxRate.class, wrapper.getSelectedTaxRateId());
+	                    if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
+	                        totalGrossAmount += (wrapper.getTotalLine() * (taxrate.getPercentage().doubleValue()/100));
+	                    }
+	                }
+	            }
+	        }
         }
         return totalGrossAmount;
     }
 
     public Double getTotalVat() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         Double total = 0D;
-        for(GoodsServicesFieldWrapper wrapper: getGoodsServicesFields()) {
-            if(!ValidationHelper.isNullOrEmpty(wrapper.getTotalLine())) {
-                if(!ValidationHelper.isNullOrEmpty(wrapper.getSelectedTaxRateId())) {
-                    TaxRate taxrate = DaoManager.get(TaxRate.class, wrapper.getSelectedTaxRateId());
-                    if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
-                        total += wrapper.getTotalLine().doubleValue() * (taxrate.getPercentage().doubleValue()/100);
-                    }
-                }
-            }
+        if(!ValidationHelper.isNullOrEmpty(getGoodsServicesFields())) {
+	        for(GoodsServicesFieldWrapper wrapper: getGoodsServicesFields()) {
+	            if(!ValidationHelper.isNullOrEmpty(wrapper.getTotalLine())) {
+	                if(!ValidationHelper.isNullOrEmpty(wrapper.getSelectedTaxRateId())) {
+	                    TaxRate taxrate = DaoManager.get(TaxRate.class, wrapper.getSelectedTaxRateId());
+	                    if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
+	                        total += wrapper.getTotalLine().doubleValue() * (taxrate.getPercentage().doubleValue()/100);
+	                    }
+	                }
+	            }
+	        }
         }
         return total;
     }
