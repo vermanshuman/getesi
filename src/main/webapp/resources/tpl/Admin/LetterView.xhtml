@@ -132,6 +132,9 @@
                         <p:column headerText="#{msg.requestState}" sortBy="#{item.mailViewSubject}" filterBy="#{item.mailViewSubject}">
                             <h:outputText value="#{item.stateDescription}"/>
                         </p:column>
+                        <p:column headerText="#{msg.invoiceNumber}">
+                        	<p:commandLink value="#{item.invoice.id}" action="#{bean.openInvoiceDialog}" update="invoiceDialogBilling dialogTab"/>
+                        </p:column>
                     </p:dataTable>
                 </div>
             </div>

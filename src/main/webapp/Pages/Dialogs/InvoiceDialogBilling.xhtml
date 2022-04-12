@@ -294,7 +294,7 @@
                 <p:ajax event="tabChange" listener="#{bean.onTabChange}"/>
                 <p:tab title="#{msg.requestTab}" rendered="#{bean.showRequestTab}">
                     <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
-                        <p:dataTable value="#{bean.invoicedRequests}" styleClass="simple-table" var="item" rendered="#{bean.invoicedRequests.size() > 0}"
+                        <p:dataTable value="#{bean.invoicedRequests}" styleClass="simple-table" var="item" 
                                      scrollable="true"
                                      scrollHeight="300" style="margin-top:20px;">
 
@@ -606,7 +606,7 @@
                                 </div>
                                 <div class="p-col-2">
                                     <p:inputText id="invoiceTotalAmount" value="#{bean.allTotalLine}" disabled="true">
-                                        <f:convertNumber minFractionDigits="2" />
+                                        <!-- <f:convertNumber minFractionDigits="2" /> -->
                                         <p:keyFilter mask="num" />
                                     </p:inputText>
                                 </div>
@@ -618,7 +618,7 @@
 
                                 <div class="p-col-2">
                                     <p:inputText id="invoiceToVAT" value="#{bean.totalVat}" disabled="true">
-                                        <f:convertNumber minFractionDigits="2" />
+                                        <!-- <f:convertNumber minFractionDigits="2" /> -->
                                         <p:keyFilter mask="num" />
                                     </p:inputText>
                                 </div>
@@ -634,7 +634,7 @@
                                 </div>
                                 <div class="p-col-2">
                                     <p:inputText id="totalGA" value="#{bean.totalGrossAmount}" disabled="true">
-                                        <f:convertNumber minFractionDigits="2" />
+                                        <!-- <f:convertNumber minFractionDigits="2" /> -->
                                         <p:keyFilter mask="num" />
                                     </p:inputText>
                                 </div>
@@ -670,11 +670,12 @@
                         <p:panel widgetVar="buttonsPanelWV" style="width: 100%;">
                             <div class="p-grid">
                                 <div class="p-col-8">
-                                    <p:commandButton value="#{msg.downloadInvoice}" >
+                                    <p:commandButton value="#{msg.downloadInvoice}"  actionListener="#{bean.downloadInvoicePdf}" ajax="false">
+                                    	<p:fileDownload value="#{bean.invoicePDFFile}"/>
                                     </p:commandButton>
                                 </div>
                                 <div class="p-col-4" style="text-align:right;">
-                                    <p:commandButton value="#{msg.cancel.toUpperCase()}" oncomplete="PF('invoiceDialogBillingWV').hide()"
+                                    <p:commandButton value="#{msg.cancel.toUpperCase()}" oncomplete="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"
                                                      rendered="#{!bean.invoiceSentStatus}"/>
                                     <p:commandButton value="#{msg.saveInDraft}" styleClass="ui-button-success p-mr-2 p-mb-2" style="margin-left:5px;"
                                                      action="#{bean.saveInvoiceInDraft}" update="mainPanel goodsServicesPanel countsSummaryPanel"
@@ -682,7 +683,7 @@
                                     <p:commandButton value="#{msg.confirm}" styleClass="ui-button-success p-mr-2 p-mb-2"
                                                      action="#{bean.confirmInvoice}" update="mainPanel goodsServicesPanel countsSummaryPanel"
                                                      rendered="#{!bean.invoiceSentStatus}" />
-                                    <p:commandButton value="#{msg.close}" oncomplete="PF('invoiceDialogBillingWV').hide()"
+                                    <p:commandButton value="#{msg.close}" oncomplete="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"
                                                      rendered="#{bean.invoiceSentStatus}"/>
                                 </div>
                             </div>
@@ -862,7 +863,7 @@
                                             <p:column>
                                                 <p:commandButton icon="fa fa-cloud-download" title="#{msg.download}" update=":form, messages"
                                                                  ajax="false"
-                                                                 action="#{bean.downloadFile}"
+                                                                 action="#{bean.downloadInvoiceFile}"
                                                                  style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
                                                     <f:setPropertyActionListener value="#{file.id}" target="#{bean.downloadFileIndex}"/>
                                                 </p:commandButton>
@@ -900,7 +901,7 @@
                     <div class="p-grid">
                         <div class="p-col-8"></div>
                         <div class="p-col-4">
-                            <p:commandButton value="#{msg.cancel}" oncomplete="PF('invoiceDialogBillingWV').hide()"/>
+                            <p:commandButton value="#{msg.cancel}" oncomplete="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"/>
                             <p:commandButton value="#{msg.saveInDraft}" styleClass="ui-button-success p-mr-2 p-mb-2"
                                              style="margin-left:5px;" action="#{bean.saveMailInDraft}"/>
                             <p:commandButton value="#{msg.sendEmail}" action="#{bean.sendMail}" styleClass="ui-button-success p-mr-2 p-mb-2"/>
@@ -1038,8 +1039,13 @@
                     </script>
                 </p:tab>
             </p:tabView>
+            <p:remoteCommand name="closeInvoiceDialog" action="#{bean.closeInvoiceDialog}" />
         </div>
-
+		<script>
+			$(".ui-dialog-titlebar-close").on("click", function() {
+				closeInvoiceDialog();
+			});
+		</script>
     </p:dialog>
 
     <p:dialog widgetVar="invoiceErrorDialogWV"  modal="true" draggable="false"

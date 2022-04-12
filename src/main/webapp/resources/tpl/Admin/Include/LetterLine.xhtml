@@ -98,7 +98,7 @@
 <!--                             oncomplete="PF('invoiceDialogWV').show();"/>-->
 
                 <p:commandButton style="margin-left: 2px;"
-                                 value="#{msg.requestTextEditCreateInvoice}" rendered="#{not bean.invoiceSentStatus and bean.invoiceRequests.size() != 0 and bean.billinRequest}"
+                                 value="#{msg.requestTextEditCreateInvoice}" rendered="#{bean.showCreateFatturaButton}"
                                  id="createInvoice" styleClass="grey-button"
                                  action="#{bean.setMaxInvoiceNumber()}" update="@widgetVar(mailManagerViewRequestsForInvoiceDlg)"
                                  oncomplete="PF('mailManagerViewRequestsForInvoiceDlg').show();"/>

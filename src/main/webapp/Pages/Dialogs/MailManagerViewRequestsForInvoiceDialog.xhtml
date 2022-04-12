@@ -10,7 +10,7 @@
                      rendered="#{not empty bean.entity.validRequests}"  scrollable="true"
                      scrollHeight="300" style="margin-top:20px;">
             <p:column styleClass="action_column">
-                <p:selectBooleanCheckbox value="#{item.selectedForInvoice}"/>
+                <p:selectBooleanCheckbox value="#{item.selectedForInvoice}" disabled="true"/>
             </p:column>
             <p:column headerText="#{msg.databaseListRealEstateSubject}">
                 <h:outputText value="#{item.mailViewSubject}"/>
@@ -31,7 +31,7 @@
         <!-- </p:panelGrid> -->
 
         <div class="btn_line">
-            <p:commandButton value="#{msg.confirm}" update="@form"
+            <p:commandButton value="#{msg.confirm}" update="@form :btn_line"
                              style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"
                              action="#{bean.createInvoice}"/>
             <p:commandButton value="#{msg.cancel}" oncomplete="PF('mailManagerViewRequestsForInvoiceDlg').hide();"
