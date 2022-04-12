@@ -64,6 +64,10 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
     private List<SelectItem> referenceItems;
 
     private Long selectedReferenceId;
+
+    private Boolean salesDevelopment;
+
+    private Boolean landOmi;
     
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -154,6 +158,9 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
         this.setReferenceItems(ComboboxHelper.fillList(ServiceReferenceTypes.class, true));
 
         executeJS("setIcon();");
+
+        setSalesDevelopment(this.getEntity().getSalesDevelopment());
+        setLandOmi(this.getEntity().getLandOmi());
     }
 
     public void editService() {
@@ -246,7 +253,19 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
         this.getEntity().setRequestOutputType(RequestOutputTypes.getById(getSelectedRequestOutputId()));
 
         this.getEntity().setServiceReferenceType(ServiceReferenceTypes.getById(getSelectedReferenceId()));
-        
+
+        if (!ValidationHelper.isNullOrEmpty(this.getSalesDevelopment()) && this.getSalesDevelopment()) {
+            this.getEntity().setSalesDevelopment(this.getSalesDevelopment());
+        }else {
+            this.getEntity().setSalesDevelopment(null);
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(this.getLandOmi()) && this.getLandOmi()) {
+            this.getEntity().setLandOmi(this.getLandOmi());
+        }else {
+            this.getEntity().setLandOmi(null);
+        }
+
         DaoManager.save(this.getEntity());
     }
 
@@ -442,4 +461,19 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
         this.selectedReferenceId = selectedReferenceId;
     }
 
+    public Boolean getSalesDevelopment() {
+        return salesDevelopment;
+    }
+
+    public void setSalesDevelopment(Boolean salesDevelopment) {
+        this.salesDevelopment = salesDevelopment;
+    }
+
+    public Boolean getLandOmi() {
+        return landOmi;
+    }
+
+    public void setLandOmi(Boolean landOmi) {
+        this.landOmi = landOmi;
+    }
 }

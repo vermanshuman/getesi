@@ -63,7 +63,7 @@
             </p:column>
 
             <p:column rendered="#{not empty bean.wrapper.selectedPersonId}">
-                <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_PROVINCE}"/><br/>
+                <h:outputText value="#{bean.wrapper.selectedPersonId == 1 ? enums.documentGenerationTagsSUBJECT_MASTERY_PROVINCE : enums.documentGenerationTagsSUBJECT_MASTERY_PROVINCE_OFFICE}"/><br/>
                 <p:selectOneMenu id="SUBJECT_MASTERY_PROVINCE" value="#{bean.wrapper.selectProvinceId}"
                                  styleClass="select-width" filter="true">
                     <f:selectItems value="#{bean.wrapper.provinces}"/>
@@ -75,7 +75,7 @@
 
             <p:column id="comune_column"
                       rendered="#{not empty bean.wrapper.selectedPersonId and bean.wrapper.selectProvinceId!=-1}">
-                <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_COMUNE}"/><br/>
+                <h:outputText value="#{bean.wrapper.selectedPersonId == 1 ? enums.documentGenerationTagsSUBJECT_MASTERY_COMUNE : enums.documentGenerationTagsSUBJECT_MASTERY_COMUNE_OFFICE}"/><br/>
                 <p:selectOneMenu id="SUBJECT_MASTERY_COMUNE" value="#{bean.wrapper.selectedCityId}"
                                  styleClass="select-width" filter="true" filterFunction="filterCity"
                                  filterMatchMode="custom">
@@ -100,7 +100,7 @@
                 <br/>
                 <p:commandButton action="#{bean.restoreFiscalCode}"
                                  update="SUBJECT_MASTERY, messages" style="margin-top: 3px"
-                                 value="#{msg.databaseListSubjectFiscalCodeRestore}"/>
+                                 value="#{msg.databaseListSubjectIVARestore}"/>
             </p:column>
              <p:column rendered="#{bean.wrapper.selectedPersonId eq 2}">
                 <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_OLD_IVA}"/><br/>

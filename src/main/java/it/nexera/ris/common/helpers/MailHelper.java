@@ -113,7 +113,7 @@ public class MailHelper extends BaseHelper {
 
         for (String email : emails) {
             Matcher m = Pattern
-                    .compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+")
+                    .compile("[a-zA-Z0-9'_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+")
                     .matcher(email);
 
             while (m.find()) {

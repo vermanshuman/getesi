@@ -294,7 +294,7 @@
                 <p:ajax event="tabChange" listener="#{bean.onTabChange}"/>
                 <p:tab title="#{msg.requestTab}" rendered="#{bean.showRequestTab}">
                     <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
-                        <p:dataTable value="#{bean.invoicedRequests}" styleClass="simple-table" var="item" 
+                        <p:dataTable value="#{bean.invoicedRequests}" styleClass="simple-table" var="item"
                                      scrollable="true"
                                      scrollHeight="300" style="margin-top:20px;">
 
@@ -326,7 +326,7 @@
                                     <p:outputLabel value="#{msg.number}"/>
                                 </div>
                                 <div class="p-col-2">
-                                	<p:inputText value="#{bean.number}" id="number" readonly="true"/>
+                                    <p:inputText value="#{bean.number}" id="number" readonly="true"/>
                                 </div>
                                 <div class="p-col-1 vertical-center" >
                                     <p:outputLabel value="#{msg.data}"/>
@@ -348,7 +348,7 @@
                                     <p:outputLabel value="#{msg.codifica}"/>
                                 </div>
                                 <div class="p-col-2">
-                                	<p:inputText value="#{bean.invoiceNumber}" readonly="true"/>
+                                    <p:inputText value="#{bean.invoiceNumber}" readonly="true"/>
                                 </div>
                                 <div class="p-col-1 vertical-center">
                                     <h:outputText value="#{msg.client}"/>
@@ -515,16 +515,16 @@
                                 <ui:repeat value="#{bean.goodsServicesFields}" var="key" >
                                     <div class="p-col-2">
                                         <h:outputText value="#{msg.netAmount}"></h:outputText>
-                                        <p:inputText id="total_cost" value="#{key.invoiceTotalCost}" disabled="#{bean.invoiceSentStatus}" 
-                                        		styleClass="total_cost_#{key.counter}" onchange="updateTotalLine(this);" >
+                                        <p:inputText id="total_cost" value="#{key.invoiceTotalCost}" disabled="#{bean.invoiceSentStatus}"
+                                                     styleClass="total_cost_#{key.counter}" onchange="updateTotalLine(this);" >
                                             <p:keyFilter mask="num" />
                                         </p:inputText>
                                     </div>
                                     <div class="p-col-1">
                                         <h:outputText value="#{msg.qty}"></h:outputText>
-                                        <p:inputText id="quantita" value="#{key.invoiceItemAmount}" label="#{msg.qty}" 
-                                        		disabled="#{bean.invoiceSentStatus}" onchange="updateItemAmount(this);"
-                                        		styleClass="item_amount_#{key.counter}">
+                                        <p:inputText id="quantita" value="#{key.invoiceItemAmount}" label="#{msg.qty}"
+                                                     disabled="#{bean.invoiceSentStatus}" onchange="updateItemAmount(this);"
+                                                     styleClass="item_amount_#{key.counter}">
                                             <p:keyFilter mask="num" />
                                         </p:inputText>
                                     </div>
@@ -540,7 +540,7 @@
                                     </div>
                                     <div class="p-col-4">
                                         <h:outputText value="#{msg.vat}"></h:outputText>
-                                        <p:selectOneMenu id="invoiceVat" value="#{key.selectedTaxRateId}" style="width:100%;" onchange="updateVat();" 
+                                        <p:selectOneMenu id="invoiceVat" value="#{key.selectedTaxRateId}" style="width:100%;" onchange="updateVat();"
                                                          label="#{msg.invoiceVat}" styleClass="#{key.selectedTaxRateId ne null ? 'select-one-menu' : 'select-one-menu-width'}" disabled="#{bean.invoiceSentStatus}">
                                             <f:selectItems value="#{key.vatAmounts}"/>
                                             <!-- <p:ajax event="change" /> -->
@@ -606,7 +606,6 @@
                                 </div>
                                 <div class="p-col-2">
                                     <p:inputText id="invoiceTotalAmount" value="#{bean.allTotalLine}" disabled="true">
-                                        <!-- <f:convertNumber minFractionDigits="2" /> -->
                                         <p:keyFilter mask="num" />
                                     </p:inputText>
                                 </div>
@@ -618,7 +617,6 @@
 
                                 <div class="p-col-2">
                                     <p:inputText id="invoiceToVAT" value="#{bean.totalVat}" disabled="true">
-                                        <!-- <f:convertNumber minFractionDigits="2" /> -->
                                         <p:keyFilter mask="num" />
                                     </p:inputText>
                                 </div>
@@ -634,7 +632,6 @@
                                 </div>
                                 <div class="p-col-2">
                                     <p:inputText id="totalGA" value="#{bean.totalGrossAmount}" disabled="true">
-                                        <!-- <f:convertNumber minFractionDigits="2" /> -->
                                         <p:keyFilter mask="num" />
                                     </p:inputText>
                                 </div>
@@ -671,7 +668,7 @@
                             <div class="p-grid">
                                 <div class="p-col-8">
                                     <p:commandButton value="#{msg.downloadInvoice}"  actionListener="#{bean.downloadInvoicePdf}" ajax="false">
-                                    	<p:fileDownload value="#{bean.invoicePDFFile}"/>
+                                        <p:fileDownload value="#{bean.invoicePDFFile}"/>
                                     </p:commandButton>
                                 </div>
                                 <div class="p-col-4" style="text-align:right;">
@@ -690,48 +687,48 @@
                         </p:panel>
                     </div>
                     <script>
-                    	function updateTotalLine(element) {
-                    		var elementClass = $(element).attr("class");
-                    		var totalCost = $(element).val();
-                    		const myArray = elementClass.split(" ");
-                    		const startsWith = myArray.filter((value) => value.startsWith("total_cost_"));
-                    		var totalCostVar = startsWith[0];
-                    		var index = totalCostVar.replace("total_cost_","");
-                    		var itemAmount = $(".item_amount_"+index).val();
-                    		var totalLine = totalCost;
-                    		if(itemAmount != null) {
-                    			totalLine = (+totalCost)+(+itemAmount);
-                    		}
-                    		totalLine = roundNumber(totalLine, 12);
-                    		$(".total_line_"+index).val(totalLine);
-                    		updateCountsSummaryPanel(); 
-                    	}
-                    	
-                    	function roundNumber(number, decimals) {
-                    	    var newnumber = new Number(number+'').toFixed(parseInt(decimals));
-                    	    return parseFloat(newnumber); 
-                    	}
-                    	
-                    	function updateItemAmount(element) {
-                    		var elementClass = $(element).attr("class");
-                    		var itemAmount = $(element).val();
-                    		const myArray = elementClass.split(" ");
-                    		const startsWith = myArray.filter((value) => value.startsWith("item_amount_"));
-                    		var totalCostVar = startsWith[0];
-                    		var index = totalCostVar.replace("item_amount_","");
-                    		var totalCost = $(".total_cost_"+index).val();
-                    		var totalLine = totalCost;
-                    		if(itemAmount != null) {
-                    			totalLine = (+totalCost)+(+itemAmount);
-                    		}
-                    		totalLine = roundNumber(totalLine, 12);
-                    		$(".total_line_"+index).val(totalLine);
-                    		updateCountsSummaryPanel();
-                    	}
-                    	
-                    	function updateVat() {
-                    		updateCountsSummaryPanel();
-                    	}
+                        function updateTotalLine(element) {
+                            var elementClass = $(element).attr("class");
+                            var totalCost = $(element).val();
+                            const myArray = elementClass.split(" ");
+                            const startsWith = myArray.filter((value) => value.startsWith("total_cost_"));
+                            var totalCostVar = startsWith[0];
+                            var index = totalCostVar.replace("total_cost_","");
+                            var itemAmount = $(".item_amount_"+index).val();
+                            var totalLine = totalCost;
+                            if(itemAmount != null) {
+                                totalLine = (+totalCost)+(+itemAmount);
+                            }
+                            totalLine = roundNumber(totalLine, 12);
+                            $(".total_line_"+index).val(totalLine);
+                            updateCountsSummaryPanel();
+                        }
+
+                        function roundNumber(number, decimals) {
+                            var newnumber = new Number(number+'').toFixed(parseInt(decimals));
+                            return parseFloat(newnumber);
+                        }
+
+                        function updateItemAmount(element) {
+                            var elementClass = $(element).attr("class");
+                            var itemAmount = $(element).val();
+                            const myArray = elementClass.split(" ");
+                            const startsWith = myArray.filter((value) => value.startsWith("item_amount_"));
+                            var totalCostVar = startsWith[0];
+                            var index = totalCostVar.replace("item_amount_","");
+                            var totalCost = $(".total_cost_"+index).val();
+                            var totalLine = totalCost;
+                            if(itemAmount != null) {
+                                totalLine = (+totalCost)+(+itemAmount);
+                            }
+                            totalLine = roundNumber(totalLine, 12);
+                            $(".total_line_"+index).val(totalLine);
+                            updateCountsSummaryPanel();
+                        }
+
+                        function updateVat() {
+                            updateCountsSummaryPanel();
+                        }
                     </script>
                     <p:remoteCommand name="updateCountsSummaryPanel" update="@widgetVar(countsSummaryPanelVW) @widgetVar(goodsServicesPanelVW)"/>
                 </p:tab>
@@ -952,36 +949,36 @@
                         }
 
                         // Custom Key Events function
-                       /*  function HandleTabEvent(e) {
-                            if (e.data.keyCode == 9){
-                                var selection = CKEDITOR.instances.body.ui.editor.getSelection();
-                                var startElement = selection.getStartElement();
-                                if (e.data.keyCode == 9){
-                                    var handleTab = false;
-                                    var x = $(".cke_button__bulletedlist");
-                                    if(x &amp;&amp; x.attr('class') == 'cke_button cke_button__bulletedlist cke_button_on'){
-                                        handleTab = true;
-                                    }else {
-                                        x = $(".cke_button__numberedlist");
-                                        if(x &amp;&amp; x.attr('class') == 'cke_button cke_button__numberedlist cke_button_on'){
-                                            handleTab = true;
-                                        }
-                                    }
-                                    if(handleTab){
-                                        var element = selection.getStartElement();
-                                        var sText = element.getHtml();
-                                        var text = jQuery('&lt;div&gt;').html(sText).text();
-                                        var result = text.replace(/[^ -~]+/g, "");
-                                        if(!result || 0 === result.length){
-                                        }else {
-                                            e.cancel();
-                                            e.stop();
-                                            CKEDITOR.instances.body.ui.editor.insertText('    ');
-                                        }
-                                    }
-                                }
-                            }
-                        } */
+                        /*  function HandleTabEvent(e) {
+                             if (e.data.keyCode == 9){
+                                 var selection = CKEDITOR.instances.body.ui.editor.getSelection();
+                                 var startElement = selection.getStartElement();
+                                 if (e.data.keyCode == 9){
+                                     var handleTab = false;
+                                     var x = $(".cke_button__bulletedlist");
+                                     if(x &amp;&amp; x.attr('class') == 'cke_button cke_button__bulletedlist cke_button_on'){
+                                         handleTab = true;
+                                     }else {
+                                         x = $(".cke_button__numberedlist");
+                                         if(x &amp;&amp; x.attr('class') == 'cke_button cke_button__numberedlist cke_button_on'){
+                                             handleTab = true;
+                                         }
+                                     }
+                                     if(handleTab){
+                                         var element = selection.getStartElement();
+                                         var sText = element.getHtml();
+                                         var text = jQuery('&lt;div&gt;').html(sText).text();
+                                         var result = text.replace(/[^ -~]+/g, "");
+                                         if(!result || 0 === result.length){
+                                         }else {
+                                             e.cancel();
+                                             e.stop();
+                                             CKEDITOR.instances.body.ui.editor.insertText('    ');
+                                         }
+                                     }
+                                 }
+                             }
+                         } */
 
                         function lockValue(event) {
                             if (event.keyCode == 32 || event.key == ',') {
@@ -1041,11 +1038,11 @@
             </p:tabView>
             <p:remoteCommand name="closeInvoiceDialog" action="#{bean.closeInvoiceDialog}" />
         </div>
-		<script>
-			$(".ui-dialog-titlebar-close").on("click", function() {
-				closeInvoiceDialog();
-			});
-		</script>
+        <script>
+            $(".ui-dialog-titlebar-close").on("click", function() {
+                closeInvoiceDialog();
+            });
+        </script>
     </p:dialog>
 
     <p:dialog widgetVar="invoiceErrorDialogWV"  modal="true" draggable="false"

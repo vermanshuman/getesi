@@ -5,7 +5,7 @@
                 xmlns:h="http://java.sun.com/jsf/html" xmlns:c="http://java.sun.com/jsp/jstl/core">
     <p:dialog widgetVar="requestExtraCostDlg" modal="true" width="700" id="requestExtraCostDialog">
         <div class="cost_titles">
-            <c:if test="#{bean.costManipulationHelper.isEditable()}">
+            <c:if test="#{bean.costManipulationHelper ne null and bean.costManipulationHelper.isEditable()}">
                 <p:panelGrid rendered="#{bean.examRequest!=null}" columns="2" columnClasses="cost_form_column"
                              styleClass="ui-panelgrid-blank form-group cost_titles_table">
                     <h3>#{msg.estateSituationEditClientName}</h3>

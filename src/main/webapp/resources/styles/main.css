@@ -947,3 +947,16 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
 .icon-block i {
     width: 50px;
 }
+
+.confirmationDialog {
+    border: 7px solid #57c279 !important;
+}
+
+.confirmationDialog .ui-dialog-titlebar {
+    border-bottom: none !important;
+}
+
+body .confirmationDialog .ui-widget-header {
+    background: #f8f9fa !important;
+    color: #495057 !important;
+}

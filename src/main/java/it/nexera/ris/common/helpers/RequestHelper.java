@@ -32,6 +32,7 @@ import it.nexera.ris.web.beans.wrappers.logic.RequestStateWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.RequestTypeFilterWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.ServiceFilterWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.UserFilterWrapper;
+import static it.nexera.ris.common.helpers.TemplatePdfTableHelper.distinctByKey;
 
 public class RequestHelper {
 
@@ -285,12 +286,47 @@ public class RequestHelper {
         return true;
     }
 
-    public static List<SelectItem> onRequestTypeChange(Long requestTypeId, boolean multiple)
-            throws IllegalAccessException, PersistenceBeanException {
-        if (!ValidationHelper.isNullOrEmpty(requestTypeId)) {
-            return ComboboxHelper.fillList(Service.class, Order.asc("name"), new Criterion[]{
+    public static List<SelectItem> onRequestTypeChange(Long requestTypeId, boolean multiple, Long selectedClientId)
+            throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+        if (!ValidationHelper.isNullOrEmpty(requestTypeId) && !ValidationHelper.isNullOrEmpty(selectedClientId)) {
+            List<Service> services = DaoManager.load(Service.class,new Criterion[]{
                     Restrictions.eq("requestType.id", requestTypeId)
-            }, !multiple);
+            },  Order.asc("name"));
+
+            List<Service> filteredServices = new ArrayList<>();
+
+            Client client = DaoManager.get(Client.class, selectedClientId);
+
+            if(!ValidationHelper.isNullOrEmpty(client)){
+                if(!ValidationHelper.isNullOrEmpty(client.getLandOmi()) && client.getLandOmi()){
+                    filteredServices.addAll(services
+                            .stream()
+                            .filter(s -> !ValidationHelper.isNullOrEmpty(s.getLandOmi()) && s.getLandOmi())
+                            .collect(Collectors.toList()));
+                }
+                if(!ValidationHelper.isNullOrEmpty(client.getSalesDevelopment()) && client.getSalesDevelopment()){
+                    filteredServices.addAll(services
+                            .stream()
+                            .filter(s -> !ValidationHelper.isNullOrEmpty(s.getSalesDevelopment()) && s.getSalesDevelopment())
+                            .collect(Collectors.toList()));
+                }
+                filteredServices.addAll(services
+                        .stream()
+                        .filter(s -> ValidationHelper.isNullOrEmpty(s.getSalesDevelopment())
+                                && ValidationHelper.isNullOrEmpty(s.getLandOmi()))
+                        .collect(Collectors.toList()));
+            }
+            if(!ValidationHelper.isNullOrEmpty(filteredServices)){
+                return ComboboxHelper.fillList(filteredServices.stream()
+                        .filter(distinctByKey(c -> c.getId()))
+                        .collect(Collectors.toList()), !multiple);
+            }else {
+                return (ComboboxHelper.fillList(new ArrayList<>(), !multiple));
+            }
+
+//            return ComboboxHelper.fillList(Service.class, Order.asc("name"), new Criterion[]{
+//                    Restrictions.eq("requestType.id", requestTypeId)
+//            }, !multiple);
         } else {
             return (ComboboxHelper.fillList(new ArrayList<>(), !multiple));
         }
@@ -355,19 +391,33 @@ public class RequestHelper {
                             continue;
                         }
 
-                        InputCardManageField existingField = inputCardOutput.getFields().stream()
-                                .filter(f -> f.getField() == field.getField()).findAny().orElse(null);
-                        if (existingField == null) {
-                            inputCardOutput.getFields().add(field);
-                        } else {
-                            if ((existingField.getState() == ManageTypeFieldsState.ENABLE
-                                    || existingField.getState() == ManageTypeFieldsState.HIDDEN)
-                                    && (field.getState() == ManageTypeFieldsState.ENABLE
-                                    || field.getState() == ManageTypeFieldsState.ENABLE_AND_MANDATORY)) {
-                                inputCardOutput.getFields().remove(existingField);
+                        if(!isHidden){
+                            InputCardManageField existingField = inputCardOutput.getFields().stream()
+                                    .filter(f -> f.getField() == field.getField()).findAny().orElse(null);
+                            if (existingField == null) {
                                 inputCardOutput.getFields().add(field);
+                            } else {
+                                if ((existingField.getState() == ManageTypeFieldsState.ENABLE
+                                        || existingField.getState() == ManageTypeFieldsState.HIDDEN)
+                                        && (field.getState() == ManageTypeFieldsState.ENABLE
+                                        || field.getState() == ManageTypeFieldsState.ENABLE_AND_MANDATORY)) {
+                                    inputCardOutput.getFields().remove(existingField);
+                                    inputCardOutput.getFields().add(field);
+                                }
+                            }
+                        }else {
+                            InputCardManageField existingField = inputCardOutput.getFields().stream()
+                                    .filter(f -> f.getField() == field.getField()).findAny().orElse(null);
+                            if (existingField == null && field.getState() == ManageTypeFieldsState.HIDDEN) {
+                                inputCardOutput.getFields().add(field);
+                            } else {
+                                if (existingField != null && existingField.getState() == ManageTypeFieldsState.HIDDEN) {
+                                    inputCardOutput.getFields().remove(existingField);
+                                    inputCardOutput.getFields().add(field);
+                                }
                             }
                         }
+
                     }
                     return Collections.singletonList(inputCardOutput);
                 }

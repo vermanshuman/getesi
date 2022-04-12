@@ -9,11 +9,7 @@ import it.nexera.ris.common.helpers.create.xls.CreateExcelRequestsReportHelper;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.*;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
 import it.nexera.ris.persistence.view.ClientView;
 import it.nexera.ris.persistence.view.RequestView;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
@@ -24,7 +20,6 @@ import it.nexera.ris.web.common.EntityLazyListModel;
 import it.nexera.ris.web.common.ListPaginator;
 import lombok.Getter;
 import lombok.Setter;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,14 +48,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
@@ -300,11 +288,10 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private String emailBodyToEditor;
 
     private static final String DELIM = ", ";
-    
-    private Boolean showRequestTab;
-    
-    private StreamedContent invoicePDFFile;
 
+    private Boolean showRequestTab;
+
+    private StreamedContent invoicePDFFile;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -858,7 +845,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     }
 
     public void loadInvoiceDialogData() throws IllegalAccessException, PersistenceBeanException, HibernateException, InstantiationException  {
-    	setShowRequestTab(false);
+        setShowRequestTab(false);
         List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[] {Restrictions.isNotNull("date")}, new Order[]{
                 Order.desc("date")});
         setPaymentInvoices(paymentInvoicesList);
@@ -873,19 +860,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setVatCollectabilityList(ComboboxHelper.fillList(VatCollectability.class,
                 false, false));
         paymentTypes = ComboboxHelper.fillList(PaymentType.class);
-//        setInvoiceTotalCost(CollectionUtils.emptyIfNull(getFilteredRequest())
-//                .stream()
-//                .filter(r -> !ValidationHelper.isNullOrEmpty(r.getTotalCost()))
-//                .mapToDouble(r -> Double.parseDouble(r.getTotalCostDouble())).sum());
-//        ums = new ArrayList<>();
-//        ums.add(new SelectItem("pz", "pz"));
-//
-//        vatAmounts = new ArrayList<>();
-//        vatAmounts.add(new SelectItem(0D, "0%"));
-//        vatAmounts.add(new SelectItem(4D, "4%"));
-//        vatAmounts.add(new SelectItem(10D, "10%"));
-//        vatAmounts.add(new SelectItem(22D, "22%"));
-
         List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
                 Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
                         Restrictions.isNull("deleted"))});
@@ -900,14 +874,18 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         if(!ValidationHelper.isNullOrEmpty(invoice)) {
             setInvoiceDate(invoice.getDate());
             setSelectedInvoiceClientId(invoice.getClient().getId());
-            setSelectedPaymentTypeId(invoice.getPaymentType().getId());
-            setVatCollectabilityId(invoice.getVatCollectability().getId());
+            if(!ValidationHelper.isNullOrEmpty(invoice.getPaymentType())){
+                setSelectedPaymentTypeId(invoice.getPaymentType().getId());
+            }
+            if(!ValidationHelper.isNullOrEmpty(invoice.getVatCollectability())){
+                setVatCollectabilityId(invoice.getVatCollectability().getId());
+            }
             setInvoiceNote(invoice.getNotes());
             setInvoiceDate(invoice.getDate());
             if(!ValidationHelper.isNullOrEmpty(invoice.getNumber()))
-            	setNumber(invoice.getNumber());
+                setNumber(invoice.getNumber());
             if(!ValidationHelper.isNullOrEmpty(invoice.getInvoiceNumber()))
-            	setInvoiceNumber(invoice.getInvoiceNumber());
+                setInvoiceNumber(invoice.getInvoiceNumber());
             List<GoodsServicesFieldWrapper> wrapperList = new ArrayList<>();
             List<InvoiceItem> invoiceItemsDb = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
             int counter = 1;
@@ -967,95 +945,57 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setNumber(lastInvoiceNumber);
     }
 
-    /*public Double getTotalVat() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
-        Double totalVat = 0D;
-        if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost())){
-            if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateId())){
-                TaxRate taxrate = DaoManager.get(TaxRate.class, getSelectedTaxRateId());
-                if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
-                    totalVat += getInvoiceTotalCost() * (taxrate.getPercentage().doubleValue()/100);
-                }
-            }
-        }
-        return totalVat;
-    }
-
-     */
-
     public Double getTotalVat() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         Double total = 0D;
         if(!ValidationHelper.isNullOrEmpty(getGoodsServicesFields())) {
-	        for(GoodsServicesFieldWrapper wrapper: getGoodsServicesFields()) {
-	            if(!ValidationHelper.isNullOrEmpty(wrapper.getTotalLine())) {
-	                if(!ValidationHelper.isNullOrEmpty(wrapper.getSelectedTaxRateId())) {
-	                    TaxRate taxrate = DaoManager.get(TaxRate.class, wrapper.getSelectedTaxRateId());
-	                    if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
-	                        total += wrapper.getTotalLine().doubleValue() * (taxrate.getPercentage().doubleValue()/100);
-	                    }
-	                }
-	            }
-	        }
-	        BigDecimal tot = BigDecimal.valueOf(total);
-	        tot = tot.setScale(2, RoundingMode.HALF_UP);
-	        total = tot.doubleValue();
+            for(GoodsServicesFieldWrapper wrapper: getGoodsServicesFields()) {
+                if(!ValidationHelper.isNullOrEmpty(wrapper.getTotalLine())) {
+                    if(!ValidationHelper.isNullOrEmpty(wrapper.getSelectedTaxRateId())) {
+                        TaxRate taxrate = DaoManager.get(TaxRate.class, wrapper.getSelectedTaxRateId());
+                        if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
+                            total += wrapper.getTotalLine().doubleValue() * (taxrate.getPercentage().doubleValue()/100);
+                        }
+                    }
+                }
+            }
+            BigDecimal tot = BigDecimal.valueOf(total);
+            tot = tot.setScale(2, RoundingMode.HALF_UP);
+            total = tot.doubleValue();
         }
         return total;
     }
-
-/*    public Double getTotalGrossAmount() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
-
-        Double totalGrossAmount = 0D;
-
-        if(!ValidationHelper.isNullOrEmpty(getInvoiceTotalCost())){
-            totalGrossAmount += getInvoiceTotalCost();
-            if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateId())){
-                TaxRate taxrate = DaoManager.get(TaxRate.class, getSelectedTaxRateId());
-                if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
-                    totalGrossAmount += (getInvoiceTotalCost() * (taxrate.getPercentage().doubleValue()/100));
-                }
-            }
-//            if(!ValidationHelper.isNullOrEmpty(getInvoiceItemVat())){
-//                totalGrossAmount += (getInvoiceTotalCost() * (getInvoiceItemVat()/100));
-//            }
-        }
-        return totalGrossAmount;
-    }
-
- */
-
 
     public Double getTotalGrossAmount() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         Double totalGrossAmount = 0D;
         if(!ValidationHelper.isNullOrEmpty(getGoodsServicesFields())) {
-	        for(GoodsServicesFieldWrapper wrapper: getGoodsServicesFields()) {
-	            if(!ValidationHelper.isNullOrEmpty(wrapper.getTotalLine())){
-	                totalGrossAmount += wrapper.getTotalLine();
-	                if(!ValidationHelper.isNullOrEmpty(wrapper.getSelectedTaxRateId())){
-	                    TaxRate taxrate = DaoManager.get(TaxRate.class, wrapper.getSelectedTaxRateId());
-	                    if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
-	                        totalGrossAmount += (wrapper.getTotalLine() * (taxrate.getPercentage().doubleValue()/100));
-	                    }
-	                }
-	            }
-	        }
-	        BigDecimal tot = BigDecimal.valueOf(totalGrossAmount);
-	        tot = tot.setScale(2, RoundingMode.HALF_UP);
-	        totalGrossAmount = tot.doubleValue();
+            for(GoodsServicesFieldWrapper wrapper: getGoodsServicesFields()) {
+                if(!ValidationHelper.isNullOrEmpty(wrapper.getTotalLine())){
+                    totalGrossAmount += wrapper.getTotalLine();
+                    if(!ValidationHelper.isNullOrEmpty(wrapper.getSelectedTaxRateId())){
+                        TaxRate taxrate = DaoManager.get(TaxRate.class, wrapper.getSelectedTaxRateId());
+                        if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
+                            totalGrossAmount += (wrapper.getTotalLine() * (taxrate.getPercentage().doubleValue()/100));
+                        }
+                    }
+                }
+            }
+            BigDecimal tot = BigDecimal.valueOf(totalGrossAmount);
+            tot = tot.setScale(2, RoundingMode.HALF_UP);
+            totalGrossAmount = tot.doubleValue();
         }
-        
         return totalGrossAmount;
     }
 
     public Double getAllTotalLine() {
-    	Double total = 0D;
+        Double total = 0D;
         if(!ValidationHelper.isNullOrEmpty(getGoodsServicesFields())) {
             total = getGoodsServicesFields().stream().collect(
                     Collectors.summingDouble(GoodsServicesFieldWrapper::getTotalLine));
             BigDecimal tot = BigDecimal.valueOf(total);
-	        tot = tot.setScale(2, RoundingMode.HALF_UP);
-	        total = tot.doubleValue();
+            tot = tot.setScale(2, RoundingMode.HALF_UP);
+            total = tot.doubleValue();
         }
-        return total;
+            return total;
     }
 
     private GoodsServicesFieldWrapper createGoodsServicesFieldWrapper() throws IllegalAccessException, PersistenceBeanException {
@@ -1129,7 +1069,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     public void confirmInvoice() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         cleanValidation();
-        
 
         if(ValidationHelper.isNullOrEmpty(getInvoiceDate())){
             addRequiredFieldException("form:date");
@@ -1450,6 +1389,32 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         RedirectHelper.goTo(PageTypes.EXCEL_DATA,null);
     }
 
+    public void createInvoice() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        setMaxInvoiceNumber();
+        List<RequestView> allRequestViews = DaoManager.load(RequestView.class,
+                getRequestFilterRestrictions().toArray(new Criterion[0]));
+        List<Long> requestIdList = allRequestViews.stream().map(RequestView::getId).collect(Collectors.toList());
+        if(!ValidationHelper.isNullOrEmpty(allRequestViews)){
+            List<Request> filteredRequests = DaoManager.load(Request.class, new Criterion[]{
+                    Restrictions.in("id", requestIdList)
+            });
+            Invoice invoice = new Invoice();
+            invoice.setClient(DaoManager.get(Client.class,getSelectedSubjectClientId()));
+            invoice.setDate(getInvoiceDate());
+            invoice.setDate(new Date());
+            invoice.setStatus(InvoiceStatus.DRAFT);
+            DaoManager.save(invoice, true);
+            List<InvoiceItem> invoiceItems = InvoiceHelper.groupingItemsByTaxRate(filteredRequests);
+            for(InvoiceItem invoiceItem: invoiceItems) {
+                invoiceItem.setInvoice(invoice);
+                DaoManager.save(invoiceItem,true);
+            }
+            setInvoicedRequests(filteredRequests);
+            loadInvoiceDialogData();
+            executeJS("PF('invoiceDialogBillingWV').show();");
+        }
+    }
+
     public boolean getSelectedAllUsersOnPanel() {
         if (this.getUserWrappers() != null) {
             for (UserFilterWrapper wlrsw : this.getUserWrappers()) {
@@ -1566,6 +1531,169 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
     }
 
+    public void downloadInvoicePdf() {
+        try {
+
+            //String refrequest = "";
+            //String ndg = "";
+            String templatePath  = (new File(FileHelper.getRealPath(),
+                    "resources" + File.separator + "layouts" + File.separator
+                            + "Invoice" + File.separator + "InvoiceDocumentTemplate.docx")
+                    .getAbsolutePath());
+
+            Double imponibile = 0.0;
+            Double totalIva = 0.0;
+            Double ivaPercentage = 0.0;
+
+            Invoice invoice = DaoManager.get(Invoice.class, getNumber());
+            if(!ValidationHelper.isNullOrEmpty(invoice)) {
+                List<InvoiceItem> items = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
+                for(InvoiceItem item : items) {
+                    double total = 0.0;
+                    double amount = 0.0;
+                    double totalCost = 0.0;
+                    if(item.getAmount() != null)
+                        amount = item.getAmount();
+                    if(item.getInvoiceTotalCost() != null)
+                        totalCost = item.getInvoiceTotalCost();
+                    imponibile = imponibile + amount + totalCost;
+                    total = amount + totalCost;
+                    if(item.getVat() != null){
+                        ivaPercentage = ivaPercentage + item.getVat();
+                        totalIva = totalIva + ((item.getVat() * total)/100);
+                    }
+                }
+                ivaPercentage = ivaPercentage/ items.size();
+                BigDecimal ivaPer = BigDecimal.valueOf(ivaPercentage);
+                ivaPer = ivaPer.setScale(2, RoundingMode.HALF_UP);
+                ivaPercentage = ivaPer.doubleValue();
+
+                BigDecimal totIva = BigDecimal.valueOf(totalIva);
+                totIva = totIva.setScale(2, RoundingMode.HALF_UP);
+                totalIva = totIva.doubleValue();
+
+                Date currentDate = new Date();
+                String fileName = "Richieste_Invoice_"+DateTimeHelper.toFileDateWithMinutes(currentDate);
+
+                String tempDir = FileHelper.getLocalTempDir();
+                tempDir  += File.separator + UUID.randomUUID();
+                FileUtils.forceMkdir(new File(tempDir));
+                String tempDoc = tempDir +  File.separator +  fileName +".docx";
+
+                try (XWPFDocument doc = new XWPFDocument(
+                        Files.newInputStream(Paths.get(templatePath)))) {
+                    for (XWPFParagraph p : doc.getParagraphs()) {
+                        List<XWPFRun> runs = p.getRuns();
+                        if (runs != null) {
+                            for (XWPFRun r : runs) {
+                                String text = r.getText(0);
+                                String replace = "";
+                                if (text != null && text.contains("inum")) {
+                                    if(!ValidationHelper.isNullOrEmpty(invoice.getInvoiceNumber()))
+                                        replace = invoice.getInvoiceNumber();
+                                    text = text.replace("inum",replace );
+                                    r.setText(text, 0);
+                                }else if (text != null && text.contains("clientname")) {
+
+                                    if(!ValidationHelper.isNullOrEmpty(invoice.getClient()))
+                                        replace = invoice.getClient().toString();
+                                    text = text.replace("clientname",replace );
+                                    r.setText(text, 0);
+                                }else if (text != null && text.contains("clientaddress")) {
+                                    if(!ValidationHelper.isNullOrEmpty(invoice.getClient()) &&
+                                            !ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressStreet()))
+                                        replace = invoice.getClient().getAddressStreet();
+                                    text = text.replace("clientaddress",replace );
+                                    r.setText(text, 0);
+                                }else if (text != null && text.contains("clientaddress2")) {
+                                    if(!ValidationHelper.isNullOrEmpty(invoice.getClient()) &&
+                                            !ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressPostalCode()))
+                                        replace = invoice.getClient().getAddressPostalCode();
+
+                                    if(!ValidationHelper.isNullOrEmpty(invoice.getClient()) &&
+                                            !ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressProvinceId())){
+                                        Province province = invoice.getClient().getAddressProvinceId();
+                                        replace = province.getDescription() + "(" + province.getCode() + ")";
+                                    }
+                                    text = text.replace("clientaddress2",replace );
+                                    r.setText(text, 0);
+                                }else if (text != null && text.contains("clientpiva")) {
+                                    if(!ValidationHelper.isNullOrEmpty(invoice.getClient()) &&
+                                            !ValidationHelper.isNullOrEmpty(invoice.getClient().getFiscalCode()))
+                                        replace = invoice.getClient().getFiscalCode();
+                                    text = text.replace("clientpiva",replace );
+                                    r.setText(text, 0);
+                                }else if (text != null && text.contains("impon")) {
+                                    text = text.replace("impon",imponibile.toString() );
+                                    r.setText(text, 0);
+                                }else if (text != null && text.contains("ivap")) {
+                                    text = text.replace("ivap",ivaPercentage.toString() + "%" );
+                                    r.setText(text, 0);
+                                }else if (text != null && text.contains("ivaa")) {
+                                    text = text.replace("ivaa",totalIva.toString());
+                                    r.setText(text, 0);
+                                }else if (text != null && text.contains("totale")) {
+                                    Double total = imponibile + totalIva;
+                                    text = text.replace("totale",total.toString());
+                                    r.setText(text, 0);
+                                }/*else if (text != null && text.contains("refrequest")) {
+	                                text = text.replace("refrequest",refrequest);
+	                                r.setText(text, 0);
+	                            }else if (text != null && text.contains("inboxndg")) {
+	                                text = text.replace("inboxndg",ndg);
+	                                r.setText(text, 0);
+	                            }*/
+                            }
+                        }
+                    }
+
+                    FileOutputStream out = new FileOutputStream(tempDoc);
+                    doc.write(out);
+                    out.close();
+                }
+
+                String sb = MailHelper.getDestinationPath() +
+                        DateTimeHelper.ToFilePathString(new Date());
+                File filePath = new File(sb);
+                String sofficeCommand =
+                        ApplicationSettingsHolder.getInstance().getByKey(
+                                ApplicationSettingsKeys.SOFFICE_COMMAND).getValue().trim();
+                Process p = Runtime.getRuntime().exec(new String[] { sofficeCommand, "--headless",
+                        "--convert-to", "pdf","--outdir", filePath.getAbsolutePath(), tempDoc });
+                p.waitFor();
+                FileHelper.delete(tempDoc);
+
+                String filePathStr = sb + File.separator + fileName + ".pdf";
+                byte[] fileContent = FileHelper.loadContentByPath(filePathStr);
+                if (fileContent != null) {
+                    InputStream stream = new ByteArrayInputStream(fileContent);
+                    invoicePDFFile = new DefaultStreamedContent(stream, FileHelper.getFileExtension(filePathStr),
+                            fileName + ".pdf");
+                }
+            }
+        }catch(Exception e){
+            LogHelper.log(log,e);
+        }
+    }
+
+    public void closeInvoiceDialog() {
+        try {
+            List<WLGExport> exports = DaoManager.load(WLGExport.class, new Criterion[]{
+                    Restrictions.isNull("sourcePath")
+            });
+            if (!ValidationHelper.isNullOrEmpty(exports)) {
+                for (WLGExport export : exports) {
+                    FileHelper.delete(export.getDestinationPath());
+                    DaoManager.remove(export, true);
+                }
+            }
+            setInvoiceEmailAttachedFiles(new ArrayList<>());
+            setActiveTabIndex(0);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
     public void updateDestination() {
         if (!ValidationHelper.isNullOrEmpty(getSendTo())) {
             setEmailTo(getSendTo().stream()
@@ -1665,169 +1793,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             executeJS("showNotSendMsg();");
             return;
         }
+
     }
 
-    public void downloadInvoicePdf() {
-    	try {
-    		
-    		//String refrequest = "";
-            //String ndg = "";
-            String templatePath  = (new File(FileHelper.getRealPath(),
-                    "resources" + File.separator + "layouts" + File.separator
-                            + "Invoice" + File.separator + "InvoiceDocumentTemplate.docx")
-                    .getAbsolutePath());
 
-            Double imponibile = 0.0;
-            Double totalIva = 0.0;
-            Double ivaPercentage = 0.0;
-
-        	Invoice invoice = DaoManager.get(Invoice.class, getNumber());
-        	if(!ValidationHelper.isNullOrEmpty(invoice)) {
-	            List<InvoiceItem> items = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
-	            for(InvoiceItem item : items) {
-                	double total = 0.0;
-                	double amount = 0.0;
-                	double totalCost = 0.0;
-                	if(item.getAmount() != null)
-                		amount = item.getAmount();
-                	if(item.getInvoiceTotalCost() != null)
-                		totalCost = item.getInvoiceTotalCost();
-                    imponibile = imponibile + amount + totalCost;
-                    total = amount + totalCost;
-                    if(item.getVat() != null){
-                        ivaPercentage = ivaPercentage + item.getVat();
-                        totalIva = totalIva + ((item.getVat() * total)/100);
-                    }
-                }
-                ivaPercentage = ivaPercentage/ items.size();
-                BigDecimal ivaPer = BigDecimal.valueOf(ivaPercentage);
-	            ivaPer = ivaPer.setScale(2, RoundingMode.HALF_UP);
-	            ivaPercentage = ivaPer.doubleValue();
-	            
-	            BigDecimal totIva = BigDecimal.valueOf(totalIva);
-	            totIva = totIva.setScale(2, RoundingMode.HALF_UP);
-	            totalIva = totIva.doubleValue();
-	            
-	            Date currentDate = new Date();
-	            String fileName = "Richieste_Invoice_"+DateTimeHelper.toFileDateWithMinutes(currentDate);
-	
-	            String tempDir = FileHelper.getLocalTempDir();
-	            tempDir  += File.separator + UUID.randomUUID();
-	            FileUtils.forceMkdir(new File(tempDir));
-	            String tempDoc = tempDir +  File.separator +  fileName +".docx";
-	
-	            try (XWPFDocument doc = new XWPFDocument(
-	                    Files.newInputStream(Paths.get(templatePath)))) {
-	                for (XWPFParagraph p : doc.getParagraphs()) {
-	                    List<XWPFRun> runs = p.getRuns();
-	                    if (runs != null) {
-	                        for (XWPFRun r : runs) {
-	                            String text = r.getText(0);
-	                            String replace = "";
-	                            if (text != null && text.contains("inum")) {
-	                                if(!ValidationHelper.isNullOrEmpty(invoice.getInvoiceNumber()))
-	                                    replace = invoice.getInvoiceNumber();
-	                                text = text.replace("inum",replace );
-	                                r.setText(text, 0);
-	                            }else if (text != null && text.contains("clientname")) {
-	
-	                                if(!ValidationHelper.isNullOrEmpty(invoice.getClient()))
-	                                    replace = invoice.getClient().toString();
-	                                text = text.replace("clientname",replace );
-	                                r.setText(text, 0);
-	                            }else if (text != null && text.contains("clientaddress")) {
-	                                if(!ValidationHelper.isNullOrEmpty(invoice.getClient()) &&
-	                                        !ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressStreet()))
-	                                    replace = invoice.getClient().getAddressStreet();
-	                                text = text.replace("clientaddress",replace );
-	                                r.setText(text, 0);
-	                            }else if (text != null && text.contains("clientaddress2")) {
-	                                if(!ValidationHelper.isNullOrEmpty(invoice.getClient()) &&
-	                                !ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressPostalCode()))
-	                                    replace = invoice.getClient().getAddressPostalCode();
-	
-	                                if(!ValidationHelper.isNullOrEmpty(invoice.getClient()) &&
-	                                        !ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressProvinceId())){
-	                                    Province province = invoice.getClient().getAddressProvinceId();
-	                                    replace = province.getDescription() + "(" + province.getCode() + ")";
-	                                }
-	                                text = text.replace("clientaddress2",replace );
-	                                r.setText(text, 0);
-	                            }else if (text != null && text.contains("clientpiva")) {
-	                                if(!ValidationHelper.isNullOrEmpty(invoice.getClient()) &&
-	                                        !ValidationHelper.isNullOrEmpty(invoice.getClient().getFiscalCode()))
-	                                    replace = invoice.getClient().getFiscalCode();
-	                                text = text.replace("clientpiva",replace );
-	                                r.setText(text, 0);
-	                            }else if (text != null && text.contains("impon")) {
-	                                text = text.replace("impon",imponibile.toString() );
-	                                r.setText(text, 0);
-	                            }else if (text != null && text.contains("ivap")) {
-	                                text = text.replace("ivap",ivaPercentage.toString() + "%" );
-	                                r.setText(text, 0);
-	                            }else if (text != null && text.contains("ivaa")) {
-	                                text = text.replace("ivaa",totalIva.toString());
-	                                r.setText(text, 0);
-	                            }else if (text != null && text.contains("totale")) {
-	                                Double total = imponibile + totalIva;
-	                                text = text.replace("totale",total.toString());
-	                                r.setText(text, 0);
-	                            }/*else if (text != null && text.contains("refrequest")) {
-	                                text = text.replace("refrequest",refrequest);
-	                                r.setText(text, 0);
-	                            }else if (text != null && text.contains("inboxndg")) {
-	                                text = text.replace("inboxndg",ndg);
-	                                r.setText(text, 0);
-	                            }*/
-	                        }
-	                    }
-	                }
-	
-	                FileOutputStream out = new FileOutputStream(tempDoc);
-	                doc.write(out);
-	                out.close();
-	            }
-	
-	            String sb = MailHelper.getDestinationPath() +
-	                    DateTimeHelper.ToFilePathString(new Date());
-	            File filePath = new File(sb);
-	            String sofficeCommand =
-	                    ApplicationSettingsHolder.getInstance().getByKey(
-	                            ApplicationSettingsKeys.SOFFICE_COMMAND).getValue().trim();
-	            Process p = Runtime.getRuntime().exec(new String[] { sofficeCommand, "--headless",
-	                    "--convert-to", "pdf","--outdir", filePath.getAbsolutePath(), tempDoc });
-	            p.waitFor();
-	            FileHelper.delete(tempDoc);
-	                
-	            String filePathStr = sb + File.separator + fileName + ".pdf";
-	            byte[] fileContent = FileHelper.loadContentByPath(filePathStr);
-	            if (fileContent != null) {
-	                InputStream stream = new ByteArrayInputStream(fileContent);
-	                invoicePDFFile = new DefaultStreamedContent(stream, FileHelper.getFileExtension(filePathStr),
-	                		fileName + ".pdf");
-	            }
-        	}
-        }catch(Exception e){
-         LogHelper.log(log,e);
-        }
-    }
-    
-    public void closeInvoiceDialog() {
-        try {
-            List<WLGExport> exports = DaoManager.load(WLGExport.class, new Criterion[]{
-                    Restrictions.isNull("sourcePath")
-            });
-            if (!ValidationHelper.isNullOrEmpty(exports)) {
-                for (WLGExport export : exports) {
-                    FileHelper.delete(export.getDestinationPath());
-                    DaoManager.remove(export, true);
-                }
-            }
-            setInvoiceEmailAttachedFiles(new ArrayList<>());
-            setActiveTabIndex(0);
-        } catch (Exception e) {
-            LogHelper.log(log, e);
-        }
-    }
 
 }

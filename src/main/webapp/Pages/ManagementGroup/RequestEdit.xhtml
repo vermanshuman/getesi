@@ -295,6 +295,14 @@
                 margin-left: 10px;
             }
 
+            body .ui-fieldset .ui-fieldset-legend {
+                background-color: #dee2e6 !important;
+                color: #495057; !important;
+            }
+            fieldset div {
+                font-size: 14px;
+                text-align: left;
+            }
         </style>
 
         <script>
@@ -575,8 +583,38 @@
                         </div>
                     </c:forEach>
                 </p:outputPanel>
+
+                <p:outputPanel id="dynamicHiddenPanel" style="margin-top: 20px">
+                    <p:fieldset rendered="#{not empty bean.hiddenFields}" legend="#{msg.requestHiddenFieldsHeader}" toggleable="true" toggleSpeed="500" collapsed="true">
+                    <c:forEach items="#{bean.hiddenFields}" var="item">
+                        <div class="ui-g" style="#{item.getLineEven()?'background-color: #F5F5F5;':''}">
+                        <c:if test="#{item.field != null}">
+                        <div class="ui-g-12" style="padding: 1%; background: transparent">
+                            <ui:include src="#{item.field.field.getPath()}"/>
+                        </div>
+                        </c:if>
+                            <c:if test="#{(item.fields != null) and item.isAttachedDocumentsBlock()}">
+                                <c:forEach items="#{item.fields}" var="block">
+                                    <div class="ui-g-6" style="padding: 1%">
+                                        <ui:include src="#{block.field.getPath()}"/>
+                                    </div>
+                                </c:forEach>
+                            </c:if >
+                            <c:if test="#{(item.fields != null) and !item.isAttachedDocumentsBlock()}">
+                                <c:forEach items="#{item.fields}" var="block">
+                                    <div class="ui-g-3" style="padding: 1%">
+                                        <ui:include src="#{block.field.getPath()}"/>
+                                    </div>
+                                </c:forEach>
+                            </c:if>
+                        </div>
+                    </c:forEach>
+                    </p:fieldset>
+
+                </p:outputPanel>
             </div>
         </ui:fragment>
+
 
         <ui:fragment rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1) or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)}">
             <p:panel id="userAddPanel" style="margin-top: 1%">
