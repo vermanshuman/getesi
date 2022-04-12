@@ -1350,10 +1350,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         competence = new Date();
         setVatCollectabilityList(ComboboxHelper.fillList(VatCollectability.class,
                 false, false));
-        paymentTypes = ComboboxHelper.fillList(getExamRequest().getClient().getPaymentTypeList(), Boolean.TRUE);
+        paymentTypes = ComboboxHelper.fillList(invoiceDb.getClient().getPaymentTypeList(), Boolean.TRUE);
         setGoodsServicesFields(new ArrayList<>());
         setInvoiceDate(invoiceDb.getDate());
         setSelectedClientId(invoiceDb.getClient().getId());
+        if(invoiceDb.getClient().getSplitPayment() != null && invoiceDb.getClient().getSplitPayment())
+    		setVatCollectabilityId(VatCollectability.SPLIT_PAYMENT.getId());
         if(!ValidationHelper.isNullOrEmpty(invoiceDb.getVatCollectability()))
             setVatCollectabilityId(invoiceDb.getVatCollectability().getId());
         if(!ValidationHelper.isNullOrEmpty(invoiceDb.getPaymentType()))
@@ -1380,7 +1382,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             wrapper.setInvoiceItemAmount(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount()) ? 0.0 : invoiceItem.getAmount());
             double totalcost = !(ValidationHelper.isNullOrEmpty(invoiceItem.getInvoiceTotalCost())) ? invoiceItem.getInvoiceTotalCost().doubleValue() : 0.0;
             double amount = !(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount())) ? invoiceItem.getAmount().doubleValue() : 0.0;
-            double totalLine = totalcost + amount;
+            double totalLine = 0d; 
+            if(amount != 0.0) {
+            	totalLine = totalcost * amount;
+            } else {
+            	totalLine = totalcost;
+            }
             wrapper.setTotalLine(totalLine);
             if(!ValidationHelper.isNullOrEmpty(invoiceItem.getDescription()))
                 wrapper.setDescription(invoiceItem.getDescription());
@@ -1389,6 +1396,11 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
         setGoodsServicesFields(wrapperList);
         loadDraftEmail();
+        if(!ValidationHelper.isNullOrEmpty(getEntity())) {
+        	String causal = "Rif. " + getEntity().getReferenceRequest() + " UFFICIO " + getEntity().getOffice().getDescription() + " GESTORE " 
+        					+ getEntity().getClient().getClientName() + " FIDUCIARIO " + getEntity().getOffice().getDescription();
+        	setInvoiceNote(causal);
+        }
     }
 
     public void createInvoice() throws IllegalAccessException, PersistenceBeanException, HibernateException, InstantiationException {
@@ -1482,46 +1494,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
     }
 
-
-    public void confirmInvoice() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
-        cleanValidation();
-        if(ValidationHelper.isNullOrEmpty(getInvoiceDate())){
-            addRequiredFieldException("form:date");
-            setValidationFailed(true);
-        }
-
-        if(ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId())){
-            addRequiredFieldException("form:paymentType");
-            setValidationFailed(true);
-        }
-
-        for(GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
-            if(ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceTotalCost())){
-                setValidationFailed(true);
-            }
-
-            if(ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getSelectedTaxRateId())){
-                setValidationFailed(true);
-            }
-        }
-
-        if (getValidationFailed()){
-            executeJS("PF('invoiceErrorDialogWV').show();");
-            return;
-        }
-
-        try {
-            Invoice invoice = saveInvoice(InvoiceStatus.TOSEND, true);
-            loadInvoiceDialogData(invoice);
-            executeJS("PF('invoiceConfirmWV').show();");
-        }catch(Exception e) {
-            e.printStackTrace();
-            LogHelper.log(log, e);
-            executeJS("PF('sendInvoiceErrorDialogWV').show();");
-        }
-
-    }
-
     public Invoice saveInvoice(InvoiceStatus invoiceStatus, Boolean saveInvoiceNumber) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         Invoice invoice = DaoManager.get(Invoice.class, getNumber());
         if(ValidationHelper.isNullOrEmpty(invoice)) {
@@ -1565,6 +1537,32 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     }
 
     public void sendInvoice() {
+    	cleanValidation();
+        if(ValidationHelper.isNullOrEmpty(getInvoiceDate())){
+            addRequiredFieldException("form:date");
+            setValidationFailed(true);
+        }
+
+        if(ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId())){
+            addRequiredFieldException("form:paymentType");
+            setValidationFailed(true);
+        }
+
+        for(GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
+            if(ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceTotalCost())){
+                setValidationFailed(true);
+            }
+
+            if(ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getSelectedTaxRateId())){
+                setValidationFailed(true);
+            }
+        }
+
+        if (getValidationFailed()){
+            executeJS("PF('invoiceErrorDialogWV').show();");
+            return;
+        }
+        
         try {
             Invoice invoice = DaoManager.get(Invoice.class, getNumber());
             List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
@@ -1761,6 +1759,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
             if(!ValidationHelper.isNullOrEmpty(inbox.getEmailSubject()))
                 setEmailSubject(inbox.getEmailSubject());
+            
+            
         }
     }
 
@@ -1881,8 +1881,14 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                         amount = item.getAmount();
                     if(item.getInvoiceTotalCost() != null)
                         totalCost = item.getInvoiceTotalCost();
-                    imponibile = imponibile + amount + totalCost;
-                    total = amount + totalCost;
+                    if(amount != 0.0)
+                    	imponibile = imponibile + (amount * totalCost);
+                    else
+                    	imponibile = imponibile + totalCost;
+                    if(amount != 0.0)
+                    	total = amount * totalCost;
+                    else
+                    	total = totalCost;
                     if(item.getVat() != null){
                         ivaPercentage = ivaPercentage + item.getVat();
                         totalIva = totalIva + ((item.getVat() * total)/100);
@@ -2129,12 +2135,19 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     double total = 0.0;
                     double amount = 0.0;
                     double totalCost = 0.0;
+                    
                     if(item.getAmount() != null)
                         amount = item.getAmount();
                     if(item.getInvoiceTotalCost() != null)
                         totalCost = item.getInvoiceTotalCost();
-                    imponibile = imponibile + amount + totalCost;
-                    total = amount + totalCost;
+                    if(amount != 0.0)
+                    	imponibile = imponibile + (amount * totalCost);
+                    else
+                    	imponibile = imponibile + totalCost;
+                    if(amount != 0.0)
+                    	total = amount * totalCost;
+                    else
+                    	total = totalCost;
                     if(item.getVat() != null){
                         ivaPercentage = ivaPercentage + item.getVat();
                         totalIva = totalIva + ((item.getVat() * total)/100);

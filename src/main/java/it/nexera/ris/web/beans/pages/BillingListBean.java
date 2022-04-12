@@ -859,7 +859,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         competence = new Date();
         setVatCollectabilityList(ComboboxHelper.fillList(VatCollectability.class,
                 false, false));
-        paymentTypes = ComboboxHelper.fillList(PaymentType.class);
+        //paymentTypes = ComboboxHelper.fillList(PaymentType.class);
         List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
                 Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
                         Restrictions.isNull("deleted"))});
@@ -898,7 +898,12 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 wrapper.setInvoiceItemAmount(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount()) ? 0.0 : invoiceItem.getAmount());
                 double totalcost = !(ValidationHelper.isNullOrEmpty(invoiceItem.getInvoiceTotalCost())) ? invoiceItem.getInvoiceTotalCost().doubleValue() : 0.0;
                 double amount = !(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount())) ? invoiceItem.getAmount().doubleValue() : 0.0;
-                double totalLine = totalcost + amount;
+                double totalLine = 0d; 
+                if(amount != 0.0) {
+                	totalLine = totalcost * amount;
+                } else {
+                	totalLine = totalcost;
+                }
                 wrapper.setTotalLine(totalLine);
                 if(!ValidationHelper.isNullOrEmpty(invoiceItem.getDescription()))
                     wrapper.setDescription(invoiceItem.getDescription());
@@ -1064,51 +1069,14 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     }
 
     public void onItemSelectInvoiceClient() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
-        setSelectedInvoiceClient(DaoManager.get(Client.class, getSelectedInvoiceClientId()));
-    }
-
-    public void confirmInvoice() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
-        cleanValidation();
-
-        if(ValidationHelper.isNullOrEmpty(getInvoiceDate())){
-            addRequiredFieldException("form:date");
-            setValidationFailed(true);
-        }
-
-        if(ValidationHelper.isNullOrEmpty(getSelectedInvoiceClientId())){
-            addRequiredFieldException("form:invoiceClient");
-            setValidationFailed(true);
-        }
-
-        if(ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId())){
-            addRequiredFieldException("form:paymentType");
-            setValidationFailed(true);
-        }
-
-        for(GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
-            if(ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceTotalCost())){
-                setValidationFailed(true);
-            }
-
-            if(ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getSelectedTaxRateId())){
-                setValidationFailed(true);
-            }
-        }
-
-        if (getValidationFailed()){
-            executeJS("PF('invoiceErrorDialogWV').show();");
-            return;
-        }
-
-        try {
-            saveInvoice(InvoiceStatus.TOSEND, true);
-            loadInvoiceDialogData();
-            executeJS("PF('invoiceConfirmWV').show();");
-        }catch(Exception e) {
-            e.printStackTrace();
-            LogHelper.log(log, e);
-            executeJS("PF('sendInvoiceErrorDialogWV').show();");
-        }
+        Client selectedClient = DaoManager.get(Client.class, getSelectedInvoiceClientId());
+    	setSelectedInvoiceClient(selectedClient);
+    	System.out.println(selectedClient.getSplitPayment());
+    	if(selectedClient.getSplitPayment() != null && selectedClient.getSplitPayment())
+    		setVatCollectabilityId(VatCollectability.SPLIT_PAYMENT.getId());
+    	if(selectedClient.getPaymentTypeList() != null && !selectedClient.getPaymentTypeList().isEmpty()) {
+    		setPaymentTypes(ComboboxHelper.fillList(selectedClient.getPaymentTypeList(), true));
+    	}
     }
 
     public void saveInvoice(InvoiceStatus invoiceStatus, Boolean saveInvoiceNumber) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
@@ -1152,6 +1120,38 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     }
 
     public void sendInvoice() {
+    	cleanValidation();
+
+        if(ValidationHelper.isNullOrEmpty(getInvoiceDate())){
+            addRequiredFieldException("form:date");
+            setValidationFailed(true);
+        }
+
+        if(ValidationHelper.isNullOrEmpty(getSelectedInvoiceClientId())){
+            addRequiredFieldException("form:invoiceClient");
+            setValidationFailed(true);
+        }
+
+        if(ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId())){
+            addRequiredFieldException("form:paymentType");
+            setValidationFailed(true);
+        }
+
+        for(GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
+            if(ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceTotalCost())){
+                setValidationFailed(true);
+            }
+
+            if(ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getSelectedTaxRateId())){
+                setValidationFailed(true);
+            }
+        }
+
+        if (getValidationFailed()){
+            executeJS("PF('invoiceErrorDialogWV').show();");
+            return;
+        }
+        
         try {
             Invoice invoice = DaoManager.get(Invoice.class, getNumber());
             List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
@@ -1552,12 +1552,19 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                     double total = 0.0;
                     double amount = 0.0;
                     double totalCost = 0.0;
+                    
                     if(item.getAmount() != null)
                         amount = item.getAmount();
                     if(item.getInvoiceTotalCost() != null)
                         totalCost = item.getInvoiceTotalCost();
-                    imponibile = imponibile + amount + totalCost;
-                    total = amount + totalCost;
+                    if(amount != 0.0)
+                    	imponibile = imponibile + (amount * totalCost);
+                    else
+                    	imponibile = imponibile + totalCost;
+                    if(amount != 0.0)
+                    	total = amount * totalCost;
+                    else
+                    	total = totalCost;
                     if(item.getVat() != null){
                         ivaPercentage = ivaPercentage + item.getVat();
                         totalIva = totalIva + ((item.getVat() * total)/100);

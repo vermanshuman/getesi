@@ -355,12 +355,13 @@
                                 </div>
                                 <div class="p-col-8">
                                     <p:inputText value="#{bean.examRequest.client}" rendered="#{bean.examRequest.client ne null}" disabled="true"/>
-                                    <p:selectOneMenu id="invoiceClient" value="#{bean.selectedInvoiceClientId}" style="width: 300px; float:left;" rendered="#{bean.examRequest.client eq null}"
-                                                     styleClass="#{bean.selectedInvoiceClientId ne null ? 'select-one-menu' : ''}">
+                                    <p:selectOneMenu id="invoiceClient" value="#{bean.selectedInvoiceClientId}" style="width: 300px; float:left;" 
+                                    				rendered="#{bean.examRequest.client eq null}"
+                                                    styleClass="#{bean.selectedInvoiceClientId ne null ? 'select-one-menu' : ''}">
                                         <f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}" itemValue="#{null}" noSelectionOption="true" />
                                         <f:selectItems style="width:300px;" value="#{bean.invoiceClients}" />
-                                        <p:ajax listener="#{bean.onItemSelectInvoiceClient}" update="@this addressStreet addressPostalCode addressCityId addressProvinceId numberVAT
-										fiscalCode mailPEC addressSDI" />
+                                        <p:ajax listener="#{bean.onItemSelectInvoiceClient}" update="@this addressStreet addressPostalCode 
+                                        		addressCityId addressProvinceId numberVAT fiscalCode mailPEC addressSDI vatCollectabilitySelectMenu paymentType" />
                                     </p:selectOneMenu>
                                 </div>
 
@@ -463,7 +464,7 @@
                                     <h:outputText value="#{msg.vatCollectability}"/>
                                 </div>
                                 <div class="p-col-2" style="width: 15% !important; padding-left:0 !important; margin-top: 7px;">
-                                    <p:selectOneMenu label="#{msg.vatCollectability}" disabled="#{bean.invoiceSentStatus}"
+                                    <p:selectOneMenu label="#{msg.vatCollectability}" disabled="#{bean.invoiceSentStatus}" id="vatCollectabilitySelectMenu"
                                                      value="#{bean.vatCollectabilityId}" styleClass="#{bean.vatCollectabilityId ne null ? 'select-one-menu' : 'select-one-menu-width'}">
                                         <f:selectItems value="#{bean.vatCollectabilityList}"/>
                                     </p:selectOneMenu>
@@ -646,7 +647,9 @@
                                     <h:outputText value="#{msg.amountDue}"></h:outputText>
                                 </div>
                                 <div class="p-col-2">
-                                    <p:inputText><p:keyFilter mask="num" /></p:inputText>
+                                    <p:inputText value="#{bean.totalGrossAmount}" disabled="true">
+                                    	<p:keyFilter mask="num" />
+                                    </p:inputText>
                                 </div>
 
                                 <div class="p-col-10"></div>
@@ -677,9 +680,11 @@
                                     <p:commandButton value="#{msg.saveInDraft}" styleClass="ui-button-success p-mr-2 p-mb-2" style="margin-left:5px;"
                                                      action="#{bean.saveInvoiceInDraft}" update="mainPanel goodsServicesPanel countsSummaryPanel"
                                                      rendered="#{!bean.invoiceSentStatus}"/>
-                                    <p:commandButton value="#{msg.confirm}" styleClass="ui-button-success p-mr-2 p-mb-2"
-                                                     action="#{bean.confirmInvoice}" update="mainPanel goodsServicesPanel countsSummaryPanel"
-                                                     rendered="#{!bean.invoiceSentStatus}" />
+                                    <p:commandButton value="#{msg.delivery}" styleClass="ui-button-success p-mr-2 p-mb-2"
+                             						 action="#{bean.sendInvoice}" rendered="#{!bean.invoiceSentStatus}" 
+                             						 update="@widgetVar(buttonsPanelWV) @widgetVar(countsSummaryPanelVW) 
+                             						 		 @widgetVar(goodsServicesPanelVW) @widgetVar(mainPanelVW)"
+                             						 oncomplete="PF('invoiceConfirmWV').hide();"/>
                                     <p:commandButton value="#{msg.close}" oncomplete="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"
                                                      rendered="#{bean.invoiceSentStatus}"/>
                                 </div>
@@ -697,7 +702,11 @@
                             var itemAmount = $(".item_amount_"+index).val();
                             var totalLine = totalCost;
                             if(itemAmount != null) {
-                                totalLine = (+totalCost)+(+itemAmount);
+                            	if(itemAmount != 0.0) {
+                                	totalLine = totalCost * itemAmount;
+                            	} else {
+                            		totalLine = totalCost;
+                            	}
                             }
                             totalLine = roundNumber(totalLine, 12);
                             $(".total_line_"+index).val(totalLine);
@@ -719,7 +728,11 @@
                             var totalCost = $(".total_cost_"+index).val();
                             var totalLine = totalCost;
                             if(itemAmount != null) {
-                                totalLine = (+totalCost)+(+itemAmount);
+                            	if(itemAmount != 0.0) {
+                                	totalLine = totalCost * itemAmount;
+                            	} else {
+                            		totalLine = totalCost;
+                            	}
                             }
                             totalLine = roundNumber(totalLine, 12);
                             $(".total_line_"+index).val(totalLine);
@@ -1053,21 +1066,7 @@
         <p:commandButton oncomplete="PF('invoiceErrorDialogWV').hide();"
                          value="#{msg.close}" />
     </p:dialog>
-    <p:dialog widgetVar="invoiceConfirmWV"  modal="true" draggable="false" header="#{msg.invoiceDelivery}"
-              position="center center" width="500">
-        <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
-            <h:outputText value="#{msg.invoiceDeliverMessage}"/>
-        </p:panelGrid>
-
-        <div class="btn_line">
-            <p:commandButton value="#{msg.cancel}" styleClass="red-btn"
-                             oncomplete="PF('invoiceConfirmWV').hide();"/>
-            <p:commandButton value="#{msg.delivery}" styleClass="ui-button-success p-mr-2 p-mb-2"
-                             action="#{bean.sendInvoice}" style="margin-left: 10px;"
-                             update="@widgetVar(buttonsPanelWV) @widgetVar(countsSummaryPanelVW) @widgetVar(goodsServicesPanelVW) @widgetVar(mainPanelVW)"
-                             oncomplete="PF('invoiceConfirmWV').hide();"/>
-        </div>
-    </p:dialog>
+    
     <p:dialog widgetVar="showSendErrorDialog" modal="true" resizable="false" draggable="false">
         <h:outputText value="#{val.errorSendMail}"/>
     </p:dialog>
