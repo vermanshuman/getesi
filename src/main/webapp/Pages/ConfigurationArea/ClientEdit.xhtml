@@ -1180,6 +1180,64 @@
                     </p:panelGrid>
                 </p:panel>
 
+                <p:panel id="extraCostsService"
+                         style="margin: auto; "
+                         header ="#{msg.extraCosts}">
+                    <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" columnClasses="ui-grid-col-2, ui-grid-col-3"
+                                 layout="grid">
+
+                        <span>#{msg.mortgageCosts}: </span>
+                        <p:inputText id="mortgageCosts"
+                                     rendered="#{not bean.priceListDialogOnlyView}" styleClass="input-width"/>
+                        <h:outputText value="#{bean.negativePriceList.price}"
+                                      rendered="#{bean.priceListDialogOnlyView}"/>
+                        <p:selectOneMenu
+                                         label="#{msg.taxRate}"
+                                         rendered="#{!bean.onlyView}">
+                            <f:selectItems value="#{bean.taxRates}"/>
+                        </p:selectOneMenu>
+                        <span>#{msg.landRegistryCosts}: </span>
+                        <p:inputText value="#{bean.negativePriceList.firstPrice}" id="landRegistryCosts"
+                                     rendered="#{not bean.priceListDialogOnlyView}" styleClass="input-width"/>
+                        <h:outputText value="#{bean.negativePriceList.firstPrice}"
+                                      rendered="#{bean.priceListDialogOnlyView}"/>
+                        <p:selectOneMenu value="#{itemR.selectedTaxRateId}"
+                                         label="#{msg.taxRate}"
+                                         rendered="#{!bean.onlyView}">
+                            <f:selectItems value="#{bean.taxRates}"/>
+                        </p:selectOneMenu>
+                        <span>#{msg.stamps}: </span>
+                        <p:inputText value="#{bean.negativePriceList.firstPrice}" id="stamps"
+                                     rendered="#{not bean.priceListDialogOnlyView}" styleClass="input-width"/>
+                        <h:outputText value="#{bean.negativePriceList.firstPrice}"
+                                      rendered="#{bean.priceListDialogOnlyView}"/>
+                        <p:selectOneMenu value="#{itemR.selectedTaxRateId}"
+                                         label="#{msg.taxRate}"
+                                         rendered="#{!bean.onlyView}">
+                            <f:selectItems value="#{bean.taxRates}"/>
+                        </p:selectOneMenu>
+                        <span>#{msg.postalCosts}: </span>
+                        <p:inputText value="#{bean.negativePriceList.firstPrice}" id="postalCosts"
+                                     rendered="#{not bean.priceListDialogOnlyView}" styleClass="input-width"/>
+                        <h:outputText value="#{bean.negativePriceList.firstPrice}"
+                                      rendered="#{bean.priceListDialogOnlyView}"/>
+                        <p:selectOneMenu value="#{itemR.selectedTaxRateId}"
+                                         label="#{msg.taxRate}"
+                                         rendered="#{!bean.onlyView}">
+                            <f:selectItems value="#{bean.taxRates}"/>
+                        </p:selectOneMenu>
+                        <span>#{msg.other}: </span>
+                        <p:inputText value="#{bean.negativePriceList.firstPrice}" id="other"
+                                     rendered="#{not bean.priceListDialogOnlyView}" styleClass="input-width"/>
+                        <h:outputText value="#{bean.negativePriceList.firstPrice}"
+                                      rendered="#{bean.priceListDialogOnlyView}"/>
+                        <p:selectOneMenu value="#{itemR.selectedTaxRateId}"
+                                         label="#{msg.taxRate}"
+                                         rendered="#{!bean.onlyView}">
+                            <f:selectItems value="#{bean.taxRates}"/>
+                        </p:selectOneMenu>
+                    </p:panelGrid>
+                </p:panel>
 
                 <div class="btn_line">
                     <p:commandButton value="#{msg.confirm}" process="@(.myclass)" class="ui-button-success "

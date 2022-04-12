@@ -224,6 +224,8 @@ public class ClientEditBean extends EntityEditPageBean<Client>
 
     private Boolean fromContactList;
 
+    private List<TaxRateExtraCost> taxRateExtraCosts;
+
     /*
      * (non-Javadoc)
      *
@@ -2201,5 +2203,13 @@ public class ClientEditBean extends EntityEditPageBean<Client>
 
     public void setFromContactList(Boolean fromContactList) {
         this.fromContactList = fromContactList;
+    }
+
+    public List<TaxRateExtraCost> getTaxRateExtraCosts() {
+        return taxRateExtraCosts;
+    }
+
+    public void setTaxRateExtraCosts(List<TaxRateExtraCost> taxRateExtraCosts) {
+        this.taxRateExtraCosts = taxRateExtraCosts;
     }
 }
