@@ -153,6 +153,9 @@
                              action="#{bean.saveRequestExtraCost}" oncomplete="PF('requestExtraCostDlg').hide();"/>
 
             <p:commandButton value="#{msg.cancel}" oncomplete="PF('requestExtraCostDlg').hide();"/>
+
+            <p:commandButton value="#{msg.requestReGenerateCost}"  update="@form requestExtraCostDialog"
+                             action="#{bean.viewExtraCost(true)}"/>
         </div>
         <p:dialog id="includeNationalCostDialog" header="Note!" widgetVar="includeNationalCostDialogWV"
                   height="100px">

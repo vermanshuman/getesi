@@ -65,6 +65,11 @@ public class PropertyEntityHelper {
         return ValidationHelper.isNullOrEmpty(list) ? "" : list.get(0).getEstimateOMI();
     }
 
+    public static String getLastEstimateOMIRequestText(Property property) {
+        List<EstimateOMIHistory> list = property.getEstimateOMIHistory();
+        return ValidationHelper.isNullOrEmpty(list) ? "" : list.get(list.size()-1).getEstimateOMI();
+    }
+
     public static List<String> getTwoEstimateOMIRequestText(Property property) {
         List<String> result = new LinkedList<>();
         List<EstimateOMIHistory> list = managePropertyListOMIComm(property).stream().map(Property::getEstimateOMIHistory)
@@ -88,6 +93,11 @@ public class PropertyEntityHelper {
 //                .flatMap(List::stream).sorted(new CommercialValueHistoryComparator()).collect(Collectors.toList());
 
         return ValidationHelper.isNullOrEmpty(list) ? "" : list.get(0).getCommercialValue();
+    }
+
+    public static String getLastEstimateLastCommercialValueRequestText(Property property) {
+        List<CommercialValueHistory> list = property.getCommercialValueHistory();
+        return ValidationHelper.isNullOrEmpty(list) ? "" : list.get(list.size()-1).getCommercialValue();
     }
 
     public static List<Property> getPropertiesByFormalityIdThroughSectionB(Long formalityId)

@@ -14,6 +14,11 @@
 
 
     <ui:define name="edit_body">
+        <style>
+            #salesDevelopment, #estimate {
+                padding-left: 1rem;
+            }
+        </style>
         <h:inputHidden id="hiddenButton" value="#{bean.entity.icon}"/>
         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" columnClasses="ui-grid-col-1, ui-grid-col-3"
                      layout="grid">
@@ -90,11 +95,11 @@
                                      id="estimate" disabled="#{bean.onlyView}"/>
 
             <span>#{msg.serviceSalesDevelopment}: </span>
-            <p:selectBooleanCheckbox value="#{bean.entity.salesDevelopment}"
+            <p:selectBooleanCheckbox value="#{bean.salesDevelopment}"
                                      id="salesDevelopment" disabled="#{bean.onlyView}"/>
 
             <span>#{msg.serviceLandOmiValues}: </span>
-            <p:selectBooleanCheckbox id="serviceLandOmiValues" value="#{bean.entity.landOmi}"/>
+            <p:selectBooleanCheckbox id="serviceLandOmiValues" value="#{bean.landOmi}"  disabled="#{bean.onlyView}"/>
 
             <span>#{msg.serviceUpdate}: </span>
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">

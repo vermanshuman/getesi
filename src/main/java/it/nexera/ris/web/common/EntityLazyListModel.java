@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import javax.persistence.Column;
 
+import it.nexera.ris.persistence.beans.entities.domain.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
@@ -38,9 +39,6 @@ import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.IEntity;
-import it.nexera.ris.persistence.beans.entities.domain.Property;
-import it.nexera.ris.persistence.beans.entities.domain.WLGFolder;
-import it.nexera.ris.persistence.beans.entities.domain.WLGInbox;
 import it.nexera.ris.persistence.beans.entities.domain.readonly.WLGInboxShort;
 import it.nexera.ris.persistence.view.RequestView;
 
@@ -173,24 +171,25 @@ public class EntityLazyListModel<T extends IEntity> extends LazyDataModel<T> {
            
             Long rowCount = (Long) countCriteria.uniqueResult();
             end = System.currentTimeMillis();
-            if (WLGInboxShort.class.getName().equals(clazz.getName())) {
-//
-//                CriteriaImpl criteriaImpl = (CriteriaImpl)countCriteria;
-//                SessionImplementor session = criteriaImpl.getSession();
-//                SessionFactoryImplementor factory = session.getFactory();
-//                CriteriaQueryTranslator translator=new CriteriaQueryTranslator(factory,criteriaImpl,criteriaImpl.getEntityOrClassName(),CriteriaQueryTranslator.ROOT_SQL_ALIAS);
-//                String[] implementors = factory.getImplementors( criteriaImpl.getEntityOrClassName() );
-//
-//                CriteriaJoinWalker walker = new CriteriaJoinWalker((OuterJoinLoadable)factory.getEntityPersister(implementors[0]),
-//                        translator,
-//                        factory,
-//                        criteriaImpl,
-//                        criteriaImpl.getEntityOrClassName(),
-//                        session.getLoadQueryInfluencers()   );
-//
-//                String sql=walker.getSQLString();
-//
-//                System.out.println(">>>>>>>>>>>>>>>>> " + sql);
+            if (RequestView.class.getName().equals(clazz.getName()) || Request.class.getName().equals(clazz.getName())
+                    || Subject.class.getName().equals(clazz.getName())) {
+
+                CriteriaImpl criteriaImpl = (CriteriaImpl)countCriteria;
+                SessionImplementor session = criteriaImpl.getSession();
+                SessionFactoryImplementor factory = session.getFactory();
+                CriteriaQueryTranslator translator=new CriteriaQueryTranslator(factory,criteriaImpl,criteriaImpl.getEntityOrClassName(),CriteriaQueryTranslator.ROOT_SQL_ALIAS);
+                String[] implementors = factory.getImplementors( criteriaImpl.getEntityOrClassName() );
+
+                CriteriaJoinWalker walker = new CriteriaJoinWalker((OuterJoinLoadable)factory.getEntityPersister(implementors[0]),
+                        translator,
+                        factory,
+                        criteriaImpl,
+                        criteriaImpl.getEntityOrClassName(),
+                        session.getLoadQueryInfluencers()   );
+
+                String sql=walker.getSQLString();
+
+               // System.out.println(">>>>>>>>>>>>>>>>> " + sql);
 
                 log.info("Execution time for rowCount is " + formatter.format((end - start) / 1000d) + " seconds");
             }else  if (RequestView.class.getName().equals(clazz.getName())) {
@@ -252,6 +251,27 @@ public class EntityLazyListModel<T extends IEntity> extends LazyDataModel<T> {
                 criteria.addOrder(Order.desc(this.getCorrectFieldName(
                         sortField, criteria)));
             }
+        }
+
+        if (RequestView.class.getName().equals(clazz.getName()) || Request.class.getName().equals(clazz.getName())
+                || Subject.class.getName().equals(clazz.getName())) {
+
+            CriteriaImpl criteriaImpl = (CriteriaImpl) criteria;
+            SessionImplementor session = criteriaImpl.getSession();
+            SessionFactoryImplementor factory = session.getFactory();
+            CriteriaQueryTranslator translator = new CriteriaQueryTranslator(factory, criteriaImpl, criteriaImpl.getEntityOrClassName(), CriteriaQueryTranslator.ROOT_SQL_ALIAS);
+            String[] implementors = factory.getImplementors(criteriaImpl.getEntityOrClassName());
+
+            CriteriaJoinWalker walker = new CriteriaJoinWalker((OuterJoinLoadable) factory.getEntityPersister(implementors[0]),
+                    translator,
+                    factory,
+                    criteriaImpl,
+                    criteriaImpl.getEntityOrClassName(),
+                    session.getLoadQueryInfluencers());
+
+            String sql = walker.getSQLString();
+
+            System.out.println("Request :::: " + sql);
         }
         return criteria.list();
     }

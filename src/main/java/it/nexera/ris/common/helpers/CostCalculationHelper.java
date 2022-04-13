@@ -15,6 +15,7 @@ import it.nexera.ris.persistence.beans.entities.domain.PriceList;
 import it.nexera.ris.persistence.beans.entities.domain.Request;
 import it.nexera.ris.persistence.beans.entities.domain.RequestFormality;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
+import it.nexera.ris.web.beans.pages.ExcelDataEdit;
 import it.nexera.ris.web.beans.pages.RequestTextEditBean;
 
 import org.hibernate.Hibernate;
@@ -47,8 +48,13 @@ public class CostCalculationHelper {
         this.request = request;
     }
 
+
     public void calculateAllCosts(Boolean isCostOutputImportant) throws IllegalAccessException, PersistenceBeanException, InstantiationException {
-        calculateAllCosts(isCostOutputImportant, isBillingClient(), restrictionForPriceList());
+        calculateAllCosts(isCostOutputImportant, Boolean.FALSE);
+    }
+
+    public void calculateAllCosts(Boolean isCostOutputImportant, boolean recalculate) throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+        calculateAllCosts(isCostOutputImportant, isBillingClient(), restrictionForPriceList(), recalculate);
     }
 
     public double calculateTotalCost(Boolean isCostOutputImportant) throws IllegalAccessException, PersistenceBeanException, InstantiationException {
@@ -84,8 +90,7 @@ public class CostCalculationHelper {
                 if(!ValidationHelper.isNullOrEmpty(getRequest().getService())) {
                     priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
                             new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                                    Restrictions.eq("client", (isBillingClient() == null || !isBillingClient())
-                                            ? getRequest().getClient() : getRequest().getBillingClient()),
+                                    Restrictions.eq("client", getRequest().getClient()),
                                     Restrictions.eq("service", getRequest().getService()),
                                     Restrictions.isNotNull("cc.id"),
                                     Restrictions.eq("cc.typeId", CostType.EXTRA_COST.getId())});
@@ -93,8 +98,7 @@ public class CostCalculationHelper {
                 }else if(!ValidationHelper.isNullOrEmpty(getRequest().getMultipleServices())) {
                     priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
                             new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                                    Restrictions.eq("client", (isBillingClient() == null || !isBillingClient())
-                                            ? getRequest().getClient() : getRequest().getBillingClient()),
+                                    Restrictions.eq("client", getRequest().getClient()),
                                     Restrictions.in("service", getRequest().getMultipleServices()),
                                     Restrictions.isNotNull("cc.id"),
                                     Restrictions.eq("cc.typeId", CostType.EXTRA_COST.getId())});
@@ -115,16 +119,14 @@ public class CostCalculationHelper {
                     if(!ValidationHelper.isNullOrEmpty(getRequest().getService())) {
                         priceList = DaoManager.load(PriceList.class, 
                                 new Criterion[]{
-                                        Restrictions.eq("client", (isBillingClient() == null || !isBillingClient())
-                                                ? getRequest().getClient() : getRequest().getBillingClient()),
+                                        Restrictions.eq("client",getRequest().getClient()),
                                         Restrictions.eq("isNegative", true),
                                         Restrictions.eq("service", getRequest().getService())});
                         
                     }else if(!ValidationHelper.isNullOrEmpty(getRequest().getMultipleServices())) {
                         priceList = DaoManager.load(PriceList.class, 
                                 new Criterion[]{
-                                        Restrictions.eq("client", (isBillingClient() == null || !isBillingClient())
-                                                ? getRequest().getClient() : getRequest().getBillingClient()),
+                                        Restrictions.eq("client", getRequest().getClient()),
                                         Restrictions.eq("isNegative", true),
                                         Restrictions.in("service", getRequest().getMultipleServices())});
                     }
@@ -178,7 +180,8 @@ public class CostCalculationHelper {
         return requestCosts.finalCostWithExtraCost;
     }
 
-    private RequestCosts calculateAllCosts(boolean isCostOutputImportant, Boolean isBillingClient, boolean restrictionForPriceList)
+    private RequestCosts calculateAllCosts(boolean isCostOutputImportant, Boolean isBillingClient, boolean restrictionForPriceList,
+                                           boolean recalculate)
             throws IllegalAccessException, PersistenceBeanException, InstantiationException {
         RequestCosts requestCosts = new RequestCosts();
 
@@ -214,8 +217,7 @@ public class CostCalculationHelper {
                 if(!ValidationHelper.isNullOrEmpty(getRequest().getService())) {
                     priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
                             new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                                    Restrictions.eq("client", (isBillingClient == null || !isBillingClient)
-                                            ? getRequest().getClient() : getRequest().getBillingClient()),
+                                    Restrictions.eq("client", getRequest().getClient()),
                                     Restrictions.eq("service", getRequest().getService()),
                                     Restrictions.isNotNull("cc.id"),
                                     Restrictions.eq("cc.typeId", CostType.EXTRA_COST.getId())});
@@ -223,8 +225,7 @@ public class CostCalculationHelper {
                 }else if(!ValidationHelper.isNullOrEmpty(getRequest().getMultipleServices())) {
                     priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
                             new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                                    Restrictions.eq("client", (isBillingClient == null || !isBillingClient)
-                                            ? getRequest().getClient() : getRequest().getBillingClient()),
+                                    Restrictions.eq("client", getRequest().getClient()),
                                     Restrictions.in("service", getRequest().getMultipleServices()),
                                     Restrictions.isNotNull("cc.id"),
                                     Restrictions.eq("cc.typeId", CostType.EXTRA_COST.getId())});
@@ -245,16 +246,14 @@ public class CostCalculationHelper {
                     if(!ValidationHelper.isNullOrEmpty(getRequest().getService())) {
                         priceList = DaoManager.load(PriceList.class, 
                                 new Criterion[]{
-                                        Restrictions.eq("client", (isBillingClient == null || !isBillingClient)
-                                                ? getRequest().getClient() : getRequest().getBillingClient()),
+                                        Restrictions.eq("client", getRequest().getClient()),
                                         Restrictions.eq("isNegative", true),
                                         Restrictions.eq("service", getRequest().getService())});
                         
                     }else if(!ValidationHelper.isNullOrEmpty(getRequest().getMultipleServices())) {
                         priceList = DaoManager.load(PriceList.class, 
                                 new Criterion[]{
-                                        Restrictions.eq("client", (isBillingClient == null || !isBillingClient)
-                                                ? getRequest().getClient() : getRequest().getBillingClient()),
+                                        Restrictions.eq("client", getRequest().getClient()),
                                         Restrictions.eq("isNegative", true),
                                         Restrictions.in("service", getRequest().getMultipleServices())});
                     }
@@ -274,14 +273,12 @@ public class CostCalculationHelper {
                 requestCosts.finalCostWithExtraCost += initCost;
                 updateCostsOfRequest(initCost, requestCosts.finalCostWithExtraCost);
                 
-            } else if (getRequest().getCostButtonConfirmClicked() != null && getRequest().getCostButtonConfirmClicked()
-                    && !getRequest().isCalledFromReportList()) {
+            } else if (!recalculate && !getRequest().isCalledFromReportList()) {
                 for (ExtraCost cost : extraCost) {
                     if(ValidationHelper.isNullOrEmpty(cost.getType()) ||
                             !ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
                         requestCosts.finalCostWithExtraCost += cost.getPrice();    
                     }
-                    
                 }
                 double initCost = 0.0d;
                 if (getRequest().getInitCost() != null) {
@@ -402,8 +399,7 @@ public class CostCalculationHelper {
         if(!ValidationHelper.isNullOrEmpty(getRequest().getService())) {
             priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
                     new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                    Restrictions.eq("client", (billingClient == null || !billingClient)
-                            ? getRequest().getClient() : getRequest().getBillingClient()),
+                    Restrictions.eq("client", getRequest().getClient()),
                     Restrictions.eq("service", getRequest().getService()),
 
                     restrictionForPriceList ?
@@ -415,8 +411,7 @@ public class CostCalculationHelper {
         }else if(!ValidationHelper.isNullOrEmpty(getRequest().getMultipleServices())) {
             priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
                     new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                    Restrictions.eq("client", (billingClient == null || !billingClient)
-                            ? getRequest().getClient() : getRequest().getBillingClient()),
+                    Restrictions.eq("client",getRequest().getClient()),
                     Restrictions.in("service", getRequest().getMultipleServices()),
                     restrictionForPriceList ?
                             Restrictions.in("cc.id", getRequest().getService().getServiceCostUnauthorizedQuoteList()
@@ -440,8 +435,7 @@ public class CostCalculationHelper {
         if(!ValidationHelper.isNullOrEmpty(getRequest().getService())) {
             List<PriceList> priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
                     new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                    Restrictions.eq("client", (billingClient == null || !billingClient)
-                            ? getRequest().getClient() : getRequest().getBillingClient()),
+                    Restrictions.eq("client",getRequest().getClient()),
 
                     restictionForPriceList ?
                             Restrictions.in("cc.id", getRequest().getService().getServiceCostUnauthorizedQuoteList()
@@ -465,8 +459,7 @@ public class CostCalculationHelper {
             for(Service service : getRequest().getMultipleServices()) {
                 List<PriceList>  priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
                         new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                        Restrictions.eq("client", (billingClient == null || !billingClient)
-                                ? getRequest().getClient() : getRequest().getBillingClient()),
+                        Restrictions.eq("client", getRequest().getClient()),
 
                         restictionForPriceList ?
                                 Restrictions.in("cc.id", getRequest().getService().getServiceCostUnauthorizedQuoteList()
@@ -498,8 +491,7 @@ public class CostCalculationHelper {
             if (!ValidationHelper.isNullOrEmpty(getRequest().getService())) {
                 List<PriceList> priceList = DaoManager.load(PriceList.class, 
                         new Criterion[]{
-                                Restrictions.eq("client", (billingClient == null || !billingClient)
-                                        ? getRequest().getClient() : getRequest().getBillingClient()),
+                                Restrictions.eq("client", getRequest().getClient()),
                                 Restrictions.eq("isNegative", true),
                                 Restrictions.eq("service", getRequest().getService())});
                 if (!ValidationHelper.isNullOrEmpty(priceList)) {
@@ -515,8 +507,7 @@ public class CostCalculationHelper {
                 for(Service service : getRequest().getMultipleServices()) {
                     List<PriceList> priceList = DaoManager.load(PriceList.class, 
                             new Criterion[]{
-                                    Restrictions.eq("client", (billingClient == null || !billingClient)
-                                            ? getRequest().getClient() : getRequest().getBillingClient()),
+                                    Restrictions.eq("client", getRequest().getClient()),
                                     Restrictions.eq("isNegative", true),
                                     Restrictions.eq("service", service)});
                     if (!ValidationHelper.isNullOrEmpty(priceList)) {
@@ -536,10 +527,10 @@ public class CostCalculationHelper {
 
         List<Double> numberOfGroupedEstateFormality = getRequest().getSumOfGroupedEstateFormalities();
         Integer numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
-        if (!ValidationHelper.isNullOrEmpty(getRequest().getNumberActUpdate())) {
-            numberOfGroupedEstateFormality = Collections.singletonList(getRequest().getNumberActUpdate());
-            numberOfGroupsByDocumentOfEstateFormality = getRequest().getNumberOfGroupsByDocumentOfEstateFormality();
-        }
+//        if (!ValidationHelper.isNullOrEmpty(getRequest().getNumberActUpdate())) {
+//            numberOfGroupedEstateFormality = Collections.singletonList(getRequest().getNumberActUpdate());
+//            numberOfGroupsByDocumentOfEstateFormality = getRequest().getNumberOfGroupsByDocumentOfEstateFormality();
+//        }
         boolean isPriceList = Boolean.FALSE;
         if(!ValidationHelper.isNullOrEmpty(getRequest().getService())) {
             List<PriceList> priceList = loadPriceList(billingClient, restrictionForPriceList, getRequest().getService());  
@@ -604,8 +595,7 @@ public class CostCalculationHelper {
         
         return DaoManager.load(PriceList.class, new CriteriaAlias[]{
                 new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                Restrictions.eq("client", (billingClient == null || !billingClient)
-                        ? getRequest().getClient() : getRequest().getBillingClient()),
+                Restrictions.eq("client",getRequest().getClient()),
 
                 restrictionForPriceList ?
                         Restrictions.in("cc.id", getRequest().getService().getServiceCostUnauthorizedQuoteList()
@@ -622,8 +612,7 @@ public class CostCalculationHelper {
         
         return DaoManager.load(PriceList.class, new CriteriaAlias[]{
                 new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                Restrictions.eq("client", (billingClient == null || !billingClient)
-                        ? getRequest().getClient() : getRequest().getBillingClient()),
+                Restrictions.eq("client", getRequest().getClient()),
 
                 restrictionForPriceList ?
                         Restrictions.in("cc.id", getRequest().getService().getServiceCostUnauthorizedQuoteList()
@@ -700,8 +689,7 @@ public class CostCalculationHelper {
             if(!ValidationHelper.isNullOrEmpty(getRequest().getService())) {
                 List<PriceList> priceList = DaoManager.load(PriceList.class, 
                         new Criterion[]{
-                                Restrictions.eq("client", (billingClient == null || !billingClient)
-                                        ? getRequest().getClient() : getRequest().getBillingClient()),
+                                Restrictions.eq("client",getRequest().getClient()),
                                 Restrictions.eq("isNegative", true),
                                 Restrictions.eq("service", getRequest().getService())});
                 
@@ -715,8 +703,7 @@ public class CostCalculationHelper {
                 for(Service service : request.getMultipleServices()) {
                     List<PriceList> priceList = DaoManager.load(PriceList.class, 
                             new Criterion[]{
-                                    Restrictions.eq("client", (billingClient == null || !billingClient)
-                                            ? getRequest().getClient() : getRequest().getBillingClient()),
+                                    Restrictions.eq("client",getRequest().getClient()),
                                     Restrictions.eq("isNegative", true),
                                     Restrictions.eq("service", service)});
                     
@@ -739,8 +726,7 @@ public class CostCalculationHelper {
 
         List<PriceList> priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
                 new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                Restrictions.eq("client", (billingClient == null || !billingClient)
-                        ? getRequest().getClient() : getRequest().getBillingClient()),
+                Restrictions.eq("client", getRequest().getClient()),
 
                 restrictionForPriceList ?
                         Restrictions.in("cc.id", getRequest().getService().getServiceCostUnauthorizedQuoteList()
@@ -780,8 +766,7 @@ public class CostCalculationHelper {
         if(!ValidationHelper.isNullOrEmpty(getRequest().getService())) {
             priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
                     new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                    Restrictions.eq("client", (billingClient == null || !billingClient)
-                            ? getRequest().getClient() : getRequest().getBillingClient()),
+                    Restrictions.eq("client",getRequest().getClient()),
 
                     restrictionForPriceList ?
                             Restrictions.in("cc.id", getRequest().getService().getServiceCostUnauthorizedQuoteList()
@@ -792,8 +777,7 @@ public class CostCalculationHelper {
         }else if(!ValidationHelper.isNullOrEmpty(getRequest().getMultipleServices())) {
             priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
                     new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                    Restrictions.eq("client", (billingClient == null || !billingClient)
-                            ? getRequest().getClient() : getRequest().getBillingClient()),
+                    Restrictions.eq("client", getRequest().getClient()),
 
                     restrictionForPriceList ?
                             Restrictions.in("cc.id", getRequest().getService().getServiceCostUnauthorizedQuoteList()
@@ -834,8 +818,13 @@ public class CostCalculationHelper {
         Long modelIdOfTemplate = 0L;
         if (!ValidationHelper.isNullOrEmpty(requestTextEditBean)) {
             modelIdOfTemplate = DaoManager.get(DocumentTemplate.class, requestTextEditBean.getSelectedTemplateId()).getModel().getId();
-        }
+        }else {
+            if (!ValidationHelper.isNullOrEmpty(getRequest()) &&
+                    !ValidationHelper.isNullOrEmpty(getRequest().getSelectedTemplateId())) {
+                modelIdOfTemplate = DaoManager.get(DocumentTemplate.class, getRequest().getSelectedTemplateId()).getModel().getId();
 
+            }
+        }
         return modelIdOfTemplate.equals(value);
     }
 

@@ -55,6 +55,9 @@ public class WLGInboxShort extends IndexedEntity {
     @Column(name = "email_to", length = 400)
     private String emailTo;
 
+    @Column(name = "email_cc", length = 400)
+    private String emailCC;
+
     @Column(name = "email_subject", length = 500)
     private String emailSubject;
 
@@ -305,5 +308,13 @@ public class WLGInboxShort extends IndexedEntity {
 
     public void setUserChangedState(User userChangedState) {
         this.userChangedState = userChangedState;
+    }
+
+    public String getEmailCC() {
+        return emailCC == null ? "" : emailCC;
+    }
+
+    public void setEmailCC(String emailCC) {
+        this.emailCC = emailCC;
     }
 }

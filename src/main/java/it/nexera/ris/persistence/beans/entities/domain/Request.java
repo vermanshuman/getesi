@@ -31,6 +31,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
@@ -61,12 +62,6 @@ import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.DocumentTagEntity;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Country;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import it.nexera.ris.persistence.interfaces.BeforeSave;
 
 @Entity
@@ -87,7 +82,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "office_id")
-    private Agency office;
+    private Office office;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "notary_id")
@@ -311,6 +306,10 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     })
     private List<EstateFormality> estateFormalityListUpdate;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fiduciary_id")
+    private Client clientFiduciary;
+
     @Transient
     private List<EstateFormality> estateFormalityList;
 
@@ -454,6 +453,13 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     @Transient
     private Long referenceId;
+
+    @Transient
+    private Double result;
+
+
+    @Transient
+    private Long selectedTemplateId;
 
     public Boolean getHaveRequestReport() {
         if (haveRequestReport == null) {
@@ -1555,11 +1561,11 @@ public class Request extends DocumentTagEntity implements BeforeSave {
         this.agency = agency;
     }
 
-    public Agency getOffice() {
+    public Office getOffice() {
         return office;
     }
 
-    public void setOffice(Agency office) {
+    public void setOffice(Office office) {
         this.office = office;
     }
 
@@ -2057,5 +2063,29 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     public void setReferenceId(Long referenceId) {
         this.referenceId = referenceId;
+    }
+
+    public Client getClientFiduciary() {
+        return clientFiduciary;
+    }
+
+    public void setClientFiduciary(Client clientFiduciary) {
+        this.clientFiduciary = clientFiduciary;
+    }
+
+    public Double getResult() {
+        return result;
+    }
+
+    public void setResult(Double result) {
+        this.result = result;
+    }
+
+    public Long getSelectedTemplateId() {
+        return selectedTemplateId;
+    }
+
+    public void setSelectedTemplateId(Long selectedTemplateId) {
+        this.selectedTemplateId = selectedTemplateId;
     }
 }

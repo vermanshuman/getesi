@@ -76,7 +76,7 @@
         <p:remoteCommand name="updateSearchPanel" update=":form:searchPanel"/>
         <p:remoteCommand name="updateCalendarTo" update=":form:filterDateTo"/>
         <p:remoteCommand name="updatePoll" update=":form:table, :form:searchPanel"/>
-
+        <h:inputHidden id="currentPageNumber" value="#{bean.currentPageNumber}"/>
         <p:poll interval="30" listener="#{bean.executePoll}"/>
         <div id="list_panel">
             <p:panelGrid columns="6" id="filterSearchPanel" styleClass="ui-panelgrid-blank ui-fluid" layout="grid"
@@ -217,7 +217,8 @@
                 </ui:fragment>
 
                 <ui:fragment id="table_panel">
-                    <p:dataTable var="item" id="table" first="#{bean.tablePage}"
+
+                    <p:dataTable var="item" id="table" first="#{bean.defaultPage}" dynamic="true"
                                  filteredValue="#{mailManagerListBean.filteredList}"
                                  emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyModel}"
                                  rowKey="#{item.id}" rows="#{bean.rowsPerPage}" lazy="true" paginator="true"
@@ -228,7 +229,7 @@
                                  rowExpandMode="single" rowsPerPageTemplate="15, 30, 45, 60"
                                  sortOrder="#{bean.tableSortOrder}" sortField="#{bean.tableSortColumn}"
                                  sortBy="#{false}">
-
+                        <p:ajax event="page" listener="#{bean.onPageChange}" update="currentPageNumber"></p:ajax>
                         <!--<p:ajax event="rowSelect" listener="#{mailManagerListBean.rowSelectListener}"
                                 update=":form:searchPanel, :header_form_panel, :form:table_div"/> -->
 

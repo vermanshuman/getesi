@@ -23,6 +23,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 
+import it.nexera.ris.persistence.beans.entities.domain.*;
 import org.apache.commons.io.FileUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -56,12 +57,6 @@ import it.nexera.ris.common.xml.wrappers.SelectItemWrapper;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.Dictionary;
-import it.nexera.ris.persistence.beans.entities.domain.Client;
-import it.nexera.ris.persistence.beans.entities.domain.ClientInvoiceManageColumn;
-import it.nexera.ris.persistence.beans.entities.domain.Document;
-import it.nexera.ris.persistence.beans.entities.domain.ExtraCost;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
-import it.nexera.ris.persistence.beans.entities.domain.WLGInbox;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
@@ -134,6 +129,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
     private String costNote;
 
     private Boolean showRequestCost = Boolean.TRUE;
+
     @Override
     protected void onConstruct() {
         setMailId(Long.valueOf(getRequestParameter(RedirectHelper.ID_PARAMETER)));
@@ -298,66 +294,102 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             CreateExcelRequestsReportHelper createExcelRequestsReportHelper = new CreateExcelRequestsReportHelper(true);
             int colIndex = -1;
             List<Request> newRequests = new ArrayList<>();
-
-            for(Request request : entry.getValue()) {
-                if (!ValidationHelper.isNullOrEmpty(request.getService())) {
-                    excelTableWrapper.getRequests().add(request);
-                    addColumnValues(request, columnValues,createExcelRequestsReportHelper);
-                    List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
-                            Restrictions.eq("requestId", request.getId())});
-                    Double result = 0d;
-                    for (ExtraCost cost : extraCost) {
-                        if(ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
-                            result = cost.getPrice();
-                            try {
-                                Request newRequest = request.reportCopy();
-                                newRequest.setTempId(UUID.randomUUID().toString());
-                                newRequest.setEstateFormalityList(request.getEstateFormalityList());
-                                newRequest.setEvasionDate(request.getEvasionDate());
-                                newRequest.setReferenceId(request.getId());
-                                newRequests.add(newRequest);
-                                addColumnValues(newRequest, request.getService(), columnValues,
-                                        createExcelRequestsReportHelper,-1,result);
-                            } catch (CloneNotSupportedException e) {
-                                LogHelper.log(log, e);
-                            }
-                        }
-                    }
-                }else if (!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
-                    int index = 0;
-                    Double result = 0d;
-                    List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
-                            Restrictions.eq("requestId", request.getId())});
-                    for (ExtraCost cost : extraCost) {
-                        result += cost.getPrice();
-                        if(ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
-                            try {
-                                Request newRequest = request.copy();
-                                newRequest.setTempId(UUID.randomUUID().toString());
-                                newRequest.setEstateFormalityList(request.getEstateFormalityList());
-                                newRequest.setEvasionDate(request.getEvasionDate());
-                                newRequest.setReferenceId(request.getId());
-                                newRequests.add(newRequest);
-                                addColumnValues(newRequest, request.getService(), columnValues,
-                                        createExcelRequestsReportHelper,-1,result);
-                            } catch (CloneNotSupportedException e) {
-                                LogHelper.log(log, e);
-                            }
-                        }
-                    }
-                    for (Service service : request.getMultipleServices()) {
+            Map<Long, Request> nationalRequests = new HashMap<>();
+            for (Request request : entry.getValue()) {
+                List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
+                        Restrictions.eq("requestId", request.getId())});
+                Double result;
+                for (ExtraCost cost : extraCost) {
+                    if(ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
+                        result = cost.getPrice();
                         try {
-                            Request newRequest = request.copy();
+                            Request newRequest = request.reportCopy();
                             newRequest.setTempId(UUID.randomUUID().toString());
+                            newRequest.setEstateFormalityList(request.getEstateFormalityList());
+                            newRequest.setEvasionDate(request.getEvasionDate());
                             newRequest.setReferenceId(request.getId());
-                            newRequests.add(newRequest);
-                            addColumnValues(newRequest, service, columnValues,
-                                    createExcelRequestsReportHelper,index++,result);
+                            newRequest.setResult(result);
+
+
+                            nationalRequests.put(request.getId(), newRequest);
+
                         } catch (CloneNotSupportedException e) {
                             LogHelper.log(log, e);
                         }
                     }
+                }
+            }
+            List<Long> processedIds = new ArrayList<>();
+            for (Map.Entry<Long, Request> nationalEntry : nationalRequests.entrySet()) {
+                Request nationalRequest = nationalRequests.get(nationalEntry.getKey());
+                addColumnValues(nationalRequest, nationalRequest.getService(), columnValues,
+                        createExcelRequestsReportHelper,-1,nationalRequest.getResult());
+                excelTableWrapper.getRequests().add(nationalRequest);
 
+                List<Request> matchedCfRequests = entry.getValue().
+                        stream()
+                        .filter(r -> !ValidationHelper.isNullOrEmpty(r.getFiscalCodeVATNamber()) &&
+                                r.getFiscalCodeVATNamber().equalsIgnoreCase(nationalRequest.getFiscalCodeVATNamber()))
+                        .collect(Collectors.toList());
+
+                for (Request request : matchedCfRequests) {
+                    if (!ValidationHelper.isNullOrEmpty(request.getService())) {
+                        excelTableWrapper.getRequests().add(request);
+                        addColumnValues(request, columnValues,createExcelRequestsReportHelper);
+                    }else if (!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
+                        int index = 0;
+                        Double result = 0d;
+                        List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
+                                Restrictions.eq("requestId", request.getId())});
+                        for (ExtraCost cost : extraCost) {
+                            result += cost.getPrice();
+                        }
+                        for (Service service : request.getMultipleServices()) {
+                            try {
+                                Request newRequest = request.copy();
+                                newRequest.setTempId(UUID.randomUUID().toString());
+                                newRequest.setReferenceId(request.getId());
+                                excelTableWrapper.getRequests().add(newRequest);
+                                addColumnValues(newRequest, service, columnValues,
+                                        createExcelRequestsReportHelper,index++,result);
+                            } catch (CloneNotSupportedException e) {
+                                LogHelper.log(log, e);
+                            }
+                        }
+
+                    }
+                    processedIds.add(request.getId());
+                }
+            }
+
+
+            for (Request request : entry.getValue()) {
+                if(!processedIds.contains(request.getId())){
+                    if (!ValidationHelper.isNullOrEmpty(request.getService())) {
+                        excelTableWrapper.getRequests().add(request);
+                        addColumnValues(request, columnValues,createExcelRequestsReportHelper);
+                    }else if (!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
+                        int index = 0;
+                        Double result = 0d;
+                        List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
+                                Restrictions.eq("requestId", request.getId())});
+                        for (ExtraCost cost : extraCost) {
+                            result += cost.getPrice();
+                        }
+                        for (Service service : request.getMultipleServices()) {
+                            try {
+                                Request newRequest = request.copy();
+                                newRequest.setTempId(UUID.randomUUID().toString());
+                                newRequest.setReferenceId(request.getId());
+                                excelTableWrapper.getRequests().add(newRequest);
+                                addColumnValues(newRequest, service, columnValues,
+                                        createExcelRequestsReportHelper,index++,result);
+                            } catch (CloneNotSupportedException e) {
+                                LogHelper.log(log, e);
+                            }
+                        }
+
+                    }
                 }
             }
             if(!ValidationHelper.isNullOrEmpty(newRequests)) {
@@ -440,7 +472,8 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         }
         colIndex = getIndex(ResourcesHelper.getString("excelForm"), CreateExcelRequestsReportHelper.getRequestsColumns());
         if (colIndex > -1) {
-            columnValues.put(getColumnName(ResourcesHelper.getString("excelForm"),request), String.valueOf(request.getNumberActOrSumOfEstateFormalitiesAndOther().longValue()));
+            Long val = request.getNumberActOrSumOfEstateFormalitiesAndOther().longValue() + createExcelRequestsReportHelper.getRequestExtraCostValue(request).longValue();
+            columnValues.put(getColumnName(ResourcesHelper.getString("excelForm"),request), String.valueOf(val));
         }
 
         colIndex = getIndex(ResourcesHelper.getString("mortgageRights"), CreateExcelRequestsReportHelper.getRequestsColumns());
@@ -464,7 +497,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         colIndex = getIndex(ResourcesHelper.getString("excelNote"), CreateExcelRequestsReportHelper.getRequestsColumns());
         if (colIndex > -1) {
             if(ValidationHelper.isNullOrEmpty(request.getCostNote()))
-                columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request),createExcelRequestsReportHelper.getRequestExtraCostDistinctTypes(request));
+                columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request),createExcelRequestsReportHelper.generateCorrectNote(request));
             else
                 columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request),request.getCostNote());
         }
@@ -499,6 +532,24 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             Double result =  getExtraCostRelated(request.getId(), ExtraCostType.POSTALE);
             result = (double) Math.round((result)* 100000d) / 100000d;
             columnValues.put(getColumnName(ResourcesHelper.getString("excelPostalExpenses"),request),"\u20AC" + result);
+        }
+        request.setSelectedTemplateId(null);
+        RequestPrint requestPrint = DaoManager.get(RequestPrint.class,
+                new CriteriaAlias[]{new CriteriaAlias("request", "rq", JoinType.INNER_JOIN)},
+                new Criterion[]{Restrictions.eq("rq.id", request.getId())});
+        if (requestPrint != null) {
+            if (requestPrint.getTemplate() != null) {
+                request.setSelectedTemplateId(requestPrint.getTemplate().getId());
+            }
+        }
+        boolean isCostMismatch = createExcelRequestsReportHelper.checkTotalCostSpecialColumn( request);
+        if(isCostMismatch){
+            String value = columnValues.get(getColumnName(ResourcesHelper.getString("excelNote"),request));
+            String html = "<span style=\"color:Orange\">Anomalia costi</span>";
+            if(!ValidationHelper.isNullOrEmpty(value)){
+                html  = value + "<br/>" + html;
+            }
+            columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request),html);
         }
     }
 
@@ -633,9 +684,10 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                 if(extraCost > 0)
                     columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request,service),"Costo aggiuntivo: " + extraCost);
             }else if(index != -1){
-                if(ValidationHelper.isNullOrEmpty(request.getCostNote()))
+                if(ValidationHelper.isNullOrEmpty(request.getCostNote())){
                     columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request,service),
-                            createExcelRequestsReportHelper.getRequestExtraCostDistinctTypes(request));
+                            createExcelRequestsReportHelper.generateCorrectNote(request));
+                }
                 else
                     columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request,service),request.getCostNote());
             }else {
@@ -678,6 +730,27 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             result = (double) Math.round((result)* 100000d) / 100000d;
             columnValues.put(getColumnName(ResourcesHelper.getString("excelPostalExpenses"),request, service),
                     "\u20AC" + result);
+        }
+
+        Request referenceRequest = DaoManager.get(Request.class, !ValidationHelper.isNullOrEmpty(request.getReferenceId()) ? request.getReferenceId() : request.getId());
+        referenceRequest.setSelectedTemplateId(null);
+        RequestPrint requestPrint = DaoManager.get(RequestPrint.class,
+                new CriteriaAlias[]{new CriteriaAlias("request", "rq", JoinType.INNER_JOIN)},
+                new Criterion[]{Restrictions.eq("rq.id", referenceRequest.getId())});
+        if (requestPrint != null) {
+            if (requestPrint.getTemplate() != null) {
+                referenceRequest.setSelectedTemplateId(requestPrint.getTemplate().getId());
+            }
+        }
+
+        boolean isCostMismatch = createExcelRequestsReportHelper.checkTotalCostSpecialColumn( referenceRequest);
+        if(isCostMismatch){
+            String value = columnValues.get(getColumnName(ResourcesHelper.getString("excelNote"),request,service));
+            String html = "<span style=\"color:Orange\">Anomalia costi</span>";
+            if(!ValidationHelper.isNullOrEmpty(value)){
+                html  = value + "<br/>" + html;
+            }
+            columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request),html);
         }
     }
     protected Double getSumOfCostTotal(List<Request> requests) {
@@ -1164,7 +1237,11 @@ public class ExcelDataEdit extends BaseEntityPageBean {
 
     public void updateCosts() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         getCostManipulationHelper().updateExamRequestParametersFromHelper(getExamRequest());
-        getCostManipulationHelper().viewExtraCost(getExamRequest());
+        boolean reCalculate = true;
+        if(getExamRequest().getCostButtonConfirmClicked() != null && getExamRequest().getCostButtonConfirmClicked()){
+            reCalculate = false;
+        }
+        getCostManipulationHelper().viewExtraCost(getExamRequest(), reCalculate);
 
     }
 
@@ -1370,13 +1447,27 @@ public class ExcelDataEdit extends BaseEntityPageBean {
     }
 
     public void viewExtraCost() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        viewExtraCost(false);
+    }
+
+    public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+
         setCostNote(null);
         setCostManipulationHelper(new CostManipulationHelper());
         Request request =DaoManager.get(Request.class, getRequestId());
+        request.setSelectedTemplateId(null);
         if(!Hibernate.isInitialized(request.getRequestFormalities())){
             request.reloadRequestFormalities();
         }
         setExamRequest(request);
+        RequestPrint requestPrint = DaoManager.get(RequestPrint.class,
+                new CriteriaAlias[]{new CriteriaAlias("request", "rq", JoinType.INNER_JOIN)},
+                new Criterion[]{Restrictions.eq("rq.id", getRequestId())});
+        if (requestPrint != null) {
+            if (requestPrint.getTemplate() != null) {
+                getExamRequest().setSelectedTemplateId(requestPrint.getTemplate().getId());
+            }
+        }
         getCostManipulationHelper().setMortgageTypeList(ComboboxHelper.fillList(MortgageType.class, false, false));
         if(ValidationHelper.isNullOrEmpty(getExamRequest().getCostNote())) {
             try {
@@ -1402,7 +1493,15 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             }
         }else
             setCostNote(getExamRequest().getCostNote());
-        getCostManipulationHelper().viewExtraCost(getExamRequest());
+        getCostManipulationHelper().viewExtraCost(getExamRequest(), recalculate);
+
+        setDataTable(new ArrayList<>());
+        if(!ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
+                !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox().getRequests())) {
+            prepareTables(getMail().getRecievedInbox().getRequests());
+        }else if (!ValidationHelper.isNullOrEmpty(getMail().getRequests())) {
+            prepareTables(getMail().getRequests());
+        }
     }
 
     public void updateNationalCost() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {

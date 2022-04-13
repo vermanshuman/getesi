@@ -383,7 +383,7 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
                             if(ValidationHelper.isNullOrEmpty(x.getSubjectList())) {
                                 if(!ValidationHelper.isNullOrEmpty(x.getSubject())) {
                                     if(x.getSubject().getTypeIsPhysicalPerson()) {
-                                        subjectJoiner.add("<li>" + x.getSubject().getFullNameCapitalize()+" CF. "+ x.getSubject().getFiscalCode() + "</li>");
+                                        subjectJoiner.add("<li>" + x.getSubject().getFullNameCapitalize().toUpperCase()+" CF. "+ x.getSubject().getFiscalCode() + "</li>");
                                     }else {
                                         subjectJoiner.add("<li>" + x.getSubject().getBusinessName().toUpperCase()+" P.IVA "+ x.getSubject().getNumberVAT() + "</li>");
                                     }
@@ -748,7 +748,7 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
                             td(div().withStyle(" border-radius: 50%; width: 5px; height: 5px; background: #000;"))
                                     .withStyle("border: none; padding-left: 50px; padding-right: 5px;"),
                             td().withStyle("border: none; width:15px;"),
-                            td(i.getSubject().getFullNameCapitalize()).withStyle("border: none;"),
+                            td(i.getSubject().getFullNameCapitalize().toUpperCase()).withStyle("border: none;"),
                             td().withStyle("border: none; width:15px;"),
                             td(i.getFiscalCodeVATNamber()).withStyle("border: none;"),
                             td().withStyle("border: none; width:15px;"),

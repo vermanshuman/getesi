@@ -19,14 +19,14 @@
 			<p:selectOneMenu id="clientType" value="#{bean.clientTypeId}"
 				styleClass="select-width" label="#{msg.clientType}">
 				<f:selectItems value="#{bean.clientTypes}" />
-				<p:ajax event="change" listener="#{bean.initOfficesList}" update="client_not_manger_or_fiduciary_id client_fiduciary_id mail_ofice_id managers client_invoice_id"/>
+				<p:ajax event="change" listener="#{bean.initOfficesList(true)}" update="client_not_manger_or_fiduciary_id client_fiduciary_id mail_ofice_id managers client_invoice_id"/>
 			</p:selectOneMenu>
 			<h:outputText value="#{msg.client}:"/>
             <p:selectOneMenu id="client_not_manger_or_fiduciary_id"
                              value="#{bean.selectedNotManagerOrFiduciaryClientId}"
                              styleClass="input-width-mmv">
                 <f:selectItems value="#{bean.notManagerOrFiduciaryClients}"/>
-                <p:ajax event="change" listener="#{bean.initOfficesList}" update="client_fiduciary_id mail_ofice_id managers client_invoice_id"/>
+                <p:ajax event="change" listener="#{bean.initOfficesList(true)}" update="client_fiduciary_id mail_ofice_id managers client_invoice_id"/>
             </p:selectOneMenu>
 
             <h:outputText value="#{msg.mailBilling}:"/>

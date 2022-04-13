@@ -160,24 +160,58 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
     @Setter
     private String filterEmailFile;
 
+    @Getter
+    @Setter
+    private Integer currentPageNumber;
+
     private Integer rowsPerPage;
 
+    private Integer defaultPage;
+
+    @Override
+    protected void preLoad() throws PersistenceBeanException {
+        if (ValidationHelper.isNullOrEmpty(SessionHelper.get("loadMailFilters"))) {
+            setDefaultPage(0);
+            setCurrentPageNumber(0);
+            clearFilterValueFromSession();
+        }else {
+            if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_ROWS_PER_PAGE))) {
+                setRowsPerPage(Integer.parseInt(SessionHelper.get(KEY_ROWS_PER_PAGE).toString()));
+            } else
+                setRowsPerPage(15);
+            if (getRowsPerPage() == 0)
+                setRowsPerPage(15);
+
+            if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_PAGE_NUMBER))) {
+                setCurrentPageNumber((Integer.parseInt(SessionHelper.get(KEY_PAGE_NUMBER).toString())));
+                setTablePage(Integer.parseInt(SessionHelper.get(KEY_PAGE_NUMBER).toString()));
+                setDefaultPage(getTablePage() * getRowsPerPage());
+            } else{
+                setTablePage(0);
+                setDefaultPage(0);
+                setCurrentPageNumber(0);
+            }
+        }
+        super.preLoad();
+    }
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
     PersistenceBeanException, InstantiationException,
     IllegalAccessException, IOException {
 
+        /*
         if(ValidationHelper.isNullOrEmpty(SessionHelper.get("loadMailFilters"))){
             clearFilterValueFromSession();
         }
-        setRowsPerPage(15);
+         setRowsPerPage(15);
         String tablePage = getRequestParameter(RedirectHelper.TABLE_PAGE);
         if (!ValidationHelper.isNullOrEmpty(tablePage) && !"null".equalsIgnoreCase(tablePage)) {
             setTablePagination(Integer.parseInt(tablePage));
         }else {
             setTablePagination(0);
         }
+        */
         setAvailableStates(new ArrayList<>());
         setSelectedInboxes(new ArrayList<>());
         setSearchStates(ComboboxHelper.fillList(MailManagerStatuses.class, false));
@@ -280,6 +314,14 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
             setTableSortOrder("UNSORTED");
         }
 
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_PAGE_NUMBER))) {
+            setTablePage(Integer.parseInt(SessionHelper.get(KEY_PAGE_NUMBER).toString()));
+        } else
+            setTablePage(0);
+        executeJS("if (PF('tableWV').getPaginator() != null ) " +
+                "PF('tableWV').getPaginator().setPage(" + getTablePage() + ");");
+
+        /*
         if(ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.TABLE_PAGE))){
             if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_PAGE_NUMBER)) ){
                 value = getSessionValue(KEY_PAGE_NUMBER);
@@ -300,6 +342,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         executeJS("if (PF('tableWV').getPaginator() != null ) " +
                 "PF('tableWV').getPaginator().setPage(" + getTablePage() + ");");
 
+*/
         if(!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_ROWS_PER_PAGE)) ){
             setRowsPerPage(Integer.parseInt(SessionHelper.get(KEY_ROWS_PER_PAGE).toString()));
         }else
@@ -532,8 +575,8 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
             restrictionsLike.add(r);
         }
         if(!ValidationHelper.isNullOrEmpty(getFilterEmailTo())) {
-            Criterion r = Restrictions.like("emailTo", getFilterEmailTo(), MatchMode.ANYWHERE);
-            restrictionsLike.add(r);
+            restrictionsLike.add(Restrictions.or(Restrictions.like("emailTo", getFilterEmailTo(), MatchMode.ANYWHERE),
+                    Restrictions.like("emailCC", getFilterEmailTo(), MatchMode.ANYWHERE)));
         }
         if(!ValidationHelper.isNullOrEmpty(getFilterEmailSubject())) {
             Criterion r = Restrictions.like("emailSubject", getFilterEmailSubject(), MatchMode.ANYWHERE);
@@ -873,10 +916,21 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         if (!ValidationHelper.isNullOrEmpty(dataTable.getSortColumn())) {
             setSessionValue(KEY_SORT_COLUMN, dataTable.getSortColumn().getClientId().split(":")[1]);
         }
-        if (!ValidationHelper.isNullOrEmpty(getTablePage())) {
-            SessionHelper.put(KEY_PAGE_NUMBER, Long.toString(getTablePage()));
-        }else {
-            SessionHelper.put(KEY_PAGE_NUMBER, null);
+//        if (!ValidationHelper.isNullOrEmpty(getTablePage())) {
+//            SessionHelper.put(KEY_PAGE_NUMBER, Long.toString(getTablePage()));
+//        }else {
+//            SessionHelper.put(KEY_PAGE_NUMBER, null);
+//        }
+
+        Map<String, String> params = FacesContext.getCurrentInstance().
+                getExternalContext().getRequestParameterMap();
+        if (!params.isEmpty()) {
+            String value = params.get("currentPageNumber");
+            if (!ValidationHelper.isNullOrEmpty(value)) {
+                SessionHelper.put(KEY_PAGE_NUMBER, value);
+            } else {
+                SessionHelper.put(KEY_PAGE_NUMBER, null);
+            }
         }
 
         if (!ValidationHelper.isNullOrEmpty(getRowsPerPage())) {
@@ -901,6 +955,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
     public void onPageChange(PageEvent event) {
         if (event != null)
             setTablePage(event.getPage());
+        setCurrentPageNumber(event.getPage());
         SessionHelper.put(KEY_PAGE_NUMBER, Long.toString(getTablePage()));
         Map<String, String> params = FacesContext.getCurrentInstance().
                 getExternalContext().getRequestParameterMap();
@@ -908,7 +963,16 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
             String rows = params.get("table_rows");
             if (!ValidationHelper.isNullOrEmpty(rows)) {
                 try {
-                    setRowsPerPage(Integer.parseInt(rows));
+                    Integer rpp = Integer.parseInt(rows);
+                    SessionHelper.put(KEY_ROWS_PER_PAGE, Long.toString(getRowsPerPage()));
+                    if(!getRowsPerPage().equals(rpp)){
+                        String first = params.get("table_first");
+                        if(!ValidationHelper.isNullOrEmpty(first)){
+                            setTablePage(Integer.parseInt(first)/rpp);
+                            setCurrentPageNumber(getTablePage());
+                        }
+                    }
+                    setRowsPerPage(rpp);
                     SessionHelper.put(KEY_ROWS_PER_PAGE, Long.toString(getRowsPerPage()));
                 } catch (NumberFormatException e) {
                 }
@@ -1088,16 +1152,8 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         return tablePage;
     }
 
-    public void setTablePagination(Integer tablePage) {
-        this.tablePage = tablePage;
-    }
-
     public void setTablePage(Integer tablePage) {
-        if(!ValidationHelper.isNullOrEmpty(getRowsPerPage()) && getRowsPerPage() > 0){
-            this.tablePage = tablePage/getRowsPerPage();
-        }else {
-            this.tablePage = tablePage/15;
-        }
+        this.tablePage = tablePage;
     }
 
     public Boolean getNeedShowChangeStateUser() {
@@ -1138,5 +1194,13 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
 
     public void setRowsPerPage(Integer rowsPerPage) {
         this.rowsPerPage = rowsPerPage;
+    }
+
+    public Integer getDefaultPage() {
+        return defaultPage;
+    }
+
+    public void setDefaultPage(Integer defaultPage) {
+        this.defaultPage = defaultPage;
     }
 }

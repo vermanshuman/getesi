@@ -93,6 +93,64 @@ public class TemplatePdfTableHelper {
                                                               boolean filterRelationship,
                                                               boolean showCadastralIncome,
                                                               boolean showAgriculturalIncome) {
+        Comparator<CadastralData> comparatorCadastralData = (o1, o2) -> {
+            if(o1==null && o2==null) {
+                return 0;
+            }else if(o1==null) {
+                return -1;
+            }else if(o2==null) {
+                return 1;
+            }else {
+                if(o1.getSheet()!=null&&o2.getSheet()!=null) {
+                    int result = o1.getSheet().compareTo(o2.getSheet());
+                    if(result==0) {
+                        result = o1.getParticle().compareTo(o2.getParticle());
+                    }
+                    if(result==0) {
+                        result = o1.getSub().compareTo(o2.getSub());
+                    }
+                }else if(o1.getSheet()==null) {
+                    return -1;
+                }else if(o2.getSheet()==null) {
+                    return 1;
+                }else {
+                    return 0;
+                }
+                return 0;
+            }
+        };
+
+        Comparator<Property> comparatorProperty = (o1, o2) -> {
+            if (o1 == null && o2 == null) {
+                return 0;
+            } else if (o1 == null) {
+                return -1;
+            } else if (o2 == null) {
+                return 1;
+            } else {
+                if (ValidationHelper.isNullOrEmpty(o1.getCadastralData())
+                        && ValidationHelper.isNullOrEmpty(o2.getCadastralData())) {
+                    return 0;
+                } else if ((ValidationHelper.isNullOrEmpty(o1.getCadastralData())
+                        || o1.getCadastralData().size() < 1)
+                        && ((ValidationHelper.isNullOrEmpty(o2.getCadastralData())
+                        || o2.getCadastralData().size() < 1))) {
+                    return 0;
+                } else if (!ValidationHelper.isNullOrEmpty(o1.getCadastralData())
+                        && !ValidationHelper.isNullOrEmpty(o2.getCadastralData())
+                        && o1.getCadastralData().size() > 0 && o2.getCadastralData().size() > 0) {
+                    CadastralData data1 = o1.getCadastralData().get(0);
+                    CadastralData data2 = o2.getCadastralData().get(0);
+                    return comparatorCadastralData.compare(data1, data2);
+                } else if (!ValidationHelper.isNullOrEmpty(o1.getCadastralData())
+                        && o1.getCadastralData().size() > 0) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        };
+        propertyList = propertyList.stream().sorted(comparatorProperty).collect(Collectors.toList());
         for (Property property : propertyList) {
             if (!ValidationHelper.isNullOrEmpty(property.getCategoryCode()) && !RealEstateType.LAND.getShortValue().equals(property.getCategoryCode())) {
                 property.setType(RealEstateType.BUILDING.getId());

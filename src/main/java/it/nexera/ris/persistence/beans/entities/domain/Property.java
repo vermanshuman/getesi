@@ -633,8 +633,8 @@ public class Property extends IndexedEntity implements BeforeSave {
         DaoManager.refresh(this);
 
         String beggingOfCommentWrap = "";
-        String estimateOMIRequestText = PropertyEntityHelper.getEstimateOMIRequestText(this);
-        String estimateLastCommercialValueRequestText = PropertyEntityHelper.getEstimateLastCommercialValueRequestText(this);
+        String estimateOMIRequestText = PropertyEntityHelper.getLastEstimateOMIRequestText(this);
+        String estimateLastCommercialValueRequestText = PropertyEntityHelper.getLastEstimateLastCommercialValueRequestText(this);
 
         if (ValidationHelper.isNullOrEmpty(estimateOMIRequestText)
                 && ValidationHelper.isNullOrEmpty(estimateLastCommercialValueRequestText)) {

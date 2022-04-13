@@ -44,6 +44,7 @@
                 </p:commandButton>
         
             <p:remoteCommand name="updateCalendarTo" update=":form:filterDateTo"/>
+            <h:inputHidden id="currentPageNumber" value="#{bean.currentPageNumber}"/>
             <p:remoteCommand name="filterTableFromPanel"
                              action="#{bean.filterTableFromPanel}" update=":form:table"/>
               <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid" style="margin-bottom: 20px;"
@@ -294,7 +295,7 @@
             </p:dataTable>
         </p:overlayPanel>
 
-        <p:dataTable var="item" id="table"  first="#{bean.tablePage}"
+        <p:dataTable var="item" id="table"  first="#{bean.defaultPage}"
                      emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyModel}"
                      rowKey="#{item.id}"  rows="#{bean.rowsPerPage}" lazy="true" paginator="true"
                      paginatorAlwaysVisible="true" rowIndexVar="rowId"
@@ -308,7 +309,7 @@
 					style="color: red; font-weight: bold; font-size: 19px;" value="S" />
             </p:column>
 			 -->
-            <p:ajax event="page" listener="#{bean.onPageChange}"></p:ajax>
+            <p:ajax event="page" listener="#{bean.onPageChange}" update="currentPageNumber"></p:ajax>
             <p:column headerText="#{ff:upper(msg.requestListDate)}" sortBy="#{item.createDate}" style="width: calc( 7vw + 30px );min-width: 154px;text-align: center;">
                 <p:outputPanel style="margin-left: 10px;text-align: left;max-height: 80px;">
                     <h:outputText value="#{item.createDate}" converter="dateTimeConverter" style="color:#003871;font-weight: bold !important;"/>
@@ -504,7 +505,7 @@
 						style="text-align:left;">
 
 					 <p:commandButton value="#{ff:upper(msg.requestListManage)}" class="action-btn" onclick="document.getElementById('table:#{rowId}:gestisci-btn').click()"
-                                         disabled="#{!bean.canEdit}">
+                                         disabled="#{!bean.canEdit}" update="stateSelectCheckboxPanel">
 						</p:commandButton>
 					   <p:commandButton value="#{ff:upper(msg.headerDatabase)}" onclick="document.getElementById('table:#{rowId}:banca-btn').click()"
                                          rendered="#{item.subjectId ne null}" class="action-btn">

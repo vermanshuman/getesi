@@ -21,12 +21,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.RandomStringUtils;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -41,6 +37,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.ss.util.RegionUtil;
+import org.bouncycastle.ocsp.Req;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -751,8 +748,6 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
             }else {
                 result = ValidationHelper.isNullOrEmpty(request.getTotalCost()) ? 0d
                         : Double.parseDouble(request.getTotalCost().replaceAll(",", "."));
-                //double calculatedTotalCost = new CostCalculationHelper(request).calculateTotalCost(Boolean.TRUE);
-                //System.out.println(calculatedTotalCost + ">>>>>>>>>>>>>>> " + result);
             }
             row.createCell(11, CellType.NUMERIC).setCellValue(result);
         }else {
@@ -802,16 +797,14 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
     }
 
     public String generateCorrectNote(Request request) throws PersistenceBeanException, IllegalAccessException {
-        String requestExtraCostDistinctTypes = getRequestExtraCostDistinctTypes(request);
-        String maxNumberOfDistinctLandCharesRegistry = getMaxNumberOfDistinctLandCharesRegistry(request);
-        if (!ValidationHelper.isNullOrEmpty(requestExtraCostDistinctTypes)
-                && !ValidationHelper.isNullOrEmpty(maxNumberOfDistinctLandCharesRegistry)) {
-            return String.join(" + ", maxNumberOfDistinctLandCharesRegistry, requestExtraCostDistinctTypes);
-        } else if (!ValidationHelper.isNullOrEmpty(requestExtraCostDistinctTypes)) {
+        Long maxNumberOfDistinctLandCharesRegistry = getMaxNumberOfDistinctLandCharesRegistry(request);
+        String requestExtraCostDistinctTypes = getRequestExtraCostDistinctTypes(request, maxNumberOfDistinctLandCharesRegistry);
+        if (!ValidationHelper.isNullOrEmpty(requestExtraCostDistinctTypes)) {
             return requestExtraCostDistinctTypes;
-        } else {
-            return maxNumberOfDistinctLandCharesRegistry;
+        } else if(maxNumberOfDistinctLandCharesRegistry > 0L){
+            return String.valueOf(maxNumberOfDistinctLandCharesRegistry);
         }
+        return "";
     }
 
     public byte[] convertFilteredRequestsToExcel(List<Request> requests, Long selectedClientId)
@@ -1069,6 +1062,7 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
         optimizeColumnSizeIfItLessMinimalSize(getIndex(ResourcesHelper.getString("excelNote"), requestsColumns) + 1);
         optimizeColumnSizeIfItLessMinimalSize(getColumns().length);
     }
+
     private void checkTotalCostSpecialColumn(Row row, Request request, int colIndex)
             throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         double calculatedTotalCost = new CostCalculationHelper(request).calculateTotalCost(Boolean.TRUE);
@@ -1082,6 +1076,79 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
             row.createCell(colIndex, CellType.STRING)
                     .setCellValue(ResourcesHelper.getString("requestListTotalCostDifferent"));
         }
+    }
+    public void checkTotalCostSpecialColumn(Row row, Request request, int colIndex, boolean isExcelData,
+                                             HSSFCellStyle wrapyStyle)
+            throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        double calculatedTotalCost = new CostCalculationHelper(request).calculateTotalCost(Boolean.TRUE);
+        double totalCostFromRequest = ValidationHelper.isNullOrEmpty(request.getTotalCost()) ?
+                0d : Double.parseDouble(request.getTotalCost().replaceAll(",", "."));
+        double totalCostByColumns = getMortgageCost(request) + getCatastalCost(request)
+                + (ValidationHelper.isNullOrEmpty(request.getCostPay()) ? 0d : request.getCostPay());
+
+        if (Math.abs(calculatedTotalCost - totalCostFromRequest) > 0.0001
+                || Math.abs(totalCostByColumns - totalCostFromRequest) > 0.0001) {
+            if(ValidationHelper.isNullOrEmpty(isExcelData) || !isExcelData){
+                row.createCell(colIndex, CellType.STRING)
+                        .setCellValue(ResourcesHelper.getString("requestListTotalCostDifferent"));
+            }else {
+                row.createCell(colIndex, CellType.STRING)
+                        .setCellValue(ResourcesHelper.getString("requestListTotalCostDifferent"));
+
+                colIndex = getIndex(ResourcesHelper.getString("excelNote"), requestsColumns);
+                Cell cell =row.getCell(colIndex);
+                if(cell != null){
+                    String cellValue = cell.getStringCellValue();
+                    cell.setCellStyle(wrapyStyle);
+                    String updatedValue = "";
+                    int startIndex = 0;
+
+                    if(!ValidationHelper.isNullOrEmpty(cellValue)){
+                        if(cellValue.equals("0")){
+                            cellValue ="";
+                        }
+                        if(!ValidationHelper.isNullOrEmpty(cellValue)){
+                            startIndex = cellValue.length() + 1;
+                            updatedValue = cellValue + "\nAnomalia costi";
+                        }else {
+                            updatedValue ="Anomalia costi";
+                        }
+                    }
+                    HSSFFont orangeFont = getWorkbook().createFont();
+                    orangeFont.setColor(IndexedColors.ORANGE.getIndex());
+                    HSSFRichTextString richString = new HSSFRichTextString(updatedValue);
+                    richString.applyFont(startIndex, updatedValue.length(), orangeFont);
+                    cell.setCellValue(richString);
+                }
+            }
+
+        }
+    }
+    public boolean checkTotalCostSpecialColumn(Request request)
+            throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        double calculatedTotalCost = new CostCalculationHelper(request).calculateTotalCost(Boolean.TRUE);
+        double totalCostFromRequest = ValidationHelper.isNullOrEmpty(request.getTotalCost()) ?
+                0d : Double.parseDouble(request.getTotalCost().replaceAll(",", "."));
+       /* double totalCostByColumns = getMortgageCost(request) + getCatastalCost(request)
+                + (ValidationHelper.isNullOrEmpty(request.getCostPay()) ? 0d : request.getCostPay());
+        List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
+                Restrictions.eq("requestId", request.getId())});
+
+        for (ExtraCost cost : extraCost) {
+            if(ValidationHelper.isNullOrEmpty(cost.getType()) ||
+                    !ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType()) ||
+                    !ExtraCostType.IPOTECARIO.equals(cost.getType()) ||
+                    !ExtraCostType.CATASTO.equals(cost.getType())) {
+                totalCostByColumns += cost.getPrice();
+            }
+        } */
+        log.info("For " + request.getFiscalCodeVATNamber());
+        log.info("calculatedTotalCost " + calculatedTotalCost + ", totalCostFromRequest " + totalCostFromRequest);
+        if (Math.abs(calculatedTotalCost - totalCostFromRequest) > 0.0001) {
+            //    || Math.abs(totalCostByColumns - totalCostFromRequest) > 0.0001) {
+            return true;
+        }
+        return false;
     }
 
     private int getIndex(String columnName, String[] columns) {
@@ -1264,10 +1331,12 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
         List<Request> nonNational = new ArrayList<>();
         boolean isNational = false;
         String cf = "";
+
+        Map<Long, Request> nationalRequests = new HashMap<>();
         for (Request request : requests) {
             List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
                     Restrictions.eq("requestId", request.getId())});
-            Double result = 0d;
+            Double result;
 
             for (ExtraCost cost : extraCost) {
                 if(ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
@@ -1277,36 +1346,78 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                         newRequest.setTempId(UUID.randomUUID().toString());
                         newRequest.setEstateFormalityList(request.getEstateFormalityList());
                         newRequest.setEvasionDate(request.getEvasionDate());
-                        addCost(newRequest, null, cellStyle, font,-2, result);
-                        isNational = true;
+                        newRequest.setResult(result);
+                        nationalRequests.put(request.getId(), newRequest);
                     } catch (CloneNotSupportedException e) {
                         LogHelper.log(log, e);
                     }
                 }
             }
-            if(isNational) {
-                cf = request.getFiscalCodeVATNamber();
+        }
+        List<Long> processedIds = new ArrayList<>();
+        for (Map.Entry<Long, Request> entry : nationalRequests.entrySet()) {
+            Request nationalRequest = nationalRequests.get(entry.getKey());
+            addCost(nationalRequest, null, cellStyle, font,-2, nationalRequest.getResult());
+            List<Request> matchedCfRequests = requests.
+                    stream()
+                    .filter(r -> !ValidationHelper.isNullOrEmpty(r.getFiscalCodeVATNamber()) &&
+                    r.getFiscalCodeVATNamber().equalsIgnoreCase(nationalRequest.getFiscalCodeVATNamber()))
+                    .collect(Collectors.toList());
+
+            for (Request request : matchedCfRequests) {
                 processRequest(request, cellStyle, font);
-            }else {
-                nonNational.add(request);
+                processedIds.add(request.getId());
             }
         }
-        if(isNational){
-            for (Request request : nonNational) {
-                if(cf.equalsIgnoreCase(request.getFiscalCodeVATNamber())){
-                    processRequest(request, cellStyle, font);
-                }
-            }
-            for (Request request : nonNational) {
-                if(!cf.equalsIgnoreCase(request.getFiscalCodeVATNamber())){
-                    processRequest(request, cellStyle, font);
-                }
-            }
-        }else {
-            for (Request request : nonNational) {
-                processRequest(request, cellStyle, font);
+        for (Request request : requests) {
+            if(!processedIds.contains(request.getId())){
+                 processRequest(request, cellStyle, font);
             }
         }
+//c1
+//        for (Request request : requests) {
+//            List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
+//                    Restrictions.eq("requestId", request.getId())});
+//            Double result = 0d;
+//
+//            for (ExtraCost cost : extraCost) {
+//                if(ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
+//                    result = cost.getPrice();
+//                    try {
+//                        Request newRequest = request.reportCopy();
+//                        newRequest.setTempId(UUID.randomUUID().toString());
+//                        newRequest.setEstateFormalityList(request.getEstateFormalityList());
+//                        newRequest.setEvasionDate(request.getEvasionDate());
+//                        addCost(newRequest, null, cellStyle, font,-2, result);
+//                        isNational = true;
+//                    } catch (CloneNotSupportedException e) {
+//                        LogHelper.log(log, e);
+//                    }
+//                }
+//            }
+//            if(isNational) {
+//                cf = request.getFiscalCodeVATNamber();
+//                processRequest(request, cellStyle, font);
+//            }else {
+//                nonNational.add(request);
+//            }
+//        }
+//        if(isNational){
+//            for (Request request : nonNational) {
+//                if(cf.equalsIgnoreCase(request.getFiscalCodeVATNamber())){
+//                    processRequest(request, cellStyle, font);
+//                }
+//            }
+//            for (Request request : nonNational) {
+//                if(!cf.equalsIgnoreCase(request.getFiscalCodeVATNamber())){
+//                    processRequest(request, cellStyle, font);
+//                }
+//            }
+//        }else {
+//            for (Request request : nonNational) {
+//                processRequest(request, cellStyle, font);
+//            }
+//        }
     }
 
     private void processRequest(Request request, CellStyle cellStyle, Font font)
@@ -1326,6 +1437,8 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
         HSSFCellStyle euroStyle = getEuroStyle();
         euroStyle.setFont(font);
 
+//        HSSFCellStyle wrapStyle = getWrapTextStyle();
+//        wrapStyle.setFont(font);
         HSSFCellStyle currencyStyle = getCurrencyStyle();
         currencyStyle.setFont(font);
 
@@ -1380,8 +1493,8 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
         }
         colIndex = getIndex(ResourcesHelper.getString("excelForm"), requestsColumns);
         if (colIndex > -1 && index != -2) {
-            row.createCell(colIndex)
-                    .setCellValue(request.getNumberActOrSumOfEstateFormalitiesAndOther().longValue());
+            Long val = request.getNumberActOrSumOfEstateFormalitiesAndOther().longValue() + getRequestExtraCostValue(request).longValue();
+            row.createCell(colIndex).setCellValue(val);
             row.getCell(colIndex).setCellStyle(cellStyle);
         }
         colIndex = getIndex(ResourcesHelper.getString("mortgageRights"), requestsColumns);
@@ -1474,8 +1587,7 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                     row.createCell(colIndex, CellType.STRING).setCellValue(request.getCostNote());
                     row.getCell(colIndex).setCellStyle(cellStyle);
                 } else {
-                    row.createCell(colIndex, CellType.STRING).setCellValue(isItInvoiceReport()
-                            ? getRequestExtraCostDistinctTypes(request) : getMaxNumberOfDistinctLandCharesRegistry(request));
+                    row.createCell(colIndex, CellType.STRING).setCellValue(generateCorrectNote(request));
                     row.getCell(colIndex).setCellStyle(cellStyle);
                 }
             }else {
@@ -1527,6 +1639,8 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                 }
             }
         }
+
+       // checkTotalCostSpecialColumn(row, request, getColumns().length, true, wrapStyle);
     }
 
     private void addFooter(List<Request> requests, CellStyle cellStyle, Font font) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -1644,16 +1758,17 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
         return extraCostSum;
     }
 
-    private String getMaxNumberOfDistinctLandCharesRegistry(Request request)
+    public Long getMaxNumberOfDistinctLandCharesRegistry(Request request)
             throws PersistenceBeanException, IllegalAccessException {
-        String result = "";
+        Long result = 0L;
         List<DocumentSubject> documentSubjects = null;
         Optional<Long> maxNumberOfDistinctLandCharesRegistry = Optional.empty();
 
 //        List<Document> documents = request.getDocumentsRequest().stream().filter(x -> x.getTypeId().equals(5L)).collect(Collectors.toList());
         List<Long> documentIds = CollectionUtils.emptyIfNull(request.getRequestFormalities())
                 .stream().map(RequestFormality::getDocumentId)
-                .distinct().collect(Collectors.toList());
+                .distinct()
+                .skip(1).collect(Collectors.toList());
 
         List<Document> documents = null;
         if(documentIds.size() > 0)
@@ -1661,13 +1776,17 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                     Restrictions.in("id", documentIds)});
 
         if (!ValidationHelper.isNullOrEmpty(documents)) {
-            documentSubjects = DaoManager.load(DocumentSubject.class, new Criterion[]{Restrictions.in("document", documents)});
-            maxNumberOfDistinctLandCharesRegistry = documentSubjects.stream().map(DocumentSubject::getOffice)
+            documentSubjects = DaoManager.load(DocumentSubject.class,
+                    new Criterion[]{Restrictions.in("document",
+                            documents.stream().collect(Collectors.toList()))});
+            maxNumberOfDistinctLandCharesRegistry = documentSubjects
+                    .stream()
+                    .map(DocumentSubject::getOffice)
                     .collect(Collectors.groupingBy(IndexedEntity::getId, Collectors.counting())).values().stream().max(Long::compareTo);
         }
 
-        if (maxNumberOfDistinctLandCharesRegistry.isPresent() && maxNumberOfDistinctLandCharesRegistry.get() > 1L) {
-            result = maxNumberOfDistinctLandCharesRegistry.get() + " ispezioni ipotecarie";
+        if (maxNumberOfDistinctLandCharesRegistry.isPresent() && maxNumberOfDistinctLandCharesRegistry.get() > 0L) {
+            result = maxNumberOfDistinctLandCharesRegistry.get();// + " ispezioni ipotecarie";
         }
 
         return result;
@@ -1709,6 +1828,89 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
             result = String.join(" + ", resultList);
         }
 
+        return result;
+    }
+
+    public String getRequestExtraCostDistinctTypes(Request request, Long maxNumberOfDistinctLandCharesRegistry) throws PersistenceBeanException, IllegalAccessException {
+        String result = "";
+
+        Map<String, ExtraCost> extraCostMap = new HashMap<>();
+
+        List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
+                Restrictions.eq("requestId", request.getId())});
+
+        if (!ValidationHelper.isNullOrEmpty(extraCosts)) {
+            for (ExtraCost cost : extraCosts) {
+                if (!ValidationHelper.isNullOrEmpty(cost.getNote()) && !extraCostMap.containsKey(cost.getNote()))
+                    extraCostMap.put(cost.getNote(), cost);
+            }
+
+            for (Map.Entry<String, ExtraCost> entry : extraCostMap.entrySet()) {
+                if (!ExtraCostType.IPOTECARIO.equals(entry.getValue().getType()))
+                    continue;
+                if (MortgageType.Sintetico.toString().equals(entry.getValue().getNote())) {
+                    String prefix = getPrefixCost(entry.getValue(), maxNumberOfDistinctLandCharesRegistry);
+                    if(!ValidationHelper.isNullOrEmpty(prefix))
+                        if(prefix.equalsIgnoreCase("doppia") || prefix.equalsIgnoreCase("tripla ")){
+                            result = prefix + "ispezione ipotecaria";
+                        }else {
+                            result = prefix + "ispezioni ipotecarie";
+                        }
+                }
+            }
+        }
+        return result;
+    }
+
+
+    public Double getRequestExtraCostValue(Request request) throws PersistenceBeanException, IllegalAccessException {
+        Double value = 0d;
+        Map<String, ExtraCost> extraCostMap = new HashMap<>();
+
+        List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
+                Restrictions.eq("requestId", request.getId())});
+
+        if (!ValidationHelper.isNullOrEmpty(extraCosts)) {
+            for (ExtraCost cost : extraCosts) {
+                if (!ValidationHelper.isNullOrEmpty(cost.getNote()) && !extraCostMap.containsKey(cost.getNote()))
+                    extraCostMap.put(cost.getNote(), cost);
+            }
+            for (Map.Entry<String, ExtraCost> entry : extraCostMap.entrySet()) {
+                if (ExtraCostType.NAZIONALEPOSITIVA.equals(entry.getValue().getType()))
+                    continue;
+                if (ExtraCostType.IPOTECARIO.equals(entry.getValue().getType())) {
+                    if (MortgageType.AdditionalFormality.toString().equals(entry.getValue().getNote())) {
+                        value += entry.getValue().getPrice() /3.6 ;
+                    } else {
+                        value += entry.getValue().getPrice() /6.3 ;
+                    }
+                }
+            }
+        }
+        return value;
+    }
+
+    private String getPrefixCost(ExtraCost value, Long maxNumberOfDistinctLandCharesRegistry) {
+        String result = "";
+        Double val = 0.0;
+        if (!ValidationHelper.isNullOrEmpty(value.getPrice())) {
+            if(ExtraCostType.IPOTECARIO.equals(value.getType())){
+                val = value.getPrice() / 6.30d + maxNumberOfDistinctLandCharesRegistry;
+            }
+            if (val == 1d) {
+                result = "doppia ";
+            } else  if (val == 2d) {
+                result = "tripla ";
+            } else  if (val == 3d) {
+                result = "quattro ";
+            } else  if (val == 4d) {
+                result = "cinque ";
+            } else  if (val == 5d) {
+                result = "sei ";
+            } else  if (val == 6d) {
+                result = "sette ";
+            }
+        }
         return result;
     }
 

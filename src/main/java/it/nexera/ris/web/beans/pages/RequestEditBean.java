@@ -20,6 +20,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 
 import it.nexera.ris.common.enums.*;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
 import org.apache.commons.lang.math.NumberUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -78,13 +79,6 @@ import it.nexera.ris.persistence.beans.entities.domain.SectionC;
 import it.nexera.ris.persistence.beans.entities.domain.Subject;
 import it.nexera.ris.persistence.beans.entities.domain.User;
 import it.nexera.ris.persistence.beans.entities.domain.WLGInbox;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Country;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.LandChargesRegistry;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import it.nexera.ris.persistence.view.ClientView;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.beans.EntityEditPageBean;
@@ -1292,7 +1286,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             getEntity().setAgency(null);
         }
         if (!ValidationHelper.isNullOrEmpty(getSelectedAgencyOfficeId())) {
-            getEntity().setOffice(DaoManager.get(Agency.class, getSelectedAgencyOfficeId()));
+            getEntity().setOffice(DaoManager.get(Office.class, getSelectedAgencyOfficeId()));
         } else {
             getEntity().setOffice(null);
         }

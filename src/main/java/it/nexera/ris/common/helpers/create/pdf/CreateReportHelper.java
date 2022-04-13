@@ -308,8 +308,7 @@ public abstract class CreateReportHelper extends BaseHelper {
         double result = 0d;
         List<PriceList> priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
                 new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                        Restrictions.eq("client", (billingClient == null || !billingClient)
-                                ? request.getClient() : request.getBillingClient()),
+                        Restrictions.eq("client",request.getClient()),
 
                         restictionForPriceList ?
                                 Restrictions.in("cc.id", service.getServiceCostUnauthorizedQuoteList()
@@ -339,8 +338,7 @@ public abstract class CreateReportHelper extends BaseHelper {
         if (!ValidationHelper.isNullOrEmpty(service)) {
             List<PriceList> priceList = DaoManager.load(PriceList.class, 
                     new Criterion[]{
-                            Restrictions.eq("client", (billingClient == null || !billingClient)
-                                    ? request.getClient() : request.getBillingClient()),
+                            Restrictions.eq("client", request.getClient()),
                             Restrictions.eq("isNegative", true),
                             Restrictions.eq("service", service)});
             if (!ValidationHelper.isNullOrEmpty(priceList)) {
@@ -399,8 +397,7 @@ public abstract class CreateReportHelper extends BaseHelper {
         
         return DaoManager.load(PriceList.class, new CriteriaAlias[]{
                 new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                Restrictions.eq("client", (billingClient == null || !billingClient)
-                        ? request.getClient() : request.getBillingClient()),
+                Restrictions.eq("client", request.getClient()),
 
                 restrictionForPriceList ?
                         Restrictions.in("cc.id", service.getServiceCostUnauthorizedQuoteList()
@@ -417,8 +414,7 @@ public abstract class CreateReportHelper extends BaseHelper {
             if(!ValidationHelper.isNullOrEmpty(service)) {
                 List<PriceList> priceList = DaoManager.load(PriceList.class, 
                         new Criterion[]{
-                                Restrictions.eq("client", (billingClient == null || !billingClient)
-                                        ? request.getClient() : request.getBillingClient()),
+                                Restrictions.eq("client",request.getClient()),
                                 Restrictions.eq("isNegative", true),
                                 Restrictions.eq("service", service)});
                 
@@ -456,8 +452,7 @@ public abstract class CreateReportHelper extends BaseHelper {
         if(!ValidationHelper.isNullOrEmpty(service)) {
             priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
                     new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                    Restrictions.eq("client", (billingClient == null || !billingClient)
-                            ? request.getClient() : request.getBillingClient()),
+                    Restrictions.eq("client", request.getClient()),
                     Restrictions.eq("service", service),
 
                     restrictionForPriceList ?

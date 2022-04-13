@@ -347,6 +347,14 @@
                 <f:setPropertyActionListener value="SELECTED_ESTATE_SITUATION" target="#{bean.currentComment}"/>
                 <f:setPropertyActionListener value="#{item.comment.id}" target="#{bean.selectedId}"/>
             </p:commandButton>
+            <br/>
+            <br/>
+            <p:commandButton icon="fa fa-bars" oncomplete="PF('estateSituationRelationshipDlg').show();"
+                             update=":form:estaeRelationshipArea, :form:estateRelationshipTable"
+                             action="#{bean.prepareRelationships}">
+                <f:setPropertyActionListener value="SELECTED_ESTATE_SITUATION" target="#{bean.currentComment}"/>
+                <f:setPropertyActionListener value="#{item.estateSituationId}" target="#{bean.selectedId}"/>
+            </p:commandButton>
         </p:column>
     </p:dataTable>
     <br/>
@@ -1137,6 +1145,57 @@
             </p:column>
             <p:commandButton icon="fa fa-plus" action="#{bean.saveRelationship}"
                              update="relationshipArea, relationshipTable"/>
+        </p:panelGrid>
+    </p:dialog>
+
+
+    <p:dialog widgetVar="estateSituationRelationshipDlg" resizable="false" modal="true" draggable="false" closable="true"
+              id="estateSituationRelationshipDlg" width="600">
+        <p:dataTable value="#{bean.estateSituationRelationshipList}" var="item" id="estateRelationshipTable"
+                     styleClass="simple-table">
+            <p:column headerText="#{msg.databaseListRealEstateQuote}">
+                <h:outputText value="#{item.quote1} / #{item.quote2}"/>
+            </p:column>
+            <p:column headerText="#{msg.databaseListRealEstatePropertyType}">
+                <h:outputText value="#{item.type.description}"/>
+            </p:column>
+            <p:column headerText="#{msg.databaseListRealEstateSubject}">
+                <h:outputText value="#{item.subject.fullName}"/>
+            </p:column>
+            <p:column styleClass="action_column">
+                <p:commandButton update="estaeRelationshipArea" icon="fa fa-edit" action="#{bean.editAllRelationShip}">
+                    <f:setPropertyActionListener value="#{item}" target="#{bean.editRelationship}"/>
+                </p:commandButton>
+            </p:column>
+            <p:column styleClass="action_column">
+                <p:commandButton update="estateRelationshipTable" icon="fa fa-remove" action="#{bean.deleteAllRelationship}">
+                    <f:setPropertyActionListener value="#{item}" target="#{bean.deleteRelationship}"/>
+                </p:commandButton>
+            </p:column>
+        </p:dataTable>
+        <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" id="estaeRelationshipArea">
+            <span> #{msg.databaseListRealEstateQuote}:</span>
+            <p:column>
+                <p:inputText id="estateInputQuote1" value="#{bean.estateQuote1}" onkeypress="numbers_only('#estateInputQuote1');"/>
+                <h:outputText value=" / "/>
+                <p:inputText id="estateInputQuote2" value="#{bean.estateQuote2}" onkeypress="numbers_only('#estateInputQuote2');"/>
+            </p:column>
+            <p:column/>
+            <span> #{msg.databaseListRealEstatePropertyType}:</span>
+            <p:column>
+                <p:selectOneMenu value="#{bean.estatePropertyType}" id="estatePropertyType">
+                    <f:selectItems value="#{bean.propertyTypeList}"/>
+                </p:selectOneMenu>
+            </p:column>
+            <p:column/>
+            <span> #{msg.databaseListRegime}:</span>
+            <p:column>
+                <p:selectOneMenu value="#{bean.estateSelectedRegime}" id="estateRegimeType">
+                    <f:selectItems value="#{bean.regimes}"/>
+                </p:selectOneMenu>
+            </p:column>
+            <p:commandButton icon="fa fa-plus" action="#{bean.saveAllRelationship}"
+                             update="estaeRelationshipArea, estateRelationshipTable"/>
         </p:panelGrid>
     </p:dialog>
 </ui:composition>

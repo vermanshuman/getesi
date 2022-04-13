@@ -1,31 +1,22 @@
 package it.nexera.ris.web.beans.pages;
 
-import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.faces.model.SelectItem;
-
+import it.nexera.ris.common.enums.*;
+import it.nexera.ris.common.exceptions.PersistenceBeanException;
+import it.nexera.ris.common.helpers.*;
+import it.nexera.ris.common.helpers.create.xls.CreateExcelRequestsReportHelper;
+import it.nexera.ris.common.xml.wrappers.SelectItemWrapper;
+import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
+import it.nexera.ris.persistence.beans.dao.DaoManager;
+import it.nexera.ris.persistence.beans.entities.Dictionary;
+import it.nexera.ris.persistence.beans.entities.domain.*;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
+import it.nexera.ris.persistence.view.ClientView;
+import it.nexera.ris.settings.ApplicationSettingsHolder;
+import it.nexera.ris.web.beans.EntityViewPageBean;
+import it.nexera.ris.web.beans.base.AccessBean;
+import it.nexera.ris.web.beans.wrappers.logic.FileWrapper;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.codec.binary.Base64;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -37,52 +28,20 @@ import org.hibernate.sql.JoinType;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 
-import it.nexera.ris.common.enums.ApplicationSettingsKeys;
-import it.nexera.ris.common.enums.ClientType;
-import it.nexera.ris.common.enums.EmailType;
-import it.nexera.ris.common.enums.MailEditType;
-import it.nexera.ris.common.enums.MailManagerStatuses;
-import it.nexera.ris.common.enums.MailManagerTypes;
-import it.nexera.ris.common.enums.PageTypes;
-import it.nexera.ris.common.exceptions.PersistenceBeanException;
-import it.nexera.ris.common.helpers.ComboboxHelper;
-import it.nexera.ris.common.helpers.DateTimeHelper;
-import it.nexera.ris.common.helpers.FileHelper;
-import it.nexera.ris.common.helpers.LogHelper;
-import it.nexera.ris.common.helpers.MailHelper;
-import it.nexera.ris.common.helpers.MailManagerHelper;
-import it.nexera.ris.common.helpers.MessageHelper;
-import it.nexera.ris.common.helpers.PrintPDFHelper;
-import it.nexera.ris.common.helpers.RedirectHelper;
-import it.nexera.ris.common.helpers.ResourcesHelper;
-import it.nexera.ris.common.helpers.SelectItemHelper;
-import it.nexera.ris.common.helpers.SelectItemWrapperConverter;
-import it.nexera.ris.common.helpers.SessionHelper;
-import it.nexera.ris.common.helpers.ValidationHelper;
-import it.nexera.ris.common.helpers.create.xls.CreateExcelRequestsReportHelper;
-import it.nexera.ris.common.xml.wrappers.SelectItemWrapper;
-import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
-import it.nexera.ris.persistence.beans.dao.DaoManager;
-import it.nexera.ris.persistence.beans.entities.Dictionary;
-import it.nexera.ris.persistence.beans.entities.domain.Client;
-import it.nexera.ris.persistence.beans.entities.domain.ClientEmail;
-import it.nexera.ris.persistence.beans.entities.domain.Document;
-import it.nexera.ris.persistence.beans.entities.domain.ReadWLGInbox;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
-import it.nexera.ris.persistence.beans.entities.domain.RequestFormality;
-import it.nexera.ris.persistence.beans.entities.domain.User;
-import it.nexera.ris.persistence.beans.entities.domain.WLGExport;
-import it.nexera.ris.persistence.beans.entities.domain.WLGFolder;
-import it.nexera.ris.persistence.beans.entities.domain.WLGInbox;
-import it.nexera.ris.persistence.beans.entities.domain.WLGServer;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
-import it.nexera.ris.persistence.view.ClientView;
-import it.nexera.ris.settings.ApplicationSettingsHolder;
-import it.nexera.ris.web.beans.EntityViewPageBean;
-import it.nexera.ris.web.beans.base.AccessBean;
-import it.nexera.ris.web.beans.wrappers.logic.FileWrapper;
-import lombok.Getter;
-import lombok.Setter;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.faces.model.SelectItem;
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 @Setter
 @Getter
@@ -253,7 +212,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             setCreateClient(true);
         }
 
-        initOfficesList();
+        initOfficesList(false);
         if(!ValidationHelper.isNullOrEmpty(getSelectedClientManagers()) &&
                 ValidationHelper.isNullOrEmpty(getClientManagers())) {
             setClientManagers(getSelectedClientManagers());
@@ -266,7 +225,10 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         getEntity().reloadRequests();
     }
 
-    public void initOfficesList() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+    public void handleClientSelect() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        initOfficesList(true);
+    }
+    public void initOfficesList(boolean isClientSelected) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         List<Client> clientList = DaoManager.load(Client.class, new Criterion[]{
                 Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
                         Restrictions.isNull("deleted"))})
@@ -288,14 +250,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
          }
          
         if (getSelectedNotManagerOrFiduciaryClientId() != null) {
-//        	setClientManagers(ComboboxHelper.fillWrapperList(
-//        			clientList.stream()
-//        			.filter(c -> (c.getManager() != null 
-//        			&& c.getManager())  &&  (c.getClient() != null 
-//        			&& c.getClient().getId().equals(getSelectedNotManagerOrFiduciaryClientId())))
-//        			.collect(Collectors.toList())
-//        			));
-        	 
         	 setClientManagers(ComboboxHelper.fillWrapperList( emptyIfNull(clientList)
                	  .stream()
             	  .filter(c -> emptyIfNull(c.getReferenceClients()).stream()
@@ -316,15 +270,18 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             } else {
                 setOfficeList(Collections.singletonList(SelectItemHelper.getNotSelected()));
             }
-            List<Client> invoiceClients = new ArrayList<Client>();
-            for(Client client : clientList) {
-                if(!client.getId().equals(getSelectedNotManagerOrFiduciaryClientId())) {
-                    continue;
+            // MailManagerView data - do not set automatically Fatturazione field
+            List<Client> invoiceClients = new ArrayList<>();
+            if (isClientSelected && !ValidationHelper.isNullOrEmpty(getNotManagerOrFiduciaryClients())) {
+                for (Client client : clientList) {
+                    if (!client.getId().equals(getSelectedNotManagerOrFiduciaryClientId())) {
+                        continue;
+                    }
+                    invoiceClients.addAll(client.getBillingRecipientList());
                 }
-                invoiceClients.addAll(client.getBillingRecipientList());
             }
-            setInvoiceClients(ComboboxHelper.fillList(invoiceClients.stream() 
-                    .filter(distinctByKey(c -> c.getId())) 
+            setInvoiceClients(ComboboxHelper.fillList(invoiceClients.stream()
+                    .filter(distinctByKey(c -> c.getId()))
                     .collect(Collectors.toList()), true));
         } else {
             setOfficeList(ComboboxHelper.fillList(Office.class, Order.asc("description")));
@@ -525,7 +482,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 }
             }
 
-            DaoManager.save(getEntity(), true);
+            // MailManagerView data - do not have to be saved in db until the user clicks button Salva
+            // DaoManager.save(getEntity(), true);
             if(ValidationHelper.isNullOrEmpty(getSelectedNotManagerOrFiduciaryClientId())) {
 
                 onlyEmails = MailHelper.getOnlyEmails(getEntity().getEmailFrom());
