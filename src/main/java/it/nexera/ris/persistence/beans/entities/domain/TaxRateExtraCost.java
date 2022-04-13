@@ -56,4 +56,16 @@ public class TaxRateExtraCost extends IndexedEntity {
     public void setExtraCostType(ExtraCostType extraCostType) {
         this.extraCostType = extraCostType;
     }
+
+    public void setTaxRateExtraCost(TaxRateExtraCost taxRateExtraCost) {
+        this.setId(taxRateExtraCost.getId());
+        this.setCreateDate(taxRateExtraCost.getCreateDate());
+        this.setCreateUserId(taxRateExtraCost.getCreateUserId());
+        this.setUpdateDate(taxRateExtraCost.getUpdateDate());
+        this.setUpdateUserId(taxRateExtraCost.getUpdateUserId());
+        this.setClientId(taxRateExtraCost.getClientId());
+        this.setService(taxRateExtraCost.getService());
+        this.setTaxRate(taxRateExtraCost.getTaxRate());
+        this.setExtraCostType(taxRateExtraCost.getExtraCostType());
+    }
 }
