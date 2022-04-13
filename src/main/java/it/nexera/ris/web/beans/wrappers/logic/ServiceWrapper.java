@@ -136,15 +136,15 @@ public class ServiceWrapper implements Serializable {
                 });
                 for (TaxRateExtraCost taxRateExtraCost :taxRateExtraCosts) {
                     if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.IPOTECARIO)) {
-                        taxRateExtraCosts.get(0).setTaxRateExtraCost(taxRateExtraCost);
+                        this.taxRateExtraCosts.get(0).setTaxRateExtraCost(taxRateExtraCost);
                     } else if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.CATASTO)) {
-                        taxRateExtraCosts.get(1).setTaxRateExtraCost(taxRateExtraCost);
+                        this.taxRateExtraCosts.get(1).setTaxRateExtraCost(taxRateExtraCost);
                     } else if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.MARCA)) {
-                        taxRateExtraCosts.get(2).setTaxRateExtraCost(taxRateExtraCost);
+                        this.taxRateExtraCosts.get(2).setTaxRateExtraCost(taxRateExtraCost);
                     } else if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.POSTALE)) {
-                        taxRateExtraCosts.get(3).setTaxRateExtraCost(taxRateExtraCost);
+                        this.taxRateExtraCosts.get(3).setTaxRateExtraCost(taxRateExtraCost);
                     } else if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.ALTRO)) {
-                        taxRateExtraCosts.get(4).setTaxRateExtraCost(taxRateExtraCost);
+                        this.taxRateExtraCosts.get(4).setTaxRateExtraCost(taxRateExtraCost);
                     }
                 }
             } catch (Exception e) {
