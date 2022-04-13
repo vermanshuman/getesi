@@ -109,6 +109,7 @@ public class TemplatePdfTableHelper {
                     if(result==0) {
                         result = o1.getSub().compareTo(o2.getSub());
                     }
+                    return result;
                 }else if(o1.getSheet()==null) {
                     return -1;
                 }else if(o2.getSheet()==null) {
@@ -116,7 +117,6 @@ public class TemplatePdfTableHelper {
                 }else {
                     return 0;
                 }
-                return 0;
             }
         };
 
@@ -154,6 +154,7 @@ public class TemplatePdfTableHelper {
         for (Property property : propertyList) {
             if (!ValidationHelper.isNullOrEmpty(property.getCategoryCode()) && !RealEstateType.LAND.getShortValue().equals(property.getCategoryCode())) {
                 property.setType(RealEstateType.BUILDING.getId());
+                System.out.println(property.getSubs());
             }
         }
         Map<List<RelationshipGroupingWrapper>, List<Property>> re = new HashMap<>();
