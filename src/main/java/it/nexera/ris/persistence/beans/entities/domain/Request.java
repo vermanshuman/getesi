@@ -33,6 +33,7 @@ import javax.persistence.Transient;
 
 import it.nexera.ris.common.enums.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
+import it.nexera.ris.persistence.beans.entities.domain.readonly.WLGInboxShort;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
@@ -463,6 +464,26 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     @Transient
     private Boolean selectedRequest;
 
+    @Transient
+    private Long managerId;
+
+    @Transient
+    private String clientNameProfessional;
+
+    @Transient
+    private Boolean haveAllegatiDocuments;
+
+    @Transient
+    private Boolean isExternal;
+
+    @Transient
+    private User createUser;
+
+    @Transient
+    private Boolean haveDocuments;
+
+    @Transient
+    private int documentsCount;
 
     public Boolean getHaveRequestReport() {
         if (haveRequestReport == null) {
@@ -979,7 +1000,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
                 : getAggregationLandChargesRegistry().toString();
     }
 
-    public String getAggregationLandCharRegNameOrCity() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+    public String getAggregationLandCharRegNameOrCity() {
 
         if(ValidationHelper.isNullOrEmpty(getAggregationLandChargesRegistryName())) {
             if(ValidationHelper.isNullOrEmpty(getCity())) {
@@ -2107,5 +2128,146 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     public void setSelectedForInvoice(boolean selectedForInvoice) {
         this.selectedForInvoice = selectedForInvoice;
+    }
+
+    public Long getManagerId() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        if(!ValidationHelper.isNullOrEmpty(getMail())) {
+            WLGInbox wlgInbox = DaoManager.get(WLGInbox.class,  new CriteriaAlias[]{
+                    new CriteriaAlias("client", "c", JoinType.INNER_JOIN)
+            }, new Criterion[]{
+                    Restrictions.eq("id", getMail().getId())
+            });
+            if(!ValidationHelper.isNullOrEmpty(wlgInbox) && !ValidationHelper.isNullOrEmpty(wlgInbox.getClient())) {
+                setManagerId(wlgInbox.getClient().getId());
+            }
+        }
+        return managerId;
+    }
+
+    public void setManagerId(Long managerId) {
+        this.managerId = managerId;
+    }
+
+    public String haveManagers() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        if (!ValidationHelper.isNullOrEmpty(getMail())) {
+            WLGInbox wlgInbox =  DaoManager.get(WLGInbox.class, getMail());
+            if(!ValidationHelper.isNullOrEmpty(wlgInbox) && !ValidationHelper.isNullOrEmpty(wlgInbox.getManagers())) {
+                return wlgInbox.getManagers()
+                        .stream()
+                        .distinct()
+                        .map(w -> w.toString())
+                        .collect(Collectors.joining(","));
+            }
+        }
+        return null;
+    }
+
+
+    public String getClientNameProfessional(Client client) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        if (clientNameProfessional == null && client != null) {
+            if (client == null) {
+                clientNameProfessional = "";
+            } else {
+                if(client.getTypeId() == null || ClientType.PROFESSIONAL.getId().equals(client.getTypeId())
+                        && !ValidationHelper.isNullOrEmpty(client.getNameProfessional())){
+                    clientNameProfessional = client.getNameProfessional();
+                }else if( !( client.getTypeId() == null || ClientType.PROFESSIONAL.getId().equals(client.getTypeId()) )
+                        && !ValidationHelper.isNullOrEmpty(client.getNameOfTheCompany())){
+                    clientNameProfessional = client.getNameOfTheCompany();
+                }
+            }
+        }
+        return clientNameProfessional;
+    }
+
+    public String getMailSubject() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+        if (!ValidationHelper.isNullOrEmpty(getMail())) {
+            return getMail().getEmailSubject();
+        }
+        return null;
+    }
+
+    public Boolean getHaveAllegatiDocuments() {
+        if (haveAllegatiDocuments == null) {
+            try {
+                haveAllegatiDocuments = DaoManager.getSession()
+                        .createQuery("select 1 from Document where request= :request_id and typeId = 8")
+                        .setLong("request_id", getId())
+                        .setFetchSize(1).scroll(ScrollMode.FORWARD_ONLY).next();
+            } catch (PersistenceBeanException | IllegalAccessException e) {
+                LogHelper.log(log, e);
+            }
+        }
+        return haveAllegatiDocuments;
+    }
+
+    public Boolean getExternal() {
+        if (isExternal == null) {
+            User user = null;
+            if (getCreateUserId() == null) {
+                setExternal(false);
+                return false;
+            }
+            try {
+                user = DaoManager.get(User.class, getCreateUserId());
+                if (user == null) {
+                    setExternal(false);
+                } else {
+                    createUser = user;
+                    setExternal(user.getUserRoles().stream().anyMatch(r -> r.getType() == RoleTypes.EXTERNAL));
+                }
+            } catch (Exception e) {
+                LogHelper.log(log, e);
+                setExternal(false);
+                return false;
+            }
+        }
+        return isExternal;
+    }
+
+    public void setExternal(Boolean external) {
+        isExternal = external;
+    }
+
+    public Boolean getHaveDocuments() {
+        if (haveDocuments == null) {
+            try {
+                haveDocuments = DaoManager.getSession()
+                        .createQuery("select 1 from Document where request= :request_id and selectedForEmail = true")
+                        .setLong("request_id", getId())
+                        .setFetchSize(1).scroll(ScrollMode.FORWARD_ONLY).next();
+            } catch (PersistenceBeanException | IllegalAccessException e) {
+                LogHelper.log(log, e);
+            }
+        }
+        return haveDocuments;
+    }
+
+    public int getDocumentsCount() throws IllegalAccessException, PersistenceBeanException {
+        List<Document> documents = DaoManager.load(Document.class, new Criterion[]{
+                Restrictions.eq("request.id", getId()),
+                Restrictions.eq("selectedForEmail", true)
+//                ,
+//                Restrictions.ne("typeId", DocumentType.FORMALITY.getId())
+        });
+
+        List<Document> formalities = DaoManager.load(Document.class, new CriteriaAlias[]{
+                new CriteriaAlias("formality", "f", JoinType.INNER_JOIN),
+                new CriteriaAlias("f.requestList", "r_f", JoinType.INNER_JOIN)
+        }, new Criterion[]{
+                Restrictions.eq("r_f.id", getId()),
+                Restrictions.eq("request.id", getId()),
+                Restrictions.eq("selectedForEmail", true)
+        });
+
+        if (!ValidationHelper.isNullOrEmpty(formalities)) {
+            for (Document temp : formalities) {
+                if (!documents.contains(temp)) {
+                    documents.add(temp);
+                }
+            }
+        }
+        documentsCount = documents != null ? documents.size() : 0;
+        return documentsCount;
     }
 }

@@ -898,11 +898,11 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 wrapper.setInvoiceItemAmount(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount()) ? 0.0 : invoiceItem.getAmount());
                 double totalcost = !(ValidationHelper.isNullOrEmpty(invoiceItem.getInvoiceTotalCost())) ? invoiceItem.getInvoiceTotalCost().doubleValue() : 0.0;
                 double amount = !(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount())) ? invoiceItem.getAmount().doubleValue() : 0.0;
-                double totalLine = 0d; 
+                double totalLine = 0d;
                 if(amount != 0.0) {
-                	totalLine = totalcost * amount;
+                    totalLine = totalcost * amount;
                 } else {
-                	totalLine = totalcost;
+                    totalLine = totalcost;
                 }
                 wrapper.setTotalLine(totalLine);
                 if(!ValidationHelper.isNullOrEmpty(invoiceItem.getDescription()))
@@ -1000,7 +1000,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             tot = tot.setScale(2, RoundingMode.HALF_UP);
             total = tot.doubleValue();
         }
-            return total;
+        return total;
     }
 
     private GoodsServicesFieldWrapper createGoodsServicesFieldWrapper() throws IllegalAccessException, PersistenceBeanException {
@@ -1070,13 +1070,13 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     public void onItemSelectInvoiceClient() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         Client selectedClient = DaoManager.get(Client.class, getSelectedInvoiceClientId());
-    	setSelectedInvoiceClient(selectedClient);
-    	System.out.println(selectedClient.getSplitPayment());
-    	if(selectedClient.getSplitPayment() != null && selectedClient.getSplitPayment())
-    		setVatCollectabilityId(VatCollectability.SPLIT_PAYMENT.getId());
-    	if(selectedClient.getPaymentTypeList() != null && !selectedClient.getPaymentTypeList().isEmpty()) {
-    		setPaymentTypes(ComboboxHelper.fillList(selectedClient.getPaymentTypeList(), true));
-    	}
+        setSelectedInvoiceClient(selectedClient);
+        System.out.println(selectedClient.getSplitPayment());
+        if(selectedClient.getSplitPayment() != null && selectedClient.getSplitPayment())
+            setVatCollectabilityId(VatCollectability.SPLIT_PAYMENT.getId());
+        if(selectedClient.getPaymentTypeList() != null && !selectedClient.getPaymentTypeList().isEmpty()) {
+            setPaymentTypes(ComboboxHelper.fillList(selectedClient.getPaymentTypeList(), true));
+        }
     }
 
     public void saveInvoice(InvoiceStatus invoiceStatus, Boolean saveInvoiceNumber) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
@@ -1120,7 +1120,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     }
 
     public void sendInvoice() {
-    	cleanValidation();
+        cleanValidation();
 
         if(ValidationHelper.isNullOrEmpty(getInvoiceDate())){
             addRequiredFieldException("form:date");
@@ -1151,7 +1151,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             executeJS("PF('invoiceErrorDialogWV').show();");
             return;
         }
-        
+
         try {
             Invoice invoice = DaoManager.get(Invoice.class, getNumber());
             List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
@@ -1552,19 +1552,19 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                     double total = 0.0;
                     double amount = 0.0;
                     double totalCost = 0.0;
-                    
+
                     if(item.getAmount() != null)
                         amount = item.getAmount();
                     if(item.getInvoiceTotalCost() != null)
                         totalCost = item.getInvoiceTotalCost();
                     if(amount != 0.0)
-                    	imponibile = imponibile + (amount * totalCost);
+                        imponibile = imponibile + (amount * totalCost);
                     else
-                    	imponibile = imponibile + totalCost;
+                        imponibile = imponibile + totalCost;
                     if(amount != 0.0)
-                    	total = amount * totalCost;
+                        total = amount * totalCost;
                     else
-                    	total = totalCost;
+                        total = totalCost;
                     if(item.getVat() != null){
                         ivaPercentage = ivaPercentage + item.getVat();
                         totalIva = totalIva + ((item.getVat() * total)/100);
@@ -1802,7 +1802,4 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
 
     }
-
-
-
 }

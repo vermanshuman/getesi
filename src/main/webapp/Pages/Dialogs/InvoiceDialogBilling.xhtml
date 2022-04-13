@@ -355,12 +355,12 @@
                                 </div>
                                 <div class="p-col-8">
                                     <p:inputText value="#{bean.examRequest.client}" rendered="#{bean.examRequest.client ne null}" disabled="true"/>
-                                    <p:selectOneMenu id="invoiceClient" value="#{bean.selectedInvoiceClientId}" style="width: 300px; float:left;" 
-                                    				rendered="#{bean.examRequest.client eq null}"
-                                                    styleClass="#{bean.selectedInvoiceClientId ne null ? 'select-one-menu' : ''}">
+                                    <p:selectOneMenu id="invoiceClient" value="#{bean.selectedInvoiceClientId}" style="width: 300px; float:left;"
+                                                     rendered="#{bean.examRequest.client eq null}"
+                                                     styleClass="#{bean.selectedInvoiceClientId ne null ? 'select-one-menu' : ''}">
                                         <f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}" itemValue="#{null}" noSelectionOption="true" />
                                         <f:selectItems style="width:300px;" value="#{bean.invoiceClients}" />
-                                        <p:ajax listener="#{bean.onItemSelectInvoiceClient}" update="@this addressStreet addressPostalCode 
+                                        <p:ajax listener="#{bean.onItemSelectInvoiceClient}" update="@this addressStreet addressPostalCode
                                         		addressCityId addressProvinceId numberVAT fiscalCode mailPEC addressSDI vatCollectabilitySelectMenu paymentType" />
                                     </p:selectOneMenu>
                                 </div>
@@ -648,7 +648,7 @@
                                 </div>
                                 <div class="p-col-2">
                                     <p:inputText value="#{bean.totalGrossAmount}" disabled="true">
-                                    	<p:keyFilter mask="num" />
+                                        <p:keyFilter mask="num" />
                                     </p:inputText>
                                 </div>
 
@@ -681,10 +681,10 @@
                                                      action="#{bean.saveInvoiceInDraft}" update="mainPanel goodsServicesPanel countsSummaryPanel"
                                                      rendered="#{!bean.invoiceSentStatus}"/>
                                     <p:commandButton value="#{msg.delivery}" styleClass="ui-button-success p-mr-2 p-mb-2"
-                             						 action="#{bean.sendInvoice}" rendered="#{!bean.invoiceSentStatus}" 
-                             						 update="@widgetVar(buttonsPanelWV) @widgetVar(countsSummaryPanelVW) 
+                                                     action="#{bean.sendInvoice}" rendered="#{!bean.invoiceSentStatus}"
+                                                     update="@widgetVar(buttonsPanelWV) @widgetVar(countsSummaryPanelVW)
                              						 		 @widgetVar(goodsServicesPanelVW) @widgetVar(mainPanelVW)"
-                             						 oncomplete="PF('invoiceConfirmWV').hide();"/>
+                                                     oncomplete="PF('invoiceConfirmWV').hide();"/>
                                     <p:commandButton value="#{msg.close}" oncomplete="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"
                                                      rendered="#{bean.invoiceSentStatus}"/>
                                 </div>
@@ -702,11 +702,11 @@
                             var itemAmount = $(".item_amount_"+index).val();
                             var totalLine = totalCost;
                             if(itemAmount != null) {
-                            	if(itemAmount != 0.0) {
-                                	totalLine = totalCost * itemAmount;
-                            	} else {
-                            		totalLine = totalCost;
-                            	}
+                                if(itemAmount != 0.0) {
+                                    totalLine = totalCost * itemAmount;
+                                } else {
+                                    totalLine = totalCost;
+                                }
                             }
                             totalLine = roundNumber(totalLine, 12);
                             $(".total_line_"+index).val(totalLine);
@@ -728,11 +728,11 @@
                             var totalCost = $(".total_cost_"+index).val();
                             var totalLine = totalCost;
                             if(itemAmount != null) {
-                            	if(itemAmount != 0.0) {
-                                	totalLine = totalCost * itemAmount;
-                            	} else {
-                            		totalLine = totalCost;
-                            	}
+                                if(itemAmount != 0.0) {
+                                    totalLine = totalCost * itemAmount;
+                                } else {
+                                    totalLine = totalCost;
+                                }
                             }
                             totalLine = roundNumber(totalLine, 12);
                             $(".total_line_"+index).val(totalLine);
@@ -1066,7 +1066,7 @@
         <p:commandButton oncomplete="PF('invoiceErrorDialogWV').hide();"
                          value="#{msg.close}" />
     </p:dialog>
-    
+
     <p:dialog widgetVar="showSendErrorDialog" modal="true" resizable="false" draggable="false">
         <h:outputText value="#{val.errorSendMail}"/>
     </p:dialog>

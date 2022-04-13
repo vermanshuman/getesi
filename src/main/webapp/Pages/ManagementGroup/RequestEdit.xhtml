@@ -868,7 +868,7 @@
                         <br/>
                         <p:graphicImage id="info" url="/resources/images/tooltip.png"
                                         style="height :25px;bottom: 5px;position: absolute;"
-                                        rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}"/>
+                                        rendered="#{item.mail ne null and (not empty item.clientFiduciary or not empty item.managerId)}"/>
                         <p:tooltip for="info" styleClass="custom-design-tooltip">
                             <h:outputText value="#{ff:upper(msg.requestManagers)}"
                                           style="font-weight:bold;color:#003871;"/>
@@ -879,8 +879,8 @@
                             <h:outputText value="#{ff:upper(msg.requestTrustees)}"
                                           style="font-weight:bold;color:#003871;"/>
                             <br/>
-                            <h:outputText value="#{item.getClientNameProfessional(item.fiduciaryId)}" escape="false"
-                                          rendered="#{not empty item.fiduciaryId}" style="color:#003871;"/>
+                            <h:outputText value="#{item.getClientNameProfessional(item.clientFiduciary)}" escape="false"
+                                          rendered="#{not empty item.clientFiduciary}" style="color:#003871;"/>
                         </p:tooltip>
                     </p:column>
 
@@ -918,25 +918,25 @@
 
                     <p:column rendered="false" style="width: 100px;min-width: 100px;"
                               headerText="#{ff:upper(msg.requestLastBusinessName)}" sortBy="#{item.name}">
-                        <p:commandLink value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId ne null}"
+                        <p:commandLink value="#{ff:upper(item.nameStr)}" rendered="#{item.subject ne null}"
                                        action="#{requestBean.openRequestSubject}" style="cursor: pointer;">
-                            <f:setPropertyActionListener value="#{item.subjectId}"
+                            <f:setPropertyActionListener value="#{item.subject.id}"
                                                          target="#{requestBean.entityEditId}"/>
                         </p:commandLink>
-                        <h:outputText value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId eq null}"/>
+                        <h:outputText value="#{ff:upper(item.nameStr)}" rendered="#{item.subject eq null}"/>
                     </p:column>
 
                     <p:column headerText="#{ff:upper(msg.requestNameFiscalCodeVATNumber)}"
                               style="width: 13.1vw;min-width: 180px;"
-                              sortBy="#{item.code}">
-                        <p:commandLink value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId ne null}"
+                              sortBy="#{item.fiscalCodeVATNamber}">
+                        <p:commandLink value="#{ff:upper(item.nameStr)}" rendered="#{item.subject ne null}"
                                        action="#{requestBean.openRequestSubject}" style="cursor: pointer;">
-                            <f:setPropertyActionListener value="#{item.subjectId}"
+                            <f:setPropertyActionListener value="#{item.subject.id}"
                                                          target="#{requestBean.entityEditId}"/>
                         </p:commandLink>
-                        <h:outputText value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId eq null}"/>
+                        <h:outputText value="#{ff:upper(item.nameStr)}" rendered="#{item.subject eq null}"/>
                         <br/>
-                        <h:outputText value="#{item.code}" style="color:#003871"/>
+                        <h:outputText value="#{item.fiscalCodeVATNamber}" style="color:#003871"/>
                     </p:column>
                     <p:column headerText="#{ff:upper(msg.requestListCorservatoryName)}"
                               style="width: 9vw;min-width: 159px;text-align: center;">
@@ -960,8 +960,8 @@
                             <p:commandButton id="mailBtn" styleClass="richiesta-da-mail-icon"
                                              action="#{requestBean.openRequestMail}"
                                              style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
-                                             rendered="#{not empty item.mailId}">
-                                <f:setPropertyActionListener value="#{item.mailId}"
+                                             rendered="#{not empty item.mail}">
+                                <f:setPropertyActionListener value="#{item.mail.Id}"
                                                              target="#{requestBean.entityEditId}"/>
                             </p:commandButton>
                             <p:tooltip for="mailBtn" value="#{item.mailSubject}"/>
@@ -989,11 +989,11 @@
                             <p:graphicImage id="internalUserIcon"
                                             url="/resources/images/richiesta-da-operatore-getesi.png"
                                             style="height :28px;"
-                                            rendered="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments}"/>
+                                            rendered="#{not item.external and item.mail eq null and not item.haveAllegatiDocuments}"/>
                             <p:tooltip for="internalUserIcon" value="#{item.createUserFullName}" escape="false"/>
 
                             <p:outputPanel style="display: flex;#{empty item.mailId ? 'margin-left: 38%;' : ''}"
-                                           rendered="#{not item.external and empty item.mailId and item.haveAllegatiDocuments}">
+                                           rendered="#{not item.external and item.mail eq null and item.haveAllegatiDocuments}">
                                 <p:commandButton id="internalUserIconA" value="G"
                                                  action="#{requestBean.loadAllegatiDocuments}" update="requestDocs"
                                                  styleClass="g-btn"
