@@ -311,6 +311,14 @@
                 margin-top: -0.6rem;
                 font-size: 16px;
             }
+            
+            #requestDelete {
+            	border: 2px solid #57c279;
+            }
+            
+            #requestDelete  .ui-widget-header {
+    			background-color: #f8f9fa !important;
+    		}
         </style>
 
         <script>
@@ -1062,11 +1070,11 @@
                 </p:dataTable>
             </p:panelGrid>
             <p:dialog id="requestDelete" widgetVar="dlg2" modal="true" resizable="false"
-                      draggable="false" effect="SLIDE" >
+                      draggable="false" effect="SLIDE" width="400" >
                 #{msg.deleteRequestConfirmation}<br/>
                 <br/>
                 <div class="btn_line">
-                    <p:commandButton value="#{msg.confirm}" action="#{bean.deleteEntityInternal(requestBean.entityEditId)}" style="margin-right: 1cm;background-color: #00CC52!important;"
+                    <p:commandButton value="#{msg.confirm}" action="#{bean.deleteEntityInternal(requestBean.entityEditId)}" style="margin-right: 20px !important;background-color: #00CC52!important;"
                                      oncomplete="PF('dlg2').hide(); filterTableFromPanel();"/>
                     <p:commandButton value="#{msg.cancel}" onclick="PF('dlg2').hide()" style="background-color: #F3362B !important;"/>
                 </div>
