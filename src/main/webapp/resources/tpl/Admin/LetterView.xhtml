@@ -92,7 +92,7 @@
                     <f:setPropertyActionListener value="#{true}" target="#{bean.confirmButtonIsClicked}"/>
                 </p:commandButton>
                 <p:commandButton value="#{msg.mailManagerStart}" process="referenceAreaShow" style="background-color: #000066 !important;margin-left: 1cm;width: 110px;"
-                                 action="#{bean.checkFieldsBeforeProcessManagedStateCheck}" update="fieldsNotSetDialog">
+                                 action="#{bean.checkFieldsBeforeProcessManagedStateCheck}" update="chooseSingleOrMultipleRequestCreate">
                     <f:setPropertyActionListener value="#{true}" target="#{bean.confirmButtonIsClicked}"/>
                 </p:commandButton>
             </p:outputPanel>
@@ -226,18 +226,6 @@
             </div>
         </p:outputPanel>
     </p:panel>
-    <p:dialog id="fieldsNotSetDialog" widgetVar="fieldsNotSetDialogWV" modal="true" width="500"
-              draggable="false" resizable="false">
-        <h:outputText value="#{bean.fieldsNotSetDialogMessage}"/>
-        <br/>
-        <h:outputText value="#{msg.mailManagerViewFieldsNotSetDialogMessageQuestion}"/>
-        <br/>
-        <div class="btn_line">
-            <p:commandButton value="#{msg.confirm}" style="margin-right: 1cm;background-color: #00CC52!important;"
-                             action="#{bean.processManagedStateCheck}" oncomplete="PF('fieldsNotSetDialogWV').hide();"/>
-            <p:commandButton value="#{msg.cancel}" oncomplete="PF('fieldsNotSetDialogWV').hide();" style="background-color: #F3362B !important;"/>
-        </div>
-    </p:dialog>
     <p:dialog id="saveConfirmationDialog" closable="true" widgetVar="saveConfirmationDialogWV" modal="true" width="250"
               draggable="false" resizable="false" style="text-align: center;" >
         <h:outputText style="font-size: 16px;" id="confirmationMsg" value="#{msg.mailManagerSave}"/>

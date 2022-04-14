@@ -996,13 +996,15 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             setFieldsNotSetDialogMessage(
                     ResourcesHelper.getString("mailManagerViewFieldsNotSetDialogMessage")
                             + " " + String.join(", ", notSetFields));
-            executeJS("PF('fieldsNotSetDialogWV').show();");
+            processManagedStateCheck();
+            
         }
     }
 
     public void processManagedStateCheck() {
         setConfirmButtonIsClicked(Boolean.TRUE);
         setMultipleCreateRedirect(Boolean.TRUE);
+        setRequestType(0);
         executeJS("PF('chooseSingleOrMultipleRequestCreateWV').show();");
 //
 //        saveReference(true);
