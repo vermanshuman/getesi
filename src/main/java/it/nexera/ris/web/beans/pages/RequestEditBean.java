@@ -17,6 +17,9 @@ import it.nexera.ris.persistence.view.RequestView;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
@@ -84,7 +87,7 @@ import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 @ManagedBean(name = "requestEditBean")
 @ViewScoped
 public class RequestEditBean extends EntityEditPageBean<Request> implements Serializable {
-
+    public transient final Log log = LogFactory.getLog(getClass());
     private static final long serialVersionUID = -669341430296239089L;
     private static final int correctNumberVATLength = 11;
 
@@ -3402,6 +3405,18 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }
     }
 
+    public void deleteEntityInternal(Long id)
+            throws HibernateException, PersistenceBeanException,
+            InstantiationException, IllegalAccessException {
+        LogHelper.debugInfo(log, id.toString());
+        RequestView request = DaoManager.get(RequestView.class, id);
+        request.setDeleted(Boolean.TRUE);
+        DaoManager.save(request);
+    }
+
+    public void editTable() {
+
+    }
 
     /**
      * @return the regSubjectList

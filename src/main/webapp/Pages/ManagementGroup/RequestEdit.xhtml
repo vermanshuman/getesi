@@ -303,6 +303,14 @@
                 font-size: 14px;
                 text-align: left;
             }
+            .al-cen-fx div {
+                justify-content: center;
+            }
+            body .ui-button.ui-button-icon-only .ui-icon.fa.fa-times {
+                margin-left: -0.45rem;
+                margin-top: -0.6rem;
+                font-size: 16px;
+            }
         </style>
 
         <script>
@@ -315,6 +323,11 @@
                 var previousMenu = activeMenu - 1;
                 PrimeFaces.ab({s:"pageTabMenu",u:"form",g:false,pa:[{name:"pageTabMenu_menuid",value:previousMenu.toString()}],f:"form"});return false;
             }
+
+            function setTab(activeMenu) {
+                PrimeFaces.ab({s:"pageTabMenu",u:"form",g:false,pa:[{name:"pageTabMenu_menuid",value:activeMenu.toString()}],f:"form"});return false;
+            }
+
             jQuery(document).ready(function() {
                 $(".ui-g-3").each(function()
                 {
@@ -810,6 +823,9 @@
                     <div class="ui-g-6" style="text-align:right;">
                         <p:commandButton id="nextButton" value="#{msg.next}" rendered="#{bean.activeMenuTabNum != bean.topMenuModel.getElements().size()-1}" update="@form :buttonFragment"
                                          onclick="next(#{bean.activeMenuTabNum}, #{bean.topMenuModel.getElements().size()-1});"  icon="fa fa-arrow-right" styleClass="nav-button"/>
+                        <p:commandButton id="editButton" action="#{bean.editTable}" update="@form :buttonFragment" style="position: absolute;margin-top: 64px;right: 70px;"
+                                         onclick="setTab(0);"
+                                         icon="pi pi-pencil" rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size() - 2 ) or (!bean.multipleRequestCreate and not empty bean.shownFields)}" />
                     </div>
                 </div>
             </div>
@@ -1027,6 +1043,14 @@
                             </p:outputPanel>
                         </p:outputPanel>
                     </p:column>
+                    <p:column styleClass=" action_midle_column al-cen-fx" style="width: 4vw;min-width: 81px;">
+                        <p:outputPanel style="display: flex;">
+                            <p:commandButton icon="fa fa-times" style="background: red" oncomplete="PF('dlg2').show()" disabled="#{!bean.canDelete}">
+                                <f:setPropertyActionListener value="#{item.id}"
+                                                             target="#{requestBean.entityDeleteId}"/>
+                            </p:commandButton>
+                        </p:outputPanel>
+                    </p:column>
                     <ui:remove>
                         <p:column styleClass=" min_padding_margin" headerText="#{ff:upper(msg.requestListOpenEditor)}"
                                   rendered="#{!requestBean.getCurrentUser().isExternal()}">
@@ -1037,6 +1061,16 @@
                     </ui:remove>
                 </p:dataTable>
             </p:panelGrid>
+            <p:dialog id="requestDelete" widgetVar="dlg2" modal="true" resizable="false"
+                      draggable="false" effect="SLIDE" >
+                #{msg.deleteRequestConfirmation}<br/>
+                <br/>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.confirm}" action="#{bean.deleteEntityInternal(requestBean.entityEditId)}" style="margin-right: 1cm;background-color: #00CC52!important;"
+                                     oncomplete="PF('dlg2').hide(); filterTableFromPanel();"/>
+                    <p:commandButton value="#{msg.cancel}" onclick="PF('dlg2').hide()" style="background-color: #F3362B !important;"/>
+                </div>
+            </p:dialog>
         </ui:fragment>
 
         <ui:fragment>
