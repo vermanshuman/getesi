@@ -46,10 +46,9 @@
                 border: 1px solid #6c757d !important;
             }
 
-            .ui-widget-header:first-child {
+            /*.ui-widget-header:first-child {
                 display: none;
-            }
-
+            }*/
         </style>
         <div align="center">
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
@@ -290,24 +289,28 @@
                          icon="fa fa-chevron-circle-left"/>
     </ui:define>
     <ui:define name="dialog_body">
-        <p:dialog widgetVar="cadastralInvalidDlg" modal="true" resizable="false" effect="SLIDE">
+        <p:dialog styleClass="confirmationDialog" widgetVar="cadastralInvalidDlg" modal="true" resizable="false" effect="SLIDE">
             <h:outputText value="#{msg.estateSituationFormalityValidation}"/><br/>
             <br/>
-            <div>
-                <p:commandButton value="#{msg.yes}" action="#{bean.pageSave}" process="@this">
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" action="#{bean.pageSave}" process="@this"
+                                 style="margin-right: 1cm;background-color: #00CC52!important;">
                     <f:setPropertyActionListener value="false" target="#{bean.needValidation}"/>
                 </p:commandButton>
-                <p:commandButton value="#{msg.no}" onclick="PF('cadastralInvalidDlg').hide()" process="@this"/>
+                <p:commandButton value="#{msg.cancel}" onclick="PF('cadastralInvalidDlg').hide()" process="@this"
+                                 style="background-color: #F3362B !important;"/>
             </div>
         </p:dialog>
-        <p:dialog widgetVar="propertyCityDlg" modal="true" resizable="false" effect="SLIDE">
+        <p:dialog styleClass="confirmationDialog" widgetVar="propertyCityDlg" modal="true" width="500" draggable="false" resizable="false">
             <h:outputText value="#{msg.estateSituationPropertyCity}" escape="false"/><br/>
             <br/>
-            <div>
-                <p:commandButton value="#{msg.yes}" action="#{bean.pageSave}" process="@this">
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" action="#{bean.pageSave}" process="@this"
+                                 style="margin-right: 1cm;background-color: #00CC52!important;">
                     <f:setPropertyActionListener value="true" target="#{bean.propertyConfirmed}"/>
                 </p:commandButton>
-                <p:commandButton value="#{msg.no}" onclick="PF('propertyCityDlg').hide()" process="@this"/>
+                <p:commandButton value="#{msg.cancel}" onclick="PF('propertyCityDlg').hide()" process="@this"
+                                 style="background-color: #F3362B !important;"/>
             </div>
         </p:dialog>
     </ui:define>

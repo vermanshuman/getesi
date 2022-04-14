@@ -23,6 +23,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 
+import it.nexera.ris.common.helpers.*;
 import org.apache.commons.io.FileUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -37,20 +38,6 @@ import it.nexera.ris.common.enums.DocumentType;
 import it.nexera.ris.common.enums.ExtraCostType;
 import it.nexera.ris.common.enums.MortgageType;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
-import it.nexera.ris.common.helpers.ComboboxHelper;
-import it.nexera.ris.common.helpers.CostCalculationHelper;
-import it.nexera.ris.common.helpers.CostManipulationHelper;
-import it.nexera.ris.common.helpers.DateTimeHelper;
-import it.nexera.ris.common.helpers.FileHelper;
-import it.nexera.ris.common.helpers.LogHelper;
-import it.nexera.ris.common.helpers.MailHelper;
-import it.nexera.ris.common.helpers.RedirectHelper;
-import it.nexera.ris.common.helpers.ResourcesHelper;
-import it.nexera.ris.common.helpers.SaveRequestDocumentsHelper;
-import it.nexera.ris.common.helpers.SelectItemHelper;
-import it.nexera.ris.common.helpers.SelectItemWrapperConverter;
-import it.nexera.ris.common.helpers.ValidationHelper;
-import it.nexera.ris.common.helpers.VisureManageHelper;
 import it.nexera.ris.common.helpers.create.xls.CreateExcelRequestsReportHelper;
 import it.nexera.ris.common.xml.wrappers.SelectItemWrapper;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
@@ -135,9 +122,31 @@ public class ExcelDataEdit extends BaseEntityPageBean {
 
     private Boolean showRequestCost = Boolean.TRUE;
 
+    private List<Long> selectedRequestIds;
+
+    private Client selectedRequestClient;
+
+    private List<Request> selectedRequests;
     @Override
     protected void onConstruct() {
-        setMailId(Long.valueOf(getRequestParameter(RedirectHelper.ID_PARAMETER)));
+        setMailId(null);
+        setSelectedRequestIds(null);
+        if(!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.ID_PARAMETER))){
+            setMailId(Long.valueOf(getRequestParameter(RedirectHelper.ID_PARAMETER)));
+        }else if(!ValidationHelper.isNullOrEmpty(SessionHelper.get("selectedRequestIds"))) {
+            List<Long> selectedRequestIds =(List<Long>)SessionHelper.get("selectedRequestIds");
+            SessionHelper.removeObject("selectedRequestIds");
+            if(!ValidationHelper.isNullOrEmpty(SessionHelper.get("selectedRequestClientId"))) {
+                Long clientId = (Long)SessionHelper.get("selectedRequestClientId");
+                try {
+                    setSelectedRequestClient(DaoManager.get(Client.class, clientId));
+                } catch (Exception e) {
+                    LogHelper.log(log, e);
+                }
+            }
+            SessionHelper.removeObject("selectedRequestClientId");
+            setSelectedRequestIds(selectedRequestIds);
+        }
         loadPage();
     }
 
@@ -155,35 +164,43 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                     .stream().sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList());
 
 
-            WLGInbox mail = DaoManager.get(WLGInbox.class, getMailId());
-            setMail(mail);
+            if(!ValidationHelper.isNullOrEmpty(getMailId())){
+                WLGInbox mail = DaoManager.get(WLGInbox.class, getMailId());
+                setMail(mail);
+            }
             setClientSelectItemWrapperConverter(new SelectItemWrapperConverter<>(Client.class));
             updateComboboxes();
 
-            if (!ValidationHelper.isNullOrEmpty(mail.getClient())) {
-                setSelectedNotManagerOrFiduciaryClientId(mail.getClient().getId());
+            if(!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getClient())){
+                setSelectedNotManagerOrFiduciaryClientId(getMail().getClient().getId());
                 SelectItemHelper.addItemToListIfItIsNotInIt(getNotManagerOrFiduciaryClients(),mail.getClient());
             }
 
-            Document document = DaoManager.get(Document.class, new Criterion[]{
-                    Restrictions.eq("mail.id", getMailId())});
+//            else  if(!ValidationHelper.isNullOrEmpty(getSelectedRequestClient())){
+//                setSelectedNotManagerOrFiduciaryClientId(getSelectedRequestClient().getId());
+//                SelectItemHelper.addItemToListIfItIsNotInIt(getNotManagerOrFiduciaryClients(),getSelectedRequestClient());
+//            }
 
-            if(ValidationHelper.isNullOrEmpty(document)) {
-                document = new Document();
-                document.setMail(getMail());
-                document.setTypeId(DocumentType.INVOICE_REPORT.getId());
-                document.setReportNumber(SaveRequestDocumentsHelper.getLastInvoiceNumber() + 1);
-                DaoManager.save(document, true);
+            if (!ValidationHelper.isNullOrEmpty(getMail())) {
+                Document document = DaoManager.get(Document.class, new Criterion[]{
+                        Restrictions.eq("mail.id", getMailId())});
+
+                if(ValidationHelper.isNullOrEmpty(document)) {
+                    document = new Document();
+                    document.setMail(getMail());
+                    document.setTypeId(DocumentType.INVOICE_REPORT.getId());
+                    document.setReportNumber(SaveRequestDocumentsHelper.getLastInvoiceNumber() + 1);
+                    DaoManager.save(document, true);
+                }
+                setDocument(document);
+                if(!ValidationHelper.isNullOrEmpty(document))
+                    setExcelFatturaN(document.getInvoiceNumber());
+
+                setExcelReportN(document.getReportNumber());
+
+                setExcelDate((document == null || document.getInvoiceDate() == null ?
+                        DateTimeHelper.getNow(): document.getInvoiceDate()));
             }
-            setDocument(document);
-            if(!ValidationHelper.isNullOrEmpty(document))
-                setExcelFatturaN(document.getInvoiceNumber());
-
-            setExcelReportN(document.getReportNumber());
-
-            setExcelDate((document == null || document.getInvoiceDate() == null ?
-                    DateTimeHelper.getNow(): document.getInvoiceDate()));
-
             if (getSelectedNotManagerOrFiduciaryClientId() != null) {
                 List<Client> invoiceClients = new ArrayList<Client>();
                 for(Client client : clientList) {
@@ -210,56 +227,75 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                 setInvoiceClients(ComboboxHelper.fillList(clientList, true));
                 setOfficeList(ComboboxHelper.fillList(Office.class, Order.asc("description")));
             }
-            setExcelReportNDG(getMail().getNdg());
 
-            if(!ValidationHelper.isNullOrEmpty(getMail().getClient()) &&
-                    !ValidationHelper.isNullOrEmpty(getMail().getClient().getTypeId())) {
+            if(!ValidationHelper.isNullOrEmpty(getMail())){
+                setExcelReportNDG(getMail().getNdg());
+            }
+
+            if(!ValidationHelper.isNullOrEmpty(getMail())){
+                setExcelReportNDG(getMail().getNdg());
+                if(!ValidationHelper.isNullOrEmpty(getMail().getClient()) &&
+                        !ValidationHelper.isNullOrEmpty(getMail().getClient().getTypeId())) {
+                    List<Client> notManagerOrFiduciaryClients = clientList.stream()
+                            .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
+                            .collect(Collectors.toList());
+
+                    setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(notManagerOrFiduciaryClients.stream()
+                            .filter(c -> Objects.nonNull(c))
+                            .filter(c -> (c.getTypeId().equals(getMail().getClient().getTypeId())))
+                            .collect(Collectors.toList()), true));
+                }
+                if (!ValidationHelper.isNullOrEmpty(getMail().getClientInvoice())) {
+                    setExcelClientInvoiceId(getMail().getClientInvoice().getId());
+                    SelectItemHelper.addItemToListIfItIsNotInIt(getInvoiceClients(), getMail().getClientInvoice());
+                }
+
+                if (!ValidationHelper.isNullOrEmpty(getMail().getOffice())) {
+                    setSelectedOfficeId(getMail().getOffice().getId());
+                }
+
+                if (!ValidationHelper.isNullOrEmpty(getMail().getClientFiduciary())) {
+                    setSelectedClientFiduciaryId(getMail().getClientFiduciary().getId());
+                }
+                fillSelectedClientManagers();
+                setReferenceRequest(getMail().getReferenceRequest());
+            }else if(!ValidationHelper.isNullOrEmpty(getSelectedRequestClient())){
                 List<Client> notManagerOrFiduciaryClients = clientList.stream()
                         .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
                         .collect(Collectors.toList());
 
                 setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(notManagerOrFiduciaryClients.stream()
                         .filter(c -> Objects.nonNull(c))
-                        .filter(c -> (c.getTypeId().equals(getMail().getClient().getTypeId())))
+                        .filter(c -> (c.getTypeId().equals(getSelectedRequestClient().getTypeId())))
                         .collect(Collectors.toList()), true));
             }else {
                 setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(clientList.stream()
                         .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
                         .collect(Collectors.toList()), true));
             }
-
-            if (!ValidationHelper.isNullOrEmpty(getMail().getClientInvoice())) {
-                setExcelClientInvoiceId(getMail().getClientInvoice().getId());
-                SelectItemHelper.addItemToListIfItIsNotInIt(getInvoiceClients(), getMail().getClientInvoice());
-            }
-
-            if (!ValidationHelper.isNullOrEmpty(getMail().getOffice())) {
-                setSelectedOfficeId(getMail().getOffice().getId());
-            }
-
-            if (!ValidationHelper.isNullOrEmpty(getMail().getClientFiduciary())) {
-                setSelectedClientFiduciaryId(getMail().getClientFiduciary().getId());
-            }
-
-            fillSelectedClientManagers();
             initOfficesList();
             if(!ValidationHelper.isNullOrEmpty(getSelectedClientManagers()) &&
                     ValidationHelper.isNullOrEmpty(getClientManagers())) {
                 setClientManagers(getSelectedClientManagers());
             }
+            setSelectedRequests(null);
 
-            setReferenceRequest(getMail().getReferenceRequest());
-
-            if(!ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
-                    !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox().getRequests())) {
-                prepareTables(getMail().getRecievedInbox().getRequests());
-            }else if (!ValidationHelper.isNullOrEmpty(getMail().getRequests())) {
-                prepareTables(getMail().getRequests());
+            if(!ValidationHelper.isNullOrEmpty(getMail())){
+                if(!ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
+                        !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox().getRequests())) {
+                    prepareTables(getMail().getRecievedInbox().getRequests());
+                }else if (!ValidationHelper.isNullOrEmpty(getMail().getRequests())) {
+                    prepareTables(getMail().getRequests());
+                }
+            } else if(!ValidationHelper.isNullOrEmpty(getSelectedRequestIds())){
+                setSelectedRequests(DaoManager.load(Request.class, new Criterion[]{
+                        Restrictions.in("id", getSelectedRequestIds())
+                }));
+                prepareTables(getSelectedRequests());
             }
         } catch (Exception e) {
             LogHelper.log(log, e);
         }
-
     }
 
     private void prepareTables(List<Request> requests) throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
@@ -278,8 +314,6 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                             Restrictions.and(Restrictions.eq("client.id", requestClient.getId())
                                     ,Restrictions.eq("requestType.id",entry.getKey().getId()))
                     });
-
-
             if (!ValidationHelper.isNullOrEmpty(columns)) {
                 for (ClientInvoiceManageColumn column : clientInvoiceManageColumns) {
                     columns.add(getColumnNameByField(column.getField()));
@@ -292,7 +326,6 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             excelTableWrapper.setRequestName(entry.getKey().getName());
             excelTableWrapper.setColumnNames(columns);
             excelTableWrapper.setOriginalRequests(entry.getValue());
-            //excelTableWrapper.setRequests(entry.getValue());
             excelTableWrapper.setRequests(new ArrayList<>());
             Map<String, String> columnValues = new HashMap<>();
             Map<String, String> footerValues = new HashMap<>();
@@ -435,7 +468,8 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         }
         colIndex = getIndex(ResourcesHelper.getString("excelForm"), CreateExcelRequestsReportHelper.getRequestsColumns());
         if (colIndex > -1) {
-            columnValues.put(getColumnName(ResourcesHelper.getString("excelForm"),request), String.valueOf(request.getNumberActOrSumOfEstateFormalitiesAndOther().longValue()));
+            Long val = request.getNumberActOrSumOfEstateFormalitiesAndOther().longValue() + createExcelRequestsReportHelper.getRequestExtraCostValue(request).longValue();
+            columnValues.put(getColumnName(ResourcesHelper.getString("excelForm"),request), String.valueOf(val));
         }
 
         colIndex = getIndex(ResourcesHelper.getString("mortgageRights"), CreateExcelRequestsReportHelper.getRequestsColumns());
@@ -469,7 +503,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         colIndex = getIndex(ResourcesHelper.getString("excelNote"), CreateExcelRequestsReportHelper.getRequestsColumns());
         if (colIndex > -1) {
             if(ValidationHelper.isNullOrEmpty(request.getCostNote()))
-                columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request),createExcelRequestsReportHelper.getRequestExtraCostDistinctTypes(request));
+                columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request),createExcelRequestsReportHelper.generateCorrectNote(request));
             else
                 columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request),request.getCostNote());
         }
@@ -619,10 +653,10 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                 if(extraCost > 0)
                     columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request,service),"Costo aggiuntivo: " + extraCost);
             }else if(index != -1){
-                if(ValidationHelper.isNullOrEmpty(request.getCostNote()))
-                    columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request,service),
-                            createExcelRequestsReportHelper.getRequestExtraCostDistinctTypes(request));
-                else
+                if(ValidationHelper.isNullOrEmpty(request.getCostNote())) {
+                    columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"), request, service),
+                            createExcelRequestsReportHelper.generateCorrectNote(request));
+                } else
                     columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request,service),request.getCostNote());
             }else {
                 columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request,service),"nazionale positiva");
@@ -855,85 +889,98 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             }
 
             List<Request> recievedInboxRequests = null;
-            if(!ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
+            if(!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
                     !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox().getRequests())) {
                 recievedInboxRequests = getMail().getRecievedInbox().getRequests();
             }
-
-
-
-            if (!ValidationHelper.isNullOrEmpty(getMail().getRequests()) ||
-                    !ValidationHelper.isNullOrEmpty(recievedInboxRequests)) {
-                getMail().setNdg(excelDataWrapper.getNdg());
-                getMail().setReferenceRequest(excelDataWrapper.getReferenceRequest());
-                getMail().setClient(DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()));
-
-                if (!ValidationHelper.isNullOrEmpty(getSelectedNotManagerOrFiduciaryClientId())) {
+            if ((!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getRequests())) ||
+                    !ValidationHelper.isNullOrEmpty(recievedInboxRequests)
+                    || !ValidationHelper.isNullOrEmpty(getSelectedRequests())) {
+                if(!ValidationHelper.isNullOrEmpty(getMail())){
+                    getMail().setNdg(excelDataWrapper.getNdg());
+                    getMail().setReferenceRequest(excelDataWrapper.getReferenceRequest());
                     getMail().setClient(DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()));
-                } else {
-                    List<String> onlyEmails = MailHelper.getOnlyEmails(getMail().getEmailFrom());
-                    if (!ValidationHelper.isNullOrEmpty(onlyEmails)) {
-                        List<Client> clientList = DaoManager.load(Client.class,
-                                new CriteriaAlias[]{
-                                        new CriteriaAlias("emails", "email", JoinType.INNER_JOIN)},
-                                new Criterion[]{
-                                        Restrictions.in("email.email", onlyEmails),
-                                        Restrictions.or(Restrictions.eq("manager", Boolean.FALSE),
-                                                Restrictions.isNull("manager")),
-                                        Restrictions.or(Restrictions.eq("fiduciary", Boolean.FALSE),
-                                                Restrictions.isNull("fiduciary"))});
-                        if(clientList != null && clientList.size() > 0) {
-                            getMail().setClient(clientList.get(0));
+
+                    if (!ValidationHelper.isNullOrEmpty(getSelectedNotManagerOrFiduciaryClientId())) {
+                        getMail().setClient(DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()));
+                    } else {
+                        List<String> onlyEmails = MailHelper.getOnlyEmails(getMail().getEmailFrom());
+                        if (!ValidationHelper.isNullOrEmpty(onlyEmails)) {
+                            List<Client> clientList = DaoManager.load(Client.class,
+                                    new CriteriaAlias[]{
+                                            new CriteriaAlias("emails", "email", JoinType.INNER_JOIN)},
+                                    new Criterion[]{
+                                            Restrictions.in("email.email", onlyEmails),
+                                            Restrictions.or(Restrictions.eq("manager", Boolean.FALSE),
+                                                    Restrictions.isNull("manager")),
+                                            Restrictions.or(Restrictions.eq("fiduciary", Boolean.FALSE),
+                                                    Restrictions.isNull("fiduciary"))});
+                            if(clientList != null && clientList.size() > 0) {
+                                getMail().setClient(clientList.get(0));
+                            }else {
+                                getMail().setClient(null);
+                            }
                         }else {
                             getMail().setClient(null);
                         }
-                    }else {
-                        getMail().setClient(null);
                     }
-                }
-
-                if (!ValidationHelper.isNullOrEmpty(getExcelClientInvoiceId())) {
-                    getMail().setClientInvoice(DaoManager.get(Client.class, getExcelClientInvoiceId()));
-                } else {
-                    getMail().setClientInvoice(null);
+                    if (!ValidationHelper.isNullOrEmpty(getExcelClientInvoiceId())) {
+                        getMail().setClientInvoice(DaoManager.get(Client.class, getExcelClientInvoiceId()));
+                    } else {
+                        getMail().setClientInvoice(null);
+                    }
                 }
 
                 if (!ValidationHelper.isNullOrEmpty(getSelectedOfficeId())) {
-                    getMail().setOffice(DaoManager.get(Office.class, getSelectedOfficeId()));
+                    if(!ValidationHelper.isNullOrEmpty(getMail()))
+                        getMail().setOffice(DaoManager.get(Office.class, getSelectedOfficeId()));
                     excelDataWrapper.setOffice(getMail().getOffice().getDescription());
                 } else {
-                    getMail().setOffice(null);
+                    if(!ValidationHelper.isNullOrEmpty(getMail()))
+                        getMail().setOffice(null);
                     excelDataWrapper.setOffice(null);
                 }
 
-                if (!ValidationHelper.isNullOrEmpty(getSelectedClientManagers())) {
-                    getMail().setManagers(new ArrayList<>());
-                    List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
-                            Restrictions.in("id", getSelectedClientManagers().stream()
-                                    .map(SelectItemWrapper::getId).collect(Collectors.toList()))});
-                    if (!ValidationHelper.isNullOrEmpty(clients)) {
-                        getMail().setManagers(clients);
+                if (!ValidationHelper.isNullOrEmpty(getMail())){
+                    if (!ValidationHelper.isNullOrEmpty(getSelectedClientManagers())) {
+                        getMail().setManagers(new ArrayList<>());
+                        List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
+                                Restrictions.in("id", getSelectedClientManagers().stream()
+                                        .map(SelectItemWrapper::getId).collect(Collectors.toList()))});
+                        if (!ValidationHelper.isNullOrEmpty(clients)) {
+                            getMail().setManagers(clients);
+                        }
+                    }
+
+                    if (!ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
+                        getMail().setClientFiduciary(DaoManager.get(Client.class, getSelectedClientFiduciaryId()));
+                    } else {
+                        getMail().setClientFiduciary(null);
+                    }
+
+                    DaoManager.save(getMail(), true);
+
+                    Document document = DaoManager.get(Document.class, new Criterion[]{
+                            Restrictions.eq("mail.id", getMailId())});
+                    if(!ValidationHelper.isNullOrEmpty(document)) {
+                        document.setInvoiceNumber(excelDataWrapper.getFatturan());
+                        document.setInvoiceDate(excelDataWrapper.getData());
+                        DaoManager.save(document, true);
                     }
                 }
+                List<Request> requests = null;
 
-                if (!ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
-                    getMail().setClientFiduciary(DaoManager.get(Client.class, getSelectedClientFiduciaryId()));
-                } else {
-                    getMail().setClientFiduciary(null);
+                if(!ValidationHelper.isNullOrEmpty(recievedInboxRequests)){
+                    requests = recievedInboxRequests;
+                }else if(!ValidationHelper.isNullOrEmpty(getMail())){
+                    requests = getMail().getRequests();
+                }else if(!ValidationHelper.isNullOrEmpty(getSelectedRequests())){
+                    requests = getSelectedRequests();
                 }
-
-                DaoManager.save(getMail(), true);
-
-                Document document = DaoManager.get(Document.class, new Criterion[]{
-                        Restrictions.eq("mail.id", getMailId())});
-                if(!ValidationHelper.isNullOrEmpty(document)) {
-                    document.setInvoiceNumber(excelDataWrapper.getFatturan());
-                    document.setInvoiceDate(excelDataWrapper.getData());
-                    DaoManager.save(document, true);
-                }
-                List<Request> requests = !ValidationHelper.isNullOrEmpty(recievedInboxRequests) ? recievedInboxRequests : getMail().getRequests();
-                List<Request> filteredRequests  = emptyIfNull(requests).stream().filter(r->r.isDeletedRequest()).collect(Collectors.toList());
-                excelFile = new CreateExcelRequestsReportHelper(true).convertMailUserDataToExcel(filteredRequests, document,excelDataWrapper);
+                List<Request> filteredRequests  = emptyIfNull(requests).stream().filter(
+                        r->r.isDeletedRequest()).collect(Collectors.toList());
+                excelFile = new CreateExcelRequestsReportHelper(true).convertMailUserDataToExcel(
+                        filteredRequests, document,excelDataWrapper);
             }
         } catch (Exception e) {
             LogHelper.log(log, e);
@@ -1031,14 +1078,13 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         }
     }
 
-
     public void updateComboboxes() throws PersistenceBeanException, IllegalAccessException {
         List<Client> clientList = DaoManager.load(Client.class, new Criterion[]{
                 Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
                         Restrictions.isNull("deleted"))})
                 .stream().sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList());
 
-        List<Client> invoiceClients = new ArrayList<Client>();
+        List<Client> invoiceClients = new ArrayList<>();
         for(Client client : clientList) {
             if(!client.getId().equals(getSelectedNotManagerOrFiduciaryClientId())) {
                 continue;
@@ -1052,35 +1098,45 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         setFiduciaryClientsList(ComboboxHelper.fillList(clientList.stream()
                 .filter(c -> c.getFiduciary() != null && c.getFiduciary()).collect(Collectors.toList()), true));
 
-        if(!ValidationHelper.isNullOrEmpty(getMail().getClient()) &&
-                !ValidationHelper.isNullOrEmpty(getMail().getClient().getTypeId())) {
+        Client selectedClient = null;
+        if(!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getClient())){
+            selectedClient = getMail().getClient();
+        }else if(!ValidationHelper.isNullOrEmpty(getSelectedRequestClient()))
+            selectedClient = getSelectedRequestClient();
+
+        if(!ValidationHelper.isNullOrEmpty(selectedClient.getTypeId())) {
             List<Client> notManagerOrFiduciaryClients = clientList.stream()
                     .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
                     .collect(Collectors.toList());
-
-            setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(notManagerOrFiduciaryClients.stream()
-                    .filter(c -> Objects.nonNull(c))
-                    .filter(c -> (c.getTypeId().equals(getMail().getClient().getTypeId())))
-                    .collect(Collectors.toList()), true));
+            if(!ValidationHelper.isNullOrEmpty(getMail())){
+                setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(notManagerOrFiduciaryClients.stream()
+                        .filter(c -> Objects.nonNull(c))
+                        .filter(c -> (c.getTypeId().equals(getMail().getClient().getTypeId())))
+                        .collect(Collectors.toList()), true));
+            }else {
+                if(!ValidationHelper.isNullOrEmpty(getMail())){
+                    setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(notManagerOrFiduciaryClients.stream()
+                            .filter(c -> Objects.nonNull(c))
+                            .filter(c -> (c.getTypeId().equals(getSelectedRequestClient().getTypeId())))
+                            .collect(Collectors.toList()), true));
+                }
+            }
         }else {
             setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(clientList.stream()
                     .filter(c -> Objects.nonNull(c))
                     .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
                     .collect(Collectors.toList()), true));
         }
-
-        if (!ValidationHelper.isNullOrEmpty(getMail().getClient()) &&
+        if (!ValidationHelper.isNullOrEmpty(selectedClient) &&
                 !ValidationHelper.isNullOrEmpty(getSelectedNotManagerOrFiduciaryClientId())) {
-            SelectItemHelper.addItemToListIfItIsNotInIt(getNotManagerOrFiduciaryClients(), getMail().getClient());
+            SelectItemHelper.addItemToListIfItIsNotInIt(getNotManagerOrFiduciaryClients(), selectedClient);
         }
-        if (!ValidationHelper.isNullOrEmpty(getExcelClientInvoiceId())) {
+        if (!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getExcelClientInvoiceId())) {
             SelectItemHelper.addItemToListIfItIsNotInIt(getInvoiceClients(), getMail().getClientInvoice());
         }
-
-        if (!ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
+        if (!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
             SelectItemHelper.addItemToListIfItIsNotInIt(getInvoiceClients(), getMail().getClientFiduciary());
         }
-
         if (getSelectedNotManagerOrFiduciaryClientId() != null) {
             setClientManagers(ComboboxHelper.fillWrapperList( emptyIfNull(clientList)
                     .stream()
@@ -1093,7 +1149,6 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         }
 
         getClientSelectItemWrapperConverter().setWrapperList(new ArrayList<>(getClientManagers()));
-
         if (!ValidationHelper.isNullOrEmpty(getSelectedClientManagers())) {
             addClientToManagerListIfHeIsNotInIt();
         }

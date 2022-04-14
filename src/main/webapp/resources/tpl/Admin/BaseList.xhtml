@@ -154,6 +154,7 @@
                                     <div class="">
                                         <ui:insert name="buttons_panel"></ui:insert>
                                         <p:commandButton disabled="#{!bean.canCreate}" id="buttonCreate" style="width: 97px;"
+                                                         icon="ui-icon-circle-plus"
                                                          styleClass="ui-button-success p-mr-2 p-mb-2 mail-button"
                                                          value="#{not empty addButtonTitle ? addButtonTitle : msg.newItem}"
                                                          update=":form"

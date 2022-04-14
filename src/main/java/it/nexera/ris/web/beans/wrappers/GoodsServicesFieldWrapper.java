@@ -3,7 +3,6 @@ package it.nexera.ris.web.beans.wrappers;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
 
 import lombok.Getter;
@@ -31,7 +30,5 @@ public class GoodsServicesFieldWrapper implements Serializable {
 
     private Double totalLine;
 
-    public void invoiceTotalCostChanged(ValueChangeEvent e) {
-        totalLine = Double.valueOf(e.getNewValue().toString());
-    }
+    private Integer counter;
 }

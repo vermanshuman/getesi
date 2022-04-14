@@ -31,6 +31,12 @@ public class FileWrapper implements Serializable {
         this.filePath = filePath;
     }
 
+
+    public FileWrapper(String fileName, String filePath) {
+        this.fileName = fileName;
+        this.filePath = filePath;
+    }
+
     public String getIcon() {
         return FileExtensionIconType.getFileIcon(getFileName());
     }

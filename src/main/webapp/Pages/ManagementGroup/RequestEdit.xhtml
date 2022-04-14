@@ -303,6 +303,7 @@
                 font-size: 14px;
                 text-align: left;
             }
+
             .al-cen-fx div {
                 justify-content: center;
             }
@@ -311,14 +312,13 @@
                 margin-top: -0.6rem;
                 font-size: 16px;
             }
-            
             #requestDelete {
-            	border: 2px solid #57c279;
+                border: 2px solid #57c279;
             }
-            
+
             #requestDelete  .ui-widget-header {
-    			background-color: #f8f9fa !important;
-    		}
+                background-color: #f8f9fa !important;
+            }
         </style>
 
         <script>
@@ -331,7 +331,6 @@
                 var previousMenu = activeMenu - 1;
                 PrimeFaces.ab({s:"pageTabMenu",u:"form",g:false,pa:[{name:"pageTabMenu_menuid",value:previousMenu.toString()}],f:"form"});return false;
             }
-
             function setTab(activeMenu) {
                 PrimeFaces.ab({s:"pageTabMenu",u:"form",g:false,pa:[{name:"pageTabMenu_menuid",value:activeMenu.toString()}],f:"form"});return false;
             }
@@ -605,8 +604,8 @@
                     </c:forEach>
                 </p:outputPanel>
 
-                <p:outputPanel id="dynamicHiddenPanel">
-                    <p:fieldset rendered="#{not empty bean.hiddenFields}" legend="Legend" toggleable="true" toggleSpeed="500" collapsed="true">
+                <p:outputPanel id="dynamicHiddenPanel" style="margin-top: 20px">
+                    <p:fieldset rendered="#{not empty bean.hiddenFields}" legend="#{msg.requestHiddenFieldsHeader}" toggleable="true" toggleSpeed="500" collapsed="true">
                     <c:forEach items="#{bean.hiddenFields}" var="item">
                         <div class="ui-g" style="#{item.getLineEven()?'background-color: #F5F5F5;':''}">
                         <c:if test="#{item.field != null}">
@@ -637,7 +636,9 @@
         </ui:fragment>
 
 
-        <ui:fragment rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1) or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)}">
+        <ui:fragment
+                rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)
+                or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)}">
             <p:panel id="userAddPanel" style="margin-top: 1%">
                 <span>#{msg.requestUserChange}:</span><br/>
                 <ui:fragment rendered="#{!empty bean.entity.userName}">
@@ -833,7 +834,7 @@
                                          onclick="next(#{bean.activeMenuTabNum}, #{bean.topMenuModel.getElements().size()-1});"  icon="fa fa-arrow-right" styleClass="nav-button"/>
                         <p:commandButton id="editButton" action="#{bean.editTable}" update="@form :buttonFragment" style="position: absolute;margin-top: 64px;right: 70px;"
                                          onclick="setTab(0);"
-                                         icon="pi pi-pencil" rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size() - 2 ) or (!bean.multipleRequestCreate and not empty bean.shownFields)}" />
+                                         icon="pi pi-pencil" rendered="#{!bean.regSubjectList.isEmpty() and (bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size() - 2 ) or (!bean.multipleRequestCreate and not empty bean.shownFields)}" />
                     </div>
                 </div>
             </div>
@@ -1036,28 +1037,12 @@
                     </p:column>
 
                     <p:column styleClass=" action_midle_column al-cen-fx"
-                              headerText="#{ff:upper(msg.requestListDocuments)}" style="width: 4vw;min-width: 81px;">
-                        <p:outputPanel style="display: flex;" rendered="#{item.haveDocuments}">
-                            <p:outputPanel style="display: flex;">
-                                <p:commandButton styleClass="attachment-icon"
-                                                 action="#{requestBean.loadRequestDocuments}" update="requestDocs"
-                                                 style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
-                                                 oncomplete="PF('documentDialog').show();">
-                                    <f:setPropertyActionListener value="#{item.id}"
-                                                                 target="#{requestBean.entityEditId}"/>
-                                </p:commandButton>
-                                <h:outputText value="#{item.documentsCount}"
-                                              style="width: 19px;height: 20px;background-color: #003871;border-radius: 50%;color: white;display: block;margin-top: -10px;margin-left: -6px;text-align: center;"/>
-                            </p:outputPanel>
-                        </p:outputPanel>
-                    </p:column>
-                    <p:column styleClass=" action_midle_column al-cen-fx" style="width: 4vw;min-width: 81px;">
-                        <p:outputPanel style="display: flex;">
-                            <p:commandButton icon="fa fa-times" style="background: red" oncomplete="PF('dlg2').show()" disabled="#{!bean.canDelete}">
-                                <f:setPropertyActionListener value="#{item.id}"
-                                                             target="#{requestBean.entityDeleteId}"/>
-                            </p:commandButton>
-                        </p:outputPanel>
+                              headerText="" style="width: 4vw;min-width: 81px;">
+                        <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"  oncomplete="PF('dlg2').show()"
+                                         disabled="#{!bean.canDelete}">
+                            <f:setPropertyActionListener value="#{item.tempId}"
+                                                         target="#{bean.selectedIdForDelete}"/>
+                        </p:commandButton>
                     </p:column>
                     <ui:remove>
                         <p:column styleClass=" min_padding_margin" headerText="#{ff:upper(msg.requestListOpenEditor)}"
@@ -1069,16 +1054,6 @@
                     </ui:remove>
                 </p:dataTable>
             </p:panelGrid>
-            <p:dialog id="requestDelete" widgetVar="dlg2" modal="true" resizable="false"
-                      draggable="false" effect="SLIDE" width="400" >
-                #{msg.deleteRequestConfirmation}<br/>
-                <br/>
-                <div class="btn_line">
-                    <p:commandButton value="#{msg.confirm}" action="#{bean.deleteEntityInternal(requestBean.entityEditId)}" style="margin-right: 20px !important;background-color: #00CC52!important;"
-                                     oncomplete="PF('dlg2').hide(); filterTableFromPanel();"/>
-                    <p:commandButton value="#{msg.cancel}" onclick="PF('dlg2').hide()" style="background-color: #F3362B !important;"/>
-                </div>
-            </p:dialog>
         </ui:fragment>
 
         <ui:fragment>
@@ -1087,7 +1062,9 @@
                 <div class="ui-g-2" id="request-btns-1" style="margin-top:2%;text-align:right;">
                     <p:commandButton action="#{bean.validateMultipleRequest(true)}" value="#{bean.multipleRequestCreate ? msg.saveAndClose.toUpperCase() : msg.save.toUpperCase() }"
                                      icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left"
-                                     rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2    }"/>
+                                     rendered="#{(bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2)
+                                     or ((bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)
+                or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1))}"/>
 
                     <div style="clear: both"></div>
                 </div>
@@ -1342,6 +1319,16 @@
                         </p:column>
                     </p:dataTable>
                 </p:scrollPanel>
+            </p:dialog>
+            <p:dialog id="requestDelete" widgetVar="dlg2" modal="true" resizable="false" draggable="false" effect="SLIDE" width="400" >
+                #{msg.deleteConfirmation}<br/>
+                <br/>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.confirm}" action="#{bean.deleteEntity}" style="margin-right: 20px !important;background-color: #00CC52!important;"
+                                     oncomplete="PF('dlg2').hide();"
+                                     update="table,:form:messages"/>
+                    <p:commandButton value="#{msg.cancel}" onclick="PF('dlg2').hide()" style="background-color: #F3362B !important;"/>
+                </div>
             </p:dialog>
         </p:fragment>
     </ui:define>

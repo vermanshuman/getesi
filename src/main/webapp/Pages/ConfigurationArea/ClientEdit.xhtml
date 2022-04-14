@@ -5,7 +5,6 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
-                xmlns:c="http://java.sun.com/jsp/jstl/core"
                 template="/resources/tpl/Admin/EditBase.xhtml">
     <ui:param name="edit_title" value="#{msg.newClient}"/>
     <ui:param name="bean" value="#{clientEditBean}"/>
@@ -1181,27 +1180,6 @@
                     </p:panelGrid>
                 </p:panel>
 
-                <p:panel id="extraCostsService"
-                         style="margin: auto; "
-                         header ="#{msg.extraCosts}">
-                    <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" columnClasses="ui-grid-col-2, ui-grid-col-3"
-                                 layout="grid">
-                        <c:forEach var="taxRateExtraCost" items="#{bean.selectedService.taxRateExtraCosts}" varStatus="loop">
-                            <p:outputPanel rendered="#{loop.index == 0}"><span>#{msg.mortgageCosts}: </span></p:outputPanel>
-                            <p:outputPanel rendered="#{loop.index == 1}"><span>#{msg.landRegistryCosts}: </span></p:outputPanel>
-                            <p:outputPanel rendered="#{loop.index == 2}"><span>#{msg.stamps}: </span></p:outputPanel>
-                            <p:outputPanel rendered="#{loop.index == 3}"><span>#{msg.postalCosts}: </span></p:outputPanel>
-                            <p:outputPanel rendered="#{loop.index == 4}"><span>#{msg.other}: </span></p:outputPanel>
-                            <p:inputText id="mortgageCosts" value="#{taxRateExtraCost.extraCostType}"
-                                         rendered="#{not bean.priceListDialogOnlyView}" styleClass="input-width"/>
-                            <p:selectOneMenu value="#{taxRate}"
-                                             label="#{msg.taxRate}"
-                                             rendered="#{!bean.onlyView}">
-                                <f:selectItems value="#{bean.taxRates}"/>
-                            </p:selectOneMenu>
-                        </c:forEach>
-                    </p:panelGrid>
-                </p:panel>
 
                 <div class="btn_line">
                     <p:commandButton value="#{msg.confirm}" process="@(.myclass)" class="ui-button-success "

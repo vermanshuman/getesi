@@ -46,14 +46,14 @@
             <p:selectOneMenu id="clientType" value="#{bean.clientTypeId}"
                              styleClass="select-width w-100" label="#{msg.clientType}">
                 <f:selectItems value="#{bean.clientTypes}" />
-                <p:ajax event="change" listener="#{bean.initOfficesList}" update="client_not_manger_or_fiduciary_id client_fiduciary_id mail_ofice_id managers client_invoice_id"/>
+                <p:ajax event="change" listener="#{bean.initOfficesList(true)}" update="client_not_manger_or_fiduciary_id client_fiduciary_id mail_ofice_id managers client_invoice_id"/>
             </p:selectOneMenu>
             <h:outputText value="#{msg.client}:"/>
             <p:selectOneMenu id="client_not_manger_or_fiduciary_id"
                              value="#{bean.selectedNotManagerOrFiduciaryClientId}"
                              styleClass="input-width-mmv w-100">
                 <f:selectItems value="#{bean.notManagerOrFiduciaryClients}"/>
-                <p:ajax event="change" listener="#{bean.initOfficesList}" update="client_fiduciary_id mail_ofice_id managers client_invoice_id"/>
+                <p:ajax event="change" listener="#{bean.initOfficesList(true)}" update="client_fiduciary_id mail_ofice_id managers client_invoice_id"/>
             </p:selectOneMenu>
 
             <h:outputText value="#{msg.mailBilling}:"/>
@@ -131,6 +131,9 @@
                         </p:column>
                         <p:column headerText="#{msg.requestState}" sortBy="#{item.mailViewSubject}" filterBy="#{item.mailViewSubject}">
                             <h:outputText value="#{item.stateDescription}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.invoiceNumber}">
+                            <p:commandLink value="#{item.invoice.id}" action="#{bean.openInvoiceDialog}" update="invoiceDialogBilling dialogTab"/>
                         </p:column>
                     </p:dataTable>
                 </div>

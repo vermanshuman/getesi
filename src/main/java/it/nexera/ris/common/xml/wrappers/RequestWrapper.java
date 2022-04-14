@@ -11,6 +11,7 @@ import it.nexera.ris.persistence.beans.entities.domain.Notary;
 import it.nexera.ris.persistence.beans.entities.domain.Request;
 import it.nexera.ris.persistence.beans.entities.domain.Residence;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
+import org.hibernate.Hibernate;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -109,13 +110,25 @@ public class RequestWrapper {
     }
 
     public RequestWrapper(Request request, boolean reset) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        if (!request.isNew()) {
+      //  if (!request.isNew()) {
             setSelectedConservatoryItemId(new LinkedList<>());
             setSelectedTaloreItemId(new LinkedList<>());
             setSelectedConserItemId(new LinkedList<>());
+
             if (!reset && request.getAggregationLandChargesRegistry() != null) {
-                if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getLandChargesRegistries())) {
-                    for (LandChargesRegistry registry : request.getAggregationLandChargesRegistry().getLandChargesRegistries()) {
+
+                AggregationLandChargesRegistry aggregationLandChargesRegistry = DaoManager.get(
+                        AggregationLandChargesRegistry.class,
+                        new CriteriaAlias[]{
+                                new CriteriaAlias("landChargesRegistries", "landChargesRegistries", JoinType.INNER_JOIN)
+                        },
+                        new Criterion[]{
+                                Restrictions.eq("id",  request.getAggregationLandChargesRegistry().getId())
+                        }
+                       );
+
+                if (!ValidationHelper.isNullOrEmpty(aggregationLandChargesRegistry.getLandChargesRegistries())) {
+                    for (LandChargesRegistry registry : aggregationLandChargesRegistry.getLandChargesRegistries()) {
                         if (!ValidationHelper.isNullOrEmpty(registry.getType())) {
                             if (LandChargesRegistryType.CONSERVATORY.name().equalsIgnoreCase(registry.getType().name())) {
                                 ConservatoriaSelectItem item = new ConservatoriaSelectItem(request.getAggregationLandChargesRegistry());
@@ -148,7 +161,7 @@ public class RequestWrapper {
             setSubjectFields(request);
             setResidenceFields(request);
             setDomicileFields(request);
-        }
+        //}
     }
 
     private void setSubjectFields(Request request) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -207,7 +220,7 @@ public class RequestWrapper {
         }
     }
 
-    public void saveFields(Request request) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+    public void saveFields(Request request, Boolean saveSubject) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         request.setPropertyTypeId(getSelectedBuildingId());
         if (getSelectedProvincePropertyId() != null) {
             request.setProvince(DaoManager.get(Province.class, getSelectedProvincePropertyId()));
@@ -221,12 +234,12 @@ public class RequestWrapper {
         else
         	request.setNotary(null);
         
-        saveSubjectFields(request);
+        saveSubjectFields(request, saveSubject);
         saveResidenceFields(request);
         saveDomicileFields(request);
     }
 
-    private void saveSubjectFields(Request request) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+    private void saveSubjectFields(Request request, boolean saveSubject) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         if (getSelectedPersonId() == null) {
             request.setSubject(null);
         } else {
@@ -270,7 +283,8 @@ public class RequestWrapper {
                 request.getSubject().setFiscalCode(request.getSubject().getNumberVAT());
             }
 
-            DaoManager.save(request.getSubject());
+            if(saveSubject)
+                DaoManager.save(request.getSubject());
         }
     }
 

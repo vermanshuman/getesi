@@ -352,7 +352,7 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
                             if(ValidationHelper.isNullOrEmpty(x.getSubjectList())) {
                                 if(!ValidationHelper.isNullOrEmpty(x.getSubject())) {
                                     if(x.getSubject().getTypeIsPhysicalPerson()) {
-                                        subjectJoiner.add("<li>" + x.getSubject().getFullNameCapitalize()+" CF. "+ x.getSubject().getFiscalCode() + "</li>");
+                                        subjectJoiner.add("<li>" + x.getSubject().getFullNameCapitalize().toUpperCase() +" CF. "+ x.getSubject().getFiscalCode() + "</li>");
                                     }else {
                                         subjectJoiner.add("<li>" + x.getSubject().getBusinessName().toUpperCase()+" P.IVA "+ x.getSubject().getNumberVAT() + "</li>");
                                     }
