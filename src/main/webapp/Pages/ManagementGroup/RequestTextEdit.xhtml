@@ -629,7 +629,7 @@
                 <p:remoteCommand name="updateSubjectSelectDialog" update="restoreSubjectTable"/>
                 <p:dataTable value="#{bean.subjectsToSelect}" var="subject" selection="#{bean.selectedSubjectToGenerate}"
                              rowKey="#{subject.id}" id="restoreSubjectTable">
-                    <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                    <p:column selectionMode="single" style="width:35px;text-align:center"/>
                     <p:column headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_NAME}">
                         <h:outputText value="#{subject}"/>
                     </p:column>
@@ -649,8 +649,8 @@
                         <h:outputText value="#{subject.birthCity}"/>
                     </p:column>
                     <f:facet name="footer">
-                        <p:commandButton value="#{msg.ok}" process="restoreSubjectTable"
-                                         oncomplete="PF('subjectSelectDlg').hide()" update=":form"
+                        <p:commandButton value="#{msg.confirm}" process="restoreSubjectTable"
+                                         oncomplete="PF('subjectSelectDlg').hide();"
                                          action="#{bean.updateTemplateWithSubjectSelected}"/>
                     </f:facet>
                 </p:dataTable>

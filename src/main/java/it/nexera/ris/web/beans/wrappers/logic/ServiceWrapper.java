@@ -1,6 +1,7 @@
 package it.nexera.ris.web.beans.wrappers.logic;
 
 import it.nexera.ris.common.enums.CostType;
+import it.nexera.ris.common.enums.ExtraCostType;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.LogHelper;
 import it.nexera.ris.common.helpers.ValidationHelper;
@@ -9,6 +10,7 @@ import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.Client;
 import it.nexera.ris.persistence.beans.entities.domain.ClientServiceInfo;
 import it.nexera.ris.persistence.beans.entities.domain.PriceList;
+import it.nexera.ris.persistence.beans.entities.domain.TaxRateExtraCost;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.CostConfiguration;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import org.apache.commons.logging.Log;
@@ -40,10 +42,13 @@ public class ServiceWrapper implements Serializable {
 
     private ClientServiceInfo info;
 
+    private List<TaxRateExtraCost> taxRateExtraCosts;
+
     public ServiceWrapper(Service service, Client client) {
         this.service = service;
         this.priceLists = new ArrayList<>();
         this.client = client;
+        this.taxRateExtraCosts = new ArrayList<>();
 
         if (!client.isNew()) {
             try {
@@ -110,20 +115,57 @@ public class ServiceWrapper implements Serializable {
             }
         }
     }
-    
+
+    public void fillTaxRateExtraCostLists() {
+        if (ValidationHelper.isNullOrEmpty(getTaxRateExtraCosts())) {
+            TaxRateExtraCost mortgageCosts = new TaxRateExtraCost();
+            TaxRateExtraCost landRegistryCosts = new TaxRateExtraCost();
+            TaxRateExtraCost stamps = new TaxRateExtraCost();
+            TaxRateExtraCost postalCosts = new TaxRateExtraCost();
+            TaxRateExtraCost other = new TaxRateExtraCost();
+            taxRateExtraCosts.add(mortgageCosts);
+            taxRateExtraCosts.add(landRegistryCosts);
+            taxRateExtraCosts.add(stamps);
+            taxRateExtraCosts.add(postalCosts);
+            taxRateExtraCosts.add(other);
+
+            try {
+                List<TaxRateExtraCost> taxRateExtraCosts = DaoManager.load(TaxRateExtraCost.class, new Criterion[]{
+                        Restrictions.eq("service.id", getService().getId()),
+                        Restrictions.eq("clientId", getClient().getId())
+                });
+                for (TaxRateExtraCost taxRateExtraCost :taxRateExtraCosts) {
+                    if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.IPOTECARIO)) {
+                        this.taxRateExtraCosts.get(0).setTaxRateExtraCost(taxRateExtraCost);
+                    } else if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.CATASTO)) {
+                        this.taxRateExtraCosts.get(1).setTaxRateExtraCost(taxRateExtraCost);
+                    } else if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.MARCA)) {
+                        this.taxRateExtraCosts.get(2).setTaxRateExtraCost(taxRateExtraCost);
+                    } else if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.POSTALE)) {
+                        this.taxRateExtraCosts.get(3).setTaxRateExtraCost(taxRateExtraCost);
+                    } else if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.ALTRO)) {
+                        this.taxRateExtraCosts.get(4).setTaxRateExtraCost(taxRateExtraCost);
+                    }
+                }
+            } catch (Exception e) {
+                LogHelper.log(log, e);
+            }
+        }
+    }
+
     public List<PriceList> getCompensationList() throws HibernateException, IllegalAccessException, PersistenceBeanException {
-        
+
         List<PriceList> priceLists = DaoManager.load(PriceList.class, new Criterion[]{
                 Restrictions.eq("service.id", getService().getId()),
                 Restrictions.eq("client.id", getClient().getId())
         });
-        
+
         if (!ValidationHelper.isNullOrEmpty(priceLists)) {
             return priceLists.stream()
                     .filter(i ->
                             (!ValidationHelper.isNullOrEmpty(i.getPrice()) &&
                                     !ValidationHelper.isNullOrEmpty(i.getCostConfiguration()) &&
-                                    !ValidationHelper.isNullOrEmpty(i.getCostConfiguration().getTypeId()) && 
+                                    !ValidationHelper.isNullOrEmpty(i.getCostConfiguration().getTypeId()) &&
                                     i.getCostConfiguration().getTypeId().equals(CostType.SALARY_COST.getId())))
                     .collect(Collectors.toList());
         }
@@ -140,8 +182,8 @@ public class ServiceWrapper implements Serializable {
             return priceLists.stream()
                     .filter(i ->
                             (!ValidationHelper.isNullOrEmpty(i.getPrice()) &&
-                            i.getCostConfiguration() != null && !ValidationHelper.isNullOrEmpty(i.getCostConfiguration().getUrgency()) && 
-                            i.getCostConfiguration().getUrgency()))
+                                    i.getCostConfiguration() != null && !ValidationHelper.isNullOrEmpty(i.getCostConfiguration().getUrgency()) &&
+                                    i.getCostConfiguration().getUrgency()))
                     .collect(Collectors.toList());
         }
         return new ArrayList<>();
@@ -185,5 +227,13 @@ public class ServiceWrapper implements Serializable {
 
     public void setInfo(ClientServiceInfo info) {
         this.info = info;
+    }
+
+    public List<TaxRateExtraCost> getTaxRateExtraCosts() {
+        return taxRateExtraCosts;
+    }
+
+    public void setTaxRateExtraCosts(List<TaxRateExtraCost> taxRateExtraCosts) {
+        this.taxRateExtraCosts = taxRateExtraCosts;
     }
 }

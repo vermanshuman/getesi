@@ -622,6 +622,7 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                         .forEach( s -> {
                             s.setSelectedTaxRateId(s.getTaxRate().getId());
                         });
+                service.fillTaxRateExtraCostLists();
                 setSelectedService(service);
                 try {
                     List<PriceList> priceLists = DaoManager.load(PriceList.class, new Criterion[]{
@@ -637,6 +638,7 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                 } catch (Exception e) {
                     LogHelper.log(log, e);
                 }
+                System.out.println(">>>>>>>Fill price list>>>>>>>>>>" + service.getTaxRateExtraCosts());
                 executeJS("PF('configurePriceListWV').show();");
             }
         }
@@ -1123,6 +1125,7 @@ public class ClientEditBean extends EntityEditPageBean<Client>
             DaoManager.save(getEntity());
             this.saveAgencies();
             this.savePriceList();
+            this.saveTaxRateExtraCostList();
             this.saveClientServiceInfo();
             this.saveEmails();
             this.saveInvoiceColumns();
@@ -1199,8 +1202,41 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                 LogHelper.log(log, e);
             }
         }
+    }
 
+    private void saveTaxRateExtraCostList() {
+        System.out.println(getServices());
+        getServices().stream()
+                .forEach(s -> {
+                    System.out.println(s.getTaxRateExtraCosts());
+                });
+        for (TaxRateExtraCost taxRateExtraCost : getServices().stream().map(ServiceWrapper::getTaxRateExtraCosts).flatMap(List::stream)
+                .filter(taxRateExtraCost -> !ValidationHelper.isNullOrEmpty(taxRateExtraCost.getExtraCostType())).collect(Collectors.toList())) {
+            taxRateExtraCost.setClientId(getEntity().getId());
+            taxRateExtraCost.setService(getSelectedService().getService());
+            System.out.println("tax rate id" + taxRateExtraCost.getTaxRateId());
+            try {
+                DaoManager.save(taxRateExtraCost);
+            } catch (Exception e) {
+                LogHelper.log(log, e);
+            }
+        }
 
+        if(getSelectedService() != null && getSelectedService().getService() != null &&
+                getSelectedService().getService().getIsNegative() != null &&
+                getSelectedService().getService().getIsNegative()) {
+            if(ValidationHelper.isNullOrEmpty(getNegativePriceList().getClient()))
+                getNegativePriceList().setClient(getSelectedService().getClient());
+            if(ValidationHelper.isNullOrEmpty(getNegativePriceList().getService()))
+                getNegativePriceList().setService(getSelectedService().getService());
+            getNegativePriceList().setIsNegative(true);
+
+            try {
+                DaoManager.save(getNegativePriceList());
+            } catch (HibernateException | PersistenceBeanException e) {
+                LogHelper.log(log, e);
+            }
+        }
     }
 
     public void setOfficesByArea() {

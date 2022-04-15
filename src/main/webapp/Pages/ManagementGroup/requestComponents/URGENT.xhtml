@@ -5,7 +5,7 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:p="http://primefaces.org/ui">
 
-    <span>#{enums.documentGenerationTagsURGENT}<span class="red" style="#{block.isRequired()?'':'display:none;'}">*</span></span>
+    <span style="margin-left:10px">#{enums.documentGenerationTagsURGENT}<span class="red" style="#{block.isRequired()?'':'display:none;'}">*</span></span>
     <p:selectBooleanCheckbox id="URGENT" value="#{bean.urgent}" styleClass="input-width"/>
 
 </ui:composition>

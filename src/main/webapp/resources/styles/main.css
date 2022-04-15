@@ -960,3 +960,11 @@ body .confirmationDialog .ui-widget-header {
     background: #f8f9fa !important;
     color: #495057 !important;
 }
+
+.confirm-button {
+    background-color: #00CC52 !important;
+}
+
+#subjectRestoreDlg, #chooseSingleOrMultipleRequestCreate {
+    border: 2px solid #57c279;
+}

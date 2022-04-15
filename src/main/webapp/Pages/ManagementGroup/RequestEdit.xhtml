@@ -303,6 +303,22 @@
                 font-size: 14px;
                 text-align: left;
             }
+
+            .al-cen-fx div {
+                justify-content: center;
+            }
+            body .ui-button.ui-button-icon-only .ui-icon.fa.fa-times {
+                margin-left: -0.45rem;
+                margin-top: -0.6rem;
+                font-size: 16px;
+            }
+            #requestDelete {
+                border: 2px solid #57c279;
+            }
+
+            #requestDelete  .ui-widget-header {
+                background-color: #f8f9fa !important;
+            }
         </style>
 
         <script>
@@ -315,6 +331,10 @@
                 var previousMenu = activeMenu - 1;
                 PrimeFaces.ab({s:"pageTabMenu",u:"form",g:false,pa:[{name:"pageTabMenu_menuid",value:previousMenu.toString()}],f:"form"});return false;
             }
+            function setTab(activeMenu) {
+                PrimeFaces.ab({s:"pageTabMenu",u:"form",g:false,pa:[{name:"pageTabMenu_menuid",value:activeMenu.toString()}],f:"form"});return false;
+            }
+
             jQuery(document).ready(function() {
                 $(".ui-g-3").each(function()
                 {
@@ -454,8 +474,17 @@
                          style="margin-top: -30px">
                 <p:column>
                     <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
-                        <c:if test="#{not (objItem.contains('POSITION_PRACTICE'))}">
-                            <div class="#{objItem.contains('NOTE') ? 'ui-g-12' :'ui-g-6'} ih36" style="padding: 0">
+                        <c:if test="#{not (objItem.contains('POSITION_PRACTICE')) and not (objItem.contains('URGENT'))}">
+                            <div class="ui-g-12 ih36" style="padding: 0">
+                                <ui:include src="#{objItem}"/>
+                            </div>
+                        </c:if>
+                    </c:forEach>
+                </p:column>
+                <p:column>
+                    <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
+                        <c:if test="#{objItem.contains('URGENT')}">
+                            <div class="ui-g-6 ih36" style="padding: 0;margin-top:40px;text-align: center;">
                                 <ui:include src="#{objItem}"/>
                             </div>
                         </c:if>
@@ -616,7 +645,9 @@
         </ui:fragment>
 
 
-        <ui:fragment rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1) or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)}">
+        <ui:fragment
+                rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)
+                or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)}">
             <p:panel id="userAddPanel" style="margin-top: 1%">
                 <span>#{msg.requestUserChange}:</span><br/>
                 <ui:fragment rendered="#{!empty bean.entity.userName}">
@@ -810,6 +841,9 @@
                     <div class="ui-g-6" style="text-align:right;">
                         <p:commandButton id="nextButton" value="#{msg.next}" rendered="#{bean.activeMenuTabNum != bean.topMenuModel.getElements().size()-1}" update="@form :buttonFragment"
                                          onclick="next(#{bean.activeMenuTabNum}, #{bean.topMenuModel.getElements().size()-1});"  icon="fa fa-arrow-right" styleClass="nav-button"/>
+                        <p:commandButton id="editButton" action="#{bean.editTable}" update="@form :buttonFragment" style="position: absolute;margin-top: 64px;right: 70px;"
+                                         onclick="setTab(0);"
+                                         icon="pi pi-pencil" rendered="#{!bean.regSubjectList.isEmpty() and (bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size() - 2 ) or (!bean.multipleRequestCreate and not empty bean.shownFields)}" />
                     </div>
                 </div>
             </div>
@@ -868,7 +902,7 @@
                         <br/>
                         <p:graphicImage id="info" url="/resources/images/tooltip.png"
                                         style="height :25px;bottom: 5px;position: absolute;"
-                                        rendered="#{item.mail ne null and (not empty item.clientFiduciary or not empty item.managerId)}"/>
+                                        rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}"/>
                         <p:tooltip for="info" styleClass="custom-design-tooltip">
                             <h:outputText value="#{ff:upper(msg.requestManagers)}"
                                           style="font-weight:bold;color:#003871;"/>
@@ -879,8 +913,8 @@
                             <h:outputText value="#{ff:upper(msg.requestTrustees)}"
                                           style="font-weight:bold;color:#003871;"/>
                             <br/>
-                            <h:outputText value="#{item.getClientNameProfessional(item.clientFiduciary)}" escape="false"
-                                          rendered="#{not empty item.clientFiduciary}" style="color:#003871;"/>
+                            <h:outputText value="#{item.getClientNameProfessional(item.fiduciaryId)}" escape="false"
+                                          rendered="#{not empty item.fiduciaryId}" style="color:#003871;"/>
                         </p:tooltip>
                     </p:column>
 
@@ -918,25 +952,25 @@
 
                     <p:column rendered="false" style="width: 100px;min-width: 100px;"
                               headerText="#{ff:upper(msg.requestLastBusinessName)}" sortBy="#{item.name}">
-                        <p:commandLink value="#{ff:upper(item.nameStr)}" rendered="#{item.subject ne null}"
+                        <p:commandLink value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId ne null}"
                                        action="#{requestBean.openRequestSubject}" style="cursor: pointer;">
-                            <f:setPropertyActionListener value="#{item.subject.id}"
+                            <f:setPropertyActionListener value="#{item.subjectId}"
                                                          target="#{requestBean.entityEditId}"/>
                         </p:commandLink>
-                        <h:outputText value="#{ff:upper(item.nameStr)}" rendered="#{item.subject eq null}"/>
+                        <h:outputText value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId eq null}"/>
                     </p:column>
 
                     <p:column headerText="#{ff:upper(msg.requestNameFiscalCodeVATNumber)}"
                               style="width: 13.1vw;min-width: 180px;"
-                              sortBy="#{item.fiscalCodeVATNamber}">
-                        <p:commandLink value="#{ff:upper(item.nameStr)}" rendered="#{item.subject ne null}"
+                              sortBy="#{item.code}">
+                        <p:commandLink value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId ne null}"
                                        action="#{requestBean.openRequestSubject}" style="cursor: pointer;">
-                            <f:setPropertyActionListener value="#{item.subject.id}"
+                            <f:setPropertyActionListener value="#{item.subjectId}"
                                                          target="#{requestBean.entityEditId}"/>
                         </p:commandLink>
-                        <h:outputText value="#{ff:upper(item.nameStr)}" rendered="#{item.subject eq null}"/>
+                        <h:outputText value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId eq null}"/>
                         <br/>
-                        <h:outputText value="#{item.fiscalCodeVATNamber}" style="color:#003871"/>
+                        <h:outputText value="#{item.code}" style="color:#003871"/>
                     </p:column>
                     <p:column headerText="#{ff:upper(msg.requestListCorservatoryName)}"
                               style="width: 9vw;min-width: 159px;text-align: center;">
@@ -960,8 +994,8 @@
                             <p:commandButton id="mailBtn" styleClass="richiesta-da-mail-icon"
                                              action="#{requestBean.openRequestMail}"
                                              style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
-                                             rendered="#{not empty item.mail}">
-                                <f:setPropertyActionListener value="#{item.mail.Id}"
+                                             rendered="#{not empty item.mailId}">
+                                <f:setPropertyActionListener value="#{item.mailId}"
                                                              target="#{requestBean.entityEditId}"/>
                             </p:commandButton>
                             <p:tooltip for="mailBtn" value="#{item.mailSubject}"/>
@@ -989,11 +1023,11 @@
                             <p:graphicImage id="internalUserIcon"
                                             url="/resources/images/richiesta-da-operatore-getesi.png"
                                             style="height :28px;"
-                                            rendered="#{not item.external and item.mail eq null and not item.haveAllegatiDocuments}"/>
+                                            rendered="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments}"/>
                             <p:tooltip for="internalUserIcon" value="#{item.createUserFullName}" escape="false"/>
 
                             <p:outputPanel style="display: flex;#{empty item.mailId ? 'margin-left: 38%;' : ''}"
-                                           rendered="#{not item.external and item.mail eq null and item.haveAllegatiDocuments}">
+                                           rendered="#{not item.external and empty item.mailId and item.haveAllegatiDocuments}">
                                 <p:commandButton id="internalUserIconA" value="G"
                                                  action="#{requestBean.loadAllegatiDocuments}" update="requestDocs"
                                                  styleClass="g-btn"
@@ -1012,20 +1046,12 @@
                     </p:column>
 
                     <p:column styleClass=" action_midle_column al-cen-fx"
-                              headerText="#{ff:upper(msg.requestListDocuments)}" style="width: 4vw;min-width: 81px;">
-                        <p:outputPanel style="display: flex;" rendered="#{item.haveDocuments}">
-                            <p:outputPanel style="display: flex;">
-                                <p:commandButton styleClass="attachment-icon"
-                                                 action="#{requestBean.loadRequestDocuments}" update="requestDocs"
-                                                 style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
-                                                 oncomplete="PF('documentDialog').show();">
-                                    <f:setPropertyActionListener value="#{item.id}"
-                                                                 target="#{requestBean.entityEditId}"/>
-                                </p:commandButton>
-                                <h:outputText value="#{item.documentsCount}"
-                                              style="width: 19px;height: 20px;background-color: #003871;border-radius: 50%;color: white;display: block;margin-top: -10px;margin-left: -6px;text-align: center;"/>
-                            </p:outputPanel>
-                        </p:outputPanel>
+                              headerText="" style="width: 4vw;min-width: 81px;">
+                        <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"  oncomplete="PF('dlg2').show()"
+                                         disabled="#{!bean.canDelete}">
+                            <f:setPropertyActionListener value="#{item.tempId}"
+                                                         target="#{bean.selectedIdForDelete}"/>
+                        </p:commandButton>
                     </p:column>
                     <ui:remove>
                         <p:column styleClass=" min_padding_margin" headerText="#{ff:upper(msg.requestListOpenEditor)}"
@@ -1045,7 +1071,9 @@
                 <div class="ui-g-2" id="request-btns-1" style="margin-top:2%;text-align:right;">
                     <p:commandButton action="#{bean.validateMultipleRequest(true)}" value="#{bean.multipleRequestCreate ? msg.saveAndClose.toUpperCase() : msg.save.toUpperCase() }"
                                      icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left"
-                                     rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2    }"/>
+                                     rendered="#{(bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2)
+                                     or ((bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)
+                or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1))}"/>
 
                     <div style="clear: both"></div>
                 </div>
@@ -1300,6 +1328,16 @@
                         </p:column>
                     </p:dataTable>
                 </p:scrollPanel>
+            </p:dialog>
+            <p:dialog id="requestDelete" widgetVar="dlg2" modal="true" resizable="false" draggable="false" effect="SLIDE" width="400" >
+                #{msg.deleteConfirmation}<br/>
+                <br/>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.confirm}" action="#{bean.deleteEntity}" style="margin-right: 20px !important;background-color: #00CC52!important;"
+                                     oncomplete="PF('dlg2').hide();"
+                                     update="table,:form:messages"/>
+                    <p:commandButton value="#{msg.cancel}" onclick="PF('dlg2').hide()" style="background-color: #F3362B !important;"/>
+                </div>
             </p:dialog>
         </p:fragment>
     </ui:define>

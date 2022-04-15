@@ -79,7 +79,7 @@
     color: white;
 }
 
-body .ui-state-highlight {
+body ui:not(#client_not_manger_or_fiduciary_id_items).ui-state-highlight {
     color: #D0D7DE !important;
 }
 td.ui-panelgrid-cell {

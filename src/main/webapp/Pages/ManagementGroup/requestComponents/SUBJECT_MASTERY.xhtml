@@ -19,7 +19,7 @@
     <p:panel id="SUBJECT_MASTERY" style="background: transparent; border: none">
         <p:panelGrid columns="2" style="width: 100%;" styleClass="ui-panelgrid-blank form-group" layout="grid">
             <p:column>
-                <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_PERSON_TYPE}"/><br/>
+<!--                <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_PERSON_TYPE}"/><br/>-->
                 <p:selectOneRadio id="SUBJECT_MASTERY_PERSON_TYPE" value="#{bean.wrapper.selectedPersonId}"
                                   update="SUBJECT_MASTERY">
                     <f:selectItems value="#{bean.wrapper.persons}"/>
@@ -134,10 +134,10 @@
                                  value="#{msg.databaseListSubjectFiscalCodeRestore}"/>
             </p:column>
         </p:panelGrid>
-        <p:dialog widgetVar="subjectRestoreDlg" modal="true" draggable="false" position="center center" width="1500">
+        <p:dialog id="subjectRestoreDlg" widgetVar="subjectRestoreDlg" modal="true" draggable="false" position="center center" width="1500">
             <p:dataTable value="#{bean.subjectsToRestore}" var="subject" selection="#{bean.selectedSubjectToRestore}"
                          rowKey="#{subject.id}" id="restoreSubjectTable">
-                <p:column selectionMode="single" style="width:16px;text-align:center"/>
+                <p:column selectionMode="single" style="width:35px;text-align:center"/>
                 <p:column headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_SOCIAL_REGION}"
                           rendered="#{bean.wrapper.selectedPersonId eq 2}">
                     <h:outputText value="#{subject.businessName}"/>
@@ -171,12 +171,14 @@
                 <p:column headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_COMUNE}">
                     <h:outputText value="#{subject.birthCity}"/>
                 </p:column>
-                <f:facet name="footer">
-                    <p:commandButton update="SUBJECT_MASTERY" value="#{msg.ok}" process="restoreSubjectTable"
-                                     oncomplete="PF('subjectRestoreDlg').hide()"
-                                     action="#{bean.selectRestoredSubject}"/>
-                </f:facet>
+
             </p:dataTable>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" update="SUBJECT_MASTERY" process="restoreSubjectTable"  styleClass="confirm-button"
+                                 oncomplete="PF('subjectRestoreDlg').hide();"
+                                 action="#{bean.selectRestoredSubject}"/>
+
+            </div>
         </p:dialog>
     </p:panel>
 </ui:composition>

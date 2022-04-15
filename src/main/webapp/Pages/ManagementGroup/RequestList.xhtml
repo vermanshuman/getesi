@@ -328,7 +328,7 @@
                             <div class="p-formgroup-inline">
                                 <div class="p-field">
                                     <p:commandButton value="#{ff:upper(msg.requestNew)}"
-                                                     id="btn_new_multipa"
+                                                     id="btn_new_multipa" update="@form"
                                                      styleClass="ui-button-success	search-btn new-button-multiple"
                                                      disabled="#{!bean.canCreate}" style="margin-left:20px;"
                                                      action="#{bean.createNewMultipleRequests()}"/>

@@ -109,7 +109,6 @@ public class TemplatePdfTableHelper {
                     if(result==0) {
                         result = o1.getSub().compareTo(o2.getSub());
                     }
-                    return result;
                 }else if(o1.getSheet()==null) {
                     return -1;
                 }else if(o2.getSheet()==null) {
@@ -117,6 +116,7 @@ public class TemplatePdfTableHelper {
                 }else {
                     return 0;
                 }
+                return 0;
             }
         };
 

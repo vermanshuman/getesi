@@ -1698,9 +1698,9 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public void createNewMultipleRequests() {
-        executeJS("PF('chooseSingleOrMultipleRequestCreateWV').show();");
-//        String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE";
-//        RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT, queryParam);
+        // executeJS("PF('chooseSingleOrMultipleRequestCreateWV').show();");
+        String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE";
+        RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT, queryParam);
     }
 
     public void redirectToNewMultipleRequests() {

@@ -6,6 +6,6 @@
                 xmlns:p="http://primefaces.org/ui">
 
     <span>#{enums.documentGenerationTagsISTAT}<span class="red" style="#{block.isRequired()?'':'display:none;'}">*</span></span>
-    <p:inputText id="ISTAT" value="#{bean.entity.istat}" styleClass="input-width"/>
+    <p:inputText id="ISTAT" value="#{bean.wrapper.istat}" styleClass="input-width"/>
 
 </ui:composition>
