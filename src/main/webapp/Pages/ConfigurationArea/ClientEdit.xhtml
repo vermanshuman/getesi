@@ -995,10 +995,10 @@
         </p:tabView>
         <p:outputPanel id="nextButton" style="margin-top: 15px; position: relative;">
             <p:commandButton value="#{msg.save.toUpperCase()}" styleClass="green-button"
-                             iconPos="right" rendered="#{not bean.onlyView}"
-                             style="position: absolute; right: 10px;bottom: 0px;"
+                             rendered="#{not bean.onlyView}"
+                             style="position: absolute; right: 10px;top: 12px;"
                              actionListener="#{bean.pageSave}"
-                             icon="ui-icon-disk"/>
+                             icon="fa fa-floppy-o"/>
             <p:commandButton value="#{msg.edit}" rendered="#{bean.onlyView}" style="position: absolute; right: 10px;bottom: 10px;"
                              update=":form" action="#{bean.editClient}"/>
         </p:outputPanel>
@@ -1194,7 +1194,7 @@
                             <p:outputPanel rendered="#{loop.index == 3}"><span>#{msg.postalCosts}: </span></p:outputPanel>
                             <p:outputPanel rendered="#{loop.index == 4}"><span>#{msg.other}: </span></p:outputPanel>
                             <p:selectOneMenu value="#{taxRateExtraCost.taxRateId}"
-                                             label="#{msg.taxRate}"
+                                             label="#{msg.taxRate}" appendTo="@this"
                                              rendered="#{!bean.onlyView}">
                                 <f:selectItems value="#{bean.taxRates}"/>
                             </p:selectOneMenu>
