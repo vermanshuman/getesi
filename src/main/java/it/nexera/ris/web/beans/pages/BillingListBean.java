@@ -924,6 +924,11 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         loadDraftEmail();
     }
 
+    public void loadInvoiceDialogDataEdit(Invoice invoice) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        setNumber(invoice.getNumber());
+        loadInvoiceDialogData();
+    }
+
     public void setMaxInvoiceNumber() throws HibernateException {
         LocalDate currentdate = LocalDate.now();
         int currentYear = currentdate.getYear();
