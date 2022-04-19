@@ -1430,6 +1430,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         setShowCreateFatturaButton(Boolean.FALSE);
         setInvoicedRequests(selectedRequestList);
         loadInvoiceDialogData(invoice);
+        invoice.setTotalGrossAmount(getTotalGrossAmount());
+        DaoManager.save(invoice, true);
         executeJS("PF('invoiceDialogBillingWV').show();");
     }
 
@@ -1508,6 +1510,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             invoice.setNumber(getNumber());
             invoice.setInvoiceNumber(getInvoiceNumber());
         }
+        invoice.setTotalGrossAmount(getTotalGrossAmount());
         DaoManager.save(invoice, true);
         for (GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
             if (!ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemId())) {

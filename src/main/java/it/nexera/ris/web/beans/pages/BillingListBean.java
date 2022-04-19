@@ -844,7 +844,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         //SessionHelper.put("activeTabIndex", activeTabIndex);
     }
 
-    public void loadInvoiceDialogData() throws IllegalAccessException, PersistenceBeanException, HibernateException, InstantiationException  {
+    public void loadInvoiceDialogData(Invoice invoicedb) throws IllegalAccessException, PersistenceBeanException, HibernateException, InstantiationException  {
         setShowRequestTab(false);
         List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[] {Restrictions.isNotNull("date")}, new Order[]{
                 Order.desc("date")});
@@ -869,52 +869,54 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                                         (ValidationHelper.isNullOrEmpty(c.getFiduciary()) || !c.getFiduciary())
                         )
                 ).sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList()), Boolean.TRUE));
-
-        Invoice invoice = DaoManager.get(Invoice.class, getNumber());
-        if(!ValidationHelper.isNullOrEmpty(invoice)) {
-            setInvoiceDate(invoice.getDate());
-            setSelectedInvoiceClientId(invoice.getClient().getId());
-            if(!ValidationHelper.isNullOrEmpty(invoice.getPaymentType())){
-                setSelectedPaymentTypeId(invoice.getPaymentType().getId());
-            }
-            if(!ValidationHelper.isNullOrEmpty(invoice.getVatCollectability())){
-                setVatCollectabilityId(invoice.getVatCollectability().getId());
-            }
-            setInvoiceNote(invoice.getNotes());
-            setInvoiceDate(invoice.getDate());
-            if(!ValidationHelper.isNullOrEmpty(invoice.getNumber()))
-                setNumber(invoice.getNumber());
-            if(!ValidationHelper.isNullOrEmpty(invoice.getInvoiceNumber()))
-                setInvoiceNumber(invoice.getInvoiceNumber());
-            List<GoodsServicesFieldWrapper> wrapperList = new ArrayList<>();
-            List<InvoiceItem> invoiceItemsDb = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
-            int counter = 1;
-            for(InvoiceItem invoiceItem: invoiceItemsDb) {
-                GoodsServicesFieldWrapper wrapper = createGoodsServicesFieldWrapper();
-                wrapper.setCounter(counter);
-                wrapper.setInvoiceItemId(invoiceItem.getId());
-                wrapper.setInvoiceTotalCost(invoiceItem.getInvoiceTotalCost());
-                wrapper.setSelectedTaxRateId(invoiceItem.getTaxRate().getId());
-                wrapper.setInvoiceItemAmount(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount()) ? 0.0 : invoiceItem.getAmount());
-                double totalcost = !(ValidationHelper.isNullOrEmpty(invoiceItem.getInvoiceTotalCost())) ? invoiceItem.getInvoiceTotalCost().doubleValue() : 0.0;
-                double amount = !(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount())) ? invoiceItem.getAmount().doubleValue() : 0.0;
-                double totalLine = 0d;
-                if(amount != 0.0) {
-                    totalLine = totalcost * amount;
-                } else {
-                    totalLine = totalcost;
-                }
-                wrapper.setTotalLine(totalLine);
-                if(!ValidationHelper.isNullOrEmpty(invoiceItem.getDescription()))
-                    wrapper.setDescription(invoiceItem.getDescription());
-                wrapperList.add(wrapper);
-                counter = counter + 1;
-            }
-            setGoodsServicesFields(wrapperList);
-            setSameInvoiceNumber(invoice.getId());
-            if(invoice.getStatus().equals(InvoiceStatus.DELIVERED)) {
-                setInvoiceSentStatus(true);
-            }
+        if(!ValidationHelper.isNullOrEmpty(invoicedb)) {
+	        Invoice invoice = DaoManager.get(Invoice.class, invoicedb.getId());
+	        if(!ValidationHelper.isNullOrEmpty(invoice)) {
+	        	paymentTypes = ComboboxHelper.fillList(invoice.getClient().getPaymentTypeList(), Boolean.FALSE);
+	        	setInvoiceDate(invoice.getDate());
+	            setSelectedInvoiceClientId(invoice.getClient().getId());
+	            setSelectedInvoiceClient(invoice.getClient());
+	            if(!ValidationHelper.isNullOrEmpty(invoice.getPaymentType())){
+	                setSelectedPaymentTypeId(invoice.getPaymentType().getId());
+	            }
+	            if(!ValidationHelper.isNullOrEmpty(invoice.getVatCollectability())){
+	                setVatCollectabilityId(invoice.getVatCollectability().getId());
+	            }
+	            setInvoiceNote(invoice.getNotes());
+	            if(!ValidationHelper.isNullOrEmpty(invoice.getNumber()))
+	                setNumber(invoice.getNumber());
+	            if(!ValidationHelper.isNullOrEmpty(invoice.getInvoiceNumber()))
+	                setInvoiceNumber(invoice.getInvoiceNumber());
+	            List<GoodsServicesFieldWrapper> wrapperList = new ArrayList<>();
+	            List<InvoiceItem> invoiceItemsDb = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
+	            int counter = 1;
+	            for(InvoiceItem invoiceItem: invoiceItemsDb) {
+	                GoodsServicesFieldWrapper wrapper = createGoodsServicesFieldWrapper();
+	                wrapper.setCounter(counter);
+	                wrapper.setInvoiceItemId(invoiceItem.getId());
+	                wrapper.setInvoiceTotalCost(invoiceItem.getInvoiceTotalCost());
+	                wrapper.setSelectedTaxRateId(invoiceItem.getTaxRate().getId());
+	                wrapper.setInvoiceItemAmount(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount()) ? 0.0 : invoiceItem.getAmount());
+	                double totalcost = !(ValidationHelper.isNullOrEmpty(invoiceItem.getInvoiceTotalCost())) ? invoiceItem.getInvoiceTotalCost().doubleValue() : 0.0;
+	                double amount = !(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount())) ? invoiceItem.getAmount().doubleValue() : 0.0;
+	                double totalLine = 0d;
+	                if(amount != 0.0) {
+	                    totalLine = totalcost * amount;
+	                } else {
+	                    totalLine = totalcost;
+	                }
+	                wrapper.setTotalLine(totalLine);
+	                if(!ValidationHelper.isNullOrEmpty(invoiceItem.getDescription()))
+	                    wrapper.setDescription(invoiceItem.getDescription());
+	                wrapperList.add(wrapper);
+	                counter = counter + 1;
+	            }
+	            setGoodsServicesFields(wrapperList);
+	            setSameInvoiceNumber(invoice.getId());
+	            if(invoice.getStatus().equals(InvoiceStatus.DELIVERED)) {
+	                setInvoiceSentStatus(true);
+	            }
+	        }
         } else {
             setGoodsServicesFields(new ArrayList<>());
             createNewGoodsServicesFields();
@@ -925,8 +927,10 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     }
 
     public void loadInvoiceDialogDataEdit(Invoice invoice) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        setNumber(invoice.getNumber());
-        loadInvoiceDialogData();
+        System.out.println("id :: "+invoice.getId());
+    	setNumber(invoice.getId());
+        loadInvoiceDialogData(invoice);
+        //executeJS("PF('invoiceDialogBillingWV').show();");
     }
 
     public void setMaxInvoiceNumber() throws HibernateException {
@@ -1064,8 +1068,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
 
         try {
-            saveInvoice(InvoiceStatus.DRAFT, true);
-            loadInvoiceDialogData();
+            Invoice invoice = saveInvoice(InvoiceStatus.DRAFT, true);
+            loadInvoiceDialogData(invoice);
         }catch(Exception e) {
             e.printStackTrace();
             LogHelper.log(log, e);
@@ -1079,12 +1083,15 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         System.out.println(selectedClient.getSplitPayment());
         if(selectedClient.getSplitPayment() != null && selectedClient.getSplitPayment())
             setVatCollectabilityId(VatCollectability.SPLIT_PAYMENT.getId());
+        else
+        	setVatCollectabilityId(null);
         if(selectedClient.getPaymentTypeList() != null && !selectedClient.getPaymentTypeList().isEmpty()) {
-            setPaymentTypes(ComboboxHelper.fillList(selectedClient.getPaymentTypeList(), true));
-        }
+            setPaymentTypes(ComboboxHelper.fillList(selectedClient.getPaymentTypeList(), false));
+        } else
+        	setPaymentTypes(ComboboxHelper.fillList(new ArrayList<>(), false));
     }
 
-    public void saveInvoice(InvoiceStatus invoiceStatus, Boolean saveInvoiceNumber) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+    public Invoice saveInvoice(InvoiceStatus invoiceStatus, Boolean saveInvoiceNumber) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         Invoice invoice = DaoManager.get(Invoice.class, getNumber());
         if(ValidationHelper.isNullOrEmpty(invoice)) {
             invoice = new Invoice();
@@ -1103,6 +1110,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             invoice.setNumber(getNumber());
             invoice.setInvoiceNumber(getInvoiceNumber());
         }
+        invoice.setTotalGrossAmount(getTotalGrossAmount());
         DaoManager.save(invoice, true);
         for(GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
             if(!ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemId())) {
@@ -1122,6 +1130,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 DaoManager.save(invoiceItem, true);
             }
         }
+        return invoice;
     }
 
     public void sendInvoice() {
@@ -1415,7 +1424,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 DaoManager.save(invoiceItem,true);
             }
             setInvoicedRequests(filteredRequests);
-            loadInvoiceDialogData();
+            loadInvoiceDialogData(invoice);
             executeJS("PF('invoiceDialogBillingWV').show();");
         }
     }

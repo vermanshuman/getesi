@@ -89,6 +89,9 @@ public class Invoice extends IndexedEntity implements Serializable {
 
 	@Transient
 	private String dateString;
+	
+	@Column(name = "totale_lordo")
+	private Double totalGrossAmount;
 
 
 	public Long getCloudId() {
@@ -254,7 +257,9 @@ public class Invoice extends IndexedEntity implements Serializable {
 			Double total = invoiceItem.getPaymentImport().doubleValue();
 			paymentImportTotal = paymentImportTotal + total;
 		}
-		Double onBalance = getTotalAmount().doubleValue() - paymentImportTotal;
+		Double onBalance = 0.0;
+		if(getTotalGrossAmount() != null)
+			onBalance = getTotalGrossAmount().doubleValue() - paymentImportTotal;
 		return onBalance;
 	}
 
@@ -265,5 +270,14 @@ public class Invoice extends IndexedEntity implements Serializable {
 		}
 		return dateString;
 	}
+
+	public Double getTotalGrossAmount() {
+		return totalGrossAmount;
+	}
+
+	public void setTotalGrossAmount(Double totalGrossAmount) {
+		this.totalGrossAmount = totalGrossAmount;
+	}
+	
 
 }
