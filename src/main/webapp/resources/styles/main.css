@@ -968,3 +968,38 @@ body .confirmationDialog .ui-widget-header {
 #subjectRestoreDlg, #chooseSingleOrMultipleRequestCreate {
     border: 2px solid #57c279;
 }
+
+.dialog-gray {
+	border: 7px solid #d9e0e7 !important;
+}
+
+.dialog-gray-width {
+	width: 370px !important;
+}
+
+.dialog-gray .ui-dialog-titlebar {
+	background: #f8f9fa !important;
+    color: #495057 !important;
+}
+
+.dialog-orange {
+	border: 7px solid #ffa500 !important;
+}
+
+.dialog-orange .ui-dialog-titlebar {
+	background: #f8f9fa !important;
+    color: #495057 !important;
+}
+
+.dialog-green {
+	border: 7px solid #57c279 !important;
+}
+
+.dialog-green-width {
+	width: 370px !important;
+}
+
+.dialog-green .ui-dialog-titlebar {
+	background: #f8f9fa !important;
+    color: #495057 !important;
+}

@@ -37,10 +37,10 @@
                 padding: 0px !important;
             }
 
-            body .ui-widget-header {
+             .ui-dialog .ui-widget-header {
                 background: #f8f9fa !important;
                 color: #495057 !important;
-            }
+            } 
 
             body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
                 background-color: #fff !important;
@@ -113,14 +113,7 @@
                 padding-left: 0 !important;
                 width: 122px;
             }
-            #saveConfirmationDialog{
-                border: 2px solid #57c279 !important;
-
-            }
-            #saveConfirmationDialog > .ui-dialog-titlebar{
-                height: 35px !important;
-                padding: 0px !important;
-            }
+            
             body .ui-state-highlight {
                 color: #000 !important;
             }
@@ -170,7 +163,7 @@
             </script>
             <iframe id="mail_pdf_iframe" srcdoc="#{bean.mailPdf}"/>
         </p:outputPanel>
-        <p:dialog id="confirmReadDlg" widgetVar="confirmReadDlgWV"
+        <p:dialog id="confirmReadDlg" widgetVar="confirmReadDlgWV" styleClass="dialog-green"
                   draggable="false" modal="true" resizable="false">
             <h:outputText value="#{msg.confirmReadMessage}"/>
             <div class="btn_line">
@@ -180,7 +173,7 @@
                                  oncomplete="PF('confirmReadDlgWV').hide();"/>
             </div>
         </p:dialog>
-        <p:dialog widgetVar="imageFileDlgWV" width="300" draggable="false" modal="true" resizable="false"
+        <p:dialog widgetVar="imageFileDlgWV" width="300" draggable="false" modal="true" resizable="false" styleClass="dialog-green"
                   header="#{msg.mailManagerImgFiles}">
             <p:dataTable value="#{bean.entity.imgFiles}" var="img" styleClass="without-header">
                 <p:column>
@@ -229,7 +222,7 @@
             </div>
         </p:dialog>
 
-        <p:dialog id="chooseSingleOrMultipleRequestCreate" widgetVar="chooseSingleOrMultipleRequestCreateWV" modal="true" >
+        <p:dialog id="chooseSingleOrMultipleRequestCreate" widgetVar="chooseSingleOrMultipleRequestCreateWV" modal="true" styleClass="dialog-orange">
             <h:outputText value="#{bean.fieldsNotSetDialogMessage}"/>
             <br/>
             <h:outputText value="#{msg.mailManagerViewFieldsNotSetDialogMessageQuestion}"/>

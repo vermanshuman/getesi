@@ -439,7 +439,7 @@
                     </div>
                 </div>
             </p:panel>
-            <p:dialog widgetVar="categoryNotPresentWV" modal="true" draggable="false"
+            <p:dialog widgetVar="categoryNotPresentWV" modal="true" draggable="false" styleClass="dialog-green"
                       position="center center">
                 <div class="ui-corner-all">
                     <span >#{val.cadastralNoPresent}</span>
@@ -532,7 +532,7 @@
                 <h:outputText value="#{msg.requestTextEditNonPhysicalError}" style="font-size: 20px; color: darkred;"/>
             </p:dialog>
 
-            <p:dialog widgetVar="dateBeforeRequestCreateDateDialogWV"
+            <p:dialog widgetVar="dateBeforeRequestCreateDateDialogWV" styleClass="dialog-green"
                       id="dateBeforeRequestCreateDateDialogId" modal="true" draggable="false"
                       position="center center">
                 <div class="ui-messages-error ui-corner-all">
@@ -543,7 +543,7 @@
                 </div>
             </p:dialog>
 
-            <p:dialog widgetVar="noUpdateDateDialogIdDialogWV"
+            <p:dialog widgetVar="noUpdateDateDialogIdDialogWV" styleClass="dialog-green"
                       id="noUpdateDateDialogId" modal="true" draggable="false"
                       position="center center">
                 <div class="ui-messages-error ui-corner-all">
@@ -554,7 +554,7 @@
                 </div>
             </p:dialog>
 
-            <p:dialog widgetVar="endDateErrorMessageWV" id="endDateErrorMessage" modal="true" draggable="false"
+            <p:dialog widgetVar="endDateErrorMessageWV" id="endDateErrorMessage" modal="true" draggable="false" styleClass="dialog-green"
                       position="center center">
                 <div class="ui-messages-error ui-corner-all">
                     <span class="ui-messages-error-summary">#{val.requestTextEditEndDateErrorMessage}</span><br/>
@@ -569,7 +569,7 @@
 
             <p:remoteCommand name="toggleDateCheck" action="#{bean.checkDate}"/>
 
-            <p:dialog widgetVar="requestsStillBeingWorkedOnDialogWV" modal="true" draggable="false"
+            <p:dialog widgetVar="requestsStillBeingWorkedOnDialogWV" modal="true" draggable="false" styleClass="dialog-green"
                       position="center center">
                 <div class="ui-corner-all">
                     <span >#{msg.requestsStillBeingWorkedOnMsg}</span>
@@ -584,7 +584,7 @@
                 </div>
             </p:dialog>
 
-            <p:dialog widgetVar="checkEstateFormalityDialogWV" modal="true" draggable="false" position="center center">
+            <p:dialog widgetVar="checkEstateFormalityDialogWV" modal="true" draggable="false" position="center center" styleClass="dialog-green">
                 <div class="ui-corner-all">
                     <span >#{msg.requestTextEditNotAccountedFormalitiesExist}</span>
                 </div>
@@ -595,7 +595,8 @@
                 </div>
             </p:dialog>
 
-            <p:dialog widgetVar="checkEstateFormalitySalesDialogWV" id = "checkEstateFormalitySalesDialog" modal="true" draggable="false" position="center center">
+            <p:dialog widgetVar="checkEstateFormalitySalesDialogWV" id = "checkEstateFormalitySalesDialog" modal="true" draggable="false" 
+            		position="center center" styleClass="dialog-green">
                 <div class="ui-corner-all">
                     <span>#{msg.checkEstateFormalitySalesMessage}</span>
                     <p:repeat value="#{bean.estateFormalitySalesMessage}" var="msgItem">
@@ -610,7 +611,7 @@
             </p:dialog>
 
             <p:dialog id="requestNumberActDlg" widgetVar="requestNumberActGreaterThenClientNumberAct" modal="true"
-                      draggable="false"
+                      draggable="false" styleClass="dialog-green"
                       position="center center" resizable="false">
                 <h:outputText escape="false" value="#{bean.numberActDifference}"/>
                 <br/><br/>
@@ -657,7 +658,7 @@
             </p:dialog>
 
 
-            <p:dialog widgetVar="checkFormalityYearWV" modal="true" draggable="false" position="center center">
+            <p:dialog widgetVar="checkFormalityYearWV" modal="true" draggable="false" position="center center" styleClass="dialog-green">
                 <div class="ui-corner-all">
                     <span >#{msg.requestTextEditYearFormalityCheck}</span>
                 </div>

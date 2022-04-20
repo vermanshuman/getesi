@@ -111,14 +111,7 @@
             body .ui-button.ui-button-success {
                 background: #00CC52 !important;
             }
-            #changeUserDlg {
-                border: 2px solid #57c279;
-            }
-            #changeUserDlg .ui-dialog-titlebar {
-                border-bottom: none;
-                background: #f8f9fa !important;
-                color: #000;
-            }
+            
             .dynamic-fields input{
                 width : 98% !important;
             }
@@ -311,13 +304,6 @@
                 margin-left: -0.45rem;
                 margin-top: -0.6rem;
                 font-size: 16px;
-            }
-            #requestDelete {
-                border: 2px solid #57c279;
-            }
-
-            #requestDelete  .ui-widget-header {
-                background-color: #f8f9fa !important;
             }
         </style>
 
@@ -692,13 +678,13 @@
 
 <!--        <ui:include src="../Dialogs/RequestSubjectDialog.xhtml" />-->
 
-        <p:dialog id="saveDlg" widgetVar="saveDlgWV" modal="true" onShow="setTimer();" onHide="stopTimer();"
+        <p:dialog id="saveDlg" widgetVar="saveDlgWV" modal="true" onShow="setTimer();" onHide="stopTimer();" styleClass="dialog-green dialog-green-width"
                   resizable="false" draggable="false" effect="SLIDE">
             <p:outputLabel value="#{msg.requestListSave}"/>
 
         </p:dialog>
 
-        <p:dialog id="changeUserDlg" widgetVar="changeUserDlgWV" modal="true"
+        <p:dialog id="changeUserDlg" widgetVar="changeUserDlgWV" modal="true" styleClass="dialog-green"
                   resizable="false" draggable="false" effect="SLIDE"
                   header="#{msg.requestUserChangeDlg}">
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid">
@@ -717,7 +703,7 @@
             </div>
         </p:dialog>
 
-        <p:dialog id="saveMultipleRequest" widgetVar="multipleRequestSave" modal="true"
+        <p:dialog id="saveMultipleRequest" widgetVar="multipleRequestSave" modal="true" styleClass="dialog-green"
                   resizable="false" draggable="false" effect="SLIDE"
                   header="#{msg.requestUserChangeDlg}">
             <span>
@@ -799,7 +785,7 @@
                 <p:commandButton value="#{msg.submit}" oncomplete="PF('diffFiscalCodeWV').hide()"/>
             </div>
         </p:dialog>
-        <p:dialog id="requestSaved" widgetVar="requestSaved" modal="true" closable="false"
+        <p:dialog id="requestSaved" widgetVar="requestSaved" modal="true" closable="false" styleClass="dialog-green"
                   resizable="false" draggable="false" effect="SLIDE" style="border: 1px solid #00CC52;">
             <span>
                 <h:outputText value="#{msg.requestListSave}"/>
@@ -1329,7 +1315,7 @@
                     </p:dataTable>
                 </p:scrollPanel>
             </p:dialog>
-            <p:dialog id="requestDelete" widgetVar="dlg2" modal="true" resizable="false" draggable="false" effect="SLIDE" width="400" >
+            <p:dialog id="requestDelete" widgetVar="dlg2" modal="true" resizable="false" draggable="false" effect="SLIDE" styleClass="dialog-green dialog-green-width" >
                 #{msg.deleteConfirmation}<br/>
                 <br/>
                 <div class="btn_line">

@@ -66,10 +66,7 @@
             #mailTo .ui-icon-close:before{
                 content: "\f00d" !important;
             }
-            #confirmRedirect{
-                border: 2px solid #57c279 !important;
-
-            }
+            
             .ui-datatable-scrollable-theadclone > tr > th{
                 border : none !important;
             }
@@ -443,7 +440,7 @@
                                  oncomplete="PF('clientEmailsWV').hide();"/>
             </div>
         </p:dialog>
-        <p:dialog id="confirmRedirect" widgetVar="confirmRedirect" modal="true"
+        <p:dialog id="confirmRedirect" widgetVar="confirmRedirect" modal="true" styleClass="dialog-green"
                   resizable="false" draggable="false">
             <p:outputLabel value="#{msg.mailManagerConfirmDialog}"/>
             <div class="btn_line">
@@ -473,7 +470,7 @@
                                  styleClass="red-button" oncomplete="PF('selectFolderWV').hide();"/>
             </div>
         </p:dialog>
-        <p:dialog widgetVar="showSendErrorDialog" modal="true" resizable="false" draggable="false">
+        <p:dialog widgetVar="showSendErrorDialog" modal="true" resizable="false" draggable="false" styleClass="dialog-green">
             <p:ajax event="close" listener="#{bean.goList}"
                     oncomplete="PF('mailManagerSendTop').enable();PF('mailManagerSendBottom').enable();"/>
             <h:outputText value="#{val.errorSendMail}"/>

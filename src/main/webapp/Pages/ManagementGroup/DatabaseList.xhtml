@@ -104,13 +104,11 @@
                 border: 0.2em solid #57c279 !important;
             }
 
-            #subjectDelete {
-                border: 2px solid #57c279;
-            }
+            
 
-            #subjectDelete .ui-dialog-titlebar {
+            /* #subjectDelete .ui-dialog-titlebar {
                 border-bottom: none;
-            }
+            } */
 
             #tabs ul {
                 background-color: transparent !important;
@@ -1352,7 +1350,7 @@
 
         </p:dialog>
 
-        <p:dialog id="subjectDelete" widgetVar="dlg2" modal="true" resizable="false" effect="SLIDE">
+        <p:dialog id="subjectDelete" widgetVar="dlg2" modal="true" resizable="false" effect="SLIDE" styleClass="dialog-green dialog-green-width">
             #{msg.deleteConfirmation}<br/>
             <br/>
             <div class="btn_line">
@@ -1549,7 +1547,7 @@
             </div>
         </p:dialog>
 
-        <p:dialog widgetVar="formalityRequestForcedEstateSituationWV" modal="true" width="1200">
+        <p:dialog widgetVar="formalityRequestForcedEstateSituationWV" modal="true" width="1200" styleClass="dialog-green">
             <h:outputText value="#{msg.formalityForcedRequestOrEstateSituationExistDialog}"/>
             <div class="btn_line">
                 <p:commandButton value="#{msg.confirm}" update="@form"
