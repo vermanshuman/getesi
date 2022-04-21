@@ -1181,14 +1181,15 @@
                                 <h:outputText value="#{invoice.totalGrossAmount}"/>
                             </p:column>
                             <p:column headerText="#{msg.billingListOnBalance}" sortBy="#{invoice.onBalance}">
-                                <h:outputText value="#{invoice.onBalance}"/>
+                                <p:commandButton id="openinvoice-payment" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
+                                  action="#{bean.loadInvoiceDialogDataPayment(invoice)}" oncomplete="PF('invoiceDialogBillingWV').show();" update="invoiceDialogBilling">
+                				</p:commandButton>
+                                <p:commandLink value="#{invoice.onBalance}" onclick="document.getElementById('invoiceTable:#{rowId}:openinvoice-payment').click()"/>
                             </p:column>
                             <p:column rendered="#{invoice.email.id == null}">
                             	<p:commandButton id="openinvoice-btn" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
                                   action="#{bean.loadInvoiceDialogDataEdit(invoice)}" oncomplete="PF('invoiceDialogBillingWV').show();" update="invoiceDialogBilling">
-                    <!-- <f:setPropertyActionListener value="#{item.id}"
-                                                 target="#{bean.entityEditId}"/> -->
-                </p:commandButton>
+                				</p:commandButton>
                                 <div class="icon-block">
                                     <i class="email-icon-new"></i>
                                     <p:commandLink id="actionPnl" global="false" style="outline: none;" immediate="true"
@@ -1200,8 +1201,6 @@
                                         <p:outputPanel id="actionGrid" styleClass="actionPnl-panel">
                                             <p:commandButton value="#{ff:upper(msg.dataVerification)}" class="action-btn"
                                                               onclick="document.getElementById('invoiceTable:#{rowId}:openinvoice-btn').click()"
-                                                             
-                                                             
                                                              style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;">
                                             </p:commandButton>
                                         </p:outputPanel>

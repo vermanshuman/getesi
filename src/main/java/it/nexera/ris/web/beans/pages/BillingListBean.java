@@ -292,6 +292,14 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private Boolean showRequestTab;
 
     private StreamedContent invoicePDFFile;
+    
+    private Invoice selectedInvoice;
+    
+    private Double paymentAmount;
+    
+    private Date paymentDate;
+    
+    private String paymentDescription;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -846,7 +854,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     public void loadInvoiceDialogData(Invoice invoicedb) throws IllegalAccessException, PersistenceBeanException, HibernateException, InstantiationException  {
         setShowRequestTab(false);
-        List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[] {Restrictions.isNotNull("date")}, new Order[]{
+        List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[] {Restrictions.eq("invoice", invoicedb)}, new Order[]{
                 Order.desc("date")});
         setPaymentInvoices(paymentInvoicesList);
         double totalImport = 0.0;
@@ -860,6 +868,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setVatCollectabilityList(ComboboxHelper.fillList(VatCollectability.class,
                 false, false));
         //paymentTypes = ComboboxHelper.fillList(PaymentType.class);
+        setPaymentTypes(ComboboxHelper.fillList(new ArrayList<>(), false));
         List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
                 Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
                         Restrictions.isNull("deleted"))});
@@ -869,8 +878,12 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                                         (ValidationHelper.isNullOrEmpty(c.getFiduciary()) || !c.getFiduciary())
                         )
                 ).sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList()), Boolean.TRUE));
+        setSelectedInvoiceClientId(null);
+        setSelectedInvoiceClient(null);
+        setSelectedInvoice(invoicedb);
         if(!ValidationHelper.isNullOrEmpty(invoicedb)) {
 	        Invoice invoice = DaoManager.get(Invoice.class, invoicedb.getId());
+	        setSelectedInvoice(invoice);
 	        if(!ValidationHelper.isNullOrEmpty(invoice)) {
 	        	paymentTypes = ComboboxHelper.fillList(invoice.getClient().getPaymentTypeList(), Boolean.FALSE);
 	        	setInvoiceDate(invoice.getDate());
@@ -913,7 +926,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 	            }
 	            setGoodsServicesFields(wrapperList);
 	            setSameInvoiceNumber(invoice.getId());
-	            if(invoice.getStatus().equals(InvoiceStatus.DELIVERED)) {
+	            if(!ValidationHelper.isNullOrEmpty(invoice.getStatus()) && invoice.getStatus().equals(InvoiceStatus.DELIVERED)) {
 	                setInvoiceSentStatus(true);
 	            }
 	        }
@@ -927,7 +940,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     }
 
     public void loadInvoiceDialogDataEdit(Invoice invoice) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        System.out.println("id :: "+invoice.getId());
     	setNumber(invoice.getId());
         loadInvoiceDialogData(invoice);
         //executeJS("PF('invoiceDialogBillingWV').show();");
@@ -1053,10 +1065,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 setValidationFailed(true);
             }
 
-            if(ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemAmount())){
-                setValidationFailed(true);
-            }
-
             if(ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getSelectedTaxRateId())){
                 setValidationFailed(true);
             }
@@ -1080,7 +1088,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     public void onItemSelectInvoiceClient() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         Client selectedClient = DaoManager.get(Client.class, getSelectedInvoiceClientId());
         setSelectedInvoiceClient(selectedClient);
-        System.out.println(selectedClient.getSplitPayment());
         if(selectedClient.getSplitPayment() != null && selectedClient.getSplitPayment())
             setVatCollectabilityId(VatCollectability.SPLIT_PAYMENT.getId());
         else
@@ -1710,6 +1717,11 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             }
             setInvoiceEmailAttachedFiles(new ArrayList<>());
             setActiveTabIndex(0);
+            executeJS(
+            "$('.tab').removeClass('selected');"+
+            "$('#tab2').addClass('selected');"+
+            "$('.hide').hide();"+
+            "$('#content_tab2').show();");
         } catch (Exception e) {
             LogHelper.log(log, e);
         }
@@ -1815,5 +1827,24 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             return;
         }
 
+    }
+    
+    public void loadInvoiceDialogDataPayment(Invoice invoice) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+    	setActiveTabIndex(1);
+    	setNumber(invoice.getId());
+        loadInvoiceDialogData(invoice);
+        
+    }
+    
+    public void saveInvoicePayment() throws HibernateException, PersistenceBeanException, IllegalAccessException {
+    	PaymentInvoice paymentInvoice = new PaymentInvoice();
+    	paymentInvoice.setPaymentImport(getPaymentAmount());
+    	paymentInvoice.setDate(getPaymentDate());
+    	paymentInvoice.setDescription(getPaymentDescription());
+    	paymentInvoice.setInvoice(getSelectedInvoice());
+    	DaoManager.save(paymentInvoice, true);
+    	List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[] {Restrictions.eq("invoice", getSelectedInvoice())}, new Order[]{
+                Order.desc("date")});
+        setPaymentInvoices(paymentInvoicesList);
     }
 }

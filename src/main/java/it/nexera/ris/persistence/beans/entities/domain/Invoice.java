@@ -92,6 +92,9 @@ public class Invoice extends IndexedEntity implements Serializable {
 	
 	@Column(name = "totale_lordo")
 	private Double totalGrossAmount;
+	
+	@Transient
+	private Double totalPayment;
 
 
 	public Long getCloudId() {
@@ -253,14 +256,24 @@ public class Invoice extends IndexedEntity implements Serializable {
 	public Double getOnBalance() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
 		List<PaymentInvoice> paymentInvoices = DaoManager.load(PaymentInvoice.class, Restrictions.eq("invoice.id", this.getId()));
 		double paymentImportTotal = 0.0;
-		for(PaymentInvoice invoiceItem : paymentInvoices) {
-			Double total = invoiceItem.getPaymentImport().doubleValue();
+		for(PaymentInvoice paymentInvoice : paymentInvoices) {
+			Double total = paymentInvoice.getPaymentImport().doubleValue();
 			paymentImportTotal = paymentImportTotal + total;
 		}
 		Double onBalance = 0.0;
 		if(getTotalGrossAmount() != null)
 			onBalance = getTotalGrossAmount().doubleValue() - paymentImportTotal;
 		return onBalance;
+	}
+	
+	public Double getTotalPayment() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+		List<PaymentInvoice> paymentInvoices = DaoManager.load(PaymentInvoice.class, Restrictions.eq("invoice.id", this.getId()));
+		double paymentImportTotal = 0.0;
+		for(PaymentInvoice paymentInvoice : paymentInvoices) {
+			Double total = paymentInvoice.getPaymentImport().doubleValue();
+			paymentImportTotal = paymentImportTotal + total;
+		}
+		return paymentImportTotal;
 	}
 
 	public String getDateString() {
