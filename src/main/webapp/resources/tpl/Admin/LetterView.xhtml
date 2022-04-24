@@ -112,8 +112,8 @@
                                                 </span>
                             </div>
                         </f:facet>
-                        <p:column styleClass=" action_column">
-                            <p:commandButton icon="ui-icon pi pi-pencil" update=":form" action="#{bean.gotoEditRequest}">
+                        <p:column styleClass=" action_column" style="padding: 6px 7px !important;">
+                            <p:commandButton icon="ui-icon pi pi-pencil" update=":form" action="#{bean.gotoEditRequest}" style="width: 32px;">
                                 <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                             </p:commandButton>
                         </p:column>
