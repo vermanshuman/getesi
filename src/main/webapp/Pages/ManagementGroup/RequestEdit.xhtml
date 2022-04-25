@@ -321,6 +321,10 @@
             #addRequestService .ui-button-text {
                 margin-right: 7px;
             }
+            #dynamicHiddenPanel .ui-fieldset-legend {
+                height: 31px;
+                padding-top: 1px;
+            }
         </style>
 
         <script>
@@ -545,9 +549,10 @@
 <!--                        <div class="ui-g-3" style="padding: 1%">-->
 
 <!--                        </div>-->
-                        <div style="padding-top: 1%;">
+                        <div>
+                            <span></span><br/>
                             <p:commandButton id="confirmButton" value="#{msg.submit}"
-                                             update="form @this" style="margin-top: 16px;"
+                                             update="form @this" style="margin-top: 17px;"
                                              styleClass="ui-button-success"
                                              action="#{bean.generateDynamicContent(true)}"
                                              rendered="#{bean.showConfirmButton and bean.requestTypeMultiple}"/>
