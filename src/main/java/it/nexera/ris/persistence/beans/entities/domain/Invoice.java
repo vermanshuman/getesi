@@ -20,30 +20,30 @@ import java.util.List;
 public class Invoice extends IndexedEntity implements Serializable {
 
 	private static final long serialVersionUID = -203805995863279495L;
-	
+
     @ManyToOne
     @JoinColumn(name = "client_id")
-    private Client client;	
-	
+    private Client client;
+
 	@Column(name = "number")
-    private Long number;	
-	
+    private Long number;
+
 	@Column(name = "date")
-    private Date date;	
-	
+    private Date date;
+
 	@Column(name = "causal")
-    private String notes;	
-	
+    private String notes;
+
     @ManyToOne
     @JoinColumn(name = "payment_type_id")
-    private PaymentType paymentType;		
-	
+    private PaymentType paymentType;
+
     @Column(name = "split_payment")
     private Boolean splitPayment;
 
     @Column(name = "sent")
     private Boolean sent;
-    
+
     @Column(name = "fiscalCode")
     private String fiscalCode;
 
@@ -78,6 +78,9 @@ public class Invoice extends IndexedEntity implements Serializable {
 	@JoinColumn(name = "mail_id")
 	private WLGInbox email;
 
+	@Column(name = "totale_lordo")
+	private Double totalGrossAmount;
+
 	@Transient
 	private String documentType;
 
@@ -90,6 +93,8 @@ public class Invoice extends IndexedEntity implements Serializable {
 	@Transient
 	private String dateString;
 
+	@Transient
+	private Double totalPayment;
 
 	public Long getCloudId() {
 		return cloudId;
@@ -250,12 +255,24 @@ public class Invoice extends IndexedEntity implements Serializable {
 	public Double getOnBalance() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
 		List<PaymentInvoice> paymentInvoices = DaoManager.load(PaymentInvoice.class, Restrictions.eq("invoice.id", this.getId()));
 		double paymentImportTotal = 0.0;
-		for(PaymentInvoice invoiceItem : paymentInvoices) {
-			Double total = invoiceItem.getPaymentImport().doubleValue();
+		for(PaymentInvoice paymentInvoice : paymentInvoices) {
+			Double total = paymentInvoice.getPaymentImport().doubleValue();
 			paymentImportTotal = paymentImportTotal + total;
 		}
-		Double onBalance = getTotalAmount().doubleValue() - paymentImportTotal;
+		Double onBalance = 0.0;
+		if(getTotalGrossAmount() != null)
+			onBalance = getTotalGrossAmount().doubleValue() - paymentImportTotal;
 		return onBalance;
+	}
+
+	public Double getTotalPayment() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+		List<PaymentInvoice> paymentInvoices = DaoManager.load(PaymentInvoice.class, Restrictions.eq("invoice.id", this.getId()));
+		double paymentImportTotal = 0.0;
+		for(PaymentInvoice paymentInvoice : paymentInvoices) {
+			Double total = paymentInvoice.getPaymentImport().doubleValue();
+			paymentImportTotal = paymentImportTotal + total;
+		}
+		return paymentImportTotal;
 	}
 
 	public String getDateString() {
@@ -266,4 +283,11 @@ public class Invoice extends IndexedEntity implements Serializable {
 		return dateString;
 	}
 
+	public Double getTotalGrossAmount() {
+		return totalGrossAmount;
+	}
+
+	public void setTotalGrossAmount(Double totalGrossAmount) {
+		this.totalGrossAmount = totalGrossAmount;
+	}
 }

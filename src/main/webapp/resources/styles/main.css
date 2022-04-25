@@ -72,8 +72,18 @@ body .cyan-blue-btn {
     background-color: #547ac4 !important;
 }
 
-body .ui-button {
+body .ui-button:not(#editButton) {
     background: #547ac4;
+    color: #ffffff;
+    border: none !important;
+    /*margin: 0;*/
+    outline: 0 none;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+body .editButton {
+    background: #788FA7 !important;
     color: #ffffff;
     border: none !important;
     margin: 0;
@@ -82,6 +92,21 @@ body .ui-button {
     transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 
+body .editButton.ui-button:not(.stampaButton){
+    background: #788FA7 !important;
+}
+
+body .editButton.ui-button.ui-state-focus {
+    outline: 0 none;
+    outline-offset: 0;
+    box-shadow: 0 0 0 0.2em #788FA7;
+}
+
+body .editButton.ui-button.ui-state-active, body .ui-button.ui-state-down {
+    background: #788FA7;
+    border-color: #788FA7;
+    color: #ffffff;
+}
 .mail_style {
     color: #4c5156 !important;
 }
@@ -967,4 +992,39 @@ body .confirmationDialog .ui-widget-header {
 
 #subjectRestoreDlg, #chooseSingleOrMultipleRequestCreate {
     border: 2px solid #57c279;
+}
+
+.dialog-gray {
+    border: 7px solid #d9e0e7 !important;
+}
+
+.dialog-gray-width {
+    width: 370px !important;
+}
+
+.dialog-gray .ui-dialog-titlebar {
+    background: #f8f9fa !important;
+    color: #495057 !important;
+}
+
+.dialog-orange {
+    border: 7px solid #ffa500 !important;
+}
+
+.dialog-orange .ui-dialog-titlebar {
+    background: #f8f9fa !important;
+    color: #495057 !important;
+}
+
+.dialog-green {
+    border: 7px solid #57c279 !important;
+}
+
+.dialog-green-width {
+    width: 370px !important;
+}
+
+.dialog-green .ui-dialog-titlebar {
+    background: #f8f9fa !important;
+    color: #495057 !important;
 }

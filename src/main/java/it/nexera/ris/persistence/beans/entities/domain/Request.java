@@ -977,7 +977,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
         }, new Criterion[]{
                 Restrictions.eq("id", this.getId())});
 
-        return ValidationHelper.isNullOrEmpty(request.getMultipleServices()) ? "" : request.getMultipleServices()
+        return (ValidationHelper.isNullOrEmpty(request) || ValidationHelper.isNullOrEmpty(request.getMultipleServices())) ? "" : request.getMultipleServices()
                 .stream()
                 .filter(s -> !ValidationHelper.isNullOrEmpty(s.getName()))
                 .map(s -> s.toString())
@@ -1084,6 +1084,9 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     public String getUserName() {
         try {
+            if(!Hibernate.isInitialized(getUser())){
+                Hibernate.initialize(getUser());
+            }
             return getUser() == null ? "" : getUser().getFullname();
         } catch (Exception e) {
             LogHelper.log(log, e);

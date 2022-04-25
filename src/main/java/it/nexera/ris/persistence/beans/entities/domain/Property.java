@@ -651,7 +651,7 @@ public class Property extends IndexedEntity implements BeforeSave {
                 .append(getCurrentString(estateInterno, getInterno(), false))
                 .append(getCurrentString(estateScala, getScala(), false))
                 .append((getCategory() != null && getCategory().getCode() != null && getCategory().getCode().startsWith("A") ? getCurrentString(estateConsistency, getConsistencyTrimmed(), false) :
-                        getCategory() != null && getCategory().getCode() != null && getCategory().getCode().startsWith("C") && (getCadastralArea() == null || getCadastralArea() == 0) ? getCurrentString(estateMq, getConsistencyNumber(), false) : ""))
+                        getCategory() != null && getCategory().getCode() != null && getCategory().getCode().startsWith("C") && (getCadastralArea() == null || getCadastralArea() == 0) ? getCurrentString(estateMq, getConsistencyNumber(), false) : getCategory() != null && getCategory().getCode() != null && getCategory().getCode().equalsIgnoreCase("EU")  ? getCurrentString(estateMq, getConsistencEu(), false) : ""))
                 .append(getCurrentString(estateMq, (getCadastralArea() == null || getCadastralArea() == 0) ? null : Long.toString(getCadastralArea().longValue()), false))
                 .append(getCurrentString(estateAnnuity, manageMoneyView(getRevenue()), true));
 
@@ -1067,6 +1067,14 @@ public class Property extends IndexedEntity implements BeforeSave {
             landMQ = GeneralFunctionsHelper.formatDoubleString(landMQ);
         }
         return landMQ;
+    }
+
+    public String getConsistencEu() {
+        if (!ValidationHelper.isNullOrEmpty(getConsistency())) {
+            return getConsistency().replace("centiare", "").replace("are", "").replaceAll("\\s", "").trim();
+        } else {
+            return "";
+        }
     }
 
     public String getConsistency() {

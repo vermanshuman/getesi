@@ -279,6 +279,13 @@ public class TemplatePdfTableHelper {
             joiner.add(landData);
         }
 
+        for (Property property : freeProperty) {
+            if (!ValidationHelper.isNullOrEmpty(property.getCategoryCode())
+                    && !RealEstateType.LAND.getShortValue().equals(property.getCategoryCode())) {
+                property.setType(RealEstateType.BUILDING.getId());
+            }
+        }
+
         Map<String, List<Property>> map = new HashMap<>();
         List<Property> properties = freeProperty.stream()
                 .filter(p -> p.getType() != null)

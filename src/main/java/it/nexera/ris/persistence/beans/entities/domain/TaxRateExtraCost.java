@@ -1,6 +1,7 @@
 package it.nexera.ris.persistence.beans.entities.domain;
 
 import it.nexera.ris.common.enums.ExtraCostType;
+import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import lombok.Getter;
@@ -43,5 +44,7 @@ public class TaxRateExtraCost extends IndexedEntity {
         this.setService(taxRateExtraCost.getService());
         this.setTaxRate(taxRateExtraCost.getTaxRate());
         this.setExtraCostType(taxRateExtraCost.getExtraCostType());
+        if (!ValidationHelper.isNullOrEmpty(getTaxRate()))
+            setTaxRateId(getTaxRate().getId());
     }
 }

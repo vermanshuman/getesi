@@ -1214,6 +1214,9 @@ public class ImportXMLHelper extends BaseHelper {
 
                         case QUOTE:
                             quote = value.trim();
+                            if(org.apache.commons.lang3.StringUtils.isNotBlank(quote) && quote.trim().startsWith("per ")){
+                                quote = quote.replaceFirst("per", "").trim();
+                            }
                             break;
 
                         case TYPE:

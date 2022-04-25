@@ -190,7 +190,7 @@
         }
 
         #dialogTab .ui-datatable thead th, .ui-datatable tfoot td {
-            text-align: center !important;
+            text-align: left !important;
         }
 
         #dialogTab .ui-panel .ui-panel-content {
@@ -284,12 +284,20 @@
             content: "\f00d" !important;
         }
 
+        .dialog-white-bg .ui-dialog-titlebar {
+            background: #f8f9fa !important;
+            color: #495057 !important;
+        }
+
+        #paymentDate_input {
+            width: 210px !important;
+        }
 
     </style>
 
-    <p:dialog widgetVar="invoiceDialogBillingWV" modal="true" width="1150" draggable="false" id="invoiceDialogBilling"
+    <p:dialog widgetVar="invoiceDialogBillingWV" modal="true" width="1350" draggable="false" id="invoiceDialogBilling"
               header="#{msg.requestTextEditElectronicSalesInvoice} (n. #{bean.invoiceNumber})">
-        <div style="margin-top:20px; overflow-x:hidden; overflow-y:auto; height: 600px;" class="invoiceDialog">
+        <div style="margin-top:20px; overflow-x:hidden; overflow-y:auto; height: 700px;" class="invoiceDialog">
             <p:tabView dynamic="true" cache="true" id="dialogTab" activeIndex="#{bean.activeTabIndex}">
                 <p:ajax event="tabChange" listener="#{bean.onTabChange}"/>
                 <p:tab title="#{msg.requestTab}" rendered="#{bean.showRequestTab}">
@@ -542,7 +550,7 @@
                                     <div class="p-col-4">
                                         <h:outputText value="#{msg.vat}"></h:outputText>
                                         <p:selectOneMenu id="invoiceVat" value="#{key.selectedTaxRateId}" style="width:100%;" onchange="updateVat();"
-                                                         label="#{msg.invoiceVat}" styleClass="#{key.selectedTaxRateId ne null ? 'select-one-menu' : 'select-one-menu-width'}" disabled="#{bean.invoiceSentStatus}">
+                                                         label="#{msg.invoiceVat}"  disabled="#{bean.invoiceSentStatus}" >
                                             <f:selectItems value="#{key.vatAmounts}"/>
                                             <!-- <p:ajax event="change" /> -->
                                         </p:selectOneMenu>
@@ -749,14 +757,14 @@
                 <p:tab title="#{msg.requestTextEditPaymentsTab}">
                     <div class="p-grid">
                         <div class="p-col-12">
-                            <p:commandButton value=" #{msg.addPayment}" icon="fa fa-plus" style="width:175px;"
+                            <p:commandButton value=" #{msg.addPayment}" icon="fa fa-plus" style="width:175px;" oncomplete="PF('addPaymentDialogWV').show();"
                                              styleClass="ui-button-success p-mr-2 p-mb-2"/>
                         </div>
                         <div class="p-col-12">
-                            <p:outputLabel value="#{msg.amountToBeCollected} : #{bean.amountToBeCollected}" style="font-weight: 700 !important; float:right;"/>
+                            <p:outputLabel value="#{msg.amountToBeCollected} : #{bean.selectedInvoice.onBalance}" style="font-weight: 700 !important; float:right;"/>
                         </div>
-                        <p:panel id="table_div">
-                            <p:dataTable id="paymentInvoiceTable" value="#{bean.paymentInvoices}" emptyMessage="#{msg.noRecordsFound}"
+                        <p:panel id="table_div" widgetVar="paymentInvoicePanelWV">
+                            <p:dataTable id="paymentInvoiceTable" value="#{bean.paymentInvoices}" emptyMessage="#{msg.noRecordsFound}" widgetVar="paymentInvoiceTableWV"
                                          var="paymentInvoice"  lazy="true"
                                          paginator="true" paginatorAlwaysVisible="true" rowIndexVar="rowId">
                                 <p:column headerText="#{msg.importAmount}">
@@ -775,7 +783,7 @@
                             </p:dataTable>
                         </p:panel>
                         <div class="p-col-12">
-                            <p:outputLabel value="#{msg.totalPayments} : #{bean.totalPayments} #{msg.outOf}" style="font-weight: 700 !important; float:right;"/>
+                            <p:outputLabel value="#{msg.totalPayments} : #{bean.selectedInvoice.totalPayment} #{msg.outOf} #{bean.selectedInvoice.totalGrossAmount}" style="font-weight: 700 !important; float:right;"/>
                         </div>
                     </div>
                 </p:tab>
@@ -1049,7 +1057,7 @@
                     </script>
                 </p:tab>
             </p:tabView>
-            <p:remoteCommand name="closeInvoiceDialog" action="#{bean.closeInvoiceDialog}" />
+            <p:remoteCommand name="closeInvoiceDialog" action="#{bean.closeInvoiceDialog}" update=":form" />
         </div>
         <script>
             $(".ui-dialog-titlebar-close").on("click", function() {
@@ -1069,6 +1077,54 @@
 
     <p:dialog widgetVar="showSendErrorDialog" modal="true" resizable="false" draggable="false">
         <h:outputText value="#{val.errorSendMail}"/>
+    </p:dialog>
+
+    <p:dialog widgetVar="addPaymentDialogWV"  modal="true" draggable="false" width="400" styleClass="dialog-white-bg"
+              position="center center" header="#{msg.addPayment}">
+        <div class="p-grid">
+            <div class="p-col-12 p-md-12">
+                <div class="card"
+                     style="border: none !important; padding-top:0px; padding-bottom:0px; margin-top:10px;">
+                    <div class="p-grid">
+                        <div class="p-col-4 vertical-center" style="padding-bottom: 0px !important;">
+                            <h:outputText value="#{msg.importAmount}"/>
+                        </div>
+                        <div class="p-col-8">
+                            <p:inputText value="#{bean.paymentAmount}" >
+                                <p:keyFilter mask="num" />
+                            </p:inputText>
+                        </div>
+                        <div class="p-col-4 vertical-center" style="padding-bottom: 0px !important;">
+                            <h:outputText value="#{msg.date}"/>
+                        </div>
+                        <div class="p-col-8">
+                            <p:calendar  value="#{bean.paymentDate}" disabled="#{bean.invoiceSentStatus}"
+                                         showOn="button" id="paymentDate"
+                                         pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
+                                         popupIconOnly="true"
+                                         onblur="check_date(this)"
+                                         styleClass="#{bean.paymentDate ne null ? 'calender-filled' : ''}" >
+                                <p:ajax event="dateSelect" update="@this" />
+                            </p:calendar>
+                        </div>
+                        <div class="p-col-4 vertical-center" style="padding-bottom: 0px !important;">
+                            <h:outputText value="#{msg.description}"/>
+                        </div>
+                        <div class="p-col-8">
+                            <p:inputText value="#{bean.paymentDescription}" >
+                            </p:inputText>
+                        </div>
+                        <div class="p-col-12" style="text-align:center;">
+                            <p:commandButton oncomplete="PF('addPaymentDialogWV').hide();"
+                                             value="#{msg.close.toUpperCase()}" />
+                            <p:commandButton value="#{msg.save.toUpperCase()}" oncomplete="PF('addPaymentDialogWV').hide();" style="margin-left:15px;"
+                                             action="#{bean.saveInvoicePayment}" update="@widgetVar(paymentInvoicePanelWV)" styleClass="ui-button-success p-mr-2 p-mb-2"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </p:dialog>
 
 </ui:composition>

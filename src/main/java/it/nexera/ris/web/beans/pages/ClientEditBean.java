@@ -632,13 +632,14 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                     });
                     if(priceLists!=null && priceLists.size() >0 ) {
                         setNegativePriceList(priceLists.get(0));
+                        if(!ValidationHelper.isNullOrEmpty(getNegativePriceList().getTaxRate()))
+                            getNegativePriceList().setSelectedTaxRateId(getNegativePriceList().getTaxRate().getId());
                     }else {
                         setNegativePriceList(new PriceList());
                     }
                 } catch (Exception e) {
                     LogHelper.log(log, e);
                 }
-                System.out.println(">>>>>>>Fill price list>>>>>>>>>>" + service.getTaxRateExtraCosts());
                 executeJS("PF('configurePriceListWV').show();");
             }
         }
@@ -1195,26 +1196,28 @@ public class ClientEditBean extends EntityEditPageBean<Client>
             if(ValidationHelper.isNullOrEmpty(getNegativePriceList().getService()))
                 getNegativePriceList().setService(getSelectedService().getService());
             getNegativePriceList().setIsNegative(true);
-
             try {
+                if(!ValidationHelper.isNullOrEmpty(getNegativePriceList().getSelectedTaxRateId())){
+                    getNegativePriceList().setTaxRate(DaoManager.get(TaxRate.class, getNegativePriceList().getSelectedTaxRateId()));
+                }
                 DaoManager.save(getNegativePriceList());
-            } catch (HibernateException | PersistenceBeanException e) {
+
+            } catch (HibernateException | PersistenceBeanException | InstantiationException | IllegalAccessException e) {
                 LogHelper.log(log, e);
             }
         }
     }
 
-    private void saveTaxRateExtraCostList() {
-        System.out.println(getServices());
-        getServices().stream()
-                .forEach(s -> {
-                    System.out.println(s.getTaxRateExtraCosts());
-                });
-        for (TaxRateExtraCost taxRateExtraCost : getServices().stream().map(ServiceWrapper::getTaxRateExtraCosts).flatMap(List::stream)
-                .filter(taxRateExtraCost -> !ValidationHelper.isNullOrEmpty(taxRateExtraCost.getExtraCostType())).collect(Collectors.toList())) {
+    private void saveTaxRateExtraCostList() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+        for (TaxRateExtraCost taxRateExtraCost :
+                getServices().stream().map(
+                        ServiceWrapper::getTaxRateExtraCosts).flatMap(List::stream).collect(Collectors.toList())) {
             taxRateExtraCost.setClientId(getEntity().getId());
-            taxRateExtraCost.setService(getSelectedService().getService());
-            System.out.println("tax rate id" + taxRateExtraCost.getTaxRateId());
+            if(!ValidationHelper.isNullOrEmpty(taxRateExtraCost.getTaxRateId()))
+                taxRateExtraCost.setTaxRate(DaoManager.get(TaxRate.class, taxRateExtraCost.getTaxRateId()));
+            else
+                taxRateExtraCost.setTaxRate(null);
+
             try {
                 DaoManager.save(taxRateExtraCost);
             } catch (Exception e) {

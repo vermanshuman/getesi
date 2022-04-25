@@ -1179,6 +1179,14 @@
                                      rendered="#{not bean.priceListDialogOnlyView}" styleClass="input-width"/>
                         <h:outputText value="#{bean.negativePriceList.firstPrice}"
                                       rendered="#{bean.priceListDialogOnlyView}"/>
+                        <span>#{msg.taxRate}: </span>
+                        <p:selectOneMenu value="#{bean.negativePriceList.selectedTaxRateId}" id="serviceFixedTaxRate"
+                                         label="#{msg.taxRate}"
+                                         rendered="#{not bean.priceListDialogOnlyView}">
+                            <f:selectItems value="#{bean.taxRates}"/>
+                        </p:selectOneMenu>
+                        <h:outputText value="#{bean.negativePriceList.taxRate}"
+                                      rendered="#{bean.priceListDialogOnlyView}"/>
                     </p:panelGrid>
                 </p:panel>
 
@@ -1207,7 +1215,7 @@
                                      oncomplete="PF('configurePriceListWV').hide()" style="margin-right: 5px;"/>
                     <p:commandButton value="#{msg.cancel}" process="@(.myclass)" class="ui-button-danger"
                                      oncomplete="PF('configurePriceListWV').hide()"
-                                     action="#{bean.cancelPriceList}" immediate="true"/>
+                                     action="#{bean.cancelPriceList}" immediate="true"  style="background-color: #F3362B !important;"/>
                 </div>
             </p:outputPanel>
         </p:dialog>

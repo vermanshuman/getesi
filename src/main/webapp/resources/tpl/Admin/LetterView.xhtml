@@ -114,7 +114,7 @@
                         </f:facet>
                         <p:column styleClass=" action_column" style="padding: 6px 7px !important;">
                             <p:commandButton icon="ui-icon pi pi-pencil" update=":form" action="#{bean.gotoEditRequest}" style="width: 32px;">
-                                <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                            <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                             </p:commandButton>
                         </p:column>
                         <p:column headerText="#{msg.databaseListRealEstateSubject}" sortBy="#{item.mailViewSubject}" filterBy="#{item.mailViewSubject}">
@@ -229,7 +229,7 @@
             </div>
         </p:outputPanel>
     </p:panel>
-    <p:dialog id="saveConfirmationDialog" closable="true" widgetVar="saveConfirmationDialogWV" modal="true" width="250"
+    <p:dialog id="saveConfirmationDialog" closable="true" widgetVar="saveConfirmationDialogWV" modal="true" width="250" styleClass="dialog-green dialog-green-width"
               draggable="false" resizable="false" style="text-align: center;" >
         <h:outputText style="font-size: 16px;" id="confirmationMsg" value="#{msg.mailManagerSave}"/>
         <br/>

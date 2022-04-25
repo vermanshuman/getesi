@@ -1,4 +1,4 @@
-package it.nexera.ris.web.beans.pages;
+    package it.nexera.ris.web.beans.pages;
 
 import it.nexera.ris.common.enums.*;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
@@ -24,6 +24,7 @@ import lombok.Setter;
 import org.apache.commons.lang.math.NumberUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
+import org.hibernate.StaleObjectStateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
@@ -289,6 +290,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private String selectedIdForDelete;
 
+    private boolean showServiceTable;
+
     @Override
     protected void preLoad() throws PersistenceBeanException {
         setMultiRequestMap(new HashMap());
@@ -395,6 +398,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
             InstantiationException, IllegalAccessException {
+        setShowServiceTable(Boolean.TRUE);
         setOfficeList(ComboboxHelper.fillList(Office.class, Order.asc("description")));
         setFiduciaryList(ComboboxHelper.fillList(ClientView.class, Order.asc("name"), new Criterion[]{
                 Restrictions.and(Restrictions.eq("fiduciary", Boolean.TRUE),
@@ -622,7 +626,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 setSelectedClientId(mail.getClient().getId());
             }
         }
-        openRequestSubjectDialog();
+        openRequestSubjectDialog(Boolean.FALSE);
         if(ValidationHelper.isNullOrEmpty(this.getEntity().getUser())) {
             this.getEntity().setUser(DaoManager.get(User.class, getCurrentUser().getId()));
         }
@@ -1226,7 +1230,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }
     }
 
-    public boolean valid() {
+    public boolean valid() throws PersistenceBeanException, IllegalAccessException {
         if (isMultipleCreate() && getActiveMenuTabNum() == 0) {
             return validSubject();
         } else if ((!isMultipleCreate() && getActiveMenuTabNum() == 0)
@@ -1235,7 +1239,52 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         } else if (!isMultipleRequestCreate() && !ValidationHelper.isNullOrEmpty(getInputCardList()) &&
                 getActiveMenuTabNum() <= getInputCardList().size()) {
             return validGeneratedTab();
-        } else return true;
+        } else if (isMultipleCreate() && getActiveMenuTabNum() == 2) {
+
+            this.cleanValidation();
+
+            if( getEntity().isNew() && ValidationHelper.isNullOrEmpty(getRegSubjectList())){
+                if (ValidationHelper.isNullOrEmpty(getSelectedRequestTypesIdMultiple())) {
+                    addRequiredFieldException("form:servicerequestType");
+                }
+                if(!ValidationHelper.isNullOrEmpty(getSelectedRequestTypesIdMultiple())){
+                    try {
+                        if(!ValidationHelper.isNullOrEmpty(getRequestTypeMultiple())
+                                && getRequestTypeMultiple()){
+                            if (ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
+                                addRequiredFieldException("form:multipleServiceRequest");
+                            }
+                        }else {
+                            if (ValidationHelper.isNullOrEmpty(getSelectedServiceId())) {
+                                addRequiredFieldException("form:singleServiceRequest");
+                            }
+                        }
+                    } catch (Exception e) {
+                        LogHelper.log(log, e);
+                    }
+                }
+                return !getValidationFailed();
+            }else if(!getEntity().isNew()){
+                if (!ValidationHelper.isNullOrEmpty(getSelectedRequestTypesIdMultiple())) {
+                    try {
+                        if(!ValidationHelper.isNullOrEmpty(getRequestTypeMultiple())
+                                && getRequestTypeMultiple()){
+                            if (ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
+                                addRequiredFieldException("form:multipleServiceRequest");
+                            }
+                        }else {
+                            if (ValidationHelper.isNullOrEmpty(getSelectedServiceId())) {
+                                addRequiredFieldException("form:singleServiceRequest");
+                            }
+                        }
+                    } catch (Exception e) {
+                        LogHelper.log(log, e);
+                    }
+                }
+                return !getValidationFailed();
+            }
+            return true;
+        }else return true;
     }
 
     private boolean validGeneratedTab() {
@@ -1569,6 +1618,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             //
             if(!redirect){
                 insertNewRequest();
+                setShowServiceTable(Boolean.TRUE);
             }else {
                 int index = 0;
                 List<Request> newRequests = new ArrayList<>();
@@ -1626,10 +1676,11 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                         setUpdatedNewRequestList(new ArrayList<>());
                     getUpdatedNewRequestList().addAll(newRequests);
                 }
-                pageSave();
+               // pageSave();
+                saveData();
             }
             executeJS("PF('requestSaved').show();");
-            executeJS("setTimeout(function(){PF('requestSaved').hide();}, 2000);");
+            executeJS("setTimeout(function(){PF('requestSaved').hide();}, 500);");
             // openRequestSubjectDialog();
             setShownFields(null);
             setHiddenFields(null);
@@ -1640,6 +1691,76 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             setInputCardList(null);
             setHiddenInputCardList(null);
             setWrapper(new RequestWrapper(getEntity(), isMultipleCreate(), false, true));
+        }
+    }
+
+    private void saveData() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        if(!getEntity().isNew()){
+            pageSave();
+        }else {
+            Subject subject = null;
+            if (this.getSaveFlag() == 0) {
+                try {
+                    this.cleanValidation();
+                    this.setValidationFailed(false);
+                    this.onValidate();
+                    if (this.getValidationFailed()) {
+                        return;
+                    }
+                } catch (Exception e) {
+                    LogHelper.log(log, e);
+                    e.printStackTrace();
+                    return;
+                }
+
+            }
+            for(int index =0; index < emptyIfNull(getNewRequestList()).size() ; index++){
+                Request newRequest = getNewRequestList().get(index);
+                prepareRequestToSave(newRequest);
+                if(index == 0){
+                    subject = newRequest.getSubject();
+                }else {
+                    newRequest.setSubject(subject);
+                }
+                try {
+                    this.tr = DaoManager.getSession().beginTransaction();
+
+                    this.setSaveFlag(1);
+
+                    saveAllDataRelatedToRequestOrNotify(newRequest , index == 0 ? true: false);
+                } catch (Exception e) {
+                    if (this.tr != null) {
+                        this.tr.rollback();
+                    }
+                    LogHelper.log(log, e);
+                    MessageHelper.addGlobalMessage(FacesMessage.SEVERITY_ERROR, "",
+                            ResourcesHelper.getValidation("objectEditedException"));
+                } finally {
+                    if (this.tr != null && !this.tr.wasRolledBack()
+                            && this.tr.isActive()) {
+                        try {
+                            this.tr.commit();
+                        } catch (StaleObjectStateException e) {
+                            MessageHelper
+                                    .addGlobalMessage(
+                                            FacesMessage.SEVERITY_ERROR,
+                                            "",
+                                            ResourcesHelper
+                                                    .getValidation("exceptionOccuredWhileSaving"));
+                            LogHelper.log(log, e);
+                        } catch (Exception e) {
+                            LogHelper.log(log, e);
+                            e.printStackTrace();
+                        }
+                    }
+                    this.setSaveFlag(0);
+                }
+
+            }
+
+            if (isRunAfterSave()) {
+                this.afterSave();
+            }
         }
     }
 
@@ -1682,6 +1803,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             newRequest = new Request();
         }
         newRequest.setRequestType(DaoManager.get(RequestType.class, getSelectedRequestTypesIdMultiple()));
+        newRequest.setCreateDate(new Date());
         if (isMultipleCreate() && !ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
             List<Service> serviceList = DaoManager.load(Service.class, new Criterion[]{
                     Restrictions.in("id", Arrays.asList(getSelectedServiceIds()).stream().collect(Collectors.toList()))
@@ -1767,7 +1889,6 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             serviceRequestWrapper.setBillingClientId(newRequest.getBillingClient().getId());
         if(!ValidationHelper.isNullOrEmpty(newRequest.getType()))
             serviceRequestWrapper.setTypeId(newRequest.getType().getId());
-        serviceRequestWrapper.setClientName(newRequest.getClientName());
         if(!ValidationHelper.isNullOrEmpty(newRequest.getRequestType()))
             serviceRequestWrapper.setRequestTypeId(newRequest.getRequestType().getId());
         if(!ValidationHelper.isNullOrEmpty(newRequest.getService()))
@@ -1823,6 +1944,9 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 newRequest.getAggregationLandCharRegName());
         if(!ValidationHelper.isNullOrEmpty(newRequest.getClientFiduciary()))
             serviceRequestWrapper.setFiduciaryId(newRequest.getClientFiduciary().getId());
+        if(newRequest.getSubject() != null){
+            serviceRequestWrapper.setReverseName(newRequest.getSubject().getFullName());
+        }
         serviceRequestWrapper.setManagerId(newRequest.getManagerId());
         serviceRequestWrapper.setId(newRequest.getId());
         serviceRequestWrapper.setCreateUserId(newRequest.getCreateUserId());
@@ -1833,6 +1957,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         getRegSubjectList().add(serviceRequestWrapper);
 
     }
+
     private void setRequestData(Request request) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         if(isMultipleRequestCreate()){
             request.setRequestCreationType(RequestCreationType.MULTIPLE);
@@ -1920,7 +2045,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         } else {
             request.setClientFiduciary(null);
         }
-
+        request.setNote(getEntity().getNote());
         if (getSubject() != null) {
             Subject tempSubject  = getSubject();
             SubjectHelper.fillSubjectFromWrapper(tempSubject, getWrapper());
@@ -2132,9 +2257,10 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 index++;
             }
         }else {
-            int index = 0;
             Subject subject = null;
-            for(Request newRequest : emptyIfNull(getNewRequestList())){
+
+            for(int index =0; index < emptyIfNull(getNewRequestList()).size() ; index++){
+                Request newRequest = getNewRequestList().get(index);
                 prepareRequestToSave(newRequest);
                 if(index == 0){
                     subject = newRequest.getSubject();
@@ -2142,11 +2268,19 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                     newRequest.setSubject(subject);
                 }
                 saveAllDataRelatedToRequestOrNotify(newRequest , index == 0 ? true: false);
-                index++;
             }
+//            for(Request newRequest : emptyIfNull(getNewRequestList())){
+//                prepareRequestToSave(newRequest);
+//                if(index == 0){
+//                    subject = newRequest.getSubject();
+//                }else {
+//                    newRequest.setSubject(subject);
+//                }
+//                saveAllDataRelatedToRequestOrNotify(newRequest , index == 0 ? true: false);
+//                index++;
+//            }
         }
-
-
+        afterSave();
     }
     // @Override
     public void onSave_Old() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -2850,6 +2984,19 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     }
 
 
+    private void saveAllDataRelatedToRequestOrNotify(Request entity, Boolean saveSubject, Boolean redirect) throws PersistenceBeanException,
+            InstantiationException, IllegalAccessException {
+        getWrapper().saveFields(entity, saveSubject);
+        saveMultipleSubjects(entity);
+        List<Request> sameRequestList = getSameRequestsIfExist(entity);
+        if (!findAppropriateRequest(sameRequestList)) {
+            saveToDB(entity, false);
+        } else {
+            setShouldBeRedirected(false);
+            notifyUser();
+        }
+    }
+
     private void saveMultipleSubjects(Request request) throws IllegalAccessException, PersistenceBeanException, InstantiationException {
         if (!ValidationHelper.isNullOrEmpty(getSubjectWrapperList())) {
             if (ValidationHelper.isNullOrEmpty(request.getSubjectList())) {
@@ -2928,7 +3075,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             setShouldBeRedirected(getRedirected());
         else
             setShouldBeRedirected(true);
-        afterSave();
+
+        //afterSave();
     }
 
     private void notifyUser() throws PersistenceBeanException, IllegalAccessException {
@@ -3166,26 +3314,48 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         setSelectedServiceIds(new Long[]{});
         setShownFields(null);
         setHiddenFields(null);
-        RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 2000);");
+        RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 500);");
     }
 
     public void onMultipleServiceChangeBlock() throws PersistenceBeanException, IllegalAccessException {
         RequestContext.getCurrentInstance().execute("jQuery('.layout-mask')[0].style.display = 'block';");
         onMultipleServiceChange();
-        RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 2000);");
+        RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 500);");
     }
 
     public void onMultipleServiceChanges() throws IllegalAccessException, PersistenceBeanException {
         onMultipleServiceChange();
-        if(isMultipleRequestCreate() && (!ValidationHelper.isNullOrEmpty(getSelectedServiceIds()) ||
-                !ValidationHelper.isNullOrEmpty(getSelectedServiceId()))){
-            setShowConfirmButton(Boolean.TRUE);
-            generateDynamicContent(true);
-        }else {
-            setShowConfirmButton(Boolean.FALSE);
+        boolean reset = true;
+        if(isMultipleRequestCreate()){
+            if(!ValidationHelper.isNullOrEmpty(getRequestTypeMultiple())
+                    && getRequestTypeMultiple() && !ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
+                setShowConfirmButton(Boolean.TRUE);
+            }else if((!ValidationHelper.isNullOrEmpty(getRequestTypeMultiple())
+                    && getRequestTypeMultiple() && ValidationHelper.isNullOrEmpty(getSelectedServiceIds()))){
+                setShowConfirmButton(Boolean.FALSE);
+                reset = true;
+            }else if(!ValidationHelper.isNullOrEmpty(getSelectedServiceId())){
+                reset = false;
+                setShowConfirmButton(Boolean.FALSE);
+                generateDynamicContent(true);
+            }
+        }
+        if(reset){
             setShownFields(null);
             setHiddenFields(null);
         }
+//        if(isMultipleRequestCreate()
+//                && ((!ValidationHelper.isNullOrEmpty(getRequestTypeMultiple())
+//                && getRequestTypeMultiple() && !ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) ||
+//                !ValidationHelper.isNullOrEmpty(getSelectedServiceId()))
+//        ){
+//            setShowConfirmButton(Boolean.TRUE);
+//            generateDynamicContent(true);
+//        }else {
+//            setShowConfirmButton(Boolean.FALSE);
+//            setShownFields(null);
+//            setHiddenFields(null);
+//        }
     }
 
     public void generateDynamicContent(Boolean showLoader) throws PersistenceBeanException, IllegalAccessException {
@@ -3197,7 +3367,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             generateHiddenFields();
         }
         if(showLoader)
-            RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 2000);");
+            RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 500);");
     }
 
     public Long getSelectedClientId() {
@@ -3933,7 +4103,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     }
 
-    public void openRequestSubjectDialog() throws HibernateException, PersistenceBeanException, IllegalAccessException, InstantiationException{
+    public void openRequestSubjectDialog(boolean isDeleted) throws HibernateException, PersistenceBeanException, IllegalAccessException, InstantiationException{
         Subject aSubject = null;
         if(getEntity().isNew()){
             aSubject =  SubjectHelper.getSubjectIfExists(getSubject(),getWrapper().getSelectedPersonId());
@@ -3942,7 +4112,9 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }
         if (getNewRequestList() == null)
             setNewRequestList(new ArrayList<>());
-        if(!getEntity().isNew()){
+
+        if(!getEntity().isNew() && !isDeleted){
+            getEntity().setTempId(UUID.randomUUID().toString());
             getNewRequestList().add(getEntity());
         }
         setSubjectListServiceIds(new HashMap<>());
@@ -4206,10 +4378,17 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                     DaoManager.save(request, true);
                 }
                 getRegSubjectList().removeIf(s -> s.getTempId().equalsIgnoreCase(getSelectedIdForDelete()));
-                if(!ValidationHelper.isNullOrEmpty(getNewRequestList()))
-                    getNewRequestList().removeIf(s -> s.getTempId().equalsIgnoreCase(getSelectedIdForDelete()));
+                if(!ValidationHelper.isNullOrEmpty(getNewRequestList())){
+                    getNewRequestList().removeIf(s -> !ValidationHelper.isNullOrEmpty(s.getTempId()) &&
+                            s.getTempId().equalsIgnoreCase(getSelectedIdForDelete()));
+
+                    getRegSubjectList().removeIf(s -> !ValidationHelper.isNullOrEmpty(s.getTempId()) &&
+                            s.getTempId().equalsIgnoreCase(getSelectedIdForDelete()));
+                }
+
                 if(!ValidationHelper.isNullOrEmpty(getUpdatedNewRequestList()))
-                    getUpdatedNewRequestList().removeIf(s -> s.getTempId().equalsIgnoreCase(getSelectedIdForDelete()));
+                    getUpdatedNewRequestList().removeIf(s -> !ValidationHelper.isNullOrEmpty(s.getTempId()) &&
+                            s.getTempId().equalsIgnoreCase(getSelectedIdForDelete()));
             }
         }
     }
@@ -4220,5 +4399,13 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void setUpdatedNewRequestList(List<Request> updatedNewRequestList) {
         this.updatedNewRequestList = updatedNewRequestList;
+    }
+
+    public boolean isShowServiceTable() {
+        return showServiceTable;
+    }
+
+    public void setShowServiceTable(boolean showServiceTable) {
+        this.showServiceTable = showServiceTable;
     }
 }

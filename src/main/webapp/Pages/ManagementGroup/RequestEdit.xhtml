@@ -19,7 +19,7 @@
                 width: 100% !important;
             }
 
-            body .ui-button {
+            body .ui-button:not(#editButton)  {
                 margin-right: 3px !important;
                 background: #3582b8;
             }
@@ -111,14 +111,7 @@
             body .ui-button.ui-button-success {
                 background: #00CC52 !important;
             }
-            #changeUserDlg {
-                border: 2px solid #57c279;
-            }
-            #changeUserDlg .ui-dialog-titlebar {
-                border-bottom: none;
-                background: #f8f9fa !important;
-                color: #000;
-            }
+
             .dynamic-fields input{
                 width : 98% !important;
             }
@@ -312,12 +305,9 @@
                 margin-top: -0.6rem;
                 font-size: 16px;
             }
-            #requestDelete {
-                border: 2px solid #57c279;
-            }
 
-            #requestDelete  .ui-widget-header {
-                background-color: #f8f9fa !important;
+            #editButton .ui-button-icon-left {
+                color:#000066 !important;
             }
             .shopping-cart-icon {
                 background-image: url("../../resources/images/shopping-cart.png");
@@ -496,7 +486,7 @@
                 <p:column>
                     <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
                         <c:if test="#{objItem.contains('URGENT')}">
-                            <div class="ui-g-6 ih36" style="padding: 0;margin-top: 35px;margin-left: -6px;">
+                            <div class="ui-g-6 ih36" style="padding: 0;margin-top:40px;text-align: left;">
                                 <ui:include src="#{objItem}"/>
                             </div>
                         </c:if>
@@ -525,7 +515,7 @@
                             <span> #{msg.requestRequestType}<span class="red">*</span>:</span><br/>
                             <p:selectOneMenu id="servicerequestType" value="#{bean.selectedRequestTypesIdMultiple}"
                                              label="#{msg.requestRequestType}" styleClass="select-width" style="min-height: 37px;">
-                                <p:ajax delay="500" event="change" listener="#{bean.onRequestTypeChangeBlock}"
+                                <p:ajax event="change" listener="#{bean.onRequestTypeChangeBlock}"
                                         update="form @this"/>
                                 <f:selectItems value="#{bean.requestTypes}"/>
                             </p:selectOneMenu>
@@ -535,7 +525,7 @@
                             <span> #{msg.requestService}<span class="red">*</span>:</span><br/>
                             <p:selectOneMenu id="singleServiceRequest" value="#{bean.selectedServiceId}"
                                              label="#{msg.requestRequestType}" styleClass="select-width" style="min-height: 37px;">
-                                <p:ajax delay="2000" event="change" listener="#{bean.onMultipleServiceChanges()}"
+                                <p:ajax event="change" listener="#{bean.onMultipleServiceChanges()}"
                                         update="form @this" />
                                 <f:selectItem itemValue="" itemLabel="- Non selezionato -" />
                                 <f:selectItems value="#{bean.services}"/>
@@ -548,7 +538,7 @@
                             <p:selectCheckboxMenu value="#{bean.selectedServiceIds}" id="multipleServiceRequest" multiple="true"
                                                   label="#{msg.requestService}"
                                                   styleClass="select-width" style="min-height: 37px;">
-                                <p:ajax delay="2000" event="change" listener="#{bean.onMultipleServiceChanges()}" update="form @this" />
+                                <p:ajax delay="1000" event="change" listener="#{bean.onMultipleServiceChanges()}" update="form @this" />
                                 <f:selectItems value="#{bean.services}"/>
                             </p:selectCheckboxMenu>
                         </h:panelGroup>
@@ -556,12 +546,24 @@
 
 <!--                        </div>-->
                         <div style="padding-top: 1%;">
-<!--                            <p:commandButton id="confirmButton" value="#{msg.submit}"-->
-<!--                                             update="form @this" style="margin-top: 16px;"-->
-<!--                                             styleClass="ui-button-success"-->
-<!--                                             action="#{bean.generateDynamicContent(true)}"-->
-<!--                                             rendered="#{bean.showConfirmButton}"/>-->
+                            <p:commandButton id="confirmButton" value="#{msg.submit}"
+                                             update="form @this" style="margin-top: 16px;"
+                                             styleClass="ui-button-success"
+                                             action="#{bean.generateDynamicContent(true)}"
+                                             rendered="#{bean.showConfirmButton and bean.requestTypeMultiple}"/>
                         </div>
+<!--                        <div id="request-btns" style="padding-top: 1%;">-->
+<!--                            <p:commandButton style="margin-top: 20px;"-->
+<!--                                             id="addRequestService"-->
+<!--                                             action="#{bean.validateMultipleRequest(false)}"-->
+<!--                                             value="#{msg.addRequestService.toUpperCase()}"-->
+<!--                                             icon="shopping-cart-icon" styleClass="ui-button-success" iconPos="right"-->
+<!--                                             update="saveMultipleRequest table newRequestList servicerequestType multipleServiceRequest form"-->
+<!--                                             disabled="#{bean.selectedRequestTypesIdMultiple eq null}"-->
+<!--                                             rendered="#{bean.showAddServiceButton and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2-->
+<!--                                                            and bean.multipleRequestCreate}"/>-->
+<!--                            <div style="clear: both"></div>-->
+<!--                        </div>-->
                     </div>
                 </c:if>
 <!--                <c:forEach rendered="#{not empty bean.shownFields}" items="#{bean.shownFields}" var="item">-->
@@ -661,13 +663,12 @@
                 rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)
                 or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)}">
             <p:panel id="userAddPanel" style="margin-top: 1%">
-                <span>#{msg.requestUserChange}:</span><br/>
+                <span>#{msg.requestUserChange}:</span>
                 <ui:fragment rendered="#{!empty bean.entity.userName}">
-                    <span><i class="fa fa-user"/></span>
+                    <span style="margin-left:10px"><i class="fa fa-user"/></span>
                 </ui:fragment>
                 <h:outputText value="#{bean.entity.userName}"/>
                 <br/>
-
                 <p:commandButton value="#{msg.requestUserChangeBtn}" oncomplete="PF('changeUserDlgWV').show();"
                                  styleClass="grey-btn"/>
             </p:panel>
@@ -704,13 +705,13 @@
 
 <!--        <ui:include src="../Dialogs/RequestSubjectDialog.xhtml" />-->
 
-        <p:dialog id="saveDlg" widgetVar="saveDlgWV" modal="true" onShow="setTimer();" onHide="stopTimer();"
+        <p:dialog id="saveDlg" widgetVar="saveDlgWV" modal="true" onShow="setTimer();" onHide="stopTimer();" styleClass="dialog-green dialog-green-width"
                   resizable="false" draggable="false" effect="SLIDE">
             <p:outputLabel value="#{msg.requestListSave}"/>
 
         </p:dialog>
 
-        <p:dialog id="changeUserDlg" widgetVar="changeUserDlgWV" modal="true"
+        <p:dialog id="changeUserDlg" widgetVar="changeUserDlgWV" modal="true" styleClass="dialog-green"
                   resizable="false" draggable="false" effect="SLIDE"
                   header="#{msg.requestUserChangeDlg}">
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid">
@@ -729,7 +730,7 @@
             </div>
         </p:dialog>
 
-        <p:dialog id="saveMultipleRequest" widgetVar="multipleRequestSave" modal="true"
+        <p:dialog id="saveMultipleRequest" widgetVar="multipleRequestSave" modal="true" styleClass="dialog-green"
                   resizable="false" draggable="false" effect="SLIDE"
                   header="#{msg.requestUserChangeDlg}">
             <span>
@@ -811,7 +812,7 @@
                 <p:commandButton value="#{msg.submit}" oncomplete="PF('diffFiscalCodeWV').hide()"/>
             </div>
         </p:dialog>
-        <p:dialog id="requestSaved" widgetVar="requestSaved" modal="true" closable="false"
+        <p:dialog id="requestSaved" widgetVar="requestSaved" modal="true" closable="false" styleClass="dialog-green"
                   resizable="false" draggable="false" effect="SLIDE" style="border: 1px solid #00CC52;">
             <span>
                 <h:outputText value="#{msg.requestListSave}"/>
@@ -851,9 +852,9 @@
                                          onclick="previous(#{bean.activeMenuTabNum}, #{bean.topMenuModel.getElements().size()-1});" icon="fa fa-arrow-left" styleClass="nav-button"/>
                     </div>
                     <div class="ui-g-6" style="text-align:right;">
-                        <p:commandButton id="nextButton" value="#{msg.next}" rendered="#{bean.activeMenuTabNum != bean.topMenuModel.getElements().size()-1}" update="@form :buttonFragment"
+                        <p:commandButton id="nextButton" value="#{msg.next}" rendered="#{bean.activeMenuTabNum != bean.topMenuModel.getElements().size()-1}" update=":form:messages :form:pageTabMenu :buttonFragment"
                                          onclick="next(#{bean.activeMenuTabNum}, #{bean.topMenuModel.getElements().size()-1});"  icon="fa fa-arrow-right" styleClass="nav-button"/>
-                        <p:commandButton id="editButton" action="#{bean.editTable}" update="@form :buttonFragment" style="position: absolute;margin-top: 64px;right: 70px;"
+                        <p:commandButton id="editButton" action="#{bean.editTable}" update="@form :buttonFragment" style="position: absolute;margin-top: 64px;right: 70px;" styleClass="editButton"
                                          onclick="setTab(0);"
                                          icon="pi pi-pencil" rendered="#{!bean.regSubjectList.isEmpty() and (bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size() - 2 ) or (!bean.multipleRequestCreate and not empty bean.shownFields)}" />
                     </div>
@@ -1059,11 +1060,13 @@
 
                     <p:column styleClass=" action_midle_column al-cen-fx"
                               headerText="" style="width: 4vw;min-width: 81px;">
-                        <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"  oncomplete="PF('dlg2').show()"
-                                         disabled="#{!bean.canDelete}">
-                            <f:setPropertyActionListener value="#{item.tempId}"
-                                                         target="#{bean.selectedIdForDelete}"/>
-                        </p:commandButton>
+                        <div class="btn_line">
+                            <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"  oncomplete="PF('dlg2').show()"
+                                             disabled="#{!bean.canDelete}">
+                                <f:setPropertyActionListener value="#{item.tempId}"
+                                                             target="#{bean.selectedIdForDelete}"/>
+                            </p:commandButton>
+                        </div>
                     </p:column>
                     <ui:remove>
                         <p:column styleClass=" min_padding_margin" headerText="#{ff:upper(msg.requestListOpenEditor)}"
@@ -1083,7 +1086,7 @@
                 <div class="ui-g-2" id="request-btns-1" style="margin-top:2%;text-align:right;">
                     <p:commandButton action="#{bean.validateMultipleRequest(true)}" value="#{bean.multipleRequestCreate ? msg.saveAndClose.toUpperCase() : msg.save.toUpperCase() }"
                                      icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left"
-                                     rendered="#{(bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2)
+                                     rendered="#{!bean.regSubjectList.isEmpty() and (bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2)
                                      or ((bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)
                 or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1))}"/>
 
@@ -1341,13 +1344,13 @@
                     </p:dataTable>
                 </p:scrollPanel>
             </p:dialog>
-            <p:dialog id="requestDelete" widgetVar="dlg2" modal="true" resizable="false" draggable="false" effect="SLIDE" width="400" >
+            <p:dialog id="requestDelete" widgetVar="dlg2" modal="true" resizable="false" draggable="false" effect="SLIDE" styleClass="dialog-green dialog-green-width" >
                 #{msg.deleteConfirmation}<br/>
                 <br/>
                 <div class="btn_line">
                     <p:commandButton value="#{msg.confirm}" action="#{bean.deleteEntity}" style="margin-right: 20px !important;background-color: #00CC52!important;"
                                      oncomplete="PF('dlg2').hide();"
-                                     update="table,:form:messages"/>
+                                    update=":form:table :form:messages newRequestList :form"/>
                     <p:commandButton value="#{msg.cancel}" onclick="PF('dlg2').hide()" style="background-color: #F3362B !important;"/>
                 </div>
             </p:dialog>

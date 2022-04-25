@@ -196,9 +196,9 @@
 
 
     </p:dialog>
-    <p:dialog id="reloadPageDialog" header="Note!"
-              widgetVar="reloadPageDialogWV" height="100px">
-        #{msg.reloadPageMessage} <br />
+    <p:dialog id="reloadPageDialog" header="Note!" styleClass="dialog-green dialog-green-width"
+              widgetVar="reloadPageDialogWV">
+    #{msg.reloadPageMessage} <br />
         <div class="btn_line">
             <p:commandButton value="#{msg.confirm}" update="@form"
                              action="#{bean.reloadPage}"

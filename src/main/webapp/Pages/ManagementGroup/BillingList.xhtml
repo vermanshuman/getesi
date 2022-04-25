@@ -596,7 +596,6 @@
             #filterClient_items {
                 width: 305px !important;
             }
-
             .actionPnl-tooltip {
                 text-align:center; width:140px; background-color: #6688AA !important;border-radius: 7px !important; border: 1px solid #FFFFFF; opacity: 0.8;
             }
@@ -1005,7 +1004,7 @@
                                     <div class="p-col-3" style="padding-bottom: 0px !important;">
                                         <div class="p-formgroup-inline">
                                             <div class="p-field">
-                                                <p:commandButton value="#{msg.billingListCreateInvoice}" id="createInvoice" action="#{bean.loadInvoiceDialogData}"
+                                                <p:commandButton value="#{msg.billingListCreateInvoice}" id="createInvoice" action="#{bean.loadInvoiceDialogData(null)}"
                                                                  update=":invoiceDialogBilling"
                                                                  oncomplete="PF('invoiceDialogBillingWV').show();"
                                                                  styleClass="ui-button-success p-mr-2 p-mb-2"/>
@@ -1177,25 +1176,32 @@
                                         styleClass="#{invoice.status == null ? 'orange-button' : (invoice.status.getId() == 1 ? 'orange-button' : (invoice.status.getId() == 3 ? 'green-button' : (invoice.status.getId() == 4 ? 'red-button' : 'button')))  }">
                                 </p:commandButton>
                             </p:column>
-                            <p:column headerText="#{msg.billingListAmount}" sortBy="#{invoice.totalAmount}">
-                                <h:outputText value="#{invoice.totalAmount}"/>
+                            <p:column headerText="#{msg.billingListAmount}" sortBy="#{invoice.totalGrossAmount}">
+                                <h:outputText value="#{invoice.totalGrossAmount}"/>
                             </p:column>
                             <p:column headerText="#{msg.billingListOnBalance}" sortBy="#{invoice.onBalance}">
-                                <h:outputText value="#{invoice.onBalance}"/>
+                                <p:commandButton id="openinvoice-payment" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
+                                                 action="#{bean.loadInvoiceDialogDataPayment(invoice)}" oncomplete="PF('invoiceDialogBillingWV').show();" update="invoiceDialogBilling">
+                                </p:commandButton>
+                                <p:commandLink value="#{invoice.onBalance}" onclick="document.getElementById('invoiceTable:#{rowId}:openinvoice-payment').click()"/>
                             </p:column>
                             <p:column rendered="#{invoice.email.id == null}">
+                                <p:commandButton id="openinvoice-btn" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
+                                                 action="#{bean.loadInvoiceDialogDataEdit(invoice)}" oncomplete="PF('invoiceDialogBillingWV').show();" update="invoiceDialogBilling">
+                                    <!-- <f:setPropertyActionListener value="#{item.id}"
+                                                                 target="#{bean.entityEditId}"/> -->
+                                </p:commandButton>
                                 <div class="icon-block">
                                     <i class="email-icon-new"></i>
-                                    <p:commandLink id="table_actionPnl" global="false" style="outline: none;" immediate="true"
+                                    <p:commandLink id="actionPnl" global="false" style="outline: none;" immediate="true"
                                                    readonly="true">
                                         <i class="menu-dots-icon" style="font-size: x-large;"
-                                           onmouseover="document.getElementById('table_actionPnl').focus();" />
+                                           onmouseover="document.getElementById('invoiceTable:#{rowId}:actionPnl').focus();" />
                                     </p:commandLink>
-                                    <p:tooltip for="table_actionPnl" hideEvent="blur" showEvent="focus" styleClass="actionPnl-tooltip">
+                                    <p:tooltip for="actionPnl" hideEvent="blur" showEvent="focus" styleClass="actionPnl-tooltip">
                                         <p:outputPanel id="actionGrid" styleClass="actionPnl-panel">
                                             <p:commandButton value="#{ff:upper(msg.dataVerification)}" class="action-btn"
-                                                             action="#{bean.loadInvoiceDialogDataEdit(invoice)}"
-                                                             update=":invoiceDialogBilling"
+                                                             onclick="document.getElementById('invoiceTable:#{rowId}:openinvoice-btn').click()"
                                                              oncomplete="PF('invoiceDialogBillingWV').show();"
                                                              style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;">
                                             </p:commandButton>

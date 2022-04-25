@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ServiceWrapper implements Serializable {
@@ -117,39 +118,78 @@ public class ServiceWrapper implements Serializable {
     }
 
     public void fillTaxRateExtraCostLists() {
-        if (ValidationHelper.isNullOrEmpty(getTaxRateExtraCosts())) {
+        this.taxRateExtraCosts.clear();
+       /* if (ValidationHelper.isNullOrEmpty(getTaxRateExtraCosts())) {
             TaxRateExtraCost mortgageCosts = new TaxRateExtraCost();
+            mortgageCosts.setExtraCostType(ExtraCostType.IPOTECARIO);
             TaxRateExtraCost landRegistryCosts = new TaxRateExtraCost();
+            landRegistryCosts.setExtraCostType(ExtraCostType.CATASTO);
             TaxRateExtraCost stamps = new TaxRateExtraCost();
+            stamps.setExtraCostType(ExtraCostType.MARCA);
             TaxRateExtraCost postalCosts = new TaxRateExtraCost();
+            postalCosts.setExtraCostType(ExtraCostType.POSTALE);
             TaxRateExtraCost other = new TaxRateExtraCost();
+            other.setExtraCostType(ExtraCostType.ALTRO);
             taxRateExtraCosts.add(mortgageCosts);
             taxRateExtraCosts.add(landRegistryCosts);
             taxRateExtraCosts.add(stamps);
             taxRateExtraCosts.add(postalCosts);
             taxRateExtraCosts.add(other);
-
-            try {
-                List<TaxRateExtraCost> taxRateExtraCosts = DaoManager.load(TaxRateExtraCost.class, new Criterion[]{
-                        Restrictions.eq("service.id", getService().getId()),
-                        Restrictions.eq("clientId", getClient().getId())
-                });
-                for (TaxRateExtraCost taxRateExtraCost :taxRateExtraCosts) {
-                    if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.IPOTECARIO)) {
-                        this.taxRateExtraCosts.get(0).setTaxRateExtraCost(taxRateExtraCost);
-                    } else if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.CATASTO)) {
-                        this.taxRateExtraCosts.get(1).setTaxRateExtraCost(taxRateExtraCost);
-                    } else if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.MARCA)) {
-                        this.taxRateExtraCosts.get(2).setTaxRateExtraCost(taxRateExtraCost);
-                    } else if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.POSTALE)) {
-                        this.taxRateExtraCosts.get(3).setTaxRateExtraCost(taxRateExtraCost);
-                    } else if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.ALTRO)) {
-                        this.taxRateExtraCosts.get(4).setTaxRateExtraCost(taxRateExtraCost);
+        }
+*/
+        try {
+            List<TaxRateExtraCost> taxRateExtraCosts = DaoManager.load(TaxRateExtraCost.class, new Criterion[]{
+                    Restrictions.eq("service.id", getService().getId()),
+                    Restrictions.eq("clientId", getClient().getId())
+            });
+            if(ValidationHelper.isNullOrEmpty(taxRateExtraCosts)){
+                for (ExtraCostType extraCostType : ExtraCostType.values()) {
+                    if(!extraCostType.equals(ExtraCostType.NAZIONALEPOSITIVA)){
+                        TaxRateExtraCost taxRateExtraCost = new TaxRateExtraCost();
+                        taxRateExtraCost.setExtraCostType(extraCostType);
+                        taxRateExtraCost.setService(getService());
+                        this.getTaxRateExtraCosts().add(taxRateExtraCost);
                     }
                 }
-            } catch (Exception e) {
-                LogHelper.log(log, e);
+            } else {
+                taxRateExtraCosts
+                        .stream()
+                        .forEach(t -> {
+                            if(!ValidationHelper.isNullOrEmpty(t.getTaxRate()))
+                                t.setTaxRateId(t.getTaxRate().getId());
+                        });
+                this.getTaxRateExtraCosts().addAll(taxRateExtraCosts);
+                for (ExtraCostType extraCostType : ExtraCostType.values()) {
+                    if(!extraCostType.equals(ExtraCostType.NAZIONALEPOSITIVA)){
+                        Optional<TaxRateExtraCost> taxRateExtraCost = this.getTaxRateExtraCosts()
+                                .stream()
+                                .filter(trec -> !ValidationHelper.isNullOrEmpty(trec.getExtraCostType())
+                                        && trec.getExtraCostType().equals(extraCostType))
+                                .findFirst();
+                        if(!taxRateExtraCost.isPresent()){
+                            TaxRateExtraCost missingTaxRateExtraCost = new TaxRateExtraCost();
+                            missingTaxRateExtraCost.setExtraCostType(extraCostType);
+                            missingTaxRateExtraCost.setService(getService());
+                            this.getTaxRateExtraCosts().add(missingTaxRateExtraCost);
+                        }
+                    }
+                }
             }
+//            for (TaxRateExtraCost taxRateExtraCost :taxRateExtraCosts) {
+//                if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.IPOTECARIO)) {
+//                    this.taxRateExtraCosts.get(0).setTaxRateExtraCost(taxRateExtraCost);
+//                } else if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.CATASTO)) {
+//                    this.taxRateExtraCosts.get(1).setTaxRateExtraCost(taxRateExtraCost);
+//                } else if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.MARCA)) {
+//                    this.taxRateExtraCosts.get(2).setTaxRateExtraCost(taxRateExtraCost);
+//                } else if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.POSTALE)) {
+//                    this.taxRateExtraCosts.get(3).setTaxRateExtraCost(taxRateExtraCost);
+//                } else if(taxRateExtraCost.getExtraCostType().equals(ExtraCostType.ALTRO)) {
+//                    this.taxRateExtraCosts.get(4).setTaxRateExtraCost(taxRateExtraCost);
+//                }
+//            }
+        } catch (Exception e) {
+            LogHelper.log(log, e);
         }
     }
 

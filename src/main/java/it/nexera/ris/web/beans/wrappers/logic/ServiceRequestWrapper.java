@@ -139,7 +139,7 @@ public class ServiceRequestWrapper implements Serializable {
                 if (billingClient == null) {
                     clientName = client.toString();
                 } else {
-                    clientName = String.format("%s (%s)", client.toString(), billingClient.toString());
+                    clientName = String.format("%s (%s)", client, billingClient);
                 }
             }
         }

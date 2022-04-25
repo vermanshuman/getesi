@@ -7,6 +7,6 @@
                 xmlns:p="http://primefaces.org/ui">
 
     <span>#{enums.documentGenerationTagsULTIMA_RESIDENZA}<span class="red" style="#{block.isRequired()?'':'display:none;'}">*</span></span>
-    <p:inputText id="ULTIMA_RESIDENZA" value="#{bean.entity.ultimaResidenza}" styleClass="input-width" placeholder="Indirizzo, civico, citt&agrave;"/>
+    <p:inputText id="ULTIMA_RESIDENZA" value="#{bean.wrapper.ultimaResidenza}" styleClass="input-width" placeholder="Indirizzo, civico, citt&agrave;"/>
 
 </ui:composition>

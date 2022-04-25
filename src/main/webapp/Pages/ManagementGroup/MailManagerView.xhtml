@@ -37,7 +37,7 @@
                 padding: 0px !important;
             }
 
-            body .ui-widget-header {
+            .ui-dialog .ui-widget-header {
                 background: #f8f9fa !important;
                 color: #495057 !important;
             }
@@ -113,14 +113,7 @@
                 padding-left: 0 !important;
                 width: 122px;
             }
-            #saveConfirmationDialog{
-                border: 2px solid #57c279 !important;
 
-            }
-            #saveConfirmationDialog > .ui-dialog-titlebar{
-                height: 35px !important;
-                padding: 0px !important;
-            }
             body .ui-state-highlight {
                 color: #000 !important;
             }
@@ -170,7 +163,7 @@
             </script>
             <iframe id="mail_pdf_iframe" srcdoc="#{bean.mailPdf}"/>
         </p:outputPanel>
-        <p:dialog id="confirmReadDlg" widgetVar="confirmReadDlgWV"
+        <p:dialog id="confirmReadDlg" widgetVar="confirmReadDlgWV" styleClass="dialog-green"
                   draggable="false" modal="true" resizable="false">
             <h:outputText value="#{msg.confirmReadMessage}"/>
             <div class="btn_line">
@@ -180,7 +173,7 @@
                                  oncomplete="PF('confirmReadDlgWV').hide();"/>
             </div>
         </p:dialog>
-        <p:dialog widgetVar="imageFileDlgWV" width="300" draggable="false" modal="true" resizable="false"
+        <p:dialog widgetVar="imageFileDlgWV" width="300" draggable="false" modal="true" resizable="false" styleClass="dialog-green"
                   header="#{msg.mailManagerImgFiles}">
             <p:dataTable value="#{bean.entity.imgFiles}" var="img" styleClass="without-header">
                 <p:column>
@@ -229,25 +222,28 @@
             </div>
         </p:dialog>
 
-        <p:dialog id="chooseSingleOrMultipleRequestCreate" widgetVar="chooseSingleOrMultipleRequestCreateWV" modal="true" >
+        <p:dialog id="chooseSingleOrMultipleRequestCreate" widgetVar="chooseSingleOrMultipleRequestCreateWV" modal="true" styleClass="dialog-orange">
             <h:outputText value="#{bean.fieldsNotSetDialogMessage}"/>
             <br/>
             <h:outputText value="#{msg.mailManagerViewFieldsNotSetDialogMessageQuestion}"/>
             <br/>
-            <p:outputPanel style="margin-top:15px; margin-bottom:15px;">
-                <h:outputText value="#{msg.mailManagerViewSingleOrMultipleRequest}:" />
-            </p:outputPanel>
-            <p:outputPanel style="justify-content: center; display: flex">
-                <p:selectOneRadio value="#{bean.requestType}" unselectable="false">
-                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestBySubject}" itemValue="0"/>
-                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestForBuilding}" itemValue="1"/>
-                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestForLand}" itemValue="2"/>
-                </p:selectOneRadio>
-            </p:outputPanel>
+<!--            <p:outputPanel style="margin-top:15px; margin-bottom:15px;">-->
+<!--                <h:outputText value="#{msg.mailManagerViewSingleOrMultipleRequest}:" />-->
+<!--            </p:outputPanel>-->
+<!--            <p:outputPanel style="justify-content: center; display: flex">-->
+<!--                <p:selectOneRadio value="#{bean.requestType}" unselectable="false">-->
+<!--                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestBySubject}" itemValue="0"/>-->
+<!--                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestForBuilding}" itemValue="1"/>-->
+<!--                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestForLand}" itemValue="2"/>-->
+<!--                </p:selectOneRadio>-->
+<!--            </p:outputPanel>-->
             <br/>
             <div class="btn_line">
-                <p:commandButton value="#{msg.confirm}" update="@form" styleClass="confirm-button"
+                <p:commandButton value="#{msg.mailManagerViewRequestBySubject}" update="@form" styleClass="confirm-button"
+                                 style="margin-right: 15px;"
                                  action="#{bean.saveReference(true)}" oncomplete="PF('chooseSingleOrMultiplerequestCreateWV').hide();"/>
+                <p:commandButton value="#{msg.cancel}" oncomplete="PF('chooseSingleOrMultipleRequestCreateWV').hide();"
+                                 style="background-color: #F3362B !important; width: 100px;" />
             </div>
         </p:dialog>
 
