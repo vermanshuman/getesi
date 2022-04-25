@@ -322,10 +322,14 @@
             .shopping-cart-icon {
                 background-image: url("../../resources/images/shopping-cart.png");
                 background-position: 50%;
-                background-size: cover;
-                width: 24px;
-                height: 24px;
+                background-size: 78%;
+                width: 21px;
+                height: 21px;
                 margin-top: -11px !important;
+                margin-right: -3px !important;
+            }
+            #addRequestService .ui-button-text {
+                margin-right: 7px;
             }
         </style>
 
@@ -563,7 +567,7 @@
                                              id="addRequestService"
                                              action="#{bean.validateMultipleRequest(false)}"
                                              value="#{msg.addRequestService.toUpperCase()}"
-                                             icon="shopping-cart-icon" styleClass="ui-button-success" iconPos="left"
+                                             icon="shopping-cart-icon" styleClass="ui-button-success" iconPos="right"
                                              update="saveMultipleRequest table newRequestList servicerequestType multipleServiceRequest form"
                                              disabled="#{bean.selectedRequestTypesIdMultiple eq null}"
                                              rendered="#{bean.showAddServiceButton and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2
