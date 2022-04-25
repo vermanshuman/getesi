@@ -562,18 +562,6 @@
 <!--                                             action="#{bean.generateDynamicContent(true)}"-->
 <!--                                             rendered="#{bean.showConfirmButton}"/>-->
                         </div>
-                        <div id="request-btns" style="padding-top: 1%;">
-                            <p:commandButton style="margin-top: 20px;"
-                                             id="addRequestService"
-                                             action="#{bean.validateMultipleRequest(false)}"
-                                             value="#{msg.addRequestService.toUpperCase()}"
-                                             icon="shopping-cart-icon" styleClass="ui-button-success" iconPos="right"
-                                             update="saveMultipleRequest table newRequestList servicerequestType multipleServiceRequest form"
-                                             disabled="#{bean.selectedRequestTypesIdMultiple eq null}"
-                                             rendered="#{bean.showAddServiceButton and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2
-                                                            and bean.multipleRequestCreate}"/>
-                            <div style="clear: both"></div>
-                        </div>
                     </div>
                 </c:if>
 <!--                <c:forEach rendered="#{not empty bean.shownFields}" items="#{bean.shownFields}" var="item">-->
@@ -653,6 +641,18 @@
                     </p:fieldset>
 
                 </p:outputPanel>
+            </div>
+            <div id="request-btns" style="padding-top: 1%;">
+                <p:commandButton style="margin-top: 20px;float: right;"
+                                 id="addRequestService"
+                                 action="#{bean.validateMultipleRequest(false)}"
+                                 value="#{msg.addRequestService.toUpperCase()}"
+                                 icon="shopping-cart-icon" styleClass="ui-button-success" iconPos="right"
+                                 update="saveMultipleRequest table newRequestList servicerequestType multipleServiceRequest form"
+                                 disabled="#{bean.selectedRequestTypesIdMultiple eq null}"
+                                 rendered="#{bean.showAddServiceButton and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2
+                                                            and bean.multipleRequestCreate}"/>
+                <div style="clear: both"></div>
             </div>
         </ui:fragment>
 
