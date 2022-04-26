@@ -307,19 +307,19 @@
                                      scrollHeight="300" style="margin-top:20px;">
 
 
-                            <p:column headerText="#{msg.requestListRequestType}">
+                            <p:column headerText="#{msg.requestListRequestType}" style="width: 242px !important;text-align: center !important;">
                                 <h:outputText value="#{item.requestTypeName}"/>
                             </p:column>
-                            <p:column headerText="#{msg.requestListService}">
+                            <p:column headerText="#{msg.requestListService}" style="width: 242px !important;text-align: center !important;">
                                 <h:outputText value="#{item.service ne null ? item.serviceName : (item.multipleServices ne null ? item.multipleServiceNames : '')}"/>
                             </p:column>
-                            <p:column headerText="#{msg.requestEditSubjectListName}">
+                            <p:column headerText="#{msg.requestEditSubjectListName}" style="width: 242px !important;text-align: center !important;">
                                 <h:outputText value="#{item.nameStr}"/>
                             </p:column>
-                            <p:column headerText="#{msg.requestListCorservatoryName}">
+                            <p:column headerText="#{msg.requestListCorservatoryName}" style="width: 242px !important;text-align: center !important;">
                                 <h:outputText value="#{item.aggregationLandCharRegNameOrCity}"/>
                             </p:column>
-                            <p:column headerText="#{msg.dateEvasion}">
+                            <p:column headerText="#{msg.dateEvasion}" style="width: 242px !important;text-align: center !important;">
                                 <h:outputText value="#{item.dateEvasionString}"/>
                             </p:column>
                         </p:dataTable>
