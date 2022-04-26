@@ -1082,7 +1082,7 @@
                                 <td style="width: 4vw;min-width: 81px;">
                                     <p:outputPanel style="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments ? 'text-align: center;' : 'display: flex;'}">
                                         <p:commandButton id="mailBtn" styleClass="richiesta-da-mail-icon" action="#{bean.openRequestMail}"
-                                                         style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
+                                                         style="color: transparent !important;background-color: transparent !important;border-color: transparent !important;margin: 0 auto;cursor: pointer;"
                                                          rendered="#{not empty item.mailId}">
                                             <f:setPropertyActionListener value="#{item.mailId}" target="#{bean.entityEditId}"/>
                                         </p:commandButton>
@@ -1123,7 +1123,7 @@
                                     <p:outputPanel style="display: flex;" rendered="#{item.haveDocuments}">
                                         <p:outputPanel style="display: flex;">
                                             <p:commandButton styleClass="attachment-icon" action="#{bean.loadRequestDocuments}" update="requestDocs"
-                                                             style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
+                                                             style="color: transparent !important;background-color: transparent !important;border-color: transparent !important;margin: 0 auto;cursor: pointer;"
                                                              oncomplete="PF('documentDialog').show();">
                                                 <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                                             </p:commandButton>
