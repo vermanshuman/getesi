@@ -44,7 +44,20 @@
             left: 10px !important;
             margin-left: 0px !important;
         }
+        
+        .fa-info-circle {
+        	left: 26% !important;
+        }
+        
+        
     </style>
+    <script>
+    $(document).ready(function() {
+        setTimeout(() => {
+            $("#dataSaved").hide();
+        }, 5000);
+    });
+    </script>
     <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/mail.css"
           media="all" rel="stylesheet" type="text/css"/>
     <div class="button-panel-space p-grid">
@@ -106,8 +119,10 @@
                 <!--  <p:commandButton icon="ui-icon fa fa-pencil" update=":form" styleClass="right-side"
                                   action="#{bean.editEntity}"
                                   disabled="#{!bean.entity.canEdit}"/> -->
-            <p:commandButton rendered="#{bean.canDeleteMail and bean.actual}" styleClass="ui-button-danger"
+            	<p:commandButton rendered="#{bean.canDeleteMail and bean.actual}" styleClass="ui-button-danger"
                              action="#{bean.cancelMail}" icon="pi pi-trash"  style="background: #fb6e51 !important"/>
+                <p:commandButton rendered="#{bean.dataSaved}" id="dataSaved" value="#{msg.mailManagerSave}"  style="background-color: green; width:200px; margin-left:100px;" oncomplete="setTimeout();" 
+                              icon="fa fa-info-circle"  />
             </p:outputPanel>
         </div>
         <div class="p-col-3" style="text-align:right;">

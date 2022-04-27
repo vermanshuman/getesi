@@ -260,6 +260,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private Date paymentDate;
 
     private String paymentDescription;
+    
+    private Boolean dataSaved;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
@@ -1075,12 +1077,13 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 }
             }
             DaoManager.save(getEntity(), true);
-            if (!redirect) {
+            setDataSaved(Boolean.TRUE);
+            /*if (!redirect) {
                 RequestContext.getCurrentInstance().execute("PF('saveConfirmationDialogWV').show();");
             } else {
                 FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, ResourcesHelper.getString("mailManagerSave"), null);
                 FacesContext.getCurrentInstance().addMessage("", facesMessage);
-            }
+            }*/
         }
         if (redirect) {
             processManagedState(true);
