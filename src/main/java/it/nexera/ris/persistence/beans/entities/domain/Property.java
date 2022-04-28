@@ -258,6 +258,9 @@ public class Property extends IndexedEntity implements BeforeSave {
     @Transient
     private LandCadastralCulture cadastralCulture;
 
+    @Transient
+    private LandCulture landCulture;
+
     @Override
     public void beforeSave() {
         if (ValidationHelper.isNullOrEmpty(getEstateSituationListWithoutInit())) {
@@ -630,8 +633,8 @@ public class Property extends IndexedEntity implements BeforeSave {
         DaoManager.refresh(this);
 
         String beggingOfCommentWrap = "";
-        String estimateOMIRequestText = PropertyEntityHelper.getEstimateOMIRequestText(this);
-        String estimateLastCommercialValueRequestText = PropertyEntityHelper.getEstimateLastCommercialValueRequestText(this);
+        String estimateOMIRequestText = PropertyEntityHelper.getLastEstimateOMIRequestText(this);
+        String estimateLastCommercialValueRequestText = PropertyEntityHelper.getLastEstimateLastCommercialValueRequestText(this);
 
         if (ValidationHelper.isNullOrEmpty(estimateOMIRequestText)
                 && ValidationHelper.isNullOrEmpty(estimateLastCommercialValueRequestText)) {
@@ -1531,5 +1534,12 @@ public class Property extends IndexedEntity implements BeforeSave {
             });
         }
         return cadastralCulture;
+    }
+    public LandCulture getLandCulture() {
+        return landCulture;
+    }
+
+    public void setLandCulture(LandCulture landCulture) {
+        this.landCulture = landCulture;
     }
 }

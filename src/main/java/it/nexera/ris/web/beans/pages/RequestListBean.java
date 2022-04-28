@@ -162,8 +162,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     private Integer requestType;
 
-    private boolean resetSettingPanel = true;
-
     @Getter
     @Setter
     private ListPaginator paginator;
@@ -1657,8 +1655,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         }
     }
 
-    public void clearFiltraPanel() throws PersistenceBeanException, IllegalAccessException {
-        loadFilterData();
+    public void clearFiltraPanel() {
         setSelectedClientId(null);
         setDateFrom(null);
         setDateTo(null);
@@ -1669,7 +1666,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         setManagerClientFilterid(null);
         setFiduciaryClientFilterId(null);
         setAggregationFilterId(null);
-        setSelectedServices(null);
 
         SessionHelper.removeObject(KEY_CLIENT_ID);
         SessionHelper.removeObject(KEY_DATE_FROM_REQ);
@@ -1681,8 +1677,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         SessionHelper.removeObject(KEY_CLIENT_MANAGER_ID);
         SessionHelper.removeObject(KEY_CLIENT_FIDUCIARY_ID);
         SessionHelper.removeObject(KEY_AGGREAGATION);
-        SessionHelper.removeObject(KEY_SERVICES);
-        resetSettingPanel = false;
     }
 
     public void setSelectedRequestTypes(List<RequestType> selectedRequestTypes) {
@@ -1736,13 +1730,5 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     public void setRequestType(Integer requestType) {
         this.requestType = requestType;
-    }
-
-    public boolean isResetSettingPanel() {
-        return resetSettingPanel;
-    }
-
-    public void setResetSettingPanel(boolean resetSettingPanel) {
-        this.resetSettingPanel = resetSettingPanel;
     }
 }

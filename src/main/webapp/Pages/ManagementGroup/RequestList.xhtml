@@ -408,7 +408,7 @@
                                     </script>
 
                                     <p:panel id="settingPanel" widgetVar="panelSetting" closable="true"
-                                             toggleable="true" style="display: none;" rendered="#{bean.resetSettingPanel}">
+                                             toggleable="true" style="display: none;">
                                         <div class="p-grid">
                                             <div class="p-col-12" style="text-align: center;">
                                                 <h2>Filtra per</h2>
@@ -596,9 +596,9 @@
                                                                  oncomplete="PF('panelSetting').getJQ().hide();"/>
                                                 <p:commandButton id="manageReestablishBtn" style="width: auto;"
                                                                  value="#{ff:upper(msg.mailManageReestablish)}"
-                                                                 update="settingPanel searchPanel services servicesTxt"
+                                                                 update="settingPanel searchPanel"
                                                                  actionListener="#{bean.clearFiltraPanel}"
-                                                                 oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').getJQ().hide();updateSettingPanel();"/>
+                                                                 oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').getJQ().hide();"/>
                                             </div>
                                         </div>
                                     </p:panel>
@@ -633,7 +633,6 @@
 
         <p:remoteCommand name="onLoadFilterData"
                          action="#{bean.loadFilterData()}" update="settingPanel" oncomplete="togglePanel()"/>
-        <p:remoteCommand name="updateSettingPanel" update="services servicesTxt"/>
 
         <p:outputPanel id="searchPanel" style="display:none;" >
             <p:commandButton icon="fa fa-fw fa-file-pdf-o"  rendered="false"
@@ -1082,12 +1081,15 @@
 
                                 <td style="width: 4vw;min-width: 81px;">
                                     <p:outputPanel style="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments ? 'text-align: center;' : 'display: flex;'}">
-                                        <p:commandButton id="mailBtn" styleClass="richiesta-da-mail-icon" action="#{bean.openRequestMail}"
+                                        <p:commandButton id="mailBtn-#{loop.index}" styleClass="richiesta-da-mail-icon" action="#{bean.openRequestMail}"
                                                          style="color: transparent !important;background-color: transparent !important;border-color: transparent !important;margin: 0 auto;cursor: pointer;"
                                                          rendered="#{not empty item.mailId}">
                                             <f:setPropertyActionListener value="#{item.mailId}" target="#{bean.entityEditId}"/>
                                         </p:commandButton>
-                                        <p:tooltip for="mailBtn" value="#{item.mailSubject}"/>
+                                        <p:tooltip for="mailBtn-#{loop.index}" styleClass="custom-design-tooltip">
+                                            <h:outputText value="#{item.mailSubject}"
+                                                          style="font-weight:bold;color:#003871;"/>
+                                        </p:tooltip>
 
                                         <h:outputText id="externalUserIcon" rendered="#{item.external and not item.haveAllegatiDocuments}"
                                                       style="margin: 0 auto;" styleClass="richiesta-da-clienti-icon" />

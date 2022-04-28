@@ -1334,10 +1334,18 @@ public class Formality extends IndexedEntity {
     }
 
     public Date getComparedDate() {
-        if(!ValidationHelper.isNullOrEmpty(checkRenewalTypeFormality()) && !ValidationHelper.isNullOrEmpty(getSectionA()) &&
-                !ValidationHelper.isNullOrEmpty(getSectionA().getOtherData())){
-            return getSectionA().getOtherData();
+        if(ValidationHelper.isNullOrEmpty(checkRenewalTypeFormality())){
+            if (!ValidationHelper.isNullOrEmpty(getSectionA()) &&
+                    !ValidationHelper.isNullOrEmpty(getSectionA().getOtherData()))
+                return getSectionA().getOtherData();
         }
         return getPresentationDateOrNewDateIfNull();
+    }
+
+    public Date getComparedDeathDate() {
+        if(!ValidationHelper.isNullOrEmpty(getSectionA())  &&
+                !ValidationHelper.isNullOrEmpty(getSectionA().getDeathDate()))
+            return  getSectionA().getDeathDate();
+        return new Date();
     }
 }

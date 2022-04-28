@@ -48,7 +48,11 @@ public class CostCalculationHelper {
     }
 
     public void calculateAllCosts(Boolean isCostOutputImportant) throws IllegalAccessException, PersistenceBeanException, InstantiationException {
-        calculateAllCosts(isCostOutputImportant, isBillingClient(), restrictionForPriceList());
+        calculateAllCosts(isCostOutputImportant, Boolean.FALSE);
+    }
+
+    public void calculateAllCosts(Boolean isCostOutputImportant, boolean recalculate) throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+        calculateAllCosts(isCostOutputImportant, isBillingClient(), restrictionForPriceList(), recalculate);
     }
 
     public double calculateTotalCost(Boolean isCostOutputImportant) throws IllegalAccessException, PersistenceBeanException, InstantiationException {
@@ -178,8 +182,9 @@ public class CostCalculationHelper {
         return requestCosts.finalCostWithExtraCost;
     }
 
-    private RequestCosts calculateAllCosts(boolean isCostOutputImportant, Boolean isBillingClient, boolean restrictionForPriceList)
-            throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+    private RequestCosts calculateAllCosts(boolean isCostOutputImportant, Boolean isBillingClient, boolean restrictionForPriceList,
+                                           boolean recalculate)
+    throws IllegalAccessException, PersistenceBeanException, InstantiationException {
         RequestCosts requestCosts = new RequestCosts();
 
         if (!ValidationHelper.isNullOrEmpty(isBillingClient) || isCostOutputImportant) {
@@ -196,7 +201,6 @@ public class CostCalculationHelper {
                     }
                     
                 }
-
                 double initCost = 0.0d;
                 if (!ValidationHelper.isNullOrEmpty(getRequest().getService())
                         && !ValidationHelper.isNullOrEmpty(getRequest().getService().getNationalPrice())) {
@@ -269,9 +273,8 @@ public class CostCalculationHelper {
                 }
                 requestCosts.finalCostWithExtraCost += initCost;
                 updateCostsOfRequest(initCost, requestCosts.finalCostWithExtraCost);
-                
-            } else if (getRequest().getCostButtonConfirmClicked() != null && getRequest().getCostButtonConfirmClicked()
-                    && !getRequest().isCalledFromReportList()) {
+
+            } else if (!recalculate && !getRequest().isCalledFromReportList()) {
                 for (ExtraCost cost : extraCost) {
                     if(ValidationHelper.isNullOrEmpty(cost.getType()) ||
                             !ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
@@ -322,7 +325,7 @@ public class CostCalculationHelper {
         return requestCosts;
     }
 
-    private Boolean isBillingClient() {
+    public Boolean isBillingClient() {
         if (!ValidationHelper.isNullOrEmpty(getRequest().getBillingClient())) {
             return true;
         } else if (!ValidationHelper.isNullOrEmpty(getRequest().getClient())
@@ -360,7 +363,7 @@ public class CostCalculationHelper {
         return requestCosts;
     }
 
-    private boolean restrictionForPriceList() {
+    public boolean restrictionForPriceList() {
         boolean result = false;
 
         if (!ValidationHelper.isNullOrEmpty(getRequest().getDocumentsRequest())) {
@@ -430,7 +433,7 @@ public class CostCalculationHelper {
         return result;
     }
 
-    private Double getCostEstate(Boolean billingClient, boolean restictionForPriceList)
+    public Double getCostEstate(Boolean billingClient, boolean restictionForPriceList)
             throws PersistenceBeanException, IllegalAccessException {
         double result = 0d;
         if(!ValidationHelper.isNullOrEmpty(getRequest().getService())) {
@@ -612,7 +615,7 @@ public class CostCalculationHelper {
                 Restrictions.eq("cc.typeId", CostType.FIXED_COST.getId())});
     }
     
-    private List<PriceList> loadPriceList(Boolean billingClient, boolean restrictionForPriceList, Service service)
+    public List<PriceList> loadPriceList(Boolean billingClient, boolean restrictionForPriceList, Service service)
             throws PersistenceBeanException, IllegalAccessException {
         
         

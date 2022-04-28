@@ -361,7 +361,8 @@
             }
         </script>
         <p:remoteCommand name="updateSubjects" update="form"/>
-
+        <p:remoteCommand  name="executeOnOnServicehide"
+                          action="#{bean.onMultipleServiceChanges()}"  update="form"/>
         <p:tabMenu activeIndex="#{bean.activeMenuTabNum}" model="#{bean.topMenuModel}" style="background-color:#FFFFFF !important;"
                    id="pageTabMenu"  />
         <ui:fragment rendered="#{bean.multipleCreate and bean.activeMenuTabNum==0}">
@@ -541,8 +542,8 @@
                             <span> #{msg.requestService}<span class="red">*</span>:</span><br/>
                             <p:selectCheckboxMenu value="#{bean.selectedServiceIds}" id="multipleServiceRequest" multiple="true"
                                                   label="#{msg.requestService}"
-                                                  styleClass="select-width" style="min-height: 37px;">
-                                <p:ajax delay="1000" event="change" listener="#{bean.onMultipleServiceChanges()}" update="form @this" />
+                                                  styleClass="select-width" style="min-height: 37px;"
+                                                  onHide="executeOnOnServicehide()">
                                 <f:selectItems value="#{bean.services}"/>
                             </p:selectCheckboxMenu>
                         </h:panelGroup>
@@ -1011,12 +1012,15 @@
                                 style="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments ? 'text-align: center;' : 'display: flex;'}">
                             <p:commandButton id="mailBtn" styleClass="richiesta-da-mail-icon"
                                              action="#{requestBean.openRequestMail}"
-                                             style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
+                                             style="color: transparent !important;background-color: transparent !important;border-color: transparent !important;margin: 0 auto;cursor: pointer;"
                                              rendered="#{not empty item.mailId}">
                                 <f:setPropertyActionListener value="#{item.mailId}"
                                                              target="#{requestBean.entityEditId}"/>
                             </p:commandButton>
-                            <p:tooltip for="mailBtn" value="#{item.mailSubject}"/>
+                            <p:tooltip for="mailBtn" styleClass="custom-design-tooltip">
+                                <h:outputText value="#{item.mailSubject}"
+                                              style="font-weight:bold;color:#003871;"/>
+                            </p:tooltip>
 
                             <h:outputText id="externalUserIcon"
                                           rendered="#{item.external and not item.haveAllegatiDocuments}"
@@ -1027,7 +1031,7 @@
                                            style="display: flex;margin-left: calc( 50% - 15px );">
                                 <p:commandButton id="externalUserIconA" styleClass="richiesta-da-clienti-icon"
                                                  action="#{requestBean.loadAllegatiDocuments}" update="requestDocs"
-                                                 style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
+                                                 style="color: transparent !important;background-color: transparent !important;border-color: transparent !important;margin: 0 auto;cursor: pointer;"
                                                  oncomplete="PF('documentDialog').show();">
                                     <f:setPropertyActionListener value="#{item.id}"
                                                                  target="#{requestBean.entityEditId}"/>
@@ -1166,7 +1170,7 @@
 
                     <p:column rendered="#{not empty bean.subjectWrapper.typeId}">
                         <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_PROVINCE}"/><br/>
-                        <p:selectOneMenu value="#{bean.subjectWrapper.provinceId}" required="true"
+                        <p:selectOneMenu value="#{bean.subjectWrapper.provinceId}"
                                          styleClass="select-width" filter="true">
                             <f:selectItems value="#{bean.wrapper.provinces}"/>
                             <p:ajax event="change" process="@this"
@@ -1180,7 +1184,7 @@
                     <p:column
                             rendered="#{not empty bean.subjectWrapper.typeId and bean.subjectWrapper.provinceId!=-1}">
                         <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_COMUNE}"/><br/>
-                        <p:selectOneMenu value="#{bean.subjectWrapper.cityId}" required="true"
+                        <p:selectOneMenu value="#{bean.subjectWrapper.cityId}"
                                          styleClass="select-width" filter="true" filterFunction="filterCity"
                                          filterMatchMode="custom">
                             <f:selectItems value="#{bean.subjectWrapper.cities}"/>

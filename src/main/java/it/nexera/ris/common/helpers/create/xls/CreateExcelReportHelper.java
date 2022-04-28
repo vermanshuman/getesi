@@ -117,6 +117,12 @@ public abstract class CreateExcelReportHelper extends CreateReportHelper {
         return euroStyle;
     }
 
+    protected HSSFCellStyle getWrapTextStyle() {
+        HSSFCellStyle wrapStyle = workbook.createCellStyle();
+        wrapStyle.setWrapText(true);
+        return wrapStyle;
+    }
+
     protected void createFreezePane(int colSplit, int rowSplit, int leftmostColumn, int topRow) {
         sheet.createFreezePane(colSplit, rowSplit, leftmostColumn, topRow);
     }

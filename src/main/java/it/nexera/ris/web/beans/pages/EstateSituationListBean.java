@@ -265,7 +265,11 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
     public void saveRequestEstateFormalityCost() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         getCostManipulationHelper().saveRequestEstateFormalityCost(getExamRequest());
         if (!ValidationHelper.isNullOrEmpty(getExamRequest().getNumberActUpdate())) {
-            getCostManipulationHelper().viewExtraCost(getExamRequest());
+            boolean reCalculate = true;
+            if(getExamRequest().getCostButtonConfirmClicked() != null && getExamRequest().getCostButtonConfirmClicked()){
+                reCalculate = false;
+            }
+            getCostManipulationHelper().viewExtraCost(getExamRequest(), reCalculate);
         }
     }
 
@@ -283,7 +287,11 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
     }
 
     public void viewExtraCost() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        getCostManipulationHelper().viewExtraCost(getExamRequest());
+        viewExtraCost(false);
+    }
+
+    public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        getCostManipulationHelper().viewExtraCost(getExamRequest(), recalculate);
     }
 
     public void addExtraCost(String extraCostValue) {

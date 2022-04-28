@@ -120,6 +120,10 @@ public class ReportListBean extends EntityLazyListPageBean<Document> implements 
     }
 
     public void viewExtraCost() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        viewExtraCost(false);
+    }
+
+    public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         setExamRequest(DaoManager.get(Request.class, getEntityEditId()));
         setCostNote(null);
         if(ValidationHelper.isNullOrEmpty(getExamRequest().getCostNote())) {
@@ -148,13 +152,18 @@ public class ReportListBean extends EntityLazyListPageBean<Document> implements 
             }
         }else
             setCostNote(getExamRequest().getCostNote());
-        getCostManipulationHelper().viewExtraCost(getExamRequest());
+        getCostManipulationHelper().viewExtraCost(getExamRequest(), recalculate);
     }
 
     public void updateCosts() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         getExamRequest().setCalledFromReportList(true);
         getCostManipulationHelper().updateExamRequestParametersFromHelper(getExamRequest());
-        getCostManipulationHelper().viewExtraCost(getExamRequest());
+        boolean reCalculate = true;
+
+        if(getExamRequest().getCostButtonConfirmClicked() != null && getExamRequest().getCostButtonConfirmClicked()){
+            reCalculate = false;
+        }
+        getCostManipulationHelper().viewExtraCost(getExamRequest(),reCalculate);
     }
 
     public void saveRequestExtraCost() throws Exception {
@@ -166,7 +175,11 @@ public class ReportListBean extends EntityLazyListPageBean<Document> implements 
     public void saveRequestEstateFormalityCost() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         getCostManipulationHelper().saveRequestEstateFormalityCost(getExamRequest());
         if (!ValidationHelper.isNullOrEmpty(getExamRequest().getNumberActUpdate())) {
-            getCostManipulationHelper().viewExtraCost(getExamRequest());
+            boolean reCalculate = true;
+            if(getExamRequest().getCostButtonConfirmClicked() != null && getExamRequest().getCostButtonConfirmClicked()){
+                reCalculate = false;
+            }
+            getCostManipulationHelper().viewExtraCost(getExamRequest(), reCalculate);
         }
     }
 

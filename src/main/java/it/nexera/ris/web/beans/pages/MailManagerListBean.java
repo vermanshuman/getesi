@@ -356,10 +356,10 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         if (!ValidationHelper.isNullOrEmpty(value)) {
             setRowsPerPage(Integer.parseInt(value));
         } else {
-            setRowsPerPage(15);
+            setRowsPerPage(18);
         }
         if(getRowsPerPage() == 0)
-            setRowsPerPage(15);
+            setRowsPerPage(18);
 
         if(ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.TABLE_PAGE))){
            value = getSessionValue(KEY_PAGE_NUMBER);

@@ -11,10 +11,7 @@ import it.nexera.ris.common.helpers.tableGenerator.CertificazioneTableGenerator;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.*;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.CadastralCategory;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.LandChargesRegistry;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.OmiValue;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
 import it.nexera.ris.persistence.view.FormalityView;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.beans.EntityEditPageBean;
@@ -249,6 +246,33 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     @Getter
     @Setter
     private Double totalPayments;
+
+    @Getter
+    @Setter
+    private boolean showRegime;
+
+    @Getter
+    @Setter
+    private List<SelectItem> regimes;
+
+    @Getter
+    @Setter
+    private Long selectedRegime;
+
+
+    private PropertyEditInTableWrapper propertyEditInTableWrapper;
+
+    private EstateSituationEditInTableWrapper currentEstateSituation;
+
+    private List<RelationshipEditInTableWrapper> estateSituationRelationshipList;
+
+    private String estateQuote1;
+
+    private String estateQuote2;
+
+    private PropertyTypeEnum estatePropertyType;
+
+    private Long estateSelectedRegime;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
@@ -1127,6 +1151,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     }
 
     public void openTableProcedure() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        setEstateSituationRelationshipList(new ArrayList<>());
         if (getShowEstateTable()) {
             setShowEstateTable(!getShowEstateTable());
             return;
@@ -1272,6 +1297,13 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         }
 
         for (EstateSituationEditInTableWrapper situation : getEstateSituations()) {
+            for (PropertyEditInTableWrapper propertyEditInTableWrapper : situation.getPropertyList()) {
+                if(!ValidationHelper.isNullOrEmpty(situation.getEstateSituationRelationshipList())){
+                    if(ValidationHelper.isNullOrEmpty(propertyEditInTableWrapper.getRelationshipList()))
+                        propertyEditInTableWrapper.setRelationshipList(new ArrayList<>());
+                    propertyEditInTableWrapper.getRelationshipList().addAll(situation.getEstateSituationRelationshipList());
+                }
+            }
             situation.save();
         }
         for (EstateSituationEditInTableWrapper situation : getOtherEstateSituations()) {
@@ -1522,10 +1554,19 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     public void viewExtraCost() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         log.debug("Fecthing extra cost for request " + getExamRequest());
+        boolean reCalculate = true;
+        if(getExamRequest().getCostButtonConfirmClicked() != null && getExamRequest().getCostButtonConfirmClicked()){
+            reCalculate = false;
+        }
+        viewExtraCost(reCalculate);
+    }
+
+    public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        log.debug("Fecthing extra cost for request " + getExamRequest());
         if (!ValidationHelper.isNullOrEmpty(getRequestNumberActUpdate())) {
             getExamRequest().setNumberActUpdate(Double.valueOf(getRequestNumberActUpdate()));
         }
-        getCostManipulationHelper().viewExtraCost(getExamRequest());
+        getCostManipulationHelper().viewExtraCost(getExamRequest(), recalculate);
     }
 
     public void addExtraCost(String extraCostValue) {
@@ -1669,6 +1710,11 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     }
 
     public void prepareRelationships() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        setSelectedRegime(null);
+        setCurrentProperty(null);
+        setEstateSelectedRegime(null);
+        setCurrentEstateSituation(null);
+
         switch (getCurrentComment()) {
             case SELECTED_PROPERTY:
                 setCurrentProperty(getEstateSituations().stream().map(EstateSituationEditInTableWrapper::getPropertyList)
@@ -1680,15 +1726,30 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                         .flatMap(List::stream).filter(w -> w.getId().equals(getSelectedId())).findAny()
                         .orElse(null));
                 break;
+            case SELECTED_ESTATE_SITUATION:
+                setCurrentEstateSituation(getEstateSituations().stream()
+                        .filter(w -> w.getEstateSituationId().equals(getSelectedId())).findAny()
+                        .orElse(null));
+                break;
             default:
                 break;
         }
-        getCurrentProperty().prepareRelationship(getExamRequest().getSubject());
+
+        if(!ValidationHelper.isNullOrEmpty(getCurrentProperty()))
+            getCurrentProperty().prepareRelationship(getExamRequest().getSubject());
+        else if(!ValidationHelper.isNullOrEmpty(getCurrentEstateSituation())){
+            setEstateSituationRelationshipList(getCurrentEstateSituation().getEstateSituationRelationshipList());
+        }
+
         setQuote1(null);
         setQuote2(null);
         setPropertyType(null);
         setEditRelationship(null);
         setDeleteRelationship(null);
+
+        setEstateQuote1(null);
+        setEstateQuote2(null);
+        setEstatePropertyType(null);
     }
 
     public void editRelationShip() {
@@ -1715,7 +1776,14 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             addRequiredFieldException("form:propertyType");
             return;
         }
-
+        Regime regime = null;
+        if(!ValidationHelper.isNullOrEmpty(getSelectedRegime())){
+            try {
+                regime = DaoManager.get(Regime.class, getSelectedRegime());
+            } catch (Exception e) {
+                LogHelper.log(log, e);
+            }
+        }
         if(!ValidationHelper.isNullOrEmpty(getEditRelationship())) {
             RelationshipEditInTableWrapper relationshipEditInTableWrapper =
                     getCurrentProperty().getRelationshipList().stream()
@@ -1725,11 +1793,13 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             relationshipEditInTableWrapper.setQuote1(getQuote1());
             relationshipEditInTableWrapper.setQuote2(getQuote2());
             relationshipEditInTableWrapper.setType(getPropertyType());
+            relationshipEditInTableWrapper.setRegime(regime);
         }else {
-            getCurrentProperty().getRelationshipList().add(new RelationshipEditInTableWrapper(
-                    getQuote1(), getQuote2(), getPropertyType(), getExamRequest().getSubject()));
-        }
 
+            getCurrentProperty().getRelationshipList().add(new RelationshipEditInTableWrapper(
+                    getQuote1(), getQuote2(), getPropertyType(), getExamRequest().getSubject(), regime));
+        }
+        setSelectedRegime(null);
         setCurrentComment(null);
         setComment(new Comment());
         setSelectedId(null);
@@ -1753,6 +1823,86 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         }
         setDeleteRelationship(null);
     }
+
+    public void saveAllRelationship() {
+        cleanValidation();
+        if (ValidationHelper.isNullOrEmpty(getEstateQuote1())
+                || ValidationHelper.isNullOrEmpty(getEstateQuote2())
+                || Double.parseDouble(getEstateQuote1().replaceAll(",", "."))
+                / Double.parseDouble(getEstateQuote2().replaceAll(",", ".")) > 1.0) {
+            addRequiredFieldException("form:estateInputQuote1");
+            addRequiredFieldException("form:estateInputQuote2");
+            return;
+        }
+        if (ValidationHelper.isNullOrEmpty(getEstatePropertyType())
+                || !ValidationHelper.isNullOrEmpty(getCurrentEstateSituation())
+                && !ValidationHelper.isNullOrEmpty(getEstateSituationRelationshipList())
+                && (ValidationHelper.isNullOrEmpty(getEditRelationship())
+                && getEstateSituationRelationshipList().stream().anyMatch(r -> getEstatePropertyType().equals(r.getType())))) {
+            addRequiredFieldException("form:estatePropertyType");
+            return;
+        }
+        Regime regime = null;
+        if(!ValidationHelper.isNullOrEmpty(getEstateSelectedRegime())){
+            try {
+                regime = DaoManager.get(Regime.class, getEstateSelectedRegime());
+            } catch (Exception e) {
+                LogHelper.log(log, e);
+            }
+        }
+        if(!ValidationHelper.isNullOrEmpty(getEditRelationship())) {
+            RelationshipEditInTableWrapper relationshipEditInTableWrapper =
+                    getEstateSituationRelationshipList().stream()
+                            .filter(r -> r.getId().equals(getEditRelationship().getId()))
+                            .findAny()
+                            .orElse(null);
+            relationshipEditInTableWrapper.setQuote1(getEstateQuote1());
+            relationshipEditInTableWrapper.setQuote2(getEstateQuote2());
+            relationshipEditInTableWrapper.setType(getEstatePropertyType());
+            relationshipEditInTableWrapper.setRegime(regime);
+        }else {
+            if(ValidationHelper.isNullOrEmpty(getEstateSituationRelationshipList())){
+                setEstateSituationRelationshipList(new ArrayList<>());
+            }
+            getEstateSituationRelationshipList().add(new RelationshipEditInTableWrapper(
+                    getEstateQuote1(), getEstateQuote2(), getEstatePropertyType(), getExamRequest().getSubject(), regime));
+            getCurrentEstateSituation().setEstateSituationRelationshipList(getEstateSituationRelationshipList());
+        }
+        setEstateSelectedRegime(null);
+        setCurrentComment(null);
+        setComment(new Comment());
+        setSelectedId(null);
+        setEstateQuote1(null);
+        setEstateQuote2(null);
+        setEstatePropertyType(null);
+        setEditRelationship(null);
+    }
+
+    public void editAllRelationShip() {
+        this.setEstateQuote1(this.getEditRelationship().getQuote1());
+        this.setEstateQuote2(this.getEditRelationship().getQuote2());
+        this.setEstatePropertyType(this.getEditRelationship().getType());
+        if(!ValidationHelper.isNullOrEmpty(this.getEditRelationship().getRegime())){
+            this.setEstateSelectedRegime(this.getEditRelationship().getRegime().getId());
+        }else
+            this.setEstateSelectedRegime(null);
+    }
+
+    public void deleteAllRelationship() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        cleanValidation();
+        if(!ValidationHelper.isNullOrEmpty(getDeleteRelationship())) {
+            RelationshipEditInTableWrapper relationshipEditInTableWrapper =
+                    getEstateSituationRelationshipList().stream()
+                            .filter(r -> r.getId().equals(getDeleteRelationship().getId()))
+                            .findAny()
+                            .orElse(null);
+            relationshipEditInTableWrapper.setToDelete(Boolean.TRUE);
+            Property property = DaoManager.get(Property.class, getCurrentProperty().getId());
+            relationshipEditInTableWrapper.save(property);
+        }
+        setDeleteRelationship(null);
+    }
+
 
     public void openRequestEditor() {
         RedirectHelper.goTo(PageTypes.REQUEST_TEXT_EDIT, getEntityEditId(), true);
@@ -2763,5 +2913,53 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     public void setSelectedTaxRateId(Long selectedTaxRateId) {
         this.selectedTaxRateId = selectedTaxRateId;
+    }
+
+    public EstateSituationEditInTableWrapper getCurrentEstateSituation() {
+        return currentEstateSituation;
+    }
+
+    public void setCurrentEstateSituation(EstateSituationEditInTableWrapper currentEstateSituation) {
+        this.currentEstateSituation = currentEstateSituation;
+    }
+
+    public List<RelationshipEditInTableWrapper> getEstateSituationRelationshipList() {
+        return estateSituationRelationshipList;
+    }
+
+    public void setEstateSituationRelationshipList(List<RelationshipEditInTableWrapper> estateSituationRelationshipList) {
+        this.estateSituationRelationshipList = estateSituationRelationshipList;
+    }
+
+    public String getEstateQuote1() {
+        return estateQuote1;
+    }
+
+    public void setEstateQuote1(String estateQuote1) {
+        this.estateQuote1 = estateQuote1;
+    }
+
+    public String getEstateQuote2() {
+        return estateQuote2;
+    }
+
+    public void setEstateQuote2(String estateQuote2) {
+        this.estateQuote2 = estateQuote2;
+    }
+
+    public PropertyTypeEnum getEstatePropertyType() {
+        return estatePropertyType;
+    }
+
+    public void setEstatePropertyType(PropertyTypeEnum estatePropertyType) {
+        this.estatePropertyType = estatePropertyType;
+    }
+
+    public Long getEstateSelectedRegime() {
+        return estateSelectedRegime;
+    }
+
+    public void setEstateSelectedRegime(Long estateSelectedRegime) {
+        this.estateSelectedRegime = estateSelectedRegime;
     }
 }

@@ -1104,7 +1104,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         }else if(!ValidationHelper.isNullOrEmpty(getSelectedRequestClient()))
             selectedClient = getSelectedRequestClient();
 
-        if(!ValidationHelper.isNullOrEmpty(selectedClient.getTypeId())) {
+        if(!ValidationHelper.isNullOrEmpty(selectedClient) && !ValidationHelper.isNullOrEmpty(selectedClient.getTypeId())) {
             List<Client> notManagerOrFiduciaryClients = clientList.stream()
                     .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
                     .collect(Collectors.toList());
@@ -1218,8 +1218,11 @@ public class ExcelDataEdit extends BaseEntityPageBean {
 
     public void updateCosts() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         getCostManipulationHelper().updateExamRequestParametersFromHelper(getExamRequest());
-        getCostManipulationHelper().viewExtraCost(getExamRequest());
-
+        boolean reCalculate = true;
+        if(getExamRequest().getCostButtonConfirmClicked() != null && getExamRequest().getCostButtonConfirmClicked()){
+            reCalculate = false;
+        }
+        getCostManipulationHelper().viewExtraCost(getExamRequest(), reCalculate);
     }
 
     private int getIndex(String columnName, String[] columns) {
@@ -1407,6 +1410,10 @@ public class ExcelDataEdit extends BaseEntityPageBean {
     }
 
     public void viewExtraCost() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        viewExtraCost(false);
+    }
+
+    public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         setCostNote(null);
         setCostManipulationHelper(new CostManipulationHelper());
         Request request =DaoManager.get(Request.class, getRequestId());
@@ -1439,7 +1446,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             }
         }else
             setCostNote(getExamRequest().getCostNote());
-        getCostManipulationHelper().viewExtraCost(getExamRequest());
+        getCostManipulationHelper().viewExtraCost(getExamRequest(), recalculate);
     }
 
     public void updateNationalCost() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {

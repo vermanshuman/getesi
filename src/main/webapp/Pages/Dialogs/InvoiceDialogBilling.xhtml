@@ -7,6 +7,18 @@
                 xmlns:ff="http://readytech.com/functions">
 
     <style>
+        .request-table thead th {
+            border-color: #5f666c !important;
+            text-align: center;
+        }
+
+        .request-table tbody tr {
+            background-color: white !important;
+            border-color: #5f666c !important;
+            text-align: center;
+        }
+
+
         #invoiceDialogBilling .ui-widget-header {
             background-color: #FFFFFF !important;
             color: #000000 !important;
@@ -302,7 +314,7 @@
                 <p:ajax event="tabChange" listener="#{bean.onTabChange}"/>
                 <p:tab title="#{msg.requestTab}" rendered="#{bean.showRequestTab}">
                     <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
-                        <p:dataTable value="#{bean.invoicedRequests}" styleClass="simple-table" var="item"
+                        <p:dataTable value="#{bean.invoicedRequests}" styleClass="request-table" var="item"
                                      scrollable="true"
                                      scrollHeight="300" style="margin-top:20px;">
 

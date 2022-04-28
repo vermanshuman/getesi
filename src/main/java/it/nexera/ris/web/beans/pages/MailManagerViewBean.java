@@ -260,7 +260,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private Date paymentDate;
 
     private String paymentDescription;
-    
+
     private Boolean dataSaved;
 
     @Override
@@ -1078,12 +1078,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             }
             DaoManager.save(getEntity(), true);
             setDataSaved(Boolean.TRUE);
-            /*if (!redirect) {
-                RequestContext.getCurrentInstance().execute("PF('saveConfirmationDialogWV').show();");
-            } else {
-                FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, ResourcesHelper.getString("mailManagerSave"), null);
-                FacesContext.getCurrentInstance().addMessage("", facesMessage);
-            }*/
+//            if (!redirect) {
+//                RequestContext.getCurrentInstance().execute("PF('saveConfirmationDialogWV').show();");
+//            } else {
+//                FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, ResourcesHelper.getString("mailManagerSave"), null);
+//                FacesContext.getCurrentInstance().addMessage("", facesMessage);
+//            }
         }
         if (redirect) {
             processManagedState(true);

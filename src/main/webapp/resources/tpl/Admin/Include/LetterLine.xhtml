@@ -44,19 +44,16 @@
             left: 10px !important;
             margin-left: 0px !important;
         }
-        
         .fa-info-circle {
-        	left: 26% !important;
+            left: 26% !important;
         }
-        
-        
     </style>
     <script>
-    $(document).ready(function() {
-        setTimeout(() => {
-            $("#dataSaved").hide();
-        }, 5000);
-    });
+        $(document).ready(function() {
+            setTimeout(() => {
+                $("#dataSaved").hide();
+            }, 5000);
+        });
     </script>
     <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/mail.css"
           media="all" rel="stylesheet" type="text/css"/>
@@ -119,17 +116,17 @@
                 <!--  <p:commandButton icon="ui-icon fa fa-pencil" update=":form" styleClass="right-side"
                                   action="#{bean.editEntity}"
                                   disabled="#{!bean.entity.canEdit}"/> -->
-            	<p:commandButton rendered="#{bean.canDeleteMail and bean.actual}" styleClass="ui-button-danger"
+                <p:commandButton rendered="#{bean.canDeleteMail and bean.actual}" styleClass="ui-button-danger"
                              action="#{bean.cancelMail}" icon="pi pi-trash"  style="background: #fb6e51 !important"/>
-                <p:commandButton rendered="#{bean.dataSaved}" id="dataSaved" value="#{msg.mailManagerSave}"  style="background-color: green; width:200px; margin-left:250px;" oncomplete="setTimeout();" 
-                              icon="fa fa-info-circle"  />
+                <p:commandButton rendered="#{bean.dataSaved}" id="dataSaved" value="#{msg.mailManagerSave}"  style="background-color: green; width:200px; margin-left:100px;" oncomplete="setTimeout();"
+                                 icon="fa fa-info-circle"  />
             </p:outputPanel>
         </div>
         <div class="p-col-3" style="text-align:right;">
             <!-- <p:commandButton icon="fa fa-pencil-square" actionListener="#{bean.checkFieldsBeforeProcessManagedStateCheck}"
                              value="#{msg.mailManagerStart}" styleClass="ui-button-success"/> -->
             <p:commandButton icon="pi pi-print" update="form:print_panel"
-                             styleClass="ui-button-warning stampaButton" action="#{bean.generateMailPdf}" oncomplete="printIframe();" value="Stampa" style="margin-right: 1cm;width: auto;background: #FFCC00;"/>
+                             styleClass="ui-button-warning stampaButton" action="#{bean.generateMailPdf}" oncomplete="printIframe();" value="Stampa" style="margin-right: 1cm;width: auto;background: #fed820;"/>
             <p:commandButton update=":form" style="background-color: #F3362B !important;margin-left: 2px;width: 110px;" value="#{msg.close}" styleClass="grey-button"
                              actionListener="#{bean.goTable}"/>
         </div>

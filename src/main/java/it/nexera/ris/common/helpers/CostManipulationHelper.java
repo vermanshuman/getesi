@@ -87,7 +87,11 @@ public class CostManipulationHelper extends PageBean {
 
     public void viewExtraCost(Request request) throws PersistenceBeanException, IllegalAccessException,
             InstantiationException {
+        viewExtraCost(request, false);
+    }
 
+    public void viewExtraCost(Request request, boolean recalculate) throws PersistenceBeanException, IllegalAccessException,
+            InstantiationException {
         if (request == null) {
             return;
         } else {
@@ -116,7 +120,7 @@ public class CostManipulationHelper extends PageBean {
 
         CostCalculationHelper calculation = new CostCalculationHelper(request);
 
-        calculation.calculateAllCosts(true);
+        calculation.calculateAllCosts(true, recalculate);
 
         List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
                 Restrictions.eq("requestId", request.getId())});

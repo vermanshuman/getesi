@@ -1814,13 +1814,17 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             if (!ValidationHelper.isNullOrEmpty(serviceList)) {
                 if (serviceList.size() == 1) {
                     newRequest.setService(serviceList.get(0));
+                    newRequest.setMultipleRequestTypes(null);
                 } else {
+                    newRequest.setService(null);
                     newRequest.setMultipleServices(serviceList);
                 }
             }
         } else {
-            if (!ValidationHelper.isNullOrEmpty(getSelectedServiceId()))
+            if (!ValidationHelper.isNullOrEmpty(getSelectedServiceId())){
                 newRequest.setService(DaoManager.get(Service.class, getSelectedServiceId()));
+                newRequest.setMultipleServices(null);
+            }
         }
         fillRequestExpirationDate(newRequest);
         setRequestData(newRequest);
@@ -3329,7 +3333,9 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if(isMultipleRequestCreate()){
             if(!ValidationHelper.isNullOrEmpty(getRequestTypeMultiple())
                     && getRequestTypeMultiple() && !ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
-                setShowConfirmButton(Boolean.TRUE);
+                //setShowConfirmButton(Boolean.TRUE);
+                reset = false;
+                generateDynamicContent(true);
             }else if((!ValidationHelper.isNullOrEmpty(getRequestTypeMultiple())
                     && getRequestTypeMultiple() && ValidationHelper.isNullOrEmpty(getSelectedServiceIds()))){
                 setShowConfirmButton(Boolean.FALSE);
