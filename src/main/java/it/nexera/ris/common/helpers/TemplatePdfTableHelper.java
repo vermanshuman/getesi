@@ -101,13 +101,13 @@ public class TemplatePdfTableHelper {
             }else if(o2==null) {
                 return 1;
             }else {
-                if(o1.getSheet()!=null&&o2.getSheet()!=null) {
-                    int result = o1.getSheet().compareTo(o2.getSheet());
-                    if(result==0) {
-                        result = o1.getParticle().compareTo(o2.getParticle());
+                if(o1.getSheet() != null && o2.getSheet() != null) {
+                    int result = extractInt(o1.getSheet()).compareTo(extractInt(o2.getSheet()));
+                    if(result == 0) {
+                        result = extractInt(o1.getParticle()).compareTo(extractInt(o2.getParticle()));
                     }
-                    if(result==0) {
-                        result = o1.getSub().compareTo(o2.getSub());
+                    if(result == 0) {
+                        result = extractInt(o1.getSub()).compareTo(extractInt(o2.getSub()));
                     }
                     return result;
                 }else if(o1.getSheet()==null) {
@@ -167,6 +167,13 @@ public class TemplatePdfTableHelper {
         }
         return joiner;
     }
+    
+    private static Integer extractInt(String s) {
+        String num = s.replaceAll("\\D", "");
+        // return 0 if no digits found
+        return num.isEmpty() ? 0 : Integer.parseInt(num);
+    }
+    
     public static List<String> groupPropertiesByQuoteTypeList(List<Property> propertyList, Subject subject,
                                                               boolean filterRelationship,
                                                               boolean showCadastralIncome,
