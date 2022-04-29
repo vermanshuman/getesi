@@ -854,6 +854,13 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     public void loadInvoiceDialogData(Invoice invoicedb) throws IllegalAccessException, PersistenceBeanException, HibernateException, InstantiationException  {
         setShowRequestTab(false);
+        if(!ValidationHelper.isNullOrEmpty(invoicedb)) {
+	        List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.eq("invoice", invoicedb)});
+	        if(requests != null && !requests.isEmpty()) {
+	        	setInvoicedRequests(requests);
+	        	setShowRequestTab(true);
+	        }
+        }
         List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[] {Restrictions.eq("invoice", invoicedb)}, new Order[]{
                 Order.desc("date")});
         setPaymentInvoices(paymentInvoicesList);
@@ -929,6 +936,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 if(!ValidationHelper.isNullOrEmpty(invoice.getStatus()) && invoice.getStatus().equals(InvoiceStatus.DELIVERED)) {
                     setInvoiceSentStatus(true);
                 }
+                
+                
             }
         } else {
             setGoodsServicesFields(new ArrayList<>());
@@ -1831,6 +1840,10 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     public void loadInvoiceDialogDataPayment(Invoice invoice) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         setActiveTabIndex(1);
+        List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
+        if(requests != null && !requests.isEmpty()) {
+        	setActiveTabIndex(2);
+        }
         setNumber(invoice.getId());
         loadInvoiceDialogData(invoice);
 
