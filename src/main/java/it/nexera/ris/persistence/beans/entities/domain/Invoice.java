@@ -80,6 +80,10 @@ public class Invoice extends IndexedEntity implements Serializable {
 
 	@Column(name = "totale_lordo")
 	private Double totalGrossAmount;
+	
+	@ManyToOne
+	@JoinColumn(name = "email_from")
+	private WLGInbox emailFrom;
 
 	@Transient
 	private String documentType;
@@ -290,4 +294,14 @@ public class Invoice extends IndexedEntity implements Serializable {
 	public void setTotalGrossAmount(Double totalGrossAmount) {
 		this.totalGrossAmount = totalGrossAmount;
 	}
+
+	public WLGInbox getEmailFrom() {
+		return emailFrom;
+	}
+
+	public void setEmailFrom(WLGInbox emailFrom) {
+		this.emailFrom = emailFrom;
+	}
+	
+	
 }

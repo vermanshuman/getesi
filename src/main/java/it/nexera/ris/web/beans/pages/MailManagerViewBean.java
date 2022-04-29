@@ -1409,6 +1409,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     + " GESTORE " + (!ValidationHelper.isNullOrEmpty(getEntity().getClient()) && !ValidationHelper.isNullOrEmpty(getEntity().getClient().getClientName()) ? getEntity().getClient().getClientName() : "")
                     + " FIDUCIARIO " + (!ValidationHelper.isNullOrEmpty(getEntity().getOffice()) && !ValidationHelper.isNullOrEmpty(getEntity().getOffice().getDescription()) ? getEntity().getOffice().getDescription() : "");
             setInvoiceNote(causal);
+            setEmailSubject(causal);
         }
     }
 
@@ -1426,6 +1427,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         invoice.setDate(getInvoiceDate());
         invoice.setDate(new Date());
         invoice.setStatus(InvoiceStatus.DRAFT);
+        invoice.setEmailFrom(getEntity());
         DaoManager.save(invoice, true);
 
         List<InvoiceItem> invoiceItems = InvoiceHelper.groupingItemsByTaxRate(selectedRequestList);
@@ -1836,7 +1838,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 setInvoicedRequests(baseMail.getRequests()
                         .stream()
                         .filter(r -> !ValidationHelper.isNullOrEmpty(r.getStateId()) &&
-                                r.getStateId().equals(RequestState.SENT_TO_SDI.getId()))
+                                (r.getStateId().equals(RequestState.EVADED.getId()) || r.getStateId().equals(RequestState.SENT_TO_SDI.getId())))
                         .collect(Collectors.toList()));
             }
             refrequest = baseMail.getReferenceRequest();
