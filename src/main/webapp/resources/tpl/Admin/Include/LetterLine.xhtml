@@ -47,6 +47,16 @@
         .fa-info-circle {
             left: 26% !important;
         }
+
+        #dataSaved {
+            margin-left:10px;
+        }
+        @media (min-width: 1600px) {
+            #dataSaved {
+                margin-left: calc(50vw - 745px);
+                position: absolute;
+            }
+        }
     </style>
     <script>
         $(document).ready(function() {
@@ -118,7 +128,7 @@
                                   disabled="#{!bean.entity.canEdit}"/> -->
                 <p:commandButton rendered="#{bean.canDeleteMail and bean.actual}" styleClass="ui-button-danger"
                              action="#{bean.cancelMail}" icon="pi pi-trash"  style="background: #fb6e51 !important"/>
-                <p:commandButton rendered="#{bean.dataSaved}" id="dataSaved" value="#{msg.mailManagerSave}"  style="background-color: green; width:200px;left: calc(50% - 100px);position: absolute;" oncomplete="setTimeout();"
+                <p:commandButton rendered="#{bean.dataSaved}" id="dataSaved" value="#{msg.mailManagerSave}"  style="background-color: green; width:200px;" oncomplete="setTimeout();"
                                  icon="fa fa-info-circle"  />
             </p:outputPanel>
         </div>
