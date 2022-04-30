@@ -1132,11 +1132,16 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
 
     public boolean checkTotalCostSpecialColumn(Request request)
             throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        request.setCalculateCost(Boolean.TRUE);
         double calculatedTotalCost = new CostCalculationHelper(request).calculateTotalCost(Boolean.TRUE);
         double totalCostFromRequest = ValidationHelper.isNullOrEmpty(request.getTotalCost()) ?
                 0d : Double.parseDouble(request.getTotalCost().replaceAll(",", "."));
+        double totalCostByColumns = getMortgageCost(request) + getCatastalCost(request)
+                + (ValidationHelper.isNullOrEmpty(request.getCostPay()) ? 0d : request.getCostPay());
+        request.setCalculateCost(null);
         log.info("For " + request.getFiscalCodeVATNamber());
-        log.info("calculatedTotalCost " + calculatedTotalCost + ", totalCostFromRequest " + totalCostFromRequest);
+        log.info("calculatedTotalCost " + calculatedTotalCost + ", totalCostFromRequest " + totalCostFromRequest + ", totalCostByColumns  " + totalCostByColumns);
+
         if (Math.abs(calculatedTotalCost - totalCostFromRequest) > 0.0001) {
             return true;
         }

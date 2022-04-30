@@ -17,14 +17,11 @@
             border-color: #5f666c !important;
             text-align: center;
         }
-        
         .request-table table {
-		    border-collapse: unset;
-		    border-spacing: unset;
-		    width: auto;
-		}
-
-
+            border-collapse: unset;
+            border-spacing: unset;
+            width: auto;
+        }
         #invoiceDialogBilling .ui-widget-header {
             background-color: #FFFFFF !important;
             color: #000000 !important;
@@ -310,10 +307,10 @@
         #paymentDate_input {
             width: 210px !important;
         }
-        
+
         .ui-datatable-tablewrapper {
-		    overflow: unset;
-		}
+            overflow: unset;
+        }
 
     </style>
 
@@ -325,7 +322,8 @@
                 <p:tab title="#{msg.requestTab}" rendered="#{bean.showRequestTab}">
                     <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
                         <p:dataTable value="#{bean.invoicedRequests}" styleClass="request-table" var="item"
-                                      style="margin-top:20px;">
+                                     style="margin-top:20px;">
+
 
                             <p:column headerText="#{msg.requestListRequestType}" style="width: 242px !important;text-align: center !important;">
                                 <h:outputText value="#{item.requestTypeName}"/>
@@ -781,12 +779,11 @@
                                              styleClass="ui-button-success p-mr-2 p-mb-2"/>
                         </div>
                         <p:panel id="table_div" widgetVar="paymentInvoicePanelWV">
-	                        <div class="p-col-12">
-	                            <p:outputLabel  value="#{msg.amountToBeCollected} : #{bean.selectedInvoice.onBalance}" style="font-weight: 700 !important; float:right;"/>
-	                        </div>
-                        
+                            <div class="p-col-12">
+                                <p:outputLabel  value="#{msg.amountToBeCollected} : #{bean.selectedInvoice.onBalance}" style="font-weight: 700 !important; float:right;"/>
+                            </div>
                             <p:dataTable id="paymentInvoiceTable" value="#{bean.paymentInvoices}" emptyMessage="#{msg.noRecordsFound}" widgetVar="paymentInvoiceTableWV"
-                                         var="paymentInvoice"  lazy="true" 
+                                         var="paymentInvoice"  lazy="true"
                                          paginator="true" paginatorAlwaysVisible="true" rowIndexVar="rowId">
                                 <p:column headerText="#{msg.importAmount}">
                                     <h:outputText value="#{paymentInvoice.paymentImport}"/>
@@ -802,10 +799,10 @@
                                     </p:commandButton>
                                 </p:column>
                             </p:dataTable>
-                        
-	                        <div class="p-col-12">
-	                            <p:outputLabel value="#{msg.totalPayments} : #{bean.selectedInvoice.totalPayment} #{msg.outOf} #{bean.selectedInvoice.totalGrossAmount}" style="font-weight: 700 !important; float:right;"/>
-	                        </div>
+                            <div class="p-col-12">
+                                <p:outputLabel value="#{msg.totalPayments} : #{bean.selectedInvoice.totalPayment} #{msg.outOf} #{bean.selectedInvoice.totalGrossAmount}" style="font-weight: 700 !important; float:right;"/>
+                            </div>
+
                         </p:panel>
                     </div>
                 </p:tab>

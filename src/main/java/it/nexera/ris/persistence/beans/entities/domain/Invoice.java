@@ -80,7 +80,7 @@ public class Invoice extends IndexedEntity implements Serializable {
 
 	@Column(name = "totale_lordo")
 	private Double totalGrossAmount;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "email_from")
 	private WLGInbox emailFrom;
@@ -302,6 +302,4 @@ public class Invoice extends IndexedEntity implements Serializable {
 	public void setEmailFrom(WLGInbox emailFrom) {
 		this.emailFrom = emailFrom;
 	}
-	
-	
 }

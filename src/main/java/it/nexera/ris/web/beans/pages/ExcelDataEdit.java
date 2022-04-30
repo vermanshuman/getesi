@@ -24,6 +24,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 
 import it.nexera.ris.common.helpers.*;
+import it.nexera.ris.persistence.beans.entities.domain.*;
 import org.apache.commons.io.FileUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -43,12 +44,6 @@ import it.nexera.ris.common.xml.wrappers.SelectItemWrapper;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.Dictionary;
-import it.nexera.ris.persistence.beans.entities.domain.Client;
-import it.nexera.ris.persistence.beans.entities.domain.ClientInvoiceManageColumn;
-import it.nexera.ris.persistence.beans.entities.domain.Document;
-import it.nexera.ris.persistence.beans.entities.domain.ExtraCost;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
-import it.nexera.ris.persistence.beans.entities.domain.WLGInbox;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
@@ -127,6 +122,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
     private Client selectedRequestClient;
 
     private List<Request> selectedRequests;
+
     @Override
     protected void onConstruct() {
         setMailId(null);
@@ -525,6 +521,38 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         if (colIndex > -1 && !ValidationHelper.isNullOrEmpty(request.getPosition())) {
             columnValues.put(getColumnName(ResourcesHelper.getString("excelPosition"),request),request.getPosition());
         }
+
+        colIndex = getIndex(ResourcesHelper.getString("excelStamps"), CreateExcelRequestsReportHelper.getRequestsColumns());
+        if (colIndex > -1) {
+            Double result =  getExtraCostRelated(request.getId(), ExtraCostType.MARCA);
+            result = (double) Math.round((result)* 100000d) / 100000d;
+            columnValues.put(getColumnName(ResourcesHelper.getString("excelStamps"),request), "\u20AC" + result);
+        }
+
+        colIndex = getIndex(ResourcesHelper.getString("excelPostalExpenses"), CreateExcelRequestsReportHelper.getRequestsColumns());
+        if (colIndex > -1) {
+            Double result =  getExtraCostRelated(request.getId(), ExtraCostType.POSTALE);
+            result = (double) Math.round((result)* 100000d) / 100000d;
+            columnValues.put(getColumnName(ResourcesHelper.getString("excelPostalExpenses"),request),"\u20AC" + result);
+        }
+        request.setSelectedTemplateId(null);
+        RequestPrint requestPrint = DaoManager.get(RequestPrint.class,
+                new CriteriaAlias[]{new CriteriaAlias("request", "rq", JoinType.INNER_JOIN)},
+                new Criterion[]{Restrictions.eq("rq.id", request.getId())});
+        if (requestPrint != null) {
+            if (requestPrint.getTemplate() != null) {
+                request.setSelectedTemplateId(requestPrint.getTemplate().getId());
+            }
+        }
+        boolean isCostMismatch = createExcelRequestsReportHelper.checkTotalCostSpecialColumn( request);
+        if(isCostMismatch){
+            String value = columnValues.get(getColumnName(ResourcesHelper.getString("excelNote"),request));
+            String html = "<span style=\"color:Orange\">Anomalia costi</span>";
+            if(!ValidationHelper.isNullOrEmpty(value)){
+                html  = value + "<br/>" + html;
+            }
+            columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request),html);
+        }
     }
 
     private void addColumnValues(Request request, Service service,
@@ -680,6 +708,45 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         colIndex = getIndex(ResourcesHelper.getString("excelPosition"), CreateExcelRequestsReportHelper.getRequestsColumns());
         if (colIndex > -1 && !ValidationHelper.isNullOrEmpty(request.getPosition())) {
             columnValues.put(getColumnName(ResourcesHelper.getString("excelPosition"),request,service),request.getPosition());
+        }
+
+        colIndex = getIndex(ResourcesHelper.getString("excelStamps"), CreateExcelRequestsReportHelper.getRequestsColumns());
+        if (colIndex > -1 && index != -1) {
+
+            Double result = getExtraCostRelated(!ValidationHelper.isNullOrEmpty(request.getId()) ? request.getId() : request.getReferenceId(), ExtraCostType.MARCA);
+            result = (double) Math.round((result)* 100000d) / 100000d;
+
+            columnValues.put(getColumnName(ResourcesHelper.getString("excelStamps"),request, service),
+                    "\u20AC" + result);
+        }
+
+        colIndex = getIndex(ResourcesHelper.getString("excelPostalExpenses"), CreateExcelRequestsReportHelper.getRequestsColumns());
+        if (colIndex > -1  && index != -1) {
+            Double result = getExtraCostRelated(!ValidationHelper.isNullOrEmpty(request.getId()) ? request.getId() : request.getReferenceId(), ExtraCostType.POSTALE);
+            result = (double) Math.round((result)* 100000d) / 100000d;
+            columnValues.put(getColumnName(ResourcesHelper.getString("excelPostalExpenses"),request, service),
+                    "\u20AC" + result);
+        }
+
+        Request referenceRequest = DaoManager.get(Request.class, !ValidationHelper.isNullOrEmpty(request.getReferenceId()) ? request.getReferenceId() : request.getId());
+        referenceRequest.setSelectedTemplateId(null);
+        RequestPrint requestPrint = DaoManager.get(RequestPrint.class,
+                new CriteriaAlias[]{new CriteriaAlias("request", "rq", JoinType.INNER_JOIN)},
+                new Criterion[]{Restrictions.eq("rq.id", referenceRequest.getId())});
+        if (requestPrint != null) {
+            if (requestPrint.getTemplate() != null) {
+                referenceRequest.setSelectedTemplateId(requestPrint.getTemplate().getId());
+            }
+        }
+
+        boolean isCostMismatch = createExcelRequestsReportHelper.checkTotalCostSpecialColumn( referenceRequest);
+        if(isCostMismatch){
+            String value = columnValues.get(getColumnName(ResourcesHelper.getString("excelNote"),request,service));
+            String html = "<span style=\"color:Orange\">Anomalia costi</span>";
+            if(!ValidationHelper.isNullOrEmpty(value)){
+                html  = value + "<br/>" + html;
+            }
+            columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request),html);
         }
     }
     protected Double getSumOfCostTotal(List<Request> requests) {
@@ -1225,6 +1292,22 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         getCostManipulationHelper().viewExtraCost(getExamRequest(), reCalculate);
     }
 
+
+    protected Double getExtraCostRelated(Long requestId, ExtraCostType extraCostType) throws PersistenceBeanException, IllegalAccessException {
+        Double result = 0d;
+
+        List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
+                Restrictions.eq("requestId", requestId),
+                Restrictions.eq("type", extraCostType)});
+
+        if (!ValidationHelper.isNullOrEmpty(extraCosts)) {
+            for (ExtraCost cost : extraCosts) {
+                result += cost.getPrice();
+            }
+        }
+        return result.equals(0d) ? result : Math.round(result * 100000d) / 100000d;
+    }
+
     private int getIndex(String columnName, String[] columns) {
         return Arrays.asList(columns).indexOf(columnName);
     }
@@ -1417,10 +1500,19 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         setCostNote(null);
         setCostManipulationHelper(new CostManipulationHelper());
         Request request =DaoManager.get(Request.class, getRequestId());
+        request.setSelectedTemplateId(null);
         if(!Hibernate.isInitialized(request.getRequestFormalities())){
             request.reloadRequestFormalities();
         }
         setExamRequest(request);
+        RequestPrint requestPrint = DaoManager.get(RequestPrint.class,
+                new CriteriaAlias[]{new CriteriaAlias("request", "rq", JoinType.INNER_JOIN)},
+                new Criterion[]{Restrictions.eq("rq.id", getRequestId())});
+        if (requestPrint != null) {
+            if (requestPrint.getTemplate() != null) {
+                getExamRequest().setSelectedTemplateId(requestPrint.getTemplate().getId());
+            }
+        }
         getCostManipulationHelper().setMortgageTypeList(ComboboxHelper.fillList(MortgageType.class, false, false));
         if(ValidationHelper.isNullOrEmpty(getExamRequest().getCostNote())) {
             try {
@@ -1447,6 +1539,13 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         }else
             setCostNote(getExamRequest().getCostNote());
         getCostManipulationHelper().viewExtraCost(getExamRequest(), recalculate);
+        setDataTable(new ArrayList<>());
+        if(!ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
+                !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox().getRequests())) {
+            prepareTables(getMail().getRecievedInbox().getRequests());
+        }else if (!ValidationHelper.isNullOrEmpty(getMail().getRequests())) {
+            prepareTables(getMail().getRequests());
+        }
     }
 
     public void updateNationalCost() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {

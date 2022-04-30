@@ -16,6 +16,7 @@
         <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/request.css"
               media="all" rel="stylesheet" type="text/css"/>
         <style>
+
             .search-btn {
                 margin-top: 18px !important;
             }
@@ -268,6 +269,19 @@
             body .ui-datatable .ui-datatable-data > tr.ui-datatable-selectable {
                 cursor: default;
             }
+            #requestDocs thead th {
+                background-color: #003871 !important;
+                color: #ffffff !important;
+                font-weight: normal;
+                font-size: 14px;
+            }
+            body #requestDocs .ui-datatable-data tr.ui-datatable-even {
+                background-color: #f0f3f5;
+            }
+
+           .docdowload {
+                 background-color: #003871 !important;
+             }
         </style>
         <script>
             var doChange = true;
@@ -408,7 +422,7 @@
                                     </script>
 
                                     <p:panel id="settingPanel" widgetVar="panelSetting" closable="true"
-                                             toggleable="true" style="display: none;">
+                                             toggleable="true" style="display: none;" rendered="#{bean.resetSettingPanel}">
                                         <div class="p-grid">
                                             <div class="p-col-12" style="text-align: center;">
                                                 <h2>Filtra per</h2>
@@ -596,9 +610,9 @@
                                                                  oncomplete="PF('panelSetting').getJQ().hide();"/>
                                                 <p:commandButton id="manageReestablishBtn" style="width: auto;"
                                                                  value="#{ff:upper(msg.mailManageReestablish)}"
-                                                                 update="settingPanel searchPanel"
+                                                                 update="settingPanel searchPanel services"
                                                                  actionListener="#{bean.clearFiltraPanel}"
-                                                                 oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').getJQ().hide();"/>
+                                                                 oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').getJQ().hide();updateSettingPanel();"/>
                                             </div>
                                         </div>
                                     </p:panel>
@@ -633,7 +647,7 @@
 
         <p:remoteCommand name="onLoadFilterData"
                          action="#{bean.loadFilterData()}" update="settingPanel" oncomplete="togglePanel()"/>
-
+        <p:remoteCommand name="updateSettingPanel" update="services"/>
         <p:outputPanel id="searchPanel" style="display:none;" >
             <p:commandButton icon="fa fa-fw fa-file-pdf-o"  rendered="false"
                              action="#{bean.downloadPdfFile}" ajax="false" update="@form">
@@ -1091,31 +1105,43 @@
                                                           style="font-weight:bold;color:#003871;"/>
                                         </p:tooltip>
 
-                                        <h:outputText id="externalUserIcon" rendered="#{item.external and not item.haveAllegatiDocuments}"
+                                        <h:outputText id="externalUserIcon-#{loop.index}" rendered="#{item.external and not item.haveAllegatiDocuments}"
                                                       style="margin: 0 auto;" styleClass="richiesta-da-clienti-icon" />
-                                        <p:tooltip for="externalUserIcon" value="#{item.createUserFullName}" escape="false"/>
+                                        <p:tooltip for="externalUserIcon-#{loop.index}" styleClass="custom-design-tooltip" escape="false">
+                                            <h:outputText value="#{item.createUserFullName}"
+                                                          style="font-weight:bold;color:#003871;"/>
+                                        </p:tooltip>
 
                                         <p:outputPanel rendered="#{item.external and item.haveAllegatiDocuments}" style="display: flex;margin-left: calc( 50% - 15px );">
-                                            <p:commandButton id="externalUserIconA"  styleClass="richiesta-da-clienti-icon" action="#{bean.loadAllegatiDocuments}" update="requestDocs"
+                                            <p:commandButton id="externalUserIconA-#{loop.index}"  styleClass="richiesta-da-clienti-icon" action="#{bean.loadAllegatiDocuments}" update="requestDocs"
                                                              style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
                                                              oncomplete="PF('documentDialog').show();">
                                                 <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                                             </p:commandButton>
-                                            <p:tooltip for="externalUserIconA" value="#{item.createUserFullName}" escape="false"/>
+                                            <p:tooltip for="externalUserIconA-#{loop.index}" styleClass="custom-design-tooltip" escape="false">
+                                                <h:outputText value="#{item.createUserFullName}"
+                                                              style="font-weight:bold;color:#003871;"/>
+                                            </p:tooltip>
                                             <h:outputText value="A"  style="width: 19px;height: 20px;background-color: #003871;border-radius: 50%;color: white;display: block;margin-top: -10px;margin-left: -6px;text-align: center;" />
                                         </p:outputPanel>
 
 
-                                        <p:graphicImage id="internalUserIcon" url="/resources/images/richiesta-da-operatore-getesi.png"
+                                        <p:graphicImage id="internalUserIcon-#{loop.index}" url="/resources/images/richiesta-da-operatore-getesi.png"
                                                         style="height :28px;"  rendered="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments}" />
-                                        <p:tooltip for="internalUserIcon" value="#{item.createUserFullName}" escape="false"/>
+                                        <p:tooltip for="internalUserIcon-#{loop.index}" styleClass="custom-design-tooltip" escape="false">
+                                            <h:outputText value="#{item.createUserFullName}"
+                                                          style="font-weight:bold;color:#003871;"/>
+                                        </p:tooltip>
 
                                         <p:outputPanel style="display: flex;#{empty item.mailId ? 'margin-left: 38%;' : ''}" rendered="#{not item.external and empty item.mailId and item.haveAllegatiDocuments}">
-                                            <p:commandButton id="internalUserIconA" value="G" action="#{bean.loadAllegatiDocuments}" update="requestDocs" styleClass="g-btn" style="background-color: transparent !important;display: block;width: 24px;height: 24px;border: 2px solid;border-radius: 50%;color: #003871;margin: 0 auto;cursor: pointer;"
+                                            <p:commandButton id="internalUserIconA-#{loop.index}" value="G" action="#{bean.loadAllegatiDocuments}" update="requestDocs" styleClass="g-btn" style="background-color: transparent !important;display: block;width: 24px;height: 24px;border: 2px solid;border-radius: 50%;color: #003871;margin: 0 auto;cursor: pointer;"
                                                              oncomplete="PF('documentDialog').show();">
                                                 <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                                             </p:commandButton>
-                                            <p:tooltip for="internalUserIconA" value="#{item.createUserFullName}" escape="false"/>
+                                            <p:tooltip for="internalUserIconA-#{loop.index}" styleClass="custom-design-tooltip" escape="false">
+                                            <h:outputText value="#{item.createUserFullName}"
+                                                          style="font-weight:bold;color:#003871;"/>
+                                        </p:tooltip>
                                             <h:outputText value="A"  style="width: 19px;height: 20px;background-color: #003871;border-radius: 50%;color: white;display: block;margin-top: -10px;margin-left: -6px;text-align: center;" />
                                         </p:outputPanel>
 
@@ -1259,7 +1285,7 @@
                         <h:outputText value="#{doc.title}#{not empty doc.fileExtension ? doc.fileExtension : '' }"/>
                     </p:column>
                     <p:column styleClass="action_column">
-                        <p:commandButton icon="fa fa-download" action="#{bean.downloadRequestFile}" ajax="false">
+                        <p:commandButton icon="fa fa-download" action="#{bean.downloadRequestFile}" ajax="false" styleClass="docdowload">
                             <f:setPropertyActionListener value="#{doc.id}" target="#{bean.entityEditId}"/>
                         </p:commandButton>
                     </p:column>

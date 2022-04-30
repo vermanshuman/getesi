@@ -166,6 +166,8 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     @Setter
     private ListPaginator paginator;
 
+    private boolean resetSettingPanel = true;
+
     private static final String KEY_CLIENT_ID = "KEY_CLIENT_ID_SESSION_KEY_NOT_COPY";
     private static final String KEY_STATES = "KEY_STATES_SESSION_KEY_NOT_COPY";
     private static final String KEY_REQUEST_TYPE = "KEY_REQUEST_TYPE_SESSION_KEY_NOT_COPY";
@@ -648,14 +650,14 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         }
 
         if (!ValidationHelper.isNullOrEmpty(getFiduciaryClientFilterId())) {
-            restrictions.add(Restrictions.eq("fiduciaryId",
-                    getFiduciaryClientFilterId()));
+//            restrictions.add(Restrictions.eq("fiduciaryId",
+//                    getFiduciaryClientFilterId()));
         }
 
 
         if (!ValidationHelper.isNullOrEmpty(getManagerClientFilterid())) {
-            restrictions.add(Restrictions.eq("managerId",
-                    getManagerClientFilterid()));
+//            restrictions.add(Restrictions.eq("managerId",
+//                    getManagerClientFilterid()));
         }
 
         setFilterRestrictions(restrictions);
@@ -1655,7 +1657,8 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         }
     }
 
-    public void clearFiltraPanel() {
+    public void clearFiltraPanel() throws PersistenceBeanException, IllegalAccessException {
+        loadFilterData();
         setSelectedClientId(null);
         setDateFrom(null);
         setDateTo(null);
@@ -1666,6 +1669,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         setManagerClientFilterid(null);
         setFiduciaryClientFilterId(null);
         setAggregationFilterId(null);
+        setSelectedServices(null);
 
         SessionHelper.removeObject(KEY_CLIENT_ID);
         SessionHelper.removeObject(KEY_DATE_FROM_REQ);
@@ -1677,6 +1681,8 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         SessionHelper.removeObject(KEY_CLIENT_MANAGER_ID);
         SessionHelper.removeObject(KEY_CLIENT_FIDUCIARY_ID);
         SessionHelper.removeObject(KEY_AGGREAGATION);
+        SessionHelper.removeObject(KEY_SERVICES);
+        resetSettingPanel = false;
     }
 
     public void setSelectedRequestTypes(List<RequestType> selectedRequestTypes) {
@@ -1730,5 +1736,13 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     public void setRequestType(Integer requestType) {
         this.requestType = requestType;
+    }
+
+    public boolean isResetSettingPanel() {
+        return resetSettingPanel;
+    }
+
+    public void setResetSettingPanel(boolean resetSettingPanel) {
+        this.resetSettingPanel = resetSettingPanel;
     }
 }

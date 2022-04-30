@@ -75,8 +75,9 @@
                     	<f:facet name="header">
                         	<h:outputText value="#{column}" />
                         </f:facet>
-                        <h:outputText value="#{key.columnValues[column.concat('_').concat(req.tempId)]}" />
-                        <f:facet name="footer">
+						<h:outputText value="#{key.columnValues[column.concat('_').concat(req.tempId)]}" rendered="#{column eq msg.excelNote}" escape="false"/>
+						<h:outputText value="#{key.columnValues[column.concat('_').concat(req.tempId)]}" rendered="#{column ne msg.excelNote}"/>
+						<f:facet name="footer">
                         	<h:outputText value="#{key.footerValues[column]}" style="font-weight:bold;font-size: 15px;"/>
 	        			</f:facet>
 					</p:columns>

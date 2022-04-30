@@ -15,6 +15,7 @@ import it.nexera.ris.persistence.beans.entities.domain.PriceList;
 import it.nexera.ris.persistence.beans.entities.domain.Request;
 import it.nexera.ris.persistence.beans.entities.domain.RequestFormality;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
+import it.nexera.ris.web.beans.pages.ExcelDataEdit;
 import it.nexera.ris.web.beans.pages.RequestTextEditBean;
 
 import org.hibernate.Hibernate;
@@ -146,8 +147,8 @@ public class CostCalculationHelper {
                     getRequest().setCostPay(result);
                 }
                 requestCosts.finalCostWithExtraCost += initCost;
-                
-            }else if (getRequest().getCostButtonConfirmClicked() != null 
+
+            }else if ((getRequest().getCalculateCost() == null || !getRequest().getCalculateCost()) && getRequest().getCostButtonConfirmClicked() != null
                     && getRequest().getCostButtonConfirmClicked()) {
                 for (ExtraCost cost : extraCost) {
                     if(ValidationHelper.isNullOrEmpty(cost.getType()) ||
@@ -833,6 +834,11 @@ public class CostCalculationHelper {
         Long modelIdOfTemplate = 0L;
         if (!ValidationHelper.isNullOrEmpty(requestTextEditBean)) {
             modelIdOfTemplate = DaoManager.get(DocumentTemplate.class, requestTextEditBean.getSelectedTemplateId()).getModel().getId();
+        }else {
+            if (!ValidationHelper.isNullOrEmpty(getRequest()) &&
+                    !ValidationHelper.isNullOrEmpty(getRequest().getSelectedTemplateId())) {
+                modelIdOfTemplate = DaoManager.get(DocumentTemplate.class, getRequest().getSelectedTemplateId()).getModel().getId();
+            }
         }
 
         return modelIdOfTemplate.equals(value);

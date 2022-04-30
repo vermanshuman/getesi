@@ -427,6 +427,15 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     private Boolean salesDevelopment;
 
     @Transient
+    private Long referenceId;
+
+    @Transient
+    private Long selectedTemplateId;
+
+    @Transient
+    private Boolean calculateCost;
+
+    @Transient
     private String dateEvasionString;
 
     @Transient
@@ -2107,6 +2116,14 @@ public class Request extends DocumentTagEntity implements BeforeSave {
         this.selectedRequest = selectedRequest;
     }
 
+    public Long getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(Long referenceId) {
+        this.referenceId = referenceId;
+    }
+
     public String getDateEvasionString() {
         if (getEvasionDate() != null) {
             return DateTimeHelper.toFormatedStringLocal(getEvasionDate(),
@@ -2335,5 +2352,21 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     public void setRequestTypeIcon(String requestTypeIcon) {
         this.requestTypeIcon = requestTypeIcon;
+    }
+
+    public Long getSelectedTemplateId() {
+        return selectedTemplateId;
+    }
+
+    public void setSelectedTemplateId(Long selectedTemplateId) {
+        this.selectedTemplateId = selectedTemplateId;
+    }
+
+    public Boolean getCalculateCost() {
+        return calculateCost;
+    }
+
+    public void setCalculateCost(Boolean calculateCost) {
+        this.calculateCost = calculateCost;
     }
 }
