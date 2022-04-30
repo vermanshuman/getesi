@@ -48,13 +48,7 @@
             left: 26% !important;
         }
         #dataSaved {
-            margin-left:10px;
-        }
-        @media (min-width: 1600px) {
-            #dataSaved {
-                margin-left: calc(50vw - 745px);
-                position: absolute;
-            }
+            position: absolute;
         }
     </style>
     <script>
@@ -62,6 +56,24 @@
             setTimeout(() => {
                 $("#dataSaved").hide();
             }, 5000);
+
+            function setDataSavedPosition() {
+                var totalWidth = 0;
+                var stampaPosition = $('.stampaButton')[0].offsetLeft;
+                $('#btn_line').children('button').each((index, element) => {
+                    if(element.id != 'dataSaved') {
+                        totalWidth = element.clientWidth + element.offsetLeft;
+                    }
+                });
+                var distanceBetween = stampaPosition - totalWidth;
+                if(distanceBetween >= 205) {
+                    $("#dataSaved").css('left', ((distanceBetween / 2) + totalWidth - 100) + 'px');
+                }
+            }
+            setDataSavedPosition();
+            $( window ).resize(function() {
+                setDataSavedPosition();
+            });
         });
     </script>
     <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/mail.css"
