@@ -154,6 +154,7 @@ body .custom-design-tooltip .ui-tooltip-arrow {
 	min-width: 6.45rem;
 	height: 14px;
 	text-align: center;
+	padding-top: 0.4px;
 }
 
 @media (max-width: 1400px) {

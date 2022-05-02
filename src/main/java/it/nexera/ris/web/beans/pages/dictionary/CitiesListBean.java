@@ -52,6 +52,8 @@ public class CitiesListBean extends EntityLazyInListEditPageBean<City> implement
         try {
             if (DaoManager.getCount(City.class, "id", new Criterion[]{
                     Restrictions.eq("cfis", getEntity().getCfis()),
+                    Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                            Restrictions.isNull("isDeleted")),
                     Restrictions.ne("id", getEntity().isNew() ? 0L : getEntity().getId())
             }) > 0) {
                 getEntity().setCfis(getCfis());

@@ -979,21 +979,24 @@
                                                      onclick="PF('userSelectCheckboxWV').show(); event.stopImmediatePropagation();"
                                                      value="#{ff:upper(msg.requestListCurrentOperator)}" type="button" style="font-size: 14px;font-weight: normal;"/>
                                 </th>
+                                <th id="table:j_idt167" class="ui-state-default ui-sortable-column" role="columnheader"
+                                    aria-label="SCADENZA: activate to sort column ascending" scope="col"
+                                    style="background-color: #D9E0E7 !important;width: 6vw;min-width: 125px;text-align: center;" tabindex="0"><span
+                                        class="ui-column-title">SCADENZA</span><span
+                                        class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s"></span></th>
                             </c:if>
-                            <th id="table:j_idt167" class="ui-state-default ui-sortable-column" role="columnheader"
-                                aria-label="SCADENZA: activate to sort column ascending" scope="col"
-                                style="background-color: #D9E0E7 !important;width: 6vw;min-width: 125px;text-align: center;" tabindex="0"><span
-                                    class="ui-column-title">SCADENZA</span><span
-                                    class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s"></span></th>
+
                             <th id="table:j_idt169" class="ui-state-default" role="columnheader" aria-label="INPUT"
                                 scope="col" style="background-color: #D9E0E7 !important;width: 4vw;min-width: 81px;"><span
                                     class="ui-column-title">INPUT</span></th>
                             <th id="table:j_idt180" class="ui-state-default  action_midle_column al-cen-fx"
                                 role="columnheader" aria-label="OUTPUT" scope="col" style="background-color: #D9E0E7 !important;width: 4vw;min-width: 81px;">
                                 <span class="ui-column-title">OUTPUT</span></th>
-                            <th id="table:j_idt185" class="ui-state-default action_midle_column" role="columnheader"
-                                aria-label="GESTISCI" scope="col" style="background-color: #D9E0E7 !important;sswidth: 6vw;min-width: 99px;"><span
-                                    class="ui-column-title">GESTISCI</span></th>
+                            <c:if test="${!bean.getCurrentUser().isExternal()}">
+                                <th id="table:j_idt185" class="ui-state-default action_midle_column" role="columnheader"
+                                    aria-label="GESTISCI" scope="col" style="background-color: #D9E0E7 !important;sswidth: 6vw;min-width: 99px;"><span
+                                        class="ui-column-title">GESTISCI</span></th>
+                            </c:if>
                         </tr>
                         </thead>
                         <tbody id="table_data" class="ui-datatable-data ui-widget-content">
@@ -1107,7 +1110,8 @@
 
                                         <h:outputText id="externalUserIcon-#{loop.index}" rendered="#{item.external and not item.haveAllegatiDocuments}"
                                                       style="margin: 0 auto;" styleClass="richiesta-da-clienti-icon" />
-                                        <p:tooltip for="externalUserIcon-#{loop.index}" styleClass="custom-design-tooltip" escape="false">
+                                        <p:tooltip for="externalUserIcon-#{loop.index}" styleClass="custom-design-tooltip" escape="false"
+                                                   rendered="#{item.external and not item.haveAllegatiDocuments}">
                                             <h:outputText value="#{item.createUserFullName}"
                                                           style="font-weight:bold;color:#003871;"/>
                                         </p:tooltip>
@@ -1128,7 +1132,8 @@
 
                                         <p:graphicImage id="internalUserIcon-#{loop.index}" url="/resources/images/richiesta-da-operatore-getesi.png"
                                                         style="height :28px;"  rendered="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments}" />
-                                        <p:tooltip for="internalUserIcon-#{loop.index}" styleClass="custom-design-tooltip" escape="false">
+                                        <p:tooltip for="internalUserIcon-#{loop.index}" styleClass="custom-design-tooltip" escape="false"
+                                            rendered="#{not empty item.createUserFullName}">
                                             <h:outputText value="#{item.createUserFullName}"
                                                           style="font-weight:bold;color:#003871;"/>
                                         </p:tooltip>
@@ -1138,7 +1143,8 @@
                                                              oncomplete="PF('documentDialog').show();">
                                                 <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                                             </p:commandButton>
-                                            <p:tooltip for="internalUserIconA-#{loop.index}" styleClass="custom-design-tooltip" escape="false">
+                                            <p:tooltip for="internalUserIconA-#{loop.index}" styleClass="custom-design-tooltip" escape="false"
+                                                       rendered="#{not empty item.createUserFullName}">
                                             <h:outputText value="#{item.createUserFullName}"
                                                           style="font-weight:bold;color:#003871;"/>
                                         </p:tooltip>
@@ -1251,6 +1257,7 @@
 
         <p:overlayPanel id="userSelectCheckboxPanel" my="left top" at="left bottom"
                         widgetVar="userSelectCheckboxWV" for="userSelectCheckboxShow"
+                        rendered="#{bean.canSeeAllUsers}"
                         onHide="filterTableFromPanel();" dynamic="true" style="width:300px">
             <p:dataTable id="userSelectCheckboxPanelDataTable" var="state"
                          value="#{bean.userWrappers}" selectionMode="single"

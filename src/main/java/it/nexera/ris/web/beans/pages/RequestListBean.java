@@ -190,6 +190,9 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             PersistenceBeanException, InstantiationException,
             IllegalAccessException, IOException {
 
+        if(ValidationHelper.isNullOrEmpty(SessionHelper.get("loadRequestFilters"))){
+            clearFilterValueFromSession();
+        }
         setPaginator(new ListPaginator(10, 1, 1, 1,
                 "DESC", "createDate"));
 
@@ -1670,7 +1673,11 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         setFiduciaryClientFilterId(null);
         setAggregationFilterId(null);
         setSelectedServices(null);
+        clearFilterValueFromSession();
+        resetSettingPanel = false;
+    }
 
+    private void clearFilterValueFromSession() {
         SessionHelper.removeObject(KEY_CLIENT_ID);
         SessionHelper.removeObject(KEY_DATE_FROM_REQ);
         SessionHelper.removeObject(KEY_DATE_TO_REQ);
@@ -1682,7 +1689,11 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         SessionHelper.removeObject(KEY_CLIENT_FIDUCIARY_ID);
         SessionHelper.removeObject(KEY_AGGREAGATION);
         SessionHelper.removeObject(KEY_SERVICES);
-        resetSettingPanel = false;
+        SessionHelper.removeObject(KEY_CF);
+        SessionHelper.removeObject(KEY_NOMINATIVO);
+        SessionHelper.removeObject("searchLastName");
+        SessionHelper.removeObject("searchFiscalCode");
+        SessionHelper.removeObject("searchCreateUser");
     }
 
     public void setSelectedRequestTypes(List<RequestType> selectedRequestTypes) {

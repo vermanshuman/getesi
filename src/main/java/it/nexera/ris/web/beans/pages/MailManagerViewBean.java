@@ -255,6 +255,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
     private Invoice selectedInvoice;
 
+    private List<InvoiceItem> selectedInvoiceItems;
+
     private Double paymentAmount;
 
     private Date paymentDate;
@@ -364,16 +366,20 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         // Changes for invoice
 //        generateMenuModel();
         setMaxInvoiceNumber();
-
         List<Request> requestList =
                 getEntity().getRequests()
                         .stream()
-                        .filter(x -> !ValidationHelper.isNullOrEmpty(x.getStateId()) &&
-                                (RequestState.EVADED.getId().equals(x.getStateId()) || RequestState.SENT_TO_SDI.getId().equals(x.getStateId()))).collect(Collectors.toList());
+                        .filter(x ->
+                                ValidationHelper.isNullOrEmpty(x.getInvoice()) &&
+                                        !ValidationHelper.isNullOrEmpty(x.getStateId()) &&
+                                        (RequestState.EVADED.getId().equals(x.getStateId())
+                                                || RequestState.SENT_TO_SDI.getId().equals(x.getStateId())))
+                        .collect(Collectors.toList());
         setInvoicedRequests(requestList);
 
         // Double invoiceTotalCost = 0.0D;
         if (!ValidationHelper.isNullOrEmpty(requestList)) {
+            setShowCreateFatturaButton(Boolean.TRUE);
             Request examRequest = DaoManager.get(Request.class, new CriteriaAlias[]{
                     new CriteriaAlias("client", "c", JoinType.LEFT_OUTER_JOIN),
                     new CriteriaAlias("c.addressCityId", "ac", JoinType.LEFT_OUTER_JOIN),
@@ -382,6 +388,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     Restrictions.eq("id", getInvoicedRequests().get(0).getId())
             });
             setExamRequest(examRequest);
+        }else {
+            setShowCreateFatturaButton(Boolean.FALSE);
         }
         if (!ValidationHelper.isNullOrEmpty(getExamRequest())
                 && !ValidationHelper.isNullOrEmpty(getExamRequest().getInvoice())) {
@@ -400,14 +408,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         if (!requestListSentToSdi.isEmpty())
             setSendInvoice(true);
         setBillinRequest(AccessBean.canViewPage(PageTypes.BILLING_LIST));
-        List<Request> requestListInvoiceCreated =
-                getEntity().getRequests()
-                        .stream()
-                        .filter(x -> !ValidationHelper.isNullOrEmpty(x.getInvoice())).collect(Collectors.toList());
-        if (requestListInvoiceCreated.isEmpty()) {
-            setShowCreateFatturaButton(Boolean.TRUE);
-        }
-
         setBaseMailId(getEntityId());
     }
 
@@ -435,6 +435,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
                     .collect(Collectors.toList()), true));
         }
+        System.out.println("getSelectedNotManagerOrFiduciaryClientId  " + getSelectedNotManagerOrFiduciaryClientId());
 
         if (getSelectedNotManagerOrFiduciaryClientId() != null) {
             setClientManagers(ComboboxHelper.fillWrapperList(emptyIfNull(clientList)
@@ -458,7 +459,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 setOfficeList(Collections.singletonList(SelectItemHelper.getNotSelected()));
             }
             // MailManagerView data - do not set automatically Fatturazione field
-            List<Client> invoiceClients = new ArrayList<Client>();
+            List<Client> invoiceClients = new ArrayList<>();
             if (isClientSelected && !ValidationHelper.isNullOrEmpty(getNotManagerOrFiduciaryClients())) {
                 for (Client client : clientList) {
                     if (!client.getId().equals(getSelectedNotManagerOrFiduciaryClientId())) {
@@ -1342,12 +1343,15 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     public void loadInvoiceDialogData(Invoice invoiceDb) throws IllegalAccessException, PersistenceBeanException, HibernateException, InstantiationException {
         setShowRequestTab(true);
         setActiveTabIndex(0);
-        List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[] {Restrictions.eq("invoice", invoiceDb)}, new Order[]{
-                Order.desc("date")});
-        setPaymentInvoices(paymentInvoicesList);
-        double totalImport = 0.0;
-        for (PaymentInvoice paymentInvoice : paymentInvoicesList) {
-            totalImport = totalImport + paymentInvoice.getPaymentImport().doubleValue();
+        if(!invoiceDb.isNew()){
+            List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class,
+                    new Criterion[] {Restrictions.eq("invoice", invoiceDb)}, new Order[]{
+                    Order.desc("date")});
+            setPaymentInvoices(paymentInvoicesList);
+            double totalImport = 0.0;
+            for (PaymentInvoice paymentInvoice : paymentInvoicesList) {
+                totalImport = totalImport + paymentInvoice.getPaymentImport().doubleValue();
+            }
         }
         setMaxInvoiceNumber();
         docTypes = new ArrayList<>();
@@ -1376,20 +1380,28 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             setNumber(invoiceDb.getNumber());
         if (!ValidationHelper.isNullOrEmpty(invoiceDb.getInvoiceNumber()))
             setInvoiceNumber(invoiceDb.getInvoiceNumber());
-
-        List<InvoiceItem> invoiceItemsDb = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoiceDb)});
+        if(!invoiceDb.isNew()) {
+            setSelectedInvoiceItems(DaoManager.load(InvoiceItem.class,
+                    new Criterion[]{Restrictions.eq("invoice", invoiceDb)}));
+        }
         int counter = 1;
         List<GoodsServicesFieldWrapper> wrapperList = new ArrayList<>();
-        for (InvoiceItem invoiceItem : invoiceItemsDb) {
+        for (InvoiceItem invoiceItem : getSelectedInvoiceItems()) {
+
             GoodsServicesFieldWrapper wrapper = createGoodsServicesFieldWrapper();
             wrapper.setCounter(counter);
-            wrapper.setInvoiceItemId(invoiceItem.getId());
+            if(invoiceItem.getId() == null){
+                wrapper.setInvoiceItemId(invoiceItem.getId());
+            }else {
+                invoiceItem.setUuid(UUID.randomUUID().toString());
+                wrapper.setInvoiceItemUUID(invoiceItem.getUuid());
+            }
             wrapper.setInvoiceTotalCost(invoiceItem.getInvoiceTotalCost());
             wrapper.setSelectedTaxRateId(invoiceItem.getTaxRate().getId());
             wrapper.setInvoiceItemAmount(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount()) ? 0.0 : invoiceItem.getAmount());
             double totalcost = !(ValidationHelper.isNullOrEmpty(invoiceItem.getInvoiceTotalCost())) ? invoiceItem.getInvoiceTotalCost().doubleValue() : 0.0;
             double amount = !(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount())) ? invoiceItem.getAmount().doubleValue() : 0.0;
-            double totalLine = 0d;
+            double totalLine;
             if (amount != 0.0) {
                 totalLine = totalcost * amount;
             } else {
@@ -1424,14 +1436,16 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         Invoice invoice = new Invoice();
         if(selectedRequestList.size() > 0)
             invoice.setClient(selectedRequestList.get(0).getClient());
+
+        setSelectedInvoiceClient(invoice.getClient());
         invoice.setDate(getInvoiceDate());
         invoice.setDate(new Date());
         invoice.setStatus(InvoiceStatus.DRAFT);
         invoice.setEmailFrom(getEntity());
-        DaoManager.save(invoice, true);
+       // DaoManager.save(invoice, true);
 
-        List<InvoiceItem> invoiceItems = InvoiceHelper.groupingItemsByTaxRate(selectedRequestList);
-        for (InvoiceItem invoiceItem : invoiceItems) {
+        setSelectedInvoiceItems(InvoiceHelper.groupingItemsByTaxRate(selectedRequestList));
+      /*  for (InvoiceItem invoiceItem : invoiceItems) {
             invoiceItem.setInvoice(invoice);
             DaoManager.save(invoiceItem, true);
         }
@@ -1442,11 +1456,11 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             } catch (PersistenceBeanException e) {
                 log.error("error in saving invoice in request after creating invoice ", e);
             }
-        });
-        setShowCreateFatturaButton(Boolean.FALSE);
+        });*/
+     //   setShowCreateFatturaButton(Boolean.FALSE);
         setInvoicedRequests(selectedRequestList);
         invoice.setTotalGrossAmount(getTotalGrossAmount());
-        DaoManager.save(invoice, true);
+        // DaoManager.save(invoice, true);
         loadInvoiceDialogData(invoice);
         executeJS("PF('invoiceDialogBillingWV').show();");
     }
@@ -1496,10 +1510,10 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             executeJS("PF('invoiceErrorDialogWV').show();");
             return;
         }
-
         try {
-            Invoice invoice = saveInvoice(InvoiceStatus.DRAFT, true);
-            loadInvoiceDialogData(invoice);
+            saveInvoice(InvoiceStatus.DRAFT, true);
+             loadInvoiceDialogData(getSelectedInvoice());
+            setShowCreateFatturaButton(Boolean.FALSE);
         } catch (Exception e) {
             e.printStackTrace();
             LogHelper.log(log, e);
@@ -1508,33 +1522,42 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     }
 
     public Invoice saveInvoice(InvoiceStatus invoiceStatus, Boolean saveInvoiceNumber) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
-        Invoice invoice = DaoManager.get(Invoice.class, getNumber());
-        if (ValidationHelper.isNullOrEmpty(invoice)) {
-            invoice = new Invoice();
+        //- Invoice invoice = DaoManager.get(Invoice.class, getNumber());
+        if (getSelectedInvoice() == null) {
+            setSelectedInvoice(new Invoice());
         }
-        invoice.setDate(getInvoiceDate());
-        invoice.setClient(getExamRequest().getClient());
-        invoice.setDocumentType(getDocumentType());
+        getSelectedInvoice().setDate(getInvoiceDate());
+       // getSelectedInvoice().setClient(getExamRequest().getClient());
+        getSelectedInvoice().setDocumentType(getDocumentType());
         if (!ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId()))
-            invoice.setPaymentType(DaoManager.get(PaymentType.class, getSelectedPaymentTypeId()));
+            getSelectedInvoice().setPaymentType(DaoManager.get(PaymentType.class, getSelectedPaymentTypeId()));
 
         if (!ValidationHelper.isNullOrEmpty(getVatCollectabilityId()))
-            invoice.setVatCollectability(VatCollectability.getById(getVatCollectabilityId()));
-        invoice.setNotes(getInvoiceNote());
-        invoice.setStatus(invoiceStatus);
+            getSelectedInvoice().setVatCollectability(VatCollectability.getById(getVatCollectabilityId()));
+        getSelectedInvoice().setNotes(getInvoiceNote());
+        getSelectedInvoice().setStatus(invoiceStatus);
         if (saveInvoiceNumber) {
-            invoice.setNumber(getNumber());
-            invoice.setInvoiceNumber(getInvoiceNumber());
+            getSelectedInvoice().setNumber(getNumber());
+            getSelectedInvoice().setInvoiceNumber(getInvoiceNumber());
         }
-        invoice.setTotalGrossAmount(getTotalGrossAmount());
-        DaoManager.save(invoice, true);
+        getSelectedInvoice().setTotalGrossAmount(getTotalGrossAmount());
+        DaoManager.save(getSelectedInvoice(), true);
+
         for (GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
-            if (!ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemId())) {
-                InvoiceItem invoiceItem = DaoManager.get(InvoiceItem.class, goodsServicesFieldWrapper.getInvoiceItemId());
+            if (!ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemUUID())) {
+
+                InvoiceItem invoiceItem = getSelectedInvoiceItems()
+                        .stream().filter(inv ->
+                                        (inv.getId() != null
+                                                && inv.getId().equals(goodsServicesFieldWrapper.getInvoiceItemId())) ||
+                                                (inv.getUuid().equalsIgnoreCase(goodsServicesFieldWrapper.getInvoiceItemUUID()))
+                                ).findFirst().get();
+                // InvoiceItem invoiceItem = DaoManager.get(InvoiceItem.class, goodsServicesFieldWrapper.getInvoiceItemId());
                 invoiceItem.setAmount(goodsServicesFieldWrapper.getInvoiceItemAmount());
                 invoiceItem.setTaxRate(DaoManager.get(TaxRate.class, goodsServicesFieldWrapper.getSelectedTaxRateId()));
                 invoiceItem.setDescription(goodsServicesFieldWrapper.getDescription());
                 invoiceItem.setInvoiceTotalCost(goodsServicesFieldWrapper.getInvoiceTotalCost());
+                invoiceItem.setInvoice(getSelectedInvoice());
                 DaoManager.save(invoiceItem, true);
             } else {
                 InvoiceItem invoiceItem = new InvoiceItem();
@@ -1542,12 +1565,20 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 invoiceItem.setTaxRate(DaoManager.get(TaxRate.class, goodsServicesFieldWrapper.getSelectedTaxRateId()));
                 invoiceItem.setDescription(goodsServicesFieldWrapper.getDescription());
                 invoiceItem.setInvoiceTotalCost(goodsServicesFieldWrapper.getInvoiceTotalCost());
-                invoiceItem.setInvoice(invoice);
+                invoiceItem.setInvoice(getSelectedInvoice());
                 invoiceItem.setSubject(getExamRequest().getSubject().toString());
                 DaoManager.save(invoiceItem, true);
             }
         }
-        return invoice;
+        CollectionUtils.emptyIfNull(getInvoicedRequests()).stream().forEach(r -> {
+            try {
+                r.setInvoice(getSelectedInvoice());
+                DaoManager.save(r, true);
+            } catch (PersistenceBeanException e) {
+                log.error("error in saving invoice in request after creating invoice ", e);
+            }
+        });
+        return getSelectedInvoice();
     }
 
     public void sendInvoice() {

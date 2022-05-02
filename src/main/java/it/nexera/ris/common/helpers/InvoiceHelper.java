@@ -12,15 +12,13 @@ import it.nexera.ris.web.beans.pages.BillingListBean;
 import it.nexera.ris.web.common.RequestPriceListModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class InvoiceHelper {
@@ -174,6 +172,9 @@ public class InvoiceHelper {
                             numRegistry = request.getAggregationLandChargesRegistry().getNumberOfVisualizedLandChargesRegistries();
                         }
 
+                        if (!Hibernate.isInitialized(request.getRequestFormalities())) {
+                            request.reloadRequestFormalities();
+                        }
                         if (!ValidationHelper.isNullOrEmpty(request.getRequestFormalities())) {
                             List<Long> documentIds = request.getRequestFormalities().stream()
                                     .filter(rf -> !ValidationHelper.isNullOrEmpty(rf.getDocumentId()))

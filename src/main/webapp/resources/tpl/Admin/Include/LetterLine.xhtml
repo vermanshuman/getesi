@@ -50,13 +50,13 @@
         #dataSaved {
             position: absolute;
         }
+
     </style>
     <script>
         $(document).ready(function() {
             setTimeout(() => {
                 $("#dataSaved").hide();
             }, 5000);
-
             function setDataSavedPosition() {
                 var totalWidth = 0;
                 var stampaPosition = $('.stampaButton')[0].offsetLeft;
@@ -75,6 +75,7 @@
                 setDataSavedPosition();
             });
         });
+
     </script>
     <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/mail.css"
           media="all" rel="stylesheet" type="text/css"/>
