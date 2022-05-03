@@ -264,7 +264,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private String paymentDescription;
 
     private Boolean dataSaved;
-    
+
     private WLGExport courtesyInvoicePdf;
 
     @Override
@@ -437,8 +437,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
                     .collect(Collectors.toList()), true));
         }
-        System.out.println("getSelectedNotManagerOrFiduciaryClientId  " + getSelectedNotManagerOrFiduciaryClientId());
-
         if (getSelectedNotManagerOrFiduciaryClientId() != null) {
             setClientManagers(ComboboxHelper.fillWrapperList(emptyIfNull(clientList)
                     .stream()
@@ -1392,10 +1390,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
             GoodsServicesFieldWrapper wrapper = createGoodsServicesFieldWrapper();
             wrapper.setCounter(counter);
-            if(invoiceItem.getId() == null){
+            if(invoiceItem.getId() != null){
                 wrapper.setInvoiceItemId(invoiceItem.getId());
             }else {
-                invoiceItem.setUuid(UUID.randomUUID().toString());
                 wrapper.setInvoiceItemUUID(invoiceItem.getUuid());
             }
             wrapper.setInvoiceTotalCost(invoiceItem.getInvoiceTotalCost());
@@ -1544,15 +1541,14 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
         getSelectedInvoice().setTotalGrossAmount(getTotalGrossAmount());
         DaoManager.save(getSelectedInvoice(), true);
-
         for (GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
-            if (!ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemUUID())) {
-
+            if (!ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemUUID()) ||
+                    !ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemId())) {
                 InvoiceItem invoiceItem = getSelectedInvoiceItems()
                         .stream().filter(inv ->
                                         (inv.getId() != null
                                                 && inv.getId().equals(goodsServicesFieldWrapper.getInvoiceItemId())) ||
-                                                (inv.getUuid().equalsIgnoreCase(goodsServicesFieldWrapper.getInvoiceItemUUID()))
+                                                (inv.getUuid() != null && inv.getUuid().equalsIgnoreCase(goodsServicesFieldWrapper.getInvoiceItemUUID()))
                                 ).findFirst().get();
                 // InvoiceItem invoiceItem = DaoManager.get(InvoiceItem.class, goodsServicesFieldWrapper.getInvoiceItemId());
                 invoiceItem.setAmount(goodsServicesFieldWrapper.getInvoiceItemAmount());
@@ -2059,7 +2055,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         } catch (Exception e) {
             LogHelper.log(log, e);
         }
-        
         attachCourtesyInvoicePdf();
     }
 
@@ -2351,6 +2346,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     }
 
     public void openInvoiceDialog() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+
         if (!ValidationHelper.isNullOrEmpty(getExamRequest())
                 && !ValidationHelper.isNullOrEmpty(getExamRequest().getInvoice())) {
             Invoice invoice = DaoManager.get(Invoice.class, getExamRequest().getInvoice().getId());
@@ -2403,9 +2399,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 Order.desc("date")});
         setPaymentInvoices(paymentInvoicesList);
     }
-    
+
     public void attachCourtesyInvoicePdf() {
-    	try {
+        try {
             //String refrequest = "";
             //String ndg = "";
             String templatePath  = (new File(FileHelper.getRealPath(),
@@ -2457,7 +2453,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 tempDir  += File.separator + UUID.randomUUID();
                 FileUtils.forceMkdir(new File(tempDir));
                 String tempDoc = tempDir +  File.separator +  fileName +".docx";
-                
+
                 try (XWPFDocument doc = new XWPFDocument(
                         Files.newInputStream(Paths.get(templatePath)))) {
                     for (XWPFParagraph p : doc.getParagraphs()) {

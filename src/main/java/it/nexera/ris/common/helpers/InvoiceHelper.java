@@ -1,6 +1,7 @@
 package it.nexera.ris.common.helpers;
 
 import it.nexera.ris.common.enums.CostType;
+import it.nexera.ris.common.enums.DocumentType;
 import it.nexera.ris.common.enums.ExtraCostType;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
@@ -9,15 +10,20 @@ import it.nexera.ris.persistence.beans.entities.IndexedEntity;
 import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import it.nexera.ris.web.beans.pages.BillingListBean;
+import it.nexera.ris.web.beans.wrappers.GoodsServicesFieldWrapper;
 import it.nexera.ris.web.common.RequestPriceListModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 
+import javax.faces.model.SelectItem;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -78,22 +84,22 @@ public class InvoiceHelper {
                     requestPriceList.addAll(priceList);
                 }
 
-                priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
-                        new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                        Restrictions.eq("client", (costCalculationHelper.isBillingClient() == null || !costCalculationHelper.isBillingClient())
-                                ? request.getClient() : request.getBillingClient()),
-
-                        costCalculationHelper.restrictionForPriceList() ?
-                                Restrictions.in("cc.id", request.getService().getServiceCostUnauthorizedQuoteList()
-                                        .stream().map(IndexedEntity::getId).collect(Collectors.toList())) :
-                                Restrictions.isNotNull("cc.id"),
-
-                        Restrictions.eq("service", request.getService()),
-                        Restrictions.eq("cc.typeId", CostType.BASED_OF_NUMBER_OF_FORMALITIES_CONSULTED.getId())});
-
-                if (!ValidationHelper.isNullOrEmpty(priceList)) {
-                    requestPriceList.addAll(priceList);
-                }
+//                priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
+//                        new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
+//                        Restrictions.eq("client", (costCalculationHelper.isBillingClient() == null || !costCalculationHelper.isBillingClient())
+//                                ? request.getClient() : request.getBillingClient()),
+//
+//                        costCalculationHelper.restrictionForPriceList() ?
+//                                Restrictions.in("cc.id", request.getService().getServiceCostUnauthorizedQuoteList()
+//                                        .stream().map(IndexedEntity::getId).collect(Collectors.toList())) :
+//                                Restrictions.isNotNull("cc.id"),
+//
+//                        Restrictions.eq("service", request.getService()),
+//                        Restrictions.eq("cc.typeId", CostType.BASED_OF_NUMBER_OF_FORMALITIES_CONSULTED.getId())});
+//
+//                if (!ValidationHelper.isNullOrEmpty(priceList)) {
+//                    requestPriceList.addAll(priceList);
+//                }
 
             }else if(!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
                 for(Service service : request.getMultipleServices()) {
@@ -304,6 +310,34 @@ public class InvoiceHelper {
                     }
                 }
             }
+
+            List<Document> documents = DaoManager.load(Document.class, new Criterion[]{
+                    Restrictions.eq("request.id", requestId)});
+            if (!ValidationHelper.isNullOrEmpty(documents)) {
+                for (Document document : documents) {
+                    if (DocumentType.CADASTRAL.getId().equals(document.getTypeId())
+                            && !ValidationHelper.isNullOrEmpty(document.getCost())) {
+                        String cost = document.getCost().replaceAll(",", ".");
+                        RequestPriceListModel requestPriceListModel = new RequestPriceListModel();
+                        requestPriceListModel.setRequestId(requestId);
+                        requestPriceListModel.setRequest(request);
+                        requestPriceListModel.setTotalCost(Double.parseDouble(cost));
+                        requestPriceListModel.setClient(request.getClient());
+                        requestPriceListModel.setService(request.getService());
+                        List<TaxRateExtraCost> taxRateExtraCosts = DaoManager.load(TaxRateExtraCost.class, new Criterion[]{
+                                Restrictions.isNotNull("extraCostType"),
+                                Restrictions.isNotNull("clientId"),
+                                Restrictions.isNotNull("service"),
+                                Restrictions.eq("clientId", request.getClient().getId()),
+                                Restrictions.eq("service", request.getService()),
+                                Restrictions.eq("extraCostType", ExtraCostType.CATASTO)});
+                        if (!ValidationHelper.isNullOrEmpty(taxRateExtraCosts)) {
+                            requestPriceListModel.setTaxRate(taxRateExtraCosts.get(0).getTaxRate());
+                            requestPriceListModels.add(requestPriceListModel);
+                        }
+                    }
+                }
+            }
         }
         requestPriceListModels.stream()
                 .forEach(rp -> {
@@ -322,9 +356,87 @@ public class InvoiceHelper {
             TaxRate taxRate = taxRateEntry.getKey();
             InvoiceItem invoiceItem = new InvoiceItem();
             invoiceItem.setTaxRate(taxRate);
-            invoiceItem.setInvoiceTotalCost(taxRateEntry.getValue().doubleValue());
+            BigDecimal bd = BigDecimal.valueOf(taxRateEntry.getValue().doubleValue());
+            bd = bd.setScale(2,RoundingMode.HALF_UP);
+            invoiceItem.setInvoiceTotalCost(bd.doubleValue());
             invoiceItems.add(invoiceItem);
         }
             return invoiceItems;
+    }
+
+    public GoodsServicesFieldWrapper createGoodsServicesFieldWrapper() throws IllegalAccessException, PersistenceBeanException {
+        GoodsServicesFieldWrapper wrapper = new GoodsServicesFieldWrapper();
+        List<SelectItem> ums = new ArrayList<>();
+        ums.add(new SelectItem("pz", "pz"));
+        wrapper.setUms(ums);
+        wrapper.setVatAmounts(ComboboxHelper.fillList(TaxRate.class, Order.asc("description"), new CriteriaAlias[]{}, new Criterion[]{
+                Restrictions.eq("use", Boolean.TRUE)
+        }, true, false));
+        wrapper.setTotalLine(0D);
+        return wrapper;
+    }
+
+    public Double getTotalVat(List<GoodsServicesFieldWrapper> goodsServicesFields) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+        Double total = 0D;
+        if(!ValidationHelper.isNullOrEmpty(goodsServicesFields)) {
+            for(GoodsServicesFieldWrapper wrapper: goodsServicesFields) {
+                if(!ValidationHelper.isNullOrEmpty(wrapper.getTotalLine())) {
+                    if(!ValidationHelper.isNullOrEmpty(wrapper.getSelectedTaxRateId())) {
+                        TaxRate taxrate = DaoManager.get(TaxRate.class, wrapper.getSelectedTaxRateId());
+                        if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
+                            total += wrapper.getTotalLine().doubleValue() * (taxrate.getPercentage().doubleValue()/100);
+                        }
+                    }
+                }
+            }
+            BigDecimal tot = BigDecimal.valueOf(total);
+            tot = tot.setScale(2, RoundingMode.HALF_UP);
+            total = tot.doubleValue();
+        }
+        return total;
+    }
+
+    public Double getAllTotalLine(List<GoodsServicesFieldWrapper> goodsServicesFields) {
+        Double total = 0D;
+        if(!ValidationHelper.isNullOrEmpty(goodsServicesFields)) {
+            total = goodsServicesFields.stream().collect(
+                    Collectors.summingDouble(GoodsServicesFieldWrapper::getTotalLine));
+            BigDecimal tot = BigDecimal.valueOf(total);
+            tot = tot.setScale(2, RoundingMode.HALF_UP);
+            total = tot.doubleValue();
+        }
+        return total;
+    }
+
+    public Double getTotalGrossAmount(List<GoodsServicesFieldWrapper> goodsServicesFields) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+        Double totalGrossAmount = 0D;
+        if(!ValidationHelper.isNullOrEmpty(goodsServicesFields)) {
+            for(GoodsServicesFieldWrapper wrapper: goodsServicesFields) {
+                if(!ValidationHelper.isNullOrEmpty(wrapper.getTotalLine())){
+                    totalGrossAmount += wrapper.getTotalLine();
+                    if(!ValidationHelper.isNullOrEmpty(wrapper.getSelectedTaxRateId())){
+                        TaxRate taxrate = DaoManager.get(TaxRate.class, wrapper.getSelectedTaxRateId());
+                        if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
+                            totalGrossAmount += (wrapper.getTotalLine() * (taxrate.getPercentage().doubleValue()/100));
+                        }
+                    }
+                }
+            }
+            BigDecimal tot = BigDecimal.valueOf(totalGrossAmount);
+            tot = tot.setScale(2, RoundingMode.HALF_UP);
+            totalGrossAmount = tot.doubleValue();
+        }
+        return totalGrossAmount;
+    }
+
+    public Double getTotalPayment(Invoice invoice) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        List<PaymentInvoice> paymentInvoices = DaoManager.load(PaymentInvoice.class,
+                Restrictions.eq("invoice.id", invoice.getId()));
+        double paymentImportTotal = 0.0;
+        for(PaymentInvoice paymentInvoice : paymentInvoices) {
+            Double total = paymentInvoice.getPaymentImport().doubleValue();
+            paymentImportTotal = paymentImportTotal + total;
+        }
+        return paymentImportTotal;
     }
 }

@@ -1456,7 +1456,8 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
     }
 
     public void handleRowsChange() {
-        String rowsPerPage = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("table_rppDD");
+        String rowsPerPage = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("rowsPerPageSelected");
+        // String rowsPerPage = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("table_rppDD");
         String pageNumber = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("pageNumber");
         if(!ValidationHelper.isNullOrEmpty(rowsPerPage))
             setRowsPerPage(Integer.parseInt(rowsPerPage));

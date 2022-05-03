@@ -1113,18 +1113,18 @@
                                         <p:tooltip for="externalUserIcon-#{loop.index}" styleClass="custom-design-tooltip" escape="false"
                                                    rendered="#{item.external and not item.haveAllegatiDocuments}">
                                             <h:outputText value="#{item.createUserFullName}"
-                                                          style="font-weight:bold;color:#003871;"/>
+                                                          style="font-weight:bold;color:#003871;" escape="false"/>
                                         </p:tooltip>
 
                                         <p:outputPanel rendered="#{item.external and item.haveAllegatiDocuments}" style="display: flex;margin-left: calc( 50% - 15px );">
                                             <p:commandButton id="externalUserIconA-#{loop.index}"  styleClass="richiesta-da-clienti-icon" action="#{bean.loadAllegatiDocuments}" update="requestDocs"
-                                                             style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
+                                                             style="color: transparent !important;background-color: transparent !important;border-color: transparent !important;margin: 0 auto;cursor: pointer;"
                                                              oncomplete="PF('documentDialog').show();">
                                                 <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                                             </p:commandButton>
                                             <p:tooltip for="externalUserIconA-#{loop.index}" styleClass="custom-design-tooltip" escape="false">
                                                 <h:outputText value="#{item.createUserFullName}"
-                                                              style="font-weight:bold;color:#003871;"/>
+                                                              style="font-weight:bold;color:#003871;" escape="false"/>
                                             </p:tooltip>
                                             <h:outputText value="A"  style="width: 19px;height: 20px;background-color: #003871;border-radius: 50%;color: white;display: block;margin-top: -10px;margin-left: -6px;text-align: center;" />
                                         </p:outputPanel>
@@ -1135,7 +1135,7 @@
                                         <p:tooltip for="internalUserIcon-#{loop.index}" styleClass="custom-design-tooltip" escape="false"
                                             rendered="#{not empty item.createUserFullName}">
                                             <h:outputText value="#{item.createUserFullName}"
-                                                          style="font-weight:bold;color:#003871;"/>
+                                                          style="font-weight:bold;color:#003871;" escape="false"/>
                                         </p:tooltip>
 
                                         <p:outputPanel style="display: flex;#{empty item.mailId ? 'margin-left: 38%;' : ''}" rendered="#{not item.external and empty item.mailId and item.haveAllegatiDocuments}">
@@ -1146,7 +1146,7 @@
                                             <p:tooltip for="internalUserIconA-#{loop.index}" styleClass="custom-design-tooltip" escape="false"
                                                        rendered="#{not empty item.createUserFullName}">
                                             <h:outputText value="#{item.createUserFullName}"
-                                                          style="font-weight:bold;color:#003871;"/>
+                                                          style="font-weight:bold;color:#003871;" escape="false"/>
                                         </p:tooltip>
                                             <h:outputText value="A"  style="width: 19px;height: 20px;background-color: #003871;border-radius: 50%;color: white;display: block;margin-top: -10px;margin-left: -6px;text-align: center;" />
                                         </p:outputPanel>

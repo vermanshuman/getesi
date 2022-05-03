@@ -704,10 +704,10 @@
                                     <p:commandButton value="#{msg.cancel.toUpperCase()}" oncomplete="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"
                                                      rendered="#{!bean.invoiceSentStatus}"/>
                                     <p:commandButton value="#{msg.saveInDraft}" styleClass="ui-button-success p-mr-2 p-mb-2" style="margin-left:5px;"
-                                                     action="#{bean.saveInvoiceInDraft}" update="mainPanel goodsServicesPanel countsSummaryPanel"
+                                                     action="#{bean.saveInvoiceInDraft}" update="mainPanel goodsServicesPanel countsSummaryPanel @widgetVar(buttonsPanelWV)"
                                                      rendered="#{!bean.invoiceSentStatus}"/>
                                     <p:commandButton value="#{msg.delivery}" styleClass="ui-button-success p-mr-2 p-mb-2"
-                                                     action="#{bean.sendInvoice}" rendered="#{!bean.invoiceSentStatus}"
+                                                     action="#{bean.sendInvoice}" rendered="#{bean.selectedInvoice.id ne null and !bean.invoiceSentStatus}"
                                                      update="@widgetVar(buttonsPanelWV) @widgetVar(countsSummaryPanelVW)
                              						 		 @widgetVar(goodsServicesPanelVW) @widgetVar(mainPanelVW)"
                                                      oncomplete="PF('invoiceConfirmWV').hide();"/>

@@ -514,11 +514,6 @@
                 margin-bottom: 4px;
             }
 
-            #filterInvoiceNumber {
-                width: 200px;
-                border: 1px solid #a8acb1 !important;
-            }
-
             .ui-selectonemenu {
                 border: 1px solid #a8acb1 !important;
             }
@@ -607,7 +602,7 @@
                 margin-top: 0px !important;
             }
             #subjectClient_label {
-                padding-top: 9px;
+                padding-top: 7px;
             }
         </style>
         <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
@@ -1026,7 +1021,8 @@
                                             <div class="p-field">
                                                 <p:inputText id="filterInvoiceNumber"
                                                              value="#{bean.filterInvoiceNumber}"
-                                                             placeholder="#{msg.billingListNumber}"/>
+                                                             placeholder="#{msg.billingListNumber}"
+                                                             style="width: 300px !important;height: 36px;border: 1px solid #a8acb1 !important;background: #ffffff !important;"/>
                                             </div>
                                             <p:selectOneMenu id="filterClient" value="#{bean.selectedCompanyId}" style="width: 300px; margin-right: 20px;"
                                                              styleClass="#{bean.selectedCompanyId ne null ? 'select-one-menu' : ''}">
@@ -1143,7 +1139,8 @@
                                         </div>
                                     </div>
                                     <div class="p-col-12" style="margin-top: -15px; margin-bottom: -15px;">
-                                        <p:commandButton value="#{msg.billingListExcel}" style="float: right"/>
+                                        <p:commandButton value="#{msg.billingListExcel}" style="float: right"
+                                                         ajax="false" action="#{bean.generateXlsWithInvoicesReport}"/>
                                     </div>
                                 </div>
                             </div>

@@ -211,13 +211,15 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                         .filter(distinctByKey(c -> c.getId()))
                         .collect(Collectors.toList()), true));
 
-                List<Office> offices = DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()).getOffices();
-                if (!ValidationHelper.isNullOrEmpty(offices)) {
-                    setOfficeList(ComboboxHelper.fillList(offices.stream()
-                            .sorted(Comparator.comparing(Dictionary::getDescription))
-                            .collect(Collectors.toList()), true));
-                } else {
-                    setOfficeList(Collections.singletonList(SelectItemHelper.getNotSelected()));
+                if(!ValidationHelper.isNullOrEmpty(getSelectedNotManagerOrFiduciaryClientId())){
+                    List<Office> offices = DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()).getOffices();
+                    if (!ValidationHelper.isNullOrEmpty(offices)) {
+                        setOfficeList(ComboboxHelper.fillList(offices.stream()
+                                .sorted(Comparator.comparing(Dictionary::getDescription))
+                                .collect(Collectors.toList()), true));
+                    } else {
+                        setOfficeList(Collections.singletonList(SelectItemHelper.getNotSelected()));
+                    }
                 }
             }else {
                 setInvoiceClients(ComboboxHelper.fillList(clientList, true));
@@ -1117,14 +1119,17 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                     .filter(c -> (c.getFiduciary() != null && c.getFiduciary()))
                     .collect(Collectors.toList()), true));
 
-            List<Office> offices = DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()).getOffices();
-            if (!ValidationHelper.isNullOrEmpty(offices)) {
-                setOfficeList(ComboboxHelper.fillList(offices.stream()
-                        .sorted(Comparator.comparing(Dictionary::getDescription))
-                        .collect(Collectors.toList()), true));
-            } else {
-                setOfficeList(Collections.singletonList(SelectItemHelper.getNotSelected()));
+            if(!ValidationHelper.isNullOrEmpty(getSelectedNotManagerOrFiduciaryClientId())){
+                List<Office> offices = DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()).getOffices();
+                if (!ValidationHelper.isNullOrEmpty(offices)) {
+                    setOfficeList(ComboboxHelper.fillList(offices.stream()
+                            .sorted(Comparator.comparing(Dictionary::getDescription))
+                            .collect(Collectors.toList()), true));
+                } else {
+                    setOfficeList(Collections.singletonList(SelectItemHelper.getNotSelected()));
+                }
             }
+
             List<Client> invoiceClients = new ArrayList<Client>();
             for(Client client : clientList) {
                 if(!client.getId().equals(getSelectedNotManagerOrFiduciaryClientId())) {
@@ -1540,10 +1545,10 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             setCostNote(getExamRequest().getCostNote());
         getCostManipulationHelper().viewExtraCost(getExamRequest(), recalculate);
         setDataTable(new ArrayList<>());
-        if(!ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
+        if(!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
                 !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox().getRequests())) {
             prepareTables(getMail().getRecievedInbox().getRequests());
-        }else if (!ValidationHelper.isNullOrEmpty(getMail().getRequests())) {
+        }else if (!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getRequests())) {
             prepareTables(getMail().getRequests());
         }
     }

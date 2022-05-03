@@ -133,7 +133,9 @@
                             <h:outputText value="#{item.stateDescription}"/>
                         </p:column>
                         <p:column headerText="#{msg.invoiceNumber}">
-                            <p:commandLink value="#{item.invoice.id}" action="#{bean.openInvoiceDialog}" update="invoiceDialogBilling dialogTab"/>
+                            <p:commandLink value="#{item.invoice.invoiceNumber}" action="#{bean.openInvoiceDialog}" update="invoiceDialogBilling dialogTab">
+                                <f:setPropertyActionListener value="#{item}" target="#{bean.examRequest}"/>
+                            </p:commandLink>
                         </p:column>
                     </p:dataTable>
                 </div>

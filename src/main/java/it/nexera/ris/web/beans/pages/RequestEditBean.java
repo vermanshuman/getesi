@@ -558,9 +558,15 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             }
             setRequestTypeMultiple(Boolean.TRUE);
         }else {
-            setSelectedServiceId(getEntity().getService() != null ? getEntity().getService().getId() : null);
-            serviceIdsList = new ArrayList<>();
-            serviceIdsList.add(getSelectedServiceId());
+            if(!ValidationHelper.isNullOrEmpty(getEntity().getService())){
+                setSelectedServiceId( getEntity().getService().getId());
+                serviceIdsList = new ArrayList<>();
+                serviceIdsList.add(getSelectedServiceId());
+            }else if(!ValidationHelper.isNullOrEmpty(getEntity().getMultipleServices())){
+                serviceIdsList = getEntity().getMultipleServices() != null
+                        ? getEntity().getMultipleServices().stream()
+                        .map(Service::getId).collect(Collectors.toList()) : null;
+            }
             setRequestTypeMultiple(Boolean.FALSE);
         }
 
@@ -3308,7 +3314,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             }else {
                 setRequestTypeMultiple(Boolean.FALSE);
             }
-            setShowAddServiceButton(Boolean.TRUE);
+            //setShowAddServiceButton(Boolean.TRUE);
         }else {
             setRequestTypeMultiple(Boolean.FALSE);
             setShowAddServiceButton(Boolean.FALSE);
@@ -3336,14 +3342,17 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 //setShowConfirmButton(Boolean.TRUE);
                 reset = false;
                 generateDynamicContent(true);
+                setShowAddServiceButton(Boolean.TRUE);
             }else if((!ValidationHelper.isNullOrEmpty(getRequestTypeMultiple())
                     && getRequestTypeMultiple() && ValidationHelper.isNullOrEmpty(getSelectedServiceIds()))){
                 setShowConfirmButton(Boolean.FALSE);
+                setShowAddServiceButton(Boolean.FALSE);
                 reset = true;
             }else if(!ValidationHelper.isNullOrEmpty(getSelectedServiceId())){
                 reset = false;
                 setShowConfirmButton(Boolean.FALSE);
                 generateDynamicContent(true);
+                setShowAddServiceButton(Boolean.TRUE);
             }
         }
         if(reset){

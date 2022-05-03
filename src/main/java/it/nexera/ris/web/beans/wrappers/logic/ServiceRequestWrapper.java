@@ -180,7 +180,7 @@ public class ServiceRequestWrapper implements Serializable {
 //    }
 
     public Boolean getExternal() {
-        if (isExternal == null) {
+        if (isExternal == null || createUser == null) {
             User user = null;
             if (getCreateUserId() == null) {
                 setExternal(false);

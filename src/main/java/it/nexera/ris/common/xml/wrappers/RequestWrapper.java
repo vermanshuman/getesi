@@ -3,6 +3,7 @@ package it.nexera.ris.common.xml.wrappers;
 import it.nexera.ris.common.enums.*;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.ComboboxHelper;
+import it.nexera.ris.common.helpers.LogHelper;
 import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
@@ -400,7 +401,11 @@ public class RequestWrapper {
         */
         saveSubjectFields(request, saveSubject);
         saveResidenceFields(request);
-        saveDomicileFields(request);
+        try {
+            saveDomicileFields(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void saveSubjectFields(Request request, boolean saveSubject) throws PersistenceBeanException, IllegalAccessException, InstantiationException {

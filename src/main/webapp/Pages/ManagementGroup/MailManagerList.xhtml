@@ -563,6 +563,7 @@
                                     <h:inputHidden id="entityEditId" value="#{bean.entityEditId}"/>
                                     <h:inputHidden id="tableHeader" name="tableHeader" value="data_header"/>
                                     <h:inputHidden id="selectedIds" name="selectedIds" value="#{bean.selectedIds}"/>
+                                    <h:inputHidden id="rowsPerPageSelected" value="#{bean.rowsPerPage}"/>
                                     <script>
                                         // <![CDATA[
 
@@ -605,6 +606,11 @@
                                                     $('#' + columnheader).addClass("ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s ui-icon-triangle-1-n");
                                                 }
                                             }
+                                        }
+
+                                        function refreshPerPage(id) {
+                                            $('input[id*="rowsPerPageSelected"]').val(document.getElementById(id).value);
+                                            handleRowsChange();
                                         }
 
                                         function loadPerPage() {
@@ -725,7 +731,7 @@
                                         <h:outputText styleClass="ui-paginator-pages" value="#{bean.paginatorString}" escape="false"/>
                                         <h:outputText value="#{bean.pageNavigationEnd}" escape="false"/>
                                         <label id="table_rppLabel" class="ui-paginator-rpp-label ui-helper-hidden">Rows Per Page</label>
-                                        <h:selectOneMenu value = "#{bean.rowsPerPage}" onchange="loadPerPage()" name="table_rppDD" id="table_rppDD">
+                                        <h:selectOneMenu value = "#{bean.rowsPerPage}" onchange="refreshPerPage('table_rppDD')" name="table_rppDD" id="table_rppDD">
                                             <f:selectItem itemValue = "18" itemLabel = "18" />
                                             <f:selectItem itemValue = "50" itemLabel = "50" />
                                             <f:selectItem itemValue = "100" itemLabel = "100" />
@@ -903,7 +909,7 @@
                                         <h:outputText value="#{bean.pageNavigationEnd}" escape="false"/>
                                         <label id="table_rppLabel_bottom"
                                                class="ui-paginator-rpp-label ui-helper-hidden">Rows Per Page</label>
-                                        <h:selectOneMenu value = "#{bean.rowsPerPage}" onchange="loadPerPage()" name="table_rppDD"
+                                        <h:selectOneMenu value = "#{bean.rowsPerPage}" onchange="refreshPerPage('table_rppDD_bottom')" name="table_rppDD"
                                                          id="table_rppDD_bottom">
                                             <f:selectItem itemValue = "18" itemLabel = "18" />
                                             <f:selectItem itemValue = "50" itemLabel = "50" />

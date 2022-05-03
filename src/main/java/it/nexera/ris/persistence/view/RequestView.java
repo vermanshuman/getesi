@@ -390,7 +390,7 @@ public class RequestView extends IndexedView {
     }
 
     public Boolean getExternal() {
-        if (isExternal == null) {
+        if (isExternal == null || createUser == null) {
             User user = null;
             if (getCreateUserId() == null) {
                 setExternal(false);
