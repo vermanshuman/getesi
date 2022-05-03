@@ -599,6 +599,16 @@
             .actionPnl-tooltip {
                 text-align:center; width:140px; background-color: #6688AA !important;border-radius: 7px !important; border: 1px solid #FFFFFF; opacity: 0.8;
             }
+            .ui-selectonemenu-label {
+                background-color: #fff !important;
+                margin-top: 0px;
+            }
+            #subjectClient .ui-selectonemenu-trigger {
+                margin-top: 0px !important;
+            }
+            #subjectClient_label {
+                padding-top: 9px;
+            }
         </style>
         <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
         <link rel="stylesheet"
@@ -1242,14 +1252,14 @@
                                             <div class="p-field">
                                                 <p:inputText value="#{bean.nameFilter}" id="nominativo"
                                                              placeholder="#{msg.databaseListName}"
-                                                             style="width: 300px !important;height: 46px;"/>
+                                                             style="width: 300px !important;height: 36px;border: 1px solid #a8acb1 !important;background: #ffffff !important;"/>
                                             </div>
                                             <div class="p-field">
                                                 <div class="p-field">
                                                     <p:selectOneMenu id="subjectClient"
                                                                      value="#{bean.selectedSubjectClientId}"
                                                                      label="#{msg.requestClient}"
-                                                                     style="width: 300px !important;"
+                                                                     style="width: 300px !important;height: 36px;border: 1px solid #a8acb1 !important;background: #ffffff !important;"
                                                                      styleClass="#{bean.selectedSubjectClientId ne null ? 'select-one-menu' : ''}">
                                                         <f:selectItem itemLabel="#{ff:upper(msg.requestListClient)}"
                                                                       itemValue="#{null}"
