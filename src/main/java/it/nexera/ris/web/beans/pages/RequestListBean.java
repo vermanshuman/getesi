@@ -270,7 +270,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         List<User> notExternalCategoryUsers = DaoManager.load(User.class
                 , new Criterion[]{Restrictions.or(
                         Restrictions.eq("category", UserCategories.INTERNO),
-                        Restrictions.isNull("category"))});
+                        Restrictions.isNull("category")), Restrictions.eq("status", UserStatuses.ACTIVE)});
 
         notExternalCategoryUsers.forEach(u -> getUserWrappers().add(new UserFilterWrapper(u)));
 
