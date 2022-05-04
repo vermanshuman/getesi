@@ -132,7 +132,7 @@
                 <p:commandButton style="margin-left: 2px;"
                                  value="#{msg.requestTextEditCreateInvoice}" rendered="#{bean.showCreateFatturaButton}"
                                  id="createInvoice" styleClass="grey-button"
-                                 action="#{bean.setMaxInvoiceNumber()}" update="@widgetVar(mailManagerViewRequestsForInvoiceDlg)"
+                                 update="@widgetVar(mailManagerViewRequestsForInvoiceDlg)"
                                  oncomplete="PF('mailManagerViewRequestsForInvoiceDlg').show();"/>
 
                 <!--  <p:commandButton icon="ui-icon fa fa-pencil" update=":form" styleClass="right-side"

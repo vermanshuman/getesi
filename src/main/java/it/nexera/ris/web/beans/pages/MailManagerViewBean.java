@@ -367,7 +367,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
         // Changes for invoice
 //        generateMenuModel();
-        setMaxInvoiceNumber();
+        //setMaxInvoiceNumber();
         List<Request> requestList =
                 getEntity().getRequests()
                         .stream()
@@ -395,6 +395,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
         if (!ValidationHelper.isNullOrEmpty(getExamRequest())
                 && !ValidationHelper.isNullOrEmpty(getExamRequest().getInvoice())) {
+        	System.out.println("load method invoice id :: "+getExamRequest().getInvoice().getId());
             Invoice invoice = DaoManager.get(Invoice.class, getExamRequest().getInvoice().getId());
             loadInvoiceDialogData(invoice);
         }
@@ -1165,7 +1166,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 //        getTopMenuModel().addElement(menuItem);
 //    }
 
-    public void setMaxInvoiceNumber() throws HibernateException {
+    public void setMaxInvoiceNumber(Long invoiceId) throws HibernateException {
         LocalDate currentdate = LocalDate.now();
         int currentYear = currentdate.getYear();
 
@@ -1178,9 +1179,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
         if (lastInvoiceNumber == null)
             lastInvoiceNumber = 0l;
-        String invoiceNumber = (lastInvoiceNumber) + "-" + currentYear + "-FE";
+        String invoiceNumber = (invoiceId) + "-" + currentYear + "-FE";
         setInvoiceNumber(invoiceNumber);
-        setNumber(lastInvoiceNumber);
+        setNumber(invoiceId);
     }
 
     public Double getAllTotalLine() {
@@ -1353,7 +1354,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 totalImport = totalImport + paymentInvoice.getPaymentImport().doubleValue();
             }
         }
-        setMaxInvoiceNumber();
+        //setMaxInvoiceNumber();
         docTypes = new ArrayList<>();
         docTypes.add(new SelectItem("FE", "FATTURA"));
         setDocumentType("FE");
@@ -1490,10 +1491,10 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             setValidationFailed(true);
         }
 
-        if (ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId())) {
+        /*if (ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId())) {
             addRequiredFieldException("form:paymentType");
             setValidationFailed(true);
-        }
+        }*/
 
         for (GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
             if (ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceTotalCost())) {
@@ -1535,11 +1536,14 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             getSelectedInvoice().setVatCollectability(VatCollectability.getById(getVatCollectabilityId()));
         getSelectedInvoice().setNotes(getInvoiceNote());
         getSelectedInvoice().setStatus(invoiceStatus);
+        
+        getSelectedInvoice().setTotalGrossAmount(getTotalGrossAmount());
+        DaoManager.save(getSelectedInvoice(), true);
+        setMaxInvoiceNumber(getSelectedInvoice().getId());
         if (saveInvoiceNumber) {
             getSelectedInvoice().setNumber(getNumber());
             getSelectedInvoice().setInvoiceNumber(getInvoiceNumber());
         }
-        getSelectedInvoice().setTotalGrossAmount(getTotalGrossAmount());
         DaoManager.save(getSelectedInvoice(), true);
         for (GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
             if (!ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemUUID()) ||
