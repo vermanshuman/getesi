@@ -212,7 +212,7 @@
                     <h:outputText value="#{msg.mailManagerAttachedFiles}:"
                                   rendered="#{not empty bean.attachedFiles}"/>
                 </div>
-                <div class="ui-g-10">
+                <div class="ui-g-10 attach-files">
                     <ui:repeat value="#{bean.attachedFiles}" var="file">
                         <i class="#{file.icon} #{file.style}"/>
                         <p:commandLink title="#{msg.download}" update=":form, messages" ajax="false"
