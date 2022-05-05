@@ -942,17 +942,17 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                     setInvoiceNumber(invoice.getInvoiceNumber());
                 List<GoodsServicesFieldWrapper> wrapperList = new ArrayList<>();
                 int counter = 1;
-                if(ValidationHelper.isNullOrEmpty(getSelectedInvoiceItems()))
-                	setSelectedInvoiceItems(DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)}));
-                for (InvoiceItem invoiceItem : getSelectedInvoiceItems()) {
+                //if(ValidationHelper.isNullOrEmpty(getSelectedInvoiceItems()))
+                	List<InvoiceItem> items = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
+                for (InvoiceItem invoiceItem : items) {
                     GoodsServicesFieldWrapper wrapper = invoiceHelper.createGoodsServicesFieldWrapper();//createGoodsServicesFieldWrapper();
                     wrapper.setCounter(counter);
-                    if(invoiceItem.getId() == null){
+                    //if(invoiceItem.getId() == null){
                         wrapper.setInvoiceItemId(invoiceItem.getId());
-                    }else {
-                        invoiceItem.setUuid(UUID.randomUUID().toString());
-                        wrapper.setInvoiceItemUUID(invoiceItem.getUuid());
-                    }
+                    //}else {
+                        //invoiceItem.setUuid(UUID.randomUUID().toString());
+                        //wrapper.setInvoiceItemUUID(invoiceItem.getUuid());
+                    //}
                     wrapper.setInvoiceTotalCost(invoiceItem.getInvoiceTotalCost());
                     wrapper.setSelectedTaxRateId(invoiceItem.getTaxRate().getId());
                     wrapper.setInvoiceItemAmount(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount()) ? 0.0 : invoiceItem.getAmount());
@@ -1130,7 +1130,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }catch(Exception e) {
             e.printStackTrace();
             LogHelper.log(log, e);
-            executeJS("PF('sendInvoiceErrorDialogWV').show();");
+            executeJS("PF('invoiceErrorDialogWV').show();");
         }
     }
 
@@ -1170,12 +1170,18 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         getSelectedInvoice().setTotalGrossAmount(getTotalGrossAmount());
         DaoManager.save(getSelectedInvoice(), true);
         for(GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
-            if (!ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemUUID())) {
+            /*if (!ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemUUID())) {
                 InvoiceItem invoiceItem = getSelectedInvoiceItems()
                         .stream().filter(inv ->
                                 (inv.getId() != null
                                         && inv.getId().equals(goodsServicesFieldWrapper.getInvoiceItemId())) ||
                                         (inv.getUuid().equalsIgnoreCase(goodsServicesFieldWrapper.getInvoiceItemUUID()))
+                        ).findFirst().get();*/
+        	if (!ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemId())) {
+                InvoiceItem invoiceItem = getSelectedInvoiceItems()
+                        .stream().filter(inv ->
+                                (inv.getId() != null
+                                        && inv.getId().equals(goodsServicesFieldWrapper.getInvoiceItemId())) 
                         ).findFirst().get();
 
               //  InvoiceItem invoiceItem = DaoManager.get(InvoiceItem.class, goodsServicesFieldWrapper.getInvoiceItemId());
@@ -1253,12 +1259,12 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                     }else
                         setApiError(fatturaAPIResponse.getDescription());
                 }
-                executeJS("PF('sendInvoiceErrorDialogWV').show();");
+                executeJS("PF('invoiceErrorDialogWV').show();");
             }
         }catch(Exception e) {
             e.printStackTrace();
             LogHelper.log(log, e);
-            executeJS("PF('sendInvoiceErrorDialogWV').show();");
+            executeJS("PF('invoiceErrorDialogWV').show();");
         }
     }
 
