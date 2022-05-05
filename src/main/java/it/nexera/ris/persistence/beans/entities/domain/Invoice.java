@@ -12,6 +12,8 @@ import org.hibernate.criterion.Restrictions;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 
@@ -253,6 +255,7 @@ public class Invoice extends IndexedEntity implements Serializable {
 				totalAmount = totalAmount + total;
 			}
 		}
+		
 		return totalAmount;
 	}
 
@@ -266,6 +269,9 @@ public class Invoice extends IndexedEntity implements Serializable {
 		Double onBalance = 0.0;
 		if(getTotalGrossAmount() != null)
 			onBalance = getTotalGrossAmount().doubleValue() - paymentImportTotal;
+		BigDecimal balance = BigDecimal.valueOf(onBalance);
+		balance = balance.setScale(2, RoundingMode.HALF_UP);
+		onBalance = balance.doubleValue();
 		return onBalance;
 	}
 
@@ -276,6 +282,9 @@ public class Invoice extends IndexedEntity implements Serializable {
 			Double total = paymentInvoice.getPaymentImport().doubleValue();
 			paymentImportTotal = paymentImportTotal + total;
 		}
+		BigDecimal tot = BigDecimal.valueOf(paymentImportTotal);
+		tot = tot.setScale(2, RoundingMode.HALF_UP);
+		paymentImportTotal = tot.doubleValue();
 		return paymentImportTotal;
 	}
 
