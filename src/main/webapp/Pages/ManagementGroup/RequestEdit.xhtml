@@ -329,6 +329,9 @@
             .ui-fieldset-legend {
                 font-size: 14px !important;
             }
+            #insertConfirmDlg {
+                width: auto !important;
+            }
         </style>
 
         <script>
@@ -661,10 +664,9 @@
                 <p:commandButton
                         style="margin-left: 25px"
                                  id="addRequestService"
-                                 action="#{bean.validateMultipleRequest(false)}"
+                                 onclick="PF('insertConfirmDlgWV').show()"
                                  value="#{msg.addRequestService.toUpperCase()}"
                                  icon="shopping-cart-icon" styleClass="ui-button-success" iconPos="right"
-                                 update="saveMultipleRequest table newRequestList servicerequestType multipleServiceRequest form"
                                  disabled="#{bean.selectedRequestTypesIdMultiple eq null}"
                                  rendered="#{bean.showAddServiceButton and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2
                                                             and bean.multipleRequestCreate}"/>
@@ -723,6 +725,22 @@
                   resizable="false" draggable="false" effect="SLIDE">
             <p:outputLabel value="#{msg.requestListSave}"/>
 
+        </p:dialog>
+
+        <p:dialog id="insertConfirmDlg" widgetVar="insertConfirmDlgWV" modal="true" styleClass="dialog-green dialog-green-width"
+                  resizable="false" draggable="false" effect="SLIDE">
+            <h:outputText value="#{msg.multipleRequestConfirm}"/>
+            <br/>
+            <br/>
+            <div class="btn_line">
+
+                <p:commandButton value="#{msg.confirm}" oncomplete="PF('insertConfirmDlgWV').hide()"
+                                 action="#{bean.validateMultipleRequest(false)}"
+                                 update="saveMultipleRequest table newRequestList servicerequestType multipleServiceRequest form"
+                                 style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"/>
+                <p:commandButton value="#{msg.cancel}" onclick="PF('insertConfirmDlgWV').hide();"
+                                 style="background-color: #F3362B !important; width: 100px;" />
+            </div>
         </p:dialog>
 
         <p:dialog id="changeUserDlg" widgetVar="changeUserDlgWV" modal="true" styleClass="dialog-green"
