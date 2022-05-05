@@ -1813,7 +1813,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         if(!ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
             inbox = DaoManager.get(WLGInbox.class, invoice.getEmail().getId());
         }
-        inbox.setEmailFrom(getEmailFrom());
+        inbox.setEmailFrom(invoice.getEmailFrom().getEmailFrom());
         inbox.setEmailTo(getEmailTo());
         inbox.setEmailCC(getEmailCC());
         inbox.setEmailSubject(getEmailSubject());
@@ -1871,20 +1871,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         
         try {
         	Invoice invoice = DaoManager.get(Invoice.class, getNumber());
-        	if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getEmailFrom())) {
-                List<String> emailsFrom = new ArrayList<>();
-                try {
-                    emailsFrom = DaoManager.loadField(WLGServer.class, "login", String.class, new Criterion[]{
-                            Restrictions.eq("id", Long.parseLong(ApplicationSettingsHolder.getInstance()
-                                    .getByKey(ApplicationSettingsKeys.SENT_SERVER_ID).getValue()))
-                    });
-                } catch (PersistenceBeanException | IllegalAccessException e) {
-                    LogHelper.log(log, e);
-                }
-                if (emailsFrom != null) {
-                    setEmailFrom(emailsFrom.get(0));
-                }
-            }
         	WLGInbox wlgInbox = saveMail(MailManagerStatuses.NEW.getId());
             MailHelper.sendMail(wlgInbox, getInvoiceEmailAttachedFiles(), null);
             log.info("Mail is sent");

@@ -1824,20 +1824,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         updateDestination();
         updateCC();
 
-        if (!ValidationHelper.isNullOrEmpty(getEntity().getEmailFrom())) {
-            List<String> emailsFrom = new ArrayList<>();
-            try {
-                emailsFrom = DaoManager.loadField(WLGServer.class, "login", String.class, new Criterion[]{
-                        Restrictions.eq("id", Long.parseLong(ApplicationSettingsHolder.getInstance()
-                                .getByKey(ApplicationSettingsKeys.SENT_SERVER_ID).getValue()))
-                });
-            } catch (PersistenceBeanException | IllegalAccessException e) {
-                LogHelper.log(log, e);
-            }
-            if (emailsFrom != null) {
-                getEntity().setEmailFrom(emailsFrom.get(0));
-            }
-        }
         WLGInbox wlgInbox = saveMail(MailManagerStatuses.NEW.getId());
 
         try {

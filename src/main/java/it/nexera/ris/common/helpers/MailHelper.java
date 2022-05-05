@@ -189,6 +189,9 @@ public class MailHelper extends BaseHelper {
         InternetAddress[] bccAddress = new InternetAddress[mailBCC.size()];
 
         InternetAddress fromAddress = new InternetAddress(mail.getEmailFrom(), defaultSendFromName);
+        if(mail.getEmailFrom().contains("<")) {
+        	fromAddress = new InternetAddress(getOnlyEmails(mail.getEmailFrom()).get(0), defaultSendFromName);
+        }
 
         for (int i = 0; i < mailsTo.size(); ++i) {
             toAddress[i] = new InternetAddress(mailsTo.get(i));
