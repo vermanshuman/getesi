@@ -6,7 +6,10 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
 
-    <span>#{enums.documentGenerationTagsULTIMA_RESIDENZA}<span class="red" style="#{block.isRequired()?'':'display:none;'}">*</span></span>
+    <span>#{enums.documentGenerationTagsULTIMA_RESIDENZA}
+        <h:panelGroup rendered="#{not empty block}" style="#{block.isRequired()?'':'display:none;'}">*</h:panelGroup>
+        <h:panelGroup rendered="#{not empty item and not empty item.field}" style="#{item.field.isRequired()?'':'display:none;'}">*</h:panelGroup>
+    </span>
     <p:inputText id="ULTIMA_RESIDENZA" value="#{bean.wrapper.ultimaResidenza}" styleClass="input-width" placeholder="Indirizzo, civico, citt&agrave;"/>
 
 </ui:composition>

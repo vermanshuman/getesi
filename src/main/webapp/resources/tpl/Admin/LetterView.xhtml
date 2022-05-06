@@ -109,17 +109,8 @@
         <div class="p-grid table-demo" style="margin-top: 35px;">
             <div class="p-col-12">
                 <div class="card">
-                    <p:dataTable widgetVar="validRequestsDT" var="item" value="#{bean.entity.validRequests}" reflow="true" styleClass="simple-table">
-                        <f:facet name="header">
-                            <div class="customers-table-header">
-                                <span style="font-weight: bold"></span>
-
-                                <span class="ui-input-icon-left filter-container">
-                                                    <i class="pi pi-search"/>
-                                                    <p:inputText id="globalFilter" onkeyup="PF('validRequestsDT').filter()" placeholder="Global Search"/>
-                                                </span>
-                            </div>
-                        </f:facet>
+                    <p:dataTable widgetVar="validRequestsDT" var="item" value="#{bean.entity.validRequests}" reflow="true" styleClass="simple-table"
+                        rendered="#{not empty bean.entity.validRequests}">
                         <p:column styleClass=" action_column" style="padding: 6px 7px !important;">
                             <p:commandButton icon="ui-icon pi pi-pencil" update=":form" action="#{bean.gotoEditRequest}" style="width: 32px;">
                             <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>

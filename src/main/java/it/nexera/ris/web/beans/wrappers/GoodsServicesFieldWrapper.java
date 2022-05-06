@@ -32,5 +32,4 @@ public class GoodsServicesFieldWrapper implements Serializable {
 
     private Integer counter;
 
-    //private String invoiceItemUUID;
 }

@@ -5,7 +5,10 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:p="http://primefaces.org/ui">
 
-    <span>#{enums.documentGenerationTagsACT_DATE}<span class="red" style="#{block.isRequired()?'':'display:none;'}">*</span></span>
+    <span>#{enums.documentGenerationTagsACT_DATE}
+        <h:panelGroup rendered="#{not empty block}" style="#{block.isRequired()?'':'display:none;'}">*</h:panelGroup>
+        <h:panelGroup rendered="#{not empty item and not empty item.field}" style="#{item.field.isRequired()?'':'display:none;'}">*</h:panelGroup>
+    </span>
     <p:calendar id="ACT_DATE" value="#{bean.entity.actDate}" styleClass="input-width"/>
 
 </ui:composition>

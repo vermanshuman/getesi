@@ -1009,7 +1009,7 @@
                                 <c:set value="" var="evenclass"></c:set>
                             </c:if>
 
-                            <tr class="ui-widget-content ui-datatable-selectable ${cssClass} ${evenclass}">
+                            <tr class="ui-widget-content ui-datatable-selectable ${cssClass} ${evenclass} #{item.isInserted ? 'receive_new_mail_style':''}">
                                 <td style="width: 20px !important;"
                                     class="ui-selection-column min_padding_margin icon_column">
                                     <p:outputPanel style="margin-left: 10px;text-align: left;max-height: 80px;">

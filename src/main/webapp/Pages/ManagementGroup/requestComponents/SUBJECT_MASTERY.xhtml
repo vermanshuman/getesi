@@ -13,7 +13,8 @@
         }
     </script>
     <span>#{enums.documentGenerationTagsSUBJECT_MASTERY}
-        <span class="red" style="#{item.field.isRequired() or bean.multipleCreate ? '':'display:none;'}">*</span>
+        <h:panelGroup rendered="#{not empty block}" style="#{block.isRequired()?'':'display:none;'}">*</h:panelGroup>
+        <h:panelGroup rendered="#{not empty item and not empty item.field}" style="#{item.field.isRequired()?'':'display:none;'}">*</h:panelGroup>
     </span>
     <p:remoteCommand name="updateDate" update="SUBJECT_MASTERY_BIRTHDAY"/>
     <p:panel id="SUBJECT_MASTERY" style="background: transparent; border: none">

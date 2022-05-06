@@ -255,7 +255,6 @@ public class Invoice extends IndexedEntity implements Serializable {
 				totalAmount = totalAmount + total;
 			}
 		}
-		
 		return totalAmount;
 	}
 

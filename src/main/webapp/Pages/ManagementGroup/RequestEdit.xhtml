@@ -329,9 +329,6 @@
             .ui-fieldset-legend {
                 font-size: 14px !important;
             }
-            #insertConfirmDlg {
-                width: auto !important;
-            }
         </style>
 
         <script>
@@ -528,7 +525,7 @@
                         <div class="ui-g-3" style="padding: 1%">
                             <span> #{msg.requestRequestType}<span class="red">*</span>:</span><br/>
                             <p:selectOneMenu id="servicerequestType" value="#{bean.selectedRequestTypesIdMultiple}"
-                                             label="#{msg.requestRequestType}" styleClass="select-width" style="min-height: 37px;">
+                                             label="#{msg.requestRequestType}" styleClass="select-width servicedropdowns" style="min-height: 37px;">
                                 <p:ajax event="change" listener="#{bean.onRequestTypeChangeBlock}"
                                         update="form @this"/>
                                 <f:selectItems value="#{bean.requestTypes}"/>
@@ -551,7 +548,7 @@
                             <span> #{msg.requestService}<span class="red">*</span>:</span><br/>
                             <p:selectCheckboxMenu value="#{bean.selectedServiceIds}" id="multipleServiceRequest" multiple="true"
                                                   label="#{msg.requestService}"
-                                                  styleClass="select-width" style="min-height: 37px;"
+                                                  styleClass="select-width servicedropdowns" style="min-height: 37px;"
                                                   onHide="executeOnOnServicehide()">
                                 <f:selectItems value="#{bean.services}"/>
                             </p:selectCheckboxMenu>
@@ -662,12 +659,13 @@
 
             <div id="request-btns">
                 <p:commandButton
-                        style="margin-left: 25px"
+                        style="margin-left: 18px"
                                  id="addRequestService"
-                                 onclick="PF('insertConfirmDlgWV').show()"
+                               action="#{bean.validateMultipleRequest(false)}"
                                  value="#{msg.addRequestService.toUpperCase()}"
                                  icon="shopping-cart-icon" styleClass="ui-button-success" iconPos="right"
                                  disabled="#{bean.selectedRequestTypesIdMultiple eq null}"
+                                update="saveMultipleRequest table newRequestList @(.servicedropdowns) form"
                                  rendered="#{bean.showAddServiceButton and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2
                                                             and bean.multipleRequestCreate}"/>
                 <div style="clear: both"></div>
@@ -727,22 +725,6 @@
 
         </p:dialog>
 
-        <p:dialog id="insertConfirmDlg" widgetVar="insertConfirmDlgWV" modal="true" styleClass="dialog-green dialog-green-width"
-                  resizable="false" draggable="false" effect="SLIDE">
-            <h:outputText value="#{msg.multipleRequestConfirm}"/>
-            <br/>
-            <br/>
-            <div class="btn_line">
-
-                <p:commandButton value="#{msg.confirm}" oncomplete="PF('insertConfirmDlgWV').hide()"
-                                 action="#{bean.validateMultipleRequest(false)}"
-                                 update="saveMultipleRequest table newRequestList servicerequestType multipleServiceRequest form"
-                                 style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"/>
-                <p:commandButton value="#{msg.cancel}" onclick="PF('insertConfirmDlgWV').hide();"
-                                 style="background-color: #F3362B !important; width: 100px;" />
-            </div>
-        </p:dialog>
-
         <p:dialog id="changeUserDlg" widgetVar="changeUserDlgWV" modal="true" styleClass="dialog-green"
                   resizable="false" draggable="false" effect="SLIDE"
                   header="#{msg.requestUserChangeDlg}">
@@ -769,8 +751,9 @@
                 <h:outputText value="#{bean.multipleReqMessage}"/>
             </span>
             <div class="btn_line">
-                <p:commandButton value="#{msg.yes}" action="#{bean.pageSave}"
-                                 update="@form" oncomplete="PF('multipleRequestSave').hide();"/>
+                <p:commandButton value="#{msg.yes}" action="#{bean.saveServiceRequest(false)}"
+                                 update="saveMultipleRequest table newRequestList @(.servicedropdowns) form"
+                                 oncomplete="PF('multipleRequestSave').hide();"/>
                 <p:commandButton value="#{msg.no}"
                                  oncomplete="PF('multipleRequestSave').hide();"/>
             </div>

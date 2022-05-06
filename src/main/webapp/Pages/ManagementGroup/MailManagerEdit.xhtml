@@ -12,10 +12,25 @@
         <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/mail.css"
               media="all" rel="stylesheet" type="text/css"/>
         <style>
-            body .ui-widget-header {
+            .ui-dialog:not(#attachFielDlg) .ui-widget-header {
                 background-color: #FFFFFF !important;
                 color: #ffffff !important;
                 font-size: 15px;
+            }
+            #attachFielDlg .ui-datatable .ui-datatable-data tr.ui-datatable-even {
+                background-color: #f0f3f5;
+            }
+            #attachFielDlg .ui-dialog-titlebar {
+                padding-top: 0px !important;
+                padding-bottom: 0px !important;
+            }
+
+            #attachFielDlg .ui-fileupload-buttonbar {
+                text-align: center !important;
+            }
+
+            #attachFielDlg .ui-button {
+                background-color: #003871 !important;
             }
 
             body .ui-inputfield {
@@ -70,9 +85,8 @@
                 border : none !important;
             }
             #attachFielDlg{
-                width:50% !important;
+                /*width:50% !important;*/
                 left: calc(25% - 0px) ;
-                border: 2px solid #57c279 !important;
             }
             #tableFiles > .ui-datatable-tablewrapper > table > tbody > tr > td {
                 border-color: #808080 !important;
@@ -390,6 +404,7 @@
         <ui:include src="/resources/tpl/Admin/Include/ButtonLineBottom.xhtml"/>
         <p:remoteCommand update="listFile" name="updateFiles"/>
         <p:dialog id="attachFielDlg" widgetVar="attachFielDlgWV" modal="true"
+                  position="center center"
                   resizable="false" draggable="false" width="80%" height="400" onHide="updateFiles()">
             <p:ajax event="close" oncomplete="updateFiles()"/>
 

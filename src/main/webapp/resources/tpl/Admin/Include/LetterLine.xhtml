@@ -138,6 +138,15 @@
                 <!--  <p:commandButton icon="ui-icon fa fa-pencil" update=":form" styleClass="right-side"
                                   action="#{bean.editEntity}"
                                   disabled="#{!bean.entity.canEdit}"/> -->
+
+                <ui:fragment rendered="#{bean.entity.received and bean.relatedToClient}">
+	            <span style="border: 2px solid #788fa7 !important;padding: 5px 8px 8px 4px; border-radius: 2px;display: inline-block;">
+	                <i class="fa fa-check-circle-o" style="color: green; margin-right: 5px; margin-left: 5px;"/>
+	                <p:commandLink value="#{msg.mailManagerRelatedToClient}" action="#{bean.prepareClients}"
+                                   oncomplete="PF('associateToClientDlgWV').show();" update="associateToClientDlgPanel"/>
+	            </span>
+                </ui:fragment>
+
                 <p:commandButton rendered="#{bean.canDeleteMail and bean.actual}" styleClass="ui-button-danger"
                              action="#{bean.cancelMail}" icon="pi pi-trash"  style="background: #fb6e51 !important"/>
                 <p:commandButton rendered="#{bean.dataSaved}" id="dataSaved" value="#{msg.mailManagerSave}"  style="background-color: green; width:200px;" oncomplete="setTimeout();"
@@ -148,18 +157,9 @@
             <!-- <p:commandButton icon="fa fa-pencil-square" actionListener="#{bean.checkFieldsBeforeProcessManagedStateCheck}"
                              value="#{msg.mailManagerStart}" styleClass="ui-button-success"/> -->
             <p:commandButton icon="pi pi-print" update="form:print_panel"
-                             styleClass="ui-button-warning stampaButton" action="#{bean.generateMailPdf}" oncomplete="printIframe();" value="Stampa" style="margin-right: 1cm;width: auto;background: #FFCC00;"/>
+                             styleClass="ui-button-warning stampaButton" action="#{bean.generateMailPdf}" oncomplete="printIframe();" value="Stampa" style="margin-right: 1cm;width: auto;background: #000066;"/>
             <p:commandButton update=":form" style="background-color: #F3362B !important;margin-left: 2px;width: 110px;" value="#{msg.close}" styleClass="grey-button"
                              actionListener="#{bean.goTable}"/>
-        </div>
-        <div class="p-col-12" style="margin-top: -10px;">
-            <ui:fragment rendered="#{bean.entity.received and bean.relatedToClient}">
-	            <span style="border: 2px solid #788fa7 !important;padding: 5px 8px 8px 4px; border-radius: 2px;display: inline-block;">
-	                <i class="fa fa-check-circle-o" style="color: green; margin-right: 5px; margin-left: 5px;"/>
-	                <p:commandLink value="#{msg.mailManagerRelatedToClient}" action="#{bean.prepareClients}"
-                                   oncomplete="PF('associateToClientDlgWV').show();" update="associateToClientDlgPanel"/>
-	            </span>
-            </ui:fragment>
         </div>
     </div>
 </ui:composition>

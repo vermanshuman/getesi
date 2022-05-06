@@ -15,8 +15,11 @@
     <p:panel style="background: transparent; border: none" styleClass="ui-g-6">
         <p:panelGrid columns="2" style="width: 100%;" styleClass="ui-panelgrid-blank form-group" layout="grid">
             <p:column>
-        <span>#{msg.requestProvince}<span class="red"
-                                                                    style="#{block.isRequired()?'':'display:none;'}">*</span></span>
+        <span>#{msg.requestProvince}
+<!--            <span class="red" style="#{block.isRequired()?'':'display:none;'}">*</span>-->
+            <h:panelGroup rendered="#{not empty block}" style="#{block.isRequired()?'':'display:none;'}">*</h:panelGroup>
+            <h:panelGroup rendered="#{not empty item and not empty item.field}" style="#{item.field.isRequired()?'':'display:none;'}">*</h:panelGroup>
+        </span>
                 <p:selectOneMenu id="STANDART_PROVINCE" value="#{bean.wrapper.selectedProvincePropertyId}"
                                  styleClass="select-width">
                     <f:selectItems value="#{bean.wrapper.provinces}"/>

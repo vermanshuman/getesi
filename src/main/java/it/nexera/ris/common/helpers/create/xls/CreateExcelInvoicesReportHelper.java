@@ -147,12 +147,12 @@ public class CreateExcelInvoicesReportHelper extends CreateExcelReportHelper {
         for (InvoiceItem invoiceItem : invoiceItems) {
             GoodsServicesFieldWrapper wrapper = invoiceHelper.createGoodsServicesFieldWrapper();
             wrapper.setCounter(counter);
-            //if(invoiceItem.getId() == null){
-                wrapper.setInvoiceItemId(invoiceItem.getId());
-            //}else {
-                //invoiceItem.setUuid(UUID.randomUUID().toString());
-                //wrapper.setInvoiceItemUUID(invoiceItem.getUuid());
-            //}
+//            if(invoiceItem.getId() == null){
+//                wrapper.setInvoiceItemId(invoiceItem.getId());
+//            }else {
+//                invoiceItem.setUuid(UUID.randomUUID().toString());
+//                wrapper.setInvoiceItemUUID(invoiceItem.getUuid());
+//            }
             wrapper.setInvoiceTotalCost(invoiceItem.getInvoiceTotalCost());
             wrapper.setSelectedTaxRateId(invoiceItem.getTaxRate().getId());
             wrapper.setInvoiceItemAmount(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount()) ? 0.0 : invoiceItem.getAmount());

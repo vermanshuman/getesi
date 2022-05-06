@@ -6,8 +6,10 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
 
-    <span>#{enums.documentGenerationTagsRESIDENCE}<span class="red"
-                                                        style="#{item.field.isRequired()?'':'display:none;'}">*</span></span>
+    <span>#{enums.documentGenerationTagsRESIDENCE}
+        <h:panelGroup rendered="#{not empty block}" style="#{block.isRequired()?'':'display:none;'}">*</h:panelGroup>
+        <h:panelGroup rendered="#{not empty item and not empty item.field}" style="#{item.field.isRequired()?'':'display:none;'}">*</h:panelGroup>
+    </span>
     <p:panel id="RESIDENCE" style="background: transparent; border: none">
         <p:panelGrid id="physicalRenderResidence" columns="4"
                      style="width: 100%;" styleClass="ui-panelgrid-blank form-group" layout="grid">

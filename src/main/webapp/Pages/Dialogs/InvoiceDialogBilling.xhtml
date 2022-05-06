@@ -809,33 +809,33 @@
 
                 <p:tab title="#{msg.emailTab}" id="emailTab">
                     <div class="p-grid emailTab" style="border: none; background-color: #f0f2f5;">
-                        <!-- <p:remoteCommand action="#{bean.deleteEmailFrom}" name="removeEmailAddressFrom" update="mailFrom"/> -->
+<!--                        <p:remoteCommand action="#{bean.deleteEmailFrom}" name="removeEmailAddressFrom" update="mailFrom"/>-->
                         <p:remoteCommand action="#{bean.deleteEmailTo}" name="removeEmailAddressTo" update="mailTo"/>
                         <p:remoteCommand action="#{bean.deleteEmailCC}" name="removeEmailAddressCC" update="mailCC"/>
                         <p:remoteCommand name="showNotSendMsg" onstart="PF('showSendErrorDialog').show();" />
                         <h:inputHidden id="changeVar" value="#{bean.changeVar}"/>
                         <div class="p-col-6">
                             <div class="p-grid">
-                                <!-- <div class="p-col-2 vertical-center">
-                                    <h:outputText value="#{msg.mailManagerEmailFrom}:"/>
-                                </div>
-                                <div class="p-col-10">
-                                    <p:autoComplete maxResults="6" multiple="true" value="#{bean.sendFrom}"
-                                                    completeMethod="#{bean.completeMailFrom}"
-                                                    inputStyle="width: 80%;" id="mailFrom"
-                                                    var="dest" itemLabel="#{dest}" itemValue="#{dest}"
-                                                    style="width: 80%; background: #FFF;"
-                                                    onkeydown="return lockValue(event);"
-                                                    immediate="false">
-                                        <p:column>
-                                            <h:outputText value="#{dest}" escape="false" />
-                                        </p:column>
-                                        <p:column style="width: 32px;">
-                                            <p:commandButton icon="fa fa-times"
-                                                             onclick="removeEmailAddressFrom([{name:'param', value:'#{dest}'}]);" />
-                                        </p:column>
-                                    </p:autoComplete>
-                                </div> -->
+<!--                                <div class="p-col-2 vertical-center">-->
+<!--                                    <h:outputText value="#{msg.mailManagerEmailFrom}:"/>-->
+<!--                                </div>-->
+<!--                                <div class="p-col-10">-->
+<!--                                    <p:autoComplete maxResults="6" multiple="true" value="#{bean.sendFrom}"-->
+<!--                                                    completeMethod="#{bean.completeMailFrom}"-->
+<!--                                                    inputStyle="width: 80%;" id="mailFrom"-->
+<!--                                                    var="dest" itemLabel="#{dest}" itemValue="#{dest}"-->
+<!--                                                    style="width: 80%; background: #FFF;"-->
+<!--                                                    onkeydown="return lockValue(event);"-->
+<!--                                                    immediate="false">-->
+<!--                                        <p:column>-->
+<!--                                            <h:outputText value="#{dest}" escape="false" />-->
+<!--                                        </p:column>-->
+<!--                                        <p:column style="width: 32px;">-->
+<!--                                            <p:commandButton icon="fa fa-times"-->
+<!--                                                             onclick="removeEmailAddressFrom([{name:'param', value:'#{dest}'}]);" />-->
+<!--                                        </p:column>-->
+<!--                                    </p:autoComplete>-->
+<!--                                </div>-->
 
                                 <div class="p-col-2 vertical-center">
                                     <h:outputText value="#{msg.mailManagerEditMailTo}:"/>

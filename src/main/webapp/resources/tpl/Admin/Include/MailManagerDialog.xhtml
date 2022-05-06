@@ -5,13 +5,18 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
-    <p:dialog widgetVar="moveDlgWV" styleClass="dialog-gray dialog-gray-width"
+    <style>
+        #moveDlg{
+            width:30% !important;
+        }
+    </style>
+    <p:dialog widgetVar="moveDlgWV" styleClass="dialog-gray dialog-gray-width" id="moveDlg"
               draggable="false" modal="true" resizable="false"
               header="#{msg.mailManagerMoveMailHeader}">
         <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" layout="grid">
             <h:outputText style="font-size: initial; margin: 0; position: absolute; top: 17%; -ms-transform: translateY(-50%); transform: translateY(-17%);"
                           value="#{msg.mailManagerMailType}:"/>
-            <p:selectOneMenu value="#{bean.selectedTypeId}">
+            <p:selectOneMenu value="#{bean.selectedTypeId}"  styleClass="select-width">
                 <f:selectItems value="#{bean.mailTypes}"/>
             </p:selectOneMenu>
         </p:panelGrid>

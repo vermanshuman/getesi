@@ -336,7 +336,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                     addColumnValues(request, columnValues,createExcelRequestsReportHelper);
                     List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
                             Restrictions.eq("requestId", request.getId())});
-                    Double result = 0d;
+                    Double result;
                     for (ExtraCost cost : extraCost) {
                         if(ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
                             result = cost.getPrice();
@@ -1048,6 +1048,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                 }
                 List<Request> filteredRequests  = emptyIfNull(requests).stream().filter(
                         r->r.isDeletedRequest()).collect(Collectors.toList());
+                Collections.sort(filteredRequests, Comparator.comparing(r -> r.getSubject().getId()));
                 excelFile = new CreateExcelRequestsReportHelper(true).convertMailUserDataToExcel(
                         filteredRequests, document,excelDataWrapper);
             }
@@ -1227,6 +1228,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
     }
 
     protected void sortRequestsByType(List<Request> requests, Map<RequestType, List<Request>> sortedRequests) {
+        Collections.sort(requests, Comparator.comparing(r -> r.getSubject().getId()));
         for (Request elem : requests) {
             elem.setTempId(UUID.randomUUID().toString());
             if (!sortedRequests.containsKey(elem.getRequestType())) {

@@ -816,29 +816,31 @@
                                                     <c:set value="" var="evenclass"></c:set>
                                                 </c:if>
 
-                                                <c:if test="${bean.mailManagerButtonSelectedId==2 and item.read and bean.isSendOrStorage()}">
-                                                    <c:set value="mail_style mail-tab-DELETE-SEND ui-datatable-gridlines" var="cssClass"></c:set>
-                                                </c:if>
-                                                <c:if test="${bean.mailManagerButtonSelectedId==2 and item.read and !bean.isSendOrStorage()}">
-                                                    <c:set value="mail_style ui-datatable-gridlines" var="cssClass"></c:set>
-                                                </c:if>
-                                                <c:if test="${bean.mailManagerButtonSelectedId==2 and !item.read and bean.isSendOrStorage()}">
-                                                    <c:set value="receive_new_mail_style mail-tab-DELETE-SEND ui-datatable-gridlines" var="cssClass"></c:set>
-                                                </c:if>
-                                                <c:if test="${bean.mailManagerButtonSelectedId==2 and !item.read and !bean.isSendOrStorage()}">
-                                                    <c:set value="receive_new_mail_style ui-datatable-gridlines" var="cssClass"></c:set>
-                                                </c:if>
+<!--                                                <c:if test="${bean.mailManagerButtonSelectedId==2 and item.read and bean.isSendOrStorage()}">-->
+<!--                                                    <c:set value="mail_style mail-tab-DELETE-SEND ui-datatable-gridlines" var="cssClass"></c:set>-->
+<!--                                                </c:if>-->
+<!--                                                <c:if test="${bean.mailManagerButtonSelectedId==2 and item.read and !bean.isSendOrStorage()}">-->
+<!--                                                    <c:set value="mail_style ui-datatable-gridlines" var="cssClass"></c:set>-->
+<!--                                                </c:if>-->
+<!--                                                <c:if test="${bean.mailManagerButtonSelectedId==2 and !item.read and bean.isSendOrStorage()}">-->
+<!--                                                    <c:set value="receive_new_mail_style mail-tab-DELETE-SEND ui-datatable-gridlines" var="cssClass"></c:set>-->
+<!--                                                </c:if>-->
+<!--                                                <c:if test="${bean.mailManagerButtonSelectedId==2 and !item.read and !bean.isSendOrStorage()}">-->
+<!--                                                    <c:set value="receive_new_mail_style ui-datatable-gridlines" var="cssClass"></c:set>-->
+<!--                                                </c:if>-->
 
 
-                                                <c:if test="${bean.mailManagerButtonSelectedId != 2 and bean.isSendOrStorage()}">
-                                                    <c:set value="mail_style mail-tab-DELETE-SEND ui-datatable-gridlines" var="cssClass"></c:set>
-                                                </c:if>
-                                                <c:if test="${bean.mailManagerButtonSelectedId != 2 and !bean.isSendOrStorage()}">
-                                                    <c:set value="mail_style ui-datatable-gridlines" var="cssClass"></c:set>
-                                                </c:if>
+<!--                                                <c:if test="${bean.mailManagerButtonSelectedId != 2 and bean.isSendOrStorage()}">-->
+<!--                                                    <c:set value="mail_style mail-tab-DELETE-SEND ui-datatable-gridlines" var="cssClass"></c:set>-->
+<!--                                                </c:if>-->
+<!--                                                <c:if test="${bean.mailManagerButtonSelectedId != 2 and !bean.isSendOrStorage()}">-->
+<!--                                                    <c:set value="mail_style ui-datatable-gridlines" var="cssClass"></c:set>-->
+<!--                                                </c:if>-->
 
 
-                                                <tr class="ui-widget-content ui-datatable-selectable ${cssClass} ${evenclass}">
+                                                <tr class="ui-widget-content ui-datatable-selectable ${evenclass}
+                                                    #{bean.mailManagerButtonSelectedId==2 ? (item.read? 'mail_style':'receive_new_mail_style'):'mail_style'}
+                                                        #{bean.isSendOrStorage() ? 'mail-tab-DELETE-SEND' :''}">
                                                     <td style="width: 20px !important;"
                                                         class="ui-selection-column min_padding_margin icon_column">
                                                         <div class="ui-chkbox ui-widget">
@@ -882,17 +884,17 @@
                                                         <td style="width: 400px;"  onclick="selectRow(#{item.id})">  <h:outputText value="#{item.emailFromStr[0]}" id="email_from"/></td>
                                                     </c:if>
                                                     <c:if test="${bean.needShowEmailTo}">
-                                                        <td>  <h:outputText value="#{item.emailToStr[0]}" id="email_to"/></td>
+                                                        <td onclick="selectRow(#{item.id})">  <h:outputText value="#{item.emailToStr[0]}" id="email_to"/></td>
                                                     </c:if>
                                                     <td onclick="selectRow(#{item.id})">  <h:outputText value="#{item.emailSubject}"/></td>
                                                     <c:if test="${bean.needShowEmailUser}">
-                                                        <td>  <h:outputText value="#{item.createUser}"/></td>
+                                                        <td onclick="selectRow(#{item.id})">  <h:outputText value="#{item.createUser}"/></td>
                                                     </c:if>
                                                     <c:if test="${bean.mailManagerButtonSelectedId != 1}">
-                                                        <td><h:outputText styleClass="min_padding_margin" style="width: 70px;" value="#{item.stateStr}"/></td>
+                                                        <td onclick="selectRow(#{item.id})"><h:outputText styleClass="min_padding_margin" style="width: 70px;" value="#{item.stateStr}"/></td>
                                                     </c:if>
                                                     <c:if test="${bean.needShowChangeStateUser}">
-                                                        <td><h:outputText value="#{item.changeStateUser}"/></td>
+                                                        <td onclick="selectRow(#{item.id})"><h:outputText value="#{item.changeStateUser}"/></td>
                                                     </c:if>
 
                                                 </tr>

@@ -190,7 +190,7 @@ public class MailHelper extends BaseHelper {
 
         InternetAddress fromAddress = new InternetAddress(mail.getEmailFrom(), defaultSendFromName);
         if(mail.getEmailFrom().contains("<")) {
-        	fromAddress = new InternetAddress(getOnlyEmails(mail.getEmailFrom()).get(0), defaultSendFromName);
+            fromAddress = new InternetAddress(getOnlyEmails(mail.getEmailFrom()).get(0), defaultSendFromName);
         }
 
         for (int i = 0; i < mailsTo.size(); ++i) {

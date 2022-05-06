@@ -425,7 +425,7 @@ public class RequestView extends IndexedView {
             setCreateUserFullName(createUser.getFullname());
             if (getOffice() == null && !ValidationHelper.isNullOrEmpty(getUserOfficeId())) {
                 Office office = DaoManager.get(Office.class, getUserOfficeId());
-                setCreateUserFullName(String.format("%s <br/> %s - %s", createUser.getFullname(), office.getCode(),
+                setCreateUserFullName(String.format("%s - %s - %s", createUser.getFullname(), office.getCode(),
                         office.getDescription()));
             }
         }

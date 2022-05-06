@@ -1344,7 +1344,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         setShowRequestTab(true);
         setActiveTabIndex(0);
         if(!ValidationHelper.isNullOrEmpty(invoiceDb) && !ValidationHelper.isNullOrEmpty(invoiceDb.getId()))
-        	setInvoicedRequests(DaoManager.load(Request.class, new Criterion[]{ Restrictions.eq("invoice", invoiceDb)}));
+            setInvoicedRequests(DaoManager.load(Request.class, new Criterion[]{ Restrictions.eq("invoice", invoiceDb)}));
         if(!invoiceDb.isNew()){
             List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class,
                     new Criterion[] {Restrictions.eq("invoice", invoiceDb)}, new Order[]{
@@ -1421,7 +1421,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     + " FIDUCIARIO " + (!ValidationHelper.isNullOrEmpty(getEntity().getOffice()) && !ValidationHelper.isNullOrEmpty(getEntity().getOffice().getDescription()) ? getEntity().getOffice().getDescription() : "");
             setInvoiceNote(causal);
             if (!ValidationHelper.isNullOrEmpty(invoiceDb.getNotes()))
-            	setInvoiceNote(invoiceDb.getNotes());
+                setInvoiceNote(invoiceDb.getNotes());
             setEmailSubject(causal);
         }
         setEmailBodyToEditor(getEntity().getEmailBodyToEditor());
@@ -1548,20 +1548,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
         DaoManager.save(getSelectedInvoice(), true);
         for (GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
-            /*if (!ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemUUID()) ||
-                    !ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemId())) {
+            if (!ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemId())) {
                 InvoiceItem invoiceItem = getSelectedInvoiceItems()
                         .stream().filter(inv ->
-                                        (inv.getId() != null
-                                                && inv.getId().equals(goodsServicesFieldWrapper.getInvoiceItemId())) ||
-                                                (inv.getUuid() != null && inv.getUuid().equalsIgnoreCase(goodsServicesFieldWrapper.getInvoiceItemUUID()))
-                                ).findFirst().get();*/
-        	if (!ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemId())) {
-                InvoiceItem invoiceItem = getSelectedInvoiceItems()
-                        .stream().filter(inv ->
-                                        (inv.getId() != null
-                                                && inv.getId().equals(goodsServicesFieldWrapper.getInvoiceItemId()))
-                                ).findFirst().get();
+                                (inv.getId() != null
+                                        && inv.getId().equals(goodsServicesFieldWrapper.getInvoiceItemId()))
+                        ).findFirst().get();
                 // InvoiceItem invoiceItem = DaoManager.get(InvoiceItem.class, goodsServicesFieldWrapper.getInvoiceItemId());
                 invoiceItem.setAmount(goodsServicesFieldWrapper.getInvoiceItemAmount());
                 invoiceItem.setTaxRate(DaoManager.get(TaxRate.class, goodsServicesFieldWrapper.getSelectedTaxRateId()));
@@ -1666,9 +1658,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
     }
 
-    /*public List<String> completeMailFrom(String query) {
-        return completeField(query, "email_from");
-    }*/
+//    public List<String> completeMailFrom(String query) {
+//        return completeField(query, "email_from");
+//    }
 
     public List<String> completeDestinations(String query) {
         return completeField(query, "email_to");
@@ -1715,13 +1707,13 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
     }
 
-    /*public void deleteEmailFrom() throws PersistenceBeanException {
-        String email = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("param");
-        if (!ValidationHelper.isNullOrEmpty(email)) {
-            deleteEmail(MailHelper.prepareEmailToSend(email));
-            getSendFrom().remove(getSendFrom().size() - 1);
-        }
-    }*/
+//    public void deleteEmailFrom() throws PersistenceBeanException {
+//        String email = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("param");
+//        if (!ValidationHelper.isNullOrEmpty(email)) {
+//            deleteEmail(MailHelper.prepareEmailToSend(email));
+//            getSendFrom().remove(getSendFrom().size() - 1);
+//        }
+//    }
 
     public void deleteEmail(String email) throws PersistenceBeanException {
         EmailRemove remove = new EmailRemove();
@@ -1834,12 +1826,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             MailHelper.sendMail(wlgInbox, getInvoiceEmailAttachedFiles(), null);
             log.info("Mail is sent");
             if (!ValidationHelper.isNullOrEmpty(getBaseMailId())) {
-            	wlgInbox.setRecievedInbox(DaoManager.get(WLGInbox.class, getBaseMailId()));
+                wlgInbox.setRecievedInbox(DaoManager.get(WLGInbox.class, getBaseMailId()));
                 DaoManager.save(wlgInbox, true);
             }
             if(!ValidationHelper.isNullOrEmpty(getEntity().getManagers())) {
-            	wlgInbox.setManagers(new ArrayList<>(getEntity().getManagers()));
-            	DaoManager.save(wlgInbox, true);
+                wlgInbox.setManagers(new ArrayList<>(getEntity().getManagers()));
+                DaoManager.save(wlgInbox, true);
             }
             wlgInbox.setServerId(Long.parseLong(ApplicationSettingsHolder.getInstance()
                     .getByKey(ApplicationSettingsKeys.SENT_SERVER_ID).getValue()));
@@ -1850,12 +1842,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                         .collect(Collectors.toList());
             }
             CollectionUtils.emptyIfNull(selectedRequestList).stream().forEach(r -> {
-               try {
+                try {
                     r.setStateId(RequestState.INVOICED.getId());
                     DaoManager.save(r, true);
-               } catch (PersistenceBeanException e) {
+                } catch (PersistenceBeanException e) {
                     log.error("error in saving request after sending mail ", e);
-               }
+                }
             });
         } catch (Exception e) {
             log.info("Mail is not sent");
@@ -1863,7 +1855,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             executeJS("showNotSendMsg();");
             return;
         }
-        
+
     }
 
     public List<SelectItem> getClientTypes() {
@@ -1966,10 +1958,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 BigDecimal totIva = BigDecimal.valueOf(totalIva);
                 totIva = totIva.setScale(2, RoundingMode.HALF_UP);
                 totalIva = totIva.doubleValue();
-                
-                BigDecimal imponi = BigDecimal.valueOf(imponibile);
-                imponi = imponi.setScale(2, RoundingMode.HALF_UP);
-                imponibile = imponi.doubleValue();
             }
             Date currentDate = new Date();
             String fileName = "Richieste_Invoice_" + DateTimeHelper.toFileDateWithMinutes(currentDate);
@@ -2230,6 +2218,10 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 BigDecimal totIva = BigDecimal.valueOf(totalIva);
                 totIva = totIva.setScale(2, RoundingMode.HALF_UP);
                 totalIva = totIva.doubleValue();
+
+                BigDecimal imponi = BigDecimal.valueOf(imponibile);
+                imponi = imponi.setScale(2, RoundingMode.HALF_UP);
+                imponibile = imponi.doubleValue();
             }
             Date currentDate = new Date();
             String fileName = "Richieste_Invoice_" + DateTimeHelper.toFileDateWithMinutes(currentDate);
@@ -2379,7 +2371,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             executeJS("PF('invoiceDialogBillingWV').show();");
         }
     }
-    
+
     public void closeInvoiceDialog() {
         try {
             List<WLGExport> exports = DaoManager.load(WLGExport.class, new Criterion[]{
@@ -2470,7 +2462,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 BigDecimal totIva = BigDecimal.valueOf(totalIva);
                 totIva = totIva.setScale(2, RoundingMode.HALF_UP);
                 totalIva = totIva.doubleValue();
-                
+
                 BigDecimal imponi = BigDecimal.valueOf(imponibile);
                 imponi = imponi.setScale(2, RoundingMode.HALF_UP);
                 imponibile = imponi.doubleValue();
