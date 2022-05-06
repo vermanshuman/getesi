@@ -1187,7 +1187,7 @@
                                 <h:outputText value="#{invoice.totalGrossAmount}"/>
                             </p:column>
                             <p:column headerText="#{msg.billingListOnBalance}" sortBy="#{invoice.onBalance}">
-                                <p:commandButton id="openinvoice-payment" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
+                                <p:commandButton id="openinvoice-payment" disabled="#{invoice.email.id != null}" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
                                                  action="#{bean.loadInvoiceDialogDataPayment(invoice)}" oncomplete="PF('invoiceDialogBillingWV').show();" update="invoiceDialogBilling">
                                 </p:commandButton>
                                 <p:commandLink value="#{invoice.onBalance}" onclick="document.getElementById('invoiceTable:#{rowId}:openinvoice-payment').click()"/>

@@ -1800,12 +1800,18 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     }
 
     public WLGInbox saveMail(Long mailManagerStatus) throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException  {
-        Invoice invoice = DaoManager.get(Invoice.class, getNumber());
+    	String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
+                String.class, new Criterion[]{Restrictions.eq("id", Long.parseLong(
+                        ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.SENT_SERVER_ID)
+                                .getValue()))}).get(0);
+    	System.out.println("email from :: "+emailsFrom);
+    	
+    	Invoice invoice = DaoManager.get(Invoice.class, getNumber());
         WLGInbox inbox = new WLGInbox();
         if(!ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
             inbox = DaoManager.get(WLGInbox.class, invoice.getEmail().getId());
         }
-        inbox.setEmailFrom(getEmailFrom());
+        inbox.setEmailFrom(emailsFrom);
         inbox.setEmailTo(getEmailTo());
         inbox.setEmailCC(getEmailCC());
         inbox.setEmailSubject(getEmailSubject());
