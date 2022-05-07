@@ -63,6 +63,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
 
 @Setter
 @Getter
@@ -266,6 +267,26 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private Boolean dataSaved;
 
     private WLGExport courtesyInvoicePdf;
+
+    private String clientAddressStreet;
+
+    private String clientAddressPostalCode;
+
+    private Long clientAddressCityId;
+
+    private Long clientAddressProvinceId;
+
+    private String clientNumberVAT;
+
+    private String clientFiscalCode;
+
+    private String clientMailPEC;
+
+    private String clientAddressSDI;
+
+    private List<SelectItem> clientProvinces;
+
+    private List<SelectItem> clientAddressCities;
 
     private static final String MAIL_RERLY_FOOTER = ResourcesHelper.getString("emailReplyFooter");
 
@@ -1357,6 +1378,15 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 totalImport = totalImport + paymentInvoice.getPaymentImport().doubleValue();
             }
         }
+        List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
+                Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
+                        Restrictions.isNull("deleted"))});
+        setInvoiceClients(ComboboxHelper.fillList(clients.stream()
+                .filter(c -> (
+                                (ValidationHelper.isNullOrEmpty(c.getManager()) || !c.getManager()) &&
+                                        (ValidationHelper.isNullOrEmpty(c.getFiduciary()) || !c.getFiduciary())
+                        )
+                ).sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList()), Boolean.TRUE));
         //setMaxInvoiceNumber();
         docTypes = new ArrayList<>();
         docTypes.add(new SelectItem("FE", "FATTURA"));
@@ -1369,6 +1399,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         setInvoiceDate(invoiceDb.getDate());
         setSelectedInvoice(invoiceDb);
         setSelectedClientId(invoiceDb.getClient().getId());
+        setSelectedInvoiceClientId(invoiceDb.getClient().getId());
+        setSelectedInvoiceClient(invoiceDb.getClient());
         if (invoiceDb.getClient().getSplitPayment() != null && invoiceDb.getClient().getSplitPayment())
             setVatCollectabilityId(VatCollectability.SPLIT_PAYMENT.getId());
         if (!ValidationHelper.isNullOrEmpty(invoiceDb.getVatCollectability()))
@@ -1426,6 +1458,10 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 setInvoiceNote(invoiceDb.getNotes());
             setEmailSubject(causal);
         }
+        setClientProvinces(ComboboxHelper.fillList(Province.class, Order.asc("description")));
+        getClientProvinces().add(new SelectItem(Province.FOREIGN_COUNTRY_ID, Province.FOREIGN_COUNTRY));
+        setClientAddressCities(ComboboxHelper.fillList(new ArrayList<City>(), true));
+        getInvoiceClientData(getSelectedInvoiceClient());
     }
 
     public void createInvoice() throws IllegalAccessException, PersistenceBeanException, HibernateException, InstantiationException {
@@ -1530,7 +1566,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             setSelectedInvoice(new Invoice());
         }
         getSelectedInvoice().setDate(getInvoiceDate());
-       // getSelectedInvoice().setClient(getExamRequest().getClient());
+        getSelectedInvoice().setClient(getSelectedInvoiceClient());
         getSelectedInvoice().setDocumentType(getDocumentType());
         if (!ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId()))
             getSelectedInvoice().setPaymentType(DaoManager.get(PaymentType.class, getSelectedPaymentTypeId()));
@@ -1581,6 +1617,23 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 log.error("error in saving invoice in request after creating invoice ", e);
             }
         });
+        if(!ValidationHelper.isNullOrEmpty(getClientAddressStreet()))
+            getSelectedInvoiceClient().setAddressStreet(getClientAddressStreet());
+        if(!ValidationHelper.isNullOrEmpty(getClientAddressPostalCode()))
+            getSelectedInvoiceClient().setAddressPostalCode(getClientAddressPostalCode());
+        if(!ValidationHelper.isNullOrEmpty(getClientAddressProvinceId()))
+            getSelectedInvoiceClient().setAddressProvinceId(DaoManager.get(Province.class, getClientAddressProvinceId()));
+        if(!ValidationHelper.isNullOrEmpty(getClientAddressCityId()))
+            getSelectedInvoiceClient().setAddressCityId(DaoManager.get(City.class, getClientAddressCityId()));
+        if(!ValidationHelper.isNullOrEmpty(getClientNumberVAT()))
+            getSelectedInvoiceClient().setNumberVAT(getClientNumberVAT());
+        if(!ValidationHelper.isNullOrEmpty(getClientFiscalCode()))
+            getSelectedInvoiceClient().setFiscalCode(getClientFiscalCode());
+        if(!ValidationHelper.isNullOrEmpty(getClientMailPEC()))
+            getSelectedInvoiceClient().setMailPEC(getClientMailPEC());
+        if(!ValidationHelper.isNullOrEmpty(getClientAddressSDI()))
+            getSelectedInvoiceClient().setAddressSDI(getClientAddressSDI());
+        DaoManager.save(getSelectedInvoiceClient(), true);
         return getSelectedInvoice();
     }
 
@@ -1773,6 +1826,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         inbox.setEmailSubject(getEmailSubject());
         inbox.setEmailBody(MailHelper.htmlToText(getEmailBodyToEditor()));
         inbox.setEmailBodyHtml(getEmailBodyToEditor());
+        inbox.setClient(getSelectedInvoiceClient());
         inbox.setClient(getExamRequest().getClient());
         inbox.setState(mailManagerStatus);
         inbox.setSendDate(new Date());
@@ -2615,5 +2669,43 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
     private String prepareEmailAddress(String email) {
         return email.replace("<", "&lt;").replace(">", "&gt;");
+    }
+
+    public void onItemSelectInvoiceClient() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        Client selectedClient = DaoManager.get(Client.class, getSelectedInvoiceClientId());
+        setSelectedInvoiceClient(selectedClient);
+        System.out.println(selectedClient.getSplitPayment());
+        if(selectedClient.getSplitPayment() != null && selectedClient.getSplitPayment())
+            setVatCollectabilityId(VatCollectability.SPLIT_PAYMENT.getId());
+        else
+            setVatCollectabilityId(null);
+        if(selectedClient.getPaymentTypeList() != null && !selectedClient.getPaymentTypeList().isEmpty()) {
+            setPaymentTypes(ComboboxHelper.fillList(selectedClient.getPaymentTypeList(), false));
+        } else
+            setPaymentTypes(ComboboxHelper.fillList(new ArrayList<>(), false));
+        getInvoiceClientData(selectedClient);
+    }
+
+    private void getInvoiceClientData(Client client) throws HibernateException, IllegalAccessException, PersistenceBeanException {
+        setClientAddressStreet(client != null ? client.getAddressStreet() : "");
+        setClientAddressPostalCode(client != null ? client.getAddressPostalCode() : "");
+
+        if(!ValidationHelper.isNullOrEmpty(client) && !ValidationHelper.isNullOrEmpty(client.getAddressProvinceId())) {
+            setClientAddressProvinceId(client.getAddressProvinceId().getId());
+            handleAddressProvinceChange();
+        }
+        if(!ValidationHelper.isNullOrEmpty(client) && !ValidationHelper.isNullOrEmpty(client.getAddressCityId())) {
+            setClientAddressCityId(client.getAddressCityId().getId());
+        }
+        setClientNumberVAT(client != null ? client.getNumberVAT() : "");
+        setClientFiscalCode(client != null ? client.getFiscalCode() : "");
+        setClientMailPEC(client != null ? client.getMailPEC() : "");
+        setClientAddressSDI(client != null ? client.getAddressSDI() : "");
+    }
+
+    public void handleAddressProvinceChange() throws HibernateException, PersistenceBeanException, IllegalAccessException {
+        setClientAddressCities(ComboboxHelper.fillList(City.class, Order.asc("description"),
+                new Criterion[] { Restrictions.eq("province.id", getClientAddressProvinceId()),
+                        Restrictions.eq("external", Boolean.TRUE) }));
     }
 }
