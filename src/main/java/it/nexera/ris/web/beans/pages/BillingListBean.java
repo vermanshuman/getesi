@@ -318,29 +318,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private WLGExport courtesyInvoicePdf;
 
     private Integer downloadFileIndex;
-    
-    private static final String MAIL_RERLY_FOOTER = ResourcesHelper.getString("emailReplyFooter");
-    
-    private String clientAddressStreet;
-	
-	private String clientAddressPostalCode;
-	
-	private Long clientAddressCityId;
-	
-	private Long clientAddressProvinceId;
-	
-	private String clientNumberVAT;
-	
-	private String clientFiscalCode;
-	
-	private String clientMailPEC;
 
-	private String clientAddressSDI;
-	
-	private List<SelectItem> clientProvinces;
-	
-	private List<SelectItem> clientAddressCities;
-    
+    private static final String MAIL_RERLY_FOOTER = ResourcesHelper.getString("emailReplyFooter");
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
@@ -996,10 +976,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             setMaxInvoiceNumber();
             setInvoiceDate(new Date());
         }
-        setClientProvinces(ComboboxHelper.fillList(Province.class, Order.asc("description")));
-        getClientProvinces().add(new SelectItem(Province.FOREIGN_COUNTRY_ID, Province.FOREIGN_COUNTRY));
-        setClientAddressCities(ComboboxHelper.fillList(new ArrayList<City>(), true));
-        getInvoiceClientData(getSelectedInvoiceClient());
         loadDraftEmail();
     }
 
@@ -1164,7 +1140,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             setPaymentTypes(ComboboxHelper.fillList(selectedClient.getPaymentTypeList(), false));
         } else
             setPaymentTypes(ComboboxHelper.fillList(new ArrayList<>(), false));
-        getInvoiceClientData(selectedClient);
     }
 
     public Invoice saveInvoice(InvoiceStatus invoiceStatus, Boolean saveInvoiceNumber) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
@@ -1214,24 +1189,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 DaoManager.save(invoiceItem, true);
             }
         }
-        
-        if(!ValidationHelper.isNullOrEmpty(getClientAddressStreet()))
-        	getSelectedInvoiceClient().setAddressStreet(getClientAddressStreet());
-        if(!ValidationHelper.isNullOrEmpty(getClientAddressPostalCode()))
-        	getSelectedInvoiceClient().setAddressPostalCode(getClientAddressPostalCode());
-        if(!ValidationHelper.isNullOrEmpty(getClientAddressProvinceId()))
-        	getSelectedInvoiceClient().setAddressProvinceId(DaoManager.get(Province.class, getClientAddressProvinceId()));
-        if(!ValidationHelper.isNullOrEmpty(getClientAddressCityId()))
-        	getSelectedInvoiceClient().setAddressCityId(DaoManager.get(City.class, getClientAddressCityId()));
-        if(!ValidationHelper.isNullOrEmpty(getClientNumberVAT()))
-        	getSelectedInvoiceClient().setNumberVAT(getClientNumberVAT());
-        if(!ValidationHelper.isNullOrEmpty(getClientFiscalCode()))
-        	getSelectedInvoiceClient().setFiscalCode(getClientFiscalCode());
-        if(!ValidationHelper.isNullOrEmpty(getClientMailPEC()))
-        	getSelectedInvoiceClient().setMailPEC(getClientMailPEC());
-        if(!ValidationHelper.isNullOrEmpty(getClientAddressSDI()))
-        	getSelectedInvoiceClient().setAddressSDI(getClientAddressSDI());
-        DaoManager.save(getSelectedInvoiceClient(), true);
         return getSelectedInvoice();
     }
 
@@ -1845,12 +1802,11 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     }
 
     public WLGInbox saveMail(Long mailManagerStatus) throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException  {
-    	String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
+        String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
                 String.class, new Criterion[]{Restrictions.eq("id", Long.parseLong(
                         ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.SENT_SERVER_ID)
                                 .getValue()))}).get(0);
-    	
-    	Invoice invoice = DaoManager.get(Invoice.class, getNumber());
+        Invoice invoice = DaoManager.get(Invoice.class, getNumber());
         WLGInbox inbox = new WLGInbox();
         if(!ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
             inbox = DaoManager.get(WLGInbox.class, invoice.getEmail().getId());
@@ -1895,54 +1851,54 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             if (!ValidationHelper.isNullOrEmpty(getEmailCC()))
                 setSendCC(Arrays.asList(getEmailCC().split(",")));
 
-            if(!ValidationHelper.isNullOrEmpty(inbox.getEmailBodyToEditor()))
+            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailBodyToEditor()))
                 setEmailBodyToEditor(inbox.getEmailBodyToEditor());
 
-            if(!ValidationHelper.isNullOrEmpty(inbox.getEmailSubject()))
+            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailSubject()))
                 setEmailSubject(inbox.getEmailSubject());
         } else {
-        	if(!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
-            	String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
+            if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
+                String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
                         String.class, new Criterion[]{Restrictions.eq("id", Long.parseLong(
                                 ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.SENT_SERVER_ID)
                                         .getValue()))}).get(0);
-    	        if (invoice.getEmailFrom().getEmailCC().contains(emailsFrom)) {
-    	            sendTo = new LinkedList<>();
-    	            sendTo.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailFrom()));
-    	            sendTo.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailTo()));
-    	            sendCC = new LinkedList<>();
-    	            sendCC = MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailCC()).stream()
-    	                    .filter(m -> !m.contains(emailsFrom)).collect(Collectors.toList());
-    	        } else {
-    	            sendTo = MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailFrom());
-    	            sendCC = new LinkedList<>();
-    	            sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailTo()).stream()
-    	                    .filter(m -> !m.contains(emailsFrom)).collect(Collectors.toList()));
-    	            sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailCC()));
-    	        }
-    	        
-    	        WLGInbox baseMail = DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId());
-    	        String sendDate;
-    	        if (invoice.getEmailFrom().getSendDate() == null) {
-    	            sendDate = "";
-    	        } else if (baseMail.getReceived()) {
-    	            sendDate = DateTimeHelper.toFormatedStringLocal(invoice.getEmailFrom().getSendDate(),
-    	                    DateTimeHelper.getMySQLDateTimePattern(), null);
-    	        } else {
-    	            sendDate = DateTimeHelper.ToMySqlStringWithSeconds(invoice.getEmailFrom().getSendDate());
-    	        }
-    	        StringBuilder html = new StringBuilder();
-                
-    	        String emailPrefix = String.format(MAIL_RERLY_FOOTER,
-    	                prepareEmailAddress(invoice.getEmailFrom().getEmailFrom()),
-    	                sendDate,
-    	                prepareEmailAddress(invoice.getEmailFrom().getEmailTo()),
-    	                invoice.getEmailFrom().getEmailCC(),
-    	                invoice.getEmailFrom().getEmailSubject());
-    	        html.append(emailPrefix);
+                if (invoice.getEmailFrom().getEmailCC().contains(emailsFrom)) {
+                    sendTo = new LinkedList<>();
+                    sendTo.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailFrom()));
+                    sendTo.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailTo()));
+                    sendCC = new LinkedList<>();
+                    sendCC = MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailCC()).stream()
+                            .filter(m -> !m.contains(emailsFrom)).collect(Collectors.toList());
+                } else {
+                    sendTo = MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailFrom());
+                    sendCC = new LinkedList<>();
+                    sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailTo()).stream()
+                            .filter(m -> !m.contains(emailsFrom)).collect(Collectors.toList()));
+                    sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailCC()));
+                }
+
+                WLGInbox baseMail = DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId());
+                String sendDate;
+                if (invoice.getEmailFrom().getSendDate() == null) {
+                    sendDate = "";
+                } else if (baseMail.getReceived()) {
+                    sendDate = DateTimeHelper.toFormatedStringLocal(invoice.getEmailFrom().getSendDate(),
+                            DateTimeHelper.getMySQLDateTimePattern(), null);
+                } else {
+                    sendDate = DateTimeHelper.ToMySqlStringWithSeconds(invoice.getEmailFrom().getSendDate());
+                }
+                StringBuilder html = new StringBuilder();
+
+                String emailPrefix = String.format(MAIL_RERLY_FOOTER,
+                        prepareEmailAddress(invoice.getEmailFrom().getEmailFrom()),
+                        sendDate,
+                        prepareEmailAddress(invoice.getEmailFrom().getEmailTo()),
+                        invoice.getEmailFrom().getEmailCC(),
+                        invoice.getEmailFrom().getEmailSubject());
+                html.append(emailPrefix);
                 html.append(invoice.getEmailFrom().getEmailBody());
                 html.append(invoice.getEmailFrom().getEmailPostfix());
-    	        setEmailBodyToEditor(html.toString());
+                setEmailBodyToEditor(html.toString());
             }
         }
     }
@@ -2034,8 +1990,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         String ndg = "";
         // WLGInbox baseMail = DaoManager.get(WLGInbox.class, getBaseMailId());
         if(ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
-        	attachCourtesyInvoicePdf(invoice);
-        	return;
+            attachCourtesyInvoicePdf(invoice);
+            return;
         }
         WLGInbox baseMail = DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId());
         if (!ValidationHelper.isNullOrEmpty(baseMail)) {
@@ -2493,31 +2449,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             }
         }
     }
-    
+
     private String prepareEmailAddress(String email) {
         return email.replace("<", "&lt;").replace(">", "&gt;");
     }
-    
-    private void getInvoiceClientData(Client client) throws HibernateException, IllegalAccessException, PersistenceBeanException {
-    	setClientAddressStreet(client != null ? client.getAddressStreet() : "");
-    	setClientAddressPostalCode(client != null ? client.getAddressPostalCode() : "");
-    	
-    	if(!ValidationHelper.isNullOrEmpty(client) && !ValidationHelper.isNullOrEmpty(client.getAddressProvinceId())) {
-    		setClientAddressProvinceId(client.getAddressProvinceId().getId());
-    		handleAddressProvinceChange();
-    	}
-    	if(!ValidationHelper.isNullOrEmpty(client) && !ValidationHelper.isNullOrEmpty(client.getAddressCityId())) {
-    		setClientAddressCityId(client.getAddressCityId().getId());
-    	}
-    	setClientNumberVAT(client != null ? client.getNumberVAT() : "");
-    	setClientFiscalCode(client != null ? client.getFiscalCode() : "");
-    	setClientMailPEC(client != null ? client.getMailPEC() : "");
-    	setClientAddressSDI(client != null ? client.getAddressSDI() : "");
-    }
-    
-	public void handleAddressProvinceChange() throws HibernateException, PersistenceBeanException, IllegalAccessException {
-		setClientAddressCities(ComboboxHelper.fillList(City.class, Order.asc("description"),
-				new Criterion[] { Restrictions.eq("province.id", getClientAddressProvinceId()),
-						Restrictions.eq("external", Boolean.TRUE) }));
-	}
 }

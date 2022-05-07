@@ -110,10 +110,10 @@
             <div class="p-col-12">
                 <div class="card">
                     <p:dataTable widgetVar="validRequestsDT" var="item" value="#{bean.entity.validRequests}" reflow="true" styleClass="simple-table"
-                        rendered="#{not empty bean.entity.validRequests}">
+                                 rendered="#{not empty bean.entity.validRequests}">
                         <p:column styleClass=" action_column" style="padding: 6px 7px !important;">
                             <p:commandButton icon="ui-icon pi pi-pencil" update=":form" action="#{bean.gotoEditRequest}" style="width: 32px;">
-                            <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                                <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                             </p:commandButton>
                         </p:column>
                         <p:column headerText="#{msg.databaseListRealEstateSubject}" sortBy="#{item.mailViewSubject}" filterBy="#{item.mailViewSubject}">
@@ -213,12 +213,14 @@
                 </div>
                 <div class="ui-g-10 attach-files">
                     <ui:repeat value="#{bean.attachedFiles}" var="file">
-                        <i class="#{file.icon} #{file.style}"/>
-                        <p:commandLink title="#{msg.download}" update=":form, messages" ajax="false"
-                                       action="#{bean.downloadFile}" value="&nbsp;#{file.fileName}"
-                                       style="color: black; padding-right: 5px;">
-                            <f:setPropertyActionListener value="#{file.id}" target="#{bean.downloadFileIndex}"/>
-                        </p:commandLink>
+                        <div style="display: flex;align-items: center;">
+                            <i class="#{file.icon} #{file.style}"/>
+                            <p:commandLink title="#{msg.download}" update=":form, messages" ajax="false"
+                                           action="#{bean.downloadFile}" value="&nbsp;#{file.fileName}"
+                                           style="color: black; padding-right: 5px;">
+                                <f:setPropertyActionListener value="#{file.id}" target="#{bean.downloadFileIndex}"/>
+                            </p:commandLink>
+                        </div>
                     </ui:repeat>
                 </div>
             </div>

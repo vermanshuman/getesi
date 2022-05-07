@@ -102,6 +102,28 @@ public class MailHelper extends BaseHelper {
         return id;
     }
 
+    public static List<String> parseAutoCompleteMailAddress(String address) {
+        if (ValidationHelper.isNullOrEmpty(address)) {
+            return new ArrayList<>();
+        }
+
+        List<String> emails = Arrays.asList(address.split(","));
+
+        Set<String> emailsSet = new HashSet<>();
+
+        for (String email : emails) {
+            Matcher m = Pattern
+                    .compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+")
+                    .matcher(email);
+
+            while (m.find()) {
+                emailsSet.add(m.group().toLowerCase());
+            }
+        }
+
+        return new ArrayList<>(emailsSet);
+    }
+
     public static List<String> parseMailAddress(String address) {
         if (ValidationHelper.isNullOrEmpty(address)) {
             return new ArrayList<>();

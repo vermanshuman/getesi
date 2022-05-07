@@ -60,6 +60,16 @@
             }
 
             function selectAllRowTopTableWV() {
+                if (PF('selectTopAllWV').input.is(':checked')) {
+                    console.log(">>>> checked ");
+                    PF('selectRowWV').check();
+                }else {
+                    console.log(">>>> unchecked ");
+                    PF('selectRowWV').uncheck();
+                }
+            }
+
+            function selectAllRowTopTableWV_old() {
                 var selectedIds = '';
                 if (PF('selectTopAllWV').input.is(':checked')) {
                         $('.rowcheckboxes').each(function () {
@@ -199,6 +209,18 @@
                 font-family: "cabin", sans-serif !important;
                 font-size: 1rem !important;
                 text-decoration: none;
+            }
+
+
+            body .ui-datatable .ui-datatable-data tr.ui-datatable-even.ui-state-highlight {
+                background-color: #2f8ee5 !important;
+                color: #ffffff;
+                border-color: #1c82df;
+            }
+
+            body .ui-state-highlight {
+                background-color: #2d353c !important;
+                color: #D0D7DE !important;
             }
 
             /*body .ui-datatable .ui-paginator.ui-paginator-top {*/
@@ -349,7 +371,11 @@
         <p:remoteCommand name="updatePoll" update=":form:table, :form:searchPanel"/>
         <p:remoteCommand name="globalSearch"
                          action="#{bean.globalSearch}"  update=":form:table"/>
-        <p:poll interval="30" listener="#{bean.executePoll}"/>
+        <p:remoteCommand name="handleParentCheck"
+                         action="#{bean.handleParentCheck}"  update=":form:table"/>
+        <p:remoteCommand name="refreshButtons"
+                         action="#{bean.refreshButtons}"  update=":form"/>
+        <p:poll interval="60" listener="#{bean.executePoll}"/>
         <div id="list_panel">
             <div class="p-grid" style="margin-right: -28px !important; margin-left: -28px !important; margin-top : 1em !important; ">
                 <div class="p-col-12 p-md-12">
@@ -744,17 +770,23 @@
                                                 <th id="table:j_idt93"
                                                     class="ui-state-default ui-selection-column min_padding_margin icon_column"
                                                     role="columnheader" scope="col" style="width: 20px !important;">
-                                                        <span class="ui-column-title"><div id="table:checkTop"
-                                                                                           class="ui-chkbox ui-widget"><div
-                                                                class="ui-helper-hidden-accessible"></div><div
-                                                                class="ui-chkbox-box ui-widget ui-corner-all ui-state-default"><span
-                                                                class="ui-chkbox-icon ui-icon ui-icon-blank ui-c"></span></div></div></span>
-                                                    <div class="ui-chkbox ui-chkbox-all ui-widget">
-                                                        <div class="ui-helper-hidden-accessible"></div>
-                                                        <div class="ui-chkbox-box ui-widget ui-corner-all ui-state-default">
-                                                            <span class="ui-chkbox-icon ui-icon ui-icon-blank ui-c"></span>
-                                                        </div>
-                                                    </div>
+                                                    <p:selectBooleanCheckbox id="checkTop" async="true" widgetVar="selectTopAllWV"
+                                                                             onchange="handleParentCheck();" value="#{bean.parentCheck}"/>
+<!--                                                    <span class="ui-column-title">-->
+<!--                                                        <div id="table:checkTop" class="ui-chkbox ui-widget">-->
+<!--                                                            <div class="ui-helper-hidden-accessible">-->
+<!--                                                                <input id="table:checkTop_input" name="checkTop_input"-->
+<!--                                                                       type="checkbox" autocomplete="off"-->
+<!--                                                                       aria-checked="false"-->
+<!--                                                                       onchange="selectAllRowTopTableWV()"/>-->
+<!--                                                            </div>-->
+<!--                                                            <div class="ui-chkbox-box ui-widget ui-corner-all ui-state-default">-->
+<!--                                                                <span class="ui-chkbox-icon ui-icon ui-icon-blank ui-c">-->
+
+<!--                                                                </span>-->
+<!--                                                            </div>-->
+<!--                                                        </div>-->
+<!--                                                    </span>-->
                                                 </th>
                                                 <th id="table:j_idt94"
                                                     class="ui-state-default min_padding_margin icon_column"
@@ -813,7 +845,7 @@
                                                 </c:if>
 
                                                 <c:if test="${loop.index % 2 != 0}">
-                                                    <c:set value="" var="evenclass"></c:set>
+                                                    <c:set value="ui-datatable-odd" var="evenclass"></c:set>
                                                 </c:if>
 
 <!--                                                <c:if test="${bean.mailManagerButtonSelectedId==2 and item.read and bean.isSendOrStorage()}">-->
@@ -838,19 +870,24 @@
 <!--                                                </c:if>-->
 
 
-                                                <tr class="ui-widget-content ui-datatable-selectable ${evenclass}
-                                                    #{bean.mailManagerButtonSelectedId==2 ? (item.read? 'mail_style':'receive_new_mail_style'):'mail_style'}
-                                                        #{bean.isSendOrStorage() ? 'mail-tab-DELETE-SEND' :''}">
+<!--                                                <tr class="ui-widget-content ui-datatable-selectable ${evenclass}-->
+<!--                                                    #{bean.mailManagerButtonSelectedId==2 ? (item.read? 'mail_style':'receive_new_mail_style'):'mail_style'}-->
+<!--                                                        #{bean.isSendOrStorage() ? 'mail-tab-DELETE-SEND' :''}">-->
+                                                <tr class="ui-widget-content ui-datatable-selectable ${evenclass} ${item.rowCheck ? 'ui-state-highlight' : ''} #{bean.mailManagerButtonSelectedId==2 ? (item.read? 'mail_style':'receive_new_mail_style'):'mail_style'} #{bean.isSendOrStorage() ? 'mail-tab-DELETE-SEND' :''}">
                                                     <td style="width: 20px !important;"
                                                         class="ui-selection-column min_padding_margin icon_column">
-                                                        <div class="ui-chkbox ui-widget">
-                                                            <div class="ui-helper-hidden-accessible"><input type="checkbox"
-                                                                                                            name="table_checkbox"/>
-                                                            </div>
-                                                            <div class="ui-chkbox-box ui-widget ui-corner-all ui-state-default">
-                                                                <span class="ui-chkbox-icon ui-icon ui-icon-blank ui-c"></span>
-                                                            </div>
-                                                        </div>
+                                                        <p:selectBooleanCheckbox id="checkRow" value="#{item.rowCheck}" styleClass="checkRow">
+                                                            <p:ajax event="change" async="true" delay="1000" listener="#{bean.handleRowCheck}" update=":form"/>
+                                                            <f:attribute name="selectedInbox" value="#{item}" />
+                                                        </p:selectBooleanCheckbox>
+<!--                                                        <div class="ui-chkbox ui-widget">-->
+<!--                                                            <div class="ui-helper-hidden-accessible"><input type="checkbox"-->
+<!--                                                                                                            name="table_checkbox"/>-->
+<!--                                                            </div>-->
+<!--                                                            <div class="ui-chkbox-box ui-widget ui-corner-all ui-state-default">-->
+<!--                                                                <span class="ui-chkbox-icon ui-icon ui-icon-blank ui-c"></span>-->
+<!--                                                            </div>-->
+<!--                                                        </div>-->
                                                     </td>
                                                     <td style="width: 20px !important;"
                                                         class="min_padding_margin icon_column" onclick="selectRow(#{item.id})">

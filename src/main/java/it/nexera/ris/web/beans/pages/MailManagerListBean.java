@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
 
@@ -23,7 +24,9 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
+import org.primefaces.behavior.ajax.AjaxBehavior;
 import org.primefaces.component.datatable.DataTable;
+import org.primefaces.component.selectbooleancheckbox.SelectBooleanCheckbox;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.PageEvent;
@@ -208,6 +211,10 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
     private String paginatorString;
 
     private String selectedIds;
+
+    private Boolean parentCheck;
+
+    private WLGInboxShort selectedInbox;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -1601,5 +1608,65 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
 
     public void setSelectedIds(String selectedIds) {
         this.selectedIds = selectedIds;
+    }
+
+    public Boolean getParentCheck() {
+        return parentCheck;
+    }
+
+    public void setParentCheck(Boolean parentCheck) {
+        this.parentCheck = parentCheck;
+    }
+
+    public void handleParentCheck() {
+        if(!ValidationHelper.isNullOrEmpty(getParentCheck()) && getParentCheck()){
+            ((List<WLGInboxShort>) getLazyModel().getWrappedData())
+                    .stream()
+                    .forEach(w -> w.setRowCheck(Boolean.TRUE));
+            getSelectedInboxes().addAll((List<WLGInboxShort>) getLazyModel().getWrappedData());
+        } else {
+            ((List<WLGInboxShort>) getLazyModel().getWrappedData())
+                    .stream()
+                    .forEach(w -> w.setRowCheck(Boolean.FALSE));
+            setSelectedInboxes(new ArrayList<>());
+        }
+    }
+
+    public void refreshButtons() {
+        if(!ValidationHelper.isNullOrEmpty(getParentCheck()) && getParentCheck()){
+            getSelectedInboxes().addAll((List<WLGInboxShort>) getLazyModel().getWrappedData());
+        } else {
+            setSelectedInboxes(new ArrayList<>());
+        }
+    }
+
+    public void handleRowCheck(AjaxBehaviorEvent event) {
+        WLGInboxShort selectedInbox = (WLGInboxShort) event.getComponent().getAttributes().get("selectedInbox");
+        if(!ValidationHelper.isNullOrEmpty(selectedInbox)){
+            if(selectedInbox.getRowCheck()){
+                getSelectedInboxes().add(selectedInbox);
+            }else
+                getSelectedInboxes().removeIf(w -> w.getId().equals(selectedInbox.getId()));
+        }
+        boolean unselect = false;
+        for(WLGInboxShort wlgInboxShort :  ((List<WLGInboxShort>) getLazyModel().getWrappedData())){
+            if(ValidationHelper.isNullOrEmpty(wlgInboxShort.getRowCheck()) || !wlgInboxShort.getRowCheck()){
+                unselect = true;
+                break;
+            }
+        }
+        if(unselect && (!ValidationHelper.isNullOrEmpty(getParentCheck()) && getParentCheck())){
+            setParentCheck(Boolean.FALSE);
+        }else if(!unselect && (ValidationHelper.isNullOrEmpty(getParentCheck()) || !getParentCheck())){
+            setParentCheck(Boolean.TRUE);
+        }
+    }
+
+    public WLGInboxShort getSelectedInbox() {
+        return selectedInbox;
+    }
+
+    public void setSelectedInbox(WLGInboxShort selectedInbox) {
+        this.selectedInbox = selectedInbox;
     }
 }

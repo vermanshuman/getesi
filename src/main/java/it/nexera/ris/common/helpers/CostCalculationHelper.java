@@ -598,9 +598,8 @@ public class CostCalculationHelper {
         return result;
     }
 
-    private List<PriceList> loadPriceList(Boolean billingClient, boolean restrictionForPriceList)
+    public List<PriceList> loadPriceList(Boolean billingClient, boolean restrictionForPriceList)
             throws PersistenceBeanException, IllegalAccessException {
-        
         
         return DaoManager.load(PriceList.class, new CriteriaAlias[]{
                 new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{

@@ -124,6 +124,7 @@
 
             .red-file {
                 width: 21px;
+                min-width: 21px;
                 background-size: 21px !important;
                 margin-left: 10px;
             }
@@ -131,6 +132,7 @@
             .attach-files {
                 display: flex;
                 align-items: center;
+                flex-wrap: wrap;
             }
 
             .dialog-gray, #showToBeSentRequest {
@@ -246,16 +248,16 @@
             <br/>
             <h:outputText value="#{msg.mailManagerViewFieldsNotSetDialogMessageQuestion}"/>
             <br/>
-<!--            <p:outputPanel style="margin-top:15px; margin-bottom:15px;">-->
-<!--                <h:outputText value="#{msg.mailManagerViewSingleOrMultipleRequest}:" />-->
-<!--            </p:outputPanel>-->
-<!--            <p:outputPanel style="justify-content: center; display: flex">-->
-<!--                <p:selectOneRadio value="#{bean.requestType}" unselectable="false">-->
-<!--                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestBySubject}" itemValue="0"/>-->
-<!--                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestForBuilding}" itemValue="1"/>-->
-<!--                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestForLand}" itemValue="2"/>-->
-<!--                </p:selectOneRadio>-->
-<!--            </p:outputPanel>-->
+            <!--            <p:outputPanel style="margin-top:15px; margin-bottom:15px;">-->
+            <!--                <h:outputText value="#{msg.mailManagerViewSingleOrMultipleRequest}:" />-->
+            <!--            </p:outputPanel>-->
+            <!--            <p:outputPanel style="justify-content: center; display: flex">-->
+            <!--                <p:selectOneRadio value="#{bean.requestType}" unselectable="false">-->
+            <!--                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestBySubject}" itemValue="0"/>-->
+            <!--                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestForBuilding}" itemValue="1"/>-->
+            <!--                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestForLand}" itemValue="2"/>-->
+            <!--                </p:selectOneRadio>-->
+            <!--            </p:outputPanel>-->
             <br/>
             <div class="btn_line">
                 <p:commandButton value="#{msg.mailManagerViewRequestBySubject}" update="@form" styleClass="confirm-button"

@@ -592,7 +592,14 @@ public class RequestWrapper {
                     || fields.contains(ManageTypeFields.SUBJECT_MASTERY)
                     || fields.contains(ManageTypeFields.SUBJECT_LIST)
                     || fields.contains(ManageTypeFields.DOMICILE)) {
-                setNations(ComboboxHelper.fillList(Country.class, true));
+                setNations(ComboboxHelper.fillList(
+                        Country.class, Order.asc("description"),
+                        new Criterion[]{
+                                Restrictions.or(
+                                        Restrictions.isNotNull("external"),
+                                        Restrictions.eq("external", Boolean.TRUE)
+                                )
+                        }));
             }
             if (fields.contains(ManageTypeFields.NOTARY)) {
                 setNotaries(ComboboxHelper.fillList(Notary.class, true));

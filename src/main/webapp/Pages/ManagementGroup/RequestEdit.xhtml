@@ -603,7 +603,7 @@
                 <!--                </c:forEach>-->
                 <p:outputPanel id="dynamicPanel" rendered="#{not empty bean.shownFields}" style="margin-bottom:10px">
                     <c:forEach rendered="#{not empty bean.shownFields}" items="#{bean.shownFields}" var="item">
-                        <div class="ui-g" style="#{item.getLineEven()?'background-color: #F5F5F5;':''}">
+                        <div class="ui-g">
                             <c:if test="#{item.field != null}">
                                 <div class="ui-g-12" style="padding: 1%; background: transparent">
                                     <ui:include src="#{item.field.field.getPath()}"/>
@@ -630,7 +630,7 @@
                 <p:outputPanel id="dynamicHiddenPanel" style="margin-top: 20px;margin-bottom:10px" rendered="#{not empty bean.hiddenFields}">
                     <p:fieldset rendered="#{not empty bean.hiddenFields}" legend="#{msg.requestHiddenFieldsHeader}" toggleable="true" toggleSpeed="500" collapsed="true">
                         <c:forEach items="#{bean.hiddenFields}" var="item">
-                            <div class="ui-g" style="#{item.getLineEven()?'background-color: #F5F5F5;':''}">
+                            <div class="ui-g">
                                 <c:if test="#{item.field != null}">
                                     <div class="ui-g-12" style="padding: 1%; background: transparent">
                                         <ui:include src="#{item.field.field.getPath()}"/>
@@ -659,27 +659,26 @@
 
             <div id="request-btns">
                 <p:outputPanel style="margin-bottom:10px">
-                        <div class="ui-g">
-                            <div class="ui-g-3" style="padding: 1%"><span></span></div>
-                            <div class="ui-g-3" style="padding: 1%"><span></span></div>
-                            <div class="ui-g-3" style="padding: 1%"><span></span></div>
-                            <div class="ui-g-3" style="padding: 1%">
-                                <p:commandButton
-                                        style="margin-left: 18px"
-                                        id="addRequestService"
-                                        action="#{bean.validateMultipleRequest(false)}"
-                                        value="#{msg.addRequestService.toUpperCase()}"
-                                        icon="shopping-cart-icon" styleClass="ui-button-success" iconPos="right"
-                                        disabled="#{bean.selectedRequestTypesIdMultiple eq null}"
-                                        update="saveMultipleRequest table newRequestList @(.servicedropdowns) form"
-                                        rendered="#{bean.showAddServiceButton and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2
+                    <div class="ui-g">
+                        <div class="ui-g-3" style="padding: 1%"><span></span></div>
+                        <div class="ui-g-3" style="padding: 1%"><span></span></div>
+                        <div class="ui-g-3" style="padding: 1%"><span></span></div>
+                        <div class="ui-g-3" style="padding: 1%">
+                            <p:commandButton
+                                    style="margin-left: 18px"
+                                    id="addRequestService"
+                                    action="#{bean.validateMultipleRequest(false)}"
+                                    value="#{msg.addRequestService.toUpperCase()}"
+                                    icon="shopping-cart-icon" styleClass="ui-button-success" iconPos="right"
+                                    disabled="#{bean.selectedRequestTypesIdMultiple eq null}"
+                                    update="saveMultipleRequest table newRequestList @(.servicedropdowns) form"
+                                    rendered="#{bean.showAddServiceButton and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2
                                                             and bean.multipleRequestCreate}"/>
-                            </div>
                         </div>
+                    </div>
                 </p:outputPanel>
             </div>
         </ui:fragment>
-
 
         <ui:fragment
                 rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)
@@ -845,7 +844,7 @@
     </ui:define>
 
     <ui:define name="view_buttons">
-        <ui:fragment>
+        <ui:fragment rendered="#{bean.activeMenuTabNum==0}">
             <div style="margin: 2% 1% 1%;text-align: center">
                 <ui:remove>
                     <p:commandButton value="#{msg.edit}" action="#{bean.editSubject}"

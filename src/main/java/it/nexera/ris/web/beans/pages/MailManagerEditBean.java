@@ -818,7 +818,7 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
                     "WHERE " + field + " LIKE '%" + query + "%' AND " + "(" + field + " LIKE '%,%' " +
                     "OR NOT EXISTS(SELECT 1 FROM email_remove WHERE wlg." + field + " LIKE CONCAT('%', email, '%')))")
                     .list()).stream()
-                    .map(MailHelper::parseMailAddress)
+                    .map(MailHelper::parseAutoCompleteMailAddress)
                     .flatMap(List::stream)
                     .filter(item -> item.toLowerCase().contains(query.toLowerCase()))
                     .filter(item -> !filterList.contains(item))

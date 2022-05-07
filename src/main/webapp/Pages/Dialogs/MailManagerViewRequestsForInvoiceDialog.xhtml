@@ -4,87 +4,87 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html">
     <style>
-    	
-    	#mailManagerViewRequestsForInvoiceDialog .ui-datatable:not(.borderless) thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
-    		padding: 1rem 1rem !important;
-    	}
-    	
-    	#mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-header th:nth-child(1) {
-    		width: 40px !important;
-		}	
-    	#mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-body td:nth-child(1) {
-    		width: 59px !important;
-    	}
-    	#mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-header th:nth-child(2) {
-    		width: 205px !important;
-		}
-    	#mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-body td:nth-child(2) {
-    		width: 200px !important;
-    	}
-    	#mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-header th:nth-child(3) {
-    		width: 170px !important;
-		}
-    	#mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-body td:nth-child(3) {
-    		width: 170px !important;
-    	}
-    	#mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-header th:nth-child(4) {
-    		width: 170px !important;
-		}
-    	#mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-body td:nth-child(4) {
-    		width: 170px !important;
-    	}
-    	#mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-header th:nth-child(5) {
-    		width: 170px !important;
-		}
-    	#mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-body td:nth-child(5) {
-    		width: 170px !important;
-    	}
-    	#mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-header th:nth-child(6) {
-    		width: 170px !important;
-		}
-    	#mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-body td:nth-child(6) {
-    		width: 170px !important;
-    		
-    	}
+
+        #mailManagerViewRequestsForInvoiceDialog .ui-datatable:not(.borderless) thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+            padding: 1rem 1rem !important;
+        }
+
+        #mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-header th:nth-child(1) {
+            width: 40px !important;
+        }
+        #mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-body td:nth-child(1) {
+            width: 59px !important;
+        }
+        #mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-header th:nth-child(2) {
+            width: 205px !important;
+        }
+        #mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-body td:nth-child(2) {
+            width: 200px !important;
+        }
+        #mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-header th:nth-child(3) {
+            width: 170px !important;
+        }
+        #mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-body td:nth-child(3) {
+            width: 170px !important;
+        }
+        #mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-header th:nth-child(4) {
+            width: 170px !important;
+        }
+        #mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-body td:nth-child(4) {
+            width: 170px !important;
+        }
+        #mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-header th:nth-child(5) {
+            width: 170px !important;
+        }
+        #mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-body td:nth-child(5) {
+            width: 170px !important;
+        }
+        #mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-header th:nth-child(6) {
+            width: 170px !important;
+        }
+        #mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable-body td:nth-child(6) {
+            width: 170px !important;
+
+        }
     </style>
-    <p:dialog widgetVar="mailManagerViewRequestsForInvoiceDlg" modal="true" width="1300" 
-               header="#{msg.mailManagerViewRequestsDialogHeader}" id="mailManagerViewRequestsForInvoiceDialog">
+    <p:dialog widgetVar="mailManagerViewRequestsForInvoiceDlg" modal="true" width="1300"
+              header="#{msg.mailManagerViewRequestsDialogHeader}" id="mailManagerViewRequestsForInvoiceDialog">
         <!-- <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group" id="validRequests"> -->
         <div class="p-grid">
-			<div class="p-col-12">
-		        <p:dataTable value="#{bean.entity.validRequests}"  var="item" 
-		                     rendered="#{not empty bean.entity.validRequests}"  scrollable="true"
-		                     scrollHeight="300" style="margin-top:20px;max-width:1250px">
-		            <p:column >
-		                <p:selectBooleanCheckbox value="#{item.selectedForInvoice}" disabled="true"/>
-		            </p:column>
-		            <p:column headerText="#{msg.databaseListRealEstateSubject}" >
-		                <h:outputText value="#{item.mailViewSubject}"/>
-		            </p:column>
-		            <p:column headerText="#{msg.requestListRequestType}" >
-		                <h:outputText value="#{item.requestTypeName}"/>
-		            </p:column>
-		            <p:column headerText="#{msg.requestListService}" >
-		                <h:outputText value="#{item.service ne null ? item.serviceName : (item.multipleServices ne null ? item.multipleServiceNames : '')}"/>
-		            </p:column>
-		            <p:column headerText="#{msg.requestListCorservatoryName}">
-		                <h:outputText value="#{item.aggregationLandCharRegNameOrCity}"/>
-		            </p:column>
-		            <p:column headerText="#{msg.requestState}">
-		                <h:outputText value="#{item.stateDescription}"/>
-		            </p:column>
-		        </p:dataTable>
-		        <!-- </p:panelGrid> -->
-			</div>
-			<div class="p-col-12">
-        		<div class="btn_line">
-            		<p:commandButton value="#{msg.confirm}" update="@form :btn_line"
-                             style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"
-                             action="#{bean.createInvoice}"/>
-            		<p:commandButton value="#{msg.cancel}" oncomplete="PF('mailManagerViewRequestsForInvoiceDlg').hide();"
-                             style="background-color: #F3362B !important; width: 100px;" />
-        		</div>
-        	</div>
+            <div class="p-col-12">
+                <p:dataTable value="#{bean.entity.validRequests}"  var="item"
+                             rendered="#{not empty bean.entity.validRequests}"  scrollable="true"
+                             scrollHeight="300" style="margin-top:20px;max-width:1250px">
+                    <p:column >
+                        <p:selectBooleanCheckbox value="#{item.selectedForInvoice}" disabled="true"/>
+                    </p:column>
+                    <p:column headerText="#{msg.databaseListRealEstateSubject}" >
+                        <h:outputText value="#{item.mailViewSubject}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.requestListRequestType}" >
+                        <h:outputText value="#{item.requestTypeName}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.requestListService}" >
+                        <h:outputText value="#{item.service ne null ? item.serviceName : (item.multipleServices ne null ? item.multipleServiceNames : '')}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.requestListCorservatoryName}">
+                        <h:outputText value="#{item.aggregationLandCharRegNameOrCity}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.requestState}">
+                        <h:outputText value="#{item.stateDescription}"/>
+                    </p:column>
+                </p:dataTable>
+                <!-- </p:panelGrid> -->
+            </div>
+            <div class="p-col-12">
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.confirm}" update="@form :btn_line"
+                                     style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"
+                                     action="#{bean.createInvoice}"/>
+                    <p:commandButton value="#{msg.cancel}" oncomplete="PF('mailManagerViewRequestsForInvoiceDlg').hide();"
+                                     style="background-color: #F3362B !important; width: 100px;" />
+                </div>
+            </div>
         </div>
         <style>
             .ui-datatable-scrollable-theadclone {

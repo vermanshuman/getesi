@@ -93,6 +93,9 @@ public class WLGInboxShort extends IndexedEntity {
     @Transient
     private Boolean received;
 
+    @Transient
+    private Boolean rowCheck;
+
     public boolean getRead() {
         boolean isRead = false;
         try {
@@ -316,5 +319,13 @@ public class WLGInboxShort extends IndexedEntity {
 
     public void setEmailCC(String emailCC) {
         this.emailCC = emailCC;
+    }
+
+    public Boolean getRowCheck() {
+        return rowCheck;
+    }
+
+    public void setRowCheck(Boolean rowCheck) {
+        this.rowCheck = rowCheck;
     }
 }

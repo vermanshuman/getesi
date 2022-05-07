@@ -813,6 +813,20 @@ public class RequestHelper {
             if (!ValidationHelper.isNullOrEmpty(request.getService())) {
                 result += "Tipo Richiesta: " + request.getServiceName() + "<br/>";
                 result += "Ufficio: " + request.getService().getEmailTextCamelCase() + " ";
+            }else if (!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
+                result += "Tipo Richiesta: " +  request.getMultipleServices()
+                        .stream()
+                        .filter(s -> !ValidationHelper.isNullOrEmpty(s.getName()))
+                        .map(s -> s.toString())
+                        .collect(Collectors.joining(","));
+                result += "<br/>";
+
+                result += "Ufficio: " + request.getMultipleServices()
+                        .stream()
+                        .filter(s -> !ValidationHelper.isNullOrEmpty(s.getEmailTextCamelCase()))
+                        .map(s -> s.getEmailTextCamelCase())
+                        .collect(Collectors.joining(","));
+                result += " ";
             }
             if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())) {
                 result += request.getAggregationLandChargesRegistryName() + "<br/>";

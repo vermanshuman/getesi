@@ -311,21 +311,20 @@
         .ui-datatable-tablewrapper {
             overflow: unset;
         }
-        
-        body .ui-calendar:not(#currentDay) .ui-button {
-		    background-color: transparent !important;
-		    margin-left: -37px;
-		}
-		
-		.ui-calendar:not(#currentDay) .ui-datepicker-trigger {
-		    color: #003871 !important;
-		}
-		
-		body .ui-state-active {
-		    background-color: #2d353c !important;
-		    color: #ffffff !important;
-		}
 
+        body .ui-calendar:not(#currentDay) .ui-button {
+            background-color: transparent !important;
+            margin-left: -37px;
+        }
+
+        .ui-calendar:not(#currentDay) .ui-datepicker-trigger {
+            color: #003871 !important;
+        }
+
+        body .ui-state-active {
+            background-color: #2d353c !important;
+            color: #ffffff !important;
+        }
     </style>
 
     <p:dialog widgetVar="invoiceDialogBillingWV" modal="true" width="1350" draggable="false" id="invoiceDialogBilling"
@@ -394,9 +393,9 @@
                                     <h:outputText value="#{msg.client}"/>
                                 </div>
                                 <div class="p-col-8">
-                                    <!-- <p:inputText value="#{bean.examRequest.client}" rendered="#{bean.examRequest.client ne null}" disabled="true"/> -->
+                                    <p:inputText value="#{bean.examRequest.client}" rendered="#{bean.examRequest.client ne null}" disabled="true"/>
                                     <p:selectOneMenu id="invoiceClient" value="#{bean.selectedInvoiceClientId}" style="width: 300px; float:left;"
-                                                     disabled="#{bean.invoiceSentStatus}"
+                                                     rendered="#{bean.examRequest.client eq null}"
                                                      styleClass="#{bean.selectedInvoiceClientId ne null ? 'select-one-menu' : ''}">
                                         <f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}" itemValue="#{null}" noSelectionOption="true" />
                                         <f:selectItems style="width:300px;" value="#{bean.invoiceClients}" />
@@ -420,14 +419,16 @@
                                     <h:outputText value="#{msg.streetAddress}"/>
                                 </div>
                                 <div class="p-col-7">
-                                    <!-- <p:inputText value="#{bean.examRequest.client ne null ? bean.examRequest.client.addressStreet : ''}"
-                                                 rendered="#{bean.examRequest.client ne null}" disabled="true"/> -->
-                                    <p:inputText value="#{bean.clientAddressStreet}"  id="addressStreet" disabled="#{bean.invoiceSentStatus}"/>
+                                    <p:inputText value="#{bean.examRequest.client ne null ? bean.examRequest.client.addressStreet : ''}"
+                                                 rendered="#{bean.examRequest.client ne null}" disabled="true"/>
+                                    <p:inputText value="#{bean.selectedInvoiceClient ne null ? bean.selectedInvoiceClient.addressStreet : ''}"
+                                                 rendered="#{bean.examRequest.client eq null}" disabled="true" id="addressStreet"/>
                                 </div>
                                 <div class="p-col-1">
-                                    <!-- <p:inputText value="#{bean.examRequest.client ne null ? bean.examRequest.client.addressPostalCode : ''}"
-                                                 rendered="#{bean.examRequest.client ne null}" disabled="true"/> -->
-                                    <p:inputText value="#{bean.clientAddressPostalCode}" id="addressPostalCode" disabled="#{bean.invoiceSentStatus}"/>
+                                    <p:inputText value="#{bean.examRequest.client ne null ? bean.examRequest.client.addressPostalCode : ''}"
+                                                 rendered="#{bean.examRequest.client ne null}" disabled="true"/>
+                                    <p:inputText value="#{bean.selectedInvoiceClient ne null ? bean.selectedInvoiceClient.addressPostalCode : ''}"
+                                                 rendered="#{bean.examRequest.client eq null}" disabled="true" id="addressPostalCode"/>
                                 </div>
 
                                 <!-- ROW 4 -->
@@ -435,23 +436,18 @@
                                     <h:outputText value=""/>
                                 </div>
                                 <div class="p-col-4">
-                                    <!-- <p:inputText value="#{(bean.examRequest.client ne null and bean.examRequest.client.addressCityId ne null)
-		                            ? bean.examRequest.client.addressCityId : ''}" rendered="#{bean.examRequest.client ne null}" disabled="true"/> -->
-                                    <p:selectOneMenu id="addressProvinceId" value="#{bean.clientAddressProvinceId}" style="width: 90%"
-                                             label="#{msg.clientAddressProvince}" disabled="#{bean.invoiceSentStatus}">
-                                		<p:ajax update="addressProvinceId addressCityId"
-                                        	listener="#{bean.handleAddressProvinceChange}"/>
-                                		<f:selectItems value="#{bean.clientProvinces}"/>
-                            		</p:selectOneMenu>
+                                    <p:inputText value="#{(bean.examRequest.client ne null and bean.examRequest.client.addressCityId ne null)
+		                            ? bean.examRequest.client.addressCityId : ''}" rendered="#{bean.examRequest.client ne null}" disabled="true"/>
+                                    <p:inputText value="#{(bean.selectedInvoiceClient ne null and bean.selectedInvoiceClient.addressCityId ne null)
+		                            ? bean.selectedInvoiceClient.addressCityId : ''}" rendered="#{bean.examRequest.client eq null}" disabled="true"
+                                                 id="addressCityId"/>
                                 </div>
                                 <div class="p-col-3">
-                                    <!-- <p:inputText value="#{(bean.examRequest.client ne null and bean.examRequest.client.addressProvinceId ne null)
-		                            ? bean.examRequest.client.addressProvinceId : ''}" rendered="#{bean.examRequest.client ne null}" disabled="true"/> -->
-                                    <p:selectOneMenu id="addressCityId" value="#{bean.clientAddressCityId}"
-                                             style="width: 90%;" disabled="#{bean.invoiceSentStatus}"
-                                             label="#{msg.clientAddressCity}">
-                                		<f:selectItems value="#{bean.clientAddressCities}"/>
-                            		</p:selectOneMenu>
+                                    <p:inputText value="#{(bean.examRequest.client ne null and bean.examRequest.client.addressProvinceId ne null)
+		                            ? bean.examRequest.client.addressProvinceId : ''}" rendered="#{bean.examRequest.client ne null}" disabled="true"/>
+                                    <p:inputText value="#{(bean.selectedInvoiceClient ne null and bean.selectedInvoiceClient.addressProvinceId ne null)
+		                            ? bean.selectedInvoiceClient.addressProvinceId : ''}" rendered="#{bean.examRequest.client eq null}" disabled="true"
+                                                 id="addressProvinceId"/>
                                 </div>
                                 <div class="p-col-1">
                                 </div>
@@ -464,14 +460,16 @@
                                     <h:outputText value="#{msg.vatCF}"/>
                                 </div>
                                 <div class="p-col-4">
-                                    <!-- <p:inputText value="#{bean.examRequest.client ne null ? bean.examRequest.client.numberVAT : ''}"
-                                                 rendered="#{bean.examRequest.client ne null}" disabled="true"/> -->
-                                    <p:inputText value="#{bean.clientNumberVAT}" id="numberVAT" disabled="#{bean.invoiceSentStatus}"/>
+                                    <p:inputText value="#{bean.examRequest.client ne null ? bean.examRequest.client.numberVAT : ''}"
+                                                 rendered="#{bean.examRequest.client ne null}" disabled="true"/>
+                                    <p:inputText value="#{bean.selectedInvoiceClient ne null ? bean.selectedInvoiceClient.numberVAT : ''}"
+                                                 rendered="#{bean.examRequest.client eq null}" disabled="true" id="numberVAT"/>
                                 </div>
                                 <div class="p-col-4">
-                                    <!-- <p:inputText value="#{bean.examRequest.client ne null ? bean.examRequest.client.fiscalCode : ''}"
-                                                 rendered="#{bean.examRequest.client ne null}" disabled="true"/> -->
-                                    <p:inputText value="#{bean.clientFiscalCode}" id="fiscalCode" disabled="#{bean.invoiceSentStatus}"/>
+                                    <p:inputText value="#{bean.examRequest.client ne null ? bean.examRequest.client.fiscalCode : ''}"
+                                                 rendered="#{bean.examRequest.client ne null}" disabled="true"/>
+                                    <p:inputText value="#{bean.selectedInvoiceClient ne null ? bean.selectedInvoiceClient.fiscalCode : ''}"
+                                                 rendered="#{bean.examRequest.client eq null}" disabled="true" id="fiscalCode"/>
                                 </div>
 
                                 <!-- ROW 6 -->
@@ -482,17 +480,19 @@
                                     <h:outputText value="#{msg.pecAddress}"/>
                                 </div>
                                 <div class="p-col-4" style="margin-top: 7px;">
-                                    <!-- <p:inputText value="#{bean.examRequest.client ne null ? bean.examRequest.client.mailPEC : ''}"
-                                                 rendered="#{bean.examRequest.client ne null}" disabled="true"/> -->
-                                    <p:inputText value="#{bean.clientMailPEC }" id="mailPEC" disabled="#{bean.invoiceSentStatus}"/>
+                                    <p:inputText value="#{bean.examRequest.client ne null ? bean.examRequest.client.mailPEC : ''}"
+                                                 rendered="#{bean.examRequest.client ne null}" disabled="true"/>
+                                    <p:inputText value="#{bean.selectedInvoiceClient ne null ? bean.selectedInvoiceClient.mailPEC : ''}"
+                                                 rendered="#{bean.examRequest.client eq null}" disabled="true" id="mailPEC"/>
                                 </div>
                                 <div class="p-col-1 vertical-center" style="padding-left:0 !important; margin-top: 7px;">
                                     <h:outputText value="#{msg.sdlAddress}"/>
                                 </div>
                                 <div class="p-col-3" style="padding-left:0 !important; margin-top: 7px;">
-                                    <!-- <p:inputText value="#{bean.examRequest.client ne null ? bean.examRequest.client.addressSDI : ''}"
-                                                 rendered="#{bean.examRequest.client ne null}" disabled="true"/> -->
-                                    <p:inputText value="#{bean.clientAddressSDI}" id="addressSDI" disabled="#{bean.invoiceSentStatus}"/>
+                                    <p:inputText value="#{bean.examRequest.client ne null ? bean.examRequest.client.addressSDI : ''}"
+                                                 rendered="#{bean.examRequest.client ne null}" disabled="true"/>
+                                    <p:inputText value="#{bean.selectedInvoiceClient ne null ? bean.selectedInvoiceClient.addressSDI : ''}"
+                                                 rendered="#{bean.examRequest.client eq null}" disabled="true" id="addressSDI"/>
                                 </div>
 
                                 <!-- ROW 7 -->
@@ -902,7 +902,7 @@
                                 <div class="p-col-12">
                                     <p:outputPanel id="listFile">
                                         <p:dataTable value="#{bean.invoiceEmailAttachedFiles}" styleClass="simple-table" var="file"
-                                                     rendered="#{not empty bean.invoiceEmailAttachedFiles}"  
+                                                     rendered="#{not empty bean.invoiceEmailAttachedFiles}"
                                                      scrollHeight="150" style="border: 1px solid #a8acb1;">
                                             <p:column styleClass="action_column">
                                                 <p:selectBooleanCheckbox/>
