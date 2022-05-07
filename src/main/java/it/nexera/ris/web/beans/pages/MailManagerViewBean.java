@@ -39,7 +39,6 @@ import org.hibernate.sql.JoinType;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.primefaces.component.tabview.TabView;
-import org.primefaces.context.RequestContext;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -61,7 +60,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 @Setter
@@ -266,7 +264,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private Boolean dataSaved;
 
     private WLGExport courtesyInvoicePdf;
-
+    
+    private static final String MAIL_RERLY_FOOTER = ResourcesHelper.getString("emailReplyFooter");
+    
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
         setActiveTabIndex(0);
@@ -1424,7 +1424,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 setInvoiceNote(invoiceDb.getNotes());
             setEmailSubject(causal);
         }
-        setEmailBodyToEditor(getEntity().getEmailBodyToEditor());
     }
 
     public void createInvoice() throws IllegalAccessException, PersistenceBeanException, HibernateException, InstantiationException {
@@ -1761,7 +1760,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 String.class, new Criterion[]{Restrictions.eq("id", Long.parseLong(
                         ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.SENT_SERVER_ID)
                                 .getValue()))}).get(0);
-    	System.out.println("email from :: "+emailsFrom);
     	
     	Invoice invoice = DaoManager.get(Invoice.class, getNumber());
         WLGInbox inbox = new WLGInbox();
@@ -1807,13 +1805,36 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             if (!ValidationHelper.isNullOrEmpty(getEmailCC()))
                 setSendCC(Arrays.asList(getEmailCC().split(",")));
 
-            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailBodyHtml()))
-                setEmailBodyToEditor(inbox.getEmailBodyHtml());
+            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailBodyToEditor()))
+                setEmailBodyToEditor(inbox.getEmailBodyToEditor());
 
             if (!ValidationHelper.isNullOrEmpty(inbox.getEmailSubject()))
                 setEmailSubject(inbox.getEmailSubject());
 
 
+        } else {
+        	if(!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
+            	appendReplyFooter();
+            	String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
+                        String.class, new Criterion[]{Restrictions.eq("id", Long.parseLong(
+                                ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.SENT_SERVER_ID)
+                                        .getValue()))}).get(0);
+    	        if (invoice.getEmailFrom().getEmailCC().contains(emailsFrom)) {
+    	            sendTo = new LinkedList<>();
+    	            sendTo.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailFrom()));
+    	            sendTo.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailTo()));
+    	            sendCC = new LinkedList<>();
+    	            sendCC = MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailCC()).stream()
+    	                    .filter(m -> !m.contains(emailsFrom)).collect(Collectors.toList());
+    	        } else {
+    	            sendTo = MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailFrom());
+    	            sendCC = new LinkedList<>();
+    	            sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailTo()).stream()
+    	                    .filter(m -> !m.contains(emailsFrom)).collect(Collectors.toList()));
+    	            sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailCC()));
+    	        }
+            }
+            setEmailBodyToEditor(getEntity().getEmailBodyToEditor());
         }
     }
 
@@ -2042,7 +2063,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                                 text = text.replace("totale", total.toString());
                                 r.setText(text, 0);
                             } else if (text != null && text.contains("refrequest")) {
-                                text = text.replace("refrequest", refrequest);
+                                text = text.replace("refrequest", refrequest != null ? refrequest : "");
                                 r.setText(text, 0);
                             } else if (text != null && text.contains("inboxndg")) {
                                 text = text.replace("inboxndg", ndg);
@@ -2573,4 +2594,29 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             LogHelper.log(log,e);
         }
     }
+    
+    private void appendReplyFooter() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        WLGInbox baseMail = DaoManager.get(WLGInbox.class, getBaseMailId());
+        String sendDate;
+        if (getEntity().getSendDate() == null) {
+            sendDate = "";
+        } else if (baseMail.getReceived()) {
+            sendDate = DateTimeHelper.toFormatedStringLocal(getEntity().getSendDate(),
+                    DateTimeHelper.getMySQLDateTimePattern(), null);
+        } else {
+            sendDate = DateTimeHelper.ToMySqlStringWithSeconds(getEntity().getSendDate());
+        }
+        getEntity().setEmailPrefix(String.format(MAIL_RERLY_FOOTER,
+                prepareEmailAddress(getEntity().getEmailFrom()),
+                sendDate,
+                prepareEmailAddress(getEntity().getEmailTo()),
+                getEntity().getEmailCC(),
+                getEntity().getEmailSubject()));
+    }
+
+    private String prepareEmailAddress(String email) {
+        return email.replace("<", "&lt;").replace(">", "&gt;");
+    }
+
+    
 }

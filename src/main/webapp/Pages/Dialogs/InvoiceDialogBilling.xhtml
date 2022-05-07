@@ -311,6 +311,20 @@
         .ui-datatable-tablewrapper {
             overflow: unset;
         }
+        
+        body .ui-calendar:not(#currentDay) .ui-button {
+		    background-color: transparent !important;
+		    margin-left: -37px;
+		}
+		
+		.ui-calendar:not(#currentDay) .ui-datepicker-trigger {
+		    color: #003871 !important;
+		}
+		
+		body .ui-state-active {
+		    background-color: #2d353c !important;
+		    color: #ffffff !important;
+		}
 
     </style>
 
@@ -889,7 +903,7 @@
                                 <div class="p-col-12">
                                     <p:outputPanel id="listFile">
                                         <p:dataTable value="#{bean.invoiceEmailAttachedFiles}" styleClass="simple-table" var="file"
-                                                     rendered="#{not empty bean.invoiceEmailAttachedFiles}"  scrollable="true"
+                                                     rendered="#{not empty bean.invoiceEmailAttachedFiles}"  
                                                      scrollHeight="150" style="border: 1px solid #a8acb1;">
                                             <p:column styleClass="action_column">
                                                 <p:selectBooleanCheckbox/>
