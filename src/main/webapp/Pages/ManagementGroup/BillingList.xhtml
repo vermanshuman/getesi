@@ -1187,20 +1187,20 @@
                                 <h:outputText value="#{invoice.totalGrossAmount}"/>
                             </p:column>
                             <p:column headerText="#{msg.billingListOnBalance}" sortBy="#{invoice.onBalance}">
-                                <p:commandButton id="openinvoice-payment" disabled="#{invoice.email.id != null}" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
+                                <p:commandButton id="openinvoice-payment" disabled="#{invoice.email.serverId != null}" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
                                                  action="#{bean.loadInvoiceDialogDataPayment(invoice)}" oncomplete="PF('invoiceDialogBillingWV').show();" update="invoiceDialogBilling">
                                 </p:commandButton>
                                 <p:commandLink value="#{invoice.onBalance}" onclick="document.getElementById('invoiceTable:#{rowId}:openinvoice-payment').click()"/>
                             </p:column>
-                            <p:column rendered="#{invoice.email.id == null}">
+                            <p:column rendered="#{invoice.email.serverId == null}">
                                 <p:commandButton id="openinvoice-btn" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
                                                  action="#{bean.loadInvoiceDialogDataEdit(invoice)}" oncomplete="PF('invoiceDialogBillingWV').show();" update="invoiceDialogBilling">
                                     <!-- <f:setPropertyActionListener value="#{item.id}"
                                                                  target="#{bean.entityEditId}"/> -->
                                 </p:commandButton>
-                                <div class="icon-block">
+                                <div class="icon-block" style="justify-content: left;">
                                     <i class="email-icon-new"></i>
-                                    <p:commandLink id="actionPnl" global="false" style="outline: none;" immediate="true"
+                                    <p:commandLink id="actionPnl" global="false" style="outline: none;" immediate="true" rendered="#{invoice.email.serverId == null}"
                                                    readonly="true">
                                         <i class="menu-dots-icon" style="font-size: x-large;"
                                            onmouseover="document.getElementById('invoiceTable:#{rowId}:actionPnl').focus();" />
@@ -1216,10 +1216,10 @@
                                     </p:tooltip>
                                 </div>
                             </p:column>
-                            <p:column rendered="#{invoice.email.id != null}">
-                                <div class="icon-block">
+                            <p:column rendered="#{invoice.email.serverId != null}">
+                                <div class="icon-block" style="justify-content: left;">
                                     <i class="email-check-icon"></i>
-                                    <i class="menu-dots-icon"></i>
+                                    <!-- <i class="menu-dots-icon"></i> -->
                                 </div>
                             </p:column>
                         </p:dataTable>

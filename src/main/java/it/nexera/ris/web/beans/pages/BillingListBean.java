@@ -914,7 +914,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setInvoicedRequests(DaoManager.load(Request.class, new Criterion[]{ Restrictions.eq("invoice", invoicedb)}));
         if(!ValidationHelper.isNullOrEmpty(invoicedb) && !invoicedb.isNew()){
             List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[] {Restrictions.eq("invoice", invoicedb)}, new Order[]{
-                    Order.desc("date")});
+                    Order.asc("date")});
             setPaymentInvoices(paymentInvoicesList);
             double totalImport = 0.0;
             for(PaymentInvoice paymentInvoice : paymentInvoicesList) {
@@ -2011,7 +2011,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         paymentInvoice.setInvoice(getSelectedInvoice());
         DaoManager.save(paymentInvoice, true);
         List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[] {Restrictions.eq("invoice", getSelectedInvoice())}, new Order[]{
-                Order.desc("date")});
+                Order.asc("date")});
         setPaymentInvoices(paymentInvoicesList);
     }
 

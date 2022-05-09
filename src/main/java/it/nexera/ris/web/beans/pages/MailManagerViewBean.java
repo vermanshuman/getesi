@@ -1371,7 +1371,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         if(!invoiceDb.isNew()){
             List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class,
                     new Criterion[] {Restrictions.eq("invoice", invoiceDb)}, new Order[]{
-                    Order.desc("date")});
+                    Order.asc("date")});
             setPaymentInvoices(paymentInvoicesList);
             double totalImport = 0.0;
             for (PaymentInvoice paymentInvoice : paymentInvoicesList) {
@@ -2493,7 +2493,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         paymentInvoice.setInvoice(getSelectedInvoice());
         DaoManager.save(paymentInvoice, true);
         List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[] {Restrictions.eq("invoice", getSelectedInvoice())}, new Order[]{
-                Order.desc("date")});
+                Order.asc("date")});
         setPaymentInvoices(paymentInvoicesList);
     }
 
