@@ -604,6 +604,55 @@
             #subjectClient_label {
                 padding-top: 7px;
             }
+            
+            #subjectTable table {
+				margin-top: 20px;
+				padding-left: 0px;
+				width: calc(100% - 0px);
+			}
+			
+			.request-table table {
+				border-collapse: separate !important;
+				border-spacing: 0 0.6em !important;
+			}
+			
+			#table_paginator_top :first-child {
+                margin-top: 6px !important;
+            }
+            
+            #table_paginator_bottom :first-child {
+                margin-top: 6px !important;
+            }
+
+            #subjectTable_content .ui-paginator .ui-paginator-pages {
+                margin-top: -6px !important;
+            }
+
+            #subjectTable_content .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-rpp-options {
+                margin: 6px;
+            }
+            .al-cen-fx div {
+                justify-content: center;
+            }
+            
+            #requestTypeSelectCheckboxPanelDataTable .ui-chkbox .ui-chkbox-box.ui-state-active {
+                background-color: transparent !important;
+                border-color: #4D759D !important;
+                color: #5f666c !important;
+            }
+            
+            #serviceSelectCheckboxPanel {
+                left: 75% !important;
+                width: 22% !important;
+                height: 50%;
+                overflow: auto;
+            }
+            
+            #serviceSelectCheckboxPanelDataTable .ui-chkbox .ui-chkbox-box.ui-state-active {
+                background-color: transparent !important;
+                border-color: #4D759D !important;
+                color: #5f666c !important;
+            }
         </style>
         <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
         <link rel="stylesheet"
@@ -1387,16 +1436,15 @@
                                                         </p:selectCheckboxMenu>
                                                     </div>
                                                     <div class="p-col-6">
-                                                        <p:selectCheckboxMenu id="services"
-                                                                              style="width: 100%;min-height: 38px;"
-                                                                              multiple="true" label=""
-                                                                              value="#{bean.selectedServices}"
-                                                                              onclick="applyBorder('services');"
-                                                                              styleClass="#{bean.getServiceSelected() gt 0 ? ' select-checkbox' : ''}">
-                                                            <f:selectItems value="#{bean.serviceWrappers}" var="service"
-                                                                           itemValue="#{service}"
-                                                                           itemLabel="#{service.value}"/>
-                                                        </p:selectCheckboxMenu>
+                                                        <p:selectCheckboxMenu id="services" 
+                                                        					style="width: 100%;min-height: 38px;" 
+                                                        					multiple="true" label="" 
+                                                        					value="#{bean.selectedServices}"
+                                                                      		onclick="PF('serviceSelectCheckboxWV').show();applyBorder('services');" 
+                                                                      		styleClass="#{bean.getServiceSelected() gt 0 ? ' select-checkbox' : ''}">
+                                                    		<f:selectItems value="#{bean.serviceWrappers}" var="service" itemValue="#{service}"
+                                                                   itemLabel="#{service.value}"/>
+                                                		</p:selectCheckboxMenu>
                                                     </div>
                                                     <div class="p-col-6">
                                                         <p:selectOneMenu id="subjectManager"
@@ -1589,7 +1637,33 @@
                             </p:column>
                         </p:dataTable>
                     </p:overlayPanel>
-
+                    
+                    <p:overlayPanel id="serviceSelectCheckboxPanel" my="left top" at="right bottom"
+                        widgetVar="serviceSelectCheckboxWV" for="services" dynamic="true" style="width:400px;">
+			            <p:dataTable id="serviceSelectCheckboxPanelDataTable" var="service"
+			                         value="#{bean.serviceWrappers}" selectionMode="single"
+			                         selection="#{bean.selectedServiceForFilter}" rowKey="#{service.value}">
+			                <p:ajax event="rowSelect"
+			                        listener="#{bean.selectServiceForFilter}"
+			                        update="serviceSelectCheckboxPanelDataTable searchPanel"/>
+			                <p:column style="width:18px">
+			                    <f:facet name="header">
+			                        <p:selectBooleanCheckbox value="#{bean.selectedAllServicesOnPanel}">
+			                            <p:ajax update="serviceSelectCheckboxPanelDataTable" event="change"/>
+			                            <p:ajax event="change" update="services" oncomplete="applyClickListener('services', 'serviceSelectCheckboxWV');"/>
+			                        </p:selectBooleanCheckbox>
+			                    </f:facet>
+			                    <p:selectBooleanCheckbox value="#{service.selected}">
+			                        <p:ajax update="serviceSelectCheckboxPanelDataTable searchPanel" event="change" listener="#{bean.selectServiceCheck}"/>
+			                        <p:ajax event="change" update="services" oncomplete="applyClickListener('services', 'serviceSelectCheckboxWV');"/>
+			                    </p:selectBooleanCheckbox>
+			                </p:column>
+			                <p:column headerText="#{msg.requestService}">
+			                    <h:outputText value="#{service.value}"/>
+			                </p:column>
+			            </p:dataTable>
+			        </p:overlayPanel>
+                    
                     <p:overlayPanel id="userSelectCheckboxPanel" my="left top" at="left bottom"
                                     widgetVar="userSelectCheckboxWV" for="userSelectCheckboxShow"
                                     onHide="filterRequestTableFromPanel();" dynamic="true" style="width:300px">
@@ -1618,7 +1692,7 @@
                         </p:dataTable>
                     </p:overlayPanel>
 
-                        <p:panel id="subjectTable" styleClass="ui-datatable ui-widget" widgetVar="subjectTableWV">
+                        <p:panel id="subjectTable" styleClass="ui-datatable ui-widget" widgetVar="subjectTableWV" style="margin-right: -15px; margin-left: 0px;">
 
                             <h:inputHidden id="numTotalPages" value="#{bean.paginator.totalPages}"/>
                             <h:inputHidden id="rowsPerPageSelected" value="#{bean.paginator.rowsPerPage}"/>
@@ -1773,7 +1847,7 @@
                                                     </p:outputPanel>
                                                 </td>
 
-                                                <td style="width: 13.1vw;min-width: 180px;">
+                                                <td style="width: 13.1vw;min-width: 180px; text-align: left;">
                                                     <p:commandLink value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId ne null}" action="#{bean.openRequestSubject}" style="cursor: pointer;">
                                                         <f:setPropertyActionListener value="#{item.subjectId}" target="#{bean.entityEditId}"/>
                                                     </p:commandLink>
@@ -1787,13 +1861,13 @@
                                                 </td>
 
                                                 <c:if test="${!bean.getCurrentUser().isExternal()}">
-                                                    <td>
+                                                    <td style="text-align: left;">
                                                         <h:outputText value="#{item.userName}"/>
                                                     </td>
                                                 </c:if>
 
                                                 <c:if test="${!bean.getCurrentUser().isExternal()}">
-                                                    <td>
+                                                    <td style="text-align: left;">
                                                         <h:outputText value="#{item.expirationDate}" converter="dateTimeConverter"/>
                                                     </td>
                                                 </c:if>
@@ -1913,6 +1987,25 @@
 									</table>
 
                                 </div>
+                            	<div id="table_paginator_bottom" class="ui-paginator ui-paginator-bottom ui-widget-header ui-corner-bottom"
+				                     role="navigation" aria-label="Pagination">
+				                    <h:outputText style="float: left;" value="Elementi visibili nella pagina"/>
+				                    <label for="table_rppDD_bottom" class="ui-paginator-rpp-label ui-helper-hidden">Rows Per Page</label>
+				
+				                    <h:selectOneMenu  value = "#{bean.paginator.rowsPerPage}" onchange="loadPerPage('table_rppDD_bottom')"
+				                                      name="table_rppDD" id="table_rppDD_bottom"
+				                                      class="ui-paginator-rpp-options ui-widget ui-state-default ui-corner-left">
+				                        <f:selectItem itemValue = "10" itemLabel = "10" />
+				                        <f:selectItem itemValue = "20" itemLabel = "20" />
+				                        <f:selectItem itemValue = "50" itemLabel = "50" />
+				                    </h:selectOneMenu>
+				
+				                    <h:outputText value="#{bean.paginator.pageNavigationStart}" escape="false"/>
+				                    <h:outputText styleClass="ui-paginator-pages" value="#{bean.paginator.paginatorString}" escape="false"/>
+				                    <h:outputText value="#{bean.paginator.pageNavigationEnd}" escape="false"/>
+				                    <h:outputText id="totalPagesBottom" value="(Pagina 1 di #{bean.paginator.totalPages})"
+				                                  styleClass="ui-paginator-current"/>
+				                </div>
                             </div>
                         </p:panel>
 

@@ -156,14 +156,26 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private List<RequestStateWrapper> stateWrappers;
 
     private List<RequestState> selectedStates;
+    
+    private Long selectedRequestType;
+    
+    private List<SelectItem> requestTypes;
+    
+    private List<SelectItem> requestTypesForSelect;
 
     private List<RequestType> selectedRequestTypes;
+    
+    private Integer requestType;
 
     private List<RequestTypeFilterWrapper> requestTypeWrappers;
 
     private List<Service> selectedServices;
 
     private List<ServiceFilterWrapper> serviceWrappers;
+    
+    private ServiceFilterWrapper selectedServiceForFilter;
+    
+    private List<SelectItem> servicesForSelect;
 
     private Long fiduciaryClientFilterId;
 
@@ -340,6 +352,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private List<SelectItem> clientProvinces;
 
     private List<SelectItem> clientAddressCities;
+    
+    private List<SelectItem> cities;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -376,10 +390,12 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setPaginator(new ListPaginator(10, 1, 1, 1,
                 "DESC", "createDate"));
         setStateWrappers(new ArrayList<>());
-        setRequestTypeWrappers(new ArrayList<>());
+        setServicesForSelect(new ArrayList<>());
         setServiceWrappers(new ArrayList<>());
         setUsersForSelect(new ArrayList<>());
         setUserWrappers(new ArrayList<>());
+        setRequestTypeWrappers(new ArrayList<>());
+        setRequestTypesForSelect(new ArrayList<>());
         List<User> notExternalCategoryUsers = DaoManager.load(User.class
                 , new Criterion[]{Restrictions.or(
                         Restrictions.eq("category", UserCategories.INTERNO),
@@ -576,6 +592,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setFilterNotes(null);
         setFilterNdg(null);
         setFilterPractice(null);
+        setServiceWrappers(new ArrayList<>());
+        setRequestTypeWrappers(new ArrayList<>());
         this.onLoad();
     }
 
@@ -892,6 +910,10 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 .add(new SelectItem(st.getId(), st.toString())));
         getUserWrappers().forEach(u -> getUsersForSelect().add(new SelectItem(u.getId(), u.getValue())));
         setShowPrintButton(true);
+        getServicesForSelect().add(SelectItemHelper.getNotSelected());
+        getServiceWrappers().forEach(s -> getServicesForSelect().add(new SelectItem(s.getId(), s.getValue())));
+        getRequestTypesForSelect().add(SelectItemHelper.getNotSelected());
+        getRequestTypeWrappers().forEach(r -> getRequestTypesForSelect().add(new SelectItem(r.getId(), r.getValue())));
     }
 
     public final void onTabChange(final TabChangeEvent event) throws HibernateException, InstantiationException,
@@ -2517,5 +2539,76 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setClientAddressCities(ComboboxHelper.fillList(City.class, Order.asc("description"),
                 new Criterion[] { Restrictions.eq("province.id", getClientAddressProvinceId()),
                         Restrictions.eq("external", Boolean.TRUE) }));
+    }
+    
+    public void selectServiceForFilter() throws HibernateException, IllegalAccessException, PersistenceBeanException {
+        if (!ValidationHelper.isNullOrEmpty(this.getServiceWrappers())) {
+            for (ServiceFilterWrapper wkrsw : this.getServiceWrappers()) {
+                if (wkrsw.getId().equals(this.getSelectedServiceForFilter().getId())) {
+                    wkrsw.setSelected(!wkrsw.getSelected().booleanValue());
+                    break;
+                }
+            }
+        }
+        selectServiceCheck();
+    }
+    
+    public void selectServiceCheck() throws HibernateException, IllegalAccessException, PersistenceBeanException {
+
+        if (!ValidationHelper.isNullOrEmpty(this.getServiceWrappers())) {
+
+            List<ServiceFilterWrapper> filterWrappers =
+                    this.getServiceWrappers().stream().
+                            filter(sw -> Objects.nonNull(
+                                    sw.getService().getServiceReferenceType()))
+                            .filter(distinctByKey(sw -> sw.getService().getServiceReferenceType()))
+                            .collect(Collectors.toList());
+
+            if (ValidationHelper.isNullOrEmpty(filterWrappers)) {
+                setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.FALSE));
+            } else {
+                boolean isConservatory = false;
+                boolean isComuni = false;
+                for (ServiceFilterWrapper wkrsw : filterWrappers) {
+                    if (wkrsw.getSelected()) {
+                        if (wkrsw.getService().getServiceReferenceType() == ServiceReferenceTypes.COMMON) {
+                            isComuni = true;
+                        } else {
+                            isConservatory = true;
+                        }
+                    }
+                }
+                if (isComuni && isConservatory) {
+                    setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.FALSE));
+                    getLandAggregations().addAll(getCities());
+                } else if (isComuni) {
+                    setLandAggregations(getCities());
+                } else {
+                    setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.FALSE));
+                }
+            }
+        } else {
+            setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.FALSE));
+        }
+    }
+    
+    public boolean getSelectedAllServicesOnPanel() {
+        if (this.getServiceWrappers() != null) {
+            for (ServiceFilterWrapper wlrsw : this.getServiceWrappers()) {
+                if (!wlrsw.getSelected().booleanValue()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public void setSelectedAllServicesOnPanel(boolean selectedAllServicesOnPanel) {
+        if (this.getServiceWrappers() != null) {
+            for (ServiceFilterWrapper wlrsw : this.getServiceWrappers()) {
+                wlrsw.setSelected(selectedAllServicesOnPanel);
+            }
+        }
     }
 }
