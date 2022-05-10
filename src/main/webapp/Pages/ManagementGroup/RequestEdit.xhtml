@@ -553,6 +553,18 @@
                                 <f:selectItems value="#{bean.services}"/>
                             </p:selectCheckboxMenu>
                         </h:panelGroup>
+                        <div class="ui-g-3" style="padding: 1%">
+                            <p:commandButton
+                                    style="margin-top: 18px;"
+                                    id="addRequestService"
+                                    action="#{bean.validateMultipleRequest(false)}"
+                                    value="#{msg.addRequestService.toUpperCase()}"
+                                    icon="shopping-cart-icon" styleClass="ui-button-success" iconPos="right"
+                                    disabled="#{bean.selectedRequestTypesIdMultiple eq null}"
+                                    update="saveMultipleRequest table newRequestList @(.servicedropdowns) form"
+                                    rendered="#{bean.showAddServiceButton and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2
+                                                            and bean.multipleRequestCreate}"/>
+                        </div>
                         <!--                        <div class="ui-g-3" style="padding: 1%">-->
 
                         <!--                        </div>-->
@@ -663,18 +675,7 @@
                         <div class="ui-g-3" style="padding: 1%"><span></span></div>
                         <div class="ui-g-3" style="padding: 1%"><span></span></div>
                         <div class="ui-g-3" style="padding: 1%"><span></span></div>
-                        <div class="ui-g-3" style="padding: 1%">
-                            <p:commandButton
-                                    style="margin-left: 18px"
-                                    id="addRequestService"
-                                    action="#{bean.validateMultipleRequest(false)}"
-                                    value="#{msg.addRequestService.toUpperCase()}"
-                                    icon="shopping-cart-icon" styleClass="ui-button-success" iconPos="right"
-                                    disabled="#{bean.selectedRequestTypesIdMultiple eq null}"
-                                    update="saveMultipleRequest table newRequestList @(.servicedropdowns) form"
-                                    rendered="#{bean.showAddServiceButton and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2
-                                                            and bean.multipleRequestCreate}"/>
-                        </div>
+
                     </div>
                 </p:outputPanel>
             </div>
