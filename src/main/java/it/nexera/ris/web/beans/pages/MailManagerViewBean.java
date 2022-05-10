@@ -1100,6 +1100,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     getEntity().setClient(null);
                 }
             }
+            if(!ValidationHelper.isNullOrEmpty(getNdg()))
+            	getEntity().setNdg(getNdg());
+            if(!ValidationHelper.isNullOrEmpty(getCdr()))
+            	getEntity().setCdr(getCdr());
+            if(!ValidationHelper.isNullOrEmpty(getReferencePractice()))
+            	getEntity().setReferenceRequest(getReferencePractice());
             DaoManager.save(getEntity(), true);
             setDataSaved(Boolean.TRUE);
 //            if (!redirect) {
