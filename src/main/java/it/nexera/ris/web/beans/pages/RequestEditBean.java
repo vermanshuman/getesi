@@ -1000,9 +1000,9 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         cleanValidation();
         setActiveMenuTabNum(getActiveMenuTabNum() - 1);
         if (isMultipleCreate() && getActiveMenuTabNum() == 1) {
-            //setShownFields(null);
-            //setHiddenFields(null);
-            //return;
+            setShownFields(null);
+            setHiddenFields(null);
+            return;
         }
         if (isMultipleCreate() && getActiveMenuTabNum() == 2) {
             onMultipleServiceChange();
@@ -1024,10 +1024,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }
         setActiveMenuTabNum(getActiveMenuTabNum() + 1);
         if (isMultipleCreate() && getActiveMenuTabNum() == 1) {
-        	onMultipleServiceChange();
-            generateTab();
-            generateHiddenFields();
-            //return true;
+            return true;
         }
         if ((isMultipleCreate() && getActiveMenuTabNum() == 2) ) {
             onMultipleServiceChange();
