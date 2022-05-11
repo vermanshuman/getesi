@@ -514,32 +514,6 @@
                     <f:selectItems value="#{bean.requestEnumTypesSecond}"/>
                 </p:selectOneRadio>
             </p:panelGrid>
-            
-            <p:outputPanel id="dynamicPanel1"  style="margin-bottom:10px">
-                    <c:forEach rendered="#{not empty bean.shownFields}" items="#{bean.shownFields}" var="item">
-                        <div class="ui-g">
-                            <!-- <c:if test="#{item.field != null}">
-                                <div class="ui-g-12" style="padding: 1%; background: transparent">
-                                    <ui:include src="#{item.field.field.getPath()}"/>
-                                </div>
-                            </c:if> -->
-                           <c:if test="#{(item.fields != null) and item.isAttachedDocumentsBlock()}">
-                                <c:forEach items="#{item.fields}" var="block">
-                                    <div class="ui-g-6" style="padding: 1%">
-                                        <ui:include src="#{block.field.getPath()}"/>
-                                    </div>
-                                </c:forEach>
-                            </c:if >
-                            <c:if test="#{(item.fields != null) and !item.isAttachedDocumentsBlock()}">
-                                <c:forEach items="#{item.fields}" var="block">
-                                    <div class="ui-g-3" style="padding: 1%">
-                                        <ui:include src="#{block.field.getPath()}"/>
-                                    </div>
-                                </c:forEach>
-                            </c:if> 
-                        </div>
-                    </c:forEach>
-                </p:outputPanel>
         </ui:fragment>
 
         <ui:fragment id="dynamicFragment" rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size() - 2 ) or (!bean.multipleRequestCreate and not empty bean.shownFields)}">
@@ -647,20 +621,20 @@
                                     <ui:include src="#{item.field.field.getPath()}"/>
                                 </div>
                             </c:if>
-                            <!-- <c:if test="#{(item.fields != null) and item.isAttachedDocumentsBlock()}">
+                            <c:if test="#{(item.fields != null) and item.isAttachedDocumentsBlock()}">
                                 <c:forEach items="#{item.fields}" var="block">
                                     <div class="ui-g-6" style="padding: 1%">
                                         <ui:include src="#{block.field.getPath()}"/>
                                     </div>
                                 </c:forEach>
-                            </c:if> -->
+                            </c:if >
                             <c:if test="#{(item.fields != null) and !item.isAttachedDocumentsBlock()}">
                                 <c:forEach items="#{item.fields}" var="block">
                                     <div class="ui-g-3" style="padding: 1%">
                                         <ui:include src="#{block.field.getPath()}"/>
                                     </div>
                                 </c:forEach>
-                            </c:if> 
+                            </c:if>
                         </div>
                     </c:forEach>
                 </p:outputPanel>
