@@ -445,6 +445,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 getMutipleRequestFirstObjTabPath().add(ManageTypeFields.POSITION_PRACTICE.getPath());
                 getMutipleRequestFirstObjTabPath().add(ManageTypeFields.NOTE.getPath());
                 getMutipleRequestFirstObjTabPath().add(ManageTypeFields.URGENT.getPath());
+                getMutipleRequestFirstObjTabPath().add(ManageTypeFields.ATTACHED_DOCUMENTS.getPath());
                 setMutipleRequestNDGPath(new ArrayList<>());
                 getMutipleRequestNDGPath().add(ManageTypeFields.NDG.getPath());
                 setMutipleRequestObjTabPath(new ArrayList<>());
