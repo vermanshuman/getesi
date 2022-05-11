@@ -387,8 +387,11 @@
                                         $("body").click(function(e){
                                             var target = $(e.target);
                                             if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('#client_panel').length
-                                                && !target.parents('#requestTypeSelectCheckboxPanel').length && !target.parents('#manager_panel').length && !target.parents('#office_panel').length
-                                                && !target.parents('#stateSelectCheckboxPanel').length && !target.parents('#serviceSelectCheckboxPanel').length && !target.parents('#fiduciario_panel').length) {
+                                                && !target.parents('#requestTypeSelectCheckboxPanel').length && !target.parents('#manager_panel').length 
+                                                && !target.parents('#office_panel').length
+                                                && !target.parents('#stateSelectCheckboxPanel').length && !target.parents('#serviceSelectCheckboxPanel').length 
+                                                && !target.parents('#fiduciario_panel').length
+                                                && !target.parents('#ui-datepicker-div').length && !target.parents('.ui-datepicker-header').length) {
                                                 PF('panelSetting').getJQ().hide();
                                             }
                                             if(target.closest('#statuses').length || target.closest('#stateSelectCheckboxPanelDataTable').length) {
@@ -453,7 +456,7 @@
 
                                             <div class="p-col-6">
                                                 <p:selectCheckboxMenu id="statuses" style="width: 100%;min-height: 38px;" multiple="true" label="" value="#{bean.selectedStates}"
-                                                                      onclick="applyBorder('statuses');" styleClass="#{bean.getStateSelected() gt 0 ? ' select-checkbox' : ''}">
+                                                                      onclick="PF('stateSelectCheckboxWV').show(); applyBorder('statuses');" styleClass="#{bean.getStateSelected() gt 0 ? ' select-checkbox' : ''}">
                                                     <f:selectItems value="#{bean.stateWrappers}" var="state" itemValue="#{state}"
                                                                    itemLabel="#{state.value}"/>
                                                 </p:selectCheckboxMenu>

@@ -1319,6 +1319,36 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             executeJS("PF('invoiceErrorDialogWV').show();");
         }
     }
+    
+    public void sendInvoice(Invoice invoiceDb) {
+        try {
+            Invoice invoice = DaoManager.get(Invoice.class, invoiceDb.getId());
+            List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
+            FatturaAPI fatturaAPI = new FatturaAPI();
+            String xmlData = fatturaAPI.getDataForXML(invoice, invoiceItems);
+            log.info("Mailmanager XMLDATA: " + xmlData);
+            FatturaAPIResponse fatturaAPIResponse = fatturaAPI.callFatturaAPI(xmlData, log);
+
+            if (fatturaAPIResponse != null && fatturaAPIResponse.getReturnCode() != -1) {
+                invoice.setStatus(InvoiceStatus.DELIVERED);
+                DaoManager.save(invoice, true);
+                setInvoiceSentStatus(true);
+            } else {
+                setApiError(ResourcesHelper.getString("sendInvoiceErrorMsg"));
+                if(fatturaAPIResponse != null
+                        && !ValidationHelper.isNullOrEmpty(fatturaAPIResponse.getDescription())){
+                    if(fatturaAPIResponse.getDescription().contains("already exists")) {
+                        setApiError(ResourcesHelper.getString("sendInvoiceDuplicateMsg"));
+                    }else
+                        setApiError(fatturaAPIResponse.getDescription());
+                }
+            }
+        }catch(Exception e) {
+            e.printStackTrace();
+            LogHelper.log(log, e);
+            executeJS("PF('invoiceErrorDialogWV').show();");
+        }
+    }
 
     public void loadRequestsExcel() throws PersistenceBeanException,
             IllegalAccessException, IOException, InstantiationException {
@@ -2611,4 +2641,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             }
         }
     }
+    
+    
 }

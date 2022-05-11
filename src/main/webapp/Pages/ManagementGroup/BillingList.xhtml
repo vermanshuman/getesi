@@ -653,6 +653,9 @@
                 border-color: #4D759D !important;
                 color: #5f666c !important;
             }
+            .searchPanelButton {
+    			background: #fb6e51 !important;
+			}
         </style>
         <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
         <link rel="stylesheet"
@@ -1083,14 +1086,14 @@
 
                                             <div class="p-field">
                                                 <p:commandButton id="cercaButton" onclick="filterTableFromPanel();"
-                                                                 styleClass="ui-button-warning-icon"
+                                                                 styleClass="ui-button-warning-icon searchPanelButton"
                                                                  update="searchPanel"
                                                                  icon="ui-icon ui-icon-search pi pi-search"/>
                                             </div>
-                                            <p:commandButton id="settingButton" onclick="PF('panelSetting').toggle()"
+                                            <p:commandButton id="settingButton" onclick="PF('panelSetting').toggle();"
                                                              type="button"
-                                                             styleClass="ui-button-warning-icon"
-                                                             icon="ui-icon ui-icon-search pi pi-sliders-h"/>
+                                                             styleClass="ui-button-warning-icon searchPanelButton"
+                                                             icon="ui-icon ui-icon-search pi pi-sliders-h"/>                                                             
                                             <p:panel id="settingPanel" widgetVar="panelSetting" closable="true"
                                                      toggleable="true" collapsed="true">
                                                 <div class="p-grid">
@@ -1225,7 +1228,7 @@
                             <p:column headerText="#{msg.billingListNotes}" sortBy="#{invoice.notes}">
                                 <h:outputText value="#{invoice.notes}"/>
                             </p:column>
-                            <p:column headerText="#{msg.billingListStatus}">
+                            <p:column headerText="#{msg.billingListStatus}" style="text-align:center;">
                                 <p:commandButton
                                         value="#{invoice.status != null ? invoice.status.toString() : ff:upper(msg.billingListDraft)}"
                                         style="width: 150px;"
@@ -1247,6 +1250,8 @@
                                     <!-- <f:setPropertyActionListener value="#{item.id}"
                                                                  target="#{bean.entityEditId}"/> -->
                                 </p:commandButton>
+                                <p:commandButton id="sendinvoice-btn" value="#{ff:upper(msg.delivery)}" class="action-btn" style="display: none;"
+                                                 action="#{bean.sendInvoice(invoice)}" update="invoiceTable"/>
                                 <div class="icon-block" style="justify-content: left;">
                                     <i class="email-icon-new"></i>
                                     <p:commandLink id="actionPnl" global="false" style="outline: none;" immediate="true" rendered="#{invoice.email.serverId == null}"
@@ -1256,11 +1261,15 @@
                                     </p:commandLink>
                                     <p:tooltip for="actionPnl" hideEvent="blur" showEvent="focus" styleClass="actionPnl-tooltip">
                                         <p:outputPanel id="actionGrid" styleClass="actionPnl-panel">
-                                            <p:commandButton value="#{ff:upper(msg.dataVerification)}" class="action-btn"
+                                            <p:commandButton value="#{ff:upper(msg.dataVerification)}" styleClass="action-btn"
                                                              onclick="document.getElementById('invoiceTable:#{rowId}:openinvoice-btn').click()"
                                                              oncomplete="PF('invoiceDialogBillingWV').show();"
                                                              style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;">
                                             </p:commandButton>
+                                            <p:commandButton value="#{ff:upper(msg.delivery)}" styleClass="action-btn"
+                                            		  		onclick="document.getElementById('invoiceTable:#{rowId}:sendinvoice-btn').click()"
+                                                     		rendered="#{invoice.status.toString() == 'BOZZA'}"
+                                                     		style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;"/>
                                         </p:outputPanel>
                                     </p:tooltip>
                                 </div>
@@ -1268,7 +1277,7 @@
                             <p:column rendered="#{invoice.email.serverId != null}">
                                 <div class="icon-block" style="justify-content: left;">
                                     <i class="email-check-icon"></i>
-                                    <!-- <i class="menu-dots-icon"></i> -->
+                                    <i class="menu-dots-icon"></i> 
                                 </div>
                             </p:column>
                         </p:dataTable>
@@ -1322,14 +1331,14 @@
                                             <div class="p-field">
                                                 <p:commandButton id="subjectSearch" onclick="filterRequestTableFromPanel();"
                                                                  action="#{bean.prepareToModify}"
-                                                                 styleClass="ui-button-warning-icon"
+                                                                 styleClass="ui-button-warning-icon searchPanelButton"
                                                                  update="subjectSearchPanel editAndPrintDialog printPanel"
                                                                  icon="ui-icon ui-icon-search pi pi-search"/>
                                             </div>
 
                                             <p:commandButton id="subjectSettingButton"
                                                              onclick="togglePanel();" type="button"
-                                                             styleClass="ui-button-warning-icon"
+                                                             styleClass="ui-button-warning-icon searchPanelButton"
                                                              icon="ui-icon ui-icon-search pi pi-sliders-h"/>
 
         <script type="text/javascript">
@@ -1338,7 +1347,9 @@
                 var target = $(e.target);
                 if (!target.parents('#subjectSettingButton').length && !target.parents('#subjectSettingPanel').length && !target.parents('#client_panel').length
                     && !target.parents('#requestTypeSelectCheckboxPanel').length && !target.parents('#manager_panel').length && !target.parents('#office_panel').length
-                    && !target.parents('#stateSelectCheckboxPanel').length && !target.parents('#serviceSelectCheckboxPanel').length && !target.parents('#fiduciario_panel').length) {
+                    && !target.parents('#stateSelectCheckboxPanel').length && !target.parents('#serviceSelectCheckboxPanel').length 
+                    && !target.parents('#fiduciario_panel').length
+                    && !target.parents('#ui-datepicker-div').length && !target.parents('.ui-datepicker-header').length) {
                   PF('subjectPanelSetting').getJQ().hide();
                 }
                 if(target.closest('#statuses').length || target.closest('#stateSelectCheckboxPanelDataTable').length) {

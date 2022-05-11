@@ -4,13 +4,25 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:p="http://primefaces.org/ui">
-
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+	<style>
+		#tableDocuments_head {
+			display: none;
+		}
+		
+		.ui-datatable:not(.borderless) thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+		    padding: 4px 10px!important;
+		    overflow: hidden!important;
+		    border-width: 0 0 0 0 !important;
+		    border-style: solid!important;
+		}
+	</style>
     <span>#{enums.documentGenerationTagsATTACHED_DOCUMENTS}
         <h:panelGroup rendered="#{not empty block}" style="#{block.isRequired()?'':'display:none;'}">*</h:panelGroup>
         <h:panelGroup rendered="#{not empty item and not empty item.field}" style="#{item.field.isRequired()?'':'display:none;'}">*</h:panelGroup>
     </span>
-    <p:panel id="ATTACHED_DOCUMENTS" style="width: 100%; background: transparent; border: none">
+    <p:panel id="ATTACHED_DOCUMENTS" style="width: 80%; background: transparent; border: none">
         <div class="ui-g">
             <div class="ui-g-6">
                 <h:outputText value="#{msg.requestDocumentAddNew}:"/>
@@ -20,8 +32,8 @@
             </div>
         </div>
         <div class="ui-g">
-            <div class="ui-g-12">
-                <p:dataTable var="doc" id="tableDocuments"
+            <div class="ui-g-12"> 
+            	<!-- <p:dataTable var="doc" id="tableDocuments"
                              rendered="#{not empty bean.documents}"
                              emptyMessage="#{msg.noRecordsFound}" value="#{bean.documents}"
                              rowKey="#{doc.id}" rowIndexVar="rowId"
@@ -53,8 +65,25 @@
                                                      target="#{bean.deleteDocumentFileName}"/>
                         </p:commandButton>
                     </p:column>
+                </p:dataTable> -->
+            	<p:dataTable var="doc" id="tableDocuments" style="width:60%;"
+                             rendered="#{not empty bean.documents}"
+                             emptyMessage="#{msg.noRecordsFound}" value="#{bean.documents}"
+                             rowKey="#{doc.id}" rowIndexVar="rowId"
+                             widgetVar="tableDocumentsWV">
+
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.requestTableOfOtherDocumentsAssociatedWithSubject}"/>
+                    </f:facet>
+
+                    <p:column colspan="2">
+                        <h:outputText value="#{doc.title}"/>
+                        <p:commandButton icon="fa fa-fw fa-file-pdf-o" style="margin-left:20px;"
+                                         action="#{bean.downloadPdfFile(doc)}" ajax="false" update="@form">
+                        </p:commandButton>
+                    </p:column>
                 </p:dataTable>
-            </div>
+           </div> 
         </div>
     </p:panel>
 

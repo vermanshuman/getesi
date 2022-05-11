@@ -222,7 +222,8 @@
                                             $("body").click(function (e) {
                                                 var target = $(e.target);
                                                 if (!target.parents('#settingButton').length && !target.parents('#tabs\\:settingButton').length &&
-                                                    !target.parents('.ui-selectcheckboxmenu-panel').length && !target.parents('#tabs\\:settingPanel').length) {
+                                                    !target.parents('.ui-selectcheckboxmenu-panel').length && !target.parents('#tabs\\:settingPanel').length
+                                                    && !target.parents('#ui-datepicker-div').length && !target.parents('.ui-datepicker-header').length) {
                                                     PF('panelSetting').getJQ().hide();
                                                 }
 

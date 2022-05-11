@@ -416,7 +416,7 @@
                                             $("body").click(function(e){
                                                 var target = $(e.target);
                                                 if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('.ui-selectcheckboxmenu-panel').length
-                                                    && !target.parents('#ui-datepicker-div').length) {
+                                                    && !target.parents('#ui-datepicker-div').length && !target.parents('.ui-datepicker-header').length) {
                                                     PF('panelSetting').getJQ().hide();
                                                 }
                                                 if(target.closest('.ui-selectcheckboxmenu-item').length) {
