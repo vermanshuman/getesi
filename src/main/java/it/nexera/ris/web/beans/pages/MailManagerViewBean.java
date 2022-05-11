@@ -1077,6 +1077,10 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 }
             }
 
+            getEntity().setReferenceRequest(getReferencePractice());
+            getEntity().setNdg(getNdg());
+            getEntity().setCdr(getCdr());
+
             if (!ValidationHelper.isNullOrEmpty(getSelectedNotManagerOrFiduciaryClientId())) {
                 getEntity().setClient(DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()));
             } else {
@@ -1100,12 +1104,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     getEntity().setClient(null);
                 }
             }
-            if(!ValidationHelper.isNullOrEmpty(getNdg()))
-            	getEntity().setNdg(getNdg());
-            if(!ValidationHelper.isNullOrEmpty(getCdr()))
-            	getEntity().setCdr(getCdr());
-            if(!ValidationHelper.isNullOrEmpty(getReferencePractice()))
-            	getEntity().setReferenceRequest(getReferencePractice());
             DaoManager.save(getEntity(), true);
             setDataSaved(Boolean.TRUE);
 //            if (!redirect) {
@@ -1377,7 +1375,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         if(!invoiceDb.isNew()){
             List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class,
                     new Criterion[] {Restrictions.eq("invoice", invoiceDb)}, new Order[]{
-                    Order.asc("date")});
+                    Order.desc("date")});
             setPaymentInvoices(paymentInvoicesList);
             double totalImport = 0.0;
             for (PaymentInvoice paymentInvoice : paymentInvoicesList) {
@@ -1671,6 +1669,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
 
         try {
+
+            saveInvoiceInDraft();
             Invoice invoice = DaoManager.get(Invoice.class, getNumber());
             List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
             FatturaAPI fatturaAPI = new FatturaAPI();

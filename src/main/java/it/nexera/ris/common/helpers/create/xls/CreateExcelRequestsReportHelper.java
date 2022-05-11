@@ -811,7 +811,6 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
             Boolean billingClient = isBillingClient(request);
             boolean restrictionForPriceList = restrictionForPriceList(request);
             List<PriceList> priceList = costCalculationHelper.loadPriceList(billingClient, restrictionForPriceList);
-            System.out.println(">> " + priceList);
             if (!ValidationHelper.isNullOrEmpty(priceList)) {
                 double fixedCost = 0;
                 PriceList first = priceList.get(0);
@@ -828,8 +827,6 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                             double yCost = y * Double.parseDouble(first.getNextPrice().replaceAll(",", "."));
 
                             fixedCost += yCost + Double.parseDouble(first.getFirstPrice().replaceAll(",", "."));
-                        } else {
-                            fixedCost += Double.parseDouble(first.getFirstPrice().replaceAll(",", "."));
                         }
                     }
                 }

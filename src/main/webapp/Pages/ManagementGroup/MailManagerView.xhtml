@@ -184,14 +184,16 @@
             </script>
             <iframe id="mail_pdf_iframe" srcdoc="#{bean.mailPdf}"/>
         </p:outputPanel>
-        <p:dialog id="confirmReadDlg" widgetVar="confirmReadDlgWV" styleClass="dialog-green"
+        <p:dialog id="confirmReadDlg" widgetVar="confirmReadDlgWV" styleClass="dialog-gray"
                   draggable="false" modal="true" resizable="false">
             <h:outputText value="#{msg.confirmReadMessage}"/>
             <div class="btn_line">
-                <p:commandButton value="#{msg.ok}" action="#{bean.sendConfirmMail}"
-                                 oncomplete="PF('confirmReadDlgWV').hide();"/>
+                <p:commandButton value="#{msg.confirm}" action="#{bean.sendConfirmMail}"
+                                 oncomplete="PF('confirmReadDlgWV').hide();"
+                                 style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"/>
                 <p:commandButton value="#{msg.cancel}" action="#{bean.setConfirmMailRead}"
-                                 oncomplete="PF('confirmReadDlgWV').hide();"/>
+                                 oncomplete="PF('confirmReadDlgWV').hide();"
+                                 style="background-color: #F3362B !important; width: 100px;"/>
             </div>
         </p:dialog>
         <p:dialog widgetVar="imageFileDlgWV" width="300" draggable="false" modal="true" resizable="false" styleClass="dialog-green"

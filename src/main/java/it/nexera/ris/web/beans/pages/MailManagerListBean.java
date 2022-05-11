@@ -402,6 +402,8 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         HttpSessionHelper.put(KEY_SORT_COLUMN, null);
         SessionHelper.removeObject(KEY_EMAIL_TO);
         HttpSessionHelper.put(KEY_EMAIL_TO, null);
+        SessionHelper.removeObject(KEY_EMAIL);
+        HttpSessionHelper.put(KEY_EMAIL, null);
         SessionHelper.removeObject(KEY_EMAIL_SUBJECT);
         HttpSessionHelper.put(KEY_EMAIL_SUBJECT, null);
         SessionHelper.removeObject(KEY_EMAIL_BODY);
@@ -936,6 +938,7 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
     public void cancelMail() {
         changeMailsStatus(MailManagerStatuses.CANCELED);
         setSelectedInboxes(new ArrayList<WLGInboxShort>());
+        filterTableFromPanel();
     }
 
     public void filterLetterByOwner() {

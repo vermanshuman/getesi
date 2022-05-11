@@ -279,9 +279,9 @@
                 background-color: #f0f3f5;
             }
 
-           .docdowload {
-                 background-color: #003871 !important;
-             }
+            .docdowload {
+                background-color: #003871 !important;
+            }
         </style>
         <script>
             var doChange = true;
@@ -339,23 +339,23 @@
                                                      disabled="#{!bean.canCreate}" style="margin-left:20px;"
                                                      action="#{bean.createNewMultipleRequests()}"/>
                                 </div>
-<!--                                <div class="p-field">-->
-<!--                                    <p:commandButton value="#{ff:upper(msg.requestNew)}" id="btn_new"-->
-<!--                                                     styleClass="ui-button-success search-btn new-button" style="margin-left:20px;"-->
-<!--                                                     disabled="#{!bean.canCreate}" action="#{bean.createNewRequest}" />-->
-<!--                                </div>-->
-<!--                                <div class="p-field">-->
-<!--                                    <p:commandButton value="#{ff:upper(msg.requestNewMultiple)}"-->
-<!--                                                     id="btn_new_multipe" styleClass="ui-button-success	search-btn new-button-multiple"-->
-<!--                                                     disabled="#{!bean.canCreate}"-->
-<!--                                                     action="#{bean.createNewMultipleRequest}" />-->
-<!--                                </div>-->
-<!--                                <div class="p-field">-->
-<!--                                    <p:commandButton value="#{ff:upper(msg.requestNewMultiples)}"-->
-<!--                                                     id="btn_new_multipa" styleClass="ui-button-success	search-btn new-button-multiple"-->
-<!--                                                     disabled="#{!bean.canCreate}"-->
-<!--                                                     action="#{bean.createNewMultipleRequests()}" />-->
-<!--                                </div>-->
+                                <!--                                <div class="p-field">-->
+                                <!--                                    <p:commandButton value="#{ff:upper(msg.requestNew)}" id="btn_new"-->
+                                <!--                                                     styleClass="ui-button-success search-btn new-button" style="margin-left:20px;"-->
+                                <!--                                                     disabled="#{!bean.canCreate}" action="#{bean.createNewRequest}" />-->
+                                <!--                                </div>-->
+                                <!--                                <div class="p-field">-->
+                                <!--                                    <p:commandButton value="#{ff:upper(msg.requestNewMultiple)}"-->
+                                <!--                                                     id="btn_new_multipe" styleClass="ui-button-success	search-btn new-button-multiple"-->
+                                <!--                                                     disabled="#{!bean.canCreate}"-->
+                                <!--                                                     action="#{bean.createNewMultipleRequest}" />-->
+                                <!--                                </div>-->
+                                <!--                                <div class="p-field">-->
+                                <!--                                    <p:commandButton value="#{ff:upper(msg.requestNewMultiples)}"-->
+                                <!--                                                     id="btn_new_multipa" styleClass="ui-button-success	search-btn new-button-multiple"-->
+                                <!--                                                     disabled="#{!bean.canCreate}"-->
+                                <!--                                                     action="#{bean.createNewMultipleRequests()}" />-->
+                                <!--                                </div>-->
 
                             </div>
                         </div>
@@ -387,11 +387,8 @@
                                         $("body").click(function(e){
                                             var target = $(e.target);
                                             if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('#client_panel').length
-                                                && !target.parents('#requestTypeSelectCheckboxPanel').length && !target.parents('#manager_panel').length 
-                                                && !target.parents('#office_panel').length
-                                                && !target.parents('#stateSelectCheckboxPanel').length && !target.parents('#serviceSelectCheckboxPanel').length 
-                                                && !target.parents('#fiduciario_panel').length
-                                                && !target.parents('#ui-datepicker-div').length && !target.parents('.ui-datepicker-header').length) {
+                                                && !target.parents('#requestTypeSelectCheckboxPanel').length && !target.parents('#manager_panel').length && !target.parents('#office_panel').length
+                                                && !target.parents('#stateSelectCheckboxPanel').length && !target.parents('#serviceSelectCheckboxPanel').length && !target.parents('#fiduciario_panel').length) {
                                                 PF('panelSetting').getJQ().hide();
                                             }
                                             if(target.closest('#statuses').length || target.closest('#stateSelectCheckboxPanelDataTable').length) {
@@ -417,6 +414,11 @@
                                         }
                                         function togglePanel() {
                                             PF('panelSetting').getJQ().toggle();
+                                        }
+                                        function resetSettingPanelData() {
+                                            $('#requestTypes .ui-selectcheckboxmenu-multiple-container li').remove();
+                                            $('#services .ui-selectcheckboxmenu-multiple-container li').remove();
+                                            return true;
                                         }
                                         jQuery(document).ready(function() {
                                             PF('panelSetting').getJQ().hide();
@@ -613,9 +615,9 @@
                                                                  oncomplete="PF('panelSetting').getJQ().hide();"/>
                                                 <p:commandButton id="manageReestablishBtn" style="width: auto;"
                                                                  value="#{ff:upper(msg.mailManageReestablish)}"
-                                                                 update="settingPanel searchPanel services"
-                                                                 actionListener="#{bean.clearFiltraPanel}"
-                                                                 oncomplete="resetData();checkDates();filterTableFromPanel();PF('panelSetting').getJQ().hide();updateSettingPanel();"/>
+                                                                 update=":form:settingPanel :form:requestTypeSelectCheckboxPanel :form:serviceSelectCheckboxPanel :form:stateSelectCheckboxPanel"
+                                                                 actionListener="#{bean.reset}"
+                                                                 oncomplete="resetSettingPanelData();filterTableFromPanel();PF('panelSetting').getJQ().hide();"/>
                                             </div>
                                         </div>
                                     </p:panel>
@@ -841,7 +843,7 @@
         </p:outputPanel>
 
         <p:overlayPanel id="stateSelectCheckboxPanel" my="left top" at="right bottom"
-                        widgetVar="stateSelectCheckboxWV" for="statuses" dynamic="true" style="width:200px;left: 1650px !important;" styleClass="settingsBlock">
+                        widgetVar="stateSelectCheckboxWV" for="statuses" style="width:200px;left: 1650px !important;" styleClass="settingsBlock">
 
             <p:dataTable id="stateSelectCheckboxPanelDataTable" var="state"
                          value="#{bean.stateWrappers}" selectionMode="single"
@@ -868,7 +870,7 @@
         </p:overlayPanel>
 
         <p:overlayPanel id="serviceSelectCheckboxPanel" my="left top" at="right bottom"
-                        widgetVar="serviceSelectCheckboxWV" for="services" dynamic="true" style="width:400px;">
+                        widgetVar="serviceSelectCheckboxWV" for="services" style="width:400px;">
             <p:dataTable id="serviceSelectCheckboxPanelDataTable" var="service"
                          value="#{bean.serviceWrappers}" selectionMode="single"
                          selection="#{bean.selectedServiceForFilter}" rowKey="#{service.value}">
@@ -894,7 +896,7 @@
         </p:overlayPanel>
 
         <p:overlayPanel id="requestTypeSelectCheckboxPanel" my="left top" at="left bottom"
-                        widgetVar="requestTypeSelectCheckboxWV" for="requestTypes" dynamic="true" style="width:300px;">
+                        widgetVar="requestTypeSelectCheckboxWV" for="requestTypes" style="width:300px;">
             <p:dataTable id="requestTypeSelectCheckboxPanelDataTable" var="requestType"
                          value="#{bean.requestTypeWrappers}" selectionMode="single"
                          selection="#{bean.selectedRequestTypeForFilter}" rowKey="#{requestType.value}">
@@ -932,7 +934,7 @@
 
                     <h:selectOneMenu  value = "#{bean.paginator.rowsPerPage}" onchange="loadPerPage('table_rppDD')"
                                       name="table_rppDD" id="table_rppDD"
-                                     class="ui-paginator-rpp-options ui-widget ui-state-default ui-corner-left">
+                                      class="ui-paginator-rpp-options ui-widget ui-state-default ui-corner-left">
                         <f:selectItem itemValue = "10" itemLabel = "10" />
                         <f:selectItem itemValue = "20" itemLabel = "20" />
                         <f:selectItem itemValue = "50" itemLabel = "50" />
@@ -1136,7 +1138,7 @@
                                         <p:graphicImage id="internalUserIcon-#{loop.index}" url="/resources/images/richiesta-da-operatore-getesi.png"
                                                         style="height :28px;"  rendered="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments}" />
                                         <p:tooltip for="internalUserIcon-#{loop.index}" styleClass="custom-design-tooltip" escape="false"
-                                            rendered="#{not empty item.createUserFullName}">
+                                                   rendered="#{not empty item.createUserFullName}">
                                             <h:outputText value="#{item.createUserFullName}"
                                                           style="font-weight:bold;color:#003871;" escape="false"/>
                                         </p:tooltip>
@@ -1148,9 +1150,9 @@
                                             </p:commandButton>
                                             <p:tooltip for="internalUserIconA-#{loop.index}" styleClass="custom-design-tooltip" escape="false"
                                                        rendered="#{not empty item.createUserFullName}">
-                                            <h:outputText value="#{item.createUserFullName}"
-                                                          style="font-weight:bold;color:#003871;" escape="false"/>
-                                        </p:tooltip>
+                                                <h:outputText value="#{item.createUserFullName}"
+                                                              style="font-weight:bold;color:#003871;" escape="false"/>
+                                            </p:tooltip>
                                             <h:outputText value="A"  style="width: 19px;height: 20px;background-color: #003871;border-radius: 50%;color: white;display: block;margin-top: -10px;margin-left: -6px;text-align: center;" />
                                         </p:outputPanel>
 
@@ -1172,11 +1174,11 @@
 
                                 <ui:remove>
                                     <c:if test="${!bean.getCurrentUser().isExternal()}">
-                                    <td class=" min_padding_margin">
-                                        <p:commandButton icon="fa fa-indent" action="#{bean.openRequestEditor}">
-                                            <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
-                                        </p:commandButton>
-                                    </td>
+                                        <td class=" min_padding_margin">
+                                            <p:commandButton icon="fa fa-indent" action="#{bean.openRequestEditor}">
+                                                <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                                            </p:commandButton>
+                                        </td>
                                     </c:if>
                                 </ui:remove>
                                 <c:if test="${!bean.getCurrentUser().isExternal()}">

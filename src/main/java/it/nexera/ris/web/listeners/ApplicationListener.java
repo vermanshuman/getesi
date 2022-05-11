@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -27,6 +29,9 @@ import it.nexera.ris.web.services.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
@@ -90,6 +95,52 @@ public class ApplicationListener implements ServletContextListener, IConnectionL
         initializeProps();
 
         FileHelper.setRealPath(servletContextEvent.getServletContext().getRealPath("/"));
+
+
+        String templatePath = (new File(FileHelper.getRealPath(),
+                "resources" + File.separator + "layouts" + File.separator
+                        + "Invoice" + File.separator + "InvoiceDocumentTemplate.docx")
+                .getAbsolutePath());
+        try {
+            try (XWPFDocument doc = new XWPFDocument(
+                    Files.newInputStream(Paths.get(templatePath)))) {
+                for (XWPFParagraph p : doc.getParagraphs()) {
+                    List<XWPFRun> runs = p.getRuns();
+                    if (runs != null) {
+                        for (XWPFRun r : runs) {
+                            String text = r.getText(0);
+                            if (text != null && text.contains("inum")) {
+                                FileHelper.getTemplateMapping().put("inum", r);
+                            } else if (text != null && text.contains("clientname")) {
+                                FileHelper.getTemplateMapping().put("clientname", r);
+                            } else if (text != null && text.contains("clientaddress")) {
+                                FileHelper.getTemplateMapping().put("clientaddress", r);
+                            } else if (text != null && text.contains("clientaddress2")) {
+                                FileHelper.getTemplateMapping().put("clientaddress2", r);
+                            } else if (text != null && text.contains("clientpiva")) {
+                                FileHelper.getTemplateMapping().put("clientpiva", r);
+                            } else if (text != null && text.contains("impon")) {
+                                FileHelper.getTemplateMapping().put("impon", r);
+                            } else if (text != null && text.contains("ivap")) {
+                                FileHelper.getTemplateMapping().put("ivap", r);
+                            } else if (text != null && text.contains("ivaa")) {
+                                FileHelper.getTemplateMapping().put("ivaa", r);
+                            } else if (text != null && text.contains("totale")) {
+                                FileHelper.getTemplateMapping().put("totale", r);
+                            } else if (text != null && text.contains("refrequest")) {
+                                FileHelper.getTemplateMapping().put("refrequest", r);
+                            } else if (text != null && text.contains("inboxndg")) {
+                                FileHelper.getTemplateMapping().put("inboxndg", r);
+                            }
+                        }
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("Exception while parsing template");
+            LogHelper.log(log, e);
+        }
 
         HibernateUtil.addConnectionListener(this);
         HibernateUtil.getSessionFactory(false);

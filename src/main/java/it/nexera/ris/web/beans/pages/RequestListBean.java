@@ -1037,11 +1037,11 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         } else {
             setStateWrappers(new ArrayList<>());
             for (RequestState rs : RequestState.values()) {
-            	if(RequestState.EVADED.equals(rs) || RequestState.INSERTED.equals(rs) 
-            			|| RequestState.IN_WORK.equals(rs) || RequestState.TO_BE_SENT.equals(rs))
-            		getStateWrappers().add(new RequestStateWrapper(false, rs));
-            	else
-            		getStateWrappers().add(new RequestStateWrapper(true, rs));
+                if(RequestState.EVADED.equals(rs) || RequestState.INSERTED.equals(rs)
+                        || RequestState.IN_WORK.equals(rs) || RequestState.TO_BE_SENT.equals(rs))
+                    getStateWrappers().add(new RequestStateWrapper(false, rs));
+                else
+                    getStateWrappers().add(new RequestStateWrapper(true, rs));
             }
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_REQUEST_TYPE))) {

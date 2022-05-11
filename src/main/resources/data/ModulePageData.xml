@@ -94,7 +94,7 @@
 		<module_code entity_field="code">PTR</module_code>
 	</data_entry>
 	<data_entry>
-		<page_type>FOREIGN_STATES_LIST</page_type>
+		<page_type>FOREIGN_STATE_LIST</page_type>
 		<module_code entity_field="code">FSL</module_code>
 	</data_entry>
 	<data_entry>

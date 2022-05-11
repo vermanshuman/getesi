@@ -216,10 +216,10 @@
 
         #dialogTab .ui-button.ui-button-icon-only .ui-icon {
             font-size: 18px !important;
-		    top: 0px; 
-		    left: 0px;
-		    margin-top: 6px;
-		    margin-left: 10px;
+            top: 0px;
+            left: 0px;
+            margin-top: 6px;
+            margin-left: 10px;
         }
 
         div.dataTab input {
@@ -722,9 +722,10 @@
                                                      rendered="#{!bean.invoiceSentStatus}"/>
                                     <p:commandButton value="#{msg.saveInDraft}" styleClass="ui-button-success p-mr-2 p-mb-2" style="margin-left:5px;"
                                                      action="#{bean.saveInvoiceInDraft}" update="mainPanel goodsServicesPanel countsSummaryPanel @widgetVar(buttonsPanelWV)"
-                                                     rendered="#{!bean.invoiceSentStatus}"/>
+                                                     rendered="#{!bean.invoiceSentStatus}"
+                                                     oncomplete="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"/>
                                     <p:commandButton value="#{msg.delivery}" styleClass="ui-button-success p-mr-2 p-mb-2"
-                                                     action="#{bean.sendInvoice}" rendered="#{bean.selectedInvoice.id ne null and !bean.invoiceSentStatus}"
+                                                     action="#{bean.sendInvoice}" rendered="#{!bean.invoiceSentStatus}"
                                                      update="@widgetVar(buttonsPanelWV) @widgetVar(countsSummaryPanelVW)
                              						 		 @widgetVar(goodsServicesPanelVW) @widgetVar(mainPanelVW)"
                                                      oncomplete="PF('invoiceConfirmWV').hide();"/>

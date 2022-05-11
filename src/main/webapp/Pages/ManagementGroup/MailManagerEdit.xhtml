@@ -411,7 +411,7 @@
             <h:outputText value="#{msg.mailManagerEditMailAttachedFiles}:"
                           style="font-weight: bold;"/>
 
-            <p:dataTable emptyMessage="#{msg.noRecordsFound}" var="file"
+            <p:dataTable emptyMessage=" " var="file"
                          value="#{bean.attachedFiles}" id="tableFiles">
                 <f:facet name="header">
                     <p:fileUpload fileUploadListener="#{bean.handleFileUpload}"

@@ -22,6 +22,16 @@
             <p:inputText id="description" maxlength="100"
                          value="#{bean.entity.description}" label="#{msg.description}"
                          onkeypress="numbers_letters_only('#description');"/>
+
+            <span><span class="red">*</span>#{msg.requestFiscalCode}:</span>
+            <p:inputText id="fiscalCode" maxlength="100"
+                         value="#{bean.fiscalCode}" label="#{msg.requestFiscalCode}"
+                         onkeypress="numbers_letters_only('#fiscalCode');"/>
+
+            <span>#{msg.citiesListExternal}</span>
+            <h:panelGroup layout="block" styleClass="externalCity">
+                <p:selectBooleanCheckbox value="#{bean.entity.external}" />
+            </h:panelGroup>
         </p:panelGrid>
     </ui:define>
 
@@ -35,6 +45,10 @@
         <p:column sortBy="#{item.description}" filterBy="#{item.description}"
                   headerText="#{msg.description}">
             <h:outputText value="#{item.description}"/>
+        </p:column>
+
+        <p:column headerText="#{msg.requestFiscalCode}">
+            <h:outputText value="#{item.fiscalCode}"/>
         </p:column>
     </ui:define>
 

@@ -156,15 +156,15 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private List<RequestStateWrapper> stateWrappers;
 
     private List<RequestState> selectedStates;
-    
+
     private Long selectedRequestType;
-    
+
     private List<SelectItem> requestTypes;
-    
+
     private List<SelectItem> requestTypesForSelect;
 
     private List<RequestType> selectedRequestTypes;
-    
+
     private Integer requestType;
 
     private List<RequestTypeFilterWrapper> requestTypeWrappers;
@@ -172,9 +172,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private List<Service> selectedServices;
 
     private List<ServiceFilterWrapper> serviceWrappers;
-    
+
     private ServiceFilterWrapper selectedServiceForFilter;
-    
+
     private List<SelectItem> servicesForSelect;
 
     private Long fiduciaryClientFilterId;
@@ -352,7 +352,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private List<SelectItem> clientProvinces;
 
     private List<SelectItem> clientAddressCities;
-    
+
     private List<SelectItem> cities;
 
     @Override
@@ -1319,7 +1319,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             executeJS("PF('invoiceErrorDialogWV').show();");
         }
     }
-    
+
     public void sendInvoice(Invoice invoiceDb) {
         try {
             Invoice invoice = DaoManager.get(Invoice.class, invoiceDb.getId());
@@ -1951,7 +1951,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             if (!ValidationHelper.isNullOrEmpty(inbox.getEmailSubject()))
                 setEmailSubject(inbox.getEmailSubject());
         } else {
-            if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
+            if (!ValidationHelper.isNullOrEmpty(invoice) &&
+                    !ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
                 String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
                         String.class, new Criterion[]{Restrictions.eq("id", Long.parseLong(
                                 ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.SENT_SERVER_ID)
@@ -2570,7 +2571,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 new Criterion[] { Restrictions.eq("province.id", getClientAddressProvinceId()),
                         Restrictions.eq("external", Boolean.TRUE) }));
     }
-    
+
     public void selectServiceForFilter() throws HibernateException, IllegalAccessException, PersistenceBeanException {
         if (!ValidationHelper.isNullOrEmpty(this.getServiceWrappers())) {
             for (ServiceFilterWrapper wkrsw : this.getServiceWrappers()) {
@@ -2582,7 +2583,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
         selectServiceCheck();
     }
-    
+
     public void selectServiceCheck() throws HibernateException, IllegalAccessException, PersistenceBeanException {
 
         if (!ValidationHelper.isNullOrEmpty(this.getServiceWrappers())) {
@@ -2621,7 +2622,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.FALSE));
         }
     }
-    
+
     public boolean getSelectedAllServicesOnPanel() {
         if (this.getServiceWrappers() != null) {
             for (ServiceFilterWrapper wlrsw : this.getServiceWrappers()) {
@@ -2641,6 +2642,4 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             }
         }
     }
-    
-    
 }

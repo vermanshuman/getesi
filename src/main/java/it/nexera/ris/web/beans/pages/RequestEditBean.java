@@ -1817,6 +1817,18 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 newRequest.setService(DaoManager.get(Service.class, getSelectedServiceId()));
         }
         fillRequestExpirationDate(newRequest);
+        if(ValidationHelper.isNullOrEmpty(newRequest.getUser()))
+            newRequest.setUser(getEntity().getUser());
+        if(!ValidationHelper.isNullOrEmpty(newRequest.getUser())){
+            User user = DaoManager.get(User.class,new CriteriaAlias[]{
+                            new CriteriaAlias("roles", "roles", JoinType.INNER_JOIN)
+                    },
+                    new Criterion[]{
+                            Restrictions.eq("id", newRequest.getUser().getId())
+                    });
+            if(!user.isAdmin())
+                newRequest.setStateId(RequestState.IN_WORK.getId());
+        }
         setRequestData(newRequest);
         if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
             newRequest.setSelectedConservatoryItemId(getWrapper().getSelectedConservatoryItemId());
@@ -1824,6 +1836,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if (getNewRequestList() == null)
             setNewRequestList(new ArrayList<>());
         setAllDataRelatedToRequestOrNotify(newRequest);
+
         setServiceRequestWrapper(newRequest);
     }
 
@@ -1859,6 +1872,18 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             }
         }
         fillRequestExpirationDate(newRequest);
+        if(ValidationHelper.isNullOrEmpty(newRequest.getUser()))
+            newRequest.setUser(getEntity().getUser());
+        if(!ValidationHelper.isNullOrEmpty(newRequest.getUser())){
+            User user = DaoManager.get(User.class,new CriteriaAlias[]{
+                            new CriteriaAlias("roles", "roles", JoinType.INNER_JOIN)
+                    },
+                    new Criterion[]{
+                            Restrictions.eq("id", newRequest.getUser().getId())
+                    });
+            if(!user.isAdmin())
+                newRequest.setStateId(RequestState.IN_WORK.getId());
+        }
         setRequestData(newRequest);
         if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
             newRequest.setSelectedConservatoryItemId(getWrapper().getSelectedConservatoryItemId());
@@ -1898,6 +1923,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 //            setAllDataRelatedToRequestOrNotify(newRequest);
 //        }
         newRequest.setTempId(UUID.randomUUID().toString());
+
         getNewRequestList().add(newRequest);
         setServiceRequestWrapper(newRequest);
     }
