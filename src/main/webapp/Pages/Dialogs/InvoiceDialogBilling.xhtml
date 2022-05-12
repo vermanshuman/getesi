@@ -793,7 +793,7 @@
                 <p:tab title="#{msg.requestTextEditPaymentsTab}">
                     <div class="p-grid">
                         <div class="p-col-12">
-                            <p:commandButton value=" #{msg.addPayment}" icon="fa fa-plus" style="width:175px;" oncomplete="PF('addPaymentDialogWV').show();"
+                            <p:commandButton value=" #{msg.addPayment}" icon="fa fa-plus" oncomplete="PF('addPaymentDialogWV').show();"
                                              styleClass="ui-button-success p-mr-2 p-mb-2"/>
                         </div>
                         <p:panel id="table_div" widgetVar="paymentInvoicePanelWV">
@@ -1117,7 +1117,7 @@
     </p:dialog>
 
     <p:dialog widgetVar="addPaymentDialogWV"  modal="true" draggable="false" width="400" styleClass="dialog-white-bg"
-              position="center center" header="#{msg.addPayment}">
+              position="center center" header="#{msg.addPayment}" process="@this">
         <div class="p-grid">
             <div class="p-col-12 p-md-12">
                 <div class="card"
