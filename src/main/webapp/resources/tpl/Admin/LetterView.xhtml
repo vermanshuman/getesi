@@ -217,7 +217,7 @@
                             <i class="#{file.icon} #{file.style}"/>
                             <p:commandLink title="#{msg.download}" update=":form, messages" ajax="false"
                                            action="#{bean.downloadFile}" value="&nbsp;#{file.fileName}"
-                                           style="color: black; padding-right: 5px;">
+                                           style="color: black; padding-right: 5px;font-size: 13px !important;">
                                 <f:setPropertyActionListener value="#{file.id}" target="#{bean.downloadFileIndex}"/>
                             </p:commandLink>
                         </div>
