@@ -57,6 +57,8 @@ public class RedirectHelper extends BaseHelper {
     public static final String TAB = "tab";
 
     public static final String REQUEST_TYPE_PARAM = "type";
+    
+    public static final String BILLING_LIST = "billing";
 
     public static void goTo(PageTypes type) {
         try {
@@ -445,6 +447,23 @@ public class RedirectHelper extends BaseHelper {
                     + (needArchive ? ARCHIVE_MAIL : MAIL) + "=" + id + "&"
                     + REQUEST_TYPE_PARAM + "=" + requestType
                     + (isMultipleCreate ? "&" + MULTIPLE + "=true" : "") + "&"+ RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE");
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+    
+    public static void goToMailManagerViewFromBillingList(Serializable mailId) {
+        try {
+            sendRedirect(PageTypes.MAIL_MANAGER_VIEW.getPagesContext() + "?"
+                    + ID_PARAMETER + "=" + mailId + "&page=0" + "&" +BILLING_LIST + "=3");
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+    
+    public static void goToBillingListFromMailManagerView(Serializable tab) {
+        try {
+            sendRedirect(PageTypes.BILLING_LIST.getPagesContext() + "?" +BILLING_LIST + "=" + tab);
         } catch (Exception e) {
             LogHelper.log(log, e);
         }

@@ -481,12 +481,21 @@
 
             </p:panelGrid>
 
-            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" id="initialTab1"
+            <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" layout="grid" id="initialTab1"
                          style="margin-top: -30px">
                 <p:column>
                     <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
-                        <c:if test="#{not (objItem.contains('POSITION_PRACTICE')) and not (objItem.contains('URGENT'))}">
+                        <c:if test="#{not (objItem.contains('POSITION_PRACTICE')) and not (objItem.contains('URGENT')) and not (objItem.contains('ATTACHED_DOCUMENTS'))}">
                             <div class="ui-g-12 ih_36" style="padding: 0">
+                                <ui:include src="#{objItem}"/>
+                            </div>
+                        </c:if>
+                    </c:forEach>
+                </p:column>
+                <p:column>
+                    <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
+                        <c:if test="#{objItem.contains('ATTACHED_DOCUMENTS')}">
+                            <div class="ui-g-12 ih_36" style="padding:0; text-align: left;">
                                 <ui:include src="#{objItem}"/>
                             </div>
                         </c:if>
@@ -501,7 +510,7 @@
                         </c:if>
                     </c:forEach>
                 </p:column>
-                <p:column styleClass="test123"></p:column>
+                <!-- <p:column styleClass="test123"></p:column> -->
             </p:panelGrid>
 
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" id="requstType" rendered="#{bean.requestType eq null || bean.requestType eq -1}">
