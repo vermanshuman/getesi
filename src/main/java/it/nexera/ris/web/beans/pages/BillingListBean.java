@@ -360,6 +360,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             PersistenceBeanException, InstantiationException,
             IllegalAccessException, IOException {
 
+    	if (!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.BILLING_LIST))) {
+    		openSubjectsToBeInvoicedTab();
+    	}
         invoiceHelper = new InvoiceHelper();
         List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
                 Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
@@ -900,7 +903,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     }
 
     public void openRequestMail() {
-        RedirectHelper.goTo(PageTypes.MAIL_MANAGER_VIEW, getEntityEditId());
+        //RedirectHelper.goTo(PageTypes.MAIL_MANAGER_VIEW, getEntityEditId());
+    	RedirectHelper.goToMailManagerViewFromBillingList(getEntityEditId());
     }
 
     public void prepareToModify() {
@@ -2641,5 +2645,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 wlrsw.setSelected(selectedAllServicesOnPanel);
             }
         }
+    }
+    
+    private void openSubjectsToBeInvoicedTab() {
+    	executeJS("$('.tab').removeClass('selected'); $('#content_tab4').addClass('selected'); $('.hide').hide(); $('#content_tab4').show();");
     }
 }
