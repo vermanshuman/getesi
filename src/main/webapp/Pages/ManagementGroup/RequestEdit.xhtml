@@ -481,7 +481,7 @@
 
             </p:panelGrid>
 
-            <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" layout="grid" id="initialTab1"
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" id="initialTab1"
                          style="margin-top: -30px">
                 <p:column>
                     <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
@@ -495,13 +495,20 @@
                 <p:column>
                     <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
                         <c:if test="#{objItem.contains('ATTACHED_DOCUMENTS')}">
-                            <div class="ui-g-12 ih_36" style="padding:0; text-align: left;">
+                            <div class="ui-g-6 ih_36" style="padding:0; text-align: left;">
+                                <ui:include src="#{objItem}"/>
+                            </div>
+                        </c:if>
+                    </c:forEach>
+                    <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
+                        <c:if test="#{objItem.contains('URGENT')}">
+                            <div class="ui-g-6 ih_36" style="padding: 0;margin-top:40px;text-align: left; padding-left:50px;">
                                 <ui:include src="#{objItem}"/>
                             </div>
                         </c:if>
                     </c:forEach>
                 </p:column>
-                <p:column>
+                <!-- <p:column>
                     <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
                         <c:if test="#{objItem.contains('URGENT')}">
                             <div class="ui-g-6 ih_36" style="padding: 0;margin-top:40px;text-align: left;">
@@ -509,7 +516,7 @@
                             </div>
                         </c:if>
                     </c:forEach>
-                </p:column>
+                </p:column> -->
                 <!-- <p:column styleClass="test123"></p:column> -->
             </p:panelGrid>
 

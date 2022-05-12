@@ -599,7 +599,9 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         List<Criterion> restrictions = RequestHelper.filterTableFromPanel(getDateFrom(), getDateTo(), getDateFromEvasion(),
                 getDateToEvasion(), getSelectedClientId(), getRequestTypeWrappers(), getStateWrappers(), getUserWrappers(),
                 getServiceWrappers(), getSelectedUserType(), getAggregationFilterId(), getSelectedServiceType(), Boolean.FALSE);
-
+        if(ValidationHelper.isNullOrEmpty(getSelectedStates()))
+        	restrictions.add(Restrictions.or(Restrictions.eq("stateId", RequestState.INSERTED.getId()), 
+        			Restrictions.eq("stateId", RequestState.IN_WORK.getId()), Restrictions.eq("stateId", RequestState.TO_BE_SENT.getId())));
         if (!ValidationHelper.isNullOrEmpty(getSearchLastName())) {
             restrictions.add(
                     Restrictions.or(

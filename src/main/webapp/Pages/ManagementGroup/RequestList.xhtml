@@ -282,6 +282,11 @@
             .docdowload {
                 background-color: #003871 !important;
             }
+            
+            #settingPanel .ui-state-active {
+    			background-color: #A9A9A9 !important;
+    			color: #ffffff !important;
+			} 
         </style>
         <script>
             var doChange = true;
@@ -388,7 +393,8 @@
                                             var target = $(e.target);
                                             if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('#client_panel').length
                                                 && !target.parents('#requestTypeSelectCheckboxPanel').length && !target.parents('#manager_panel').length && !target.parents('#office_panel').length
-                                                && !target.parents('#stateSelectCheckboxPanel').length && !target.parents('#serviceSelectCheckboxPanel').length && !target.parents('#fiduciario_panel').length) {
+                                                && !target.parents('#stateSelectCheckboxPanel').length && !target.parents('#serviceSelectCheckboxPanel').length && !target.parents('#fiduciario_panel').length
+                                                && !target.parents('#ui-datepicker-div').length && !target.parents('.ui-datepicker-header').length) {
                                                 PF('panelSetting').getJQ().hide();
                                             }
                                             if(target.closest('#statuses').length || target.closest('#stateSelectCheckboxPanelDataTable').length) {
