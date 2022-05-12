@@ -213,7 +213,7 @@
                 </div>
                 <div class="ui-g-10 attach-files">
                     <ui:repeat value="#{bean.attachedFiles}" var="file">
-                        <div style="display: flex;align-items: center;">
+                        <div style="display: flex;align-items: center;height: 30px;">
                             <i class="#{file.icon} #{file.style}"/>
                             <p:commandLink title="#{msg.download}" update=":form, messages" ajax="false"
                                            action="#{bean.downloadFile}" value="&nbsp;#{file.fileName}"

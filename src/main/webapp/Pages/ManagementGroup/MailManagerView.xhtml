@@ -138,6 +138,13 @@
             .dialog-gray, #showToBeSentRequest {
                 border: 7px solid #6688AA !important;
             }
+
+            #mailManagerViewRequestsDialog .ui-dialog-content {
+                overflow-x: hidden;
+            }
+            #mailManagerViewRequestsDialog .ui-datatable-scrollable-body {
+                overflow-x: scroll;
+            }
         </style>
         <ui:include src="/resources/tpl/Admin/LetterView.xhtml"/>
         <p:outputPanel id="print_panel" style="visibility: hidden; position: absolute;">

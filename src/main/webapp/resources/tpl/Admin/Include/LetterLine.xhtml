@@ -80,7 +80,7 @@
     <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/mail.css"
           media="all" rel="stylesheet" type="text/css"/>
     <div class="button-panel-space p-grid">
-        <div class="p-col-9">
+        <div class="p-col-10" style="width: 80%">
             <p:outputPanel id="btn_line">
                 <p:commandButton icon="fa fa-reply-all" title="#{msg.mailManagerReplyToAll}"
                              value="#{msg.mailManagerReplyToAll}" styleClass="grey-button"
@@ -153,7 +153,7 @@
                                  icon="fa fa-info-circle"  />
             </p:outputPanel>
         </div>
-        <div class="p-col-3" style="text-align:right;">
+        <div class="p-col-2" style="text-align:right;width: 20%">
             <!-- <p:commandButton icon="fa fa-pencil-square" actionListener="#{bean.checkFieldsBeforeProcessManagedStateCheck}"
                              value="#{msg.mailManagerStart}" styleClass="ui-button-success"/> -->
             <p:commandButton icon="pi pi-print" update="form:print_panel"

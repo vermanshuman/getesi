@@ -4,7 +4,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html">
 	<p:dialog widgetVar="mailManagerViewRequestsDlg" modal="true" width="1200" styleClass="dialog-gray"
-			  header="#{msg.mailManagerViewRequestsDialogHeader}">
+			  header="#{msg.mailManagerViewRequestsDialogHeader}" id="mailManagerViewRequestsDialog">
 
 	<p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group" id="estateFormalityArea">
 	        <p:dataTable value="#{bean.entity.validRequests}" styleClass="simple-table" var="item"
