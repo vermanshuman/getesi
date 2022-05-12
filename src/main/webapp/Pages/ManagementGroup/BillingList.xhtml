@@ -1254,7 +1254,7 @@
                                                  action="#{bean.sendInvoice(invoice)}" update="invoiceTable"/>
                                 <div class="icon-block" style="justify-content: left;">
                                     <i class="email-icon-new"></i>
-                                    <p:commandLink id="actionPnl" global="false" style="outline: none;" immediate="true" rendered="#{invoice.email.serverId == null}"
+                                    <p:commandLink id="actionPnl" global="false" style="outline: none;" immediate="true" 
                                                    readonly="true">
                                         <i class="menu-dots-icon" style="font-size: x-large;"
                                            onmouseover="document.getElementById('invoiceTable:#{rowId}:actionPnl').focus();" />
@@ -1276,7 +1276,17 @@
                             </p:column>
                             <p:column rendered="#{invoice.email.serverId != null}">
                                 <div class="icon-block" style="justify-content: left;">
-                                    <i class="menu-dots-icon"></i>
+                                	<i class="email-check-icon"></i>
+                                    <p:commandLink id="actionPnl1" global="false" style="outline: none;" immediate="true" readonly="true">
+                                        <i class="menu-dots-icon" style="font-size: x-large;"
+                                           onmouseover="document.getElementById('invoiceTable:#{rowId}:actionPnl1').focus();" />
+                                    </p:commandLink>
+                                    <p:tooltip for="actionPnl1" hideEvent="blur" showEvent="focus" styleClass="actionPnl-tooltip">
+                                        <p:outputPanel id="actionGrid1" styleClass="actionPnl-panel">
+                                            <p:commandButton value="#{ff:upper(msg.dataVerification)}" styleClass="action-btn"
+                                                             style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;"/>
+                                        </p:outputPanel>
+                                    </p:tooltip>
                                 </div>
                             </p:column>
                         </p:dataTable>
