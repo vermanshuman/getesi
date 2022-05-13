@@ -289,16 +289,15 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private List<SelectItem> clientAddressCities;
 
     private static final String MAIL_RERLY_FOOTER = ResourcesHelper.getString("emailReplyFooter");
-    
-    private Integer billingListPageTab;
 
+    private Integer billingListPageTab;
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
-    	if (!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.BILLING_LIST))) {
-    		setBillingListPageTab(Integer.valueOf(getRequestParameter(RedirectHelper.BILLING_LIST)));
-    	}
-    	
-    	setActiveTabIndex(0);
+        if (!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.BILLING_LIST))) {
+            setBillingListPageTab(Integer.valueOf(getRequestParameter(RedirectHelper.BILLING_LIST)));
+        }
+
+        setActiveTabIndex(0);
         setOnlyView(Boolean.parseBoolean(getRequestParameter(RedirectHelper.ONLY_VIEW)));
         SessionHelper.removeObject("isFromMailView");
         String tablePage = getRequestParameter(RedirectHelper.TABLE_PAGE);
@@ -966,14 +965,14 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
     public void goTable() {
         SessionHelper.put("isFromMailView", Boolean.TRUE);
-        if(!ValidationHelper.isNullOrEmpty(getBillingListPageTab())) { 
-        	RedirectHelper.goToBillingListFromMailManagerView(getBillingListPageTab());
-        	return;
+        if(!ValidationHelper.isNullOrEmpty(getBillingListPageTab())) {
+            RedirectHelper.goToBillingListFromMailManagerView(getBillingListPageTab());
+            return;
         }
-        if (isOnlyView()) 
-        	RedirectHelper.goTo(PageTypes.MAIL_MANAGER_FOLDER);
-        else 
-        	RedirectHelper.goToSavePage(PageTypes.MAIL_MANAGER_LIST, null, getTablePage());
+        if (isOnlyView())
+            RedirectHelper.goTo(PageTypes.MAIL_MANAGER_FOLDER);
+        else
+            RedirectHelper.goToSavePage(PageTypes.MAIL_MANAGER_LIST, null, getTablePage());
     }
 
     public void processManagedState(boolean redirectToCreateRequest) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -1484,10 +1483,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         List<Request> selectedRequestList = new ArrayList<>();
         if (!ValidationHelper.isNullOrEmpty(getEntity().getValidRequests())) {
             selectedRequestList = getEntity().getValidRequests().stream()
-                    .filter(r -> r.isSelectedForInvoice())
+                    .filter(r -> !ValidationHelper.isNullOrEmpty(r.isSelectedForInvoice()) && r.isSelectedForInvoice())
                     .collect(Collectors.toList());
         }
-
         Invoice invoice = new Invoice();
         if(selectedRequestList.size() > 0)
             invoice.setClient(selectedRequestList.get(0).getClient());

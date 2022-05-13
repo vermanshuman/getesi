@@ -1348,4 +1348,30 @@ public class Formality extends IndexedEntity {
             return  getSectionA().getDeathDate();
         return new Date();
     }
+
+    public TypeFormality getDicTypeFormality() {
+        TypeFormality typeFormality = null;
+        TypeActEnum typeActEnum = getTypeEnum();
+        if(!ValidationHelper.isNullOrEmpty(sectionA)){
+            Integer code = ValidationHelper.isNullOrEmpty(sectionA.getDerivedFromCode()) ?
+                    0 : Integer.parseInt(sectionA.getDerivedFromCode());
+            if (code / 1000 != 0) {
+                if (code / 1000 == 9 || code / 1000 == 8) {
+                }
+                code = code % 1000;
+            }
+            try {
+                List<TypeFormality> typeFormalities = DaoManager.load(TypeFormality.class, new Criterion[]{
+                        Restrictions.eq("type", typeActEnum),
+                        Restrictions.eq("code", code.toString())
+                });
+                if(!ValidationHelper.isNullOrEmpty(typeFormalities)){
+                    typeFormality = typeFormalities.get(0);
+                }
+            } catch (Exception e) {
+                LogHelper.log(log,e);
+            }
+        }
+        return typeFormality;
+    }
 }

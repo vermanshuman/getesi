@@ -65,11 +65,14 @@ public class RoleRightsFilter extends BaseFilter implements Filter {
                 if(httpRequest.getRequestURI().endsWith(PageTypes.REQUEST_LIST.getPage())){
                     SessionHelper.put("loadRequestFilters", "true");
                 }
-            }else if(previousURL.endsWith(PageTypes.MAIL_MANAGER_LIST.getPage()) ||
+            }else
+                if(previousURL.endsWith(PageTypes.MAIL_MANAGER_LIST.getPage()) ||
                     previousURL.endsWith(PageTypes.MAIL_MANAGER_EDIT.getPage()) ||
                     previousURL.endsWith(PageTypes.MAIL_MANAGER_FOLDER.getPage()) ||
                     previousURL.endsWith(PageTypes.MAIL_MANAGER_VIEW.getPage())){
-                if(httpRequest.getRequestURI().endsWith(PageTypes.MAIL_MANAGER_LIST.getPage())){
+                    System.out.println(">>>>>>>>>>>>>>>>>" + httpRequest.getParameter("page"));
+                if( httpRequest.getParameter("page") != null
+                        && httpRequest.getRequestURI().endsWith(PageTypes.MAIL_MANAGER_LIST.getPage())){
                     SessionHelper.put("loadMailFilters", "true");
                 }
             }

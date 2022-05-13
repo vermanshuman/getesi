@@ -503,12 +503,12 @@
                     <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
                         <c:if test="#{objItem.contains('URGENT')}">
                             <div class="ui-g-6 ih_36" style="padding: 0;margin-top:40px;text-align: left; padding-left:50px;">
-                                <ui:include src="#{objItem}"/>
+                            <ui:include src="#{objItem}"/>
                             </div>
                         </c:if>
                     </c:forEach>
                 </p:column>
-                <!-- <p:column>
+                <p:column>
                     <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
                         <c:if test="#{objItem.contains('URGENT')}">
                             <div class="ui-g-6 ih_36" style="padding: 0;margin-top:40px;text-align: left;">
@@ -516,8 +516,8 @@
                             </div>
                         </c:if>
                     </c:forEach>
-                </p:column> -->
-                <!-- <p:column styleClass="test123"></p:column> -->
+                </p:column>
+<!--                <p:column styleClass="test123"></p:column>-->
             </p:panelGrid>
 
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" id="requstType" rendered="#{bean.requestType eq null || bean.requestType eq -1}">
@@ -650,7 +650,7 @@
                                         <ui:include src="#{block.field.getPath()}"/>
                                     </div>
                                 </c:forEach>
-                            </c:if> 
+                            </c:if>
                         </div>
                     </c:forEach>
                 </p:outputPanel>
@@ -664,13 +664,13 @@
                                         <ui:include src="#{item.field.field.getPath()}"/>
                                     </div>
                                 </c:if>
-                                <!-- <c:if test="#{(item.fields != null) and item.isAttachedDocumentsBlock()}">
-                                    <c:forEach items="#{item.fields}" var="block">
-                                        <div class="ui-g-6" style="padding: 1%">
-                                            <ui:include src="#{block.field.getPath()}"/>
-                                        </div>
-                                    </c:forEach>
-                                </c:if >  -->
+<!--                                <c:if test="#{(item.fields != null) and item.isAttachedDocumentsBlock()}">-->
+<!--                                    <c:forEach items="#{item.fields}" var="block">-->
+<!--                                        <div class="ui-g-6" style="padding: 1%">-->
+<!--                                            <ui:include src="#{block.field.getPath()}"/>-->
+<!--                                        </div>-->
+<!--                                    </c:forEach>-->
+<!--                                </c:if >-->
                                 <c:if test="#{(item.fields != null) and !item.isAttachedDocumentsBlock()}">
                                     <c:forEach items="#{item.fields}" var="block">
                                         <div class="ui-g-3" style="padding: 1%">

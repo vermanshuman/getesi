@@ -360,9 +360,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             PersistenceBeanException, InstantiationException,
             IllegalAccessException, IOException {
 
-    	if (!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.BILLING_LIST))) {
-    		openSubjectsToBeInvoicedTab();
-    	}
+        if (!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.BILLING_LIST))) {
+            openSubjectsToBeInvoicedTab();
+        }
         invoiceHelper = new InvoiceHelper();
         List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
                 Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
@@ -903,8 +903,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     }
 
     public void openRequestMail() {
-        //RedirectHelper.goTo(PageTypes.MAIL_MANAGER_VIEW, getEntityEditId());
-    	RedirectHelper.goToMailManagerViewFromBillingList(getEntityEditId());
+        RedirectHelper.goToMailManagerViewFromBillingList(getEntityEditId());
     }
 
     public void prepareToModify() {
@@ -923,13 +922,15 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     public final void onTabChange(final TabChangeEvent event) throws HibernateException, InstantiationException,
             IllegalAccessException, PersistenceBeanException, IOException {
         TabView tv = (TabView) event.getComponent();
-        this.activeTabIndex = tv.getActiveIndex();
-        if (activeTabIndex == 3) {
-            Invoice invoice = DaoManager.get(Invoice.class, getNumber());
-            if (ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
-                attachInvoiceData(invoice);
-            } else {
-                fillAttachedFiles(invoice.getEmail());
+        if(!ValidationHelper.isNullOrEmpty(tv)){
+            this.activeTabIndex = tv.getActiveIndex();
+            if (activeTabIndex == 3) {
+                Invoice invoice = DaoManager.get(Invoice.class, getNumber());
+                if (ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
+                    attachInvoiceData(invoice);
+                } else {
+                    fillAttachedFiles(invoice.getEmail());
+                }
             }
         }
     }
@@ -2646,8 +2647,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             }
         }
     }
-    
+
     private void openSubjectsToBeInvoicedTab() {
-    	executeJS("$('.tab').removeClass('selected'); $('#content_tab4').addClass('selected'); $('.hide').hide(); $('#content_tab4').show();");
+        executeJS("$('.tab').removeClass('selected'); $('#content_tab4').addClass('selected'); $('.hide').hide(); $('#content_tab4').show();");
     }
 }

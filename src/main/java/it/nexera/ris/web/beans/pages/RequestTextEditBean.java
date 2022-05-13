@@ -433,10 +433,6 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         fillRequestDocumentList();
         log.info("after fillRequestDocumentList");
 
-        log.info("before fillOtherDocumentList");
-        fillOtherDocumentList();
-        log.info("after fillOtherDocumentList");
-
         log.info("before fillNonSaleDocumentList");
         fillNonSaleDocumentList();
         log.info("after fillNonSaleDocumentList");
@@ -444,6 +440,10 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         log.info("before fillSaleDocumentList");
         fillRequestDocumentSaleList();
         log.info("after fillSaleDocumentList");
+
+        log.info("before fillOtherDocumentList");
+        fillOtherDocumentList();
+        log.info("after fillOtherDocumentList");
     }
 
     public void executeRequest() throws PersistenceBeanException, IllegalAccessException {
@@ -525,7 +525,10 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             GeneralFunctionsHelper.saveReport(getEntity().getRequest(), getSelectedTemplateId(),
                     getCurrentUser(), false, getEditText(), fileName, DaoManager.getSession());
 
-            List<Document> documentListToView = EstateSituationHelper.getDocuments(type, getExamRequest());
+            List<Document> documentListToView = EstateSituationHelper.getDocuments(type, getExamRequest(), null);
+            documentListToView.removeIf(d -> !ValidationHelper.isNullOrEmpty(d.getTypeId())
+                    && d.getTypeId().equals(DocumentType.FORMALITY.getId()));
+
             if(!ValidationHelper.isNullOrEmpty(documentListToView)) {
                 for (Document document : documentListToView) {
                     if (Objects.equals(document.getTypeId(), DocumentType.OTHER.getId())
@@ -536,9 +539,6 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                     }
                 }
             }
-            documentListToView.removeIf(d -> !ValidationHelper.isNullOrEmpty(d.getTypeId())
-                    && d.getTypeId().equals(DocumentType.FORMALITY.getId()));
-
             setRequestDocuments(documentListToView);
         }else if(!ValidationHelper.isNullOrEmpty(getEntity().getRequest().getTranscriptionActId())
                 && type == RequestOutputTypes.XML) {
@@ -665,28 +665,21 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             type = RequestOutputTypes.ALL;
         }
 
-        if (type == RequestOutputTypes.ALL || type == RequestOutputTypes.ONLY_EDITOR || type == RequestOutputTypes.ONLY_FILE) {
+        if (type == RequestOutputTypes.ALL || type == RequestOutputTypes.ONLY_EDITOR
+                || type == RequestOutputTypes.ONLY_FILE) {
             String fileName = generatePdfName();
             GeneralFunctionsHelper.saveReport(getEntity().getRequest(), getSelectedTemplateId(),
                     getCurrentUser(), false, getEditText(), fileName, DaoManager.getSession());
 
-            List<Document> documentListToView = EstateSituationHelper.getDocumentsNonSale(type, getExamRequest());
+            List<Document> documentListToView = EstateSituationHelper.getDocuments(type, getExamRequest(), Boolean.FALSE);
             if(!ValidationHelper.isNullOrEmpty(documentListToView)) {
-                for (Document document : documentListToView) {
-
-                    if (Objects.equals(document.getTypeId(), DocumentType.OTHER.getId())
-                            || Objects.equals(document.getTypeId(), DocumentType.REQUEST_REPORT.getId())) {
-                        document.setSelectedForDialogList(true);
-                    } else {
-                        document.setSelectedForDialogList(false);
-                    }
-                }
+                documentListToView.removeIf(d -> !ValidationHelper.isNullOrEmpty(d.getTypeId())
+                        && !d.getTypeId().equals(DocumentType.FORMALITY.getId()));
             }
             if (!ValidationHelper.isNullOrEmpty(getExamRequest().getClient()) &&
-                    !ValidationHelper.isNullOrEmpty(getExamRequest().getClient().getSendFormality())) {
-                if (getExamRequest().getClient().getSendFormality()) {
-                    documentListToView.forEach(d -> { d.setSelectedForDialogList(true);});
-                }
+                    !ValidationHelper.isNullOrEmpty(getExamRequest().getClient().getSendFormality()) &&
+                    getExamRequest().getClient().getSendFormality()) {
+                documentListToView.forEach(d -> d.setSelectedForDialogList(true));
             }
             setRequestNonSaleDocuments(documentListToView);
         }
@@ -728,22 +721,18 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             GeneralFunctionsHelper.saveReport(getEntity().getRequest(), getSelectedTemplateId(),
                     getCurrentUser(), false, getEditText(), fileName, DaoManager.getSession());
 
-            List<Document> documentListToView = EstateSituationHelper.getDocumentsSale(type, getExamRequest());
+            List<Document> documentListToView = EstateSituationHelper.getDocuments(type, getExamRequest(), Boolean.TRUE);
             if(!ValidationHelper.isNullOrEmpty(documentListToView)) {
-                for (Document document : documentListToView) {
-                    if (Objects.equals(document.getTypeId(), DocumentType.OTHER.getId())
-                            || Objects.equals(document.getTypeId(), DocumentType.REQUEST_REPORT.getId())) {
-                        document.setSelectedForDialogList(true);
-                    } else {
-                        document.setSelectedForDialogList(false);
-                    }
-                }
+                documentListToView.removeIf(d ->
+                        (!ValidationHelper.isNullOrEmpty(d.getTypeId())
+                                && !d.getTypeId().equals(DocumentType.FORMALITY.getId())) ||
+                                (!ValidationHelper.isNullOrEmpty(getRequestNonSaleDocuments())
+                                        && getRequestNonSaleDocuments().contains(d)));
             }
             if (!ValidationHelper.isNullOrEmpty(getExamRequest().getClient()) &&
-                    !ValidationHelper.isNullOrEmpty(getExamRequest().getClient().getSendFormality())) {
-                if (getExamRequest().getClient().getSendSalesDevelopmentFormality()) {
-                    documentListToView.forEach(d -> { d.setSelectedForDialogList(true);});
-                }
+                    !ValidationHelper.isNullOrEmpty(getExamRequest().getClient().getSendSalesDevelopmentFormality()) &&
+                    getExamRequest().getClient().getSendSalesDevelopmentFormality()) {
+                documentListToView.forEach(d -> d.setSelectedForDialogList(true));
             }
             setRequestSaleDocuments(documentListToView);
         }
@@ -2071,13 +2060,25 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                         .map(Document::getId)
                         .collect(Collectors.toList());
 
+                getRequestNonSaleDocuments()
+                        .stream()
+                        .map(Document::getId)
+                        .forEach(existingIds::add);
+
+                getRequestSaleDocuments()
+                        .stream()
+                        .map(Document::getId)
+                        .forEach(existingIds::add);
+
                 for(FormalityView formality: formalityPDFList) {
                     if(!ValidationHelper.isNullOrEmpty(formality.getDocumentId())
                             && !existingIds.contains(formality.getDocumentId())) {
                         Document otherDoc = DaoManager.get(Document.class, formality.getDocumentId());
                         if(!getOtherDocuments().contains(otherDoc)){
-                            if (Objects.equals(otherDoc.getTypeId(), DocumentType.FORMALITY.getId()))
+                            if (Objects.equals(otherDoc.getTypeId(), DocumentType.FORMALITY.getId())){
                                 getOtherDocuments().add(otherDoc);
+                            }
+
                         }
                     }
                 }

@@ -515,7 +515,7 @@ public class RequestWrapper {
       */
         if (getSelectedDomicileProvinceId() == null) {
             request.setDomicile(null);
-        } else {
+        } else if(!ValidationHelper.isNullOrEmpty(request.getDomicile())){
             DaoManager.save(request.getDomicile());
         }
     }
@@ -523,7 +523,9 @@ public class RequestWrapper {
     public void onChangeProvince() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
         setCities(ComboboxHelper.fillList(City.class, Order.asc("description"), new Criterion[]{
                 Restrictions.eq("province.id", getSelectProvinceId()),
-                Restrictions.eq("external", Boolean.TRUE)
+                Restrictions.eq("external", Boolean.TRUE),
+                Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                        Restrictions.isNull("isDeleted"))
         }));
     }
 
@@ -574,6 +576,7 @@ public class RequestWrapper {
             if (fields.contains(ManageTypeFields.PROPERTY_DATA)) {
                 setBuildings(ComboboxHelper.fillList(RealEstateType.class, false));
             }
+
             if (fields.contains(ManageTypeFields.SUBJECT_MASTERY)
                     || fields.contains(ManageTypeFields.SUBJECT_LIST)) {
                 setPersons(ComboboxHelper.fillList(SubjectType.class, false));

@@ -656,14 +656,13 @@
             .searchPanelButton {
                 background: #fb6e51 !important;
             }
-            
             #subjectSettingPanel .ui-state-active {
-    			background-color: #A9A9A9 !important;
-    			color: #ffffff !important;
-			}
-			#subjectSettingPanel .ui-state-disabled {
-     			opacity: 0.8; 
-			}
+                background-color: #A9A9A9 !important;
+                color: #ffffff !important;
+            }
+            #subjectSettingPanel .ui-state-disabled {
+                opacity: 0.8;
+            }
         </style>
         <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
         <link rel="stylesheet"
@@ -1262,7 +1261,7 @@
                                                  action="#{bean.sendInvoice(invoice)}" update="invoiceTable"/>
                                 <div class="icon-block" style="justify-content: left;">
                                     <i class="email-icon-new"></i>
-                                    <p:commandLink id="actionPnl" global="false" style="outline: none;" immediate="true" 
+                                    <p:commandLink id="actionPnl" global="false" style="outline: none;" immediate="true"
                                                    readonly="true">
                                         <i class="menu-dots-icon" style="font-size: x-large;"
                                            onmouseover="document.getElementById('invoiceTable:#{rowId}:actionPnl').focus();" />
@@ -1284,7 +1283,7 @@
                             </p:column>
                             <p:column rendered="#{invoice.email.serverId != null}">
                                 <div class="icon-block" style="justify-content: left;">
-                                	<i class="email-check-icon"></i>
+                                    <i class="email-check-icon"></i>
                                     <p:commandLink id="actionPnl1" global="false" style="outline: none;" immediate="true" readonly="true">
                                         <i class="menu-dots-icon" style="font-size: x-large;"
                                            onmouseover="document.getElementById('invoiceTable:#{rowId}:actionPnl1').focus();" />

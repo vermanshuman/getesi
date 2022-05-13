@@ -18,6 +18,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static it.nexera.ris.common.helpers.TemplatePdfTableHelper.distinctByKey;
@@ -950,7 +951,7 @@ public class EstateSituationHelper extends BaseHelper {
         });
     }
 
-    public static List<Document> getDocuments(RequestOutputTypes type, Request request) throws PersistenceBeanException,
+    public static List<Document> getDocuments(RequestOutputTypes type, Request request, Boolean isSale) throws PersistenceBeanException,
             IllegalAccessException {
         List<Criterion> restrictions = new ArrayList<>();
         restrictions.add(Restrictions.eq("request.id", request.getId()));
@@ -965,25 +966,33 @@ public class EstateSituationHelper extends BaseHelper {
         }
 
         List<Document> documentList = DaoManager.load(Document.class, restrictions.toArray(new Criterion[0]));
+
         if ((type == RequestOutputTypes.ALL || type == RequestOutputTypes.ONLY_EDITOR)
                 && !ValidationHelper.isNullOrEmpty(request.getSituationEstateLocations())
                 && request.getSituationEstateLocations().stream()
                 .map(EstateSituation::getFormalityList).flatMap(List::stream).anyMatch(Objects::nonNull)) {
-            Criterion[] criterions = getCriterions(request, documentList);
+            Criterion[] criterions = getCriterions(request, documentList, isSale);
 
             if (criterions.length != 0) {
                 List<Document> formalityDocs = DaoManager.load(Document.class, criterions);
                 documentList.addAll(formalityDocs);
             }
+            if(isSale != null && isSale){
+                criterions = getCriterions(request, documentList, false);
+                if (criterions.length != 0) {
+                    List<Document> formalityDocs = DaoManager.load(Document.class, criterions);
+                    documentList.addAll(formalityDocs);
+                }
+            }
         }
-        if (!ValidationHelper.isNullOrEmpty(documentList)) {
+
+        if (ValidationHelper.isNullOrEmpty(isSale) && !ValidationHelper.isNullOrEmpty(documentList)) {
             List<Formality> formalities = new ArrayList<>();
             for (Document tempDocument : documentList) {
                 if (DocumentType.FORMALITY.getId().equals(tempDocument.getTypeId())) {
                     formalities.addAll(tempDocument.getFormality());
                 }
             }
-
             DaoManager.refresh(request);
             request.setFormalityPdfList(formalities);
             DaoManager.save(request, true);
@@ -994,8 +1003,24 @@ public class EstateSituationHelper extends BaseHelper {
         for (Document document : documentList) {
             if (!ValidationHelper.isNullOrEmpty(document.getFormality())) {
                 for (Formality formality : document.getFormality()) {
-                    if (!ValidationHelper.isNullOrEmpty(formality.getEstateSituationList()) && formality
-                            .getEstateSituationList().stream().anyMatch(x -> x.getRequest().equals(request))) {
+                    AtomicBoolean includeDicType = new AtomicBoolean(Boolean.TRUE);
+                    if(ValidationHelper.isNullOrEmpty(formality.getDicTypeFormality()) ||
+                            ValidationHelper.isNullOrEmpty(formality.getDicTypeFormality().getPrejudicial()) ||
+                            !formality.getDicTypeFormality().getPrejudicial()){
+                        includeDicType.getAndSet(Boolean.FALSE);
+                    }
+
+                    if (!ValidationHelper.isNullOrEmpty(formality.getEstateSituationList())
+                            && formality.getEstateSituationList()
+                            .stream()
+                            .filter(es -> isSale == null || (!isSale && includeDicType.get()
+                                    && (es.getSalesDevelopment() == null || !es.getSalesDevelopment())) ||
+                                    (isSale) && ((es.getSalesDevelopment() != null && es.getSalesDevelopment()) ||
+                                            ((es.getSalesDevelopment() == null
+                                                    || es.getSalesDevelopment()) && !includeDicType.get())
+                                    )
+                            )
+                            .anyMatch(x -> x.getRequest().equals(request))) {
                         documentListToView.add(document);
                     }
                 }
@@ -1006,12 +1031,42 @@ public class EstateSituationHelper extends BaseHelper {
         return documentListToView;
     }
 
-    private static Criterion[] getCriterions(Request request, List<Document> documentList) {
+    private static Criterion[] getCriterions(Request request, List<Document> documentList, Boolean isSale) {
         List<Criterion> restrictionsList = new ArrayList<>();
+        List<Long> documentIds = null;
 
-        List<Long> documentIds = request.getSituationEstateLocations().stream()
-                .map(EstateSituation::getFormalityList).flatMap(List::stream).map(Formality::getDocument)
-                .filter(Objects::nonNull).map(Document::getId).collect(Collectors.toList());
+        if(ValidationHelper.isNullOrEmpty(isSale)){
+            documentIds = request.getSituationEstateLocations()
+                    .stream()
+                    .map(EstateSituation::getFormalityList)
+                    .flatMap(List::stream)
+                    .map(Formality::getDocument)
+                    .filter(Objects::nonNull)
+                    .map(Document::getId)
+                    .collect(Collectors.toList());
+        }else if(!isSale){
+            documentIds = request
+                    .getSituationEstateLocations()
+                    .stream()
+                    .filter(s -> s.getSalesDevelopment() == null || !s.getSalesDevelopment())
+                    .map(EstateSituation::getFormalityList)
+                    .flatMap(List::stream)
+                    .map(Formality::getDocument)
+                    .filter(Objects::nonNull)
+                    .map(Document::getId)
+                    .collect(Collectors.toList());
+        }else {
+            documentIds = request
+                    .getSituationEstateLocations()
+                    .stream()
+                    .filter(s -> s.getSalesDevelopment() != null && s.getSalesDevelopment())
+                    .map(EstateSituation::getFormalityList)
+                    .flatMap(List::stream)
+                    .map(Formality::getDocument)
+                    .filter(Objects::nonNull)
+                    .map(Document::getId)
+                    .collect(Collectors.toList());
+        }
 
         List<Long> notInIds = documentList.stream().map(Document::getId).collect(Collectors.toList());
 

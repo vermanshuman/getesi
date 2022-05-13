@@ -194,7 +194,7 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
             type = RequestOutputTypes.ALL;
         }
 
-        List<Document> documentListToView = EstateSituationHelper.getDocuments(type, getExamRequest());
+        List<Document> documentListToView = EstateSituationHelper.getDocuments(type, getExamRequest(), null);
 
         for (Document document : documentListToView) {
             if (Objects.equals(document.getTypeId(), DocumentType.OTHER.getId())

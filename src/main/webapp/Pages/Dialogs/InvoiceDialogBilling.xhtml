@@ -800,7 +800,7 @@
                             <div class="p-col-12">
                                 <p:outputLabel  value="#{msg.amountToBeCollected} : #{bean.selectedInvoice.onBalance}" style="font-weight: 700 !important; float:right;"/>
                             </div>
-                            <p:dataTable id="paymentInvoiceTable" value="#{bean.paymentInvoices}" emptyMessage="#{msg.noRecordsFound}" widgetVar="paymentInvoiceTableWV"
+                            <p:dataTable id="paymentInvoiceTable" value="#{bean.paymentInvoices}" emptyMessage=" " widgetVar="paymentInvoiceTableWV"
                                          var="paymentInvoice"  lazy="true"
                                          paginator="true" paginatorAlwaysVisible="true" rowIndexVar="rowId">
                                 <p:column headerText="#{msg.importAmount}">
@@ -1098,7 +1098,10 @@
         </div>
         <script>
             $(".ui-dialog-titlebar-close").on("click", function() {
-                closeInvoiceDialog();
+                if($(this).closest(".addPaymentDialog").length > 0){
+                }else {
+                    closeInvoiceDialog();
+                }
             });
         </script>
     </p:dialog>
@@ -1116,8 +1119,8 @@
         <h:outputText value="#{val.errorSendMail}"/>
     </p:dialog>
 
-    <p:dialog widgetVar="addPaymentDialogWV"  modal="true" draggable="false" width="400" styleClass="dialog-white-bg"
-              position="center center" header="#{msg.addPayment}" process="@this">
+    <p:dialog widgetVar="addPaymentDialogWV"  id="addPaymentDialog" modal="true" draggable="false" width="400" styleClass="dialog-white-bg addPaymentDialog"
+              position="center center" header="#{msg.addPayment}">
         <div class="p-grid">
             <div class="p-col-12 p-md-12">
                 <div class="card"
@@ -1153,7 +1156,7 @@
                         </div>
                         <div class="p-col-12" style="text-align:center;">
                             <p:commandButton oncomplete="PF('addPaymentDialogWV').hide();"
-                                             value="#{msg.close.toUpperCase()}" />
+                                             value="#{msg.close.toUpperCase()}" style="background-color: #F3362B !important;"/>
                             <p:commandButton value="#{msg.save.toUpperCase()}" oncomplete="PF('addPaymentDialogWV').hide();" style="margin-left:15px;"
                                              action="#{bean.saveInvoicePayment}" update="@widgetVar(paymentInvoicePanelWV)" styleClass="ui-button-success p-mr-2 p-mb-2"/>
                         </div>

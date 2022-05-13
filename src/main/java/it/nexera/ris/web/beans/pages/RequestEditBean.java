@@ -2304,6 +2304,36 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
            */
 
         if(!getEntity().isNew()){
+
+            getEntity().setRequestType(DaoManager.get(RequestType.class, getSelectedRequestTypesIdMultiple()));
+
+            if (isMultipleCreate() && !ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
+                List<Service> serviceList = DaoManager.load(Service.class, new Criterion[]{
+                        Restrictions.in("id", Arrays.asList(getSelectedServiceIds()).stream().collect(Collectors.toList()))
+                });
+                if (isMultipleRequestCreate()) {
+                    serviceList = serviceList.stream().filter(service -> getSelectedRequestTypesIdMultiple().equals(service.getRequestType().getId())).collect(Collectors.toList());
+                }
+
+                if(!ValidationHelper.isNullOrEmpty(getEntity().getRequestType())
+                        && !ValidationHelper.isNullOrEmpty(getEntity().getRequestType().getMultiselectionOperation()) &&
+                        getEntity().getRequestType().getMultiselectionOperation()){
+                    if (!ValidationHelper.isNullOrEmpty(serviceList))
+                        getEntity().setMultipleServices(serviceList);
+                    getEntity().setService(null);
+                }else {
+                    if (!ValidationHelper.isNullOrEmpty(getSelectedServiceId())){
+                        getEntity().setService(DaoManager.get(Service.class, getSelectedServiceId()));
+                        getEntity().setMultipleServices(null);
+                    }
+                }
+            } else {
+                if (!ValidationHelper.isNullOrEmpty(getSelectedServiceId())){
+                    getEntity().setService(DaoManager.get(Service.class, getSelectedServiceId()));
+                    getEntity().setMultipleServices(null);
+                }
+            }
+
             prepareRequestToSave(getEntity());
             saveAllDataRelatedToRequestOrNotify(getEntity(), true);
             int index = 0;

@@ -7,9 +7,14 @@ import it.nexera.ris.common.helpers.create.xls.CreateExcelRequestsReportHelper;
 import it.nexera.ris.persistence.UserHolder;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
-import it.nexera.ris.persistence.beans.entities.domain.*;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
-import it.nexera.ris.persistence.beans.entities.domain.readonly.RequestShort;
+import it.nexera.ris.persistence.beans.entities.domain.Client;
+import it.nexera.ris.persistence.beans.entities.domain.Document;
+import it.nexera.ris.persistence.beans.entities.domain.Request;
+import it.nexera.ris.persistence.beans.entities.domain.User;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import it.nexera.ris.persistence.view.ClientView;
 import it.nexera.ris.persistence.view.RequestView;
 import it.nexera.ris.web.beans.EntityLazyListPageBean;
@@ -190,7 +195,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             PersistenceBeanException, InstantiationException,
             IllegalAccessException, IOException {
 
-        if(ValidationHelper.isNullOrEmpty(SessionHelper.get("loadRequestFilters"))){
+        if (ValidationHelper.isNullOrEmpty(SessionHelper.get("loadRequestFilters"))) {
             clearFilterValueFromSession();
         }
         setPaginator(new ListPaginator(10, 1, 1, 1,
@@ -290,8 +295,8 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                     getRequestTypeWrappers().add(new RequestTypeFilterWrapper(r.getId().equals(dueRequestTypeId), r));
                 });
             }
-            for(RequestState rs: RequestState.values()) {
-                getStateWrappers().add(new RequestStateWrapper(!RequestState.EVADED.equals(rs) , rs));
+            for (RequestState rs : RequestState.values()) {
+                getStateWrappers().add(new RequestStateWrapper(!RequestState.EVADED.equals(rs), rs));
             }
             Integer expirationDays = (Integer) SessionHelper.get("expirationDays");
             if (!ValidationHelper.isNullOrEmpty(expirationDays)) {
@@ -306,12 +311,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
             List<RequestType> requestTypes = DaoManager.load(RequestType.class, new Criterion[]{Restrictions.isNotNull("name")});
             if (!ValidationHelper.isNullOrEmpty(requestTypes)) {
-                Collections.sort(requestTypes, new Comparator<RequestType>() {
-                    @Override
-                    public int compare(final RequestType object1, final RequestType object2) {
-                        return object1.toString().toUpperCase().compareTo(object2.toString().toUpperCase());
-                    }
-                });
+                Collections.sort(requestTypes, Comparator.comparing(object -> object.toString().toUpperCase()));
                 requestTypes.forEach(r -> getRequestTypeWrappers().add(new RequestTypeFilterWrapper(r)));
             }
 
@@ -328,6 +328,10 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             SessionHelper.removeObject("REQUEST_LIST_FILTER_BY");
         }
         loadFilterValueFromSession();
+        getStateWrappers()
+                .forEach( s -> {
+                    System.out.println("sssss " + s.getSelected());
+                });
         filterTableFromPanel();
     }
 
@@ -599,9 +603,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         List<Criterion> restrictions = RequestHelper.filterTableFromPanel(getDateFrom(), getDateTo(), getDateFromEvasion(),
                 getDateToEvasion(), getSelectedClientId(), getRequestTypeWrappers(), getStateWrappers(), getUserWrappers(),
                 getServiceWrappers(), getSelectedUserType(), getAggregationFilterId(), getSelectedServiceType(), Boolean.FALSE);
-        if(ValidationHelper.isNullOrEmpty(getSelectedStates()))
-        	restrictions.add(Restrictions.or(Restrictions.eq("stateId", RequestState.INSERTED.getId()), 
-        			Restrictions.eq("stateId", RequestState.IN_WORK.getId()), Restrictions.eq("stateId", RequestState.TO_BE_SENT.getId())));
+
         if (!ValidationHelper.isNullOrEmpty(getSearchLastName())) {
             restrictions.add(
                     Restrictions.or(
@@ -688,9 +690,10 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public void loadFilterData() throws PersistenceBeanException, IllegalAccessException {
-        if(ValidationHelper.isNullOrEmpty(getCities()))
+        if (ValidationHelper.isNullOrEmpty(getCities()))
             populateCities(getFilterRestrictions());
     }
+
     private void populateCities(List<Criterion> restrictions)
             throws PersistenceBeanException, IllegalAccessException {
         List<RequestView> requestList = DaoManager.load(RequestView.class, restrictions.toArray(new Criterion[0]));
@@ -1036,12 +1039,8 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_STATES))) {
             setStateWrappers((List<RequestStateWrapper>) SessionHelper.get(KEY_STATES));
-        } else {
-            setStateWrappers(new ArrayList<>());
-            for (RequestState rs : RequestState.values()) {
-                getStateWrappers().add(new RequestStateWrapper(false, rs));
-            }
         }
+
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_REQUEST_TYPE))) {
             setRequestTypeWrappers((List<RequestTypeFilterWrapper>) SessionHelper.get(KEY_REQUEST_TYPE));
         }
@@ -1723,7 +1722,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public void redirectToNewMultipleRequests() {
-        String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE&" +RedirectHelper.REQUEST_TYPE_PARAM + "=" + getRequestType();
+        String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE&" + RedirectHelper.REQUEST_TYPE_PARAM + "=" + getRequestType();
         RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT, queryParam);
     }
 

@@ -55,8 +55,9 @@
                 <p:dataTable value="#{bean.entity.validRequests}"  var="item"
                              rendered="#{not empty bean.entity.validRequests}"  scrollable="true"
                              scrollHeight="300" style="margin-top:20px;max-width:1250px">
+
                     <p:column >
-                        <p:selectBooleanCheckbox value="#{item.selectedForInvoice}" disabled="true"/>
+                        <p:selectBooleanCheckbox value="#{item.selectedForInvoice}"/>
                     </p:column>
                     <p:column headerText="#{msg.databaseListRealEstateSubject}" >
                         <h:outputText value="#{item.mailViewSubject}"/>
