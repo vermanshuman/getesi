@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                template="/resources/tpl/Admin/EditBase.xhtml">
+    <ui:param name="edit_title" value="#{msg.court}"/>
+    <ui:param name="bean" value="#{courtEditBean}"/>
+
+    <ui:define name="edit_body">
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" style="width: 40%">
+            <span><span class="red">*</span>#{msg.name}</span>
+            <p:inputText id="name" maxlength="50" value="#{bean.entity.name}"
+                         label="#{msg.name}" onkeypress="numbers_letters_only('#name');"/>
+
+            <span>#{msg.courtFiscalCode}:</span>
+            <p:inputText id="fiscalcode" maxlength="100"
+                         value="#{bean.entity.fiscalCode}" label="#{msg.courtFiscalCode}"
+                         onkeypress="numbers_letters_only('#fiscalcode');"/>
+
+            <span style="margin-right: 10px">#{msg.courtCity}</span>
+            <p:selectOneMenu value="#{bean.selectedCityId}" styleClass="select-width"
+                             filter="true" filterMatchMode="contains">
+                <f:selectItems value="#{bean.cities}"/>
+            </p:selectOneMenu>
+
+        </p:panelGrid>
+    </ui:define>
+
+</ui:composition>

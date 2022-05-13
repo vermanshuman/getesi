@@ -4,32 +4,33 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core">
-<ui:composition template="/resources/tpl/Admin/LazyInListEditBase.xhtml">
+<ui:composition template="/resources/tpl/Admin/LazyListBase.xhtml">
     <ui:param name="list_title" value="#{msg.court}"/>
     <ui:param name="bean" value="#{courtListBean}"/>
     <ui:param name="entity_name" value="#{msg.court}"/>
+
     <ui:param name="disableSelection" value="true"/>
     <ui:param name="additionalEditAction" value="window.scrollTo(0,0);"/>
 
-    <ui:define name="edit_fields">
-        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+<!--    <ui:define name="edit_fields">-->
+<!--        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">-->
 
-            <span><span class="red">*</span> #{msg.name}:</span>
-            <p:inputText id="name" maxlength="50" value="#{bean.entity.name}"
-                         label="#{msg.name}" onkeypress="numbers_letters_only('#name');"/>
+<!--            <span><span class="red">*</span> #{msg.name}:</span>-->
+<!--            <p:inputText id="name" maxlength="50" value="#{bean.entity.name}"-->
+<!--                         label="#{msg.name}" onkeypress="numbers_letters_only('#name');"/>-->
 
-            <span>#{msg.courtFiscalCode}:</span>
-            <p:inputText id="fiscalcode" maxlength="100"
-                         value="#{bean.entity.fiscalCode}" label="#{msg.courtFiscalCode}"
-                         onkeypress="numbers_letters_only('#fiscalcode');"/>
+<!--            <span>#{msg.courtFiscalCode}:</span>-->
+<!--            <p:inputText id="fiscalcode" maxlength="100"-->
+<!--                         value="#{bean.entity.fiscalCode}" label="#{msg.courtFiscalCode}"-->
+<!--                         onkeypress="numbers_letters_only('#fiscalcode');"/>-->
 
-            <span style="margin-right: 10px">#{msg.courtCity}</span>
-            <p:selectOneMenu value="#{bean.selectedCityId}" styleClass="select-width" 
-            	filter="true" filterMatchMode="contains" >
-                <f:selectItems value="#{bean.cities}"/>
-            </p:selectOneMenu>
-        </p:panelGrid>
-    </ui:define>
+<!--            <span style="margin-right: 10px">#{msg.courtCity}</span>-->
+<!--            <p:selectOneMenu value="#{bean.selectedCityId}" styleClass="select-width" -->
+<!--            	filter="true" filterMatchMode="contains" >-->
+<!--                <f:selectItems value="#{bean.cities}"/>-->
+<!--            </p:selectOneMenu>-->
+<!--        </p:panelGrid>-->
+<!--    </ui:define>-->
 
     <ui:define name="columns">
         <p:column sortBy="#{item.name}" filterBy="#{item.name}"
