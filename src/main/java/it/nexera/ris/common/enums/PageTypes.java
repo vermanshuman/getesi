@@ -134,6 +134,7 @@ public enum PageTypes {
     NOTARY_EDIT("/Pages/Dictionaries/NotaryEdit.jsf", true),
     
     COURT_LIST("/Pages/Dictionaries/CourtList.jsf", true),
+    COURT_EDIT("/Pages/Dictionaries/CourtEdit.jsf", true),
     
     RELATIONSHIP_TYPES("/Pages/Dictionaries/RelationshipTypeList.jsf", true),
     
