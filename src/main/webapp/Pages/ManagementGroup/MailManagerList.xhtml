@@ -807,38 +807,32 @@
                                                         class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s"></span>
                                                 </th>
                                                 <th id="table:emailFrom" class="ui-state-default ui-sortable-column"
-                                                    role="columnheader"
-                                                    aria-label="Mittente: activate to sort column ascending"
-                                                    scope="col" style="display : #{bean.needShowEmailFrom ? '' : 'none'};" tabindex="0"><span
+                                                    scope="col" style="display : #{bean.needShowEmailFrom ? '' : 'none'};"><span
                                                         class="ui-column-title">Mittente</span><span
                                                         class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s"></span>
                                                 </th>
 
                                                 <th id="table:emailTo" class="ui-state-default ui-sortable-column"
-                                                    role="columnheader"
-                                                    aria-label="Destinatario: activate to sort column ascending"
-                                                    scope="col" style="display : #{bean.needShowEmailTo ? '' : 'none'}" tabindex="0"><span
+                                                    scope="col" style="display : #{bean.needShowEmailTo ? '' : 'none'}"><span
                                                         class="ui-column-title">Destinatario</span><span
                                                         class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s"></span>
                                                 </th>
-                                                <th id="table:j_idt110" class="ui-state-default" role="columnheader"
-                                                    aria-label="Oggetto" scope="col"><span
-                                                        class="ui-column-title">Oggetto</span></th>
-                                                <th id="table:j_idt112" class="ui-state-default" role="columnheader"
-                                                    aria-label="Operatore" scope="col"
-                                                    style="width: 100px;display: none"><span
-                                                        class="ui-column-title">Operatore</span></th>
-                                                <th id="table:state"
-                                                    class="ui-state-default ui-sortable-column min_padding_margin"
-                                                    role="columnheader"
-                                                    aria-label="Stato: activate to sort column ascending"
-                                                    scope="col" style="width: 70px;" tabindex="0"><span
-                                                        class="ui-column-title">Stato</span><span
-                                                        class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s"></span>
+                                                <th id="table:j_idt110" class="ui-state-default" scope="col"><span
+                                                        class="ui-column-title">Oggetto</span>
                                                 </th>
-                                                <c:if test="${bean.needShowChangeStateUser}">
+
+                                                <c:if test="${bean.mailManagerButtonSelectedId != 1}">
+                                                    <th id="table:state"
+                                                        class="ui-state-default ui-sortable-column min_padding_margin"
+                                                        scope="col" style="width: 100px;"><span
+                                                            class="ui-column-title">Stato</span><span
+                                                            class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s"></span>
+                                                    </th>
+                                                </c:if>
+
+                                                <c:if test="${bean.needShowChangeStateUser or bean.needShowEmailUser}">
                                                     <th id="table:j_idt115" class="ui-state-default" scope="col"
-                                                        style="width: 100px;"><span
+                                                        style="width: 150px;"><span
                                                             class="ui-column-title">Operatore</span></th>
                                                 </c:if>
 
@@ -925,10 +919,10 @@
                                                     <td style="width: 120px;" onclick="selectRow(#{item.id})">
                                                         <h:outputText value="#{item.sendDateStr}"/></td>
                                                     <c:if test="${bean.needShowEmailFrom}">
-                                                        <td style="width: 400px;"  onclick="selectRow(#{item.id})">  <h:outputText value="#{item.emailFromStr[0]}" id="email_from"/></td>
+                                                        <td style="width: 100px;"  onclick="selectRow(#{item.id})">  <h:outputText value="#{item.emailFromStr[0]}" id="email_from"/></td>
                                                     </c:if>
                                                     <c:if test="${bean.needShowEmailTo}">
-                                                        <td onclick="selectRow(#{item.id})">  <h:outputText value="#{item.emailToStr[0]}" id="email_to"/></td>
+                                                        <td style="width: 100px;" onclick="selectRow(#{item.id})">  <h:outputText value="#{item.emailToStr[0]}" id="email_to"/></td>
                                                     </c:if>
                                                     <td onclick="selectRow(#{item.id})">  <h:outputText value="#{item.emailSubject}"/></td>
                                                     <c:if test="${bean.needShowEmailUser}">

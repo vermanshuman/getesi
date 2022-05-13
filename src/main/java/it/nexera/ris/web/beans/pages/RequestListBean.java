@@ -306,8 +306,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         } else {
             setExpirationDays(null);
             Arrays.asList(RequestState.values()).forEach(st -> getStateWrappers()
-                    .add(new RequestStateWrapper(PageTypes.REPORT_LIST.equals(getCurrentPage())
-                            ? RequestState.EVADED.equals(st) : st.isNeedShow(), st)));
+                    .add(new RequestStateWrapper(false, st)));
 
             List<RequestType> requestTypes = DaoManager.load(RequestType.class, new Criterion[]{Restrictions.isNotNull("name")});
             if (!ValidationHelper.isNullOrEmpty(requestTypes)) {
@@ -599,6 +598,10 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         List<Criterion> restrictions = RequestHelper.filterTableFromPanel(getDateFrom(), getDateTo(), getDateFromEvasion(),
                 getDateToEvasion(), getSelectedClientId(), getRequestTypeWrappers(), getStateWrappers(), getUserWrappers(),
                 getServiceWrappers(), getSelectedUserType(), getAggregationFilterId(), getSelectedServiceType(), Boolean.FALSE);
+
+        if(ValidationHelper.isNullOrEmpty(getSelectedStates()))
+            restrictions.add(Restrictions.or(Restrictions.eq("stateId", RequestState.INSERTED.getId()),
+                    Restrictions.eq("stateId", RequestState.IN_WORK.getId()), Restrictions.eq("stateId", RequestState.TO_BE_SENT.getId())));
 
         if (!ValidationHelper.isNullOrEmpty(getSearchLastName())) {
             restrictions.add(

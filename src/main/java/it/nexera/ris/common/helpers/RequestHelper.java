@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import javax.faces.model.SelectItem;
 
+import it.nexera.ris.common.enums.*;
 import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
 import it.nexera.ris.persistence.beans.entities.domain.readonly.RequestShort;
@@ -19,10 +20,6 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 
-import it.nexera.ris.common.enums.ManageTypeFields;
-import it.nexera.ris.common.enums.ManageTypeFieldsState;
-import it.nexera.ris.common.enums.ServiceReferenceTypes;
-import it.nexera.ris.common.enums.UserCategories;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
@@ -406,6 +403,9 @@ public class RequestHelper {
                                 }
                             }
                         }else {
+                            if((field.getField() == ManageTypeFields.ATTACHED_DOCUMENTS)){
+                                continue;
+                            }
                             InputCardManageField existingField = inputCardOutput.getFields().stream()
                                     .filter(f -> f.getField() == field.getField()).findAny().orElse(null);
                             if (existingField == null && field.getState() == ManageTypeFieldsState.HIDDEN) {

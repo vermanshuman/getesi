@@ -1019,6 +1019,8 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                         if (!ValidationHelper.isNullOrEmpty(clients)) {
                             getMail().setManagers(clients);
                         }
+                    }else {
+                        getMail().setManagers(null);
                     }
 
                     if (!ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
