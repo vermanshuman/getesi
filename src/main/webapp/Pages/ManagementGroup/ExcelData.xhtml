@@ -29,14 +29,14 @@
 			<h:outputText value=""/>
 			<h:outputText value="#{msg.fatturaN}:"/>
 			<p:inputText id="fatturaN" value="#{bean.excelFatturaN}"
-				style="width: 100%" />
+				style="width: 100%" disabled="true"/>
 			<h:outputText value="#{msg.excelData}:"/>
 			<p:calendar id="excelDate" readonlyInput="false" showOn="button"
 				onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
 				pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
 				popupIconOnly="true"
 				onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
-				value="#{bean.excelDate}" placeholder="#{msg.excelData}:" />
+				value="#{bean.excelDate}" placeholder="#{msg.excelData}:" disabled="true"/>
 			<h:outputText value="#{msg.reportN}:"/>
 			<p:inputText id="reportN" value="#{bean.excelReportN}"
 				style="width: 100%" disabled="true"/>

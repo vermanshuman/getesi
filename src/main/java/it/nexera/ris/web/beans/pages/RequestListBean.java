@@ -328,10 +328,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             SessionHelper.removeObject("REQUEST_LIST_FILTER_BY");
         }
         loadFilterValueFromSession();
-        getStateWrappers()
-                .forEach( s -> {
-                    System.out.println("sssss " + s.getSelected());
-                });
         filterTableFromPanel();
     }
 
@@ -1540,6 +1536,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public void reset() throws PersistenceBeanException, IOException, InstantiationException, IllegalAccessException {
+        clearFilterValueFromSession();
         setSelectedClientId(null);
         setManagerClientFilterid(null);
         setFiduciaryClientFilterId(null);
@@ -1692,6 +1689,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         SessionHelper.removeObject(KEY_SERVICES);
         SessionHelper.removeObject(KEY_CF);
         SessionHelper.removeObject(KEY_NOMINATIVO);
+        SessionHelper.removeObject(KEY_STATES);
         SessionHelper.removeObject("searchLastName");
         SessionHelper.removeObject("searchFiscalCode");
         SessionHelper.removeObject("searchCreateUser");
