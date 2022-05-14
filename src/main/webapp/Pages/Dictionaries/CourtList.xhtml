@@ -42,7 +42,7 @@
                 $("body").click(function(e){
                     var target = $(e.target);
                     if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('.ui-selectcheckboxmenu-panel').length
-                        && !target.parents('#ui-datepicker-div').length && !target.parents('.ui-datepicker-header').length) {
+                        && !target.parents('#ui-datepicker-div').length && !target.parents('#filterCourtCity_items').length) {
                         PF('panelSetting').getJQ().hide();
                     }
                     if(target.closest('.ui-selectcheckboxmenu-item').length) {
@@ -86,6 +86,15 @@
                 .green-border {
                     border: 1px solid #009900 !important;
                 }
+                #buttonCreate .ui-button-text {
+                    margin-left: -15px;
+                }
+                body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
+                    background-color: #f0f3f5 !important;
+                }
+                body .ui-datatable:not(.borderless) thead th {
+                    padding: 10px 10px !important;
+                }
             </style>
             <p:remoteCommand name="onPageChange"
                              action="#{bean.onPageChange()}" oncomplete="setPageNumber()"/>
@@ -99,6 +108,8 @@
                              action="#{bean.onBottomPageChange()}" oncomplete="setPageNumber()"/>
             <p:remoteCommand name="updateFilterInput"
                              update=":filterName :filterTaxCode :filterCourtCity"/>
+            <p:remoteCommand name="filterTableFromPanel"
+                             action="#{bean.filterTableFromPanel}" update=":form:table"/>
             <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" styleClass="panelSetting" style="display: none;">
                 <div class="p-grid">
                     <div class="p-col-12" style="text-align: center;">
@@ -150,25 +161,25 @@
                     </div>
                     <div class="p-col-12" style="text-align: center;">
                         <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #00CC52;margin-right: 20px;" id="searchButton"
-                                         onclick="PF('panelSetting').getJQ().hide()" />
-                        <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFiltraPanel}" update="settingPanel" onclick="PF('panelSetting').getJQ().hide()"/>
+                                         onclick="filterTableFromPanel();" onsuccess="PF('panelSetting').getJQ().hide()"/>
+                        <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFiltraPanel}" update="settingPanel" oncomplete="filterTableFromPanel();PF('panelSetting').getJQ().hide()"/>
                     </div>
                 </div>
             </p:panel>
         </div>
     </ui:define>
     <ui:define name="columns">
-        <p:column sortBy="#{item.name}" filterBy="#{item.name}"
+        <p:column sortBy="#{item.name}"
                   headerText="#{msg.name}">
             <h:outputText value="#{item.name}"/>
         </p:column>
 
-        <p:column sortBy="#{item.fiscalCode}" filterBy="#{item.fiscalCode}"
+        <p:column sortBy="#{item.fiscalCode}"
                   headerText="#{msg.courtFiscalCode}">
             <h:outputText value="#{item.fiscalCode}"/>
         </p:column>
         
-         <p:column headerText="#{msg.courtCity}" filterBy="#{item.city.description}" sortBy="#{item.city.description}">
+         <p:column headerText="#{msg.courtCity}" sortBy="#{item.city.description}">
             <h:outputText value="#{item.city.description}"/>
         </p:column>
     </ui:define>

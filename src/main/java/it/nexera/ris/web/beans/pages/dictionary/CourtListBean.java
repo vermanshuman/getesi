@@ -89,9 +89,18 @@ public class CourtListBean extends
         if(!ValidationHelper.isNullOrEmpty(getName())){
             restrictions.add(   Restrictions.ilike("name", getName(), MatchMode.ANYWHERE));
         }
+        if(!ValidationHelper.isNullOrEmpty(getTaxCode())){
+            restrictions.add(   Restrictions.ilike("fiscalCode", getTaxCode(), MatchMode.ANYWHERE));
+        }
+        if(!ValidationHelper.isNullOrEmpty(getSelectedCityId())){
+            restrictions.add(Restrictions.eq("city", DaoManager.get(City.class, getSelectedCityId())));
+        }
+
         restrictions.add(Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
                 Restrictions.isNull("isDeleted")));
-        List<Court> courts = DaoManager.load(Court.class, restrictions.toArray(new Criterion[0]));
+        List<Court> courts = DaoManager.load(Court.class,  new Criterion[]
+                {Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                        Restrictions.isNull("isDeleted"))});
         List<Long> cityIds = new ArrayList<>();
 
         for (Court court : courts) {
@@ -108,6 +117,13 @@ public class CourtListBean extends
         this.loadList(Court.class, restrictions.toArray(new Criterion[0]), new Order[]
                 {Order.asc("name")});
 
+    }
+
+    public void clearFiltraPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        setName(null);
+        setTaxCode(null);
+        setSelectedCityId(null);
+        filterTableFromPanel();
     }
 
 //    public List<SelectItem> getCities() {
