@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class InvoiceHelper {
     private static transient final Log log = LogFactory.getLog(InvoiceHelper.class);
 
-    public static List<InvoiceItem> groupingItemsByTaxRate(List<Request> selectedRequestList) throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
+    public static List<InvoiceItem> groupingItemsByTaxRate(List<Request> selectedRequestList, String causal) throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
         Map<Long, List<PriceList>> priceListMap = new HashMap<>();
         for(Request request: selectedRequestList) {
             CostCalculationHelper costCalculationHelper = new CostCalculationHelper(request);
@@ -290,7 +290,7 @@ public class InvoiceHelper {
                     Restrictions.eq("requestId", requestId)});
 
             for (ExtraCost cost : extraCost) {
-                if(!ExtraCostType.NAZIONALEPOSITIVA.equals(extraCost)) {
+                if(!ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
                     RequestPriceListModel requestPriceListModel = new RequestPriceListModel();
                     requestPriceListModel.setRequestId(requestId);
                     requestPriceListModel.setRequest(request);
@@ -343,7 +343,7 @@ public class InvoiceHelper {
                 .forEach(rp -> {
                     log.info(rp.getTaxRate() + "   " + rp.getTotalCost());
                 });
-        Map<TaxRate, Double> taxRateMap = requestPriceListModels
+        /*Map<TaxRate, Double> taxRateMap = requestPriceListModels
                 .stream()
                 .filter(rp -> !ValidationHelper.isNullOrEmpty(rp.getTaxRate())
                         && !ValidationHelper.isNullOrEmpty(rp.getRequest())
@@ -360,8 +360,34 @@ public class InvoiceHelper {
             bd = bd.setScale(2,RoundingMode.HALF_UP);
             invoiceItem.setInvoiceTotalCost(bd.doubleValue());
             invoiceItems.add(invoiceItem);
+        }*/
+        
+        Map<TaxRate, List<RequestPriceListModel>> taxRateMap = requestPriceListModels
+		        .stream()
+		        .filter(rp -> !ValidationHelper.isNullOrEmpty(rp.getTaxRate())
+		                && !ValidationHelper.isNullOrEmpty(rp.getRequest())
+		                && !ValidationHelper.isNullOrEmpty(rp.getTotalCost()))
+		        .collect(
+                Collectors.groupingBy(RequestPriceListModel::getTaxRate, Collectors.toList()));
+        List<InvoiceItem> invoiceItems = new ArrayList<>();
+        for(Map.Entry<TaxRate, List<RequestPriceListModel>> taxRateEntry : taxRateMap.entrySet()) {
+        	TaxRate taxRate = taxRateEntry.getKey();
+        	List<RequestPriceListModel> list = taxRateEntry.getValue();
+        	double sumTotalCost = 0d;
+        	String requestName = "";
+        	for(RequestPriceListModel requestPriceListModel : list) {
+        		requestName = requestPriceListModel.getRequest().getRequestType().getName();
+        		sumTotalCost = sumTotalCost + requestPriceListModel.getTotalCost();
+        	}
+        	InvoiceItem invoiceItem = new InvoiceItem();
+            invoiceItem.setTaxRate(taxRate);
+            BigDecimal bd = BigDecimal.valueOf(sumTotalCost);
+            bd = bd.setScale(2,RoundingMode.HALF_UP);
+            invoiceItem.setInvoiceTotalCost(bd.doubleValue());
+            invoiceItem.setDescription(causal + " + " +requestName);
+            invoiceItems.add(invoiceItem);
         }
-            return invoiceItems;
+        return invoiceItems;
     }
 
     public GoodsServicesFieldWrapper createGoodsServicesFieldWrapper() throws IllegalAccessException, PersistenceBeanException {

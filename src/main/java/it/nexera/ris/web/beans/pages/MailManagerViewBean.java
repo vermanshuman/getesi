@@ -7,6 +7,7 @@ import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.*;
 import it.nexera.ris.common.helpers.create.xls.CreateExcelRequestsReportHelper;
 import it.nexera.ris.common.xml.wrappers.SelectItemWrapper;
+import it.nexera.ris.persistence.UserHolder;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.Dictionary;
@@ -939,11 +940,14 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 }
             } else if (MailManagerStatuses.CANCELED == status) {
                 getEntity().setPreviousState(getEntity().getState());
+                getEntity().setUserChangedState(DaoManager.get(User.class, getCurrentUser().getId()));
             } else if (MailManagerStatuses.PARTIAL == status || MailManagerStatuses.MANAGED == status) {
                 getEntity().setUserChangedState(DaoManager.get(User.class, getCurrentUser().getId()));
             }
 
             getEntity().setState(status.getId());
+            log.info("setting mail :: "+getEntity().getId() + " state to :: "+MailManagerStatuses.findById(getEntity().getState()) 
+				+ " by user:: "+ getCurrentUser().getId());
             DaoManager.save(getEntity(), true);
         }
     }
@@ -1463,23 +1467,94 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
         setGoodsServicesFields(wrapperList);
         loadDraftEmail();
-        if (!ValidationHelper.isNullOrEmpty(getEntity())) {
-            String causal = "Rif. " + (!ValidationHelper.isNullOrEmpty(getEntity().getReferenceRequest()) ? getEntity().getReferenceRequest() : "")
-                    + " UFFICIO " + (!ValidationHelper.isNullOrEmpty(getEntity().getOffice()) && !ValidationHelper.isNullOrEmpty(getEntity().getOffice().getDescription()) ? getEntity().getOffice().getDescription() : "")
-                    + " GESTORE " + (!ValidationHelper.isNullOrEmpty(getEntity().getClient()) && !ValidationHelper.isNullOrEmpty(getEntity().getClient().getClientName()) ? getEntity().getClient().getClientName() : "")
-                    + " FIDUCIARIO " + (!ValidationHelper.isNullOrEmpty(getEntity().getOffice()) && !ValidationHelper.isNullOrEmpty(getEntity().getOffice().getDescription()) ? getEntity().getOffice().getDescription() : "");
-            setInvoiceNote(causal);
+        //if (!ValidationHelper.isNullOrEmpty(getEntity())) {
+        	/*String reference = "";
+        	if(!ValidationHelper.isNullOrEmpty(getEntity().getReferenceRequest()))
+        		reference = "Rif. " + getEntity().getReferenceRequest();
+        	String ndg = "";
+        	if(!ValidationHelper.isNullOrEmpty(getEntity().getNdg()))
+        		ndg = "NDG: " + getEntity().getNdg();
+        	String uffico = "";
+        	if(!ValidationHelper.isNullOrEmpty(getEntity().getOffice()) && !ValidationHelper.isNullOrEmpty(getEntity().getOffice().getDescription()))
+        		uffico = "UFFICIO: " + getEntity().getOffice().getDescription();
+        	String gestore = "";
+        	if(!ValidationHelper.isNullOrEmpty(getEntity().getClient()) && !ValidationHelper.isNullOrEmpty(getEntity().getClient().getClientName()))
+				gestore = "GESTORE: " + getEntity().getClient().getClientName();
+			String fiduciario = "";
+			if(!ValidationHelper.isNullOrEmpty(getEntity().getClientFiduciary()) && !ValidationHelper.isNullOrEmpty(getEntity().getClientFiduciary().getClientName()))
+				fiduciario = "FIDUCIARIO: " + getEntity().getClientFiduciary().getClientName();
+            String causal = reference + 
+            				(!reference.isEmpty() && !ndg.isEmpty() ? " - " : "") + 
+            				ndg + 
+            				(!uffico.isEmpty() ? " - " : "") + 
+            				uffico + 
+            				(!gestore.isEmpty() ? " - " : "") + 
+            				gestore + 
+            				(!fiduciario.isEmpty() ? " - " : "") + 
+            				fiduciario;*/
+            setInvoiceNote(getCausal());
             if (!ValidationHelper.isNullOrEmpty(invoiceDb.getNotes()))
                 setInvoiceNote(invoiceDb.getNotes());
-            setEmailSubject(causal);
+            
+       // }
+        if(!ValidationHelper.isNullOrEmpty(invoiceDb.getInvoiceNumber())) {
+        	String invoiceNo = "Fattura: " + invoiceDb.getInvoiceNumber();
+        	String invoiceDate = "";
+        	if(!ValidationHelper.isNullOrEmpty(invoiceDb.getDateString())) 
+        			invoiceDate = invoiceDb.getDateString();
+        	String reference = "";
+        	if(!ValidationHelper.isNullOrEmpty(getEntity().getReferenceRequest()))
+        		reference = "- Rif. " + getEntity().getReferenceRequest() + " ";
+        	String ndg = "";
+        	if(!ValidationHelper.isNullOrEmpty(getEntity().getNdg()))
+        		ndg = "NDG: " + getEntity().getNdg();
+        	String emailSubject = 	invoiceNo + " " +
+        						 	invoiceDate + " " + 
+        						 	reference + 
+        						 	(!reference.isEmpty() && !ndg.isEmpty() ? " - " : "") + 
+        						 	ndg;
+        	setEmailSubject(emailSubject);
+        	if (!ValidationHelper.isNullOrEmpty(invoiceDb.getEmail()) && !ValidationHelper.isNullOrEmpty(invoiceDb.getEmail().getEmailSubject()))
+        		setEmailSubject(invoiceDb.getEmail().getEmailSubject());
         }
         setClientProvinces(ComboboxHelper.fillList(Province.class, Order.asc("description")));
         getClientProvinces().add(new SelectItem(Province.FOREIGN_COUNTRY_ID, Province.FOREIGN_COUNTRY));
         setClientAddressCities(ComboboxHelper.fillList(new ArrayList<City>(), true));
         getInvoiceClientData(getSelectedInvoiceClient());
     }
+    
+    private String getCausal() {
+    	String causal = "";
+    	if (!ValidationHelper.isNullOrEmpty(getEntity())) {
+        	String reference = "";
+        	if(!ValidationHelper.isNullOrEmpty(getEntity().getReferenceRequest()))
+        		reference = "Rif. " + getEntity().getReferenceRequest();
+        	String ndg = "";
+        	if(!ValidationHelper.isNullOrEmpty(getEntity().getNdg()))
+        		ndg = "NDG: " + getEntity().getNdg();
+        	String uffico = "";
+        	if(!ValidationHelper.isNullOrEmpty(getEntity().getOffice()) && !ValidationHelper.isNullOrEmpty(getEntity().getOffice().getDescription()))
+        		uffico = "UFFICIO: " + getEntity().getOffice().getDescription();
+        	String gestore = "";
+        	if(!ValidationHelper.isNullOrEmpty(getEntity().getClient()) && !ValidationHelper.isNullOrEmpty(getEntity().getClient().getClientName()))
+				gestore = "GESTORE: " + getEntity().getClient().getClientName();
+			String fiduciario = "";
+			if(!ValidationHelper.isNullOrEmpty(getEntity().getClientFiduciary()) && !ValidationHelper.isNullOrEmpty(getEntity().getClientFiduciary().getClientName()))
+				fiduciario = "FIDUCIARIO: " + getEntity().getClientFiduciary().getClientName();
+            causal = reference + 
+            				(!reference.isEmpty() && !ndg.isEmpty() ? " - " : "") + 
+            				ndg + 
+            				(!uffico.isEmpty() ? " - " : "") + 
+            				uffico + 
+            				(!gestore.isEmpty() ? " - " : "") + 
+            				gestore + 
+            				(!fiduciario.isEmpty() ? " - " : "") + 
+            				fiduciario;
+    	}
+        return causal;
+    }
 
-    public void createInvoice() throws IllegalAccessException, PersistenceBeanException, HibernateException, InstantiationException {
+    public void createInvoice() throws IllegalAccessException, PersistenceBeanException, HibernateException, InstantiationException, Exception {
         List<Request> selectedRequestList = new ArrayList<>();
         if (!ValidationHelper.isNullOrEmpty(getEntity().getValidRequests())) {
             selectedRequestList = getEntity().getValidRequests().stream()
@@ -1487,9 +1562,13 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     .collect(Collectors.toList());
         }
         Invoice invoice = new Invoice();
-        if(selectedRequestList.size() > 0)
-            invoice.setClient(selectedRequestList.get(0).getClient());
-
+        if(selectedRequestList.size() > 0) {
+            //invoice.setClient(selectedRequestList.get(0).getClient());
+        	if(!ValidationHelper.isNullOrEmpty(getEntity().getClientInvoice()))
+        		invoice.setClient(getEntity().getClientInvoice());
+        	else
+        		throw new Exception("Client invoice is null, Can't create invoice");
+        }
         setSelectedInvoiceClient(invoice.getClient());
         invoice.setDate(getInvoiceDate());
         invoice.setDate(new Date());
@@ -1497,7 +1576,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         invoice.setEmailFrom(getEntity());
        // DaoManager.save(invoice, true);
 
-        setSelectedInvoiceItems(InvoiceHelper.groupingItemsByTaxRate(selectedRequestList));
+        setSelectedInvoiceItems(InvoiceHelper.groupingItemsByTaxRate(selectedRequestList, getCausal()));
       /*  for (InvoiceItem invoiceItem : invoiceItems) {
             invoiceItem.setInvoice(invoice);
             DaoManager.save(invoiceItem, true);
@@ -1844,6 +1923,11 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         inbox.setEmailBodyHtml(getEmailBodyToEditor());
         inbox.setClient(getSelectedInvoiceClient());
         inbox.setClient(getExamRequest().getClient());
+        if(inbox.isNew())
+        	log.info("setting new mail state to :: "+MailManagerStatuses.findById(mailManagerStatus));
+        else
+        	log.info("setting mail :: "+inbox.getId() + " state to :: "+MailManagerStatuses.findById(mailManagerStatus) 
+        		+ " by user:: "+UserHolder.getInstance().getCurrentUser().getId());
         inbox.setState(mailManagerStatus);
         inbox.setSendDate(new Date());
         inbox.setReceiveDate(new Date());
@@ -1883,8 +1967,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 setEmailSubject(inbox.getEmailSubject());
         } else {
             if(!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
-                appendReplyFooter();
-                String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
+                //appendReplyFooter();
+                /*String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
                         String.class, new Criterion[]{Restrictions.eq("id", Long.parseLong(
                                 ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.SENT_SERVER_ID)
                                         .getValue()))}).get(0);
@@ -1901,9 +1985,22 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailTo()).stream()
                             .filter(m -> !m.contains(emailsFrom)).collect(Collectors.toList()));
                     sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailCC()));
+                }*/
+            	if(!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getManagers())) {
+                	List<Client> managers = invoice.getEmailFrom().getManagers();
+                	List<ClientEmail> allEmailList = new ArrayList<>();
+                	CollectionUtils.emptyIfNull(managers).stream().forEach(manager -> {
+                		if(!ValidationHelper.isNullOrEmpty(manager.getEmails()))
+                			allEmailList.addAll(manager.getEmails());
+                    });
+                	sendTo = new LinkedList<>();
+                	CollectionUtils.emptyIfNull(allEmailList).stream().forEach(email -> {
+                		if(!ValidationHelper.isNullOrEmpty(email.getEmail()))
+                			sendTo.addAll(MailHelper.parseMailAddress(email.getEmail()));
+                    });
                 }
             }
-            setEmailBodyToEditor(getEntity().getEmailBodyToEditor());
+            //setEmailBodyToEditor(getEntity().getEmailBodyToEditor());
         }
     }
 
