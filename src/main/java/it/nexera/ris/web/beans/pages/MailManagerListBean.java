@@ -542,6 +542,8 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
             }
             if (wlgInbox.getState().equals(MailManagerStatuses.NEW.getId())) {
                 wlgInbox.setState(MailManagerStatuses.READ.getId());
+                log.info("setting mail :: "+ wlgInbox.getId() + " state to :: "+MailManagerStatuses.findById(wlgInbox.getState()) 
+					+ " by user:: "+ getCurrentUser().getId());
                 try {
                     DaoManager.save(wlgInbox, true);
                 } catch (PersistenceBeanException e) {
@@ -838,9 +840,13 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
                 if (mail != null) {
                     if (mail.getPreviousState() != null) {
                         mail.setState(mail.getPreviousState());
+                        log.info("setting mail :: "+mail.getId() + " state to :: "+MailManagerStatuses.findById(mail.getState()) 
+            				+ " by user:: "+ getCurrentUser().getId());
                         mail.setPreviousState(null);
                     } else {
                         mail.setState(MailManagerStatuses.NEW.getId());
+                        log.info("setting mail :: "+mail.getId() + " state to :: "+MailManagerStatuses.findById(mail.getState()) 
+            				+ " by user:: "+ getCurrentUser().getId());
                         if (!mail.getRead()) {
                             ReadWLGInbox readWLGInbox = new ReadWLGInbox(mail.getId(), getCurrentUser().getId());
                             DaoManager.save(readWLGInbox, true);
@@ -884,10 +890,13 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
                             }
                         } else if (MailManagerStatuses.CANCELED == status) {
                             mail.setPreviousState(mail.getState());
+                            mail.setUserChangedState(DaoManager.get(User.class, getCurrentUser().getId()));
                         } else if (MailManagerStatuses.PARTIAL == status || MailManagerStatuses.MANAGED == status) {
                             mail.setUserChangedState(DaoManager.get(User.class, getCurrentUser().getId()));
                         }
                         mail.setState(status.getId());
+                        log.info("setting mail :: "+mail.getId() + " state to :: "+MailManagerStatuses.findById(mail.getState()) 
+            				+ " by user:: "+ getCurrentUser().getId());
                         DaoManager.save(mail, true);
                     }
                     DaoManager.getSession().refresh(inbox);
@@ -1010,6 +1019,8 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
         }
         if (wlgInbox.getState().equals(MailManagerStatuses.NEW.getId())) {
             wlgInbox.setState(MailManagerStatuses.READ.getId());
+            log.info("setting mail :: "+ wlgInbox.getId() + " state to :: "+MailManagerStatuses.findById(wlgInbox.getState()) 
+			+ " by user:: "+ getCurrentUser().getId());
             try {
                 DaoManager.save(wlgInbox, true);
             } catch (PersistenceBeanException e) {

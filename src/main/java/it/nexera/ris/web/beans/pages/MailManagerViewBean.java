@@ -7,6 +7,7 @@ import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.*;
 import it.nexera.ris.common.helpers.create.xls.CreateExcelRequestsReportHelper;
 import it.nexera.ris.common.xml.wrappers.SelectItemWrapper;
+import it.nexera.ris.persistence.UserHolder;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.Dictionary;
@@ -939,11 +940,14 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 }
             } else if (MailManagerStatuses.CANCELED == status) {
                 getEntity().setPreviousState(getEntity().getState());
+                getEntity().setUserChangedState(DaoManager.get(User.class, getCurrentUser().getId()));
             } else if (MailManagerStatuses.PARTIAL == status || MailManagerStatuses.MANAGED == status) {
                 getEntity().setUserChangedState(DaoManager.get(User.class, getCurrentUser().getId()));
             }
 
             getEntity().setState(status.getId());
+            log.info("setting mail :: "+getEntity().getId() + " state to :: "+MailManagerStatuses.findById(getEntity().getState()) 
+				+ " by user:: "+ getCurrentUser().getId());
             DaoManager.save(getEntity(), true);
         }
     }
@@ -1919,6 +1923,11 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         inbox.setEmailBodyHtml(getEmailBodyToEditor());
         inbox.setClient(getSelectedInvoiceClient());
         inbox.setClient(getExamRequest().getClient());
+        if(inbox.isNew())
+        	log.info("setting new mail state to :: "+MailManagerStatuses.findById(mailManagerStatus));
+        else
+        	log.info("setting mail :: "+inbox.getId() + " state to :: "+MailManagerStatuses.findById(mailManagerStatus) 
+        		+ " by user:: "+UserHolder.getInstance().getCurrentUser().getId());
         inbox.setState(mailManagerStatus);
         inbox.setSendDate(new Date());
         inbox.setReceiveDate(new Date());

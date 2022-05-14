@@ -336,6 +336,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 setMail(DaoManager.get(WLGInbox.class,
                         Long.parseLong(getRequestParameter(RedirectHelper.ARCHIVE_MAIL))));
                 getMail().setState(MailManagerStatuses.ARCHIVED.getId());
+                log.info("setting mail :: "+getMail().getId() + " state to :: "+MailManagerStatuses.findById(getMail().getState()) 
+					+ " by user:: "+ getCurrentUser().getId());
             } catch (Exception e) {
                 LogHelper.log(log, e);
             }

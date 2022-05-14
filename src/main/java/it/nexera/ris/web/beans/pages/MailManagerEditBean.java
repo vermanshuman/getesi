@@ -1126,6 +1126,8 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
 
             if (getEntity().isNew()) {
                 getEntity().setState(MailManagerStatuses.NEW.getId());
+                log.info("setting mail :: "+getEntity().getId() + " state to :: "+MailManagerStatuses.findById(getEntity().getState()) 
+    				+ " by user:: "+UserHolder.getInstance().getCurrentUser().getId());
                 getEntity().setSendDate(new Date());
                 getEntity().setReceiveDate(new Date());
             }
@@ -1156,13 +1158,17 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
     }
 
     public void saveDraft() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
-        updateDestination();
+    	updateDestination();
         updateCC();
         updateBCC();
         getEntity().setServerId(null);
         getEntity().setReceiveDate(new Date());
         getEntity().setSendDate(new Date());
-        getEntity().setState(MailManagerStatuses.NEW.getId());
+        if(getEntity().isNew()) {
+        	getEntity().setState(MailManagerStatuses.NEW.getId());
+        	log.info("setting mail :: "+getEntity().getId() + " state to :: "+MailManagerStatuses.findById(getEntity().getState()) 
+			+ " by user:: "+UserHolder.getInstance().getCurrentUser().getId());
+        }
         getEntity().setEmailBody(MailHelper.htmlToText(getEntity().getEmailBodyToEditor()));
         getEntity().setEmailBodyHtml(getEntity().getEmailBodyToEditor());
         getEntity().setXpriority(getSelectedPriorityWrapper());
