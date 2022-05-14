@@ -1576,7 +1576,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             invoice.setDate(getInvoiceDate());
             invoice.setDate(new Date());
             invoice.setStatus(InvoiceStatus.DRAFT);
-            setSelectedInvoiceItems(InvoiceHelper.groupingItemsByTaxRate(filteredRequests));
+            setSelectedInvoiceItems(InvoiceHelper.groupingItemsByTaxRate(filteredRequests, ""));
             setInvoicedRequests(filteredRequests);
             loadInvoiceDialogData(invoice);
             executeJS("PF('invoiceDialogBillingWV').show();");
@@ -1958,7 +1958,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         } else {
             if (!ValidationHelper.isNullOrEmpty(invoice) &&
                     !ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
-                String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
+                /*String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
                         String.class, new Criterion[]{Restrictions.eq("id", Long.parseLong(
                                 ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.SENT_SERVER_ID)
                                         .getValue()))}).get(0);
@@ -1975,9 +1975,23 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                     sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailTo()).stream()
                             .filter(m -> !m.contains(emailsFrom)).collect(Collectors.toList()));
                     sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailCC()));
+                }*/
+            	if(!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getManagers())) {
+                	List<Client> managers = invoice.getEmailFrom().getManagers();
+                	List<ClientEmail> allEmailList = new ArrayList<>();
+                	CollectionUtils.emptyIfNull(managers).stream().forEach(manager -> {
+                		if(!ValidationHelper.isNullOrEmpty(manager.getEmails()))
+                			allEmailList.addAll(manager.getEmails());
+                    });
+                	sendTo = new LinkedList<>();
+                	CollectionUtils.emptyIfNull(allEmailList).stream().forEach(email -> {
+                		if(!ValidationHelper.isNullOrEmpty(email.getEmail()))
+                			sendTo.addAll(MailHelper.parseMailAddress(email.getEmail()));
+                    });
                 }
+            	
 
-                WLGInbox baseMail = DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId());
+                /* WLGInbox baseMail = DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId());
                 String sendDate;
                 if (invoice.getEmailFrom().getSendDate() == null) {
                     sendDate = "";
@@ -1998,7 +2012,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 html.append(emailPrefix);
                 html.append(invoice.getEmailFrom().getEmailBody());
                 html.append(invoice.getEmailFrom().getEmailPostfix());
-                setEmailBodyToEditor(html.toString());
+                setEmailBodyToEditor(html.toString());*/
             }
         }
     }
