@@ -289,12 +289,12 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             Long requestId = Long.parseLong(parameter);
             setRequestId(requestId);
             setExamRequest(DaoManager.get(Request.class, requestId));
-            RequestPrint requestPrint = DaoManager.get(RequestPrint.class,
+            List<RequestPrint> requestPrints = DaoManager.load(RequestPrint.class,
                     new CriteriaAlias[]{new CriteriaAlias("request", "rq", JoinType.INNER_JOIN)},
                     new Criterion[]{Restrictions.eq("rq.id", requestId)});
-            if (requestPrint != null) {
-                this.setEntityId(requestPrint.getId());
-                this.setEditText(requestPrint.getRequest().getRequestPrint().getBodyContent());
+            if (!ValidationHelper.isNullOrEmpty(requestPrints)) {
+                this.setEntityId(requestPrints.get(0).getId());
+                this.setEditText(requestPrints.get(0).getRequest().getRequestPrint().getBodyContent());
                 if (getEntity().getTemplate() != null) {
                     this.setSelectedTemplateId(getEntity().getTemplate().getId());
                 }
@@ -1571,7 +1571,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         getCostManipulationHelper().saveRequestExtraCost(getExamRequest());
         CostCalculationHelper calculation = new CostCalculationHelper(getExamRequest());
         calculation.calculateAllCosts(true);
-        if(ValidationHelper.isNullOrEmpty(getExamRequest().getRequestPrint())) {
+        if(!ValidationHelper.isNullOrEmpty(getExamRequest().getRequestPrint())) {
             updateTemplate();
         }else {
             if(!ValidationHelper.isNullOrEmpty(getExamRequest().getClient()) &&

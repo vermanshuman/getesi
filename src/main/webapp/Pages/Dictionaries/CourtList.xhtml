@@ -13,26 +13,6 @@
     <ui:param name="disableSelection" value="true"/>
     <ui:param name="additionalEditAction" value="window.scrollTo(0,0);"/>
 
-<!--    <ui:define name="edit_fields">-->
-<!--        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">-->
-
-<!--            <span><span class="red">*</span> #{msg.name}:</span>-->
-<!--            <p:inputText id="name" maxlength="50" value="#{bean.entity.name}"-->
-<!--                         label="#{msg.name}" onkeypress="numbers_letters_only('#name');"/>-->
-
-<!--            <span>#{msg.courtFiscalCode}:</span>-->
-<!--            <p:inputText id="fiscalcode" maxlength="100"-->
-<!--                         value="#{bean.entity.fiscalCode}" label="#{msg.courtFiscalCode}"-->
-<!--                         onkeypress="numbers_letters_only('#fiscalcode');"/>-->
-
-<!--            <span style="margin-right: 10px">#{msg.courtCity}</span>-->
-<!--            <p:selectOneMenu value="#{bean.selectedCityId}" styleClass="select-width" -->
-<!--            	filter="true" filterMatchMode="contains" >-->
-<!--                <f:selectItems value="#{bean.cities}"/>-->
-<!--            </p:selectOneMenu>-->
-<!--        </p:panelGrid>-->
-<!--    </ui:define>-->
-
     <ui:define name="search_body">
         <div class="settingsBlock">
             <p:commandButton id="settingButton" onclick="togglePanel();" type="button" style="float: right;"
@@ -96,16 +76,6 @@
                     padding: 10px 10px !important;
                 }
             </style>
-            <p:remoteCommand name="onPageChange"
-                             action="#{bean.onPageChange()}" oncomplete="setPageNumber()"/>
-            <p:remoteCommand name="onRowClick" action="#{bean.rowDblSelectListener}" update="table"/>
-            <p:remoteCommand name="onSortHeader" action="#{bean.sortData}" update="table"
-                             oncomplete="setHeaderSort()"/>
-
-            <p:remoteCommand name="handleRowsChange"
-                             action="#{bean.handleRowsChange()}" oncomplete="setPageNumber()"/>
-            <p:remoteCommand name="onBottomPageChange"
-                             action="#{bean.onBottomPageChange()}" oncomplete="setPageNumber()"/>
             <p:remoteCommand name="updateFilterInput"
                              update=":filterName :filterTaxCode :filterCourtCity"/>
             <p:remoteCommand name="filterTableFromPanel"
@@ -146,12 +116,12 @@
                             <f:selectItems value="#{bean.courtCities}"/>
                             <p:ajax event="itemSelect" update="@this"/>
                         </p:selectOneMenu>
-<!--                        <p:selectOneMenu id="filterCourtCity" onblur="updateFilterInput()" value="#{bean.courtCity}" style="width: 99%;" styleClass="#{bean.courtCity ne null and bean.courtCity ne '' ? 'green-border' : ''}">-->
-<!--                            <f:selectItem itemLabel="#{ff:upper(msg.courtCity)}"-->
-<!--                                          itemValue="#{null}"-->
-<!--                                          noSelectionOption="true"/>-->
-<!--                            <p:ajax event="itemSelect" update="@this"/>-->
-<!--                        </p:selectOneMenu>-->
+                        <!--                        <p:selectOneMenu id="filterCourtCity" onblur="updateFilterInput()" value="#{bean.courtCity}" style="width: 99%;" styleClass="#{bean.courtCity ne null and bean.courtCity ne '' ? 'green-border' : ''}">-->
+                        <!--                            <f:selectItem itemLabel="#{ff:upper(msg.courtCity)}"-->
+                        <!--                                          itemValue="#{null}"-->
+                        <!--                                          noSelectionOption="true"/>-->
+                        <!--                            <p:ajax event="itemSelect" update="@this"/>-->
+                        <!--                        </p:selectOneMenu>-->
                     </div>
                     <div class="p-col-6">
                         <div style="">
@@ -178,8 +148,8 @@
                   headerText="#{msg.courtFiscalCode}">
             <h:outputText value="#{item.fiscalCode}"/>
         </p:column>
-        
-         <p:column headerText="#{msg.courtCity}" sortBy="#{item.city.description}">
+
+        <p:column headerText="#{msg.courtCity}" sortBy="#{item.city.description}">
             <h:outputText value="#{item.city.description}"/>
         </p:column>
     </ui:define>

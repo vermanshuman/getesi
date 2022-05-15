@@ -56,7 +56,7 @@
                 margin-top: 8px !important;
             }
 
-            body .ui-widget-header {
+            body .ui-widget-header:not(#formalityTab_paginator_top, #formalityTab_paginator_bottom) {
                 background-color: #FFFFFF !important;
             }
 
@@ -191,7 +191,7 @@
                             <f:setPropertyActionListener value="#{fileEntry.id}" target="#{bean.downloadFileId}"/>
                         </p:commandButton>
                     </p:column>
-                    <p:column styleClass="action_column" style="width: 100px">
+                    <p:column styleClass="action_column" style="width: 150px">
                         <p:commandButton action="#{bean.removeFile}" oncomplete="removeFileCommand()"
                                          value="#{msg.estateSituationViewRemoveFile}">
                             <f:setPropertyActionListener value="#{fileEntry.id}" target="#{bean.downloadFileId}"/>
@@ -476,7 +476,7 @@
                             <f:setPropertyActionListener value="#{fileEntry.id}" target="#{bean.downloadFileId}"/>
                         </p:commandButton>
                     </p:column>
-                    <p:column styleClass="action_column" style="width: 100px">
+                    <p:column styleClass="action_column" style="width: 150px">
                         <p:commandButton action="#{bean.removeFile}"
                                          oncomplete="removeFileCommand()"
                                          value="#{msg.estateSituationViewRemoveFile}">

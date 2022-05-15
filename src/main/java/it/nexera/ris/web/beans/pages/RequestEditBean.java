@@ -293,6 +293,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private boolean showServiceTable;
 
+    private Request originalRequest;
+
     @Override
     protected void preLoad() throws PersistenceBeanException {
         setMultiRequestMap(new HashMap());
@@ -336,8 +338,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 setMail(DaoManager.get(WLGInbox.class,
                         Long.parseLong(getRequestParameter(RedirectHelper.ARCHIVE_MAIL))));
                 getMail().setState(MailManagerStatuses.ARCHIVED.getId());
-                log.info("setting mail :: "+getMail().getId() + " state to :: "+MailManagerStatuses.findById(getMail().getState()) 
-					+ " by user:: "+ getCurrentUser().getId());
+                log.info("setting mail :: "+getMail().getId() + " state to :: "+MailManagerStatuses.findById(getMail().getState())
+                        + " by user:: "+ getCurrentUser().getId());
             } catch (Exception e) {
                 LogHelper.log(log, e);
             }
@@ -400,6 +402,14 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
             InstantiationException, IllegalAccessException {
+//        if(!getEntity().isNew()){
+//            try {
+//                Request originalRequest = DaoManager.get(Request.class, getEntity().getId());
+//                setOriginalRequest(originalRequest.copy());
+//            } catch (CloneNotSupportedException e) {
+//            }
+//        }
+
         setShowServiceTable(Boolean.TRUE);
         setOfficeList(ComboboxHelper.fillList(Office.class, Order.asc("description")));
         setFiduciaryList(ComboboxHelper.fillList(ClientView.class, Order.asc("name"), new Criterion[]{
@@ -1643,6 +1653,22 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if (isShowConfirm) {
             executeJS("PF('multipleRequestSave').show();");
         } else {
+         /*   if (redirect && !getEntity().isNew()) {
+                boolean requestUpdated = false;
+                System.out.println(getWrapper().getSelectedPersonId() + ">>>>>>>>>>>>>>>>" + getSubject().getSurname());
+                System.out.println(getOriginalRequest().getSubject().getSurname());
+                if (!getOriginalRequest().getSubject().getTypeId().equals(getWrapper().getSelectedPersonId())) {
+                    requestUpdated = true;
+                }else if(getWrapper().getSelectedPersonId().equals(SubjectType.PHYSICAL_PERSON.getId())){
+                    if (!getOriginalRequest().getSubject().getSurname().equals(getSubject().getSurname())
+                        || !getOriginalRequest().getSubject().getName().equals(getSubject().getName())) {
+                        requestUpdated = true;
+                    }
+                }else if(getWrapper().getSelectedPersonId().equals(SubjectType.LEGAL_PERSON.getId())){
+
+                }
+            }*/
+
             saveServiceRequest(redirect);
         }
     }
@@ -4506,5 +4532,13 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void setShowServiceTable(boolean showServiceTable) {
         this.showServiceTable = showServiceTable;
+    }
+
+    public Request getOriginalRequest() {
+        return originalRequest;
+    }
+
+    public void setOriginalRequest(Request originalRequest) {
+        this.originalRequest = originalRequest;
     }
 }

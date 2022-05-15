@@ -656,6 +656,13 @@
             .searchPanelButton {
                 background: #fb6e51 !important;
             }
+            #subjectSettingPanel .ui-state-active {
+                background-color: #A9A9A9 !important;
+                color: #ffffff !important;
+            }
+            #subjectSettingPanel .ui-state-disabled {
+                opacity: 0.8;
+            }
         </style>
         <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
         <link rel="stylesheet"
@@ -1276,7 +1283,7 @@
                             </p:column>
                             <p:column rendered="#{invoice.email.serverId != null}">
                                 <div class="icon-block" style="justify-content: left;">
-                                	<i class="email-check-icon"></i>
+                                    <i class="email-check-icon"></i>
                                     <p:commandLink id="actionPnl1" global="false" style="outline: none;" immediate="true" readonly="true">
                                         <i class="menu-dots-icon" style="font-size: x-large;"
                                            onmouseover="document.getElementById('invoiceTable:#{rowId}:actionPnl1').focus();" />
@@ -1895,8 +1902,7 @@
                                                 <td style="width: 4vw;min-width: 81px;">
                                                     <p:outputPanel style="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments ? 'text-align: center;' : 'display: flex;'}">
                                                         <p:commandButton id="mailBtn" styleClass="richiesta-da-mail-icon" action="#{bean.openRequestMail}"
-                                                                         style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;'
-                                                                         '"
+                                                                         style="color: transparent !important;background-color: transparent !important;border-color: transparent !important;margin: 0 auto;cursor: pointer;"
                                                                          rendered="#{not empty item.mailId}">
                                                             <f:setPropertyActionListener value="#{item.mailId}" target="#{bean.entityEditId}"/>
                                                         </p:commandButton>
@@ -1937,7 +1943,7 @@
                                                     <p:outputPanel style="display: flex;" rendered="#{item.haveDocuments}">
                                                         <p:outputPanel style="display: flex;">
                                                             <p:commandButton styleClass="attachment-icon" action="#{bean.loadRequestDocuments}" update="requestDocs"
-                                                                             style="color: transparent;background-color: transparent;border-color: transparent;margin: 0 auto;cursor: pointer;"
+                                                                             style="color: transparent !important;background-color: transparent !important;border-color: transparent !important;margin: 0 auto;cursor: pointer;"
                                                                              oncomplete="PF('documentDialog').show();">
                                                                 <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                                                             </p:commandButton>

@@ -455,7 +455,7 @@ public class RedirectHelper extends BaseHelper {
     public static void goToMailManagerViewFromBillingList(Serializable mailId) {
         try {
             sendRedirect(PageTypes.MAIL_MANAGER_VIEW.getPagesContext() + "?"
-                    + ID_PARAMETER + "=" + mailId + "&page=0" + "&" +BILLING_LIST + "=3");
+                    + ID_PARAMETER + "=" + mailId + "&page=0" + "&" +BILLING_LIST + "=3", true);
         } catch (Exception e) {
             LogHelper.log(log, e);
         }
