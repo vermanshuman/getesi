@@ -1573,13 +1573,14 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         calculation.calculateAllCosts(true);
         if(!ValidationHelper.isNullOrEmpty(getExamRequest().getRequestPrint())) {
             updateTemplate();
-        }else {
-            if(!ValidationHelper.isNullOrEmpty(getExamRequest().getClient()) &&
-                    !ValidationHelper.isNullOrEmpty(getExamRequest().getClient().getCostOutput()) &&
-                    getExamRequest().getClient().getCostOutput()){
-                executeJS("PF('reloadPageDialogWV').show()");
-            }
         }
+        //else {
+        //    if(!ValidationHelper.isNullOrEmpty(getExamRequest().getClient()) &&
+        //            !ValidationHelper.isNullOrEmpty(getExamRequest().getClient().getCostOutput()) &&
+        //            getExamRequest().getClient().getCostOutput()){
+        //         executeJS("PF('reloadPageDialogWV').show()");
+        //    }
+        //}
 
         //  getCostManipulationHelper().saveRequestExtraCost(getExamRequest());
         // updateTemplate();
