@@ -1516,8 +1516,10 @@ public class ExcelDataRequestEdit extends BaseEntityPageBean {
         setCostManipulationHelper(new CostManipulationHelper());
         Request request =DaoManager.get(Request.class, getRequestId());
         request.setSelectedTemplateId(null);
-        if(!Hibernate.isInitialized(request.getRequestFormalities())){
-            request.reloadRequestFormalities();
+        if(!ValidationHelper.isNullOrEmpty(request.getRequestFormalities())) { 
+	        if(!Hibernate.isInitialized(request.getRequestFormalities())){
+	            request.reloadRequestFormalities();
+	        }
         }
         setExamRequest(request);
         RequestPrint requestPrint = DaoManager.get(RequestPrint.class,
