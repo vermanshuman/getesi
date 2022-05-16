@@ -223,6 +223,12 @@ public class ClientEditBean extends EntityEditPageBean<Client>
     private List<SelectItem> taxRates;
 
     private Boolean fromContactList;
+    
+    private Long selectedClientIdToCopy;
+    
+    private List<SelectItem> clientsToCopy;
+    
+    private Boolean showClientCopy;
 
     /*
      * (non-Javadoc)
@@ -389,6 +395,21 @@ public class ClientEditBean extends EntityEditPageBean<Client>
         activeTaxRates.forEach(tr -> {
             getTaxRates().add(new SelectItem(tr.getId(), tr.getPercentage() +  "% - " + tr.getDescription()));
         });
+        
+        List<PriceList> priceLists = DaoManager.load(PriceList.class, new Criterion[]{
+                Restrictions.eq("client.id", getEntityId())});
+        if(ValidationHelper.isNullOrEmpty(priceLists)) {
+	        List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
+	                Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
+	                        Restrictions.isNull("deleted"))});
+	        setClientsToCopy(ComboboxHelper.fillList(clients.stream()
+	                .filter(c -> (
+	                                (ValidationHelper.isNullOrEmpty(c.getManager()) || !c.getManager()) &&
+	                                        (ValidationHelper.isNullOrEmpty(c.getFiduciary()) || !c.getFiduciary())
+	                        )
+	                ).sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList()), Boolean.TRUE));
+	        setShowClientCopy(true);
+        }
     }
 
     public void initAreasAndOffices() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -1640,6 +1661,28 @@ public class ClientEditBean extends EntityEditPageBean<Client>
             }
         }
     }
+    
+    public void copyPriceListClient() throws HibernateException, IllegalAccessException, PersistenceBeanException {
+    	if(!ValidationHelper.isNullOrEmpty(getSelectedClientIdToCopy())) {
+    		List<PriceList> priceLists = DaoManager.load(PriceList.class, new Criterion[]{
+                    Restrictions.eq("client.id", getSelectedClientIdToCopy())});
+    		if(!ValidationHelper.isNullOrEmpty(priceLists)) {
+    			for(PriceList priceList: priceLists) {
+    				DaoManager.getSession().evict(priceList);
+    				priceList.setId(null);
+    				PriceList newPrice = new PriceList();
+    				newPrice = priceList;
+    				newPrice.setClient(getEntity());
+    				newPrice.setCreateDate(new Date());
+    				newPrice.setUpdateDate(null);
+    				newPrice.setUpdateUserId(null);
+    				newPrice.setConfigureDate(null);
+    				DaoManager.save(newPrice, true);
+    			}
+    		}
+    	}
+    }
+    
     public void lastStepListener(boolean isLast) {
         setLastStep(isLast);
     }
@@ -2241,4 +2284,30 @@ public class ClientEditBean extends EntityEditPageBean<Client>
     public void setFromContactList(Boolean fromContactList) {
         this.fromContactList = fromContactList;
     }
+
+	public Long getSelectedClientIdToCopy() {
+		return selectedClientIdToCopy;
+	}
+
+	public void setSelectedClientIdToCopy(Long selectedClientIdToCopy) {
+		this.selectedClientIdToCopy = selectedClientIdToCopy;
+	}
+
+	public List<SelectItem> getClientsToCopy() {
+		return clientsToCopy;
+	}
+
+	public void setClientsToCopy(List<SelectItem> clientsToCopy) {
+		this.clientsToCopy = clientsToCopy;
+	}
+
+	public Boolean getShowClientCopy() {
+		return showClientCopy;
+	}
+
+	public void setShowClientCopy(Boolean showClientCopy) {
+		this.showClientCopy = showClientCopy;
+	}
+    
+    
 }

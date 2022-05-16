@@ -6,6 +6,7 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:ff="http://readytech.com/functions"
                 template="/resources/tpl/Admin/EditBase.xhtml">
     <ui:param name="edit_title" value="#{msg.newClient}"/>
     <ui:param name="bean" value="#{clientEditBean}"/>
@@ -830,7 +831,7 @@
                             <p:selectBooleanCheckbox value="#{bean.entity.monthlyInvoice}" disabled="#{bean.onlyView}"/>
                         </p:panelGrid>
                     </p:panelGrid>
-                    <p:dataTable var="item" value="#{bean.services}" editable="true" editMode="cell"
+                    <p:dataTable var="item" value="#{bean.services}" editable="true" editMode="cell" id="servicesTable"
                                  emptyMessage="#{msg.noRecordsFound}">
                         <f:facet name="header">
                             <h:outputText value="#{msg.clientServiceTable}"/>
@@ -911,6 +912,17 @@
                         </p:column>
 
                     </p:dataTable>
+                    <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" rendered="#{bean.showClientCopy}">
+                            <h:outputText value="#{msg.clientEditCopyCostList}"/>
+                            <p:selectOneMenu id="client" value="#{bean.selectedClientIdToCopy}" style="width: 300px; float:right;"
+                                         styleClass="#{bean.selectedClientIdToCopy ne null ? 'select-one-menu' : ''}">
+	                            <f:selectItem itemLabel="#{ff:upper(msg.client_list)}" itemValue="#{null}"
+	                                          noSelectionOption="true"/>
+	                            <f:selectItems value="#{bean.clientsToCopy}" />
+	                            <p:ajax event="itemSelect" update="@this"/>
+                        	</p:selectOneMenu>
+                        	<p:commandButton value="#{msg.clientEditCopy}" update="servicesTable" action="#{bean.copyPriceListClient}"/>
+                    </p:panelGrid>
                 </div>
             </p:tab>
             <p:tab id="wizardTabBILLING" title="#{msg.wizardTabBILLING.toUpperCase()}">
