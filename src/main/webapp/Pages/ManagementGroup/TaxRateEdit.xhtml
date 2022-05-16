@@ -11,16 +11,16 @@
     <ui:define name="edit_body">
         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" style="width: 40%">
             <span><span class="red">*</span>#{msg.percentage}:</span>
-            <p:inputText id="percentage" type="number"
+            <p:inputText id="percentage" type="number" style="min-width: 351px;"
                          value="#{bean.entity.percentage}"
                          label="#{msg.percentage}"/>
             <span><span class="red">*</span> #{msg.description}:</span>
-            <p:inputText id="description"
+            <p:inputText id="description" style="min-width: 351px;"
                          value="#{bean.entity.description}"
                          label="#{msg.description}"/>
 
             <span><span class="red">*</span>#{msg.codeSDI}:</span>
-            <p:inputText id="codeSDI"
+            <p:inputText id="codeSDI" style="min-width: 351px;"
                          value="#{bean.entity.codeSDI}"
                          label="#{msg.codeSDI}"/>
             <span>#{msg.use}:</span>

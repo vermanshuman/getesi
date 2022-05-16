@@ -46,7 +46,7 @@
 
     <ui:define name="search_body">
         <div class="settingsBlock">
-            <p:commandButton id="settingButton" onclick="togglePanel();" type="button" style="float: right;"
+            <p:commandButton id="settingButton" onclick="togglePanel();" type="button" style="margin-left: 110px;position: absolute;"
                              icon="ui-icon ui-icon-search pi pi-sliders-h" styleClass="searchPanelButton"/>
             <script type="text/javascript">
                 // <![CDATA[
@@ -80,7 +80,7 @@
                     z-index: 1;
                     margin-top: 40px;
                     max-width: 560px;
-                    right: 33px;
+                    left: 200px;
                     border: 1px solid #547ac4;
                 }
                 #settingPanel .ui-selectonemenu {
@@ -195,7 +195,7 @@
                     <div class="p-col-12" style="text-align: center;">
                         <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #00CC52;margin-right: 20px;" id="searchButton"
                                          onclick="filterTableFromPanel();" onsuccess="PF('panelSetting').getJQ().hide()"/>
-                        <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFiltraPanel}" update="settingPanel" oncomplete="filterTableFromPanel();PF('panelSetting').getJQ().hide()"/>
+                        <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFilterPanel}" update="settingPanel" oncomplete="filterTableFromPanel();PF('panelSetting').getJQ().hide()"/>
                     </div>
                 </div>
             </p:panel>

@@ -106,6 +106,10 @@ public class TaxRateListBean extends EntityLazyListPageBean<TaxRate>
     }
 
     public void clearFilterPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        setPercentage(null);
+        setDescription(null);
+        setCodeSDI(null);
+        setSelectedUse(-1);
         filterTableFromPanel();
     }
 }
