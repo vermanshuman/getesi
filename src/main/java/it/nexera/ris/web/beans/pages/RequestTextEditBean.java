@@ -1583,6 +1583,14 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
         //  getCostManipulationHelper().saveRequestExtraCost(getExamRequest());
         // updateTemplate();
+        editExcelDataRequest();
+    }
+    
+    public void editExcelDataRequest() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+        if(!ValidationHelper.isNullOrEmpty(getExamRequest().getMail()) && !ValidationHelper.isNullOrEmpty(getExamRequest().getMail().getId()))
+        	RedirectHelper.goToExcelDataRequest(null, getExamRequest().getMail().getId(), true);
+        else
+        	RedirectHelper.goToExcelDataRequest(getRequestId(), null, false);
     }
 
     public void reloadPage() throws IllegalAccessException, InstantiationException, PersistenceBeanException {

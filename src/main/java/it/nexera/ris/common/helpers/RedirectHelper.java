@@ -468,4 +468,15 @@ public class RedirectHelper extends BaseHelper {
             LogHelper.log(log, e);
         }
     }
+    
+    public static void goToExcelDataRequest(Serializable requestId, Serializable mailId, Boolean mailIdPresent ) {
+        try {
+        	if(mailIdPresent)
+        		sendRedirect(PageTypes.EXCEL_DATA_REQUEST.getPagesContext() + "?" + MAIL_ID + "=" + mailId);
+        	else
+        		sendRedirect(PageTypes.EXCEL_DATA_REQUEST.getPagesContext() + "?" + REQUEST_ID + "=" + requestId);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
 }
