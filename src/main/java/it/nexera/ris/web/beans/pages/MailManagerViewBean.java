@@ -1650,8 +1650,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         } catch (Exception e) {
             e.printStackTrace();
             LogHelper.log(log, e);
-            executeJS("PF('sendInvoiceErrorDialogWV').show();");
         }
+        executeJS("PF('invoiceDialogBillingWV').hide();");
+        closeInvoiceDialog();
     }
 
     public Invoice saveInvoice(InvoiceStatus invoiceStatus, Boolean saveInvoiceNumber) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
@@ -1799,13 +1800,18 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                         setApiError(fatturaAPIResponse.getDescription());
                 }
                 executeJS("PF('sendInvoiceErrorDialogWV').show();");
+                return;
             }
 
         } catch (Exception e) {
             e.printStackTrace();
             LogHelper.log(log, e);
+            setApiError(ResourcesHelper.getString("sendInvoiceErrorMsg"));
             executeJS("PF('sendInvoiceErrorDialogWV').show();");
+            return;
         }
+        executeJS("PF('invoiceDialogBillingWV').hide();");
+        closeInvoiceDialog();
     }
 
 //    public List<String> completeMailFrom(String query) {
@@ -1936,7 +1942,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         invoice.setEmail(inbox);
         DaoManager.save(invoice, true);
         saveFiles(inbox, true);
-        loadDraftEmail();
+        loadInvoiceDialogData(invoice);
+        //loadDraftEmail();
         return inbox;
     }
 
@@ -1987,19 +1994,20 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 //                            .filter(m -> !m.contains(emailsFrom)).collect(Collectors.toList()));
 //                    sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailCC()));
 //                }
-                if(!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getManagers())) {
-                    List<Client> managers = invoice.getEmailFrom().getManagers();
-                    List<ClientEmail> allEmailList = new ArrayList<>();
-                    CollectionUtils.emptyIfNull(managers).stream().forEach(manager -> {
-                        if(!ValidationHelper.isNullOrEmpty(manager.getEmails()))
-                            allEmailList.addAll(manager.getEmails());
-                    });
-                    sendTo = new LinkedList<>();
-                    CollectionUtils.emptyIfNull(allEmailList).stream().forEach(email -> {
-                        if(!ValidationHelper.isNullOrEmpty(email.getEmail()))
-                            sendTo.addAll(MailHelper.parseMailAddress(email.getEmail()));
-                    });
-                }
+                
+                WLGInbox inbox = DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId());
+            	List<Client> managers = inbox.getManagers();
+                List<ClientEmail> allEmailList = new ArrayList<>();
+                CollectionUtils.emptyIfNull(managers).stream().forEach(manager -> {
+                    if(!ValidationHelper.isNullOrEmpty(manager.getEmails()))
+                        allEmailList.addAll(manager.getEmails());
+                });
+                sendTo = new LinkedList<>();
+                CollectionUtils.emptyIfNull(allEmailList).stream().forEach(email -> {
+                    if(!ValidationHelper.isNullOrEmpty(email.getEmail()))
+                        sendTo.addAll(MailHelper.parseMailAddress(email.getEmail()));
+                });
+               
             }
 //            setEmailBodyToEditor(getEntity().getEmailBodyToEditor());
         }
@@ -2065,7 +2073,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     }
 
     private void attachInvoiceData() throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
-        String refrequest = "";
+    	setInvoiceEmailAttachedFiles(new ArrayList<>());
+    	String refrequest = "";
         String ndg = "";
         WLGInbox baseMail = DaoManager.get(WLGInbox.class, getBaseMailId());
         if (!ValidationHelper.isNullOrEmpty(baseMail)) {

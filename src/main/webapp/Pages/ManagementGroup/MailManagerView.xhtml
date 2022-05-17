@@ -276,13 +276,13 @@
             </div>
         </p:dialog>
 
-        <p:dialog widgetVar="sendInvoiceErrorDialogWV"  modal="true" draggable="false" position="center center">
+        <!-- <p:dialog widgetVar="sendInvoiceErrorDialogWV"  modal="true" draggable="false" position="center center">
             <div class="ui-messages-error ui-corner-all">
                 <span class="ui-messages-error-summary">#{msg.sendInvoiceErrorMsg}</span><br/>
             </div>
             <p:commandButton oncomplete="PF('sendInvoiceErrorDialogWV').hide();"
                              value="#{msg.close}" />
-        </p:dialog>
+        </p:dialog> -->
 
         <ui:include src="../ConfigurationArea/ClientCreate.xhtml"/>
         <ui:include src="../Dialogs/MailManagerViewRequestsDialog.xhtml"/>
