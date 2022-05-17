@@ -75,7 +75,8 @@ public enum PageTypes {
     REFERENT_LIST("/Pages/Dictionaries/ReferentList.jsf", true),
     REFERENT_EDIT("/Pages/Dictionaries/ReferentEdit.jsf", true),
 
-    DAY_PHRASE("/Pages/Dictionaries/DayPhrase.jsf", true),
+    DAY_PHRASE_LIST("/Pages/Dictionaries/DayPhraseList.jsf", true),
+    DAY_PHRASE_EDIT("/Pages/Dictionaries/DayPhraseEdit.jsf"),
     TYPE_ACT("/Pages/Dictionaries/TypeAct.jsf", true),
     TYPE_FORMALITY("/Pages/Dictionaries/TypeFormality.jsf", true),
     CADASTRAL_TOPOLOGY("/Pages/Dictionaries/CadastralTopology.jsf", true),
@@ -157,7 +158,8 @@ public enum PageTypes {
     TAX_RATE_EDIT("/Pages/ManagementGroup/TaxRateEdit.jsf"),
 
     CONTACT_LIST("/Pages/ManagementGroup/ContactList.jsf"),
-    EXCEL_DATA_REQUEST("/Pages/ManagementGroup/ExcelDataRequest.jsf"),;
+
+    EXCEL_DATA_REQUEST("/Pages/ManagementGroup/ExcelDataRequest.jsf");
 
     private String page;
 

@@ -1179,6 +1179,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
         executeJS("PF('invoiceDialogBillingWV').hide();");
         closeInvoiceDialog();
+
     }
 
     public void onItemSelectInvoiceClient() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
@@ -1940,7 +1941,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         //saveFiles(true);
         saveFiles(inbox, true);
         loadInvoiceDialogData(invoice);
-        //loadDraftEmail();
         return inbox;
     }
 
@@ -1991,19 +1991,18 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 //                            .filter(m -> !m.contains(emailsFrom)).collect(Collectors.toList()));
 //                    sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailCC()));
 //                }
-            	 WLGInbox inbox = DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId());
-             	 List<Client> managers = inbox.getManagers();
-                 List<ClientEmail> allEmailList = new ArrayList<>();
-                 CollectionUtils.emptyIfNull(managers).stream().forEach(manager -> {
-                     if(!ValidationHelper.isNullOrEmpty(manager.getEmails()))
-                         allEmailList.addAll(manager.getEmails());
-                 });
-                 sendTo = new LinkedList<>();
-                 CollectionUtils.emptyIfNull(allEmailList).stream().forEach(email -> {
-                     if(!ValidationHelper.isNullOrEmpty(email.getEmail()))
-                         sendTo.addAll(MailHelper.parseMailAddress(email.getEmail()));
-                 });
-
+                WLGInbox inbox = DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId());
+                List<Client> managers = inbox.getManagers();
+                List<ClientEmail> allEmailList = new ArrayList<>();
+                CollectionUtils.emptyIfNull(managers).stream().forEach(manager -> {
+                    if(!ValidationHelper.isNullOrEmpty(manager.getEmails()))
+                        allEmailList.addAll(manager.getEmails());
+                });
+                sendTo = new LinkedList<>();
+                CollectionUtils.emptyIfNull(allEmailList).stream().forEach(email -> {
+                    if(!ValidationHelper.isNullOrEmpty(email.getEmail()))
+                        sendTo.addAll(MailHelper.parseMailAddress(email.getEmail()));
+                });
 //                WLGInbox baseMail = DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId());
 //                String sendDate;
 //                if (invoice.getEmailFrom().getSendDate() == null) {
@@ -2113,8 +2112,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     }
 
     private void attachInvoiceData(Invoice invoice) throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
-    	setInvoiceEmailAttachedFiles(new ArrayList<>());
-    	String refrequest = "";
+        setInvoiceEmailAttachedFiles(new ArrayList<>());
+        String refrequest = "";
         String ndg = "";
         // WLGInbox baseMail = DaoManager.get(WLGInbox.class, getBaseMailId());
         if(ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {

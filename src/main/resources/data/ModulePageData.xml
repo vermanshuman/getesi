@@ -70,7 +70,7 @@
 		<module_code entity_field="code">PDTDM</module_code>
 	</data_entry>
 	<data_entry>
-		<page_type>DAY_PHRASE</page_type>
+		<page_type>DAY_PHRASE_LIST</page_type>
 		<module_code entity_field="code">PDP</module_code>
 	</data_entry>
 	<data_entry>

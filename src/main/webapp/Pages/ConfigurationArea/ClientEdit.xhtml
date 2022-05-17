@@ -913,15 +913,15 @@
 
                     </p:dataTable>
                     <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" rendered="#{bean.showClientCopy}">
-                            <h:outputText value="#{msg.clientEditCopyCostList}"/>
-                            <p:selectOneMenu id="client" value="#{bean.selectedClientIdToCopy}" style="width: 300px; float:right;"
+                        <h:outputText value="#{msg.clientEditCopyCostList}"/>
+                        <p:selectOneMenu id="client" value="#{bean.selectedClientIdToCopy}" style="width: 300px; float:right;"
                                          styleClass="#{bean.selectedClientIdToCopy ne null ? 'select-one-menu' : ''}">
-	                            <f:selectItem itemLabel="#{ff:upper(msg.client_list)}" itemValue="#{null}"
-	                                          noSelectionOption="true"/>
-	                            <f:selectItems value="#{bean.clientsToCopy}" />
-	                            <p:ajax event="itemSelect" update="@this"/>
-                        	</p:selectOneMenu>
-                        	<p:commandButton value="#{msg.clientEditCopy}" update="servicesTable" action="#{bean.copyPriceListClient}"/>
+                            <f:selectItem itemLabel="#{ff:upper(msg.client_list)}" itemValue="#{null}"
+                                          noSelectionOption="true"/>
+                            <f:selectItems value="#{bean.clientsToCopy}" />
+                            <p:ajax event="itemSelect" update="@this"/>
+                        </p:selectOneMenu>
+                        <p:commandButton value="#{msg.clientEditCopy}" update="servicesTable" action="#{bean.copyPriceListClient}"/>
                     </p:panelGrid>
                 </div>
             </p:tab>

@@ -869,6 +869,22 @@
             </span>
         </p:dialog>
 
+        <p:dialog id="requestDataChangedWarning" widgetVar="requestDataChangedWarningWV" modal="true" styleClass="dialog-green"
+                  resizable="false" draggable="false" effect="SLIDE"
+                  header="">
+            <span>
+                <h:outputText value="#{msg.requestDataChangedWarning}"/>
+            </span>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" styleClass="confirm-button"
+                                 style="margin-right: 15px;"
+                                 action="#{bean.cancelAndSaveServiceRequest(true, true)}"
+                                 oncomplete="PF('requestDataChangedWarningWV').hide();"/>
+                <p:commandButton value="#{msg.cancel}" oncomplete="PF('requestDataChangedWarningWV').hide();"
+                                 style="background-color: #F3362B !important; width: 100px;"
+                                 action="#{bean.cancelAndSaveServiceRequest(true, false)}"/>
+            </div>
+        </p:dialog>
     </ui:define>
 
     <ui:define name="view_buttons">
@@ -1055,7 +1071,7 @@
                         <p:outputPanel
                                 style="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments ? 'text-align: center;' : 'display: flex;'}">
                             <p:commandButton id="mailBtn" styleClass="richiesta-da-mail-icon"
-                                             action="#{requestBean.openRequestMail}"
+                                             action="#{requestBean.openRequestMailNew}"
                                              style="color: transparent !important;background-color: transparent !important;border-color: transparent !important;margin: 0 auto;cursor: pointer;"
                                              rendered="#{not empty item.mailId}">
                                 <f:setPropertyActionListener value="#{item.mailId}"

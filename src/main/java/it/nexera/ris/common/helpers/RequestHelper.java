@@ -388,6 +388,9 @@ public class RequestHelper {
                             continue;
                         }
 
+                        if((field.getField() == ManageTypeFields.ATTACHED_DOCUMENTS)){
+                            continue;
+                        }
                         if(!isHidden){
                             InputCardManageField existingField = inputCardOutput.getFields().stream()
                                     .filter(f -> f.getField() == field.getField()).findAny().orElse(null);
@@ -403,9 +406,6 @@ public class RequestHelper {
                                 }
                             }
                         }else {
-                            if((field.getField() == ManageTypeFields.ATTACHED_DOCUMENTS)){
-                                continue;
-                            }
                             InputCardManageField existingField = inputCardOutput.getFields().stream()
                                     .filter(f -> f.getField() == field.getField()).findAny().orElse(null);
                             if (existingField == null && field.getState() == ManageTypeFieldsState.HIDDEN) {

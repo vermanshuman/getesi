@@ -142,7 +142,7 @@ public class MenuBean extends PageBean implements Serializable {
             submenuAddElement(submenu, PageTypes.DATA_GROUP_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.EVENT_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.INPUT_CARD_LIST, "fa fa-fw fa-bars");
-            submenuAddElement(submenu, PageTypes.DAY_PHRASE, "fa fa-fw fa-quote-right");
+            submenuAddElement(submenu, PageTypes.DAY_PHRASE_LIST, "fa fa-fw fa-quote-right");
             submenuAddElement(submenu, PageTypes.TYPE_ACT, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.TYPE_FORMALITY, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.CADASTRAL_TOPOLOGY, "fa fa-fw fa-bars");

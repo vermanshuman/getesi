@@ -726,8 +726,7 @@
                                     <p:commandButton value="#{msg.delivery}" styleClass="ui-button-success p-mr-2 p-mb-2"
                                                      action="#{bean.sendInvoice}" rendered="#{!bean.invoiceSentStatus}"
                                                      update="@widgetVar(buttonsPanelWV) @widgetVar(countsSummaryPanelVW)
-                             						 		 @widgetVar(goodsServicesPanelVW) @widgetVar(mainPanelVW) @widgetVar(sendInvoiceErrorDialogWV) :form"/>
-                                    <p:commandButton value="#{msg.close}" oncomplete="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"
+                             						 		 @widgetVar(goodsServicesPanelVW) @widgetVar(mainPanelVW) @widgetVar(sendInvoiceErrorDialogWV) :form"/>                                    <p:commandButton value="#{msg.close}" oncomplete="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"
                                                      rendered="#{bean.invoiceSentStatus}"/>
                                 </div>
                             </div>
@@ -1162,15 +1161,14 @@
                 </div>
             </div>
         </div>
-
     </p:dialog>
-    
+
     <p:dialog widgetVar="sendInvoiceErrorDialogWV"  modal="true" draggable="false" position="center center">
-       <div class="ui-messages-error ui-corner-all">
-           <span class="ui-messages-error-summary">#{bean.apiError}</span><br/>
-       </div>
-       <p:commandButton oncomplete="PF('sendInvoiceErrorDialogWV').hide();"
-                        value="#{msg.close}" />
+        <div class="ui-messages-error ui-corner-all">
+            <span class="ui-messages-error-summary">#{bean.apiError}</span><br/>
+        </div>
+        <p:commandButton oncomplete="PF('sendInvoiceErrorDialogWV').hide();"
+                         value="#{msg.close}" />
     </p:dialog>
 
 </ui:composition>

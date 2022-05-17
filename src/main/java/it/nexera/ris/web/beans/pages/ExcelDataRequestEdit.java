@@ -132,8 +132,8 @@ public class ExcelDataRequestEdit extends BaseEntityPageBean {
             setMailId(Long.valueOf(getRequestParameter(RedirectHelper.MAIL_ID)));
         }
         if(!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.REQUEST_ID))){
-        	selectedRequestIds.add(Long.parseLong(getRequestParameter(RedirectHelper.REQUEST_ID)));
-        	setSelectedRequestIds(selectedRequestIds);
+            selectedRequestIds.add(Long.parseLong(getRequestParameter(RedirectHelper.REQUEST_ID)));
+            setSelectedRequestIds(selectedRequestIds);
         }
         /*else if(!ValidationHelper.isNullOrEmpty(SessionHelper.get("selectedRequestIds"))) {
             List<Long> selectedRequestIds =(List<Long>)SessionHelper.get("selectedRequestIds");
@@ -1514,12 +1514,13 @@ public class ExcelDataRequestEdit extends BaseEntityPageBean {
     public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         setCostNote(null);
         setCostManipulationHelper(new CostManipulationHelper());
-        Request request =DaoManager.get(Request.class, getRequestId());
+        System.out.println(">>>>>>>>>>>>>>>>> " + getRequestId());
+        Request request = DaoManager.get(Request.class, getRequestId());
         request.setSelectedTemplateId(null);
-        if(!ValidationHelper.isNullOrEmpty(request.getRequestFormalities())) { 
-	        if(!Hibernate.isInitialized(request.getRequestFormalities())){
-	            request.reloadRequestFormalities();
-	        }
+        if(!ValidationHelper.isNullOrEmpty(request.getRequestFormalities())) {
+            if(!Hibernate.isInitialized(request.getRequestFormalities())){
+                request.reloadRequestFormalities();
+            }
         }
         setExamRequest(request);
         RequestPrint requestPrint = DaoManager.get(RequestPrint.class,

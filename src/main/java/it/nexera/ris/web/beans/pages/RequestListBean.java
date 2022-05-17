@@ -968,6 +968,10 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public void openRequestMail() {
+        RedirectHelper.goTo(PageTypes.MAIL_MANAGER_VIEW, getEntityEditId());
+    }
+
+    public void openRequestMailNew() {
         RedirectHelper.goTo(PageTypes.MAIL_MANAGER_VIEW, getEntityEditId(), true);
     }
 

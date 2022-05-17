@@ -455,7 +455,7 @@ public class RedirectHelper extends BaseHelper {
     public static void goToMailManagerViewFromBillingList(Serializable mailId) {
         try {
             sendRedirect(PageTypes.MAIL_MANAGER_VIEW.getPagesContext() + "?"
-                    + ID_PARAMETER + "=" + mailId + "&page=0" + "&" +BILLING_LIST + "=3", true);
+                    + ID_PARAMETER + "=" + mailId + "&page=0" + "&" +BILLING_LIST + "=3");
         } catch (Exception e) {
             LogHelper.log(log, e);
         }
@@ -468,13 +468,13 @@ public class RedirectHelper extends BaseHelper {
             LogHelper.log(log, e);
         }
     }
-    
+
     public static void goToExcelDataRequest(Serializable requestId, Serializable mailId, Boolean mailIdPresent ) {
         try {
-        	if(mailIdPresent)
-        		sendRedirect(PageTypes.EXCEL_DATA_REQUEST.getPagesContext() + "?" + MAIL_ID + "=" + mailId);
-        	else
-        		sendRedirect(PageTypes.EXCEL_DATA_REQUEST.getPagesContext() + "?" + REQUEST_ID + "=" + requestId);
+            if(mailIdPresent)
+                sendRedirect(PageTypes.EXCEL_DATA_REQUEST.getPagesContext() + "?" + MAIL_ID + "=" + mailId);
+            else
+                sendRedirect(PageTypes.EXCEL_DATA_REQUEST.getPagesContext() + "?" + REQUEST_ID + "=" + requestId);
         } catch (Exception e) {
             LogHelper.log(log, e);
         }

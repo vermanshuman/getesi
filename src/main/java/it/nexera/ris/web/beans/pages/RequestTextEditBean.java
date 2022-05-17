@@ -1574,24 +1574,23 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         if(!ValidationHelper.isNullOrEmpty(getExamRequest().getRequestPrint())) {
             updateTemplate();
         }
-        //else {
-        //    if(!ValidationHelper.isNullOrEmpty(getExamRequest().getClient()) &&
-        //            !ValidationHelper.isNullOrEmpty(getExamRequest().getClient().getCostOutput()) &&
-        //            getExamRequest().getClient().getCostOutput()){
-        //         executeJS("PF('reloadPageDialogWV').show()");
-        //    }
-        //}
-
+//        else {
+//            if(!ValidationHelper.isNullOrEmpty(getExamRequest().getClient()) &&
+//                    !ValidationHelper.isNullOrEmpty(getExamRequest().getClient().getCostOutput()) &&
+//                    getExamRequest().getClient().getCostOutput()){
+//                executeJS("PF('reloadPageDialogWV').show()");
+//            }
+//        }
         //  getCostManipulationHelper().saveRequestExtraCost(getExamRequest());
         // updateTemplate();
         editExcelDataRequest();
     }
-    
+
     public void editExcelDataRequest() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
         if(!ValidationHelper.isNullOrEmpty(getExamRequest().getMail()) && !ValidationHelper.isNullOrEmpty(getExamRequest().getMail().getId()))
-        	RedirectHelper.goToExcelDataRequest(null, getExamRequest().getMail().getId(), true);
+            RedirectHelper.goToExcelDataRequest(null, getExamRequest().getMail().getId(), true);
         else
-        	RedirectHelper.goToExcelDataRequest(getRequestId(), null, false);
+            RedirectHelper.goToExcelDataRequest(getRequestId(), null, false);
     }
 
     public void reloadPage() throws IllegalAccessException, InstantiationException, PersistenceBeanException {

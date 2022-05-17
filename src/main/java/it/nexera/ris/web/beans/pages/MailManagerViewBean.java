@@ -1942,8 +1942,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         invoice.setEmail(inbox);
         DaoManager.save(invoice, true);
         saveFiles(inbox, true);
+//        loadDraftEmail();
         loadInvoiceDialogData(invoice);
-        //loadDraftEmail();
         return inbox;
     }
 
@@ -1994,9 +1994,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 //                            .filter(m -> !m.contains(emailsFrom)).collect(Collectors.toList()));
 //                    sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailCC()));
 //                }
-                
                 WLGInbox inbox = DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId());
-            	List<Client> managers = inbox.getManagers();
+                List<Client> managers = inbox.getManagers();
                 List<ClientEmail> allEmailList = new ArrayList<>();
                 CollectionUtils.emptyIfNull(managers).stream().forEach(manager -> {
                     if(!ValidationHelper.isNullOrEmpty(manager.getEmails()))
@@ -2007,7 +2006,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     if(!ValidationHelper.isNullOrEmpty(email.getEmail()))
                         sendTo.addAll(MailHelper.parseMailAddress(email.getEmail()));
                 });
-               
             }
 //            setEmailBodyToEditor(getEntity().getEmailBodyToEditor());
         }
@@ -2073,8 +2071,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     }
 
     private void attachInvoiceData() throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
-    	setInvoiceEmailAttachedFiles(new ArrayList<>());
-    	String refrequest = "";
+        setInvoiceEmailAttachedFiles(new ArrayList<>());
+        String refrequest = "";
         String ndg = "";
         WLGInbox baseMail = DaoManager.get(WLGInbox.class, getBaseMailId());
         if (!ValidationHelper.isNullOrEmpty(baseMail)) {

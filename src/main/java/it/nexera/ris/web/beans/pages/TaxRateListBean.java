@@ -109,7 +109,7 @@ public class TaxRateListBean extends EntityLazyListPageBean<TaxRate>
         setPercentage(null);
         setDescription(null);
         setCodeSDI(null);
-        setSelectedUse(-1);
+        setSelectedUse(null);
         filterTableFromPanel();
     }
 }

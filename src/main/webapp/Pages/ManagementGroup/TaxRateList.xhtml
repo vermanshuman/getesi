@@ -13,37 +13,6 @@
     <ui:param name="entity_name" value="#{msg.taxRate}"/>
     <ui:param name="disableSelection" value="true"/>
     <ui:param name="additionalEditAction" value="window.scrollTo(0,0);"/>
-
-<!--    <ui:define name="edit_fields">-->
-<!--        <style>-->
-<!--            #table {-->
-<!--                padding-left: 16px;-->
-<!--                padding-right: 15px;-->
-<!--            }-->
-<!--        </style>-->
-<!--        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">-->
-
-<!--            <span><span class="red">*</span>#{msg.percentage}:</span>-->
-<!--            <p:inputText id="percentage" type="number"-->
-<!--                         value="#{bean.entity.percentage}"-->
-<!--                         label="#{msg.percentage}"/>-->
-<!--            <span><span class="red">*</span> #{msg.description}:</span>-->
-<!--            <p:inputText id="description"-->
-<!--                         value="#{bean.entity.description}"-->
-<!--                         label="#{msg.description}"/>-->
-
-<!--            <span><span class="red">*</span>#{msg.codeSDI}:</span>-->
-<!--            <p:inputText id="codeSDI"-->
-<!--                         value="#{bean.entity.codeSDI}"-->
-<!--                         label="#{msg.codeSDI}"/>-->
-<!--            <span>#{msg.use}:</span>-->
-<!--            <p:selectOneRadio id="use" value="#{bean.entity.use}" label="#{msg.use}">-->
-<!--                <f:selectItem itemLabel="#{msg.yes}" itemValue="true" />-->
-<!--                <f:selectItem itemLabel="#{msg.no}" itemValue="false" />-->
-<!--            </p:selectOneRadio>-->
-<!--        </p:panelGrid>-->
-<!--    </ui:define>-->
-
     <ui:define name="search_body">
         <div class="settingsBlock">
             <p:commandButton id="settingButton" onclick="togglePanel();" type="button" style="margin-left: 110px;position: absolute;"
@@ -170,28 +139,28 @@
                             <p:ajax event="itemSelect" update="@this"/>
                         </p:selectOneMenu>
                     </div>
-<!--                    <div class="p-col-6">-->
-<!--                        <p:selectOneMenu id="filterCourtCity" value="#{bean.selectedCityId}"-->
-<!--                                         style="width: calc( 100% - 5px);" styleClass="#{bean.selectedCityId ne null ? 'green-border' : ''}">-->
-<!--                            <f:selectItem itemLabel="#{msg.courtCity}"-->
-<!--                                          itemValue="#{null}"-->
-<!--                                          noSelectionOption="true"/>-->
-<!--                            <f:selectItems value="#{bean.courtCities}"/>-->
-<!--                            <p:ajax event="itemSelect" update="@this"/>-->
-<!--                        </p:selectOneMenu>-->
-<!--                        &lt;!&ndash;                        <p:selectOneMenu id="filterCourtCity" onblur="updateFilterInput()" value="#{bean.courtCity}" style="width: 99%;" styleClass="#{bean.courtCity ne null and bean.courtCity ne '' ? 'green-border' : ''}">&ndash;&gt;-->
-<!--                        &lt;!&ndash;                            <f:selectItem itemLabel="#{ff:upper(msg.courtCity)}"&ndash;&gt;-->
-<!--                        &lt;!&ndash;                                          itemValue="#{null}"&ndash;&gt;-->
-<!--                        &lt;!&ndash;                                          noSelectionOption="true"/>&ndash;&gt;-->
-<!--                        &lt;!&ndash;                            <p:ajax event="itemSelect" update="@this"/>&ndash;&gt;-->
-<!--                        &lt;!&ndash;                        </p:selectOneMenu>&ndash;&gt;-->
-<!--                    </div>-->
-<!--                    <div class="p-col-6">-->
-<!--                        <div style="">-->
-<!--                            <h:outputText style="color: #003871;"-->
-<!--                                          value=""/>-->
-<!--                        </div>-->
-<!--                    </div>-->
+                    <!--                    <div class="p-col-6">-->
+                    <!--                        <p:selectOneMenu id="filterCourtCity" value="#{bean.selectedCityId}"-->
+                    <!--                                         style="width: calc( 100% - 5px);" styleClass="#{bean.selectedCityId ne null ? 'green-border' : ''}">-->
+                    <!--                            <f:selectItem itemLabel="#{msg.courtCity}"-->
+                    <!--                                          itemValue="#{null}"-->
+                    <!--                                          noSelectionOption="true"/>-->
+                    <!--                            <f:selectItems value="#{bean.courtCities}"/>-->
+                    <!--                            <p:ajax event="itemSelect" update="@this"/>-->
+                    <!--                        </p:selectOneMenu>-->
+                    <!--                        &lt;!&ndash;                        <p:selectOneMenu id="filterCourtCity" onblur="updateFilterInput()" value="#{bean.courtCity}" style="width: 99%;" styleClass="#{bean.courtCity ne null and bean.courtCity ne '' ? 'green-border' : ''}">&ndash;&gt;-->
+                    <!--                        &lt;!&ndash;                            <f:selectItem itemLabel="#{ff:upper(msg.courtCity)}"&ndash;&gt;-->
+                    <!--                        &lt;!&ndash;                                          itemValue="#{null}"&ndash;&gt;-->
+                    <!--                        &lt;!&ndash;                                          noSelectionOption="true"/>&ndash;&gt;-->
+                    <!--                        &lt;!&ndash;                            <p:ajax event="itemSelect" update="@this"/>&ndash;&gt;-->
+                    <!--                        &lt;!&ndash;                        </p:selectOneMenu>&ndash;&gt;-->
+                    <!--                    </div>-->
+                    <!--                    <div class="p-col-6">-->
+                    <!--                        <div style="">-->
+                    <!--                            <h:outputText style="color: #003871;"-->
+                    <!--                                          value=""/>-->
+                    <!--                        </div>-->
+                    <!--                    </div>-->
                     <div class="p-col-12" style="text-align: center;">
                         <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #00CC52;margin-right: 20px;" id="searchButton"
                                          onclick="filterTableFromPanel();" onsuccess="PF('panelSetting').getJQ().hide()"/>
