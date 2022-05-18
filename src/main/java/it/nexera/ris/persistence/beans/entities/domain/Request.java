@@ -439,7 +439,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     private String dateEvasionString;
 
     @Transient
-    private boolean selectedForInvoice;
+    private boolean selectedForInvoice = true;
 
     @Transient
     private Boolean selectedRequest;
