@@ -579,7 +579,7 @@
                                     disabled="#{bean.selectedRequestTypesIdMultiple eq null}"
                                     update="saveMultipleRequest table newRequestList @(.servicedropdowns) form"
                                     rendered="#{bean.showAddServiceButton and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2
-                                                            and bean.multipleRequestCreate}"/>
+                                                            and bean.multipleRequestCreate and bean.getEntity().isNew()}"/>
                         </div>
                         <!--                        <div class="ui-g-3" style="padding: 1%">-->
 
