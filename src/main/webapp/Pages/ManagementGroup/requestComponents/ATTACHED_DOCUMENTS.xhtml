@@ -17,14 +17,29 @@
             border-width: 0 0 0 0 !important;
             border-style: solid!important;
         }
+        
+        .ui-dialog .ui-widget-header {
+            background: #f8f9fa !important;
+            color: #495057 !important;
+        }
+        
+        .confirm-button {
+            background-color: #00CC52 !important;
+            width: 100px;
+        }
+        .cancel-button {
+            background-color: #F3362B !important;
+            width: 100px;
+            margin-left: 15px !important;
+        }
     </style>
     <span>#{enums.documentGenerationTagsATTACHED_DOCUMENTS}
         <h:panelGroup rendered="#{not empty block}" style="#{block.isRequired()?'':'display:none;'}">*</h:panelGroup>
         <h:panelGroup rendered="#{not empty item and not empty item.field}" style="#{item.field.isRequired()?'':'display:none;'}">*</h:panelGroup>
     </span>
-    <p:panel id="ATTACHED_DOCUMENTS" style="width: 100%; background: transparent; border: none">
+    <p:panel id="ATTACHED_DOCUMENTS" style="width: 100%; padding: 0; padding-right:1rem; background: transparent; border: none">
         <div class="ui-g">
-            <div class="ui-g-6">
+            <div class="ui-g-6">	
                 <h:outputText value="#{msg.requestDocumentAddNew}:"/>
             </div>
             <div class="ui-g-6">
@@ -87,7 +102,7 @@
         </div>
     </p:panel>
 
-    <p:dialog header="#{msg.databaseListDocumentAddDlg}" modal="true"
+    <p:dialog header="#{msg.databaseListDocumentAddDlg}" modal="true" styleClass="dialog-green"
               id="documentAddDlg" resizable="false" draggable="false"
               dynamic="true" widgetVar="documentAddDlgWV">
         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
@@ -107,10 +122,10 @@
                         value="#{bean.documentDate}"/>
         </p:panelGrid>
         <div class="btn_line">
-            <p:commandButton value="#{msg.save}" ajax="false"
+            <p:commandButton value="#{msg.save}" ajax="false" styleClass="confirm-button"
                              action="#{bean.fillUploadedFileDocumentList}" update=":form:ATTACHED_DOCUMENTS"
                              oncomplete="PF('documentAddDlgWV').hide();"/>
-            <p:commandButton value="#{msg.cancel}" ajax="false"
+            <p:commandButton value="#{msg.cancel}" ajax="false" styleClass="cancel-button"
                              action="#{bean.cancelSaveFile}" update="@form"
                              oncomplete="PF('documentAddDlgWV').hide();"/>
         </div>
