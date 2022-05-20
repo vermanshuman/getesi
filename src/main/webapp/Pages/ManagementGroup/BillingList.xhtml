@@ -1282,6 +1282,11 @@
                                 </div>
                             </p:column>
                             <p:column rendered="#{invoice.email.serverId != null}">
+                                <p:commandButton id="openinvoice-btn-server" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
+                                                 action="#{bean.loadInvoiceDialogDataEdit(invoice)}" oncomplete="PF('invoiceDialogBillingWV').show();" update="invoiceDialogBilling">
+                                    <!-- <f:setPropertyActionListener value="#{item.id}"
+                                                                 target="#{bean.entityEditId}"/> -->
+                                </p:commandButton>
                                 <div class="icon-block" style="justify-content: left;">
                                     <i class="email-check-icon"></i>
                                     <p:commandLink id="actionPnl1" global="false" style="outline: none;" immediate="true" readonly="true">
@@ -1291,6 +1296,8 @@
                                     <p:tooltip for="actionPnl1" hideEvent="blur" showEvent="focus" styleClass="actionPnl-tooltip">
                                         <p:outputPanel id="actionGrid1" styleClass="actionPnl-panel">
                                             <p:commandButton value="#{ff:upper(msg.dataVerification)}" styleClass="action-btn"
+                                                             onclick="document.getElementById('invoiceTable:#{rowId}:openinvoice-btn-server').click()"
+                                                             oncomplete="PF('invoiceDialogBillingWV').show();"
                                                              style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;"/>
                                         </p:outputPanel>
                                     </p:tooltip>
