@@ -3,6 +3,51 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html" xmlns:c="http://java.sun.com/jsp/jstl/core">
+<style>
+	#requestExtraCostDialog .ui-dialog-titlebar {
+		padding: 0.4em 0.4em 0.4em 1em;
+	}
+	
+	.ui-dialog .ui-widget-header {
+		background: #f8f9fa !important;
+		color: #495057 !important;
+	}
+	
+	.cost_titles {
+		padding-top: 20px !important;
+	}
+	
+	.cost_titles h3 {
+		font-size: 1.17em !important;
+		font-weight: bold !important;
+	}
+	
+	.cost_titles>.p-field>span {
+		font-size: 14px !important;
+		font-weight: bold !important;
+	}
+	
+	.ui-datatable-scrollable-theadclone {
+		height: 0;
+		display: none;
+	}
+	
+	.ui-dialog-content {
+		max-height: 700px !important;
+		margin-bottom: 5px !important;
+	}
+	
+	.action_column_width {
+		width: 14% !important;
+		text-align: center;
+	}
+	
+	#requestExtraCostTable .ui-datatable-scrollable-header-box table,
+		.ui-datatable-scrollable-footer-box table,
+		.ui-datatable-scrollable-body table {
+		table-layout: auto;
+	}
+</style>
     <p:dialog widgetVar="requestExtraCostDlg" modal="true" width="700" id="requestExtraCostDialog">
         <div class="cost_titles">
             <c:if test="#{bean.costManipulationHelper ne null and bean.costManipulationHelper.isEditable()}">

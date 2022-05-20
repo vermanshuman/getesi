@@ -32,7 +32,7 @@
 				<h:outputText value=""/>
 				<h:outputText value=""/>
 				<h:outputText value="#{msg.fatturaN}:"/>
-				<p:inputText id="fatturaN" value="#{bean.excelFatturaN}"
+				<p:inputText id="fatturaN" value="#{bean.excelFatturaN}" styleClass="ui-inputfield-border"
 					style="width: 100%" disabled="true"/>
 				<h:outputText value="#{msg.excelData}:"/>
 				<p:calendar id="excelDate" readonlyInput="false" showOn="button"
@@ -42,7 +42,7 @@
 					onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
 					value="#{bean.excelDate}" placeholder="#{msg.excelData}:" disabled="true"/>
 				<h:outputText value="#{msg.reportN}:"/>
-				<p:inputText id="reportN" value="#{bean.excelReportN}"
+				<p:inputText id="reportN" value="#{bean.excelReportN}" styleClass="ui-inputfield-border"
 					style="width: 100%" disabled="true"/>
 
 				<h:outputText value="#{msg.subjectViewFormalityConservatoryCap}:"/>
@@ -63,11 +63,11 @@
 					<f:selectItems value="#{bean.fiduciaryClientsList}"/>
 				</p:selectOneMenu>
 				<span> #{msg.ndgText}</span>
-				<p:inputText id="ndgShow" value="#{bean.excelReportNDG}"
+				<p:inputText id="ndgShow" value="#{bean.excelReportNDG}" styleClass="ui-inputfield-border"
 					style="width: 100%" />
 
 				<span> #{msg.referenceRequest}</span>
-				<p:inputText id="referenceRequest" value="#{bean.referenceRequest}"
+				<p:inputText id="referenceRequest" value="#{bean.referenceRequest}" styleClass="ui-inputfield-border"
 					style="width: 100%" />
 			</p:panelGrid>
 
@@ -101,25 +101,29 @@
 							<p:commandButton id="submit_btn" style="background-color: #00CC52 !important;"
 								action="#{bean.generateXlsRequestCost}"
 								value="#{msg.submit}"
-								icon="ui-icon-disk"
 								ajax="false" update="@form"/>
 						</div>
 					</div>
 				</p:panelGrid>
 			</ui:remove>
 			<p:outputPanel id="btn_line">
-				<p:panelGrid columns="3" styleClass="ui-panelgr id-blank form-group additional_button" id="excel_button_panel">
+				<p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group additional_button" id="excel_button_panel">
 
 						<p:commandButton id="excel_btn" style="background-color: #00CC52 !important;"
 										 action="#{bean.generateXlsRequestCost}"
 										 value="#{msg.submit}"
-										 icon="ui-icon-disk" onclick="updateButtonPanel();" update="@form "
+										 onclick="updateButtonPanel();" update="@form "
 										 ajax="false"/>
-						<p:commandButton id="pdf_btn"
+						<!-- <p:commandButton id="pdf_btn" 
 										 action="#{bean.generatePdfRequestCost}"
 										 value="#{msg.pdf}"
 										 icon="fa fa-fw fa-file-pdf-o"
-										 ajax="false" update="@form "/>
+										 ajax="false" update="@form "/> -->
+						<p:commandButton id="pdf_btn" styleClass="pdf-button" style="border: 1px solid #AD0B00 !important;"
+										 action="#{bean.generatePdfRequestCost}"
+										 value="#{msg.pdf}"
+										 icon="pdf-icon"
+										 ajax="false" update="@form"/>
 
 						<h:panelGroup layout="block" style="display: none" id="createInvoiceDiv">
 							<p:commandButton style="margin-left: 2px;"
@@ -138,8 +142,6 @@
 				</p:panelGrid>
 			</p:outputPanel>
 
-			 <ui:include src="../Dialogs/InvoiceDialogExcel.xhtml"/>
-			<ui:include src="../Dialogs/MailManagerViewRequestsForInvoiceDialog.xhtml"></ui:include>
 			<p:outputPanel style="visibility: hidden; position: absolute;">
 				<script>
 					function updateButtonPanel() {
@@ -152,12 +154,44 @@
 				#excel_button_panel .ui-panelgrid-cell {
 					border: 0px solid #dee2e6 !important;
 				}
-
+				
 				.ui-dialog .ui-widget-header {
 					background: #f8f9fa !important;
 					color: #495057 !important;
 				}
+				
+				body .ui-inputfield-border {
+					border: 1px solid #a8acb1 !important;
+					opacity: inherit;
+				}
+				
+				body .ui-selectcheckboxmenu {
+					border: 1px solid #a8acb1 !important;
+				}
+				
+				body .ui-selectonemenu {
+					border: 1px solid #a8acb1 !important;
+				}
+				
+				#excelDate_input {
+					border: 1px solid #a8acb1 !important;
+					opacity: inherit;
+				}
+				
+				#excelDate .ui-inputfield-border {
+					border: 1px solid #ffffff !important;
+					opacity: unset;
+				}
+				
+				.pdf-button {
+					background-color: #FFFFFF !important;
+					color: #AD0B00 !important;
+					width: 100px !important;
+				}
 			</style>
+			 <ui:include src="../Dialogs/RequestExtraCostDialog.xhtml"/>
+			<ui:include src="../Dialogs/InvoiceDialogExcel.xhtml"/>
+			<ui:include src="../Dialogs/MailManagerViewRequestsForInvoiceDialog.xhtml"></ui:include>
 		</ui:define>
 	</ui:composition>
 	</html>

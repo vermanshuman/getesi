@@ -31,6 +31,11 @@
             width: 100px;
             margin-left: 15px !important;
         }
+        .red-file {
+    		background-size: 20px !important;
+    		width: 23px;
+    		margin-top: -9%;
+    	}
     </style>
     <span>#{enums.documentGenerationTagsATTACHED_DOCUMENTS}
         <h:panelGroup rendered="#{not empty block}" style="#{block.isRequired()?'':'display:none;'}">*</h:panelGroup>
@@ -89,12 +94,17 @@
 <!--                    <f:facet name="header">-->
 <!--                        <h:outputText value="#{msg.requestTableOfOtherDocumentsAssociatedWithSubject}"/>-->
 <!--                    </f:facet>-->
-
-                    <p:column colspan="2">
-                        <h:outputText value="#{doc.title}"/>
-                        <p:commandButton icon="fa fa-fw fa-file-pdf-o" style="margin-left:20px;"
+					
+                    <p:column style="display:flex !important;">
+                        <!-- <h:outputText value="#{doc.title}"/>
+                        <p:commandButton icon="fa fa-fw fa-file-pdf-o" style="margin-left:20px;" 
                                          action="#{bean.downloadPdfFile(doc)}" ajax="false" update="@form">
-                        </p:commandButton>
+                        </p:commandButton> -->
+                    	<i class="fa fa-file-pdf-o red-file"/>
+                        <p:commandLink title="#{msg.download}" update="@form" ajax="false"
+                                       action="#{bean.downloadPdfFile(doc)}" value="&nbsp;#{doc.title}"
+                                       style="color: black; font-size: 13px !important;">
+                        </p:commandLink>
                     </p:column>
                 </p:dataTable>
             </div>

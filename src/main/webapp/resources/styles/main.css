@@ -1032,3 +1032,16 @@ body .confirmationDialog .ui-widget-header {
 .dialog-red {
     border: 7px solid #F3362B !important;
 }
+
+.pdf-icon {
+    background-image: url("../images/pdf.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 25px;
+    height: 25px;
+    background-size: 21px;
+    display: block;
+    margin-top: -14% !important;
+}
+
+
