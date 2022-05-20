@@ -15,6 +15,7 @@ import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLan
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
+import it.nexera.ris.persistence.beans.entities.domain.readonly.WLGInboxShort;
 import it.nexera.ris.persistence.view.ClientView;
 import it.nexera.ris.persistence.view.RequestView;
 import it.nexera.ris.web.beans.EntityLazyListPageBean;
@@ -595,11 +596,13 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     public void filterTableFromPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         updateFilterValueInSession();
+        String filterState = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("searchClicked");
+
         List<Criterion> restrictions = RequestHelper.filterTableFromPanel(getDateFrom(), getDateTo(), getDateFromEvasion(),
                 getDateToEvasion(), getSelectedClientId(), getRequestTypeWrappers(), getStateWrappers(), getUserWrappers(),
                 getServiceWrappers(), getSelectedUserType(), getAggregationFilterId(), getSelectedServiceType(), Boolean.FALSE);
 
-        if(ValidationHelper.isNullOrEmpty(getSelectedStates()))
+        if((ValidationHelper.isNullOrEmpty(filterState) || !Boolean.parseBoolean(filterState)) && ValidationHelper.isNullOrEmpty(getSelectedStates()))
             restrictions.add(Restrictions.or(Restrictions.eq("stateId", RequestState.INSERTED.getId()),
                     Restrictions.eq("stateId", RequestState.IN_WORK.getId()), Restrictions.eq("stateId", RequestState.TO_BE_SENT.getId())));
 

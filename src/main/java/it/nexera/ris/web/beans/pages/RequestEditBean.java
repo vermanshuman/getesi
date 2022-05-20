@@ -1752,7 +1752,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                         && !ValidationHelper.isNullOrEmpty(getNdg()))
                         || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNdg()) &&
                         !ValidationHelper.isNullOrEmpty(getNdg()) &&
-                        !getOriginalRequest().getPosition().equals(getNdg()))) {
+                        !getOriginalRequest().getNdg().equals(getNdg()))) {
                     requestUpdated = true;
                     getUpdatedPropertyNames().add("ndg");
                 }
@@ -1763,7 +1763,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                         && !ValidationHelper.isNullOrEmpty(getCdr()))
                         || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getCdr()) &&
                         !ValidationHelper.isNullOrEmpty(getCdr()) &&
-                        !getOriginalRequest().getPosition().equals(getCdr()))) {
+                        !getOriginalRequest().getCdr().equals(getCdr()))) {
                     requestUpdated = true;
                     getUpdatedPropertyNames().add("cdr");
                 }
@@ -1809,7 +1809,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                             || getOriginalRequest().getSubject().getBirthDate().compareTo(getSubject().getBirthDate()) != 0
                             || !getOriginalRequest().getSubject().getBirthProvince().equals(getSubject().getBirthProvince())
                             || !getOriginalRequest().getSubject().getBirthCity().equals(getSubject().getBirthCity())
-                            || !getOriginalRequest().getSubject().getFiscalCode().equals(getSubject().getFiscalCode())) {
+                            || !getOriginalRequest().getSubject().getFiscalCode().equals(getSubject().getFiscalCode())
+                        || !getOriginalRequest().getSubject().getSex().equals(getWrapper().getSelectedSexTypeId())) {
                         requestUpdated = true;
                         getUpdatedPropertyNames().add("subject");
                     }
@@ -1831,7 +1832,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
                 List<Request> associatedRequests =
                         DaoManager.load(Request.class, new CriteriaAlias[]{
-                        new CriteriaAlias("mail", "m", JoinType.INNER_JOIN)
+                        new CriteriaAlias("mail", "m", JoinType.INNER_JOIN),
+                                new CriteriaAlias("subject", "s", JoinType.INNER_JOIN)
                 }, new Criterion[]{
                         Restrictions.and(Restrictions.eq("m.id", getEntity().getMail().getId()),
                                 Restrictions.ne("id", getEntity().getId()))
@@ -1933,6 +1935,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private void saveData() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         if(!getEntity().isNew()){
+
             pageSave();
             if(!ValidationHelper.isNullOrEmpty(getAssociatedRequests())
                     && !ValidationHelper.isNullOrEmpty(getSaveAssociatedRequests()) && getSaveAssociatedRequests()){
@@ -1940,12 +1943,30 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                     this.tr = DaoManager.getSession().beginTransaction();
                     this.setSaveFlag(1);
 
-                    for(Request associatedRequest : getAssociatedRequests()) {
-                        if(getUpdatedPropertyNames().contains("typeId") || getUpdatedPropertyNames().contains("subject")){
-                            associatedRequest.setSubject(getEntity().getSubject());
+                    Request entity = DaoManager.get(Request.class,
+                            new CriteriaAlias[]{
+                                    new CriteriaAlias("subject", "s", JoinType.INNER_JOIN)
+                            },
+                            new Criterion[]{
+                            Restrictions.eq("id", getEntity().getId())
+                    });
+
+                    for(Request ar : getAssociatedRequests()) {
+
+                        Request associatedRequest = DaoManager.get(Request.class,
+                                new CriteriaAlias[]{
+                                        new CriteriaAlias("subject", "s", JoinType.INNER_JOIN)
+                                },
+                                new Criterion[]{
+                                        Restrictions.eq("id", ar.getId())
+                                });
+
+                        if(getUpdatedPropertyNames().contains("typeId") || getUpdatedPropertyNames().contains("subject") &&
+                            !ValidationHelper.isNullOrEmpty(associatedRequest.getSubject())
+                                    && associatedRequest.getSubject().getId().equals(getOriginalRequest().getSubject().getId())){
+                            associatedRequest.setSubject(entity.getSubject());
                         }
                         if(getUpdatedPropertyNames().contains("client")){
-                            System.out.println("PPPPPPPPPPPPp " + DaoManager.get(Client.class, getSelectedClientId()));
                             associatedRequest.setClient(DaoManager.get(Client.class, getSelectedClientId()));
                         }
                         if(getUpdatedPropertyNames().contains("billingClient")){

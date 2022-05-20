@@ -48,9 +48,11 @@ public enum PageTypes {
     // Dictionary
 
     TEMPLATE_DOCUMENT_MODEL_LIST("/Pages/Dictionaries/TemplateDocumentModelList.jsf", true),
+    TEMPLATE_DOCUMENT_MODEL_EDIT("/Pages/Dictionaries/TemplateDocumentModelEdit.jsf", true),
 
     REQUEST_TYPE_LIST("/Pages/Dictionaries/RequestTypeList.jsf", true),
-    FOREIGN_STATE_LIST("/Pages/Dictionaries/ForeignStatesList.jsf", true),
+    FOREIGN_STATE_LIST("/Pages/Dictionaries/ForeignStateList.jsf", true),
+    FOREIGN_STATE_EDIT("/Pages/Dictionaries/ForeignStateEdit.jsf", true),
     STRUCTURE_LIST("/Pages/Dictionaries/StructureList.jsf", true),
 
     COST_CONFIGURATION_LIST("/Pages/Dictionaries/CostConfigurationList.jsf", true),
@@ -77,7 +79,8 @@ public enum PageTypes {
 
     DAY_PHRASE_LIST("/Pages/Dictionaries/DayPhraseList.jsf", true),
     DAY_PHRASE_EDIT("/Pages/Dictionaries/DayPhraseEdit.jsf"),
-    TYPE_ACT("/Pages/Dictionaries/TypeAct.jsf", true),
+    TYPE_ACT_LIST("/Pages/Dictionaries/TypeActList.jsf", true),
+    TYPE_ACT_EDIT("/Pages/Dictionaries/TypeActEdit.jsf", true),
     TYPE_FORMALITY("/Pages/Dictionaries/TypeFormality.jsf", true),
     CADASTRAL_TOPOLOGY("/Pages/Dictionaries/CadastralTopology.jsf", true),
 
@@ -123,6 +126,7 @@ public enum PageTypes {
 
     IBAN_LIST("/Pages/ManagementGroup/IbanList.jsf"),
     PAYMENT_TYPE_LIST("/Pages/ManagementGroup/PaymentTypeList.jsf"),
+    PAYMENT_TYPE_EDIT("/Pages/ManagementGroup/PaymentTypeEdit.jsf"),
 
     INVOICE_LIST("/Pages/ManagementGroup/InvoiceList.jsf"),
     INVOICE_EDIT("/Pages/ManagementGroup/InvoiceEdit.jsf"),
@@ -143,6 +147,7 @@ public enum PageTypes {
     
     REGIME_CONIUGI_LIST("/Pages/Dictionaries/RegimeConiugiList.jsf", true),
     SECTION_D_FORMAT_LIST("/Pages/Dictionaries/SectionDFormatList.jsf", true),
+    SECTION_D_FORMAT_EDIT("/Pages/Dictionaries/SectionDFormatEdit.jsf", true),
     DUE_REQUESTS_VIEW("/Pages/Dictionaries/DueRequestsView.jsf", true),
 
     LAND_OMI_LIST("/Pages/ConfigurationArea/LandOmiList.jsf", true),
@@ -225,6 +230,8 @@ public enum PageTypes {
         for (PageTypes type : PageTypes.values()) {
             if (type.getPagesContext().contains("/" + className + "Edit")) {
                 return type;
+            }else if(className.equalsIgnoreCase("Country")){
+                return PageTypes.FOREIGN_STATE_EDIT;
             }
         }
 
@@ -263,6 +270,8 @@ public enum PageTypes {
         for (PageTypes type : PageTypes.values()) {
             if (type.getPagesContext().contains("/" + className + "List")) {
                 return type;
+            }else if(className.equalsIgnoreCase("Country")){
+                return PageTypes.FOREIGN_STATE_LIST;
             }
         }
 

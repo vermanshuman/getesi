@@ -1,15 +1,15 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:ui="http://java.sun.com/jsf/facelets"
+<html xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:ff="http://readytech.com/functions"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
 <ui:composition template="/resources/tpl/Admin/LazyListBase.xhtml">
-    <ui:param name="list_title" value="#{msg.models}"/>
-    <ui:param name="bean" value="#{templateDocumentModelListBean}"/>
-    <ui:param name="entity_name" value="#{msg.model}"/>
+    <ui:param name="list_title" value="#{msg.typeAct}"/>
+    <ui:param name="bean" value="#{typeActBean}"/>
+    <ui:param name="entity_name" value="#{msg.typeAct}"/>
     <ui:param name="additionalEditAction" value="window.scrollTo(0,0);"/>
+
     <ui:define name="search_body">
         <div class="settingsBlock">
             <p:commandButton id="settingButton" onclick="togglePanel();" type="button" style="margin-left: 110px;position: absolute;"
@@ -19,7 +19,7 @@
                 $("body").click(function(e){
                     var target = $(e.target);
                     if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('.ui-selectcheckboxmenu-panel').length
-                        && !target.parents('#ui-datepicker-div').length && !target.parents('#filterCourtCity_items').length) {
+                        && !target.parents('#ui-datepicker-div').length && !target.parents('#filterTypeActType_items').length) {
                         PF('panelSetting').getJQ().hide();
                     }
                     if(target.closest('.ui-selectcheckboxmenu-item').length) {
@@ -74,7 +74,7 @@
                 }
             </style>
             <p:remoteCommand name="updateFilterInput"
-                             update=":filterName"/>
+                             update=":filterTypeActCode :filterTypeActDescription :filterTypeActTextInVisura :filterTypeActCodeInVisura"/>
             <p:remoteCommand name="filterTableFromPanel"
                              action="#{bean.filterTableFromPanel}" update=":form:table"/>
             <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" styleClass="panelSetting" style="display: none;">
@@ -85,21 +85,58 @@
                     <div class="p-col-6">
                         <div style="">
                             <h:outputText style="color: #003871;"
-                                          value="#{ff:upper(msg.name)}:"/>
+                                          value="#{ff:upper(msg.typeActCode)}:"/>
                         </div>
                     </div>
                     <div class="p-col-6">
                         <div style="">
                             <h:outputText style="color: #003871;"
-                                          value=""/>
+                                          value="#{ff:upper(msg.typeActDescription)}:"/>
                         </div>
                     </div>
                     <div class="p-col-6">
                         <div style="">
-                            <p:inputText id="filterName" onblur="updateFilterInput()" value="#{bean.name}" style="width: 99%;min-height: 38px;" styleClass="#{bean.name ne null and bean.name ne '' ? 'green-border' : ''}" />
+                            <p:inputText id="filterTypeActCode" onblur="updateFilterInput()" value="#{bean.typeActCode}" style="width: 99%;min-height: 38px;" styleClass="#{bean.typeActCode ne null and bean.typeActCode ne '' ? 'green-border' : ''}" />
                         </div>
                     </div>
-
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:inputText id="filterTypeActDescription" onblur="updateFilterInput()" value="#{bean.typeActDescription}" style="width: 99%;min-height: 38px;" styleClass="#{bean.typeActDescription ne null and bean.typeActDescription ne '' ? 'green-border' : ''}" />
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value="#{ff:upper(msg.typeActTextInVisura)}:"/>
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value="#{ff:upper(msg.typeActCodeInVisura)}:"/>
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:inputText id="filterTypeActTextInVisura" onblur="updateFilterInput()" value="#{bean.typeActTextInVisura}" style="width: 99%;min-height: 38px;"
+                                         styleClass="#{bean.typeActTextInVisura ne null and bean.typeActTextInVisura ne '' ? 'green-border' : ''}" />
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:inputText id="filterTypeActCodeInVisura" onblur="updateFilterInput()" value="#{bean.typeActCodeInVisura}" style="width: 99%;min-height: 38px;" styleClass="#{bean.typeActCodeInVisura ne null and bean.typeActCodeInVisura ne '' ? 'green-border' : ''}" />
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <p:selectOneMenu id="filterTypeActType" value="#{bean.selectedType}"
+                                         style="width: calc( 100% - 5px);" styleClass="#{bean.selectedType ne null ? 'green-border' : ''}">
+                            <f:selectItem itemLabel="#{msg.typeActType}"
+                                          itemValue="#{null}"
+                                          noSelectionOption="true"/>
+                            <f:selectItems value="#{bean.types}"/>
+                            <p:ajax event="itemSelect" update="@this"/>
+                        </p:selectOneMenu>
+                    </div>
                     <div class="p-col-6">
                         <div style="">
                             <h:outputText style="color: #003871;"
@@ -115,10 +152,22 @@
             </p:panel>
         </div>
     </ui:define>
+
     <ui:define name="columns">
-        <p:column sortBy="#{item.name}" filterBy="#{item.name}"
-                  headerText="#{msg.name}">
-            <h:outputText value="#{item.name}"/>
+        <p:column headerText="#{msg.typeActCode}">
+            <h:outputText value="#{item.code}"/>
+        </p:column>
+        <p:column headerText="#{msg.typeActDescription}">
+            <h:outputText value="#{item.description}"/>
+        </p:column>
+        <p:column headerText="#{msg.typeActType}">
+            <h:outputText value="#{item.type}" converter="enumConverter"/>
+        </p:column>
+        <p:column headerText="#{msg.typeActTextInVisura}">
+            <h:outputText value="#{item.textInVisura}"/>
+        </p:column>
+        <p:column headerText="#{msg.typeActCodeInVisura}">
+            <h:outputText value="#{item.codeInVisura}"/>
         </p:column>
     </ui:define>
 

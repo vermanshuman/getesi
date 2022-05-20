@@ -1028,3 +1028,7 @@ body .confirmationDialog .ui-widget-header {
     background: #f8f9fa !important;
     color: #495057 !important;
 }
+
+.dialog-red {
+    border: 7px solid #F3362B !important;
+}

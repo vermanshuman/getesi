@@ -276,13 +276,18 @@
             </div>
         </p:dialog>
 
-<!--        <p:dialog widgetVar="sendInvoiceErrorDialogWV"  modal="true" draggable="false" position="center center">-->
-<!--            <div class="ui-messages-error ui-corner-all">-->
-<!--                <span class="ui-messages-error-summary">#{msg.sendInvoiceErrorMsg}</span><br/>-->
-<!--            </div>-->
-<!--            <p:commandButton oncomplete="PF('sendInvoiceErrorDialogWV').hide();"-->
-<!--                             value="#{msg.close}" />-->
-<!--        </p:dialog>-->
+        <p:dialog id="invoiceOpenErrorDialog" widgetVar="invoiceOpenErrorDialogWV" modal="true" styleClass="dialog-red"
+                  resizable="false" draggable="false" effect="SLIDE"
+                  header="">
+            <span>
+                <h:outputText value="#{msg.openInvoiceErrorMsg}"/>
+            </span>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.close}" styleClass="confirm-button"
+                                 style="background-color: #F3362B !important;margin-right: 15px;"
+                                 oncomplete="PF('invoiceOpenErrorDialogWV').hide();"/>
+            </div>
+        </p:dialog>
 
         <ui:include src="../ConfigurationArea/ClientCreate.xhtml"/>
         <ui:include src="../Dialogs/MailManagerViewRequestsDialog.xhtml"/>

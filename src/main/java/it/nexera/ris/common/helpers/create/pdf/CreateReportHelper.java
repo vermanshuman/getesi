@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import it.nexera.ris.persistence.HibernateUtil;
+import org.hibernate.Hibernate;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
@@ -336,10 +338,19 @@ public abstract class CreateReportHelper extends BaseHelper {
         int numRequestRegistry = 0;
         int numPlus = 0;
 
-        if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())
-                && !ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getLandChargesRegistries())) {
-            numRegistry = request.getAggregationLandChargesRegistry().getNumberOfVisualizedLandChargesRegistries();
+        if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())) {
+            if(!Hibernate.isInitialized(request.getAggregationLandChargesRegistry().getLandChargesRegistries())){
+                Hibernate.initialize(request.getAggregationLandChargesRegistry().getLandChargesRegistries());
+            }
+            if(ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getLandChargesRegistries())) {
+                numRegistry = request.getAggregationLandChargesRegistry().getNumberOfVisualizedLandChargesRegistries();
+            }
         }
+//
+//        if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())
+//                && !ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getLandChargesRegistries())) {
+//            numRegistry = request.getAggregationLandChargesRegistry().getNumberOfVisualizedLandChargesRegistries();
+//        }
 
         if (!ValidationHelper.isNullOrEmpty(request.getRequestFormalities())) {
             List<Long> documentIds = request.getRequestFormalities().stream().map(RequestFormality::getDocumentId)

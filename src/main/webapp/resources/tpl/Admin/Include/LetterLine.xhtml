@@ -1,8 +1,6 @@
 <ui:composition
         xmlns="http://www.w3.org/1999/xhtml"
-        xmlns:h="http://java.sun.com/jsf/html"
         xmlns:ui="http://java.sun.com/jsf/facelets"
-        xmlns:f="http://java.sun.com/jsf/core"
         xmlns:p="http://primefaces.org/ui">
     <style type="text/css">
         .ui-button.grey-button:hover {
@@ -100,10 +98,19 @@
                              oncomplete="PF('editStateDlgWV').show();" title="#{msg.mailManagerEditStateAction}"
                              value="#{msg.mailManagerEditStateAction}"/>
 
-            <p:commandButton icon="fa fa-fw fa-file-pdf-o" value="#{msg.mailManagerDelivery}" styleClass="grey-button"
-                             action="#{bean.editExcelData}" ajax="false" update="@form" rendered="#{bean.generatePdf}">
-            </p:commandButton>
-            <p:commandButton icon="fa fa-fw fa-file-pdf-o" value="#{msg.requestPrintRequestEvent}" styleClass="grey-button"
+                <p:commandButton icon="fa fa-fw fa-file-pdf-o" value="#{msg.mailManagerDelivery}"
+                                 styleClass="grey-button"
+                                 action="#{bean.editExcelData}" ajax="false" update="@form"
+                                 rendered="#{bean.generatePdf and !bean.documentTypeInvoice}"/>
+
+                <ui:fragment rendered="#{bean.generatePdf and bean.documentTypeInvoice}">
+	            <span style="border: 2px solid #788fa7 !important;padding: 5px 8px 8px 4px; border-radius: 2px;display: inline-block;border: 2px solid #57c279 !important;">
+	                <i class="fa fa-check-circle-o" style="color: green; margin-right: 5px; margin-left: 5px;"/>
+	                <p:commandLink value="#{msg.mailManagerDelivery}" action="#{bean.editExcelData}" update="@form"/>
+	            </span>
+                </ui:fragment>
+
+                <p:commandButton icon="fa fa-fw fa-file-pdf-o" value="#{msg.requestPrintRequestEvent}" styleClass="grey-button"
                              oncomplete="PF('showToBeSentRequestDlgWV').show();" update="showToBeSentRequestPanel" rendered="#{not empty bean.entity.toBeSentRequests}"/>
             <p:commandButton onclick="PF('imageFileDlgWV').show();" rendered="#{not empty bean.entity.imgFiles}"
                              value="#{msg.mailManagerImgFiles}" styleClass="grey-button"/>
@@ -129,11 +136,18 @@
 <!--                             action="#{bean.setMaxInvoiceNumber()}" update="@widgetVar(invoiceDialogWV)"-->
 <!--                             oncomplete="PF('invoiceDialogWV').show();"/>-->
 
+<!--                <p:commandButton style="margin-left: 2px;"-->
+<!--                                 value="#{msg.requestTextEditCreateInvoice}" rendered="#{bean.showCreateFatturaButton}"-->
+<!--                                 action="#{bean.checkDocument}"-->
+<!--                                 id="createInvoice" styleClass="grey-button"-->
+<!--                                 update="@widgetVar(mailManagerViewRequestsForInvoiceDlg)"-->
+<!--                                 oncomplete="PF('mailManagerViewRequestsForInvoiceDlg').show();"/>-->
+
+
                 <p:commandButton style="margin-left: 2px;"
                                  value="#{msg.requestTextEditCreateInvoice}" rendered="#{bean.showCreateFatturaButton}"
-                                 id="createInvoice" styleClass="grey-button"
-                                 update="@widgetVar(mailManagerViewRequestsForInvoiceDlg)"
-                                 oncomplete="PF('mailManagerViewRequestsForInvoiceDlg').show();"/>
+                                 action="#{bean.checkDocument}"
+                                 id="createInvoice" styleClass="grey-button"/>
 
                 <!--  <p:commandButton icon="ui-icon fa fa-pencil" update=":form" styleClass="right-side"
                                   action="#{bean.editEntity}"

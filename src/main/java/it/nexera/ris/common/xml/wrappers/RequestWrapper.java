@@ -399,8 +399,38 @@ public class RequestWrapper {
         request.setNatureLegal(getNatureLegal());
         request.setIstat(getIstat());
         */
+
+        // Request not save start
+        request.setPropertyTypeId(getSelectedBuildingId());
+        if (getSelectedProvincePropertyId() != null) {
+            request.setProvince(DaoManager.get(Province.class, getSelectedProvincePropertyId()));
+        }
+        if (getSelectedCityPropertyId() != null) {
+            request.setCity(DaoManager.get(City.class, getSelectedCityPropertyId()));
+        }
+
+        if (getSelectedNotaryId() != null)
+            request.setNotary(DaoManager.get(Notary.class, getSelectedNotaryId()));
+        else
+            request.setNotary(null);
+        // Request not save end
+
+
+        request.setReaNumber(getReaNumber());
+        request.setNatureLegal(getNatureLegal());
+        request.setUltimaResidenza(getUltimaResidenza());
+        request.setIstat(getIstat());
+        request.setSheet(getSheet());
+        request.setParticle(getParticle());
+        request.setAddressProperty(getAddressProperty());
+        request.setSection(getSection());
+        request.setSub(getSub());
+
         saveSubjectFields(request, saveSubject);
-        saveResidenceFields(request);
+
+        //setRequestSubjectFields(request);
+        //saveResidenceFields(request);
+        //setDomicileFields(request);
         try {
             saveDomicileFields(request);
         } catch (Exception e) {
@@ -409,7 +439,7 @@ public class RequestWrapper {
     }
 
     private void saveSubjectFields(Request request, boolean saveSubject) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-       /* if (getSelectedPersonId() == null) {
+       if (getSelectedPersonId() == null) {
             request.setSubject(null);
         } else {
             request.getSubject().setTypeId(getSelectedPersonId());
@@ -456,13 +486,13 @@ public class RequestWrapper {
                 DaoManager.save(request.getSubject());
         }
 
-        */
-        if (getSelectedPersonId() == null) {
-            request.setSubject(null);
-        } else {
-            if (saveSubject)
-                DaoManager.save(request.getSubject());
-        }
+
+//        if (getSelectedPersonId() == null) {
+//            request.setSubject(null);
+//        } else {
+//            if (saveSubject)
+//                DaoManager.save(request.getSubject());
+//        }
 
     }
 

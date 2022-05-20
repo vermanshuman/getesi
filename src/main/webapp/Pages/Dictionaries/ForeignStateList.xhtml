@@ -3,13 +3,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:ff="http://readytech.com/functions"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ff="http://readytech.com/functions">
 <ui:composition template="/resources/tpl/Admin/LazyListBase.xhtml">
-    <ui:param name="list_title" value="#{msg.models}"/>
-    <ui:param name="bean" value="#{templateDocumentModelListBean}"/>
-    <ui:param name="entity_name" value="#{msg.model}"/>
+    <ui:param name="list_title" value="#{msg.foreignState}"/>
+    <ui:param name="bean" value="#{foreignStateListBean}"/>
+    <ui:param name="entity_name" value="#{msg.foreignState}"/>
+    <ui:param name="disableSelection" value="true"/>
     <ui:param name="additionalEditAction" value="window.scrollTo(0,0);"/>
+
     <ui:define name="search_body">
         <div class="settingsBlock">
             <p:commandButton id="settingButton" onclick="togglePanel();" type="button" style="margin-left: 110px;position: absolute;"
@@ -74,7 +76,7 @@
                 }
             </style>
             <p:remoteCommand name="updateFilterInput"
-                             update=":filterName"/>
+                             update=":filterCode :filterDescription :filterRequestFiscalCode"/>
             <p:remoteCommand name="filterTableFromPanel"
                              action="#{bean.filterTableFromPanel}" update=":form:table"/>
             <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" styleClass="panelSetting" style="display: none;">
@@ -85,7 +87,29 @@
                     <div class="p-col-6">
                         <div style="">
                             <h:outputText style="color: #003871;"
-                                          value="#{ff:upper(msg.name)}:"/>
+                                          value="#{ff:upper(msg.code)}:"/>
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value="#{ff:upper(msg.description)}:"/>
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:inputText id="filterCode" onblur="updateFilterInput()" value="#{bean.code}" style="width: 99%;min-height: 38px;" styleClass="#{bean.code ne null and bean.code ne '' ? 'green-border' : ''}" />
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:inputText id="filterDescription" onblur="updateFilterInput()" value="#{bean.description}" style="width: 99%;min-height: 38px;" styleClass="#{bean.description ne null and bean.description ne '' ? 'green-border' : ''}" />
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value="#{ff:upper(msg.requestFiscalCode)}:"/>
                         </div>
                     </div>
                     <div class="p-col-6">
@@ -96,7 +120,7 @@
                     </div>
                     <div class="p-col-6">
                         <div style="">
-                            <p:inputText id="filterName" onblur="updateFilterInput()" value="#{bean.name}" style="width: 99%;min-height: 38px;" styleClass="#{bean.name ne null and bean.name ne '' ? 'green-border' : ''}" />
+                            <p:inputText id="filterRequestFiscalCode" onblur="updateFilterInput()" value="#{bean.requestFiscalCode}" style="width: 99%;min-height: 38px;" styleClass="#{bean.requestFiscalCode ne null and bean.requestFiscalCode ne '' ? 'green-border' : ''}" />
                         </div>
                     </div>
 
@@ -115,10 +139,21 @@
             </p:panel>
         </div>
     </ui:define>
+
     <ui:define name="columns">
-        <p:column sortBy="#{item.name}" filterBy="#{item.name}"
-                  headerText="#{msg.name}">
-            <h:outputText value="#{item.name}"/>
+
+        <p:column sortBy="#{item.code}" filterBy="#{item.code}"
+                  headerText="#{msg.code}">
+            <h:outputText value="#{item.code}"/>
+        </p:column>
+
+        <p:column sortBy="#{item.description}" filterBy="#{item.description}"
+                  headerText="#{msg.description}">
+            <h:outputText value="#{item.description}"/>
+        </p:column>
+
+        <p:column headerText="#{msg.requestFiscalCode}">
+            <h:outputText value="#{item.fiscalCode}"/>
         </p:column>
     </ui:define>
 

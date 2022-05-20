@@ -1716,7 +1716,9 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
 
 //        List<Document> documents = request.getDocumentsRequest().stream().filter(x -> x.getTypeId().equals(5L)).collect(Collectors.toList());
         List<Long> documentIds = CollectionUtils.emptyIfNull(request.getRequestFormalities())
-                .stream().map(RequestFormality::getDocumentId)
+                .stream()
+                .filter(rf -> !ValidationHelper.isNullOrEmpty(rf.getDocumentId()))
+                .map(RequestFormality::getDocumentId)
                 .distinct()
                 .skip(1).collect(Collectors.toList());
 

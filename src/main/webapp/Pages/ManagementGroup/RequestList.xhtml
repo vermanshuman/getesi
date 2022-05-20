@@ -376,7 +376,7 @@
                                 <div class="p-field">
                                     <p:commandButton
                                             style="" id="searchButton" styleClass="ui-button-warning-icon"
-                                            onclick="checkDates(); filterTableFromPanel();"
+                                            onclick="checkDates(); filterTableFromPanel([{name:'searchClicked',value:'true'}]);"
                                             action="#{bean.prepareToModify}" icon="ui-icon ui-icon-search pi pi-search"
                                             update="form:table searchPanel,editAndPrintDialog printPanel" />
                                 </div>
@@ -615,7 +615,7 @@
                                                                  style="background: #00CC52;"
                                                                  id="searchButtonFilter"
                                                                  action="#{bean.prepareToModify}"
-                                                                 onclick="checkDates(); filterTableFromPanel();"
+                                                                 onclick="checkDates(); filterTableFromPanel([{name:'searchClicked',value:'true'}]);"
                                                                  update="searchPanel printPanel editAndPrintDialog"
                                                                  oncomplete="PF('panelSetting').getJQ().hide();"/>
                                                 <p:commandButton id="manageReestablishBtn" style="width: auto;"
