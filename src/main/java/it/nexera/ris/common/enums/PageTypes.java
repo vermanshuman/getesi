@@ -81,7 +81,8 @@ public enum PageTypes {
     DAY_PHRASE_EDIT("/Pages/Dictionaries/DayPhraseEdit.jsf"),
     TYPE_ACT_LIST("/Pages/Dictionaries/TypeActList.jsf", true),
     TYPE_ACT_EDIT("/Pages/Dictionaries/TypeActEdit.jsf", true),
-    TYPE_FORMALITY("/Pages/Dictionaries/TypeFormality.jsf", true),
+    TYPE_FORMALITY_LIST("/Pages/Dictionaries/TypeFormalityList.jsf", true),
+    TYPE_FORMALITY_EDIT("/Pages/Dictionaries/TypeFormalityEdit.jsf", true),
     CADASTRAL_TOPOLOGY("/Pages/Dictionaries/CadastralTopology.jsf", true),
 
     // ConfigurationArea

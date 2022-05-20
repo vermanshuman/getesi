@@ -6,10 +6,11 @@ import it.nexera.ris.common.helpers.ComboboxHelper;
 import it.nexera.ris.common.helpers.LogHelper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.TypeFormality;
-import it.nexera.ris.web.beans.EntityLazyInListEditPageBean;
+import it.nexera.ris.web.beans.EntityEditPageBean;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 import javax.faces.bean.ManagedBean;
@@ -19,23 +20,27 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
-@ManagedBean(name = "typeFormalityBean")
+@ManagedBean(name = "typeFormalityEdit")
 @ViewScoped
-public class TypeFormalityBean extends EntityLazyInListEditPageBean<TypeFormality> implements Serializable {
+@Getter
+@Setter
+public class TypeFormalityEditBean extends EntityEditPageBean<TypeFormality>
+        implements Serializable {
 
-    private static final long serialVersionUID = 4576200330090741930L;
+    private static final long serialVersionUID = 2495954362545418676L;
 
     private List<SelectItem> typeActEnumList;
 
     @Override
-    public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
-            InstantiationException, IllegalAccessException, IOException {
-        this.loadList(TypeFormality.class, new Order[]{Order.asc("code")});
+    public void onLoad() throws NumberFormatException, HibernateException,
+            PersistenceBeanException, InstantiationException,
+            IllegalAccessException {
         setTypeActEnumList(ComboboxHelper.fillList(TypeActEnum.class, true, false));
     }
 
     @Override
-    protected void validate() {
+    public void onValidate() {
+
         try {
             if (DaoManager.getCount(TypeFormality.class, "id", new Criterion[]{
                     Restrictions.eq("code", getEntity().getCode()),
@@ -50,13 +55,11 @@ public class TypeFormalityBean extends EntityLazyInListEditPageBean<TypeFormalit
     }
 
     @Override
-    public void save() throws HibernateException, PersistenceBeanException, NumberFormatException {
-        DaoManager.save(getEntity());
-    }
+    public void onSave() throws HibernateException, PersistenceBeanException,
+            NumberFormatException, IOException, InstantiationException,
+            IllegalAccessException {
 
-    @Override
-    protected void setEditedValues() {
-        setEditedEntity(getEntity());
+        DaoManager.save(this.getEntity());
     }
 
     public List<SelectItem> getTypeActEnumList() {

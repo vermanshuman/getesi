@@ -82,7 +82,7 @@
 		<module_code entity_field="code">PCD</module_code>
 	</data_entry>
 	<data_entry>
-		<page_type>TYPE_FORMALITY</page_type>
+		<page_type>TYPE_FORMALITY_LIST</page_type>
 		<module_code entity_field="code">PTF</module_code>
 	</data_entry>
 	<data_entry>
