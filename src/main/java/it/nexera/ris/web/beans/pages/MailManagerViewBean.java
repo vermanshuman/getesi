@@ -1563,8 +1563,19 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             if(!ValidationHelper.isNullOrEmpty(getEntity().getOffice()) && !ValidationHelper.isNullOrEmpty(getEntity().getOffice().getDescription()))
                 uffico = "UFFICIO: " + getEntity().getOffice().getDescription();
             String gestore = "";
-            if(!ValidationHelper.isNullOrEmpty(getEntity().getClient()) && !ValidationHelper.isNullOrEmpty(getEntity().getClient().getClientName()))
-                gestore = "GESTORE: " + getEntity().getClient().getClientName();
+            if(!ValidationHelper.isNullOrEmpty(getEntity().getManagers())) {
+            	 List<Client> managers = getEntity().getManagers();
+            	 String managerNames = "";
+            	 for(Client client: managers) {
+            		 if(!ValidationHelper.isNullOrEmpty(client.getClientName())) {
+            			 if(!managerNames.isEmpty())
+            				 managerNames = managerNames + ", ";
+            			 managerNames = managerNames + client.getClientName();
+            		 }
+            	 }
+            	 if(!managerNames.isEmpty())
+            		 gestore = "GESTORE: " + managerNames;
+            }
             String fiduciario = "";
             if(!ValidationHelper.isNullOrEmpty(getEntity().getClientFiduciary()) && !ValidationHelper.isNullOrEmpty(getEntity().getClientFiduciary().getClientName()))
                 fiduciario = "FIDUCIARIO: " + getEntity().getClientFiduciary().getClientName();
