@@ -371,6 +371,7 @@ public class ExcelDataRequestEdit extends BaseEntityPageBean {
                                 Request newRequest = request.copy();
                                 newRequest.setTempId(UUID.randomUUID().toString());
                                 newRequest.setEstateFormalityList(request.getEstateFormalityList());
+                                newRequest.setMultipleRequestId(request.getId());
                                 newRequests.add(newRequest);
                                 addColumnValues(newRequest, request.getService(), columnValues,
                                         createExcelRequestsReportHelper,-1,result);
@@ -383,6 +384,7 @@ public class ExcelDataRequestEdit extends BaseEntityPageBean {
                         try {
                             Request newRequest = request.copy();
                             newRequest.setTempId(UUID.randomUUID().toString());
+                            newRequest.setMultipleRequestId(request.getId());
                             newRequests.add(newRequest);
                             addColumnValues(newRequest, service, columnValues,
                                     createExcelRequestsReportHelper,index++,result);
@@ -1514,7 +1516,6 @@ public class ExcelDataRequestEdit extends BaseEntityPageBean {
     public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         setCostNote(null);
         setCostManipulationHelper(new CostManipulationHelper());
-        System.out.println(">>>>>>>>>>>>>>>>> " + getRequestId());
         Request request = DaoManager.get(Request.class, getRequestId());
         request.setSelectedTemplateId(null);
         if(!ValidationHelper.isNullOrEmpty(request.getRequestFormalities())) {

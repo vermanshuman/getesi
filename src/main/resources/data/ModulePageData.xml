@@ -198,7 +198,7 @@
 		<module_code entity_field="code">CC</module_code>
 	</data_entry>
 	<data_entry>
-		<page_type>RELATIONSHIP_TYPES</page_type>
+		<page_type>RELATIONSHIP_TYPES_LIST</page_type>
 		<module_code entity_field="code">RT</module_code>
 	</data_entry>
 	<data_entry>

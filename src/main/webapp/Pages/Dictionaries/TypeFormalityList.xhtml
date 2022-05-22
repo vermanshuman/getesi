@@ -194,8 +194,8 @@
         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" style="width: 40%">
 
 
-			<span>#{msg.typeFormalityCertificationText}</span>
-			<p:inputText value="#{bean.entity.certificationText}" styleClass="input-width"/>
+            <span>#{msg.typeFormalityCertificationText}</span>
+            <p:inputText value="#{bean.entity.certificationText}" styleClass="input-width"/>
             <span>#{msg.typeFormalitySalesDevelopment} </span>
             <p:selectBooleanCheckbox value="#{bean.entity.salesDevelopment}" style="margin-right:100%"/>
             <span>#{msg.typeFormalitySalesDevelopmentOMI} </span>
@@ -227,7 +227,7 @@
         <p:column headerText="#{msg.typeFormalityPrejudicial}">
             <p:selectBooleanCheckbox value="#{item.prejudicial}" disabled="true"/>
         </p:column>
-          <p:column headerText="#{msg.typeFormalityCertificationText}">
+        <p:column headerText="#{msg.typeFormalityCertificationText}">
             <h:outputText value="#{item.certificationText}"/>
         </p:column>
         <p:column headerText="#{msg.typeFormalitySalesDevelopment}">

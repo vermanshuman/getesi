@@ -545,7 +545,7 @@ public class RequestWrapper {
       */
         if (getSelectedDomicileProvinceId() == null) {
             request.setDomicile(null);
-        } else if(!ValidationHelper.isNullOrEmpty(request.getDomicile())){
+        } else if(request.getDomicile() != null){
             DaoManager.save(request.getDomicile());
         }
     }

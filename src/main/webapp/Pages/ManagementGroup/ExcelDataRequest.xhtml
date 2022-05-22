@@ -27,32 +27,14 @@
                     </p:columns>
                     <p:column exportable="false" styleClass="action_midle_column">
                         <p:commandButton icon="fa fa-pencil-square-o" action="#{bean.viewExtraCost()}">
-                            <f:setPropertyActionListener value="#{req.id}" target="#{bean.requestId}"/>
+                            <f:setPropertyActionListener value="#{req.id ne null ? req.id : req.multipleRequestId}" target="#{bean.requestId}"/>
                         </p:commandButton>
                     </p:column>
                 </p:dataTable>
             </p:panelGrid>
         </ui:repeat>
 
-        <ui:remove>
-            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
-                <div class="additional_button">
-                    <div align="center">
-                        <p:commandButton id="submit_btn" style="background-color: #00CC52 !important;"
-                                         action="#{bean.generateXlsRequestCost}"
-                                         value="#{msg.submit}"
-                                         icon="ui-icon-disk"
-                                         ajax="false" update="@form"/>
-                    </div>
-                </div>
-            </p:panelGrid>
-        </ui:remove>
         <p:panelGrid columns="2" styleClass="ui-panelgr id-blank form-group additional_button">
-            <p:commandButton id="submit_btn" style="background-color: #00CC52 !important;"
-                             action="#{bean.generateXlsRequestCost}"
-                             value="#{msg.submit}"
-                             icon="ui-icon-disk"
-                             ajax="false" update="@form"/>
             <p:commandButton id="pdf_btn"
                              action="#{bean.generatePdfRequestCost}"
                              value="#{msg.pdf}"

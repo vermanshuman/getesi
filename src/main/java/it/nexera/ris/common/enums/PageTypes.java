@@ -51,6 +51,7 @@ public enum PageTypes {
     TEMPLATE_DOCUMENT_MODEL_EDIT("/Pages/Dictionaries/TemplateDocumentModelEdit.jsf", true),
 
     REQUEST_TYPE_LIST("/Pages/Dictionaries/RequestTypeList.jsf", true),
+    REQUEST_TYPE_EDIT("/Pages/Dictionaries/RequestTypeEdit.jsf", true),
     FOREIGN_STATE_LIST("/Pages/Dictionaries/ForeignStateList.jsf", true),
     FOREIGN_STATE_EDIT("/Pages/Dictionaries/ForeignStateEdit.jsf", true),
     STRUCTURE_LIST("/Pages/Dictionaries/StructureList.jsf", true),
@@ -126,6 +127,7 @@ public enum PageTypes {
     NOTARIAL_CERTIFICATION_LIST("/Pages/ManagementGroup/NotarialCertificationList.jsf"),
 
     IBAN_LIST("/Pages/ManagementGroup/IbanList.jsf"),
+    IBAN_EDIT("/Pages/ManagementGroup/IbanEdit.jsf"),
     PAYMENT_TYPE_LIST("/Pages/ManagementGroup/PaymentTypeList.jsf"),
     PAYMENT_TYPE_EDIT("/Pages/ManagementGroup/PaymentTypeEdit.jsf"),
 
@@ -133,6 +135,7 @@ public enum PageTypes {
     INVOICE_EDIT("/Pages/ManagementGroup/InvoiceEdit.jsf"),
 
     CITIES_LIST("/Pages/Dictionaries/CitiesList.jsf"),
+    CITIES_EDIT("/Pages/Dictionaries/CitiesEdit.jsf"),
 
     OMI_KML_LIST("/Pages/Dictionaries/OMIKmlList.jsf"),
 
@@ -142,7 +145,8 @@ public enum PageTypes {
     COURT_LIST("/Pages/Dictionaries/CourtList.jsf", true),
     COURT_EDIT("/Pages/Dictionaries/CourtEdit.jsf", true),
     
-    RELATIONSHIP_TYPES("/Pages/Dictionaries/RelationshipTypeList.jsf", true),
+    RELATIONSHIP_TYPES_LIST("/Pages/Dictionaries/RelationshipTypeList.jsf", true),
+    RELATIONSHIP_TYPES_EDIT("/Pages/Dictionaries/RelationshipTypeEdit.jsf", true),
     
     EXCEL_DATA("/Pages/ManagementGroup/ExcelData.jsf"),
     
@@ -233,6 +237,10 @@ public enum PageTypes {
                 return type;
             }else if(className.equalsIgnoreCase("Country")){
                 return PageTypes.FOREIGN_STATE_EDIT;
+            }else if(className.equalsIgnoreCase("TipologieDiritti")){
+                return PageTypes.RELATIONSHIP_TYPES_EDIT;
+            }else if(className.equalsIgnoreCase("City")){
+                return PageTypes.CITIES_EDIT;
             }
         }
 
@@ -273,6 +281,10 @@ public enum PageTypes {
                 return type;
             }else if(className.equalsIgnoreCase("Country")){
                 return PageTypes.FOREIGN_STATE_LIST;
+            }else if(className.equalsIgnoreCase("City")){
+                return PageTypes.CITIES_LIST;
+            }else if(className.equalsIgnoreCase("TipologieDiritti")){
+                return PageTypes.RELATIONSHIP_TYPES_LIST;
             }
         }
 

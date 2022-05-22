@@ -1587,9 +1587,6 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     }
 
     public void editExcelDataRequest() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
-        if(!ValidationHelper.isNullOrEmpty(getExamRequest().getMail()) && !ValidationHelper.isNullOrEmpty(getExamRequest().getMail().getId()))
-            RedirectHelper.goToExcelDataRequest(null, getExamRequest().getMail().getId(), true);
-        else
             RedirectHelper.goToExcelDataRequest(getRequestId(), null, false);
     }
 

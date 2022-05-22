@@ -82,7 +82,7 @@ public class CourtListBean extends
 
     }
 
-    public void clearFiltraPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+    public void clearFilterPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         setName(null);
         setTaxCode(null);
         setSelectedCityId(null);

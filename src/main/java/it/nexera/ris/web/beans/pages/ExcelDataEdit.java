@@ -373,6 +373,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                                 Request newRequest = request.copy();
                                 newRequest.setTempId(UUID.randomUUID().toString());
                                 newRequest.setEstateFormalityList(request.getEstateFormalityList());
+                                newRequest.setMultipleRequestId(request.getId());
                                 newRequests.add(newRequest);
                                 addColumnValues(newRequest, request.getService(), columnValues,
                                         createExcelRequestsReportHelper,-1,result);
@@ -385,6 +386,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                         try {
                             Request newRequest = request.copy();
                             newRequest.setTempId(UUID.randomUUID().toString());
+                            newRequest.setMultipleRequestId(request.getId());
                             newRequests.add(newRequest);
                             addColumnValues(newRequest, service, columnValues,
                                     createExcelRequestsReportHelper,index++,result);

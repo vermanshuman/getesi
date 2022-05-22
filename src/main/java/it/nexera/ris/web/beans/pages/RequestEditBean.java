@@ -1804,23 +1804,36 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 }
 
                 if (!getUpdatedPropertyNames().contains("typeId") && getWrapper().getSelectedPersonId().equals(SubjectType.PHYSICAL_PERSON.getId())) {
-                    if (!getOriginalRequest().getSubject().getSurname().equals(getSubject().getSurname())
-                            || !getOriginalRequest().getSubject().getName().equals(getSubject().getName())
+
+                    if (!equals(getOriginalRequest().getSubject().getSurname(),getSubject().getSurname())
+                            || !equals(getOriginalRequest().getSubject().getName(),getSubject().getName())
                             || getOriginalRequest().getSubject().getBirthDate().compareTo(getSubject().getBirthDate()) != 0
-                            || !getOriginalRequest().getSubject().getBirthProvince().equals(getSubject().getBirthProvince())
-                            || !getOriginalRequest().getSubject().getBirthCity().equals(getSubject().getBirthCity())
-                            || !getOriginalRequest().getSubject().getFiscalCode().equals(getSubject().getFiscalCode())
-                        || !getOriginalRequest().getSubject().getSex().equals(getWrapper().getSelectedSexTypeId())) {
+                            || !equals(getOriginalRequest().getSubject().getBirthProvince(),getSubject().getBirthProvince())
+                            || !equals(getOriginalRequest().getSubject().getBirthCity(),getSubject().getBirthCity())
+                            || !equals(getOriginalRequest().getSubject().getFiscalCode(),getSubject().getFiscalCode())
+                            || !equals(getOriginalRequest().getSubject().getSex(),getWrapper().getSelectedSexTypeId())){
+//                    if (!getOriginalRequest().getSubject().getSurname().equals(getSubject().getSurname())
+//                            || !getOriginalRequest().getSubject().getName().equals(getSubject().getName())
+//                            || getOriginalRequest().getSubject().getBirthDate().compareTo(getSubject().getBirthDate()) != 0
+//                            || !getOriginalRequest().getSubject().getBirthProvince().equals(getSubject().getBirthProvince())
+//                            || !getOriginalRequest().getSubject().getBirthCity().equals(getSubject().getBirthCity())
+//                            || !getOriginalRequest().getSubject().getFiscalCode().equals(getSubject().getFiscalCode())
+//                        || !getOriginalRequest().getSubject().getSex().equals(getWrapper().getSelectedSexTypeId())) {
                         requestUpdated = true;
                         getUpdatedPropertyNames().add("subject");
                     }
                 } else if (!getUpdatedPropertyNames().contains("typeId") && getWrapper().getSelectedPersonId().equals(SubjectType.LEGAL_PERSON.getId())) {
-                    if (!getOriginalRequest().getSubject().getBusinessName().equals(getSubject().getBusinessName())
-                            || !getOriginalRequest().getSubject().getBirthProvince().equals(getSubject().getBirthProvince())
-                            || !getOriginalRequest().getSubject().getBirthCity().equals(getSubject().getBirthCity())
-                            || !getOriginalRequest().getSubject().getNumberVAT().equals(getSubject().getNumberVAT())
-                            || !getOriginalRequest().getSubject().getOldNumberVAT().equals(getSubject().getOldNumberVAT())
-                            || !getOriginalRequest().getSubject().getFiscalCode().equals(getSubject().getFiscalCode())) {
+                    if (!equals(getOriginalRequest().getSubject().getBusinessName(),getSubject().getBusinessName())
+                            || !equals(getOriginalRequest().getSubject().getBirthProvince(),getSubject().getBirthProvince())
+                            || !equals(getOriginalRequest().getSubject().getBirthCity(),getSubject().getBirthCity())
+                            || !equals(getOriginalRequest().getSubject().getNumberVAT(),getSubject().getNumberVAT())
+                            || !equals(getOriginalRequest().getSubject().getOldNumberVAT(),getSubject().getOldNumberVAT())
+                            || !equals(getOriginalRequest().getSubject().getFiscalCode(),getSubject().getFiscalCode())){
+                            //|| !getOriginalRequest().getSubject().getBirthProvince().equals(getSubject().getBirthProvince())
+//                            || !getOriginalRequest().getSubject().getBirthCity().equals(getSubject().getBirthCity())
+//                            || !getOriginalRequest().getSubject().getNumberVAT().equals(getSubject().getNumberVAT())
+//                            || !getOriginalRequest().getSubject().getOldNumberVAT().equals(getSubject().getOldNumberVAT())
+//                            || !getOriginalRequest().getSubject().getFiscalCode().equals(getSubject().getFiscalCode()))
                         requestUpdated = true;
                         getUpdatedPropertyNames().add("subject");
                     }
@@ -1847,6 +1860,15 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             saveServiceRequest(redirect);
         }
     }
+
+    private boolean equals(Object obj1, Object obj2){
+        if(obj1 == null && obj2 == null)
+            return true;
+        if((obj1 == null && obj2 != null) || (obj1 != null && obj2 == null))
+            return false;
+        return obj1.equals(obj2);
+    }
+
     public void cancelAndSaveServiceRequest(boolean redirect, boolean saveAssociated)
             throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         setSaveAssociatedRequests(saveAssociated);
@@ -1898,10 +1920,10 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                             } catch (CloneNotSupportedException e) {
                                 LogHelper.log(log, e);
                             }
-                            request.setAggregationLandChargesRegistry(DaoManager.get(AggregationLandChargesRegistry.class, item.getId()));
 
-                            setAllDataRelatedToRequestOrNotify(request);
                             if(isNew){
+                                request.setAggregationLandChargesRegistry(DaoManager.get(AggregationLandChargesRegistry.class, item.getId()));
+                                setAllDataRelatedToRequestOrNotify(request);
                                 request.setTempId(UUID.randomUUID().toString());
                                 insertNewRequest(request);
                                 newRequests.add(request);
@@ -2336,7 +2358,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private void setRequestData(Request request) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         if(isMultipleRequestCreate()){
-            request.setRequestCreationType(RequestCreationType.MULTIPLE);
+            if(request.isNew())
+                request.setRequestCreationType(RequestCreationType.MULTIPLE);
         }else if(isMultipleCreate()){
             request.setRequestCreationType(RequestCreationType.MULTI);
         }else {
@@ -2648,12 +2671,61 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 }
             }
 
+            if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+                getWrapper().setSelectedConservatoryItemId(new ArrayList<>());
+            }
+            if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConserItemId())) {
+                getWrapper().getSelectedConserItemId().forEach(elem -> {
+                    if (!getWrapper().getSelectedConservatoryItemId().contains(elem)) {
+                        getWrapper().getSelectedConservatoryItemId().add(elem);
+                    }
+                });
+            }
+            if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedTaloreItemId())) {
+                getWrapper().getSelectedTaloreItemId().forEach(elem -> {
+                    if (!getWrapper().getSelectedConservatoryItemId().contains(elem)) {
+                        getWrapper().getSelectedConservatoryItemId().add(elem);
+                    }
+                });
+            }
+            if (!ValidationHelper.isNullOrEmpty(this.getSelectedNotaryId()))
+                getWrapper().setSelectedNotaryId(this.getSelectedNotaryId());
+            else
+                getWrapper().setSelectedNotaryId(null);
             prepareRequestToSave(getEntity());
             saveAllDataRelatedToRequestOrNotify(getEntity(), true);
+
+            boolean saved = false;
+
+            if (!getEntity().isNew() && !ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())
+                    && !ValidationHelper.isNullOrEmpty(getEntity().getAggregationLandChargesRegistry())
+                    && getWrapper().getSelectedConservatoryItemId().stream().anyMatch(c -> c.getId().equals(getEntity().getAggregationLandChargesRegistry().getId()))
+                    || ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+                if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+                    getWrapper().getSelectedConservatoryItemId().remove(getWrapper().getSelectedConservatoryItemId()
+                            .stream().filter(c -> c.getId().equals(getEntity().getAggregationLandChargesRegistry().getId()))
+                            .findAny().orElse(null));
+                }
+                saved = true;
+            }
+
+
+            if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+                List<ConservatoriaSelectItem> selectedConservatoryItemId = getWrapper().getSelectedConservatoryItemId();
+                for (int i = 0; i < selectedConservatoryItemId.size(); i++) {
+                    ConservatoriaSelectItem item = selectedConservatoryItemId.get(i);
+                    Request request = null;
+                    if (!saved) {                   // first element
+                        request = getEntity();
+                        saved = true;
+                        request.setAggregationLandChargesRegistry(DaoManager.get(AggregationLandChargesRegistry.class, item.getId()));
+                    }
+                }
+            }
+
             int index = 0;
             Subject subject = null;
             for(Request newRequest : emptyIfNull(getUpdatedNewRequestList())){
-                prepareRequestToSave(newRequest);
                 if(index == 0){
                     subject = newRequest.getSubject();
                 }else {
@@ -4510,8 +4582,10 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                     break;
             }
 
+        }else {
+            setMultipleCreate(Boolean.TRUE);
+            setMultipleRequestCreate(Boolean.TRUE);
         }
-
     }
 
     public void openRequestSubjectDialog(boolean isDeleted) throws HibernateException, PersistenceBeanException, IllegalAccessException, InstantiationException{

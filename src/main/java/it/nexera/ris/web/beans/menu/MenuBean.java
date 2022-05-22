@@ -154,7 +154,7 @@ public class MenuBean extends PageBean implements Serializable {
             submenuAddElement(submenu, PageTypes.OMI_KML_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.CATEGORY_PERCENT_VALUE_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.COURT_LIST, "fa fa-fw fa-legal");
-            submenuAddElement(submenu, PageTypes.RELATIONSHIP_TYPES, "fa fa-fw fa-bars");
+            submenuAddElement(submenu, PageTypes.RELATIONSHIP_TYPES_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.REGIME_CONIUGI_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.SECTION_D_FORMAT_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.LAND_OMI_LIST, "fa fa-fw fa-bars");

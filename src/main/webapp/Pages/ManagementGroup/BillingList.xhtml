@@ -1284,8 +1284,6 @@
                             <p:column rendered="#{invoice.email.serverId != null}">
                                 <p:commandButton id="openinvoice-btn-server" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
                                                  action="#{bean.loadInvoiceDialogDataEdit(invoice)}" oncomplete="PF('invoiceDialogBillingWV').show();" update="invoiceDialogBilling">
-                                    <!-- <f:setPropertyActionListener value="#{item.id}"
-                                                                 target="#{bean.entityEditId}"/> -->
                                 </p:commandButton>
                                 <div class="icon-block" style="justify-content: left;">
                                     <i class="email-check-icon"></i>

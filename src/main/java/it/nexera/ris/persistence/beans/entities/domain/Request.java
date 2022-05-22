@@ -483,6 +483,10 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     @Transient
     private String aggregationLandCharRegName;
 
+    @Transient
+    private Long multipleRequestId;
+
+
     public Boolean getHaveRequestReport() {
         if (haveRequestReport == null) {
             try {
@@ -2368,5 +2372,13 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     public void setCalculateCost(Boolean calculateCost) {
         this.calculateCost = calculateCost;
+    }
+
+    public Long getMultipleRequestId() {
+        return multipleRequestId;
+    }
+
+    public void setMultipleRequestId(Long multipleRequestId) {
+        this.multipleRequestId = multipleRequestId;
     }
 }
