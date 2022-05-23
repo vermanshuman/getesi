@@ -11,7 +11,7 @@
     </span>
     <br/> <br/>
     <p:remoteCommand update="subjectListTable" name="updateSubjectTable"/>
-    <p:dataTable id="subjectListTable" value="#{bean.subjectWrapperList}" var="subj" style="width: 1200px;">
+    <p:dataTable id="subjectListTable" value="#{bean.subjectWrapperList}" var="subj" style="width: 1200px;" emptyMessage="#{msg.noRecordsFound}">
         <p:column headerText="#{msg.requestEditSubjectListName}">
             <h:outputText value="#{subj.fullName}"/>
         </p:column>

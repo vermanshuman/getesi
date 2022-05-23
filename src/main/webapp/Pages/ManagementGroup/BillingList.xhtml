@@ -1646,7 +1646,7 @@
 
                     <p:overlayPanel id="requestTypeSelectCheckboxPanel" my="left top" at="left bottom"
                                     widgetVar="requestTypeSelectCheckboxWV" for="requestTypes" dynamic="true" style="width:300px;">
-                        <p:dataTable id="requestTypeSelectCheckboxPanelDataTable" var="requestType"
+                        <p:dataTable id="requestTypeSelectCheckboxPanelDataTable" var="requestType" emptyMessage="#{msg.noRecordsFound}"
                                      value="#{bean.requestTypeWrappers}" selectionMode="single"
                                      selection="#{bean.selectedRequestTypeForFilter}" rowKey="#{requestType.value}">
                             <p:ajax event="rowSelect"
@@ -1673,7 +1673,7 @@
 
                     <p:overlayPanel id="serviceSelectCheckboxPanel" my="left top" at="right bottom"
                                     widgetVar="serviceSelectCheckboxWV" for="services" dynamic="true" style="width:400px;">
-                        <p:dataTable id="serviceSelectCheckboxPanelDataTable" var="service"
+                        <p:dataTable id="serviceSelectCheckboxPanelDataTable" var="service" emptyMessage="#{msg.noRecordsFound}"
                                      value="#{bean.serviceWrappers}" selectionMode="single"
                                      selection="#{bean.selectedServiceForFilter}" rowKey="#{service.value}">
                             <p:ajax event="rowSelect"
@@ -1700,7 +1700,7 @@
                     <p:overlayPanel id="userSelectCheckboxPanel" my="left top" at="left bottom"
                                     widgetVar="userSelectCheckboxWV" for="userSelectCheckboxShow"
                                     onHide="filterRequestTableFromPanel();" dynamic="true" style="width:300px">
-                        <p:dataTable id="userSelectCheckboxPanelDataTable" var="state"
+                        <p:dataTable id="userSelectCheckboxPanelDataTable" var="state" emptyMessage="#{msg.noRecordsFound}"
                                      value="#{bean.userWrappers}" selectionMode="single"
                                      selection="#{bean.selectedUserForFilter}" rowKey="#{state.value}">
 
@@ -2094,7 +2094,7 @@
         <p:dialog id="documentDialog" widgetVar="documentDialog" modal="true" resizable="false" draggable="false"
                   width="700">
             <p:scrollPanel mode="native"  style="width: 100%; min-height: 300px; max-height: 600px;">
-                <p:dataTable value="#{bean.requestDocuments}" var="doc" id="requestDocs">
+                <p:dataTable value="#{bean.requestDocuments}" var="doc" id="requestDocs" emptyMessage="#{msg.noRecordsFound}">
                     <p:column headerText="#{msg.name}">
                         <h:outputText value="#{doc.title}#{not empty doc.fileExtension ? doc.fileExtension : '' }"/>
                     </p:column>

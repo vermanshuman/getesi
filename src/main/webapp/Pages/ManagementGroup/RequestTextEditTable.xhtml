@@ -66,7 +66,7 @@
     <div style="margin-bottom: 1%;">
 
         <p:dataTable value="#{bean.requestConservatoryList}" var="item" styleClass="without-header simple-table"
-                     rendered="#{empty bean.examRequest.distraintFormality}">
+                     rendered="#{empty bean.examRequest.distraintFormality}" emptyMessage="#{msg.noRecordsFound}">
             <p:column>
                 <h:outputText
                         value="#{empty item.registry ? msg.subjectViewCadastralDateC: msg.subjectViewCadastralDate}
@@ -95,9 +95,9 @@
         </div>
     </div>
     <p:dataTable value="#{bean.estateSituations}" styleClass="simple-table" var="item" id="tableProcedure"
-                 rowIndexVar="index" widgetVar="tableProcedureWV">
+                 rowIndexVar="index" widgetVar="tableProcedureWV" emptyMessage="#{msg.noRecordsFound}">
         <p:column style="width: 30%; vertical-align: top;" headerText="#{msg.formality}">
-            <p:dataTable rendered="#{not empty item.estateFormalityList}" value="#{item.estateFormalityList}"
+            <p:dataTable rendered="#{not empty item.estateFormalityList}" value="#{item.estateFormalityList}" emptyMessage="#{msg.noRecordsFound}"
                          var="weakForm" styleClass="without-header cadastral_table" editable="true" editMode="cell">
                 <p:column style="width: 15%; text-align: center">
                     <p:cellEditor>
@@ -151,7 +151,7 @@
         </p:column>
         <p:column style="width: 70%; vertical-align: top;" headerText="#{msg.estateLocation}">
             <p:dataTable rendered="#{not empty item.propertyList}" value="#{item.propertyList}" var="estate"
-                         editable="true" editMode="cell" styleClass="without-header cadastral_table">
+                         editable="true" editMode="cell" styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}">
                 <p:column style="text-align: center; width: 15%">
                     <p:cellEditor>
                         <f:facet name="output">
@@ -179,7 +179,7 @@
                 </p:column>
                 <p:column style="text-align: center; width: 40%">
                     <p:dataTable value="#{estate.cadastralData}" var="exam" rendered="#{not empty estate.cadastralData}"
-                                 styleClass="without-header cadastral_table" editable="true" editMode="cell">
+                                 styleClass="without-header cadastral_table" editable="true" editMode="cell" emptyMessage="#{msg.noRecordsFound}">
                         <p:column style="text-align: center">
                             <p:cellEditor>
                                 <f:facet name="output">
@@ -232,7 +232,7 @@
                 <p:column style="text-align: center; width: 17%">
                     <p:outputPanel styleClass="visible-cell-editor-value">
                         <h:outputText value="#{msg.estateLocationOMI}"/>
-                        <p:dataTable value="#{estate.lastOmi}" var="omi" editable="true" editMode="cell" styleClass="background-lightorange-td">
+                        <p:dataTable value="#{estate.lastOmi}" var="omi" editable="true" emptyMessage="#{msg.noRecordsFound}" editMode="cell" styleClass="background-lightorange-td">
                             <p:ajax event="rowEdit" listener="#{estate.setEdit(true)}"/>
                             <p:column>
                                 <p:cellEditor>
@@ -320,7 +320,7 @@
                 </p:column>
                 <p:rowExpansion>
                     <p:dataTable value="#{estate.associatedWithEstateSituationDatafromProperties}" var="datafrom"
-                                 id="datafromTable" rowStyleClass="#{datafrom.associated ? null : 'delete-row'}">
+                                 id="datafromTable" emptyMessage="#{msg.noRecordsFound}" rowStyleClass="#{datafrom.associated ? null : 'delete-row'}">
                         <p:column>
                             <h:outputText value="#{datafrom.text}"/>
                         </p:column>
@@ -396,7 +396,7 @@
     <br/>
     <h3>#{msg.textEditTableGravami}</h3>
     <p:outputPanel deferred="true">
-        <p:dataTable value="#{bean.estateSituationFormalities}" styleClass="simple-table" var="item" id="formalityTable">
+        <p:dataTable value="#{bean.estateSituationFormalities}" styleClass="simple-table" emptyMessage="#{msg.noRecordsFound}" var="item" id="formalityTable">
             <p:column headerText="#{msg.estateFormalityNumRG}">
                 <h:outputText value="#{item.generalRegister}"/>
             </p:column>
@@ -438,7 +438,7 @@
         <p:outputPanel rendered="#{bean.formalityDetailsRendered}">
             <br/>
             <h3>#{msg.textEditTableFormalityDetails}</h3>
-            <p:dataTable value="#{bean.gravamiEstateSituations}" var="gitem" id="formalityDetailsTable"
+            <p:dataTable value="#{bean.gravamiEstateSituations}" var="gitem" id="formalityDetailsTable" emptyMessage="#{msg.noRecordsFound}"
                          rowIndexVar="gindex" widgetVar="formalityDetailsTableWV" editable="true" editMode="cell"
                          styleClass="simple-table without-header cadastral_table">
                 <p:column style="width: 20%; vertical-align: top;" headerText="#{msg.formality}">
@@ -456,7 +456,7 @@
                     </p:cellEditor>
                 </p:column>
                 <p:column style="width: 80%; vertical-align: top;" headerText="#{msg.estateLocation}">
-                    <p:dataTable rendered="#{not empty gitem.propertyList}" value="#{gitem.propertyList}" var="gestate"
+                    <p:dataTable rendered="#{not empty gitem.propertyList}" value="#{gitem.propertyList}" var="gestate" emptyMessage="#{msg.noRecordsFound}"
                                  editable="true" editMode="cell" styleClass="without-header cadastral_table">
                         <p:column style="text-align: center">
                             <p:cellEditor>
@@ -485,7 +485,7 @@
                         </p:column>
                         <p:column style="text-align: center; width: 35%">
                             <p:dataTable value="#{gestate.cadastralData}" var="gexam" rendered="#{not empty gestate.cadastralData}"
-                                         styleClass="without-header cadastral_table" editable="true" editMode="cell">
+                                         styleClass="without-header cadastral_table" editable="true" editMode="cell" emptyMessage="#{msg.noRecordsFound}">
                                 <p:column style="text-align: center">
                                     <p:cellEditor>
                                         <f:facet name="output">
@@ -539,7 +539,7 @@
                         <p:column style="text-align: center; width: 20%">
                             <p:outputPanel styleClass="visible-cell-editor-value">
                                 <h:outputText value="#{msg.estateLocationOMI}"/>
-                                <p:dataTable value="#{gestate.lastOmi}" var="gomi" editable="true" editMode="cell">
+                                <p:dataTable value="#{gestate.lastOmi}" var="gomi" editable="true" editMode="cell" emptyMessage="#{msg.noRecordsFound}">
                                     <p:ajax event="rowEdit" listener="#{gestate.setEdit(true)}"/>
                                     <p:column>
                                         <p:cellEditor>
@@ -640,7 +640,7 @@
     <ui:fragment rendered="#{bean.showSalesSection}"><h3>#{msg.requestActsDevelopment}</h3></ui:fragment>
     <p:outputPanel deferred="true" deferredMode="visible">
         <p:dataTable value="#{bean.salesOtherEstateSituations}" styleClass="simple-table" var="salesitem" id="salesTableNotSelected"
-                     rowIndexVar="sindex" widgetVar="salesTableProcedureNotSelectedWV">
+                     rowIndexVar="sindex" widgetVar="salesTableProcedureNotSelectedWV" emptyMessage="#{msg.noRecordsFound}">
             <p:column style="width: 20%; vertical-align: top;" headerText="#{msg.formality}">
                 <p:cellEditor>
                     <f:facet name="output">
@@ -657,7 +657,7 @@
             </p:column>
             <p:column style="width: 80%; vertical-align: top;" headerText="#{msg.estateLocation}">
                 <p:dataTable rendered="#{not empty salesitem.propertyList}" value="#{salesitem.propertyList}" var="salesestate"
-                             editable="true" editMode="cell" styleClass="without-header cadastral_table">
+                             editable="true" editMode="cell" styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}">
                     <p:column style="text-align: center; width:17%;">
                         <p:cellEditor>
                             <f:facet name="output">
@@ -685,7 +685,7 @@
                     </p:column>
                     <p:column style="text-align: center; width: 35%">
                         <p:dataTable value="#{salesestate.cadastralData}" var="salesexam" rendered="#{not empty salesestate.cadastralData}"
-                                     styleClass="without-header cadastral_table" editable="true" editMode="cell">
+                                     styleClass="without-header cadastral_table" editable="true" editMode="cell" emptyMessage="#{msg.noRecordsFound}">
                             <p:column style="text-align: center">
                                 <p:cellEditor>
                                     <f:facet name="output">
@@ -737,7 +737,7 @@
                     <p:column style="text-align: center; width: 20%">
                         <p:outputPanel styleClass="visible-cell-editor-value">
                             <h:outputText value="#{msg.estateLocationOMI}"/>
-                            <p:dataTable value="#{salesestate.lastOmi}" var="salesomi" editable="true" editMode="cell">
+                            <p:dataTable value="#{salesestate.lastOmi}" var="salesomi" editable="true" emptyMessage="#{msg.noRecordsFound}" editMode="cell">
                                 <p:ajax event="rowEdit" listener="#{salesestate.setEdit(true)}"/>
                                 <p:column>
                                     <p:cellEditor>
@@ -830,10 +830,10 @@
     <br/>
     <p:outputPanel deferred="true" deferredMode="visible">
         <p:dataTable value="#{bean.otherEstateSituations}" styleClass="simple-table" var="item" id="tableNotSelected"
-                     rowIndexVar="index" widgetVar="tableProcedureNotSelectedWV">
+                     rowIndexVar="index" widgetVar="tableProcedureNotSelectedWV" emptyMessage="#{msg.noRecordsFound}">
             <p:column style="width: 50%; vertical-align: top;" headerText="#{msg.estateFormalityNotSelect}">
                 <p:dataTable rendered="#{not empty item.estateFormalityList}" value="#{item.estateFormalityList}"
-                             var="weakForm" styleClass="without-header cadastral_table" editable="true" editMode="cell">
+                             var="weakForm" styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}" editable="true" editMode="cell">
                     <p:column style="text-align: center">
                         <p:cellEditor>
                             <f:facet name="output">
@@ -882,7 +882,7 @@
             </p:column>
             <p:column style="width: 60%; vertical-align: top;" headerText="#{msg.estateNotSelect}">
                 <p:dataTable rendered="#{not empty item.propertyList}" value="#{item.propertyList}" var="estate"
-                             editable="true" editMode="cell" styleClass="without-header cadastral_table">
+                             editable="true" editMode="cell" emptyMessage="#{msg.noRecordsFound}" styleClass="without-header cadastral_table">
                     <p:column style="text-align: center">
                         <p:cellEditor>
                             <f:facet name="output">
@@ -908,7 +908,7 @@
                     </p:column>
                     <p:column style="text-align: center; width: 25%">
                         <p:dataTable value="#{estate.cadastralData}" var="exam" rendered="#{not empty estate.cadastralData}"
-                                     styleClass="without-header cadastral_table" editable="true" editMode="cell">
+                                     styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}" editable="true" editMode="cell">
                             <p:column style="text-align: center">
                                 <p:cellEditor>
                                     <f:facet name="output">
@@ -944,7 +944,7 @@
                     <p:column style="text-align: center; width: 20%">
                         <p:outputPanel styleClass="visible-cell-editor-value">
                             <h:outputText value="#{msg.estateLocationOMI}"/>
-                            <p:dataTable value="#{estate.lastOmi}" var="omi" editable="true" editMode="cell">
+                            <p:dataTable value="#{estate.lastOmi}" var="omi" editable="true" emptyMessage="#{msg.noRecordsFound}" editMode="cell">
                                 <p:ajax event="rowEdit" listener="#{estate.setEdit(true)}"/>
                                 <p:column>
                                     <p:cellEditor>
@@ -1041,7 +1041,7 @@
                          update=":form:commentArea" action="#{bean.prepareComment}" style="margin-top: 1%;">
             <f:setPropertyActionListener value="REQUEST" target="#{bean.currentComment}"/>
         </p:commandButton>
-        <p:dataTable value="#{bean.examRequest.commentsWithInitialize}" var="item" id="commentTable" styleClass="simple-table">
+        <p:dataTable value="#{bean.examRequest.commentsWithInitialize}" var="item" emptyMessage="#{msg.noRecordsFound}" id="commentTable" styleClass="simple-table">
             <p:column headerText="#{msg.requestTextEditComments}">
                 <h:outputText value="#{item.comment}" escape="false"/>
             </p:column>
@@ -1123,7 +1123,7 @@
     <p:dialog widgetVar="relationshipDlg" resizable="false" modal="true" draggable="false" closable="true"
               id="relationshipDlg" width="600">
         <p:dataTable value="#{bean.currentProperty.relationshipListToShow}" var="item" id="relationshipTable"
-                     styleClass="simple-table">
+                     styleClass="simple-table" emptyMessage="#{msg.noRecordsFound}">
             <p:column headerText="#{msg.databaseListRealEstateQuote}">
                 <h:outputText value="#{item.quote1} / #{item.quote2}"/>
             </p:column>
@@ -1165,7 +1165,7 @@
     <p:dialog widgetVar="estateSituationRelationshipDlg" resizable="false" modal="true" draggable="false" closable="true"
               id="estateSituationRelationshipDlg" width="600">
         <p:dataTable value="#{bean.estateSituationRelationshipList}" var="item" id="estateRelationshipTable"
-                     styleClass="simple-table">
+                     styleClass="simple-table" emptyMessage="#{msg.noRecordsFound}">
             <p:column headerText="#{msg.databaseListRealEstateQuote}">
                 <h:outputText value="#{item.quote1} / #{item.quote2}"/>
             </p:column>

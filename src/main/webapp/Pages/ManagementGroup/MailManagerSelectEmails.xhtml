@@ -33,7 +33,7 @@
                     </ui:remove>
                 </f:facet>
                 <p:dataTable id="referent" var="referent" value="#{item.notDeletedReferents}" editable="true"
-                             disabledSelection="true" styleClass="select-email-table">
+                             disabledSelection="true" styleClass="select-email-table" emptyMessage="#{msg.noRecordsFound}">
 
                     <f:facet name="header">
                         <h:outputText value="#{msg.mailManagerReferents.toUpperCase()}"
@@ -118,7 +118,7 @@
                 </p:dataTable>
 
                 <p:dataTable id="email" var="email" value="#{item.notDeletedPersonalEmails}" editable="true"
-                             disabledSelection="true"
+                             disabledSelection="true" emptyMessage="#{msg.noRecordsFound}"
                              styleClass="select-email-table">
 
                     <f:facet name="header">

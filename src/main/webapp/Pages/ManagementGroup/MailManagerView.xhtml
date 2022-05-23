@@ -232,7 +232,7 @@
         </p:dialog>
         <p:dialog widgetVar="imageFileDlgWV" width="300" draggable="false" modal="true" resizable="false" styleClass="dialog-green"
                   header="#{msg.mailManagerImgFiles}">
-            <p:dataTable value="#{bean.entity.imgFiles}" var="img" styleClass="without-header">
+            <p:dataTable value="#{bean.entity.imgFiles}" var="img" styleClass="without-header" emptyMessage="#{msg.noRecordsFound}">
                 <p:column>
                     <p:selectBooleanCheckbox value="#{img.imageSelected}"/>&nbsp;&nbsp;
                     <i class="#{img.icon} #{img.style}"/>

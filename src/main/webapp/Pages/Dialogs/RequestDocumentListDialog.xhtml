@@ -5,7 +5,7 @@
 <p:dialog widgetVar="requestDocumentDlg" id="requestDocumentDlgId" modal="true" width="1200">
     <h3>#{msg.requestDocumentDialogHeader}</h3>
     <h3>#{msg.requestDocumentDialogTable1Header}</h3>
-    <p:dataTable value="#{bean.requestDocuments}" var="doc" id="requestDocumentTable">
+    <p:dataTable value="#{bean.requestDocuments}" var="doc" id="requestDocumentTable" emptyMessage="#{msg.noRecordsFound}">
         <p:column styleClass="action_column">
             <p:selectBooleanCheckbox value="#{doc.selectedForDialogList}" />
         </p:column>
@@ -21,7 +21,7 @@
     </p:dataTable>
       <br/>
     <h3>#{msg.requestDocumentDialogNonSale}</h3>
-    <p:dataTable value="#{bean.requestNonSaleDocuments}" var="nonsaledoc" id="requestDocumentNonSaleTable">
+    <p:dataTable value="#{bean.requestNonSaleDocuments}" var="nonsaledoc" id="requestDocumentNonSaleTable" emptyMessage="#{msg.noRecordsFound}">
         <p:column styleClass="action_column">
             <p:selectBooleanCheckbox value="#{nonsaledoc.selectedForDialogList}" />
         </p:column>
@@ -37,7 +37,7 @@
     </p:dataTable>
     <br/>
     <h3>#{msg.requestDocumentDialogSale}</h3>
-    <p:dataTable value="#{bean.requestSaleDocuments}" var="saledoc" id="requestDocumentSaleTable">
+    <p:dataTable value="#{bean.requestSaleDocuments}" var="saledoc" id="requestDocumentSaleTable" emptyMessage="#{msg.noRecordsFound}">
         <p:column styleClass="action_column">
             <p:selectBooleanCheckbox value="#{saledoc.selectedForDialogList}" />
         </p:column>
@@ -53,7 +53,7 @@
     </p:dataTable>
     <br/>
     <h3>#{msg.additionalFiles}</h3>
-    <p:dataTable value="#{bean.otherDocuments}" var="doc" id="otherDocumentTable">
+    <p:dataTable value="#{bean.otherDocuments}" var="doc" id="otherDocumentTable" emptyMessage="#{msg.noRecordsFound}">
         <p:column styleClass="action_column">
             <p:selectBooleanCheckbox value="#{doc.selectedForDialogList}" />
         </p:column>

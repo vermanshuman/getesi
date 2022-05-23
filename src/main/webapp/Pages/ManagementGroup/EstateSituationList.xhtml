@@ -23,7 +23,7 @@
     <ui:define name="columns">
         <p:column headerText="#{msg.formality}">
             <p:dataTable rendered="#{not empty item.estateFormalityList}" value="#{item.estateFormalityList}"
-                         var="weakForm" styleClass="without-header cadastral_table">
+                         var="weakForm" styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}">
                 <p:column>
                     <span>#{weakForm.numRP}/#{weakForm.numRG} #{msg.estateFormalityDatePrefix}</span><h:outputText
                         value="#{weakForm.date}" converter="dateTimeConverter"/>
@@ -39,7 +39,7 @@
         </p:column>
         <p:column headerText="#{msg.estateLocation}">
             <p:dataTable rendered="#{not empty item.propertyList}" value="#{item.propertyList}" var="estate"
-                         styleClass="without-header cadastral_table">
+                         styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}">
                 <p:column style="width: 8%">
                     <h:outputText value="#{estate.category.codeInVisura}" id="category"/>
                     <p:tooltip for="category" value="#{estate.category.description}"/>
@@ -48,7 +48,7 @@
                     <h:outputText value="#{estate.address}"/>
                 </p:column>
                 <p:column>
-                    <p:dataTable value="#{estate.cadastralData}" var="exam"
+                    <p:dataTable value="#{estate.cadastralData}" var="exam" emptyMessage="#{msg.noRecordsFound}"
                                  rendered="#{not empty estate.cadastralData}"
                                  styleClass="without-header cadastral_table">
                         <p:column>
@@ -79,7 +79,7 @@
         </p:column>
         <p:column headerText="#{msg.pdfFormality}">
             <p:dataTable rendered="#{not empty item.formalityList}" value="#{item.formalityList}"
-                         styleClass="without-header cadastral_table" var="item">
+                         styleClass="without-header cadastral_table" var="item" emptyMessage="#{msg.noRecordsFound}">
                 <p:column>
                     <h:outputText value="#{item.formalityStr}"/>
                 </p:column>
@@ -356,7 +356,7 @@
                 </p:column>
                 <p:column headerText="#{msg.formality}">
                     <p:dataTable rendered="#{not empty item.estateFormalityList}" value="#{item.estateFormalityList}"
-                                 var="weakForm" styleClass="without-header cadastral_table">
+                                 var="weakForm" styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}">
 
                         <p:column>
                             <span>#{weakForm.numRP}/#{weakForm.numRG} #{msg.estateFormalityDatePrefix}</span><h:outputText
@@ -373,7 +373,7 @@
                 </p:column>
                 <p:column headerText="#{msg.estateLocation}">
                     <p:dataTable rendered="#{not empty item.propertyList}" value="#{item.propertyList}" var="estate"
-                                 styleClass="without-header cadastral_table">
+                                 styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}">
                         <p:column style="width: 8%">
                             <h:outputText value="#{estate.category.codeInVisura}" id="sales_category"/>
                             <p:tooltip for="sales_category" value="#{estate.category.description}"/>
@@ -382,7 +382,7 @@
                             <h:outputText value="#{estate.address}"/>
                         </p:column>
                         <p:column>
-                            <p:dataTable value="#{estate.cadastralData}" var="exam"
+                            <p:dataTable value="#{estate.cadastralData}" var="exam" emptyMessage="#{msg.noRecordsFound}"
                                          rendered="#{not empty estate.cadastralData}"
                                          styleClass="without-header cadastral_table">
                                 <p:column>
@@ -413,7 +413,7 @@
                 </p:column>
                 <p:column headerText="#{msg.pdfFormality}">
                     <p:dataTable rendered="#{not empty item.formalityList}" value="#{item.formalityList}"
-                                 styleClass="without-header cadastral_table" var="item">
+                                 styleClass="without-header cadastral_table" var="item" emptyMessage="#{msg.noRecordsFound}">
                         <p:column>
                             <h:outputText value="#{item.formalityStr}"/>
                         </p:column>

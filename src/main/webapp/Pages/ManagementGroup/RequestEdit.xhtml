@@ -1339,7 +1339,7 @@
             <p:dialog widgetVar="subjectRestoreDlg" modal="true"
                       draggable="false" position="center center" width="1500">
                 <p:scrollPanel mode="native" id="restoreRequestSubjectTableScrollBar" style="width: 100%; min-height: 300px; max-height: 600px;">
-                    <p:dataTable value="#{bean.subjectWrapper.subjectsToRestore}"
+                    <p:dataTable value="#{bean.subjectWrapper.subjectsToRestore}" emptyMessage="#{msg.noRecordsFound}"
                                  var="subject"
                                  selection="#{bean.subjectWrapper.selectedSubjectToRestore}"
                                  rowKey="#{subject.id}" id="restoreRequestSubjectTable">
@@ -1401,7 +1401,7 @@
             <p:dialog id="documentDialog" widgetVar="documentDialog" modal="true" resizable="false" draggable="false"
                       width="700">
                 <p:scrollPanel mode="native"  style="width: 100%; min-height: 300px; max-height: 600px;">
-                    <p:dataTable value="#{bean.requestDocuments}" var="doc" id="requestDocs">
+                    <p:dataTable value="#{bean.requestDocuments}" var="doc" id="requestDocs" emptyMessage="#{msg.noRecordsFound}">
                         <p:column headerText="#{msg.name}">
                             <h:outputText value="#{doc.title}#{not empty doc.fileExtension ? doc.fileExtension : '' }"/>
                         </p:column>

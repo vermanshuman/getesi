@@ -340,7 +340,7 @@
                 <p:tab title="#{msg.requestTab}" rendered="#{invoiceBean.showRequestTab}">
                     <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
                         <p:dataTable value="#{invoiceBean.invoicedRequests}" styleClass="request-table" var="item"
-                                     style="margin-top:20px;">
+                                     style="margin-top:20px;" emptyMessage="#{msg.noRecordsFound}">
 
 
                             <p:column headerText="#{msg.requestListRequestType}" style="width: 242px !important;text-align: center !important;">
@@ -797,7 +797,7 @@
                             <div class="p-col-12">
                                 <p:outputLabel  value="#{msg.amountToBeCollected} : #{invoiceBean.selectedInvoice.onBalance}" style="font-weight: 700 !important; float:right;"/>
                             </div>
-                            <p:dataTable id="paymentInvoiceTable" value="#{invoiceBean.paymentInvoices}" emptyMessage=" " widgetVar="paymentInvoiceTableWV"
+                            <p:dataTable id="paymentInvoiceTable" value="#{invoiceBean.paymentInvoices}" emptyMessage="#{msg.noRecordsFound}" widgetVar="paymentInvoiceTableWV"
                                          var="paymentInvoice"  lazy="true"
                                          paginator="true" paginatorAlwaysVisible="true" rowIndexVar="rowId">
                                 <p:column headerText="#{msg.importAmount}">
@@ -904,7 +904,7 @@
                                 <div class="p-col-12">
                                     <p:outputPanel id="listFile">
                                         <p:dataTable value="#{invoiceBean.invoiceEmailAttachedFiles}" styleClass="simple-table" var="file"
-                                                     rendered="#{not empty invoiceBean.invoiceEmailAttachedFiles}"
+                                                     rendered="#{not empty invoiceBean.invoiceEmailAttachedFiles}" emptyMessage="#{msg.noRecordsFound}"
                                                      scrollHeight="150" style="border: 1px solid #a8acb1;">
                                             <p:column styleClass="action_column">
                                                 <p:selectBooleanCheckbox/>

@@ -137,7 +137,7 @@
         </p:panelGrid>
         <p:dialog id="subjectRestoreDlg" widgetVar="subjectRestoreDlg" modal="true" draggable="false" position="center center" width="1500">
             <p:dataTable value="#{bean.subjectsToRestore}" var="subject" selection="#{bean.selectedSubjectToRestore}"
-                         rowKey="#{subject.id}" id="restoreSubjectTable">
+                         rowKey="#{subject.id}" id="restoreSubjectTable" emptyMessage="#{msg.noRecordsFound}">
                 <p:column selectionMode="single" style="width:35px;text-align:center"/>
                 <p:column headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_SOCIAL_REGION}"
                           rendered="#{bean.wrapper.selectedPersonId eq 2}">

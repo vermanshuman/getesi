@@ -424,7 +424,7 @@
     </p:dialog>
     <p:dialog id="documentDialog" widgetVar="documentDialog" modal="true" resizable="false" draggable="false"
               width="600">
-        <p:dataTable value="#{bean.selectedSubjectWrapper.requestDocuments}" var="doc" id="requestDocs">
+        <p:dataTable value="#{bean.selectedSubjectWrapper.requestDocuments}" var="doc" id="requestDocs" emptyMessage="#{msg.noRecordsFound}">
             <p:column headerText="#{msg.name}">
                 <h:outputText value="#{doc.title}"/>
             </p:column>

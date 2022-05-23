@@ -179,7 +179,7 @@
 
             <br/>
             <p:outputPanel id="filePanel">
-                <p:dataTable id="fileTable" var="fileEntry" value="#{bean.uploadedFiles}" rowKey="#{fileEntry.id}"
+                <p:dataTable id="fileTable" var="fileEntry" value="#{bean.uploadedFiles}" rowKey="#{fileEntry.id}" emptyMessage="#{msg.noRecordsFound}"
                              rendered="#{not empty bean.uploadedFiles}" styleClass="without-header simple-table estate-table">
                     <p:column styleClass="filename_column">
                         <h:outputText value="#{fileEntry.getTitle()}"/>
@@ -205,7 +205,7 @@
             </p:outputPanel>
             <br/>
             <h3 style="text-align: left;margin-bottom: 20px;font-weight: 100;">#{msg.realEstateBuild}</h3>
-            <p:dataTable value="#{bean.lazyPropertyListBuilding}" lazy="true"
+            <p:dataTable value="#{bean.lazyPropertyListBuilding}" lazy="true" emptyMessage="#{msg.noRecordsFound}"
                          style="width: 100%" styleClass="simple-table estate-table estateTabTable"
                          var="item" id="estateTab"
                          rowStyleClass="#{item.used?'user-row':''}"
@@ -318,7 +318,7 @@
             </p:dataTable>
             <br/>
             <h3 style="text-align: left;margin-bottom: 20px;font-weight: 100;">#{msg.realEstateLand}</h3>
-            <p:dataTable value="#{bean.lazyPropertyListLand}" lazy="true"
+            <p:dataTable value="#{bean.lazyPropertyListLand}" lazy="true" emptyMessage="#{msg.noRecordsFound}"
                          style="width: 100%!important;"
                          styleClass="simple-table estate-table" var="item" id="estateTabLand"
                          paginator="true" paginatorAlwaysVisible="false" rows="20"
@@ -461,7 +461,7 @@
                         value="#{msg.importFromDatabase}" action="#{bean.loadMostRecentPresumableFile}"/>
             </p:panelGrid>
             <p:outputPanel id="formPanel">
-                <p:dataTable id="formTable" var="fileEntry" value="#{bean.formalityDocumentList}"
+                <p:dataTable id="formTable" var="fileEntry" value="#{bean.formalityDocumentList}" emptyMessage="#{msg.noRecordsFound}"
                              rowKey="#{fileEntry.id}" rendered="#{not empty bean.formalityDocumentList}"
                              styleClass="without-header simple-table estate-table">
                     <p:column styleClass="filename_column">
@@ -489,7 +489,7 @@
                     </p:column>
                 </p:dataTable>
             </p:outputPanel>
-            <p:dataTable value="#{bean.lazyFormalityList}" lazy="true"
+            <p:dataTable value="#{bean.lazyFormalityList}" lazy="true" emptyMessage="#{msg.noRecordsFound}"
                          styleClass="simple-table simple-table-layout estate-table"
                          var="item" id="formalityTab"
                          paginator="true" paginatorAlwaysVisible="false" rows="20"
@@ -559,7 +559,7 @@
             <p:poll widgetVar="pdfPoll" interval="10" listener="#{bean.updatePDFTable}" update="formalityPDFTab"
                     autoStart="false"/>
             <p:remoteCommand update="formalityPDFTab" name="updatePdfTable"/>
-            <p:dataTable value="#{bean.formalityPDFList}" styleClass="simple-table estate-table" var="item" id="formalityPDFTab">
+            <p:dataTable value="#{bean.formalityPDFList}" styleClass="simple-table estate-table" var="item" id="formalityPDFTab" emptyMessage="#{msg.noRecordsFound}">
                 <p:column styleClass="action_column" exportable="false">
                     <p:commandButton icon="ui-icon pi pi-pencil" update=":form"
                                      action="#{bean.editFormality}">
@@ -627,7 +627,7 @@
         <p:dialog header="#{msg.formalityDocuments}" widgetVar="dlgFormalityDoc" modal="true" width="600"
                   draggable="false" position="center center">
             <p:outputPanel id="dialogFormalityDoc">
-                <p:dataTable value="#{bean.formalityDocList}" var="doc">
+                <p:dataTable value="#{bean.formalityDocList}" var="doc" emptyMessage="#{msg.noRecordsFound}">
                     <p:column headerText="#{msg.name}">
                         <h:outputText value="#{doc.title}"/>
                     </p:column>

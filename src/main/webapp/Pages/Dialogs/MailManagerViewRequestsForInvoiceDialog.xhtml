@@ -52,7 +52,7 @@
         <!-- <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group" id="validRequests"> -->
         <div class="p-grid">
             <div class="p-col-12">
-                <p:dataTable value="#{bean.requestsConsideredForInvoice}"  var="item"
+                <p:dataTable value="#{bean.requestsConsideredForInvoice}"  var="item" emptyMessage="#{msg.noRecordsFound}"
                              rendered="#{not empty bean.requestsConsideredForInvoice}"  scrollable="true"
                              scrollHeight="300" style="margin-top:20px;max-width:1250px">
                     <p:column >
