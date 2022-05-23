@@ -90,13 +90,20 @@
             </c:if>
             <c:if test="#{!bean.costManipulationHelper.isEditable()}">
                 <div class="p-field p-grid">
-                    <span class="p-col-fixed" >#{msg.estateSituationEditClientName}</span>   <h:outputText value="#{bean.examRequest.clientName}"/>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold" >#{msg.estateSituationEditClientName}</span>   <h:outputText value="#{bean.examRequest.clientName}"/><br/>
+                    </div>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.estateSituationEditRequestType} </span>  <h:outputText value="#{bean.examRequest.serviceName}"/>
+                    </div>
                 </div>
                 <div class="p-field p-grid">
-                    <span class="p-col-fixed ">#{msg.estateSituationEditRequestType} </span>  <h:outputText value="#{bean.examRequest.serviceName}"/>
-                </div>
-                <div class="p-field p-grid">
-                    <span class="p-col-fixed ">#{msg.requestTextEditNumberFormalities} </span> <h:outputText value="#{bean.costManipulationHelper.numberActOrSumOfEstateFormalitiesAndOtherTemp}"/>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.requestTextEditNumberFormalities} </span> <h:outputText value="#{bean.costManipulationHelper.numberActOrSumOfEstateFormalitiesAndOtherTemp}"/>
+                    </div>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.requestTextEditNumberSummaryList}</span> <h:outputText value="#{bean.examRequest.numberOfGroupsByDocumentOfEstateFormality}"/>
+                    </div>
                 </div>
 
                 <c:if test="#{bean.examRequest.showAuthorizedQuote()}">
@@ -107,33 +114,39 @@
                 </c:if>
 
                 <div class="p-field p-grid">
-                    <span class="p-col-fixed ">#{msg.requestTextEditNumberSummaryList}</span> <h:outputText value="#{bean.examRequest.numberOfGroupsByDocumentOfEstateFormality}"/>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.requestTextEditMortgageExpenses} </span> <h:outputText value="#{bean.costManipulationHelper.costEstateFormalityTemp}"/>
+                    </div>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.requestTextEditLandRegistryFees} </span>
+                        <h:outputText value="#{bean.costManipulationHelper.costCadastralTemp}"/>
+                    </div>
                 </div>
+
                 <div class="p-field p-grid">
-                    <span class="p-col-fixed ">#{msg.requestTextEditMortgageExpenses} </span> <h:outputText value="#{bean.costManipulationHelper.costEstateFormalityTemp}"/>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.requestTextEditCompensation}</span>
+                        <h:outputText value="#{bean.costManipulationHelper.costPayTemp}"/>
+                    </div>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.requestTaxableCost}        </span>
+                        <h:outputText id="requestTaxableCost" value="#{bean.costManipulationHelper.taxableCostTemp}"/>
+                    </div>
                 </div>
+
                 <div class="p-field p-grid">
-                    <span class="p-col-fixed ">#{msg.requestTextEditLandRegistryFees} </span>
-                    <h:outputText value="#{bean.costManipulationHelper.costCadastralTemp}"/>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.requestIncludeNationalCost} </span>
+                        <p:selectBooleanCheckbox id="includeNationalCost" value="#{bean.costManipulationHelper.includeNationalCost}">
+                            <p:ajax listener="#{bean.updateNationalCost()}" update="@this requestExtraCostTable includeNationalCostDialog"/>
+                        </p:selectBooleanCheckbox>
+                    </div>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.requestExtraCostInit}  </span>
+                        <h:outputText  id="requestExtraCostInit" value="#{bean.costManipulationHelper.initCostTemp}"/>
+                    </div>
                 </div>
-                <div class="p-field p-grid">
-                    <span class="p-col-fixed ">#{msg.requestTextEditCompensation}</span>
-                    <h:outputText value="#{bean.costManipulationHelper.costPayTemp}"/>
-                </div>
-                <div class="p-field p-grid">
-                    <span class="p-col-fixed ">#{msg.requestTaxableCost}        </span>
-                    <h:outputText id="requestTaxableCost" value="#{bean.costManipulationHelper.taxableCostTemp}"/>
-                </div>
-                <div class="p-field p-grid">
-                    <span class="p-col-fixed ">#{msg.requestIncludeNationalCost} </span>
-                    <p:selectBooleanCheckbox id="includeNationalCost" value="#{bean.costManipulationHelper.includeNationalCost}">
-                        <p:ajax listener="#{bean.updateNationalCost()}" update="@this requestExtraCostTable includeNationalCostDialog"/>
-                    </p:selectBooleanCheckbox>
-                </div>
-                <div class="p-field p-grid">
-                    <span class="p-col-fixed ">#{msg.requestExtraCostInit}  </span>
-                    <h:outputText  id="requestExtraCostInit" value="#{bean.costManipulationHelper.initCostTemp}"/>
-                </div>
+
                 <c:if test="#{bean.hideExtraCost ne null and bean.hideExtraCost}">
                     <div class="p-field p-grid">
                         <span class="p-col-fixed ">#{msg.requestCostNote} </span> <h:outputText value="#{bean.costNote}"/>

@@ -144,6 +144,33 @@
             #mailManagerViewRequestsDialog .ui-datatable-scrollable-body {
                 overflow-x: scroll;
             }
+            #paymentDate_input {
+                width: 210px !important;
+            }
+            input {
+                background-color: #F0F3F5 !important;
+                border: none !important;
+                border-radius: 7px !important;
+                min-height: 28px;
+            }
+            #addPaymentDialog .ui-dialog-titlebar {
+                padding: 3px !important;
+            }
+            #addPaymentDialog .card {
+                padding: 16px !important;
+                padding-top: 0px !important;
+                padding-bottom: 0px !important;
+            }
+            #addPaymentDialog .ui-inputfield.ui-state-focus {
+                box-shadow: 0 0 0 0.2em #57c279 !important;
+            }
+
+            #addPaymentDialog .ui-selectonemenu.ui-state-focus:not(.ui-state-error) {
+                box-shadow: 0 0 0 0.2em #57c279 !important;
+            }
+            #addPaymentDialog .calender-filled input, #addPaymentDialog .select-checkbox, #addPaymentDialog .select-one-menu {
+                border: 1px solid #009900 !important;
+            }
         </style>
         <ui:include src="/resources/tpl/Admin/LetterView.xhtml"/>
         <p:outputPanel id="print_panel" style="visibility: hidden; position: absolute;">
