@@ -2162,8 +2162,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                     new Criterion[]{
                             Restrictions.eq("id", newRequest.getUser().getId())
                     });
-            if(!user.isAdmin())
-                newRequest.setStateId(RequestState.IN_WORK.getId());
+            newRequest.setStateId(RequestState.IN_WORK.getId());
         }
         setRequestData(newRequest);
         if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
@@ -2217,8 +2216,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                     new Criterion[]{
                             Restrictions.eq("id", newRequest.getUser().getId())
                     });
-            if(!user.isAdmin())
-                newRequest.setStateId(RequestState.IN_WORK.getId());
+            newRequest.setStateId(RequestState.IN_WORK.getId());
         }
         setRequestData(newRequest);
         if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
