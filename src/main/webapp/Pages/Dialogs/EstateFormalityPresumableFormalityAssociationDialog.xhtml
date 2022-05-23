@@ -8,7 +8,7 @@
         <h:outputText value="#{msg.estateFormalityPresumableFormality}"/>
 
         <p:scrollPanel mode="native" style="min-height: 300px; max-height: 900px">
-            <p:dataTable value="#{presumableFormalityListByEstateFormality.entrySet()}" var="entry">
+            <p:dataTable value="#{presumableFormalityListByEstateFormality.entrySet()}" var="entry" emptyMessage="#{msg.noRecordsFound}">
                 <p:columnGroup type="header">
                     <p:row>
                         <p:column headerText="#{msg.estateFormality}"/>
@@ -26,7 +26,7 @@
                     </h:panelGrid>
                 </p:column>
                 <p:column headerText="#{msg.formality}">
-                    <p:dataTable value="#{entry.getValue()}" var="formality" styleClass="no_datatable_header">
+                    <p:dataTable value="#{entry.getValue()}" var="formality" styleClass="no_datatable_header" emptyMessage="#{msg.noRecordsFound}">
                         <p:column>
                             <h:outputText value="#{not empty formality.reclamePropertyService ?
                                                 formality.reclamePropertyService.name:formality.provincialOffice}"/>

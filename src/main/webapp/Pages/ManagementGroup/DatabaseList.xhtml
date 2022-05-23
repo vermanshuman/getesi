@@ -1166,8 +1166,8 @@
                     </p:column>
                     <p:rowExpansion>
                         <div align="center">
-                            <p:dataTable value="#{item.uploadedVisureRTFList}" var="visure" style="width: 40%;"
-                                         styleClass="no_datatable_header">
+                            <p:dataTable value="#{item.uploadedVisureRTFList}" var="visure" style="width: 40%;" 
+                                         styleClass="no_datatable_header" emptyMessage="#{msg.noRecordsFound}">
                                 <p:column>
                                     <h:outputText value="#{visure.visureName}" escape="false"
                                                   style="padding-right: 10px;"/>
@@ -1398,7 +1398,7 @@
 
                 <h:outputText/>
                 <p:dataTable id="documentsTableId" value="#{bean.documents}" styleClass="without-header" var="itemDoc"
-                             scrollable="true" scrollHeight="300">
+                             scrollable="true" scrollHeight="300" emptyMessage="#{msg.noRecordsFound}">
                     <p:column styleClass="action_column">
                         <p:commandButton icon="ui-icon pi pi-times" action="#{bean.removeDocument(itemDoc)}"
                                          oncomplete="updateTableDoc()"/>

@@ -41,7 +41,7 @@
                                     </div>
                                 </p:panel>
 
-                                <p:dataTable var="pitem" id="table" value="#{left_bean.lazyModel}"
+                                <p:dataTable var="pitem" id="table" value="#{left_bean.lazyModel}" emptyMessage="#{msg.noRecordsFound}"
                                              disabledSelection="#{empty disableSelection?'false':'true'}"
                                              lazy="#{true}" filteredValue="#{left_bean.filteredList}"
                                              paginator="true" rowKey="#{item.id}" rows="10"

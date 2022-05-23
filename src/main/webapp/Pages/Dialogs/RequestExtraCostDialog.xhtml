@@ -213,7 +213,7 @@
         </p:panelGrid>
 
 
-        <p:dataTable scrollable="true" scrollHeight="200" value="#{bean.costManipulationHelper.requestExtraCosts}"
+        <p:dataTable scrollable="true" scrollHeight="200" value="#{bean.costManipulationHelper.requestExtraCosts}" emptyMessage="#{msg.noRecordsFound}"
                      var="extraCost" id="requestExtraCostTable" rendered="#{bean.hideExtraCost eq null or not bean.hideExtraCost}">
 
             <p:column headerText="#{msg.requestExtraCostPrice}" styleClass="action_column_width">

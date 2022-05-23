@@ -110,7 +110,7 @@
             <div class="p-col-12">
                 <div class="card">
                     <p:dataTable widgetVar="validRequestsDT" var="item" value="#{bean.entity.validRequests}" reflow="true" styleClass="simple-table"
-                                 rendered="#{not empty bean.entity.validRequests}">
+                                 rendered="#{not empty bean.entity.validRequests}" emptyMessage="#{msg.noRecordsFound}">
                         <p:column styleClass=" action_column" style="padding: 6px 7px !important;">
                             <p:commandButton icon="ui-icon pi pi-pencil" update=":form" action="#{bean.gotoEditRequest}" style="width: 32px;">
                                 <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
@@ -242,7 +242,7 @@
               header="#{msg.selectToBeSentRequest}">
         <p:outputPanel widgetVar="showToBeSentRequestPanel" id="showToBeSentRequestPanel">
             <p:dataTable value="#{bean.entity.toBeSentRequests}" styleClass="simple-table" var="item" style="margin-top: 20px;"
-                         rendered="#{not empty bean.entity.validRequests}" scrollHeight="300" scrollable="true">
+                         rendered="#{not empty bean.entity.validRequests}" scrollHeight="300" scrollable="true" emptyMessage="#{msg.noRecordsFound}">
                 <p:column width="7%" styleClass="small-btn-column">
                     <p:selectBooleanCheckbox value="#{item.selected}"/>
                 </p:column>

@@ -79,7 +79,7 @@
 				<br />
 				<br />
 				<p:dataTable value="#{bean.groupOmis}" var="group" id="groupOmi" styleClass="groupTable borderless"
-					paginator="false" paginatorAlwaysVisible="false"
+					paginator="false" paginatorAlwaysVisible="false" emptyMessage="#{msg.noRecordsFound}"
 					widgetVar="tableGroupOMIWV" style="width: 35%;">
 					<p:column>#{group.name}
 						<p:commandButton icon="pi pi-pencil"
@@ -102,7 +102,7 @@
 						<br />
 						<br />
 						<p:dataTable value="#{group.categoryGroupItems}" var="item" id="items" styleClass="withborder"
-							widgetVar="tableItemsWV">
+							widgetVar="tableItemsWV" emptyMessage="#{msg.noRecordsFound}">
 							<p:column headerText="#{msg.categoryPercentValueGroupItemPosition}" style="width: 25%;">
 								<h:outputText value="#{item.position}" />
 							</p:column>

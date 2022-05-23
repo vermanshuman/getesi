@@ -629,7 +629,7 @@
                          onShow="updateSubjectSelectDialog()">
                 <p:remoteCommand name="updateSubjectSelectDialog" update="restoreSubjectTable"/>
                 <p:dataTable value="#{bean.subjectsToSelect}" var="subject" selection="#{bean.selectedSubjectToGenerate}"
-                             rowKey="#{subject.id}" id="restoreSubjectTable">
+                             rowKey="#{subject.id}" id="restoreSubjectTable" emptyMessage="#{msg.noRecordsFound}">
                     <p:column selectionMode="single" style="width:35px;text-align:center"/>
                     <p:column headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_NAME}">
                         <h:outputText value="#{subject}"/>

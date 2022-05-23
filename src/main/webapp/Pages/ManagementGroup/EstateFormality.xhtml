@@ -135,7 +135,7 @@
             </div>
         </p:panelGrid>
         <p:dataTable value="#{bean.formalitySuccessList}" var="item" id="formalitySuccess"
-                     style="margin-top: 10px">
+                     style="margin-top: 10px" emptyMessage="#{msg.noRecordsFound}">
             <p:column styleClass="action_column">
                 <p:commandButton action="#{bean.deleteFormalitySuccess}" update="formalitySuccess"
                                  icon="fa fa-fw fa-close" styleClass="delete-button">
@@ -185,7 +185,7 @@
                              update="formalityCommunicazionForm, formalityCommunicazionList"/>
         </p:panelGrid>
         <p:dataTable value="#{bean.formalityCommunicationList}" var="item" id="formalityCommunicazionList"
-                     style="margin-top: 10px">
+                     style="margin-top: 10px" emptyMessage="#{msg.noRecordsFound}">
             <p:column styleClass="action_column">
                 <p:commandButton action="#{bean.deleteCommunicationFormality}" update="formalityCommunicazionList"
                                  icon="fa fa-fw fa-close" styleClass="delete-button">

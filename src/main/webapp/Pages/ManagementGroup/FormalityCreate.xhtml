@@ -275,7 +275,7 @@
                                      action="#{bean.handleCreateProperty(elem)}" rendered="#{bean.listProperties}">
                     </p:commandButton>
                     <br/><br/>
-                    <p:dataTable style="width: 100%"
+                    <p:dataTable style="width: 100%" emptyMessage="#{msg.noRecordsFound}"
                                  styleClass="simple-table property-table" var="item"
                                  value="#{bean.getPropertiesOfSectionBToView(elem.bargainingUnit)}"
                                  id="estateTab">
@@ -383,7 +383,7 @@
             </p:commandButton>
             <br/><br/>
 
-            <p:dataTable style="width: 100%" widgetVar="aFavoreTableWV" id="aFavoreTable"
+            <p:dataTable style="width: 100%" widgetVar="aFavoreTableWV" id="aFavoreTable" emptyMessage="#{msg.noRecordsFound}"
                          styleClass="simple-table" var="subj" expandedRow="#{true}"
                          value="#{bean.aFavoreSectionC.subject}">
                 <p:columnGroup type="header">
@@ -447,7 +447,7 @@
 
                 <p:rowExpansion rendered="#{not empty subj.expansionTextStr}">
                     <p:dataTable value="#{subj.relationshipsToView}" var="rel" id="relationships"
-                                 styleClass="style1-sectionC">
+                                 styleClass="style1-sectionC" emptyMessage="#{msg.noRecordsFound}">
                         <p:column>
                             <h:outputText value="#{rel.text}"/>
                         </p:column>
@@ -471,7 +471,7 @@
             <br/><br/>
 
             <p:dataTable style="width: 100%" expandedRow="#{true}" widgetVar="controTableWV" id="controTable"
-                         styleClass="simple-table property-table" var="item"
+                         styleClass="simple-table property-table" var="item" emptyMessage="#{msg.noRecordsFound}"
                          value="#{bean.controSectionC.subject}">
                 <p:columnGroup type="header">
                     <p:row>
@@ -533,7 +533,7 @@
                 </p:column>
                 <p:rowExpansion rendered="#{not empty item.expansionTextStr}">
                     <p:dataTable value="#{item.relationshipsToView}" var="rel" id="relationshipsContro"
-                                 styleClass="style1-sectionC">
+                                 styleClass="style1-sectionC" emptyMessage="#{msg.noRecordsFound}">
                         <p:column>
                             <h:outputText value="#{rel.text}"/>
                         </p:column>
@@ -556,7 +556,7 @@
             </p:commandButton>
             <br/><br/>
 
-            <p:dataTable style="width: 100%" widgetVar="debitoriTableWV" id="debitoriTable"
+            <p:dataTable style="width: 100%" widgetVar="debitoriTableWV" id="debitoriTable" emptyMessage="#{msg.noRecordsFound}"
                          styleClass="simple-table property-table" var="subj" expandedRow="#{true}"
                          value="#{bean.debitoriSectionC.subject}">
                 <p:columnGroup type="header">
@@ -612,7 +612,7 @@
                 </p:column>
                 <p:rowExpansion rendered="#{not empty subj.expansionTextStr}">
                     <p:dataTable value="#{subj.relationshipsToView}" var="rel" id="relationshipsDebitori"
-                                 styleClass="style1-sectionC">
+                                 styleClass="style1-sectionC" emptyMessage="#{msg.noRecordsFound}">
                         <p:column>
                             <h:outputText value="#{rel.text}"/>
                         </p:column>
@@ -804,7 +804,7 @@
                    id="searchProperties" resizable="false" draggable="false" dynamic="true"
                    widgetVar="searchPropertiesWV" style="min-width:70%;z-index: 9999 !important;">
             <p:scrollPanel mode="native" style="width:100%; min-height: 300px; max-height: 600px" id="dialogPanel">
-                <p:dataTable value="#{bean.propertyList}"
+                <p:dataTable value="#{bean.propertyList}" emptyMessage="#{msg.noRecordsFound}"
                              selection="#{bean.selectedSearchedProperty}"
                              styleClass="simple-table estate-situation-edit-select" var="form"
                              id="searchProprertyTab" rowKey="#{form.id}"
