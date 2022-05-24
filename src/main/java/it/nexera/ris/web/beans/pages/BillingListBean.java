@@ -356,6 +356,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     private List<SelectItem> cities;
 
+    private boolean addAttachment = false;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
@@ -1222,12 +1224,12 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         for(GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
             if (!ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceItemId())) {
                 InvoiceItem invoiceItem = getSelectedInvoiceItems()
-                    .stream().filter(inv ->
-                            (inv.getId() != null
-                                    && inv.getId().equals(goodsServicesFieldWrapper.getInvoiceItemId()))
-                    ).findFirst().get();
+                        .stream().filter(inv ->
+                                (inv.getId() != null
+                                        && inv.getId().equals(goodsServicesFieldWrapper.getInvoiceItemId()))
+                        ).findFirst().get();
 
-            //  InvoiceItem invoiceItem = DaoManager.get(InvoiceItem.class, goodsServicesFieldWrapper.getInvoiceItemId());
+                //  InvoiceItem invoiceItem = DaoManager.get(InvoiceItem.class, goodsServicesFieldWrapper.getInvoiceItemId());
                 invoiceItem.setAmount(goodsServicesFieldWrapper.getInvoiceItemAmount());
                 invoiceItem.setTaxRate(DaoManager.get(TaxRate.class, goodsServicesFieldWrapper.getSelectedTaxRateId()));
                 invoiceItem.setDescription(goodsServicesFieldWrapper.getDescription());
@@ -1757,10 +1759,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 totIva = totIva.setScale(2, RoundingMode.HALF_UP);
                 totalIva = totIva.doubleValue();
 
-                //Date currentDate = new Date();
-                //String fileName = "Richieste_Invoice_"+DateTimeHelper.toFileDateWithMinutes(currentDate);
+//                Date currentDate = new Date();
+//                String fileName = "Richieste_Invoice_"+DateTimeHelper.toFileDateWithMinutes(currentDate);
                 String fileName = "FE-" + getNumber() + " " + getSelectedInvoice().getClient().getClientName();
-                
                 String tempDir = FileHelper.getLocalTempDir();
                 tempDir  += File.separator + UUID.randomUUID();
                 FileUtils.forceMkdir(new File(tempDir));
@@ -2043,7 +2044,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         try {
             Invoice invoice = DaoManager.get(Invoice.class, getNumber());
             WLGInbox wlgInbox = saveMail(MailManagerStatuses.NEW.getId());
-            MailHelper.sendMail(wlgInbox, getInvoiceEmailAttachedFiles(), null);
+            MailHelper.sendMail(wlgInbox,(addAttachment ? getInvoiceEmailAttachedFiles() : null), null);
             log.info("Mail is sent");
             if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
                 wlgInbox.setRecievedInbox(DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId()));
@@ -2070,6 +2071,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                     log.error("error in saving request after sending mail ", e);
                 }
             });
+            executeJS("PF('invoiceDialogBillingWV').hide();");
         } catch (Exception e) {
             log.info("Mail is not sent");
             LogHelper.log(log, e);
@@ -2722,50 +2724,59 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
     }
 
+    public String createInvoiceEmailDefaultBody(Invoice invoice) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        if(!ValidationHelper.isNullOrEmpty(invoice)) {
+            if(ValidationHelper.isNullOrEmpty(invoice.getEmail()) && !ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
+                String dearCustomer = ResourcesHelper.getString("dearCustomer");
+                String attachedCopyMessage = ResourcesHelper.getString("attachedCopyMessage");
+                String thanksMessage = ResourcesHelper.getString("thanksMessage");
+                String reference = "";
+                String ndg = "";
+                if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getNdg()))
+                    ndg = "NDG: " + invoice.getEmailFrom().getNdg();
+                if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getReferenceRequest()))
+                    reference = "RIF: " +invoice.getEmailFrom().getReferenceRequest() + " ";
+                String requestType = "REQUEST: ";
+                List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
+                for(Request request: requests){
+                    if(!requestType.equals(request.getRequestType().getName())) {
+                        requestType = requestType + request.getRequestType().getName() + " ";
+                    }
+                }
+
+                String emailBody = dearCustomer + ",</br></br>"
+                        + attachedCopyMessage + "</br></br>"
+                        + (ndg.isEmpty() ? "" : ndg + "</br>")
+                        + (reference.isEmpty() ? "" : reference + "</br>")
+                        + (requestType.isEmpty() ? "" : requestType + "</br></br>")
+                        + thanksMessage;
+
+                return emailBody;
+            } else if(ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
+                String dearCustomer = ResourcesHelper.getString("dearCustomer");
+                String attachedMessage = ResourcesHelper.getString("attachedMessage");
+                String thanksMessage = ResourcesHelper.getString("thanksMessage");
+
+                String emailBody = dearCustomer + ",</br></br>"
+                        + attachedMessage + "</br></br>"
+                        + thanksMessage;
+
+                return emailBody;
+            }
+        }
+        return "";
+    }
+
+
     private void openSubjectsToBeInvoicedTab() {
         executeJS("$('.tab').removeClass('selected'); $('#content_tab4').addClass('selected'); $('.hide').hide(); $('#content_tab4').show();");
     }
-    
-    public String createInvoiceEmailDefaultBody(Invoice invoice) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
-    	if(!ValidationHelper.isNullOrEmpty(invoice)) {
-	    	if(ValidationHelper.isNullOrEmpty(invoice.getEmail()) && !ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
-		    	String dearCustomer = ResourcesHelper.getString("dearCustomer");
-		    	String attachedCopyMessage = ResourcesHelper.getString("attachedCopyMessage");
-		    	String thanksMessage = ResourcesHelper.getString("thanksMessage");
-		    	String reference = "";
-		    	String ndg = "";
-		        if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getNdg()))
-		            ndg = "NDG: " + invoice.getEmailFrom().getNdg();
-		        if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getReferenceRequest()))
-		            reference = "RIF: " +invoice.getEmailFrom().getReferenceRequest() + " ";
-		        String requestType = "REQUEST: ";
-		        List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
-		        for(Request request: requests){
-		        	if(!requestType.equals(request.getRequestType().getName())) {
-		        		requestType = requestType + request.getRequestType().getName() + " ";
-		        	}
-		        }
-		        
-		        String emailBody = dearCustomer + ",</br></br>" 
-		        					+ attachedCopyMessage + "</br></br>"
-		        					+ (ndg.isEmpty() ? "" : ndg + "</br>")
-		        					+ (reference.isEmpty() ? "" : reference + "</br>")
-		        					+ (requestType.isEmpty() ? "" : requestType + "</br></br>")
-		        					+ thanksMessage;
-		        					
-		        return emailBody;
-	    	} else if(ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
-	    		String dearCustomer = ResourcesHelper.getString("dearCustomer");
-		    	String attachedMessage = ResourcesHelper.getString("attachedMessage");
-		    	String thanksMessage = ResourcesHelper.getString("thanksMessage");
-		        
-		        String emailBody = dearCustomer + ",</br></br>" 
-		        					+ attachedMessage + "</br></br>"
-		        					+ thanksMessage;
-		        					
-		        return emailBody;
-	    	}
-    	}
-    	return "";
+
+    public boolean isAddAttachment() {
+        return addAttachment;
+    }
+
+    public void setAddAttachment(boolean addAttachment) {
+        this.addAttachment = addAttachment;
     }
 }

@@ -297,6 +297,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
     private Boolean documentTypeInvoice;
 
+    private boolean addAttachment = false;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
         if (!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.BILLING_LIST))) {
@@ -1440,22 +1442,24 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         competence = new Date();
         setVatCollectabilityList(ComboboxHelper.fillList(VatCollectability.class,
                 false, false));
-        paymentTypes = ComboboxHelper.fillList(invoiceDb.getClient().getPaymentTypeList(), Boolean.TRUE);
+        if(!ValidationHelper.isNullOrEmpty(invoiceDb.getClient()))
+            paymentTypes = ComboboxHelper.fillList(invoiceDb.getClient().getPaymentTypeList(), Boolean.TRUE);
         setGoodsServicesFields(new ArrayList<>());
         setInvoiceDate(invoiceDb.getDate());
         setSelectedInvoice(invoiceDb);
-        setSelectedClientId(invoiceDb.getClient().getId());
-        setSelectedInvoiceClientId(invoiceDb.getClient().getId());
+        if(!ValidationHelper.isNullOrEmpty(invoiceDb.getClient())){
+            setSelectedClientId(invoiceDb.getClient().getId());
+            if (invoiceDb.getClient().getSplitPayment() != null && invoiceDb.getClient().getSplitPayment())
+                setVatCollectabilityId(VatCollectability.SPLIT_PAYMENT.getId());
+        }
         setSelectedInvoiceClient(invoiceDb.getClient());
-        if (invoiceDb.getClient().getSplitPayment() != null && invoiceDb.getClient().getSplitPayment())
-            setVatCollectabilityId(VatCollectability.SPLIT_PAYMENT.getId());
         if (!ValidationHelper.isNullOrEmpty(invoiceDb.getVatCollectability()))
             setVatCollectabilityId(invoiceDb.getVatCollectability().getId());
         if (!ValidationHelper.isNullOrEmpty(invoiceDb.getPaymentType()))
             setSelectedPaymentTypeId(invoiceDb.getPaymentType().getId());
         if (!ValidationHelper.isNullOrEmpty(invoiceDb.getNotes()))
             setInvoiceNote(invoiceDb.getNotes());
-        if (invoiceDb.getStatus().equals(InvoiceStatus.DELIVERED)) {
+        if (invoiceDb.getStatus() !=  null && invoiceDb.getStatus().equals(InvoiceStatus.DELIVERED)) {
             setInvoiceSentStatus(true);
         }
         if (!ValidationHelper.isNullOrEmpty(invoiceDb.getNumber()))
@@ -2045,6 +2049,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                         sendTo.addAll(MailHelper.parseMailAddress(email.getEmail()));
                 });
             }
+//            setEmailBodyToEditor(getEntity().getEmailBodyToEditor());
             setEmailBodyToEditor(createInvoiceEmailDefaultBody(invoice));
         }
     }
@@ -2061,7 +2066,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         WLGInbox wlgInbox = saveMail(MailManagerStatuses.NEW.getId());
 
         try {
-            MailHelper.sendMail(wlgInbox, getInvoiceEmailAttachedFiles(), null);
+            MailHelper.sendMail(wlgInbox,(addAttachment ? getInvoiceEmailAttachedFiles() : null), null);
             log.info("Mail is sent");
             if (!ValidationHelper.isNullOrEmpty(getBaseMailId())) {
                 wlgInbox.setRecievedInbox(DaoManager.get(WLGInbox.class, getBaseMailId()));
@@ -2507,10 +2512,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 imponi = imponi.setScale(2, RoundingMode.HALF_UP);
                 imponibile = imponi.doubleValue();
             }
-            //Date currentDate = new Date();
-            //String fileName = "Richieste_Invoice_" + DateTimeHelper.toFileDateWithMinutes(currentDate);
+//            Date currentDate = new Date();
+//            String fileName = "Richieste_Invoice_" + DateTimeHelper.toFileDateWithMinutes(currentDate);
             String fileName = "FE-" + getNumber() + " " + getSelectedInvoice().getClient().getClientName();
-
             String tempDir = FileHelper.getLocalTempDir();
             tempDir += File.separator + UUID.randomUUID();
             FileUtils.forceMkdir(new File(tempDir));
@@ -2925,13 +2929,21 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             executeJS("PF('invoiceOpenErrorDialogWV').show();");
         }
     }
-    
+
+    public boolean isAddAttachment() {
+        return addAttachment;
+    }
+
+    public void setAddAttachment(boolean addAttachment) {
+        this.addAttachment = addAttachment;
+    }
+
     public String createInvoiceEmailDefaultBody(Invoice invoice) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
-    	String dearCustomer = ResourcesHelper.getString("dearCustomer");
-    	String attachedCopyMessage = ResourcesHelper.getString("attachedCopyMessage");
-    	String thanksMessage = ResourcesHelper.getString("thanksMessage");
-    	String reference = "";
-    	String ndg = "";
+        String dearCustomer = ResourcesHelper.getString("dearCustomer");
+        String attachedCopyMessage = ResourcesHelper.getString("attachedCopyMessage");
+        String thanksMessage = ResourcesHelper.getString("thanksMessage");
+        String reference = "";
+        String ndg = "";
         if (!ValidationHelper.isNullOrEmpty(getEntity().getNdg()))
             ndg = "NDG: " + getEntity().getNdg();
         if (!ValidationHelper.isNullOrEmpty(getEntity().getReferenceRequest()))
@@ -2939,18 +2951,18 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         String requestType = "REQUEST: ";
         List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
         for(Request request: requests){
-        	if(!requestType.equals(request.getRequestType().getName())) {
-        		requestType = requestType + request.getRequestType().getName() + " ";
-        	}
+            if(!requestType.equals(request.getRequestType().getName())) {
+                requestType = requestType + request.getRequestType().getName() + " ";
+            }
         }
-        
-        String emailBody = dearCustomer + ",</br></br>" 
-        					+ attachedCopyMessage + "</br></br>"
-        					+ (ndg.isEmpty() ? "" : ndg + "</br>")
-        					+ (reference.isEmpty() ? "" : reference + "</br>")
-        					+ (requestType.isEmpty() ? "" : requestType + "</br></br>")
-        					+ thanksMessage;
-        					
+
+        String emailBody = dearCustomer + ",</br></br>"
+                + attachedCopyMessage + "</br></br>"
+                + (ndg.isEmpty() ? "" : ndg + "</br>")
+                + (reference.isEmpty() ? "" : reference + "</br>")
+                + (requestType.isEmpty() ? "" : requestType + "</br></br>")
+                + thanksMessage;
+
         return emailBody;
     }
 }

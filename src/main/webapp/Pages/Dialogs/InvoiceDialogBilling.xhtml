@@ -398,7 +398,7 @@
                                     <h:outputText value="#{msg.client}"/>
                                 </div>
                                 <div class="p-col-8">
-<!--                                    <p:inputText value="#{bean.examRequest.client}" rendered="#{bean.examRequest.client ne null}" disabled="true"/>-->
+                                    <!--                                    <p:inputText value="#{bean.examRequest.client}" rendered="#{bean.examRequest.client ne null}" disabled="true"/>-->
                                     <p:selectOneMenu id="invoiceClient" value="#{bean.selectedInvoiceClientId}" style="width: 300px; float:left;"
                                                      disabled="#{bean.invoiceSentStatus}"
                                                      styleClass="#{bean.selectedInvoiceClientId ne null ? 'select-one-menu' : ''}">
@@ -727,7 +727,7 @@
                                                      action="#{bean.sendInvoice}" rendered="#{!bean.invoiceSentStatus}"
                                                      update="@widgetVar(buttonsPanelWV) @widgetVar(countsSummaryPanelVW)
                              						 		 @widgetVar(goodsServicesPanelVW) @widgetVar(mainPanelVW) @widgetVar(sendInvoiceErrorDialogWV) :form"/>                                    <p:commandButton value="#{msg.close}" oncomplete="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"
-                                                     rendered="#{bean.invoiceSentStatus}"/>
+                                                                                                                                                                                                                          rendered="#{bean.invoiceSentStatus}"/>
                                 </div>
                             </div>
                         </p:panel>
@@ -824,33 +824,33 @@
 
                 <p:tab title="#{msg.emailTab}" id="emailTab">
                     <div class="p-grid emailTab" style="border: none; background-color: #f0f2f5;">
-<!--                        <p:remoteCommand action="#{bean.deleteEmailFrom}" name="removeEmailAddressFrom" update="mailFrom"/>-->
+                        <!--                        <p:remoteCommand action="#{bean.deleteEmailFrom}" name="removeEmailAddressFrom" update="mailFrom"/>-->
                         <p:remoteCommand action="#{bean.deleteEmailTo}" name="removeEmailAddressTo" update="mailTo"/>
                         <p:remoteCommand action="#{bean.deleteEmailCC}" name="removeEmailAddressCC" update="mailCC"/>
                         <p:remoteCommand name="showNotSendMsg" onstart="PF('showSendErrorDialog').show();" />
                         <h:inputHidden id="changeVar" value="#{bean.changeVar}"/>
                         <div class="p-col-6">
                             <div class="p-grid">
-<!--                                <div class="p-col-2 vertical-center">-->
-<!--                                    <h:outputText value="#{msg.mailManagerEmailFrom}:"/>-->
-<!--                                </div>-->
-<!--                                <div class="p-col-10">-->
-<!--                                    <p:autoComplete maxResults="6" multiple="true" value="#{bean.sendFrom}"-->
-<!--                                                    completeMethod="#{bean.completeMailFrom}"-->
-<!--                                                    inputStyle="width: 80%;" id="mailFrom"-->
-<!--                                                    var="dest" itemLabel="#{dest}" itemValue="#{dest}"-->
-<!--                                                    style="width: 80%; background: #FFF;"-->
-<!--                                                    onkeydown="return lockValue(event);"-->
-<!--                                                    immediate="false">-->
-<!--                                        <p:column>-->
-<!--                                            <h:outputText value="#{dest}" escape="false" />-->
-<!--                                        </p:column>-->
-<!--                                        <p:column style="width: 32px;">-->
-<!--                                            <p:commandButton icon="fa fa-times"-->
-<!--                                                             onclick="removeEmailAddressFrom([{name:'param', value:'#{dest}'}]);" />-->
-<!--                                        </p:column>-->
-<!--                                    </p:autoComplete>-->
-<!--                                </div>-->
+                                <!--                                <div class="p-col-2 vertical-center">-->
+                                <!--                                    <h:outputText value="#{msg.mailManagerEmailFrom}:"/>-->
+                                <!--                                </div>-->
+                                <!--                                <div class="p-col-10">-->
+                                <!--                                    <p:autoComplete maxResults="6" multiple="true" value="#{bean.sendFrom}"-->
+                                <!--                                                    completeMethod="#{bean.completeMailFrom}"-->
+                                <!--                                                    inputStyle="width: 80%;" id="mailFrom"-->
+                                <!--                                                    var="dest" itemLabel="#{dest}" itemValue="#{dest}"-->
+                                <!--                                                    style="width: 80%; background: #FFF;"-->
+                                <!--                                                    onkeydown="return lockValue(event);"-->
+                                <!--                                                    immediate="false">-->
+                                <!--                                        <p:column>-->
+                                <!--                                            <h:outputText value="#{dest}" escape="false" />-->
+                                <!--                                        </p:column>-->
+                                <!--                                        <p:column style="width: 32px;">-->
+                                <!--                                            <p:commandButton icon="fa fa-times"-->
+                                <!--                                                             onclick="removeEmailAddressFrom([{name:'param', value:'#{dest}'}]);" />-->
+                                <!--                                        </p:column>-->
+                                <!--                                    </p:autoComplete>-->
+                                <!--                                </div>-->
 
                                 <div class="p-col-2 vertical-center">
                                     <h:outputText value="#{msg.mailManagerEditMailTo}:"/>
@@ -907,7 +907,7 @@
                                                      rendered="#{not empty bean.invoiceEmailAttachedFiles}" emptyMessage="#{msg.noRecordsFound}"
                                                      scrollHeight="150" style="border: 1px solid #a8acb1;">
                                             <p:column styleClass="action_column">
-                                                <p:selectBooleanCheckbox/>
+                                                <p:selectBooleanCheckbox value="#{bean.addAttachment}"/>
                                             </p:column>
                                             <p:column headerText="#{msg.mailManagerEmailFile}" style="width: 280px !important;">
                                                 <h:outputText value="#{file.fileName}"/>
@@ -956,7 +956,9 @@
                             <p:commandButton value="#{msg.cancel}" oncomplete="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"/>
                             <p:commandButton value="#{msg.saveInDraft}" styleClass="ui-button-success p-mr-2 p-mb-2"
                                              style="margin-left:5px;" action="#{bean.saveMailInDraft}"/>
-                            <p:commandButton value="#{msg.sendEmail}" action="#{bean.sendMail}" styleClass="ui-button-success p-mr-2 p-mb-2"/>
+                            <p:commandButton value="#{msg.sendEmail}" action="#{bean.sendMail}"
+                                             styleClass="ui-button-success p-mr-2 p-mb-2"
+                            onsuccess="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"/>
                         </div>
                     </div>
                     <!-- <p:column>

@@ -64,6 +64,8 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
 
     private String chartData;
 
+    private List<String> fixedColors;
+
     private List<String> colors;
 
     private Long selectedUserId;
@@ -81,6 +83,8 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
     private List<SelectItem> expirationFilters;
 
     private Long selectedExpirationId;
+
+    Map<String, String> colorMapping;
 
     @Override
     protected void onConstruct() {
@@ -100,13 +104,16 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
 
             setExpirationFilters(ComboboxHelper.fillList(ExpirationFilter.class, false));
 
+            fixedColors = new LinkedList<>();
             colors = new LinkedList<>();
+
+            fixedColors.add("rgb(255, 124, 67");
+            fixedColors.add("rgb(72, 143, 49");
+            fixedColors.add("rgb(249, 93, 106");
+
             colors.add("rgb(0, 63, 92");
-            colors.add("rgb(72, 143, 49");
             colors.add("rgb(102, 81, 145");
             colors.add("rgb(66, 165, 245");
-            colors.add("rgb(249, 93, 106");
-            colors.add("rgb(255, 124, 67");
             colors.add("rgb(255, 166, 0");
             colors.add("rgb(131, 175, 112");
             colors.add("rgb(83, 131, 161");
@@ -238,8 +245,14 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
             List<String> borderColors = new ArrayList<>();
             List<String> backgroundColors = new ArrayList<>();
             for (int c = 0; c < chartXAxisData.size(); c++) {
-                borderColors.add(colors.get(c) + ")");
-                backgroundColors.add(colors.get(c) + ", 0.2)");
+                if(c <3 ){
+                    borderColors.add(fixedColors.get(c) + ")");
+                    backgroundColors.add(fixedColors.get(c) + ", 0.2)");
+                }else {
+                    borderColors.add(colors.get(c) + ")");
+                    backgroundColors.add(colors.get(c) + ", 0.2)");
+                }
+
             }
             List<List<String>> tooltipData = new ArrayList<>();
 
@@ -253,6 +266,15 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
                 tooltipData.add(tooltips.get(sortedrequestType));
             }
 
+            colorMapping = new HashMap<>();
+            for (int c = 0; c < sortedData.size(); c++) {
+                if(c <3 ){
+                    colorMapping.put(sortedData.get(c).getName(), fixedColors.get(c) + ")");
+
+                }else {
+                    colorMapping.put(sortedData.get(c).getName(), colors.get(c) + ")");
+                }
+            }
             MixChartDataWrapper dataSet = MixChartDataWrapper.builder()
                     .label(ResourcesHelper.getString("requestListService"))
                     .data(data)
@@ -454,11 +476,12 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
                         .count();
                 workLoadWrapper.setNumberUnclosedRequestsInWork(numberUnclosedRequestsInWork);
                 workLoadWrapper.setTotal(numberUnclosedRequestsInWork + numberNewRequests);
-                if (numberNewRequests != null && numberNewRequests > 0) {
-                    Double percentage = (numberUnclosedRequestsInWork * 1.0 / (numberNewRequests + numberUnclosedRequestsInWork)) * 100;
-                    workLoadWrapper.setPercentage(percentage.intValue());
-                }
+                //if (numberNewRequests != null && numberNewRequests > 0) {
+                Double percentage = (numberUnclosedRequestsInWork * 1.0 / (numberNewRequests + numberUnclosedRequestsInWork)) * 100;
+                workLoadWrapper.setPercentage(percentage.intValue());
+                //}
             }
+            workLoadWrapper.setBarColor(colorMapping.get(entry.getKey().getName()));
             getWorkLoadWrappers().add(workLoadWrapper);
         }
 

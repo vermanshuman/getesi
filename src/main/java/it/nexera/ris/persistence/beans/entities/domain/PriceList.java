@@ -12,7 +12,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "m")
+@Table(name = "price_list")
 @Getter
 @Setter
 public class PriceList extends IndexedEntity {

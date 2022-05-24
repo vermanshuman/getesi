@@ -372,7 +372,7 @@
                                                     <i class="carico-icon topbar-icon #{workLoad.icon}" style="#{workLoad.style}"/>
                                                     <span class="project-title"><h:outputText value="#{workLoad.name}"/></span>
                                                     <div class="project-progressbar">
-                                                        <div class="project-progressbar-value" style="width: #{workLoad.percentage}%"></div>
+                                                        <div class="project-progressbar-value" style="width: #{workLoad.percentage}%;background-color: #{workLoad.barColor}"></div>
                                                     </div>
                                                     <span class="project-detail"><h:outputText value="#{workLoad.numberUnclosedRequestsInWork}"/> in lavorazione su <h:outputText value="#{workLoad.total}"/></span>
                                                 </li>
