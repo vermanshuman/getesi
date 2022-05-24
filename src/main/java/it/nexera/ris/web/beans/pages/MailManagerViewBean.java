@@ -2939,30 +2939,35 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     }
 
     public String createInvoiceEmailDefaultBody(Invoice invoice) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
-        String dearCustomer = ResourcesHelper.getString("dearCustomer");
-        String attachedCopyMessage = ResourcesHelper.getString("attachedCopyMessage");
-        String thanksMessage = ResourcesHelper.getString("thanksMessage");
-        String reference = "";
-        String ndg = "";
-        if (!ValidationHelper.isNullOrEmpty(getEntity().getNdg()))
-            ndg = "NDG: " + getEntity().getNdg();
-        if (!ValidationHelper.isNullOrEmpty(getEntity().getReferenceRequest()))
-            reference = "RIF: " + getEntity().getReferenceRequest() + " ";
-        String requestType = "REQUEST: ";
-        List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
-        for(Request request: requests){
-            if(!requestType.equals(request.getRequestType().getName())) {
-                requestType = requestType + request.getRequestType().getName() + " ";
-            }
+    	String emailBody = "";
+    	if(!invoice.isNew()) {
+	    	String dearCustomer = ResourcesHelper.getString("dearCustomer");
+	        String attachedCopyMessage = ResourcesHelper.getString("attachedCopyMessage");
+	        String thanksMessage = ResourcesHelper.getString("thanksMessage");
+	        String reference = "";
+	        String ndg = "";
+	        if (!ValidationHelper.isNullOrEmpty(getEntity().getNdg()))
+	            ndg = "NDG: " + getEntity().getNdg();
+	        if (!ValidationHelper.isNullOrEmpty(getEntity().getReferenceRequest()))
+	            reference = "RIF: " + getEntity().getReferenceRequest() + " ";
+	        String requestType = "";
+	        List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
+	        Set<String> requestTypeSet = new HashSet<>();
+	        requests.stream().forEach(request -> {
+	        	requestTypeSet.add(request.getRequestType().getName());
+	        });
+	        for(String request: requestTypeSet){
+	        	requestType = requestType + request + " ";
+	        }
+	        requestType = "REQUEST: "+requestType;
+	
+	        emailBody = dearCustomer + ",</br></br>"
+	                + attachedCopyMessage + "</br></br>"
+	                + (ndg.isEmpty() ? "" : ndg + "</br>")
+	                + (reference.isEmpty() ? "" : reference + "</br>")
+	                + (requestType.isEmpty() ? "" : requestType + "</br></br>")
+	                + thanksMessage;
         }
-
-        String emailBody = dearCustomer + ",</br></br>"
-                + attachedCopyMessage + "</br></br>"
-                + (ndg.isEmpty() ? "" : ndg + "</br>")
-                + (reference.isEmpty() ? "" : reference + "</br>")
-                + (requestType.isEmpty() ? "" : requestType + "</br></br>")
-                + thanksMessage;
-
         return emailBody;
     }
 }

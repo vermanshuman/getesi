@@ -2736,13 +2736,16 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                     ndg = "NDG: " + invoice.getEmailFrom().getNdg();
                 if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getReferenceRequest()))
                     reference = "RIF: " +invoice.getEmailFrom().getReferenceRequest() + " ";
-                String requestType = "REQUEST: ";
-                List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
-                for(Request request: requests){
-                    if(!requestType.equals(request.getRequestType().getName())) {
-                        requestType = requestType + request.getRequestType().getName() + " ";
-                    }
-                }
+                String requestType = "";
+    	        List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
+    	        Set<String> requestTypeSet = new HashSet<>();
+    	        requests.stream().forEach(request -> {
+    	        	requestTypeSet.add(request.getRequestType().getName());
+    	        });
+    	        for(String request: requestTypeSet){
+    	        	requestType = requestType + request + " ";
+    	        }
+    	        requestType = "REQUEST: "+requestType;
 
                 String emailBody = dearCustomer + ",</br></br>"
                         + attachedCopyMessage + "</br></br>"
