@@ -1664,8 +1664,9 @@ public class ClientEditBean extends EntityEditPageBean<Client>
     }
 
     public void copyPriceListClient() throws HibernateException, IllegalAccessException, PersistenceBeanException {
-        if(!ValidationHelper.isNullOrEmpty(getSelectedClientIdToCopy())) {
-            List<PriceList> priceLists = DaoManager.load(PriceList.class, new Criterion[]{
+    	List<PriceList> priceLists = new ArrayList<>();
+    	if(!ValidationHelper.isNullOrEmpty(getSelectedClientIdToCopy())) {
+            priceLists = DaoManager.load(PriceList.class, new Criterion[]{
                     Restrictions.eq("client.id", getSelectedClientIdToCopy())});
             if(!ValidationHelper.isNullOrEmpty(priceLists)) {
                 for(PriceList priceList: priceLists) {
@@ -1681,6 +1682,12 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                     DaoManager.save(newPrice, true);
                 }
             }
+        }
+    	priceLists = DaoManager.load(PriceList.class, new Criterion[]{
+                Restrictions.eq("client", getEntity())});
+    	System.out.println(priceLists.size());
+        if(!ValidationHelper.isNullOrEmpty(priceLists)) {
+            setShowClientCopy(false);
         }
     }
 
