@@ -270,7 +270,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         List<User> notExternalCategoryUsers = DaoManager.load(User.class
                 , new Criterion[]{Restrictions.or(
                         Restrictions.eq("category", UserCategories.INTERNO),
-                        Restrictions.isNull("category")), Restrictions.eq("status", UserStatuses.ACTIVE)});
+                        Restrictions.isNull("category"))});
 
         notExternalCategoryUsers.forEach(u -> getUserWrappers().add(new UserFilterWrapper(u)));
 
@@ -735,6 +735,20 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             if (!ValidationHelper.isNullOrEmpty(request.getService())) {
                 result += "Tipo Richiesta: " + request.getServiceName() + "<br/>";
                 result += "Ufficio: " + request.getService().getEmailTextCamelCase() + " ";
+            }else if (!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
+                result += "Tipo Richiesta: " +  request.getMultipleServices()
+                        .stream()
+                        .filter(s -> !ValidationHelper.isNullOrEmpty(s.getName()))
+                        .map(s -> s.toString())
+                        .collect(Collectors.joining(","));
+                result += "<br/>";
+
+                result += "Ufficio: " + request.getMultipleServices()
+                        .stream()
+                        .filter(s -> !ValidationHelper.isNullOrEmpty(s.getEmailTextCamelCase()))
+                        .map(s -> s.getEmailTextCamelCase())
+                        .collect(Collectors.joining(","));
+                result += " ";
             }
             if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())) {
                 result += request.getAggregationLandChargesRegistryName() + "<br/>";

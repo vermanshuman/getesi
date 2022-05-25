@@ -4,7 +4,6 @@ import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.*;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.LandChargesRegistry;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
 import it.nexera.ris.web.beans.EntityLazyInListEditPageBean;
 import org.hibernate.HibernateException;
@@ -33,7 +32,7 @@ public class CitiesListBean extends EntityLazyInListEditPageBean<City> implement
     private List<SelectItem> provinces;
 
     private Long selectedProvinceId;
-    
+
     private String cfis;
 
     @Override
@@ -54,6 +53,8 @@ public class CitiesListBean extends EntityLazyInListEditPageBean<City> implement
         try {
             if (DaoManager.getCount(City.class, "id", new Criterion[]{
                     Restrictions.eq("cfis", getEntity().getCfis()),
+                    Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                            Restrictions.isNull("isDeleted")),
                     Restrictions.ne("id", getEntity().isNew() ? 0L : getEntity().getId())
             }) > 0) {
                 getEntity().setCfis(getCfis());

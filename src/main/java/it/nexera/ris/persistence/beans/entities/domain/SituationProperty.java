@@ -47,7 +47,6 @@ public class SituationProperty extends IndexedEntity {
     }
 
     public EstateSituation getSituation() {
-        System.out.println("situation  " + situation.getId());
         return situation;
     }
 

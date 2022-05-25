@@ -89,32 +89,33 @@ public class TemplatePdfTableHelper {
             return DateTimeHelper.toString(group);
         } else return "";
     }
+
     public static List<String> groupPropertiesByQuoteTypeList(List<Property> propertyList, Subject subject, Request request,
                                                               boolean filterRelationship,
                                                               boolean showCadastralIncome,
                                                               boolean showAgriculturalIncome) {
         Comparator<CadastralData> comparatorCadastralData = (o1, o2) -> {
-            if(o1==null && o2==null) {
+            if (o1 == null && o2 == null) {
                 return 0;
-            }else if(o1==null) {
+            } else if (o1 == null) {
                 return -1;
-            }else if(o2==null) {
+            } else if (o2 == null) {
                 return 1;
-            }else {
-                if(o1.getSheet() != null && o2.getSheet() != null) {
+            } else {
+                if (o1.getSheet() != null && o2.getSheet() != null) {
                     int result = extractInt(o1.getSheet()).compareTo(extractInt(o2.getSheet()));
-                    if(result == 0) {
+                    if (result == 0) {
                         result = extractInt(o1.getParticle()).compareTo(extractInt(o2.getParticle()));
                     }
-                    if(result == 0) {
+                    if (result == 0) {
                         result = extractInt(o1.getSub()).compareTo(extractInt(o2.getSub()));
                     }
                     return result;
-                }else if(o1.getSheet()==null) {
+                } else if (o1.getSheet() == null) {
                     return -1;
-                }else if(o2.getSheet()==null) {
+                } else if (o2.getSheet() == null) {
                     return 1;
-                }else {
+                } else {
                     return 0;
                 }
             }
@@ -150,11 +151,11 @@ public class TemplatePdfTableHelper {
                 }
             }
         };
+
         propertyList = propertyList.stream().sorted(comparatorProperty).collect(Collectors.toList());
         for (Property property : propertyList) {
             if (!ValidationHelper.isNullOrEmpty(property.getCategoryCode()) && !RealEstateType.LAND.getShortValue().equals(property.getCategoryCode())) {
                 property.setType(RealEstateType.BUILDING.getId());
-                System.out.println(property.getSubs());
             }
         }
         Map<List<RelationshipGroupingWrapper>, List<Property>> re = new HashMap<>();
@@ -167,18 +168,18 @@ public class TemplatePdfTableHelper {
         }
         return joiner;
     }
-    
+
     private static Integer extractInt(String s) {
         String num = s.replaceAll("\\D", "");
         // return 0 if no digits found
         return num.isEmpty() ? 0 : Integer.parseInt(num);
     }
-    
+
     public static List<String> groupPropertiesByQuoteTypeList(List<Property> propertyList, Subject subject,
                                                               boolean filterRelationship,
                                                               boolean showCadastralIncome,
                                                               boolean showAgriculturalIncome) {
-       return groupPropertiesByQuoteTypeList(propertyList, subject, null,filterRelationship, showCadastralIncome, showAgriculturalIncome);
+        return groupPropertiesByQuoteTypeList(propertyList, subject, null, filterRelationship, showCadastralIncome, showAgriculturalIncome);
     }
 
     public static List<Pair<String, String>> groupPropertiesByQuoteTypeListLikePairs(List<Property> propertyList, Subject subject,
@@ -189,6 +190,7 @@ public class TemplatePdfTableHelper {
 
         return groupPropertiesByQuoteTypeListLikePairs(propertyList, subject, presumableSubjects, filterRelationship, formality, showCadastralIncome, showAgriculturalIncome, Boolean.FALSE);
     }
+
     public static List<Pair<String, String>> groupPropertiesByQuoteTypeListLikePairs(List<Property> propertyList, Subject subject,
                                                                                      List<Subject> presumableSubjects,
                                                                                      boolean filterRelationship, Formality formality,
@@ -208,9 +210,9 @@ public class TemplatePdfTableHelper {
         String city = "";
         List<Pair<String, String>> result = new ArrayList<>();
 
-        if(!ValidationHelper.isNullOrEmpty(formality) && !addCommercialAndOmi){
+        if (!ValidationHelper.isNullOrEmpty(formality) && !addCommercialAndOmi) {
             TypeFormality typeFormality = formality.checkSalesDicTypeFormality();
-            if(typeFormality != null){
+            if (typeFormality != null) {
                 addCommercialAndOmi = Boolean.TRUE;
             }
         }
@@ -244,18 +246,19 @@ public class TemplatePdfTableHelper {
 
     private static void constructTableText(List<String> joiner, Iterator<Map.Entry<List<RelationshipGroupingWrapper>,
             List<Property>>> iterator, Map.Entry<List<RelationshipGroupingWrapper>, List<Property>> entry, boolean addCommercialAndOmi,
-                                           boolean showCadastralIncome,boolean showAgriculturalIncome) {
+                                           boolean showCadastralIncome, boolean showAgriculturalIncome) {
         constructTableText(joiner, iterator, entry, true, showCadastralIncome, showAgriculturalIncome, null);
     }
+
     private static void constructTableText(List<String> joiner, Iterator<Map.Entry<List<RelationshipGroupingWrapper>,
             List<Property>>> iterator, Map.Entry<List<RelationshipGroupingWrapper>, List<Property>> entry, boolean addCommercialAndOmi,
-            boolean showCadastralIncome,boolean showAgriculturalIncome, Request request) {
+                                           boolean showCadastralIncome, boolean showAgriculturalIncome, Request request) {
         final AtomicBoolean showRegime = new AtomicBoolean(Boolean.FALSE);
 
-        if(!ValidationHelper.isNullOrEmpty(request) &&
+        if (!ValidationHelper.isNullOrEmpty(request) &&
                 ((!ValidationHelper.isNullOrEmpty(request.getClient()) &&
-                !ValidationHelper.isNullOrEmpty(request.getClient().getRegime()) &&
-                request.getClient().getRegime()) || (!ValidationHelper.isNullOrEmpty(request.getRegime()) &&
+                        !ValidationHelper.isNullOrEmpty(request.getClient().getRegime()) &&
+                        request.getClient().getRegime()) || (!ValidationHelper.isNullOrEmpty(request.getRegime()) &&
                         request.getRegime()))) {
             showRegime.set(Boolean.TRUE);
         }
@@ -272,7 +275,7 @@ public class TemplatePdfTableHelper {
                         && p.isLandDataAreExistAndNotEmpty()).map(x ->
                 x.getAllFields(addCommercialAndOmi, true)).collect(Collectors.joining("<br />"));
 
-        
+
         freeProperty = freeProperty.stream().filter(p -> !PROPERTY_CADASTRAL_CATEGORY_CODE_FOR_LAND_PROPERTY_BLOCK.equals(p.getCategoryCode())
                 || !p.isLandDataAreExistAndNotEmpty()).collect(Collectors.toList());
         String bilding = freeProperty.stream().filter(p -> p.getType().equals(RealEstateType.BUILDING.getId()))
@@ -286,11 +289,18 @@ public class TemplatePdfTableHelper {
             joiner.add(landData);
         }
 
+        for (Property property : freeProperty) {
+            if (!ValidationHelper.isNullOrEmpty(property.getCategoryCode())
+                    && !RealEstateType.LAND.getShortValue().equals(property.getCategoryCode())) {
+                property.setType(RealEstateType.BUILDING.getId());
+            }
+        }
+
         Map<String, List<Property>> map = new HashMap<>();
         List<Property> properties = freeProperty.stream()
                 .filter(p -> p.getType() != null)
                 .filter(p -> p.getType()
-                .equals(RealEstateType.LAND.getId())).collect(Collectors.toList());
+                        .equals(RealEstateType.LAND.getId())).collect(Collectors.toList());
 
         for (Property property : properties) {
             if (map.containsKey(property.getSheets())) {
@@ -318,12 +328,12 @@ public class TemplatePdfTableHelper {
 //    }
 
     public static void wrapRequestProperties(List<Property> propertyList, Subject subject, boolean filterRelationship,
-                                      Map<List<RelationshipGroupingWrapper>, List<Property>> re, Request request) {
+                                             Map<List<RelationshipGroupingWrapper>, List<Property>> re, Request request) {
         wrapRequestProperties(propertyList, subject, filterRelationship, re, null, request);
     }
 
     public static void wrapRequestProperties(List<Property> propertyList, Subject subject, boolean filterRelationship,
-                                      Map<List<RelationshipGroupingWrapper>, List<Property>> re, Formality formality, Request request) {
+                                             Map<List<RelationshipGroupingWrapper>, List<Property>> re, Formality formality, Request request) {
         for (Property property : propertyList) {
             List<RelationshipGroupingWrapper> pairs = new LinkedList<>();
             List<Relationship> relationshipList = getRelationships(subject, formality, property);
@@ -369,36 +379,37 @@ public class TemplatePdfTableHelper {
                             && r.getRelationshipTypeId().equals(RelationshipType.CADASTRAL_DOCUMENT.getId()))
                     .collect(Collectors.toList());
         }
+
         for (Relationship relationship : relationshipList) {
             if (relationship.getQuote() != null && relationship.getPropertyType() != null) {
                 List<EstateSituation> estateSituationList = relationship.getProperty().getEstateSituationList();
 
                 Boolean showRegime = null;
-                if(request != null){
+                if (request != null) {
                     Optional<EstateSituation> estateSituation = CollectionUtils.emptyIfNull(estateSituationList)
                             .stream()
                             .filter(es -> !ValidationHelper.isNullOrEmpty(es.getRegime()) && es.getRegime())
                             .findFirst();
-                    if(estateSituation.isPresent())
+                    if (estateSituation.isPresent())
                         showRegime = true;
 
-                    if(showRegime == null){
+                    if (showRegime == null) {
                         estateSituation = CollectionUtils.emptyIfNull(estateSituationList)
                                 .stream()
                                 .filter(es -> !ValidationHelper.isNullOrEmpty(es.getRegime()) && !es.getRegime())
                                 .findFirst();
-                        if(estateSituation.isPresent())
+                        if (estateSituation.isPresent())
                             showRegime = false;
                     }
 
 
-                    if(showRegime == null){
-                        if(request.getRegime() != null)
+                    if (showRegime == null) {
+                        if (request.getRegime() != null)
                             showRegime = request.getRegime();
                     }
 
-                    if(showRegime == null){
-                        if(request.getClient() != null && request.getClient().getRegime() != null)
+                    if (showRegime == null) {
+                        if (request.getClient() != null && request.getClient().getRegime() != null)
                             showRegime = request.getClient().getRegime();
                     }
                 }
@@ -438,8 +449,8 @@ public class TemplatePdfTableHelper {
         return new ArrayList<Relationship>();
     }
 
-    private static String landPropertyBlock(List<Property> propertyList,boolean showCadastralIncome,
-            boolean showAgriculturalIncome) {
+    private static String landPropertyBlock(List<Property> propertyList, boolean showCadastralIncome,
+                                            boolean showAgriculturalIncome) {
         List<Property> landProperties = ValidationHelper.isNullOrEmpty(propertyList) ? null :
                 propertyList.stream().filter(p -> ValidationHelper.isNullOrEmpty(p.getCategory())
                         || !PROPERTY_CADASTRAL_CATEGORY_CODE_FOR_LAND_PROPERTY_BLOCK.equals(p.getCategory().getCode()))
@@ -479,28 +490,28 @@ public class TemplatePdfTableHelper {
 
             optimizePropertyParameters(property);
             str.append("&nbsp;mq&nbsp;");
-            String landMQ= property.getFormattedMQ();
-//            if(landMQ.endsWith(".00") || landMQ.endsWith(".0"))
-//                landMQ = landMQ.substring(0, landMQ.lastIndexOf("."));
-            if(!landMQ.contains(".") && !landMQ.contains(",")){
+            String landMQ = property.getTagLandMQ();
+            if (landMQ.endsWith(".00") || landMQ.endsWith(".0"))
+                landMQ = landMQ.substring(0, landMQ.lastIndexOf("."));
+            if (!landMQ.contains(".") && !landMQ.contains(",")) {
                 landMQ = GeneralFunctionsHelper.formatDoubleString(landMQ);
             }
             str.append(landMQ);
             str.append("</span>");
             str.append("</td>");
             str.append("</tr>");
-            if (showCadastralIncome || showAgriculturalIncome){
-                if(!ValidationHelper.isNullOrEmpty(property.getAgriculturalIncome())|| 
+            if (showCadastralIncome || showAgriculturalIncome) {
+                if (!ValidationHelper.isNullOrEmpty(property.getAgriculturalIncome()) ||
                         !ValidationHelper.isNullOrEmpty(property.getCadastralIncome())) {
                     str.append("<tr>");
                     str.append("<td style=\"border:none;\">");
                     str.append("</td>");
                     str.append("<td colspan=\"3\" style=\"border:none;\">");
-                  
+
                     if (showAgriculturalIncome) {
                         str.append("<span>");
                         str.append("(Red. agr. € ").append(property.getAgriculturalIncome());
-                        if(!showCadastralIncome)
+                        if (!showCadastralIncome)
                             str.append(")");
                         else
                             str.append(",");
@@ -508,27 +519,27 @@ public class TemplatePdfTableHelper {
                     }
                     if (showCadastralIncome) {
                         str.append("<span>");
-                         if(!showAgriculturalIncome)
+                        if (!showAgriculturalIncome)
                             str.append("(");
-                         else
-                             str.append("&nbsp;&nbsp;");
-                         str.append("Red. dom. € ").append(property.getCadastralIncome());
-                          str.append(")");
+                        else
+                            str.append("&nbsp;&nbsp;");
+                        str.append("Red. dom. € ").append(property.getCadastralIncome());
+                        str.append(")");
                         str.append("</span>");
                     }
-                 
+
                     str.append("</tr>");
                 }
-               
+
             }
         }
         str.append("</table></div>");
         str.append(propertyList.stream().filter(p -> !ValidationHelper.isNullOrEmpty(p.getComment())
                 && !p.getComment().equals(ResourcesHelper.getString("propertyCommentDefaultValue")))
                 .map(Property::getComment).collect(Collectors.joining("<br/>", "<i>", "</i>")));
-        
+
         return str.toString();
-        
+
     }
 
     private static void optimizePropertyParameters(Property property) {
@@ -869,17 +880,17 @@ public class TemplatePdfTableHelper {
         String defaultText = ResourcesHelper.getString("init_text_registry_or_table_default");
         AggregationLandChargesRegistry alcr = request.getAggregationLandChargesRegistry();
         boolean bReplaceWithConservatory = alcr.getLandChargesRegistries()
-        		.stream()
-        		.filter(lcr -> !ValidationHelper.isNullOrEmpty(lcr.getType()))
-        		.allMatch(x->x.getType().equals(LandChargesRegistryType.CONSERVATORY));
+                .stream()
+                .filter(lcr -> !ValidationHelper.isNullOrEmpty(lcr.getType()))
+                .allMatch(x -> x.getType().equals(LandChargesRegistryType.CONSERVATORY));
         boolean bReplaceWithTavolare = alcr.getLandChargesRegistries()
-        		.stream()
-        		.filter(lcr -> !ValidationHelper.isNullOrEmpty(lcr.getType()))
-        		.anyMatch(lcr->lcr.getType().equals(LandChargesRegistryType.TAVOLARE));
-        if(bReplaceWithTavolare) {
+                .stream()
+                .filter(lcr -> !ValidationHelper.isNullOrEmpty(lcr.getType()))
+                .anyMatch(lcr -> lcr.getType().equals(LandChargesRegistryType.TAVOLARE));
+        if (bReplaceWithTavolare) {
             defaultText = ResourcesHelper.getString("init_text_registry_or_table_tavolare");
         }
-        if(bReplaceWithConservatory) {
+        if (bReplaceWithConservatory) {
             defaultText = ResourcesHelper.getString("init_text_registry_or_table_conservatory");
         }
 

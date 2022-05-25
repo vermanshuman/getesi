@@ -988,6 +988,8 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                     if (!ValidationHelper.isNullOrEmpty(clients)) {
                         getMail().setManagers(clients);
                     }
+                }else {
+                    getMail().setManagers(null);
                 }
 
                 if (!ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
@@ -1007,6 +1009,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                 }
                 List<Request> requests = !ValidationHelper.isNullOrEmpty(recievedInboxRequests) ? recievedInboxRequests : getMail().getRequests();
                 List<Request> filteredRequests  = emptyIfNull(requests).stream().filter(r->r.isDeletedRequest()).collect(Collectors.toList());
+                Collections.sort(filteredRequests, Comparator.comparing(r -> r.getSubject().getId()));
                 excelFile = new CreateExcelRequestsReportHelper(true).convertMailUserDataToExcel(filteredRequests, document,excelDataWrapper);
             }
         } catch (Exception e) {
@@ -1174,6 +1177,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
     }
 
     protected void sortRequestsByType(List<Request> requests, Map<RequestType, List<Request>> sortedRequests) {
+        Collections.sort(requests, Comparator.comparing(r -> r.getSubject().getId()));
         for (Request elem : requests) {
             elem.setTempId(UUID.randomUUID().toString());
             if (!sortedRequests.containsKey(elem.getRequestType())) {

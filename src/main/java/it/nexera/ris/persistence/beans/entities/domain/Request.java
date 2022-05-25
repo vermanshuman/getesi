@@ -418,6 +418,9 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     @JoinColumn(name = "invoice_id")
     private Invoice invoice;
 
+    @Column(name = "unauthorized_quote")
+    private Boolean unauthorizedQuote;
+
     @Transient
     private Boolean haveRequestReport;
 
@@ -460,6 +463,9 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     @Transient
     private Long selectedTemplateId;
+
+    @Transient
+    private Boolean calculateCost;
 
     public Boolean getHaveRequestReport() {
         if (haveRequestReport == null) {
@@ -965,7 +971,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
         }, new Criterion[]{
                 Restrictions.eq("id", this.getId())});
 
-        return ValidationHelper.isNullOrEmpty(request.getMultipleServices()) ? "" : request.getMultipleServices()
+        return (ValidationHelper.isNullOrEmpty(request) || ValidationHelper.isNullOrEmpty(request.getMultipleServices())) ? "" : request.getMultipleServices()
                 .stream()
                 .filter(s -> !ValidationHelper.isNullOrEmpty(s.getName()))
                 .map(s -> s.toString())
@@ -2087,5 +2093,21 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     public void setSelectedTemplateId(Long selectedTemplateId) {
         this.selectedTemplateId = selectedTemplateId;
+    }
+
+    public Boolean getCalculateCost() {
+        return calculateCost;
+    }
+
+    public void setCalculateCost(Boolean calculateCost) {
+        this.calculateCost = calculateCost;
+    }
+
+    public Boolean getUnauthorizedQuote() {
+        return unauthorizedQuote;
+    }
+
+    public void setUnauthorizedQuote(Boolean unauthorizedQuote) {
+        this.unauthorizedQuote = unauthorizedQuote;
     }
 }

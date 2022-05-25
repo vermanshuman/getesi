@@ -212,7 +212,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             setCreateClient(true);
         }
 
-        initOfficesList(false);
+        initOfficesList(true);
         if(!ValidationHelper.isNullOrEmpty(getSelectedClientManagers()) &&
                 ValidationHelper.isNullOrEmpty(getClientManagers())) {
             setClientManagers(getSelectedClientManagers());
@@ -248,7 +248,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                      .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
                      .collect(Collectors.toList()), true));
          }
-         
+
         if (getSelectedNotManagerOrFiduciaryClientId() != null) {
         	 setClientManagers(ComboboxHelper.fillWrapperList( emptyIfNull(clientList)
                	  .stream()

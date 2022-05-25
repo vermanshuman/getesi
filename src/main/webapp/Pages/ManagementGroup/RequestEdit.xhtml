@@ -328,7 +328,7 @@
                 <p:remoteCommand name="updatebirhDateFromDialog" update="birhDateFromDialog" process="@this"/>
                 <p:panelGrid columns="2" style="width: 100%;" styleClass="ui-panelgrid-blank form-group" layout="grid" id="personTypePanel">
                     <p:column>
-                        <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_PERSON_TYPE}"/><br/>
+<!--                        <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_PERSON_TYPE}"/><br/>-->
                         <p:selectOneRadio value="#{bean.subjectWrapper.typeId}"
                                           update="subjectDialogPanel">
                             <f:selectItems value="#{bean.wrapper.persons}"/>

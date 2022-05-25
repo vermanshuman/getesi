@@ -20,6 +20,7 @@ import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.web.beans.pages.RequestTextEditBean;
 import it.nexera.ris.web.beans.wrappers.Pair;
 import it.nexera.ris.web.beans.wrappers.PartedPairsByCityWrapper;
+import it.nexera.ris.web.beans.wrappers.TerrenoDataWrapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -1653,158 +1654,140 @@ public class TemplateEntity {
                                 List<Property> inAppropriateProperties = new ArrayList<>();
                                 Double extensionTotal = 0.0;
                                 Double omiValueTotal = 0.0;
-                                Map<Long, String> terrenoData = landPropertyBlock(properties);
-                                for (Property property : properties) {
-                                    Boolean inAppropriateProperty = Boolean.FALSE;
-                                    String landCultureName = "";
-                                    if (!ValidationHelper.isNullOrEmpty(property.getQuality())) {
-                                        List<LandCadastralCulture> landCadastralCultures = DaoManager.load(LandCadastralCulture.class,
-                                                new Criterion[]{Restrictions.eq("description", property.getQuality()).ignoreCase()
-                                                });
-                                        if (!ValidationHelper.isNullOrEmpty(landCadastralCultures)) {
-                                            LandCulture landCulture = landCadastralCultures.get(0).getLandCulture();
-                                            if (!ValidationHelper.isNullOrEmpty(landCulture)
-                                                    && (ValidationHelper.isNullOrEmpty(landCulture.getUnavailable())
-                                            || !landCulture.getUnavailable())) {
-                                                landCultureName = landCulture.getName();
-                                            } else {
-                                                if(!ValidationHelper.isNullOrEmpty(landCulture.getUnavailable())
-                                                         && landCulture.getUnavailable()){
-                                                    property.setLandCulture(landCulture);
+                                List<TerrenoDataWrapper> terrenoDataWrappers = landPropertyBlocks(properties);
+                                Map<String, List<TerrenoDataWrapper>> map =
+                                        terrenoDataWrappers.stream().collect(Collectors.groupingBy(TerrenoDataWrapper::getSheet));
+                                Map<String, List<TerrenoDataWrapper>> sortedMap = new TreeMap<>(map);
+                                for(List<TerrenoDataWrapper> terrenoDatas :
+                                        sortedMap.values().stream().collect(Collectors.toList())){
+                                    for (TerrenoDataWrapper terrenoDataWrapper : terrenoDatas) {
+
+                                        Boolean inAppropriateProperty = Boolean.FALSE;
+                                        String landCultureName = "";
+                                        if (!ValidationHelper.isNullOrEmpty(terrenoDataWrapper.getProperty().getQuality())) {
+                                            List<LandCadastralCulture> landCadastralCultures = DaoManager.load(LandCadastralCulture.class,
+                                                    new Criterion[]{Restrictions.eq("description", terrenoDataWrapper.getProperty().getQuality()).ignoreCase()
+                                                    });
+                                            if (!ValidationHelper.isNullOrEmpty(landCadastralCultures)) {
+                                                LandCulture landCulture = landCadastralCultures.get(0).getLandCulture();
+                                                if (!ValidationHelper.isNullOrEmpty(landCulture)
+                                                        && (ValidationHelper.isNullOrEmpty(landCulture.getUnavailable())
+                                                        || !landCulture.getUnavailable())) {
+                                                    landCultureName = landCulture.getName();
+                                                } else {
+                                                    if(!ValidationHelper.isNullOrEmpty(landCulture.getUnavailable())
+                                                            && landCulture.getUnavailable()){
+                                                        terrenoDataWrapper.getProperty().setLandCulture(landCulture);
+                                                    }
+                                                    inAppropriateProperty = Boolean.TRUE;
                                                 }
+                                            } else {
                                                 inAppropriateProperty = Boolean.TRUE;
                                             }
                                         } else {
                                             inAppropriateProperty = Boolean.TRUE;
                                         }
-                                    } else {
-                                        inAppropriateProperty = Boolean.TRUE;
-                                    }
-                                    if (inAppropriateProperty) {
-                                        inAppropriateProperties.add(property);
-                                        continue;
-                                    }
-                                    String landMQ= property.getTagLandMQ();
-                                    if(landMQ.endsWith(".00") || landMQ.endsWith(".0"))
-                                        landMQ = landMQ.substring(0, landMQ.lastIndexOf("."));
-                                    if(landMQ.contains(".")){
-                                        String [] toks = landMQ.split("\\.");
-                                        if(toks.length > 1 && toks[1].length() == 3){
-                                            landMQ = landMQ.replaceAll("\\.", "");
-                                        }else if(toks.length > 1 && toks[1].length() == 2){
-                                            landMQ = landMQ.replaceAll("\\.", "");
-                                            landMQ = landMQ + "0";
-                                        }else if(toks.length > 1 && toks[1].length() == 1){
-                                            landMQ = landMQ.replaceAll("\\.", "");
-                                            landMQ = landMQ + "00";
+                                        if (inAppropriateProperty) {
+                                            inAppropriateProperties.add(terrenoDataWrapper.getProperty());
+                                            continue;
                                         }
-                                    }
-//                                    Double landMq = 0.0;
-//                                    if((ValidationHelper.isNullOrEmpty(property.getCentiares())
-//                                            || property.getCentiares().equals(0.0)) &&
-//                                            (ValidationHelper.isNullOrEmpty(property.getAres()) || property.getAres().equals(0.0)) &&
-//                                            (ValidationHelper.isNullOrEmpty(property.getHectares())
-//                                                    || property.getHectares().equals(0.0))){
-//
-//
-//                                        landMq =  !ValidationHelper.isNullOrEmpty(property.getConsistency()) ?
-//                                                Double.parseDouble(property.getConsistencyNumber().replaceAll("\\.", "")) : 0.0;
-//                                    }else {
-//                                        landMq  = !ValidationHelper.isNullOrEmpty(
-//                                                property.getMetersLand()) ? property.getMetersLand().doubleValue() : 0.0;
-//                                    }
+                                        String landMQ= terrenoDataWrapper.getProperty().getTagLandMQ();
+                                        if(landMQ.endsWith(".00") || landMQ.endsWith(".0"))
+                                            landMQ = landMQ.substring(0, landMQ.lastIndexOf("."));
+                                        if(landMQ.contains(".")){
+                                            String [] toks = landMQ.split("\\.");
+                                            if(toks.length > 1 && toks[1].length() == 3){
+                                                landMQ = landMQ.replaceAll("\\.", "");
+                                            }else if(toks.length > 1 && toks[1].length() == 2){
+                                                landMQ = landMQ.replaceAll("\\.", "");
+                                                landMQ = landMQ + "0";
+                                            }else if(toks.length > 1 && toks[1].length() == 1){
+                                                landMQ = landMQ.replaceAll("\\.", "");
+                                                landMQ = landMQ + "00";
+                                            }
+                                        }
+                                        extensionTotal += Double.parseDouble(landMQ);
+                                        attachmentBuffer.append("<tr>"); // Property row
 
-                                    extensionTotal += Double.parseDouble(landMQ);
-                                    attachmentBuffer.append("<tr>"); // Property row
+                                        attachmentBuffer.append("<td class=\"col-35 p6 txt-center\">");
+                                        attachmentBuffer.append(landCultureName);
+                                        attachmentBuffer.append("</td>");
 
-                                    attachmentBuffer.append("<td class=\"col-35 p6 txt-center\">");
-                                    attachmentBuffer.append(landCultureName);
-                                    attachmentBuffer.append("</td>");
+                                        attachmentBuffer.append("<td class=\"col-25 p10 txt-center\">");
+                                        String landBlock = terrenoDataWrapper.getData();
+                                        String landClass = "";
+                                        if(landBlock.contains("foglio")){
+                                            landClass = "datiterrenomain";
+                                        }else
+                                            landClass = "datiterreno";
 
-                                    attachmentBuffer.append("<td class=\"col-25 p10 txt-center\">");
-                                    String landBlock = terrenoData.get(property.getId());
-                                    String landClass = "";
-                                    if(landBlock.contains("foglio")){
-                                        landClass = "datiterrenomain";
-                                    }else
-                                        landClass = "datiterreno";
+                                        attachmentBuffer.append("<p class=\"");
+                                        attachmentBuffer.append(landClass);
+                                        attachmentBuffer.append("\" style=\"float:right\">");
+                                        attachmentBuffer.append(landBlock);
+                                        attachmentBuffer.append("</p>");
+                                        attachmentBuffer.append("</td>");
 
-                                    attachmentBuffer.append("<p class=\"");
-                                    attachmentBuffer.append(landClass);
-                                    attachmentBuffer.append("\" style=\"float:right\">");
-                                    attachmentBuffer.append(landBlock);
-                                    attachmentBuffer.append("</p>");
-                                    attachmentBuffer.append("</td>");
+                                        attachmentBuffer.append("<td class=\"col-20 p10 txt-center\">");
+                                        attachmentBuffer.append(terrenoDataWrapper.getProperty().getEstateLandMQ());
+                                        attachmentBuffer.append("</td>");
 
-                                    attachmentBuffer.append("<td class=\"col-20 p10 txt-center\">");
-                                    attachmentBuffer.append(property.getEstateLandMQ());
-                                    attachmentBuffer.append("</td>");
-
-                                    attachmentBuffer.append("<td class=\"col-20 p10 txt-center\">");
-                                    if (!ValidationHelper.isNullOrEmpty(property.getQuality())) {
-                                        List<LandCadastralCulture> landCadastralCultures = DaoManager.load(LandCadastralCulture.class,
-                                                new Criterion[]{Restrictions.eq("description", property.getQuality()).ignoreCase()
-                                                });
-                                        List<LandCulture> landCultures = emptyIfNull(landCadastralCultures)
-                                                .stream()
-                                                .filter(lcc -> !ValidationHelper.isNullOrEmpty(lcc.getLandCulture()))
-                                                .map(LandCadastralCulture::getLandCulture)
-                                                .collect(Collectors.toList());
-
-                                        if (!ValidationHelper.isNullOrEmpty(landCultures)) {
-                                            List<LandOmiValue> landOmiValues = DaoManager.load(LandOmiValue.class,
-                                                    new Criterion[]{Restrictions.in("landCulture", landCultures)
+                                        attachmentBuffer.append("<td class=\"col-20 p10 txt-center\">");
+                                        if (!ValidationHelper.isNullOrEmpty(terrenoDataWrapper.getProperty().getQuality())) {
+                                            List<LandCadastralCulture> landCadastralCultures = DaoManager.load(LandCadastralCulture.class,
+                                                    new Criterion[]{Restrictions.eq("description", terrenoDataWrapper.getProperty().getQuality()).ignoreCase()
                                                     });
-                                            if (!ValidationHelper.isNullOrEmpty(landOmiValues)) {
-                                                List<LandOmiValue> cityLandOmiValues = landOmiValues
-                                                        .stream()
-                                                        .filter(lov -> !ValidationHelper.isNullOrEmpty(lov.getLandOmi())
-                                                                && !ValidationHelper.isNullOrEmpty(lov.getLandOmi().getCities())
-                                                                && lov.getLandOmi().getCities().contains(entry.getKey()))
-                                                        .collect(Collectors.toList());
-                                                if (!ValidationHelper.isNullOrEmpty(cityLandOmiValues)
-                                                        && !ValidationHelper.isNullOrEmpty(property.getTagLandMQ())) {
-                                                    landMQ= property.getTagLandMQ();
-                                                    if(landMQ.endsWith(".00") || landMQ.endsWith(".0"))
-                                                        landMQ = landMQ.substring(0, landMQ.lastIndexOf("."));
-                                                    if(landMQ.contains(".")){
-                                                        String [] toks = landMQ.split("\\.");
-                                                        if(toks.length > 1 && toks[1].length() == 3){
-                                                            landMQ = landMQ.replaceAll("\\.", "");
-                                                        }else if(toks.length > 1 && toks[1].length() == 2){
-                                                            landMQ = landMQ.replaceAll("\\.", "");
-                                                            landMQ = landMQ + "0";
-                                                        }else if(toks.length > 1 && toks[1].length() == 1){
-                                                            landMQ = landMQ.replaceAll("\\.", "");
-                                                            landMQ = landMQ + "00";
+                                            List<LandCulture> landCultures = emptyIfNull(landCadastralCultures)
+                                                    .stream()
+                                                    .filter(lcc -> !ValidationHelper.isNullOrEmpty(lcc.getLandCulture()))
+                                                    .map(LandCadastralCulture::getLandCulture)
+                                                    .collect(Collectors.toList());
+
+                                            if (!ValidationHelper.isNullOrEmpty(landCultures)) {
+                                                List<LandOmiValue> landOmiValues = DaoManager.load(LandOmiValue.class,
+                                                        new Criterion[]{Restrictions.in("landCulture", landCultures)
+                                                        });
+                                                if (!ValidationHelper.isNullOrEmpty(landOmiValues)) {
+                                                    List<LandOmiValue> cityLandOmiValues = landOmiValues
+                                                            .stream()
+                                                            .filter(lov -> !ValidationHelper.isNullOrEmpty(lov.getLandOmi())
+                                                                    && !ValidationHelper.isNullOrEmpty(lov.getLandOmi().getCities())
+                                                                    && lov.getLandOmi().getCities().contains(entry.getKey()))
+                                                            .collect(Collectors.toList());
+                                                    if (!ValidationHelper.isNullOrEmpty(cityLandOmiValues)
+                                                            && !ValidationHelper.isNullOrEmpty(terrenoDataWrapper.getProperty().getTagLandMQ())) {
+                                                        landMQ= terrenoDataWrapper.getProperty().getTagLandMQ();
+                                                        if(landMQ.endsWith(".00") || landMQ.endsWith(".0"))
+                                                            landMQ = landMQ.substring(0, landMQ.lastIndexOf("."));
+                                                        if(landMQ.contains(".")){
+                                                            String [] toks = landMQ.split("\\.");
+                                                            if(toks.length > 1 && toks[1].length() == 3){
+                                                                landMQ = landMQ.replaceAll("\\.", "");
+                                                            }else if(toks.length > 1 && toks[1].length() == 2){
+                                                                landMQ = landMQ.replaceAll("\\.", "");
+                                                                landMQ = landMQ + "0";
+                                                            }else if(toks.length > 1 && toks[1].length() == 1){
+                                                                landMQ = landMQ.replaceAll("\\.", "");
+                                                                landMQ = landMQ + "00";
+                                                            }
                                                         }
+                                                        Double landMqValue =  Double.parseDouble(landMQ);
+                                                        Double omiValue = (cityLandOmiValues.get(0).getValue()/10000) * landMqValue;
+                                                        BigDecimal value = new BigDecimal(omiValue);
+                                                        String omiValueString = df.format(value.doubleValue());
+                                                        attachmentBuffer.append(omiValueString
+                                                                .replaceAll("\\." , "")
+                                                                .replaceAll("," , "."));
+                                                        omiValueTotal += omiValue;
                                                     }
-                                                    Double landMqValue =  Double.parseDouble(landMQ);
-//                                                    if((ValidationHelper.isNullOrEmpty(property.getCentiares()) || property.getCentiares().equals(0.0)) &&
-//                                                            (ValidationHelper.isNullOrEmpty(property.getAres()) || property.getAres().equals(0.0)) &&
-//                                                            (ValidationHelper.isNullOrEmpty(property.getHectares()) || property.getHectares().equals(0.0))){
-//
-//                                                        landMqValue = !ValidationHelper.isNullOrEmpty(property.getConsistency()) ? Double.parseDouble(property.getConsistencyNumber().replaceAll("\\.","")) : 0.0;
-//                                                        if(landMqValue > 0){
-//                                                            landMqValue = Double.parseDouble(landMqValue.toString());
-//                                                        }
-//                                                    }else {
-//                                                        landMqValue =  !ValidationHelper.isNullOrEmpty(property.getMetersLand()) ? property.getMetersLand().doubleValue() : 0.0;
-//                                                    }
-                                                    Double omiValue = (cityLandOmiValues.get(0).getValue()/10000) * landMqValue;
-                                                    BigDecimal value = new BigDecimal(omiValue);
-                                                    String omiValueString = df.format(value.doubleValue());
-                                                    attachmentBuffer.append(omiValueString
-                                                            .replaceAll("\\." , "")
-                                                            .replaceAll("," , "."));
-                                                    omiValueTotal += omiValue;
                                                 }
                                             }
                                         }
+                                        attachmentBuffer.append("</td>");
+                                        attachmentBuffer.append("</tr>"); // Property row
                                     }
-                                    attachmentBuffer.append("</td>");
-                                    attachmentBuffer.append("</tr>"); // Property row
                                 }
+
 
 
                                 attachmentBuffer.append("<tr>"); // Total row
@@ -1835,47 +1818,53 @@ public class TemplateEntity {
                                 attachmentBuffer.append("</table>"); // table1
 
                                 if(!ValidationHelper.isNullOrEmpty(inAppropriateProperties)){
-                                    terrenoData = landPropertyBlock(inAppropriateProperties);
+                                    terrenoDataWrappers =
+                                            landPropertyBlocks(inAppropriateProperties);
 
                                     attachmentBuffer.append("<div style=\"text-align: center; margin-top: 20px;\"><h3>");
                                     attachmentBuffer.append(ResourcesHelper.getString("formalityListAllegatoUAHeader"));
                                     attachmentBuffer.append("</h3></div>");
+
+                                    map = terrenoDataWrappers.stream().collect(Collectors.groupingBy(TerrenoDataWrapper::getSheet));
+                                    sortedMap = new TreeMap<>(map);
+
                                     attachmentBuffer.append("<table style=\"margin-top: 0;\" class=\"allegatoa\">" ); // table2
                                     attachmentBuffer.append("<tbody>"); // tbody2
+                                    for(List<TerrenoDataWrapper> terrenoDatas :
+                                            sortedMap.values().stream().collect(Collectors.toList())){
+                                        extensionTotal = 0.0;
+                                        for(TerrenoDataWrapper terrenoDataWrapper : terrenoDatas){
+                                            extensionTotal += terrenoDataWrapper.getProperty().getLandMQ();
+                                            attachmentBuffer.append("<tr>");
 
-                                    extensionTotal = 0.0;
-                                    for(Property property: inAppropriateProperties){
-                                        extensionTotal += property.getLandMQ();
-                                        attachmentBuffer.append("<tr>");
+                                            attachmentBuffer.append("<td class=\"col-35 p10 txt-center\">");
+                                            if(terrenoDataWrapper.getProperty().getLandCulture() == null){
+                                                attachmentBuffer.append("COLTURA ASSENTE");
+                                            }else
+                                                attachmentBuffer.append(terrenoDataWrapper.getProperty().getLandCulture().getName());
+                                            attachmentBuffer.append("</td>");
+                                            attachmentBuffer.append("<td class=\"col-25 p10 txt-center\">");
+                                            String landBlock = terrenoDataWrapper.getData();
+                                            String landClass = "";
+                                            if(landBlock.contains("foglio")){
+                                                landClass = "datiterrenomain";
+                                            }else
+                                                landClass = "datiterreno";
 
-                                        attachmentBuffer.append("<td class=\"col-35 p10 txt-center\">");
-                                        if(property.getLandCulture() == null){
-                                            attachmentBuffer.append("COLTURA ASSENTE");
-                                        }else
-                                            attachmentBuffer.append(property.getLandCulture().getName());
-                                        attachmentBuffer.append("</td>");
-                                        attachmentBuffer.append("<td class=\"col-25 p10 txt-center\">");
-                                        String landBlock = terrenoData.get(property.getId());
-                                        String landClass = "";
-                                        if(landBlock.contains("foglio")){
-                                            landClass = "datiterrenomain";
-                                        }else
-                                            landClass = "datiterreno";
+                                            attachmentBuffer.append("<p class=\"");
+                                            attachmentBuffer.append(landClass);
+                                            attachmentBuffer.append("\" style=\"float:right\">");
+                                            attachmentBuffer.append(landBlock);
+                                            attachmentBuffer.append("</p>");
 
-                                        attachmentBuffer.append("<p class=\"");
-                                        attachmentBuffer.append(landClass);
-                                        attachmentBuffer.append("\" style=\"float:right\">");
-                                        attachmentBuffer.append(landBlock);
-                                        attachmentBuffer.append("</p>");
-
-                                        attachmentBuffer.append("</td>");
-                                        attachmentBuffer.append("<td class=\"col-20 p10 txt-center\">");
-                                        attachmentBuffer.append(property.getEstateLandMQ());
-                                        attachmentBuffer.append("</td>");
-                                        attachmentBuffer.append("<td class=\"col-20 p10 txt-center\">");
-                                        attachmentBuffer.append("</td>");
-
-                                        attachmentBuffer.append("</tr>"); // Total row
+                                            attachmentBuffer.append("</td>");
+                                            attachmentBuffer.append("<td class=\"col-20 p10 txt-center\">");
+                                            attachmentBuffer.append(terrenoDataWrapper.getProperty().getEstateLandMQ());
+                                            attachmentBuffer.append("</td>");
+                                            attachmentBuffer.append("<td class=\"col-20 p10 txt-center\">");
+                                            attachmentBuffer.append("</td>");
+                                            attachmentBuffer.append("</tr>"); // Total row
+                                        }
                                     }
                                     attachmentBuffer.append("</tbody>"); // tbody2
                                     attachmentBuffer.append("</table>"); // table2
@@ -2034,6 +2023,35 @@ public class TemplateEntity {
     }
 
 
+    private static List<TerrenoDataWrapper> landPropertyBlocks(List<Property> propertyList) {
+        List<TerrenoDataWrapper> terrenoDataWrappers = new ArrayList<>();
+        List<Pair<CadastralData, Property>> dataList = new ArrayList<>();
+        for (Property property : propertyList) {
+            for (CadastralData cadastralData : CollectionUtils.emptyIfNull(property.getCadastralData())
+                    .stream().filter(distinctByKey(x -> x.getId()))
+                    .collect(Collectors.toList())) {
+                dataList.add(new Pair<>(cadastralData, property));
+            }
+        }
+        dataList.sort(Comparator.comparing(p -> p.getFirst().getSheet()));
+        for (int i = 0; i < dataList.size(); i++) {
+            StringBuilder str = new StringBuilder();
+            CadastralData data = dataList.get(i).getFirst();
+            Property property = dataList.get(i).getSecond();
+            if (i == 0 || !data.getSheet().equals(dataList.get(i - 1).getFirst().getSheet())) {
+                str.append("<span>").append("&nbsp;foglio&nbsp;").append(data.getSheet());
+            }
+            str.append("&nbsp;p.lla&nbsp;").append(data.getParticle())
+                    .append("</span>");
+            TerrenoDataWrapper terrenoDataWrapper = new TerrenoDataWrapper(property, data.getSheet() ,str.toString());
+            terrenoDataWrappers.add(terrenoDataWrapper);
+        }
+        Collections.sort(terrenoDataWrappers,
+                Comparator.nullsLast(
+                        Comparator.comparing(
+                                TerrenoDataWrapper::getSheet)));
+        return terrenoDataWrappers;
+    }
     private static Map<Long, String> landPropertyBlock(List<Property> propertyList) {
         Map<Long, String> map = new HashMap<>();
         List<Pair<CadastralData, Property>> dataList = new ArrayList<>();

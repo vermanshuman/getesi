@@ -145,7 +145,7 @@ public class CostCalculationHelper {
                 }
                 requestCosts.finalCostWithExtraCost += initCost;
                 
-            }else if (getRequest().getCostButtonConfirmClicked() != null 
+            }else if ((getRequest().getCalculateCost() == null || !getRequest().getCalculateCost()) && getRequest().getCostButtonConfirmClicked() != null
                     && getRequest().getCostButtonConfirmClicked()) {
                 for (ExtraCost cost : extraCost) {
                     if(ValidationHelper.isNullOrEmpty(cost.getType()) ||
@@ -589,7 +589,7 @@ public class CostCalculationHelper {
         return result;
     }
 
-    private List<PriceList> loadPriceList(Boolean billingClient, boolean restrictionForPriceList)
+    public List<PriceList> loadPriceList(Boolean billingClient, boolean restrictionForPriceList)
             throws PersistenceBeanException, IllegalAccessException {
         
         
