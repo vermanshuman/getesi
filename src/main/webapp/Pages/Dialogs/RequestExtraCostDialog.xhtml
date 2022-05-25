@@ -64,7 +64,7 @@
                     </p:inputText>
                     <c:if test="#{bean.examRequest.showAuthorizedQuote()}">
                         <h3>#{msg.requestTextEditAuthorizedEstimate}</h3>
-                        <p:selectBooleanCheckbox id="authorizedEstimate" value="#{bean.examRequest.authorizedQuote}"/>
+                        <p:selectBooleanCheckbox id="authorizedEstimateView" value="#{bean.examRequest.authorizedQuote}"/>
                     </c:if>
                     <h3>#{msg.requestTextEditNumberSummaryList}</h3>
                     <h:outputText value="#{bean.examRequest.numberOfGroupsByDocumentOfEstateFormality}"/>
@@ -108,8 +108,14 @@
 
                 <c:if test="#{bean.examRequest.showAuthorizedQuote()}">
                     <div class="p-field p-grid">
-                        <span class="p-col-fixed "> #{msg.requestTextEditAuthorizedEstimate}</span>
-                        <p:selectBooleanCheckbox id="authorizedEstimate" value="#{bean.examRequest.authorizedQuote}"/>
+                        <div class="p-field" style="width: 50%;">
+                            <span class="p-col-fixed text-bold"> #{msg.requestTextEditAuthorizedEstimate}</span>
+                            <p:selectBooleanCheckbox id="authorizedEstimate" value="#{bean.examRequest.authorizedQuote}"/>
+                        </div>
+                        <div class="p-field" style="width: 50%;">
+                            <span class="p-col-fixed text-bold">#{msg.requestTextEditAuthorizedNonEstimate} </span>
+                            <p:selectBooleanCheckbox id="nonAuthorizedEstimate" value="#{bean.examRequest.unauthorizedQuote}"/>
+                        </div>
                     </div>
                 </c:if>
 

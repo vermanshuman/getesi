@@ -833,8 +833,8 @@
                             <p:selectBooleanCheckbox value="#{bean.entity.monthlyInvoice}" disabled="#{bean.onlyView}"/>
                         </p:panelGrid>
                 </p:panelGrid><br/>
-                <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" rendered="#{bean.showClientCopy}" 
-                             style="position: absolute;margin-top: 390px;">
+                    <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" rendered="#{bean.showClientCopy}"
+                                 style="position: absolute;margin-top: 390px;">
 
                         <h:outputText value="#{msg.clientEditCopyCostList}"/>
                         <p:selectOneMenu id="client" value="#{bean.selectedClientIdToCopy}" style="width: 300px; "

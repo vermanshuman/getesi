@@ -2,7 +2,6 @@ package it.nexera.ris.web.beans.pages;
 
 import it.nexera.ris.common.annotations.ReattachIgnore;
 import it.nexera.ris.common.enums.DocumentType;
-import it.nexera.ris.common.enums.ExtraCostType;
 import it.nexera.ris.common.enums.PageTypes;
 import it.nexera.ris.common.enums.RealEstateType;
 import it.nexera.ris.common.enums.RequestState;
@@ -130,9 +129,9 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 	private String selectedLandCultureId;
 
 	private List<SelectItem> landCultures;
-	
+
 	private CostManipulationHelper costManipulationHelper;
-	
+
 	private Boolean showAddNationalCostButton;
 
 	@Override
@@ -161,7 +160,8 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 		setUploadedPdfFiles(new LinkedList<>());
 		setLandAggregations(ComboboxHelper.fillList(LandChargesRegistry.class, Order.asc("name")));
 		checkPreviousRequest();
-		if (!ValidationHelper.isNullOrEmpty(getRequestEntity()) && ValidationHelper.isNullOrEmpty(getRequestEntity().getIncludeNationalCost())) 
+		if (!ValidationHelper.isNullOrEmpty(getRequestEntity())
+				&& ValidationHelper.isNullOrEmpty(getRequestEntity().getIncludeNationalCost()))
 			setShowAddNationalCostButton(true);
 	}
 
@@ -1245,56 +1245,56 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 			RedirectHelper.goTo(PageTypes.REQUEST_ESTATE_SITUATION_VIEW, getRequestId(), null);
 		}
 	}
-	
+
 	public void updateNationalCost() throws Exception {
-        Request request = DaoManager.get(Request.class, new Criterion[]{
-                Restrictions.eq("id", getRequestId())});
-        
-        setCostManipulationHelper(new CostManipulationHelper());
-        getCostManipulationHelper().setIncludeNationalCost(true);
-        getCostManipulationHelper().setRequestExtraCosts(new ArrayList<>());
-        List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
-                Restrictions.eq("requestId", request.getId())});
-        if(!ValidationHelper.isNullOrEmpty(extraCosts))
-        	getCostManipulationHelper().setRequestExtraCosts(extraCosts);
-        
-        if(!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry()) &&
-                !ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getNational()) &&
-                request.getAggregationLandChargesRegistry().getNational()) {
+		Request request = DaoManager.get(Request.class, new Criterion[]{
+				Restrictions.eq("id", getRequestId())});
 
-            getCostManipulationHelper().setIncludeNationalCost(false);
-            return;
-        }
-        if(!ValidationHelper.isNullOrEmpty(getCostManipulationHelper().getIncludeNationalCost())
-                && getCostManipulationHelper().getIncludeNationalCost()) {
-            if(!ValidationHelper.isNullOrEmpty(request.getMail())) {
-                List<Request> requestsWithSameMailId = DaoManager.load(Request.class,
-                        new Criterion[] {Restrictions.and(Restrictions.eq("mail.id", request.getMail().getId()),
-                                Restrictions.eq("subject.id", request.getSubject().getId()))
-                        });
-                boolean haveAnyWithIncludeSet = requestsWithSameMailId.stream().anyMatch(
-                        x->!ValidationHelper.isNullOrEmpty(x.getIncludeNationalCost()) && x.getIncludeNationalCost());
-                if(haveAnyWithIncludeSet) {
-                    getCostManipulationHelper().setIncludeNationalCost(false);
-                    executeJS("PF('includeNationalCostDialogWV').show();");
-                    return;
-                }
-            }
+		setCostManipulationHelper(new CostManipulationHelper());
+		getCostManipulationHelper().setIncludeNationalCost(true);
+		getCostManipulationHelper().setRequestExtraCosts(new ArrayList<>());
+		List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
+				Restrictions.eq("requestId", request.getId())});
+		if(!ValidationHelper.isNullOrEmpty(extraCosts))
+			getCostManipulationHelper().setRequestExtraCosts(extraCosts);
 
-            if(!ValidationHelper.isNullOrEmpty(request) && !ValidationHelper.isNullOrEmpty(request.getService())
-                    && !ValidationHelper.isNullOrEmpty(request.getService().getNationalPrice())) {
-                getCostManipulationHelper().setExtraCostOther(request.getService().getNationalPrice().toString());
-                getCostManipulationHelper().setExtraCostOtherNote(ResourcesHelper.getString("requestServiceNationalPriceNote"));
-                getCostManipulationHelper().addExtraCost("NAZIONALEPOSITIVA", getRequestId());
-                
-                Request requestDb  = DaoManager.get(Request.class, getRequestId());
-                getCostManipulationHelper().saveRequestExtraCost(requestDb);
-                CostCalculationHelper calculation = new CostCalculationHelper(requestDb);
-                calculation.calculateAllCosts(true);
-                setShowAddNationalCostButton(false);
-            }
-        }
-    }
+		if(!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry()) &&
+				!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getNational()) &&
+				request.getAggregationLandChargesRegistry().getNational()) {
+
+			getCostManipulationHelper().setIncludeNationalCost(false);
+			return;
+		}
+		if(!ValidationHelper.isNullOrEmpty(getCostManipulationHelper().getIncludeNationalCost())
+				&& getCostManipulationHelper().getIncludeNationalCost()) {
+			if(!ValidationHelper.isNullOrEmpty(request.getMail())) {
+				List<Request> requestsWithSameMailId = DaoManager.load(Request.class,
+						new Criterion[] {Restrictions.and(Restrictions.eq("mail.id", request.getMail().getId()),
+								Restrictions.eq("subject.id", request.getSubject().getId()))
+						});
+				boolean haveAnyWithIncludeSet = requestsWithSameMailId.stream().anyMatch(
+						x->!ValidationHelper.isNullOrEmpty(x.getIncludeNationalCost()) && x.getIncludeNationalCost());
+				if(haveAnyWithIncludeSet) {
+					getCostManipulationHelper().setIncludeNationalCost(false);
+					executeJS("PF('includeNationalCostDialogWV').show();");
+					return;
+				}
+			}
+
+			if(!ValidationHelper.isNullOrEmpty(request) && !ValidationHelper.isNullOrEmpty(request.getService())
+					&& !ValidationHelper.isNullOrEmpty(request.getService().getNationalPrice())) {
+				getCostManipulationHelper().setExtraCostOther(request.getService().getNationalPrice().toString());
+				getCostManipulationHelper().setExtraCostOtherNote(ResourcesHelper.getString("requestServiceNationalPriceNote"));
+				getCostManipulationHelper().addExtraCost("NAZIONALEPOSITIVA", getRequestId());
+
+				Request requestDb  = DaoManager.get(Request.class, getRequestId());
+				getCostManipulationHelper().saveRequestExtraCost(requestDb);
+				CostCalculationHelper calculation = new CostCalculationHelper(requestDb);
+				calculation.calculateAllCosts(true);
+				setShowAddNationalCostButton(false);
+			}
+		}
+	}
 
 	public boolean isViewRelatedEstate() {
 		return viewRelatedEstate;
@@ -1650,6 +1650,4 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 	public void setShowAddNationalCostButton(Boolean showAddNationalCostButton) {
 		this.showAddNationalCostButton = showAddNationalCostButton;
 	}
-	
-	
 }

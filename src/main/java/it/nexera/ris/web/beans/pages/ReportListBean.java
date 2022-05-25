@@ -146,6 +146,10 @@ public class ReportListBean extends EntityLazyListPageBean<Document> implements 
                         && getExamRequest().getAuthorizedQuote()){
                     costNote = "Preventivo autorizzato";
                 }
+                if(!isAdded && getExamRequest().getUnauthorizedQuote()!=null
+                        && getExamRequest().getUnauthorizedQuote()){
+                    costNote = "Preventivo non autorizzato";
+                }
                 costNote = ValidationHelper.isNullOrEmpty(costNote) ? new CreateExcelRequestsReportHelper().generateCorrectNote(getExamRequest()) : costNote.concat(" ").concat(new CreateExcelRequestsReportHelper().generateCorrectNote(getExamRequest()));
             } catch (PersistenceBeanException | IllegalAccessException e) {
                 LogHelper.log(log, e);

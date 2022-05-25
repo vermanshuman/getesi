@@ -759,6 +759,10 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                 if(!isAdded && request.getAuthorizedQuote()!=null &&  request.getAuthorizedQuote()){
                     note = "Preventivo autorizzato";
                 }
+                if(!isAdded && request.getUnauthorizedQuote()!=null
+                        && request.getUnauthorizedQuote()){
+                    note = "Preventivo non autorizzato";
+                }
 
                 String requestNote = generateCorrectNote(request);
                 requestNote = requestNote.replaceAll("(?i)<br\\p{javaSpaceChar}*(?:/>|>)", "\n");
@@ -1075,6 +1079,10 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                     }
                     if(!isAdded && request.getAuthorizedQuote()!=null &&  request.getAuthorizedQuote()){
                         note = "Preventivo autorizzato";
+                    }
+                    if(!isAdded && request.getUnauthorizedQuote()!=null
+                            && request.getUnauthorizedQuote()){
+                        note = "Preventivo non autorizzato";
                     }
                     String requestNote = generateCorrectNote(request);
                     requestNote = requestNote.replaceAll("(?i)<br\\p{javaSpaceChar}*(?:/>|>)", "\n");

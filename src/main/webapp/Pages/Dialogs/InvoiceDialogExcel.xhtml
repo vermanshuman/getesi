@@ -332,7 +332,7 @@
         }
     </style>
 
-    <p:dialog widgetVar="invoiceDialogExcelWV" modal="true" width="1350" draggable="false" id="invoiceDialogExcel"
+    <p:dialog widgetVar="invoiceDialogExcelWV" modal="true" width="1350" draggable="false" id="invoiceDialogBilling"
               header="#{msg.requestTextEditElectronicSalesInvoice} (n. #{invoiceBean.invoiceNumber})">
         <div style="margin-top:20px; overflow-x:hidden; overflow-y:auto; height: 700px;" class="invoiceDialog">
             <p:tabView dynamic="true" cache="true" id="dialogTab" activeIndex="#{invoiceBean.activeTabIndex}">
@@ -726,7 +726,7 @@
                                     <p:commandButton value="#{msg.delivery}" styleClass="ui-button-success p-mr-2 p-mb-2"
                                                      action="#{invoiceBean.sendInvoice}" rendered="#{!invoiceBean.invoiceSentStatus}"
                                                      update="@widgetVar(buttonsPanelWV) @widgetVar(countsSummaryPanelVW)
-                             						 		 @widgetVar(goodsServicesPanelVW) @widgetVar(mainPanelVW) @widgetVar(sendInvoiceErrorDialogWV) :form"/>                                    <p:commandButton value="#{msg.close}" oncomplete="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"
+                             						 		 @widgetVar(goodsServicesPanelVW) @widgetVar(mainPanelVW) @widgetVar(sendInvoiceErrorDialogWV) :form"/>                                    <p:commandButton value="#{msg.close}" oncomplete="PF('invoiceDialogExcelWV').hide(); closeInvoiceDialog();"
                                                                                                                                                                                                                           rendered="#{invoiceBean.invoiceSentStatus}"/>
                                 </div>
                             </div>
@@ -907,7 +907,7 @@
                                                      rendered="#{not empty invoiceBean.invoiceEmailAttachedFiles}" emptyMessage="#{msg.noRecordsFound}"
                                                      scrollHeight="150" style="border: 1px solid #a8acb1;">
                                             <p:column styleClass="action_column">
-                                                <p:selectBooleanCheckbox/>
+                                                <p:selectBooleanCheckbox value="#{invoiceBean.addAttachment}"/>
                                             </p:column>
                                             <p:column headerText="#{msg.mailManagerEmailFile}" style="width: 280px !important;">
                                                 <h:outputText value="#{file.fileName}"/>
@@ -953,10 +953,12 @@
                     <div class="p-grid">
                         <div class="p-col-8"></div>
                         <div class="p-col-4">
-                            <p:commandButton value="#{msg.cancel}" oncomplete="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"/>
+                            <p:commandButton value="#{msg.cancel}" oncomplete="PF('invoiceDialogExcelWV').hide(); closeInvoiceDialog();"/>
                             <p:commandButton value="#{msg.saveInDraft}" styleClass="ui-button-success p-mr-2 p-mb-2"
                                              style="margin-left:5px;" action="#{invoiceBean.saveMailInDraft}"/>
-                            <p:commandButton value="#{msg.sendEmail}" action="#{invoiceBean.sendMail}" styleClass="ui-button-success p-mr-2 p-mb-2"/>
+                            <p:commandButton value="#{msg.sendEmail}" action="#{invoiceBean.sendMail}"
+                                             styleClass="ui-button-success p-mr-2 p-mb-2"
+                                             onsuccess="PF('invoiceDialogExcelWV').hide(); closeInvoiceDialog();"/>
                         </div>
                     </div>
                     <!-- <p:column>

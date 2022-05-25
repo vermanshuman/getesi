@@ -60,6 +60,8 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 @ManagedBean(name = "billingListBean")
@@ -1711,6 +1713,210 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
     }
 
+    public static String getPdfRequestBody(Invoice invoice) throws PersistenceBeanException, IllegalAccessException {
+        StringBuilder result = new StringBuilder();
+        result.append("<div style=\"padding: 20px;\">");
+        result.append("<h3>FATTURA ELETTRONICA</h3>");
+        result.append("<table style=\"width: 800px;border-collapse: collapse;border: 1px solid lightgray;\">");
+        result.append("<thead style=\"background-color: #E7E7E7;\">");
+        result.append("<td style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;font-weight: bold;background-color: #E7E7E7;\">Mittente</td>");
+        result.append("<td style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;font-weight: bold;background-color: #E7E7E7;\">Destinatario</td>");
+        result.append("</thead>");
+        result.append("<tbody>");
+        result.append("<tr>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 50%;padding: 10px;line-height: 22px;\">");
+
+        String comapnyName = ApplicationSettingsHolder.getInstance()
+                .getByKey(ApplicationSettingsKeys.COMPANY_NAME).getValue();
+        if(ValidationHelper.isNullOrEmpty(comapnyName))
+            comapnyName = "";
+        result.append("<b>");
+        result.append(comapnyName.toUpperCase());
+        result.append("</b><br/>");
+        String addressAppliant = ApplicationSettingsHolder.getInstance()
+                .getByKey(ApplicationSettingsKeys.ADDRESS).getValue();
+        if(ValidationHelper.isNullOrEmpty(addressAppliant))
+            addressAppliant = "";
+        result.append(addressAppliant.toUpperCase());
+        result.append("<br/>");
+        String cityData = "";
+        String provinceDescription = ApplicationSettingsHolder.getInstance().getByKey(
+                ApplicationSettingsKeys.COMPANY_PROVINCE).getValue();
+        if(!ValidationHelper.isNullOrEmpty(provinceDescription)) {
+            List<Province> provinces = DaoManager.load(Province.class,
+                    new Criterion[]{
+                            Restrictions.eq("description", provinceDescription).ignoreCase()
+                    });
+            if(!ValidationHelper.isNullOrEmpty(provinces)){
+                Province province = provinces.get(0);
+                String cityString = ApplicationSettingsHolder.getInstance().getByKey(
+                        ApplicationSettingsKeys.COMPANY_CITY).getValue();
+                if(!ValidationHelper.isNullOrEmpty(cityString)){
+                    List<String> cityDescriptions = Stream.of(cityString.split(",", -1))
+                            .collect(Collectors.toList());
+
+                    List<City> cities = DaoManager.load(City.class, new Criterion[]{
+                            Restrictions.eq("province.id",province.getId()),
+                            Restrictions.eq("external", Boolean.TRUE),
+                            Restrictions.in("description", cityDescriptions)
+                    },Order.asc("description"));
+                    if(!ValidationHelper.isNullOrEmpty(cities)){
+                        City city = cities.get(0);
+                        if(!ValidationHelper.isNullOrEmpty(city)){
+                            if(!ValidationHelper.isNullOrEmpty(city.getCap())){
+                                cityData += city.getCap();
+                            }
+                            if(!ValidationHelper.isNullOrEmpty(city.getDescription())){
+                                cityData += " - " + city.getDescription();
+                            }
+
+                            if(!ValidationHelper.isNullOrEmpty(province.getCode())){
+                                cityData += " - " + province.getCode();
+                            }
+                            cityData += " - IT";
+                        }
+                    }
+                }
+            }
+        }
+        result.append(cityData);
+        result.append("<br/>");
+        String fiscalCodeAppliant = ApplicationSettingsHolder.getInstance()
+                .getByKey(ApplicationSettingsKeys.FISCAL_CODE).getValue();
+        if(ValidationHelper.isNullOrEmpty(fiscalCodeAppliant))
+            fiscalCodeAppliant = "";
+
+        result.append("P.IVA: ");
+        result.append(fiscalCodeAppliant);
+        result.append("<br/>");
+        result.append("Cod. Fiscale: ");
+        result.append(fiscalCodeAppliant);
+        result.append("<br/>");
+        String emailFrom = "";
+        List<String> emailsFrom = DaoManager.loadField(WLGServer.class, "login", String.class,
+                new Criterion[]{Restrictions.eq("type", 15L)});
+        if (!ValidationHelper.isNullOrEmpty(emailsFrom)) {
+            emailFrom = emailsFrom.get(0);
+        }
+        result.append("Regime fiscale: ");
+        result.append(emailFrom);
+        result.append("<br/>");
+        result.append("<br/>");
+        result.append("<br/>");
+        result.append("</td>");
+
+        result.append("<td style=\"border: 2px solid lightgray;width: 50%;padding: 10px;line-height: 22px;\">");
+        String clientName = "";
+        String clientAddress= "";
+        String clientPostal= "";
+        String clientNumberVAT= "";
+        String clientFiscalCode= "";
+        String clientOffice= "";
+        String clientPEC= "";
+        if(!ValidationHelper.isNullOrEmpty(invoice)){
+            if(!ValidationHelper.isNullOrEmpty(invoice.getClient())){
+                if(!ValidationHelper.isNullOrEmpty(invoice.getClient().getClientName())){
+                    clientName = invoice.getClient().getClientName();
+                }
+                if(!ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressStreet())){
+                    clientAddress = invoice.getClient().getAddressStreet();
+                }
+                if(!ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressHouseNumber())){
+                    clientAddress = invoice.getClient().getAddressHouseNumber();
+                }
+                if(!ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressPostalCode())){
+                    clientPostal = invoice.getClient().getAddressPostalCode();
+                }
+                if(!ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressCityId()) &&
+                        !ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressCityId().getDescription())){
+                    clientPostal += " - " + invoice.getClient().getAddressCityId().getDescription();
+                }
+                if(!ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressProvinceId()) &&
+                        !ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressProvinceId().getCode())){
+                    clientPostal += " - " + invoice.getClient().getAddressProvinceId().getCode();
+                }
+                clientPostal += " - IT";
+                if(!ValidationHelper.isNullOrEmpty(invoice.getClient().getNumberVAT())){
+                    clientNumberVAT = invoice.getClient().getNumberVAT();
+                }
+                if(!ValidationHelper.isNullOrEmpty(invoice.getClient().getFiscalCode())){
+                    clientFiscalCode = invoice.getClient().getFiscalCode();
+                }
+                if(!ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressSDI())){
+                    clientOffice = invoice.getClient().getAddressSDI();
+                }
+                if(!ValidationHelper.isNullOrEmpty(invoice.getClient().getMailPEC())){
+                    clientPEC = invoice.getClient().getMailPEC();
+                }
+            }
+        }
+        result.append("<b>");
+        result.append(clientName.toUpperCase());
+        result.append("</b><br/>");
+        result.append(clientAddress);
+        result.append("<br/>");
+        result.append(clientPostal);
+        result.append("<br/>");
+        result.append("P.IVA: ");
+        result.append(clientNumberVAT);
+        result.append("<br/>");
+        result.append("Cod. Fiscale: ");
+        result.append(clientFiscalCode);
+        result.append("<br/>");
+        result.append("Codice Ufficio: ");
+        result.append(clientOffice);
+        result.append("<br/>");
+        result.append("PEC: ");
+        result.append(clientPEC);
+        result.append("<br/>");
+        result.append("</td>");
+        result.append("</tr>");
+        result.append("</tbody>");
+        result.append("</table>");
+        result.append("<table style=\"width: 800px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
+        result.append("<tbody>");
+        result.append("<tr style=\"background-color: #E7E7E7;\">");
+        result.append("<td colspan=\"4\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;background-color: #E7E7E7;font-weight: bold\">Dati Fattura</td>");
+        result.append("</tr>");
+        result.append("<tr style=\"background-color: #E7E7E7;\">");
+        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 25%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Natura Documento</td>");
+        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 25%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Numero</td>");
+        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 25%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Data</td>");
+        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 25%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Importo Totale</td>");
+        result.append("</tr>");
+        result.append("<tr>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\"><b>Fattura</b></td>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\"><b>");
+        result.append(invoice.getInvoiceNumber() != null ? invoice.getInvoiceNumber() : "");
+        result.append("</b></td>");
+        result.append("</tr>");
+        result.append("</tbody>");
+        result.append("</table>");
+        result.append("</div>");
+        return result.toString();
+    }
+
+    public void downloadInvoicePdf_new() throws
+            IOException, PersistenceBeanException, IllegalAccessException, InstantiationException {
+        Invoice invoice = DaoManager.get(Invoice.class, getNumber());
+        String body = getPdfRequestBody(invoice);
+        log.info("Invoice PDF body" + body);
+        byte [] fileContent  = PrintPDFHelper.convertToPDF(null, body, null,
+                DocumentType.INVOICE);
+
+        if (fileContent != null) {
+            String sb = MailHelper.getDestinationPath() +
+                    DateTimeHelper.ToFilePathString(new Date());
+            String fileName = "FE-" + getNumber() + " "
+                    + getSelectedInvoice().getClient().getClientName();
+
+            File filePath = new File(sb);
+            String filePathStr = sb + File.separator + fileName + ".pdf";
+            InputStream stream = new ByteArrayInputStream(fileContent);
+            invoicePDFFile = new DefaultStreamedContent(stream, FileHelper.getFileExtension(filePathStr),
+                    fileName + ".pdf");
+        }
+    }
     public void downloadInvoicePdf() {
         try {
 
@@ -2737,15 +2943,15 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getReferenceRequest()))
                     reference = "RIF: " +invoice.getEmailFrom().getReferenceRequest() + " ";
                 String requestType = "";
-    	        List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
-    	        Set<String> requestTypeSet = new HashSet<>();
-    	        requests.stream().forEach(request -> {
-    	        	requestTypeSet.add(request.getRequestType().getName());
-    	        });
-    	        for(String request: requestTypeSet){
-    	        	requestType = requestType + request + " ";
-    	        }
-    	        requestType = "REQUEST: "+requestType;
+                List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
+                Set<String> requestTypeSet = new HashSet<>();
+                requests.stream().forEach(request -> {
+                    requestTypeSet.add(request.getRequestType().getName());
+                });
+                for(String request: requestTypeSet){
+                    requestType = requestType + request + " ";
+                }
+                requestType = "REQUEST: "+requestType;
 
                 String emailBody = dearCustomer + ",</br></br>"
                         + attachedCopyMessage + "</br></br>"

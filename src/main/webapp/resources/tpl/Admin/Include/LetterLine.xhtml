@@ -171,9 +171,11 @@
             <!-- <p:commandButton icon="fa fa-pencil-square" actionListener="#{bean.checkFieldsBeforeProcessManagedStateCheck}"
                              value="#{msg.mailManagerStart}" styleClass="ui-button-success"/> -->
             <p:commandButton icon="pi pi-print" update="form:print_panel"
-                             styleClass="ui-button-warning stampaButton" action="#{bean.generateMailPdf}" oncomplete="printIframe();" value="Stampa" style="margin-right: 1cm;width: auto;background: #000066;"/>
-            <p:commandButton update=":form" style="background-color: #F3362B !important;margin-left: 2px;width: 110px;" value="#{msg.close}" styleClass="grey-button"
-                             actionListener="#{bean.goTable}"/>
+                             styleClass="ui-button-warning stampaButton" action="#{bean.generateMailPdf}" oncomplete="printIframe();" value="Stampa" style="margin-right: 1cm;width: auto;background: #000066;"
+                             rendered="#{bean.showButtons}"/>
+            <p:commandButton update=":form" id="closeButton" style="background-color: #F3362B !important;margin-left: 2px;width: 110px;" value="#{msg.close}"
+                             styleClass="grey-button" actionListener="#{bean.goTable}"
+                    rendered="#{bean.showButtons}"/>
         </div>
     </div>
 </ui:composition>

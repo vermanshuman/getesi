@@ -393,6 +393,9 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     @JoinColumn(name = "fiduciary_id")
     private Client clientFiduciary;
 
+    @Column(name = "unauthorized_quote")
+    private Boolean unauthorizedQuote;
+
     @Transient
     private Boolean haveRequestReport;
 
@@ -2380,5 +2383,13 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     public void setMultipleRequestId(Long multipleRequestId) {
         this.multipleRequestId = multipleRequestId;
+    }
+
+    public Boolean getUnauthorizedQuote() {
+        return unauthorizedQuote;
+    }
+
+    public void setUnauthorizedQuote(Boolean unauthorizedQuote) {
+        this.unauthorizedQuote = unauthorizedQuote;
     }
 }

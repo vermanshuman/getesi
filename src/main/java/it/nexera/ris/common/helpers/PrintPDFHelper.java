@@ -244,6 +244,13 @@ public class PrintPDFHelper extends BaseHelper {
                     marginBottom = 30l;
                     break;
 
+                case INVOICE:
+                    marginTop = 20l;
+                    marginLeft = 10l;
+                    marginRight = 10l;
+                    marginBottom = 20l;
+                    break;
+
                 default:
                     break;
 

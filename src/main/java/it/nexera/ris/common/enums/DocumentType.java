@@ -15,6 +15,7 @@ public enum DocumentType {
     ALLEGATI(8L, ""),
     INDIRECT_CADASTRAL_REQUEST(9L, ""),
     INVOICE_REPORT(11L, ""),
+    INVOICE(12L, ""),
     OTHER(2l, "");
 
     private Long id;

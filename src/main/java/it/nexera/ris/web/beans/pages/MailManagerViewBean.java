@@ -299,6 +299,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
     private boolean addAttachment = false;
 
+    private Boolean showButtons;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
         if (!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.BILLING_LIST))) {
@@ -2939,35 +2941,39 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     }
 
     public String createInvoiceEmailDefaultBody(Invoice invoice) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
-    	String emailBody = "";
-    	if(!invoice.isNew()) {
-	    	String dearCustomer = ResourcesHelper.getString("dearCustomer");
-	        String attachedCopyMessage = ResourcesHelper.getString("attachedCopyMessage");
-	        String thanksMessage = ResourcesHelper.getString("thanksMessage");
-	        String reference = "";
-	        String ndg = "";
-	        if (!ValidationHelper.isNullOrEmpty(getEntity().getNdg()))
-	            ndg = "NDG: " + getEntity().getNdg();
-	        if (!ValidationHelper.isNullOrEmpty(getEntity().getReferenceRequest()))
-	            reference = "RIF: " + getEntity().getReferenceRequest() + " ";
-	        String requestType = "";
-	        List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
-	        Set<String> requestTypeSet = new HashSet<>();
-	        requests.stream().forEach(request -> {
-	        	requestTypeSet.add(request.getRequestType().getName());
-	        });
-	        for(String request: requestTypeSet){
-	        	requestType = requestType + request + " ";
-	        }
-	        requestType = "REQUEST: "+requestType;
-	
-	        emailBody = dearCustomer + ",</br></br>"
-	                + attachedCopyMessage + "</br></br>"
-	                + (ndg.isEmpty() ? "" : ndg + "</br>")
-	                + (reference.isEmpty() ? "" : reference + "</br>")
-	                + (requestType.isEmpty() ? "" : requestType + "</br></br>")
-	                + thanksMessage;
+        String emailBody = "";
+        if(!invoice.isNew()) {
+            String dearCustomer = ResourcesHelper.getString("dearCustomer");
+            String attachedCopyMessage = ResourcesHelper.getString("attachedCopyMessage");
+            String thanksMessage = ResourcesHelper.getString("thanksMessage");
+            String reference = "";
+            String ndg = "";
+            if (!ValidationHelper.isNullOrEmpty(getEntity().getNdg()))
+                ndg = "NDG: " + getEntity().getNdg();
+            if (!ValidationHelper.isNullOrEmpty(getEntity().getReferenceRequest()))
+                reference = "RIF: " + getEntity().getReferenceRequest() + " ";
+            String requestType = "";
+            List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
+            Set<String> requestTypeSet = new HashSet<>();
+            requests.stream().forEach(request -> {
+                requestTypeSet.add(request.getRequestType().getName());
+            });
+            for(String request: requestTypeSet){
+                requestType = requestType + request + " ";
+            }
+            requestType = "REQUEST: "+requestType;
+
+            emailBody = dearCustomer + ",</br></br>"
+                    + attachedCopyMessage + "</br></br>"
+                    + (ndg.isEmpty() ? "" : ndg + "</br>")
+                    + (reference.isEmpty() ? "" : reference + "</br>")
+                    + (requestType.isEmpty() ? "" : requestType + "</br></br>")
+                    + thanksMessage;
         }
         return emailBody;
+    }
+
+    public void loadButtons() {
+        setShowButtons(Boolean.TRUE);
     }
 }

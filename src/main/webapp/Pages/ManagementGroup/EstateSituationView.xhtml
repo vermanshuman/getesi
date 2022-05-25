@@ -133,19 +133,18 @@
             .card {
                 padding:0 !important;
             }
-            
             .ui-button.grey-button {
-    			background-color: #3582b8  !important;
-			}
-			
+                background-color: #3582b8  !important;
+            }
+
             .ui-button.grey-button:hover {
-            	background-color: #003871 !important;
-        	}
-        	
-        	#nationalCostPanel_content {
-        		border:none !important; 
-        		padding:0 !important;
-        	}
+                background-color: #003871 !important;
+            }
+
+            #nationalCostPanel_content {
+                border:none !important;
+                padding:0 !important;
+            }
     </style>
         <p:remoteCommand name="removeFileCommand" update="form"/>
         <div align="center">
@@ -160,17 +159,17 @@
                     <b>#{ff:upper(bean.requestEntity.aggregationLandChargesRegistryName)}</b>
                 </span></p:column>
                 <p:column>
-                	<p:panel id="nationalCostPanel" style="border:none ; padding:0 !important; ">
-	                	<p:commandButton value="#{msg.estateSituationViewAddNationalCost}" action="#{bean.updateNationalCost}" 
-	                		styleClass="grey-button" rendered="#{bean.showAddNationalCostButton}" update="nationalCostPanel"></p:commandButton>
-	                	<ui:fragment rendered="#{not bean.showAddNationalCostButton}">
+                    <p:panel id="nationalCostPanel" style="border:none ; padding:0 !important; ">
+                        <p:commandButton value="#{msg.estateSituationViewAddNationalCost}" action="#{bean.updateNationalCost}"
+                                         styleClass="grey-button" rendered="#{bean.showAddNationalCostButton}" update="nationalCostPanel"></p:commandButton>
+                        <ui:fragment rendered="#{not bean.showAddNationalCostButton}">
 		            		<span style="border: 2px solid #57c279 !important;padding: 5px 8px 8px 4px; border-radius: 2px;display: inline-block;">
 		                	<i class="fa fa-check-circle-o" style="color: green; margin-right: 5px; margin-left: 5px;"/>
-		                	<p:commandLink value="#{msg.mailManagerRelatedToClient}" disabled="true" 
-	                                   oncomplete="PF('associateToClientDlgWV').show();" />
+		                	<p:commandLink value="#{msg.mailManagerRelatedToClient}" disabled="true"
+                                           oncomplete="PF('associateToClientDlgWV').show();" />
 		            		</span>
-	                	</ui:fragment>
-                	</p:panel>
+                        </ui:fragment>
+                    </p:panel>
                 </p:column>
                 <p:column><span style="font-size:20px;">
                     #{ff:upper(msg.estateSituationEditRequestType)} #{ff:upper(bean.requestEntity.service.name)}
@@ -179,7 +178,7 @@
                     #{ff:upper(msg.estateSituationEditClientName)} #{ff:upper(bean.requestEntity.clientName)}
                 </span></p:column>
                 <p:column>
-                	<p:outputLabel></p:outputLabel>
+                    <p:outputLabel></p:outputLabel>
                 </p:column>
             </p:panelGrid>
         </div>
@@ -766,7 +765,7 @@
                 <p:commandButton value="#{msg.no}" onclick="PF('previousRequest').hide()"/>
             </div>
         </p:dialog>
-        
+
         <p:dialog id="includeNationalCostDialog" header="Note!" widgetVar="includeNationalCostDialogWV"
                   height="100px">
             #{msg.requestIncludeNationalCostMessage} <br/>

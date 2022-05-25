@@ -176,6 +176,7 @@
         <ui:include src="/resources/tpl/Admin/LetterView.xhtml"/>
         <p:outputPanel id="print_panel" style="visibility: hidden; position: absolute;">
             <p:remoteCommand name="clearPrintArea" action="#{bean.clearPrintArea}"/>
+
             <script>
                 function closePrint() {
                     document.body.removeChild(this.__container__);
@@ -215,7 +216,12 @@
                         }
                     }
                 };
+                window.onload = () => {
+                    console.log('page is fully loaded');
+                    loadButtons();
+                };
             </script>
+            <p:remoteCommand name="loadButtons" action="#{bean.loadButtons}" update="@form"/>
             <iframe id="mail_pdf_iframe" srcdoc="#{bean.mailPdf}"/>
         </p:outputPanel>
         <p:dialog id="confirmReadDlg" widgetVar="confirmReadDlgWV" styleClass="dialog-gray"

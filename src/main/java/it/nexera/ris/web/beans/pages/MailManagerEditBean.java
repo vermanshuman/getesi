@@ -598,9 +598,14 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
     }
 
     private List<Document> getDocumentsEvade(Request request) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        List<Document> documents = new ArrayList<>();
-        documents = DaoManager.load(Document.class, new Criterion[]{
-                Restrictions.eq("request.id", request.getId()),
+        List<Document> documents = DaoManager.load(Document.class,
+                new CriteriaAlias[]{
+                        new CriteriaAlias("request", "r", JoinType.INNER_JOIN)
+                },
+                new Criterion[]{
+                Restrictions.eq("r.id", request.getId()),
+                        Restrictions.or(Restrictions.isNull("r.unauthorizedQuote"),
+                                Restrictions.eq("r.unauthorizedQuote", false)),
                 Restrictions.eq("selectedForEmail", true)
         });
 
@@ -613,6 +618,8 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
                     new CriteriaAlias("f.requestList", "r_f", JoinType.INNER_JOIN)
             }, new Criterion[]{
                     Restrictions.eq("r_f.id", request.getId()),
+                    Restrictions.or(Restrictions.isNull("r_f.unauthorizedQuote"),
+                            Restrictions.eq("r_f.unauthorizedQuote", false)),
                     Restrictions.eq("selectedForEmail", true)
             });
 

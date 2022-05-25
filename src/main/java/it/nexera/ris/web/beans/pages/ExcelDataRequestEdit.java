@@ -284,14 +284,7 @@ public class ExcelDataRequestEdit extends BaseEntityPageBean {
             }
             setSelectedRequests(null);
 
-            if(!ValidationHelper.isNullOrEmpty(getMail())){
-                if(!ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
-                        !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox().getRequests())) {
-                    prepareTables(getMail().getRecievedInbox().getRequests());
-                }else if (!ValidationHelper.isNullOrEmpty(getMail().getRequests())) {
-                    prepareTables(getMail().getRequests());
-                }
-            } else if(!ValidationHelper.isNullOrEmpty(getSelectedRequestIds())){
+          if(!ValidationHelper.isNullOrEmpty(getSelectedRequestIds())){
                 setSelectedRequests(DaoManager.load(Request.class, new Criterion[]{
                         Restrictions.in("id", getSelectedRequestIds())
                 }));
@@ -307,7 +300,9 @@ public class ExcelDataRequestEdit extends BaseEntityPageBean {
         Map<RequestType, List<Request>> sortedRequests = new HashMap<>();
         setRequests(requests.stream().filter(Request::isDeletedRequest).collect(Collectors.toList()));
         sortRequestsByType(getRequests(), sortedRequests);
-        Client requestClient = getRequests().get(0).getClient();
+        Client requestClient = null;
+        if(!ValidationHelper.isNullOrEmpty(getRequests()))
+            requestClient = getRequests().get(0).getClient();
         List<String> columns = new ArrayList<>();
         for (Map.Entry<RequestType, List<Request>> entry : sortedRequests.entrySet()) {
             columns.clear();
@@ -1550,6 +1545,10 @@ public class ExcelDataRequestEdit extends BaseEntityPageBean {
                 if(!isAdded && getExamRequest().getAuthorizedQuote()!= null
                         && getExamRequest().getAuthorizedQuote()){
                     costNote = "Preventivo autorizzato";
+                }
+                if(!isAdded && getExamRequest().getUnauthorizedQuote()!= null
+                        && getExamRequest().getUnauthorizedQuote()){
+                    costNote = "Preventivo non autorizzato";
                 }
                 costNote = ValidationHelper.isNullOrEmpty(costNote) ? new CreateExcelRequestsReportHelper().generateCorrectNote(getExamRequest()) : costNote.concat(" ").concat(new CreateExcelRequestsReportHelper().generateCorrectNote(getExamRequest()));
             } catch (PersistenceBeanException | IllegalAccessException e) {
