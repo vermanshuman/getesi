@@ -806,16 +806,46 @@
                 <div class="ui-g" style="margin-top: 20px">
 
                     <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
+                        <p:outputPanel id="costOutput">
+                            <p:selectBooleanCheckbox value="#{bean.selectedCostOutput}" disabled="#{bean.onlyView}"/>
+                            <span> #{ msg.clientEnterCostFinal.toUpperCase()}</span>
+                        </p:outputPanel>
+                        
                         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
                             <h:outputText value="#{msg.clientMaximumCountOfFormalities}"/>
                             <p:inputText value="#{bean.maximumFormalities}"
                                          onkeypress="return numbers_only(this, event, 9, 0)" onkeyup="check_numbers(this, 9, 0);"
                                          disabled="#{bean.onlyView}"/>
                         </p:panelGrid>
-                        <p:outputPanel id="costOutput">
-                            <p:selectBooleanCheckbox value="#{bean.selectedCostOutput}" disabled="#{bean.onlyView}"/>
-                            <span> #{ msg.clientEnterCostFinal.toUpperCase()}</span>
-                        </p:outputPanel>
+                        
+                        <p:panelGrid widgetVar="unauthorizedCostGrid" id="unauthorizedCostGrid" style="width: 100%" 
+                        			styleClass="ui-panelgrid-blank form-group grey-panel">
+                    		<p:row>
+                    			<p:column colspan="3" style="width: 100%!important;">
+                    			 	<h:outputText value="#{msg.clientUnauthorizedQuoteCosts.toUpperCase()}"/>
+                    			</p:column>
+                    		</p:row>
+                    		<p:row>
+		                        <p:column style="width: 15%!important;">
+		                            <span><h:outputText value="#{msg.clientUnauthorizedCostPay}"/></span><br/>
+		                            <p:inputText value="#{bean.entity.unauthorizedCostPay}">
+		                            	<p:keyFilter mask="num" />
+		                            </p:inputText>
+		                        </p:column>
+		                        <p:column style="width: 10%!important;">
+		                            <span><h:outputText value="#{msg.clientUnauthorizedCostFormality}"/> </span><br/>
+		                            <p:inputText value="#{bean.entity.unauthorizedCostFormality}">
+		                            	<p:keyFilter mask="num" />
+		                            </p:inputText>
+		                        </p:column>
+		                        <p:column style="width: 10%!important;">
+		                        	<span><h:outputText value="#{msg.clientUnauthorizedCostCadastral}"/> </span><br/>
+		                        	<p:inputText value="#{bean.entity.unauthorizedCostCadastral}">
+		                        		<p:keyFilter mask="num" />
+		                        	</p:inputText>
+		                        </p:column>
+		                    </p:row>
+		               	</p:panelGrid>
 
                         <h:outputText value="#{msg.headerBilling}"
                                       style="font-weight: bold; margin-left: 15px; font-size: large;"/>

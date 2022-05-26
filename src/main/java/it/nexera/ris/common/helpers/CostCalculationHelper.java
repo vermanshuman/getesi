@@ -377,6 +377,12 @@ public class CostCalculationHelper {
     private Double getCostCadastral() throws PersistenceBeanException, IllegalAccessException {
         double result = 0d;
 
+        if(!ValidationHelper.isNullOrEmpty(getRequest().getUnauthorizedQuote()) && getRequest().getUnauthorizedQuote() 
+        		&&  ValidationHelper.isNullOrEmpty(getRequest().getPropertyList())) {
+        	getRequest().setCostCadastral(!ValidationHelper.isNullOrEmpty(getRequest().getClient().getUnauthorizedCostCadastral()) 
+        			? getRequest().getClient().getUnauthorizedCostCadastral() : 0d);
+        	return getRequest().getCostCadastral();
+        }
         List<Document> documents = DaoManager.load(Document.class, new Criterion[]{
                 Restrictions.eq("request.id", getRequest().getId())});
         if (!ValidationHelper.isNullOrEmpty(documents)) {
@@ -486,6 +492,12 @@ public class CostCalculationHelper {
     private Double getCostEstateFormality(Boolean billingClient, boolean restrictionForPriceList)
             throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         double result = 0d;
+        if(!ValidationHelper.isNullOrEmpty(getRequest().getUnauthorizedQuote()) && getRequest().getUnauthorizedQuote() 
+        		&&  ValidationHelper.isNullOrEmpty(getRequest().getEstateFormalityList())) {
+        	getRequest().setCostEstateFormality(!ValidationHelper.isNullOrEmpty(getRequest().getClient().getUnauthorizedCostFormality()) 
+        			? getRequest().getClient().getUnauthorizedCostFormality() : 0d);
+        	return getRequest().getCostEstateFormality();
+        }
         if (isModelIdOfTemplateEqualsTo(2L)) {
             if (!ValidationHelper.isNullOrEmpty(getRequest().getService())) {
                 List<PriceList> priceList = DaoManager.load(PriceList.class,
@@ -722,6 +734,10 @@ public class CostCalculationHelper {
             numberOfEstateFormality = getRequest().getNumberActUpdate();
         }
 
+        if(!ValidationHelper.isNullOrEmpty(getRequest().getUnauthorizedQuote()) && getRequest().getUnauthorizedQuote()) {
+        	getRequest().setCostPay(!ValidationHelper.isNullOrEmpty(request.getClient().getUnauthorizedCostPay()) ? request.getClient().getUnauthorizedCostPay() : 0d);
+        	return getRequest().getCostPay();
+        }
         List<PriceList> priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
                 new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
                 Restrictions.eq("client", getRequest().getClient()),
