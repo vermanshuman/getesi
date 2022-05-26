@@ -1717,7 +1717,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         StringBuilder result = new StringBuilder();
         result.append("<div style=\"padding: 20px;\">");
         result.append("<h3>FATTURA ELETTRONICA</h3>");
-        result.append("<table style=\"width: 800px;border-collapse: collapse;border: 1px solid lightgray;\">");
+        result.append("<table style=\"width: 920px;border-collapse: collapse;border: 1px solid lightgray;\">");
         result.append("<thead style=\"background-color: #E7E7E7;\">");
         result.append("<td style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;font-weight: bold;background-color: #E7E7E7;\">Mittente</td>");
         result.append("<td style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;font-weight: bold;background-color: #E7E7E7;\">Destinatario</td>");
@@ -1873,7 +1873,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         result.append("</tr>");
         result.append("</tbody>");
         result.append("</table>");
-        result.append("<table style=\"width: 800px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
+        result.append("<table style=\"width: 920px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
         result.append("<tbody>");
         result.append("<tr style=\"background-color: #E7E7E7;\">");
         result.append("<td colspan=\"4\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;background-color: #E7E7E7;font-weight: bold\">Dati Fattura</td>");
@@ -1889,14 +1889,147 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\"><b>");
         result.append(invoice.getInvoiceNumber() != null ? invoice.getInvoiceNumber() : "");
         result.append("</b></td>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\"><b>");
+        result.append(invoice.getDate() != null ? DateTimeHelper.toFormatedString(invoice.getDate(), DateTimeHelper.getMySQLDatePattern()) : "");
+        result.append("</b></td>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\"><b>");
+        result.append("EUR ");
+        result.append(invoice.getTotalGrossAmount() != null ? invoice.getTotalGrossAmount().toString().replace(".", ",") : "");
+        result.append("</b></td>");
         result.append("</tr>");
         result.append("</tbody>");
+        result.append("<tr style=\"background-color: #E7E7E7;\">");
+        result.append("<td colspan=\"4\" style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 25%;color: #478FCA;;background-color: #f3f3f3;\"><b>Causale</b></td>");
+        result.append("</tr>");
+        result.append("<tr>");
+        result.append("<td colspan=\"4\" style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\">");
+        result.append(invoice.getNotes() != null ? invoice.getNotes() : "");
+        result.append("</td>");
+        result.append("</tr>");
+        result.append("</table>");
+
+        result.append("<table style=\"width: 920px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
+        result.append("<tbody>");
+        result.append("<tr>");
+        result.append("<td colspan=\"2\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Dati</td>");
+        result.append("</tr>");
+        result.append("<tr>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\">");
+        String ndg = "";
+        String refrenceRequest = "";
+
+        if(!ValidationHelper.isNullOrEmpty(invoice) && !ValidationHelper.isNullOrEmpty(invoice.getEmail())){
+            if(!ValidationHelper.isNullOrEmpty(invoice.getEmail().getNdg())){
+                ndg = invoice.getEmail().getNdg();
+            }
+            if(!ValidationHelper.isNullOrEmpty(invoice.getEmail().getReferenceRequest())){
+                refrenceRequest = invoice.getEmail().getReferenceRequest();
+            }
+        }
+        result.append("NDG: ");
+        result.append(ndg);
+        result.append("</td>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\">");
+        result.append("Rif.: ");
+        result.append(refrenceRequest);
+        result.append("</td>");
+        result.append("</tr>");
+        result.append("</table>");
+
+        result.append("<table style=\"width: 920px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
+        result.append("<tbody>");
+        result.append("<tr>");
+        result.append("<td colspan=\"2\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Dati cliente</td>");
+        result.append("</tr>");
+        result.append("<tr>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\">");
+        String mailClient = "";
+        String mailTrust = "";
+        String mailOffice = "";
+
+        if(!ValidationHelper.isNullOrEmpty(invoice) && !ValidationHelper.isNullOrEmpty(invoice.getEmail())){
+            if(!ValidationHelper.isNullOrEmpty(invoice.getEmail().getManagers())){
+                mailClient = invoice.getEmail()
+                        .getManagers().stream().map(Client::toString).collect(Collectors.joining(", "));
+            }
+            if(!ValidationHelper.isNullOrEmpty(invoice.getEmail().getClientFiduciary())){
+                mailTrust = invoice.getEmail().getClientFiduciary().toString();
+            }
+            if(!ValidationHelper.isNullOrEmpty(invoice.getEmail().getOffice()) &&
+                    !ValidationHelper.isNullOrEmpty(invoice.getEmail().getOffice().getDescription())){
+                mailOffice = invoice.getEmail().getOffice().toString();
+            }
+        }
+        result.append("Gestore: ");
+        result.append(mailClient);
+        result.append("<br/>");
+        result.append("Fiduciario: ");
+        result.append(mailTrust);
+        result.append("</td>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\">");
+        result.append("Ufficio: ");
+        result.append(mailOffice);
+        result.append("</td>");
+        result.append("</tr>");
+        result.append("</table>");
+
+        result.append("<table style=\"width: 920px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
+        result.append("<tbody>");
+        result.append("<tr style=\"background-color: #E7E7E7;\">");
+        result.append("<td colspan=\"6\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;background-color: #E7E7E7;font-weight: bold\">Dettaglio linee Fattura</td>");
+        result.append("</tr>");
+        result.append("<tr style=\"background-color: #E7E7E7;\">");
+        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 35%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Descrizione</td>");
+        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 10%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">U.M.</td>");
+        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 10%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Q.tà</td>");
+        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 15%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Pr. Unitario</td>");
+        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 15%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Pr. Totale</td>");
+        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 15%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">IVA</td>");
+        result.append("</tr>");
+        if(!ValidationHelper.isNullOrEmpty(invoice)){
+            List<InvoiceItem> items =
+                    DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
+            if(!ValidationHelper.isNullOrEmpty(items)){
+                for(InvoiceItem item : items){
+                    result.append("<tr>");
+                    result.append("<td style=\"border: 2px solid lightgray;width: 35%;padding: 10px;line-height: 22px;\">");
+                    if(!ValidationHelper.isNullOrEmpty(item.getDescription())){
+                        result.append(item.getDescription());
+                    }
+                    result.append("</td>");
+                    result.append("<td style=\"border: 2px solid lightgray;width: 10%;padding: 10px;line-height: 22px;\">");
+                    result.append("pz");
+                    result.append("</td>");
+                    result.append("<td style=\"border: 2px solid lightgray;width: 10%;padding: 10px;line-height: 22px;\">");
+                    if(!ValidationHelper.isNullOrEmpty(item.getAmount()))
+                        result.append(item.getAmount());
+                    result.append("</td>");
+                    result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 22px;\">");
+                    if(!ValidationHelper.isNullOrEmpty(item.getInvoiceTotalCost()))
+                        result.append(item.getInvoiceTotalCost());
+                    result.append("</td>");
+                    result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 22px;\">");
+                    if(!ValidationHelper.isNullOrEmpty(item.getAmount())
+                            && !ValidationHelper.isNullOrEmpty(item.getInvoiceTotalCost())){
+                        result.append(item.getInvoiceTotalCost() * item.getAmount());
+                    }
+                    result.append("</td>");
+                    result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 22px;\">");
+                    if(!ValidationHelper.isNullOrEmpty(item.getTaxRate())
+                            && !ValidationHelper.isNullOrEmpty(item.getTaxRate().getDescription())){
+                        result.append(item.getTaxRate().getDescription());
+                    }
+                    result.append("</td>");
+                    result.append("</tr>");
+                }
+            }
+        }
         result.append("</table>");
         result.append("</div>");
         return result.toString();
     }
 
-    public void downloadInvoicePdf_new() throws
+    public void downloadInvoicePdf() throws
             IOException, PersistenceBeanException, IllegalAccessException, InstantiationException {
         Invoice invoice = DaoManager.get(Invoice.class, getNumber());
         String body = getPdfRequestBody(invoice);
@@ -1917,7 +2050,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                     fileName + ".pdf");
         }
     }
-    public void downloadInvoicePdf() {
+    public void downloadInvoicePdf_old() {
         try {
 
             //String refrequest = "";
