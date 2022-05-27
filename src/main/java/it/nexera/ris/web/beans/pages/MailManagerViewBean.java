@@ -300,6 +300,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private boolean addAttachment = false;
 
     private Boolean showButtons;
+    
+    private String invoiceAlreadyCreated;
+    
+    private String otherRequestsExistsForInvoice;
+    
+    private List<Request> otherRequestsConsideredForInvoice;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
@@ -2920,7 +2926,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                         Restrictions.eq("external", Boolean.TRUE)}));
     }
 
-    public void checkDocument() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+    /*public void checkDocument() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         Document document = DaoManager.get(Document.class, new Criterion[]{
                 Restrictions.eq("mail.id", getEntity().getId())});
         if(!ValidationHelper.isNullOrEmpty(document) && !ValidationHelper.isNullOrEmpty(document.getTypeId()) &&
@@ -2930,7 +2936,41 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }else {
             executeJS("PF('invoiceOpenErrorDialogWV').show();");
         }
-    }
+    }*/
+    
+	public void checkDocument(boolean otherRequests) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+		setRequestsConsideredForInvoice(null);
+		Document document = DaoManager.get(Document.class, new Criterion[] { Restrictions.eq("mail.id", getEntity().getId())});
+		if (!ValidationHelper.isNullOrEmpty(document) && !ValidationHelper.isNullOrEmpty(document.getTypeId())
+				&& document.getTypeId().equals(DocumentType.INVOICE_REPORT.getId())) {
+			if (otherRequests) {
+				setRequestsConsideredForInvoice(new ArrayList<>());
+				List<Request> otherRequestListForInvoice = getOtherRequestsConsideredForInvoice();
+				if (!ValidationHelper.isNullOrEmpty(otherRequestListForInvoice)) {
+					otherRequestListForInvoice.stream().forEach(r -> {
+						r.setSelectedForInvoice(true);
+					});
+					getRequestsConsideredForInvoice().addAll(otherRequestListForInvoice);
+				}
+			} else {
+				setRequestsConsideredForInvoice(new ArrayList<>());
+				List<Request> requestListForInvoice = getEntity().getRequests().stream()
+						.filter(x -> ValidationHelper.isNullOrEmpty(x.getInvoice())
+								&& !ValidationHelper.isNullOrEmpty(x.getStateId())
+								&& (RequestState.EVADED.getId().equals(x.getStateId())))
+						.collect(Collectors.toList());
+				if (!ValidationHelper.isNullOrEmpty(requestListForInvoice)) {
+					requestListForInvoice.stream().forEach(r -> {
+						r.setSelectedForInvoice(true);
+					});
+					getRequestsConsideredForInvoice().addAll(requestListForInvoice);
+				}
+			}
+			executeJS("PF('mailManagerViewRequestsForInvoiceDlg').show();");
+		} else {
+			executeJS("PF('invoiceOpenErrorDialogWV').show();");
+		}
+	}
 
     public boolean isAddAttachment() {
         return addAttachment;
@@ -2975,5 +3015,47 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
     public void loadButtons() {
         setShowButtons(Boolean.TRUE);
+    }
+    
+    public void preCheckDocument() throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
+    	if (!ValidationHelper.isNullOrEmpty(getEntity().getNdg())) {
+    		List<Invoice> invoices = DaoManager.load(Invoice.class, new Criterion[]{Restrictions.eq("ndg", getEntity().getNdg())});
+    		if (!ValidationHelper.isNullOrEmpty(invoices)) {
+    			String message = ResourcesHelper.getString("invoiceAlreadyCreated");
+    			message = message + " "+getEntity().getNdg() + " in data "+invoices.get(0).getDateString();
+    			setInvoiceAlreadyCreated(message);
+    			RequestContext.getCurrentInstance().update("@widgetVar(invoiceAlreadyCreatedDialogWV)");
+    			executeJS("PF('invoiceAlreadyCreatedDialogWV').show();");
+    			return;
+    		}
+    	}
+    	preCheckDocumentOtherRequests();
+    }
+    
+   public void preCheckDocumentOtherRequests() throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
+    	List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.and(Restrictions.eq("ndg", getEntity().getNdg()),
+    			Restrictions.eq("stateId", RequestState.EVADED.getId()), Restrictions.isNotNull("mail"), Restrictions.ne("mail", getEntity()) )});
+    	List<Request> requestListForInvoice = new ArrayList<>();
+		if (!ValidationHelper.isNullOrEmpty(requests)) {
+			requestListForInvoice.addAll(requests);
+			List<Request> requestListEntity = getEntity().getRequests().stream()
+					.filter(x -> ValidationHelper.isNullOrEmpty(x.getInvoice())
+							&& !ValidationHelper.isNullOrEmpty(x.getStateId())
+							&& (RequestState.EVADED.getId().equals(x.getStateId())))
+					.collect(Collectors.toList());
+			if (!ValidationHelper.isNullOrEmpty(requestListEntity)) {
+				requestListForInvoice.addAll(requestListEntity);
+			}
+			if (!ValidationHelper.isNullOrEmpty(requestListForInvoice)) {
+				setOtherRequestsConsideredForInvoice(new ArrayList<>());
+				getOtherRequestsConsideredForInvoice().addAll(requestListForInvoice);
+			}
+			String message = ResourcesHelper.getString("otherRequestsExistsForInvoice");
+			setOtherRequestsExistsForInvoice(message);
+			RequestContext.getCurrentInstance().update("@widgetVar(otherRequestsExistsForInvoiceDialogWV)");
+			executeJS("PF('otherRequestsExistsForInvoiceDialogWV').show();");
+		} else {
+    		checkDocument(false);
+    	}
     }
 }

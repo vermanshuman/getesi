@@ -53,7 +53,7 @@
         <div class="p-grid">
             <div class="p-col-12">
                 <p:dataTable value="#{bean.requestsConsideredForInvoice}"  var="item" emptyMessage="#{msg.noRecordsFound}"
-                             rendered="#{not empty bean.requestsConsideredForInvoice}"  scrollable="true"
+                             rendered="#{not empty bean.requestsConsideredForInvoice}"  scrollable="true" widgetVar="requestsTableConsideredForInvoiceWV"
                              scrollHeight="300" style="margin-top:20px;max-width:1250px">
                     <p:column >
                         <p:selectBooleanCheckbox value="#{item.selectedForInvoice}"/>
