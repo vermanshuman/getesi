@@ -114,7 +114,9 @@
                         </div>
                         <div class="p-field" style="width: 50%;">
                             <span class="p-col-fixed text-bold">#{msg.requestTextEditAuthorizedNonEstimate} </span>
-                            <p:selectBooleanCheckbox id="nonAuthorizedEstimate" value="#{bean.examRequest.unauthorizedQuote}"/>
+                            <p:selectBooleanCheckbox id="nonAuthorizedEstimate" value="#{bean.examRequest.unauthorizedQuote}">
+                            	<p:ajax listener="#{bean.viewExtraCost(true)}" update="@this requestExtraCostTable"/>
+                            </p:selectBooleanCheckbox>
                         </div>
                     </div>
                 </c:if>
