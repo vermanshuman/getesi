@@ -2155,11 +2155,10 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             }
             DaoManager.save(excelInvoice, true);
             addAttachedFile(excelInvoice);
-            attachInvoicePdf(baos);
-            //attachInvoicePdf(invoice);
+            //attachInvoicePdf(baos);
+            attachInvoicePdf(invoice);
         }
-
-        invoiceDialogBean.attachCourtesyInvoicePdf(invoice);
+        //invoiceDialogBean.attachCourtesyInvoicePdf(invoice);
     }
 
     private void attachInvoicePdf(byte[] excelFile) {
@@ -2217,11 +2216,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             Files.createDirectories(Paths.get(sb));
             String pdfFilePath = sb + File.separator + fileName + ".pdf";
             invoiceDialogBean.attachInvoicePdf(invoice, pdfFilePath);
-            File convertedFile = new File(pdfFilePath);
-            String pdfFileName = convertedFile.getName();
-            pdfInvoice.generateDestinationPath(pdfFileName);
+            pdfInvoice.setDestinationPath(pdfFilePath);
             DaoManager.save(pdfInvoice, true);
-            LogHelper.log(log, pdfInvoice.getId() + " " + sb);
+            LogHelper.log(log, pdfInvoice.getId() + " " + pdfFilePath);
             addAttachedFile(pdfInvoice);
         }catch (Exception e) {
             LogHelper.log(log, e);

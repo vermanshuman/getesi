@@ -2231,9 +2231,30 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             }
             DaoManager.save(excelInvoice, true);
             addAttachedFile(excelInvoice);
-            attachInvoicePdf(baos);
+            //attachInvoicePdf(baos);
+            attachInvoicePdf(invoice);
         }
-        invoiceDialogBean.attachCourtesyInvoicePdf(invoice);
+       // invoiceDialogBean.attachCourtesyInvoicePdf(invoice);
+    }
+
+    private void attachInvoicePdf(Invoice invoice) {
+        try {
+            Date currentDate = new Date();
+            String fileName = "Richieste_Invoice_" + DateTimeHelper.toFileDateWithMinutes(currentDate);
+            pdfInvoice = new WLGExport();
+            pdfInvoice.setExportDate(currentDate);
+            DaoManager.save(pdfInvoice, true);
+            String sb = pdfInvoice.generateDestinationPath(fileName);
+            Files.createDirectories(Paths.get(sb));
+            String pdfFilePath = sb + File.separator + fileName + ".pdf";
+            invoiceDialogBean.attachInvoicePdf(invoice, pdfFilePath);
+            pdfInvoice.setDestinationPath(pdfFilePath);
+            DaoManager.save(pdfInvoice, true);
+            LogHelper.log(log, pdfInvoice.getId() + " " + pdfFilePath);
+            addAttachedFile(pdfInvoice);
+        }catch (Exception e) {
+            LogHelper.log(log, e);
+        }
     }
 
     private void attachInvoicePdf(byte[] excelFile) {
