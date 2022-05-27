@@ -144,15 +144,16 @@
 <!--                                 oncomplete="PF('mailManagerViewRequestsForInvoiceDlg').show();"/>-->
 
 
-                <!-- <p:commandButton style="margin-left: 2px;"
-                                 value="#{msg.requestTextEditCreateInvoice}" rendered="#{bean.showCreateFatturaButton}"
-                                 action="#{bean.checkDocument}"
-                                 id="createInvoice" styleClass="grey-button"/>
-                 --> 
-                    <p:commandButton style="margin-left: 2px;"
+<!--                <p:commandButton style="margin-left: 2px;"-->
+<!--                                 value="#{msg.requestTextEditCreateInvoice}" rendered="#{bean.showCreateFatturaButton}"-->
+<!--                                 action="#{bean.checkDocument}"-->
+<!--                                 id="createInvoice" styleClass="grey-button"/>-->
+
+                <p:commandButton style="margin-left: 2px;"
                                  value="#{msg.requestTextEditCreateInvoice}" rendered="#{bean.showCreateFatturaButton}"
                                  action="#{bean.preCheckDocument}" update="invoiceAlreadyCreatedDialog otherRequestsExistsForInvoiceDialog"
                                  id="createInvoice" styleClass="grey-button"/>
+
 
                 <!--  <p:commandButton icon="ui-icon fa fa-pencil" update=":form" styleClass="right-side"
                                   action="#{bean.editEntity}"

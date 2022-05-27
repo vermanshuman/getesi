@@ -1,48 +1,14 @@
 package it.nexera.ris.web.beans.pages;
 
-import java.io.File;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.ViewScoped;
-import javax.faces.model.SelectItem;
-
 import it.nexera.ris.common.enums.*;
-import it.nexera.ris.common.helpers.*;
-import it.nexera.ris.persistence.beans.entities.domain.*;
-import it.nexera.ris.persistence.view.RequestView;
-import org.apache.commons.io.FileUtils;
-import org.hibernate.Hibernate;
-import org.hibernate.HibernateException;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
-
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
+import it.nexera.ris.common.helpers.*;
 import it.nexera.ris.common.helpers.create.xls.CreateExcelRequestsReportHelper;
 import it.nexera.ris.common.xml.wrappers.SelectItemWrapper;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.Dictionary;
+import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
@@ -53,7 +19,26 @@ import it.nexera.ris.web.beans.wrappers.logic.ExcelDataWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.ExcelTableWrapper;
 import lombok.Getter;
 import lombok.Setter;
-import org.primefaces.context.RequestContext;
+import org.apache.commons.io.FileUtils;
+import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
+import javax.faces.model.SelectItem;
+import java.io.File;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 @Setter
 @Getter
@@ -510,8 +495,32 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         }
         colIndex = getIndex(ResourcesHelper.getString("excelNote"), CreateExcelRequestsReportHelper.getRequestsColumns());
         if (colIndex > -1) {
-            if(ValidationHelper.isNullOrEmpty(request.getCostNote()))
-                columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request),createExcelRequestsReportHelper.generateCorrectNote(request));
+            if(ValidationHelper.isNullOrEmpty(request.getCostNote())){
+                String note = "";
+                boolean isAdded = Boolean.FALSE;
+                List<Document> requestDocuments = DaoManager.load(Document.class,
+                        new CriteriaAlias[]{new CriteriaAlias("request", "request", JoinType.INNER_JOIN)},
+                        new Criterion[]{Restrictions.and(Restrictions.eq("request.id", request.getId()),
+                                Restrictions.eq("typeId", 2L))});
+                if (!ValidationHelper.isNullOrEmpty(requestDocuments)) {
+                    if(request.getService() !=null
+                            && request.getService().getUnauthorizedQuote()!=null && request.getService().getUnauthorizedQuote()){
+                        note = "Preventivo non autorizzato";
+                        isAdded = Boolean.TRUE;
+                    }
+                }
+                if(!isAdded && request.getAuthorizedQuote()!=null &&  request.getAuthorizedQuote()){
+                    note = "Preventivo autorizzato";
+                }
+                if(!isAdded && request.getUnauthorizedQuote() != null
+                        &&  request.getUnauthorizedQuote()){
+                    note = "Preventivo non autorizzato";
+                }
+                String requestNote = createExcelRequestsReportHelper.generateCorrectNote(request);
+                requestNote = requestNote.replaceAll("(?i)<br\\p{javaSpaceChar}*(?:/>|>)", "\n");
+                note = note.trim().isEmpty() ? requestNote : note.concat(" ").concat(requestNote);
+                columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request),note);
+            }
             else
                 columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request),request.getCostNote());
         }
@@ -694,8 +703,31 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                     columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request,service),"Costo aggiuntivo: " + extraCost);
             }else if(index != -1){
                 if(ValidationHelper.isNullOrEmpty(request.getCostNote())) {
-                    columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"), request, service),
-                            createExcelRequestsReportHelper.generateCorrectNote(request));
+                    String note = "";
+                    boolean isAdded = Boolean.FALSE;
+                    List<Document> requestDocuments = DaoManager.load(Document.class,
+                            new CriteriaAlias[]{new CriteriaAlias("request", "request", JoinType.INNER_JOIN)},
+                            new Criterion[]{Restrictions.and(Restrictions.eq("request.id", request.getId()),
+                                    Restrictions.eq("typeId", 2L))});
+                    if (!ValidationHelper.isNullOrEmpty(requestDocuments)) {
+                        if(request.getService() !=null
+                                && request.getService().getUnauthorizedQuote()!=null && request.getService().getUnauthorizedQuote()){
+                            note = "Preventivo non autorizzato";
+                            isAdded = Boolean.TRUE;
+                        }
+                    }
+                    if(!isAdded && request.getAuthorizedQuote()!=null &&  request.getAuthorizedQuote()){
+                        note = "Preventivo autorizzato";
+                    }
+                    if(!isAdded && request.getUnauthorizedQuote() != null
+                            &&  request.getUnauthorizedQuote()){
+                        note = "Preventivo non autorizzato";
+                    }
+
+                    String requestNote = createExcelRequestsReportHelper.generateCorrectNote(request);
+                    requestNote = requestNote.replaceAll("(?i)<br\\p{javaSpaceChar}*(?:/>|>)", "\n");
+                    note = note.trim().isEmpty() ? requestNote : note.concat(" ").concat(requestNote);
+                    columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request,service),note);
                 } else
                     columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request,service),request.getCostNote());
             }else {
@@ -1688,7 +1720,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                 getSelectedRequests()
                         .stream()
                         .filter(x ->
-                                ValidationHelper.isNullOrEmpty(x.getInvoice()) &&
+                                x.isDeletedRequest() && ValidationHelper.isNullOrEmpty(x.getInvoice()) &&
                                         !ValidationHelper.isNullOrEmpty(x.getStateId()) &&
                                         (RequestState.EVADED.getId().equals(x.getStateId())))
                         .collect(Collectors.toList());

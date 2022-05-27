@@ -24,12 +24,10 @@
                 .estate-situation .ui-grid-row .ui-panelgrid-cell:nth-child(2) {
                     width: 45% !important;
                 }
-
                 .estate-situation .ui-grid-row .ui-panelgrid-cell:nth-child(3) {
                     width: 265px !important;
                 }
             }
-
             .sub-list-legend legend {
                 padding: 5px 15px 5px 15px !important;
                 color: #fff !important;
@@ -698,22 +696,28 @@
             </div>
         </p:dialog>
         <p:dialog widgetVar="subjectUploadDialog" modal="true" width="600"
-                  draggable="false" position="center center">
+                  draggable="false" position="center center"
+                  style="max-width: 900px; height: auto !important; min-height: 300px !important;
+                    max-height: 700px !important; margin-top: 45px !important; border: 2px solid #57c279;">
             <h:outputText value="#{msg.subjectUploadDialogBeginning}"/>
             <h:outputText value="#{bean.subjectFromFile.fullDescriptionByEnum}" escape="false" id="subjectDialog"
                           style="font-size: large;"/>
             <h:outputText value="#{msg.subjectUploadDialogEnding}"/>
             <br/><br/>
             <div align="center">
-                <p:commandButton value="#{msg.yes}" action="#{bean.saveNewSubjectsProperties}"
-                                 onstart="PF('subjectUploadDialog').hide();"
-                                 update=":form:filePanel, :form:estateTab, :form:estateTabLand"/>
-                <p:commandButton value="#{msg.no}" action="#{bean.notSaveNewSubjectsProperties}"
+
+                <p:commandButton value="#{msg.confirm}" action="#{bean.saveNewSubjectsProperties}"
+                                 style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"
+                                 update=":form:filePanel, :form:estateTab, :form:estateTabLand"
+                                 oncomplete="PF('subjectUploadDialog').hide();"/>
+                <p:commandButton value="#{msg.cancel}" action="#{bean.notSaveNewSubjectsProperties}"
+                                 style="background-color: #F3362B !important; width: 100px;"
                                  onstart="PF('subjectUploadDialog').hide()"/>
             </div>
         </p:dialog>
         <p:dialog widgetVar="subjectEstateFormalityUploadDialog" modal="true" width="600"
-                  draggable="false" position="center center">
+                  draggable="false" position="center center"
+                  style="margin-top: 45px !important; border: 2px solid #57c279;">
             <p:outputPanel id="subjectEstateFormalityDialog">
                 <h:outputText value="#{val.estateFormalityConservatorySuccessBgn}"/>
                 <h:outputText value="#{bean.conservatoryFromFile}"/><br/>
@@ -722,10 +726,12 @@
             </p:outputPanel>
             <br/><br/>
             <div align="center">
-                <p:commandButton value="#{msg.yes}" action="#{bean.saveNewSubjectsEstateFormalities}"
-                                 onstart="PF('subjectEstateFormalityUploadDialog').hide();"
-                                 update=":form:formPanel, :form:formalityTab"/>
-                <p:commandButton value="#{msg.no}" action="#{bean.notSaveNewSubjectsEstateFormalities}"
+                <p:commandButton value="#{msg.confirm}" action="#{bean.saveNewSubjectsEstateFormalities}"
+                                 style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"
+                                 update=":form:formPanel, :form:formalityTab"
+                                 onstart="PF('subjectEstateFormalityUploadDialog').hide();"/>
+                <p:commandButton value="#{msg.cancel}" action="#{bean.notSaveNewSubjectsEstateFormalities}"
+                                 style="background-color: #F3362B !important; width: 100px;"
                                  onstart="PF('subjectEstateFormalityUploadDialog').hide()"/>
             </div>
         </p:dialog>

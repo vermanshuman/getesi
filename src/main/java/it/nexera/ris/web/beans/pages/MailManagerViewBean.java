@@ -27,6 +27,9 @@ import lombok.Setter;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.pdfbox.io.MemoryUsageSetting;
+import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
@@ -300,12 +303,15 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private boolean addAttachment = false;
 
     private Boolean showButtons;
-    
+
     private String invoiceAlreadyCreated;
-    
+
     private String otherRequestsExistsForInvoice;
-    
+
     private List<Request> otherRequestsConsideredForInvoice;
+
+    @ManagedProperty(value="#{invoiceDialogBean}")
+    private InvoiceDialogBean invoiceDialogBean;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
@@ -467,7 +473,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 getEntity().getRequests()
                         .stream()
                         .filter(x ->
-                                ValidationHelper.isNullOrEmpty(x.getInvoice()) &&
+                                x.isDeletedRequest() &&
+                                        ValidationHelper.isNullOrEmpty(x.getInvoice()) &&
                                         !ValidationHelper.isNullOrEmpty(x.getStateId()) &&
                                         (RequestState.EVADED.getId().equals(x.getStateId())))
                         .collect(Collectors.toList());
@@ -1461,6 +1468,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 setVatCollectabilityId(VatCollectability.SPLIT_PAYMENT.getId());
         }
         setSelectedInvoiceClient(invoiceDb.getClient());
+        if(!ValidationHelper.isNullOrEmpty(invoiceDb.getClient()))
+            setSelectedInvoiceClientId(invoiceDb.getClient().getId());
         if (!ValidationHelper.isNullOrEmpty(invoiceDb.getVatCollectability()))
             setVatCollectabilityId(invoiceDb.getVatCollectability().getId());
         if (!ValidationHelper.isNullOrEmpty(invoiceDb.getPaymentType()))
@@ -1506,31 +1515,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
         setGoodsServicesFields(wrapperList);
         loadDraftEmail();
-        //if (!ValidationHelper.isNullOrEmpty(getEntity())) {
-        	/*String reference = "";
-        	if(!ValidationHelper.isNullOrEmpty(getEntity().getReferenceRequest()))
-        		reference = "Rif. " + getEntity().getReferenceRequest();
-        	String ndg = "";
-        	if(!ValidationHelper.isNullOrEmpty(getEntity().getNdg()))
-        		ndg = "NDG: " + getEntity().getNdg();
-        	String uffico = "";
-        	if(!ValidationHelper.isNullOrEmpty(getEntity().getOffice()) && !ValidationHelper.isNullOrEmpty(getEntity().getOffice().getDescription()))
-        		uffico = "UFFICIO: " + getEntity().getOffice().getDescription();
-        	String gestore = "";
-        	if(!ValidationHelper.isNullOrEmpty(getEntity().getClient()) && !ValidationHelper.isNullOrEmpty(getEntity().getClient().getClientName()))
-				gestore = "GESTORE: " + getEntity().getClient().getClientName();
-			String fiduciario = "";
-			if(!ValidationHelper.isNullOrEmpty(getEntity().getClientFiduciary()) && !ValidationHelper.isNullOrEmpty(getEntity().getClientFiduciary().getClientName()))
-				fiduciario = "FIDUCIARIO: " + getEntity().getClientFiduciary().getClientName();
-            String causal = reference +
-            				(!reference.isEmpty() && !ndg.isEmpty() ? " - " : "") +
-            				ndg +
-            				(!uffico.isEmpty() ? " - " : "") +
-            				uffico +
-            				(!gestore.isEmpty() ? " - " : "") +
-            				gestore +
-            				(!fiduciario.isEmpty() ? " - " : "") +
-            				fiduciario;*/
         setInvoiceNote(getCausal());
         if (!ValidationHelper.isNullOrEmpty(invoiceDb.getNotes()))
             setInvoiceNote(invoiceDb.getNotes());
@@ -1612,15 +1596,19 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     .collect(Collectors.toList());
         }
         Invoice invoice = new Invoice();
-        if(selectedRequestList.size() > 0) {
-            //invoice.setClient(selectedRequestList.get(0).getClient());
-            if(!ValidationHelper.isNullOrEmpty(getEntity().getClientInvoice()))
-                invoice.setClient(getEntity().getClientInvoice());
-            else
-                throw new Exception("Client invoice is null, Can't create invoice");
-        }
+        if(!ValidationHelper.isNullOrEmpty(getEntity().getClientInvoice()))
+            invoice.setClient(getEntity().getClientInvoice());
+        else
+            throw new Exception("Client invoice is null, Can't create invoice");
+
+//        if(selectedRequestList.size() > 0) {
+//            //invoice.setClient(selectedRequestList.get(0).getClient());
+//
+//        }
 
         setSelectedInvoiceClient(invoice.getClient());
+        if(!ValidationHelper.isNullOrEmpty(getSelectedInvoiceClient()))
+            setSelectedInvoiceClientId(getSelectedInvoiceClient().getId());
         invoice.setDate(getInvoiceDate());
         invoice.setDate(new Date());
         invoice.setStatus(InvoiceStatus.DRAFT);
@@ -1711,7 +1699,11 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             setSelectedInvoice(new Invoice());
         }
         getSelectedInvoice().setDate(getInvoiceDate());
-        getSelectedInvoice().setClient(getSelectedInvoiceClient());
+        if(!ValidationHelper.isNullOrEmpty(getSelectedInvoiceClient())){
+            getSelectedInvoice().setClient(getSelectedInvoiceClient());
+        }else
+            getSelectedInvoice().setClient(null);
+
         getSelectedInvoice().setDocumentType(getDocumentType());
         if (!ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId()))
             getSelectedInvoice().setPaymentType(DaoManager.get(PaymentType.class, getSelectedPaymentTypeId()));
@@ -2142,6 +2134,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             return;
         Request invoiceRequest = getInvoicedRequests().get(0);
         byte[] baos = getXlsBytes(refrequest, invoiceRequest);
+        Invoice invoice = DaoManager.get(Invoice.class, getNumber());
         if (!ValidationHelper.isNullOrEmpty(baos)) {
             excelInvoice = new WLGExport();
             Date currentDate = new Date();
@@ -2163,165 +2156,10 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             DaoManager.save(excelInvoice, true);
             addAttachedFile(excelInvoice);
             attachInvoicePdf(baos);
+            //attachInvoicePdf(invoice);
         }
 
-       /* try {
-            String templatePath = (new File(FileHelper.getRealPath(),
-                    "resources" + File.separator + "layouts" + File.separator
-                            + "Invoice" + File.separator + "InvoiceDocumentTemplate.docx")
-                    .getAbsolutePath());
-
-            Double imponibile = 0.0;
-            Double totalIva = 0.0;
-            Double ivaPercentage = 0.0;
-
-            if (!ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice())) {
-                List<InvoiceItem> items =
-                        DaoManager.load(InvoiceItem.class,
-                                new Criterion[]{
-                                        Restrictions.eq("invoice.id", invoiceRequest.getInvoice().getId())
-                                });
-
-                for (InvoiceItem item : items) {
-                    double total = 0.0;
-                    double amount = 0.0;
-                    double totalCost = 0.0;
-                    if (item.getAmount() != null)
-                        amount = item.getAmount();
-                    if (item.getInvoiceTotalCost() != null)
-                        totalCost = item.getInvoiceTotalCost();
-                    if (amount != 0.0)
-                        imponibile = imponibile + (amount * totalCost);
-                    else
-                        imponibile = imponibile + totalCost;
-                    if (amount != 0.0)
-                        total = amount * totalCost;
-                    else
-                        total = totalCost;
-                    if (item.getVat() != null) {
-                        ivaPercentage = ivaPercentage + item.getVat();
-                        totalIva = totalIva + ((item.getVat() * total) / 100);
-                    }
-                }
-                ivaPercentage = ivaPercentage / items.size();
-                BigDecimal ivaPer = BigDecimal.valueOf(ivaPercentage);
-                ivaPer = ivaPer.setScale(2, RoundingMode.HALF_UP);
-                ivaPercentage = ivaPer.doubleValue();
-
-                BigDecimal totIva = BigDecimal.valueOf(totalIva);
-                totIva = totIva.setScale(2, RoundingMode.HALF_UP);
-                totalIva = totIva.doubleValue();
-            }
-            Date currentDate = new Date();
-            String fileName = "Richieste_Invoice_" + DateTimeHelper.toFileDateWithMinutes(currentDate);
-
-            String tempDir = FileHelper.getLocalTempDir();
-            tempDir += File.separator + UUID.randomUUID();
-            FileUtils.forceMkdir(new File(tempDir));
-            String tempDoc = tempDir + File.separator + fileName + ".docx";
-
-            try (XWPFDocument doc = new XWPFDocument(
-                    Files.newInputStream(Paths.get(templatePath)))) {
-                for (XWPFParagraph p : doc.getParagraphs()) {
-                    List<XWPFRun> runs = p.getRuns();
-                    if (runs != null) {
-                        for (XWPFRun r : runs) {
-                            String text = r.getText(0);
-                            String replace = "";
-                            if (text != null && text.contains("inum")) {
-                                if (!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getInvoiceNumber()))
-                                    replace = invoiceRequest.getInvoice().getInvoiceNumber();
-                                text = text.replace("inum", replace);
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("clientname")) {
-
-                                if (!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient()))
-                                    replace = invoiceRequest.getInvoice().getClient().toString();
-                                text = text.replace("clientname", replace);
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("clientaddress")) {
-                                if (!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient().getAddressStreet()))
-                                    replace = invoiceRequest.getInvoice().getClient().getAddressStreet();
-                                text = text.replace("clientaddress", replace);
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("clientaddress2")) {
-                                if (!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient().getAddressPostalCode()))
-                                    replace = invoiceRequest.getInvoice().getClient().getAddressPostalCode();
-
-                                if (!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient().getAddressProvinceId())) {
-                                    Province province = invoiceRequest.getInvoice().getClient().getAddressProvinceId();
-                                    replace = province.getDescription() + "(" + province.getCode() + ")";
-                                }
-                                text = text.replace("clientaddress2", replace);
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("clientpiva")) {
-                                if (!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient().getFiscalCode()))
-                                    replace = invoiceRequest.getInvoice().getClient().getFiscalCode();
-                                text = text.replace("clientpiva", replace);
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("impon")) {
-                                text = text.replace("impon", imponibile.toString());
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("ivap")) {
-                                text = text.replace("ivap", ivaPercentage.toString() + "%");
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("ivaa")) {
-                                text = text.replace("ivaa", totalIva.toString());
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("totale")) {
-                                Double total = imponibile + totalIva;
-                                text = text.replace("totale", total.toString());
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("refrequest")) {
-                                text = text.replace("refrequest", refrequest != null ? refrequest : "");
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("inboxndg")) {
-                                text = text.replace("inboxndg", ndg);
-                                r.setText(text, 0);
-                            }
-                        }
-                    }
-                }
-                FileOutputStream out = new FileOutputStream(tempDoc);
-                doc.write(out);
-                out.close();
-            }
-
-            pdfInvoice = new WLGExport();
-            pdfInvoice.setExportDate(currentDate);
-            DaoManager.save(pdfInvoice, true);
-            String sb = pdfInvoice.generateDestinationPath(fileName + ".pdf");
-            File filePath = new File(sb);
-            String sofficeCommand =
-                    ApplicationSettingsHolder.getInstance().getByKey(
-                            ApplicationSettingsKeys.SOFFICE_COMMAND).getValue().trim();
-            Process p = Runtime.getRuntime().exec(new String[]{sofficeCommand, "--headless",
-                    "--convert-to", "pdf", "--outdir", filePath.getAbsolutePath(), tempDoc});
-            p.waitFor();
-            FileHelper.delete(tempDoc);
-            DaoManager.save(pdfInvoice, true);
-            LogHelper.log(log, pdfInvoice.getId() + " " + filePath);
-            addAttachedFile(pdfInvoice);
-        } catch (Exception e) {
-            LogHelper.log(log, e);
-        } */
-        attachCourtesyInvoicePdf();
+        invoiceDialogBean.attachCourtesyInvoicePdf(invoice);
     }
 
     private void attachInvoicePdf(byte[] excelFile) {
@@ -2363,6 +2201,28 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 LogHelper.log(log, pdfInvoice.getId() + " " + newPath);
                 addAttachedFile(pdfInvoice);
             }
+        }catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+    private void attachInvoicePdf(Invoice invoice) {
+        try {
+            Date currentDate = new Date();
+            String fileName = "Richieste_Invoice_" + DateTimeHelper.toFileDateWithMinutes(currentDate);
+            pdfInvoice = new WLGExport();
+            pdfInvoice.setExportDate(currentDate);
+            DaoManager.save(pdfInvoice, true);
+            String sb = pdfInvoice.generateDestinationPath(fileName);
+            Files.createDirectories(Paths.get(sb));
+            String pdfFilePath = sb + File.separator + fileName + ".pdf";
+            invoiceDialogBean.attachInvoicePdf(invoice, pdfFilePath);
+            File convertedFile = new File(pdfFilePath);
+            String pdfFileName = convertedFile.getName();
+            pdfInvoice.generateDestinationPath(pdfFileName);
+            DaoManager.save(pdfInvoice, true);
+            LogHelper.log(log, pdfInvoice.getId() + " " + sb);
+            addAttachedFile(pdfInvoice);
         }catch (Exception e) {
             LogHelper.log(log, e);
         }
@@ -2451,26 +2311,43 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
     }
 
+    public String prepareInvoicePdf() throws
+            IOException, PersistenceBeanException, IllegalAccessException, InstantiationException {
+        Invoice invoice = DaoManager.get(Invoice.class, getNumber());
+        String body = invoiceDialogBean.getPdfRequestBody(invoice);
+        log.info("Invoice PDF body" + body);
+        byte [] fileContent  = PrintPDFHelper.convertToPDF(null, body, null,
+                DocumentType.INVOICE);
+
+        if (fileContent != null) {
+            String fileName = "FE-" + getNumber() + " "
+                    + getSelectedInvoice().getClient().getClientName();
+            String tempDir = FileHelper.getLocalTempDir();
+            tempDir  += File.separator + UUID.randomUUID();
+            FileUtils.forceMkdir(new File(tempDir));
+            String tempPdf = tempDir +  File.separator +  fileName +".pdf";
+            InputStream stream = new ByteArrayInputStream(fileContent);
+            File targetFile = new File(tempPdf);
+            OutputStream outStream = new FileOutputStream(targetFile);
+            byte[] buffer = new byte[8 * 1024];
+            int bytesRead;
+            while ((bytesRead = stream.read(buffer)) != -1) {
+                outStream.write(buffer, 0, bytesRead);
+            }
+            IOUtils.closeQuietly(stream);
+            IOUtils.closeQuietly(outStream);
+            log.info("Invoice PDF created : " + tempPdf);
+            return tempPdf;
+        }
+        return "";
+    }
+
     public void downloadInvoicePdf() {
         try {
-            String refrequest = "";
-            String ndg = "";
-            WLGInbox baseMail = DaoManager.get(WLGInbox.class, getBaseMailId());
-            if (!ValidationHelper.isNullOrEmpty(baseMail)) {
-                if (!ValidationHelper.isNullOrEmpty(baseMail)
-                        && !ValidationHelper.isNullOrEmpty(baseMail.getRequests())) {
-                    setInvoicedRequests(baseMail.getRequests()
-                            .stream()
-                            .filter(r -> !ValidationHelper.isNullOrEmpty(r.getStateId()) &&
-                                    (r.getStateId().equals(RequestState.EVADED.getId()) || r.getStateId().equals(RequestState.SENT_TO_SDI.getId())))
-                            .collect(Collectors.toList()));
-                }
-                refrequest = baseMail.getReferenceRequest();
-                ndg = baseMail.getNdg();
-            }
 
-            Request invoiceRequest = getInvoicedRequests().get(0);
-            String templatePath = (new File(FileHelper.getRealPath(),
+            //String refrequest = "";
+            //String ndg = "";
+            String templatePath  = (new File(FileHelper.getRealPath(),
                     "resources" + File.separator + "layouts" + File.separator
                             + "Invoice" + File.separator + "InvoiceDocumentTemplate.docx")
                     .getAbsolutePath());
@@ -2479,35 +2356,32 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             Double totalIva = 0.0;
             Double ivaPercentage = 0.0;
 
-            if (!ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice())) {
-                List<InvoiceItem> items =
-                        DaoManager.load(InvoiceItem.class,
-                                new Criterion[]{
-                                        Restrictions.eq("invoice.id", invoiceRequest.getInvoice().getId())
-                                });
-                for (InvoiceItem item : items) {
+            Invoice invoice = DaoManager.get(Invoice.class, getNumber());
+            if(!ValidationHelper.isNullOrEmpty(invoice)) {
+                List<InvoiceItem> items = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
+                for(InvoiceItem item : items) {
                     double total = 0.0;
                     double amount = 0.0;
                     double totalCost = 0.0;
 
-                    if (item.getAmount() != null)
+                    if(item.getAmount() != null)
                         amount = item.getAmount();
-                    if (item.getInvoiceTotalCost() != null)
+                    if(item.getInvoiceTotalCost() != null)
                         totalCost = item.getInvoiceTotalCost();
-                    if (amount != 0.0)
+                    if(amount != 0.0)
                         imponibile = imponibile + (amount * totalCost);
                     else
                         imponibile = imponibile + totalCost;
-                    if (amount != 0.0)
+                    if(amount != 0.0)
                         total = amount * totalCost;
                     else
                         total = totalCost;
-                    if (item.getVat() != null) {
+                    if(item.getVat() != null){
                         ivaPercentage = ivaPercentage + item.getVat();
-                        totalIva = totalIva + ((item.getVat() * total) / 100);
+                        totalIva = totalIva + ((item.getVat() * total)/100);
                     }
                 }
-                ivaPercentage = ivaPercentage / items.size();
+                ivaPercentage = ivaPercentage/ items.size();
                 BigDecimal ivaPer = BigDecimal.valueOf(ivaPercentage);
                 ivaPer = ivaPer.setScale(2, RoundingMode.HALF_UP);
                 ivaPercentage = ivaPer.doubleValue();
@@ -2516,122 +2390,118 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 totIva = totIva.setScale(2, RoundingMode.HALF_UP);
                 totalIva = totIva.doubleValue();
 
-                BigDecimal imponi = BigDecimal.valueOf(imponibile);
-                imponi = imponi.setScale(2, RoundingMode.HALF_UP);
-                imponibile = imponi.doubleValue();
-            }
-//            Date currentDate = new Date();
-//            String fileName = "Richieste_Invoice_" + DateTimeHelper.toFileDateWithMinutes(currentDate);
-            String fileName = "FE-" + getNumber() + " " + getSelectedInvoice().getClient().getClientName();
-            String tempDir = FileHelper.getLocalTempDir();
-            tempDir += File.separator + UUID.randomUUID();
-            FileUtils.forceMkdir(new File(tempDir));
-            String tempDoc = tempDir + File.separator + fileName + ".docx";
+//                Date currentDate = new Date();
+//                String fileName = "Richieste_Invoice_"+DateTimeHelper.toFileDateWithMinutes(currentDate);
+                String fileName = "FE-" + getNumber() + " " + getSelectedInvoice().getClient().getClientName();
+                String tempDir = FileHelper.getLocalTempDir();
+                tempDir  += File.separator + UUID.randomUUID();
+                FileUtils.forceMkdir(new File(tempDir));
+                String tempDoc = tempDir +  File.separator +  fileName +"_temp.docx";
 
-            try (XWPFDocument doc = new XWPFDocument(
-                    Files.newInputStream(Paths.get(templatePath)))) {
-                for (XWPFParagraph p : doc.getParagraphs()) {
-                    List<XWPFRun> runs = p.getRuns();
-                    if (runs != null) {
-                        for (XWPFRun r : runs) {
-                            String text = r.getText(0);
-                            String replace = "";
-                            if (text != null && text.contains("inum")) {
-                                if (!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getInvoiceNumber()))
-                                    replace = invoiceRequest.getInvoice().getInvoiceNumber();
-                                text = text.replace("inum", replace);
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("clientname")) {
+                try (XWPFDocument doc = new XWPFDocument(
+                        Files.newInputStream(Paths.get(templatePath)))) {
+                    for (XWPFParagraph p : doc.getParagraphs()) {
+                        List<XWPFRun> runs = p.getRuns();
+                        if (runs != null) {
+                            for (XWPFRun r : runs) {
+                                String text = r.getText(0);
+                                String replace = "";
+                                if (text != null && text.contains("inum")) {
+                                    if(!ValidationHelper.isNullOrEmpty(invoice.getInvoiceNumber()))
+                                        replace = invoice.getInvoiceNumber();
+                                    text = text.replace("inum",replace );
+                                    r.setText(text, 0);
+                                }else if (text != null && text.contains("clientname")) {
 
-                                if (!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient()))
-                                    replace = invoiceRequest.getInvoice().getClient().toString();
-                                text = text.replace("clientname", replace);
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("clientaddress")) {
-                                if (!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient().getAddressStreet()))
-                                    replace = invoiceRequest.getInvoice().getClient().getAddressStreet();
-                                text = text.replace("clientaddress", replace);
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("clientaddress2")) {
-                                if (!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient().getAddressPostalCode()))
-                                    replace = invoiceRequest.getInvoice().getClient().getAddressPostalCode();
+                                    if(!ValidationHelper.isNullOrEmpty(invoice.getClient()))
+                                        replace = invoice.getClient().toString();
+                                    text = text.replace("clientname",replace );
+                                    r.setText(text, 0);
+                                }else if (text != null && text.contains("clientaddress")) {
+                                    if(!ValidationHelper.isNullOrEmpty(invoice.getClient()) &&
+                                            !ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressStreet()))
+                                        replace = invoice.getClient().getAddressStreet();
+                                    text = text.replace("clientaddress",replace );
+                                    r.setText(text, 0);
+                                }else if (text != null && text.contains("clientaddress2")) {
+                                    if(!ValidationHelper.isNullOrEmpty(invoice.getClient()) &&
+                                            !ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressPostalCode()))
+                                        replace = invoice.getClient().getAddressPostalCode();
 
-                                if (!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient().getAddressProvinceId())) {
-                                    Province province = invoiceRequest.getInvoice().getClient().getAddressProvinceId();
-                                    replace = province.getDescription() + "(" + province.getCode() + ")";
-                                }
-                                text = text.replace("clientaddress2", replace);
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("clientpiva")) {
-                                if (!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient()) &&
-                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient().getFiscalCode()))
-                                    replace = invoiceRequest.getInvoice().getClient().getFiscalCode();
-                                text = text.replace("clientpiva", replace);
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("impon")) {
-                                text = text.replace("impon", imponibile.toString());
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("ivap")) {
-                                text = text.replace("ivap", ivaPercentage.toString() + "%");
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("ivaa")) {
-                                text = text.replace("ivaa", totalIva.toString());
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("totale")) {
-                                Double total = imponibile + totalIva;
-                                text = text.replace("totale", total.toString());
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("refrequest")) {
-                                text = text.replace("refrequest", refrequest);
-                                r.setText(text, 0);
-                            } else if (text != null && text.contains("inboxndg")) {
-                                text = text.replace("inboxndg", ndg);
-                                r.setText(text, 0);
+                                    if(!ValidationHelper.isNullOrEmpty(invoice.getClient()) &&
+                                            !ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressProvinceId())){
+                                        Province province = invoice.getClient().getAddressProvinceId();
+                                        replace = province.getDescription() + "(" + province.getCode() + ")";
+                                    }
+                                    text = text.replace("clientaddress2",replace );
+                                    r.setText(text, 0);
+                                }else if (text != null && text.contains("clientpiva")) {
+                                    if(!ValidationHelper.isNullOrEmpty(invoice.getClient()) &&
+                                            !ValidationHelper.isNullOrEmpty(invoice.getClient().getFiscalCode()))
+                                        replace = invoice.getClient().getFiscalCode();
+                                    text = text.replace("clientpiva",replace );
+                                    r.setText(text, 0);
+                                }else if (text != null && text.contains("impon")) {
+                                    text = text.replace("impon",imponibile.toString() );
+                                    r.setText(text, 0);
+                                }else if (text != null && text.contains("ivap")) {
+                                    text = text.replace("ivap",ivaPercentage.toString() + "%" );
+                                    r.setText(text, 0);
+                                }else if (text != null && text.contains("ivaa")) {
+                                    text = text.replace("ivaa",totalIva.toString());
+                                    r.setText(text, 0);
+                                }else if (text != null && text.contains("totale")) {
+                                    Double total = imponibile + totalIva;
+                                    text = text.replace("totale",total.toString());
+                                    r.setText(text, 0);
+                                }/*else if (text != null && text.contains("refrequest")) {
+	                                text = text.replace("refrequest",refrequest);
+	                                r.setText(text, 0);
+	                            }else if (text != null && text.contains("inboxndg")) {
+	                                text = text.replace("inboxndg",ndg);
+	                                r.setText(text, 0);
+	                            }*/
                             }
                         }
                     }
+
+                    FileOutputStream out = new FileOutputStream(tempDoc);
+                    doc.write(out);
+                    out.close();
                 }
 
-                FileOutputStream out = new FileOutputStream(tempDoc);
-                doc.write(out);
-                out.close();
-            }
+                String sb = MailHelper.getDestinationPath() +
+                        DateTimeHelper.ToFilePathString(new Date());
+                File filePath = new File(sb);
+                String sofficeCommand =
+                        ApplicationSettingsHolder.getInstance().getByKey(
+                                ApplicationSettingsKeys.SOFFICE_COMMAND).getValue().trim();
+                Process p = Runtime.getRuntime().exec(new String[] { sofficeCommand, "--headless",
+                        "--convert-to", "pdf","--outdir", filePath.getAbsolutePath(), tempDoc });
+                p.waitFor();
+                FileHelper.delete(tempDoc);
 
-            String sb = MailHelper.getDestinationPath() +
-                    DateTimeHelper.ToFilePathString(new Date());
-            File filePath = new File(sb);
-            String sofficeCommand =
-                    ApplicationSettingsHolder.getInstance().getByKey(
-                            ApplicationSettingsKeys.SOFFICE_COMMAND).getValue().trim();
-            Process p = Runtime.getRuntime().exec(new String[]{sofficeCommand, "--headless",
-                    "--convert-to", "pdf", "--outdir", filePath.getAbsolutePath(), tempDoc});
-            p.waitFor();
-            FileHelper.delete(tempDoc);
-
-            String filePathStr = sb + File.separator + fileName + ".pdf";
-            byte[] fileContent = FileHelper.loadContentByPath(filePathStr);
-            if (fileContent != null) {
-                InputStream stream = new ByteArrayInputStream(fileContent);
-                invoicePDFFile = new DefaultStreamedContent(stream, FileHelper.getFileExtension(filePathStr),
-                        fileName + ".pdf");
+                String tempPdf = prepareInvoicePdf();
+                String tempFilePathStr = sb + File.separator + fileName + "_temp.pdf";
+                String filePathStr = sb + File.separator + fileName + ".pdf";
+                PDFMergerUtility obj = new PDFMergerUtility();
+                obj.setDestinationFileName(filePathStr);
+                File file1 = new File(tempPdf);
+                File file2 = new File(tempFilePathStr);
+                obj.addSource(file1);
+                obj.addSource(file2);
+                obj.mergeDocuments(MemoryUsageSetting.setupTempFileOnly());
+                FileHelper.delete(tempPdf);
+                FileHelper.delete(tempFilePathStr);
+                byte[] fileContent = FileHelper.loadContentByPath(filePathStr);
+                if (fileContent != null) {
+                    InputStream stream = new ByteArrayInputStream(fileContent);
+                    invoicePDFFile = new DefaultStreamedContent(stream, FileHelper.getFileExtension(filePathStr),
+                            fileName + ".pdf");
+                }
             }
-        } catch (Exception e) {
-            LogHelper.log(log, e);
+        }catch(Exception e){
+            LogHelper.log(log,e);
         }
     }
 
@@ -2891,7 +2761,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     public void onItemSelectInvoiceClient() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         Client selectedClient = DaoManager.get(Client.class, getSelectedInvoiceClientId());
         setSelectedInvoiceClient(selectedClient);
-        System.out.println(selectedClient.getSplitPayment());
         if (selectedClient.getSplitPayment() != null && selectedClient.getSplitPayment())
             setVatCollectabilityId(VatCollectability.SPLIT_PAYMENT.getId());
         else
@@ -2926,51 +2795,40 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                         Restrictions.eq("external", Boolean.TRUE)}));
     }
 
-    /*public void checkDocument() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
-        Document document = DaoManager.get(Document.class, new Criterion[]{
-                Restrictions.eq("mail.id", getEntity().getId())});
-        if(!ValidationHelper.isNullOrEmpty(document) && !ValidationHelper.isNullOrEmpty(document.getTypeId()) &&
-            document.getTypeId().equals(DocumentType.INVOICE_REPORT.getId())){
-            RequestContext.getCurrentInstance().update("@widgetVar(mailManagerViewRequestsForInvoiceDlg)");
+    public void checkDocument(boolean otherRequests) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+        setRequestsConsideredForInvoice(null);
+        Document document = DaoManager.get(Document.class, new Criterion[] { Restrictions.eq("mail.id", getEntity().getId())});
+        if (!ValidationHelper.isNullOrEmpty(document) && !ValidationHelper.isNullOrEmpty(document.getTypeId())
+                && document.getTypeId().equals(DocumentType.INVOICE_REPORT.getId())) {
+            if (otherRequests) {
+                setRequestsConsideredForInvoice(new ArrayList<>());
+                List<Request> otherRequestListForInvoice = getOtherRequestsConsideredForInvoice();
+                if (!ValidationHelper.isNullOrEmpty(otherRequestListForInvoice)) {
+                    otherRequestListForInvoice.stream().forEach(r -> {
+                        r.setSelectedForInvoice(true);
+                    });
+                    getRequestsConsideredForInvoice().addAll(otherRequestListForInvoice);
+                }
+            } else {
+                setRequestsConsideredForInvoice(new ArrayList<>());
+                List<Request> requestListForInvoice = getEntity().getRequests().stream()
+                        .filter(x -> ValidationHelper.isNullOrEmpty(x.getInvoice())
+                                && !ValidationHelper.isNullOrEmpty(x.getStateId())
+                                && (RequestState.EVADED.getId().equals(x.getStateId())))
+                        .collect(Collectors.toList());
+                if (!ValidationHelper.isNullOrEmpty(requestListForInvoice)) {
+                    requestListForInvoice.stream().forEach(r -> {
+                        r.setSelectedForInvoice(true);
+                    });
+                    getRequestsConsideredForInvoice().addAll(requestListForInvoice);
+                }
+            }
             executeJS("PF('mailManagerViewRequestsForInvoiceDlg').show();");
-        }else {
+        } else {
             executeJS("PF('invoiceOpenErrorDialogWV').show();");
         }
-    }*/
-    
-	public void checkDocument(boolean otherRequests) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
-		setRequestsConsideredForInvoice(null);
-		Document document = DaoManager.get(Document.class, new Criterion[] { Restrictions.eq("mail.id", getEntity().getId())});
-		if (!ValidationHelper.isNullOrEmpty(document) && !ValidationHelper.isNullOrEmpty(document.getTypeId())
-				&& document.getTypeId().equals(DocumentType.INVOICE_REPORT.getId())) {
-			if (otherRequests) {
-				setRequestsConsideredForInvoice(new ArrayList<>());
-				List<Request> otherRequestListForInvoice = getOtherRequestsConsideredForInvoice();
-				if (!ValidationHelper.isNullOrEmpty(otherRequestListForInvoice)) {
-					otherRequestListForInvoice.stream().forEach(r -> {
-						r.setSelectedForInvoice(true);
-					});
-					getRequestsConsideredForInvoice().addAll(otherRequestListForInvoice);
-				}
-			} else {
-				setRequestsConsideredForInvoice(new ArrayList<>());
-				List<Request> requestListForInvoice = getEntity().getRequests().stream()
-						.filter(x -> ValidationHelper.isNullOrEmpty(x.getInvoice())
-								&& !ValidationHelper.isNullOrEmpty(x.getStateId())
-								&& (RequestState.EVADED.getId().equals(x.getStateId())))
-						.collect(Collectors.toList());
-				if (!ValidationHelper.isNullOrEmpty(requestListForInvoice)) {
-					requestListForInvoice.stream().forEach(r -> {
-						r.setSelectedForInvoice(true);
-					});
-					getRequestsConsideredForInvoice().addAll(requestListForInvoice);
-				}
-			}
-			executeJS("PF('mailManagerViewRequestsForInvoiceDlg').show();");
-		} else {
-			executeJS("PF('invoiceOpenErrorDialogWV').show();");
-		}
-	}
+    }
+
 
     public boolean isAddAttachment() {
         return addAttachment;
@@ -3016,46 +2874,48 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     public void loadButtons() {
         setShowButtons(Boolean.TRUE);
     }
-    
+
+
     public void preCheckDocument() throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
-    	if (!ValidationHelper.isNullOrEmpty(getEntity().getNdg())) {
-    		List<Invoice> invoices = DaoManager.load(Invoice.class, new Criterion[]{Restrictions.eq("ndg", getEntity().getNdg())});
-    		if (!ValidationHelper.isNullOrEmpty(invoices)) {
-    			String message = ResourcesHelper.getString("invoiceAlreadyCreated");
-    			message = message + " "+getEntity().getNdg() + " in data "+invoices.get(0).getDateString();
-    			setInvoiceAlreadyCreated(message);
-    			RequestContext.getCurrentInstance().update("@widgetVar(invoiceAlreadyCreatedDialogWV)");
-    			executeJS("PF('invoiceAlreadyCreatedDialogWV').show();");
-    			return;
-    		}
-    	}
-    	preCheckDocumentOtherRequests();
+        if (!ValidationHelper.isNullOrEmpty(getEntity().getNdg())) {
+            List<Invoice> invoices = DaoManager.load(Invoice.class, new Criterion[]{Restrictions.eq("ndg", getEntity().getNdg())});
+            if (!ValidationHelper.isNullOrEmpty(invoices)) {
+                String message = ResourcesHelper.getString("invoiceAlreadyCreated");
+                message = message + " "+getEntity().getNdg() + " in data "+invoices.get(0).getDateString();
+                setInvoiceAlreadyCreated(message);
+                RequestContext.getCurrentInstance().update("@widgetVar(invoiceAlreadyCreatedDialogWV)");
+                executeJS("PF('invoiceAlreadyCreatedDialogWV').show();");
+                return;
+            }
+        }
+        preCheckDocumentOtherRequests();
     }
-    
-   public void preCheckDocumentOtherRequests() throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
-    	List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.and(Restrictions.eq("ndg", getEntity().getNdg()),
-    			Restrictions.eq("stateId", RequestState.EVADED.getId()), Restrictions.isNotNull("mail"), Restrictions.ne("mail", getEntity()) )});
-    	List<Request> requestListForInvoice = new ArrayList<>();
-		if (!ValidationHelper.isNullOrEmpty(requests)) {
-			requestListForInvoice.addAll(requests);
-			List<Request> requestListEntity = getEntity().getRequests().stream()
-					.filter(x -> ValidationHelper.isNullOrEmpty(x.getInvoice())
-							&& !ValidationHelper.isNullOrEmpty(x.getStateId())
-							&& (RequestState.EVADED.getId().equals(x.getStateId())))
-					.collect(Collectors.toList());
-			if (!ValidationHelper.isNullOrEmpty(requestListEntity)) {
-				requestListForInvoice.addAll(requestListEntity);
-			}
-			if (!ValidationHelper.isNullOrEmpty(requestListForInvoice)) {
-				setOtherRequestsConsideredForInvoice(new ArrayList<>());
-				getOtherRequestsConsideredForInvoice().addAll(requestListForInvoice);
-			}
-			String message = ResourcesHelper.getString("otherRequestsExistsForInvoice");
-			setOtherRequestsExistsForInvoice(message);
-			RequestContext.getCurrentInstance().update("@widgetVar(otherRequestsExistsForInvoiceDialogWV)");
-			executeJS("PF('otherRequestsExistsForInvoiceDialogWV').show();");
-		} else {
-    		checkDocument(false);
-    	}
+
+    public void preCheckDocumentOtherRequests() throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
+        List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.and(Restrictions.eq("ndg", getEntity().getNdg()),
+                Restrictions.eq("stateId", RequestState.EVADED.getId()), Restrictions.isNotNull("mail"), Restrictions.ne("mail", getEntity()) )});
+        List<Request> requestListForInvoice = new ArrayList<>();
+        if (!ValidationHelper.isNullOrEmpty(requests)) {
+            requestListForInvoice.addAll(requests);
+            List<Request> requestListEntity = getEntity().getRequests().stream()
+                    .filter(x -> ValidationHelper.isNullOrEmpty(x.getInvoice())
+                            && !ValidationHelper.isNullOrEmpty(x.getStateId())
+                            && (RequestState.EVADED.getId().equals(x.getStateId())))
+                    .collect(Collectors.toList());
+            if (!ValidationHelper.isNullOrEmpty(requestListEntity)) {
+                requestListForInvoice.addAll(requestListEntity);
+            }
+            if (!ValidationHelper.isNullOrEmpty(requestListForInvoice)) {
+                setOtherRequestsConsideredForInvoice(new ArrayList<>());
+                getOtherRequestsConsideredForInvoice().addAll(requestListForInvoice);
+            }
+            String message = ResourcesHelper.getString("otherRequestsExistsForInvoice");
+            setOtherRequestsExistsForInvoice(message);
+            RequestContext.getCurrentInstance().update("@widgetVar(otherRequestsExistsForInvoiceDialogWV)");
+            executeJS("PF('otherRequestsExistsForInvoiceDialogWV').show();");
+        } else {
+            checkDocument(false);
+        }
     }
+
 }

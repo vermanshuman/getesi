@@ -327,6 +327,9 @@ public class PrintPDFHelper extends BaseHelper {
             }else if (type == DocumentType.INVOICE_REPORT) {
                 setPageSize.invoke(beanObj,PD4Constants.getField("LEDGER").get(null));
                 setHtmlWidth.invoke(beanObj,1024);
+            }else if (type == DocumentType.INVOICE) {
+                setPageSize.invoke(beanObj,PD4Constants.getField("A4").get(null));
+                setHtmlWidth.invoke(beanObj,768);
             } else {
                 Method changePageOrientation = beanClass.getMethod("changePageOrientation",new Class[]{Dimension.class});
                 Dimension dim = (Dimension)changePageOrientation.invoke(beanObj,PD4Constants.getField("A4").get(null));

@@ -1672,6 +1672,9 @@ public class ImportXMLHelper extends BaseHelper {
 
         for (int temp = 0; temp < nList.getLength(); temp++) {
             Node nNode = nList.item(temp);
+            if(nNode.getParentNode() != null && nNode.getParentNode().getNodeName() != null &&
+                    nNode.getParentNode().getNodeName().equalsIgnoreCase("UtilitaComuni"))
+                continue;
 
             if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element eElem = (Element) nNode;
