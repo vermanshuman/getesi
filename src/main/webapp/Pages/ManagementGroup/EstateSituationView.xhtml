@@ -23,10 +23,24 @@
                 border:none !important;
                 padding:0 !important;
             }
+            @media screen and (max-width: 1810px) {
+
+                .estate-situation .ui-grid-row .ui-panelgrid-cell:first-child {
+                    width: 45% !important;
+                }
+
+                .estate-situation .ui-grid-row .ui-panelgrid-cell:nth-child(2) {
+                    width: 45% !important;
+                }
+
+                .estate-situation .ui-grid-row .ui-panelgrid-cell:nth-child(3) {
+                    width: 265px !important;
+                }
+            }
         </style>
         <p:remoteCommand name="removeFileCommand" update="form"/>
         <div align="center">
-            <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" layout="grid"
+            <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group estate-situation" layout="grid"
                          style="text-align: left;width: 85%;">
             <p:column><span style="font-size:20px;">
                     #{ff:upper(msg.estateSituationEditSubjectName)}
@@ -38,12 +52,12 @@
                 </span></p:column>
                 <p:column>
                     <p:panel id="nationalCostPanel" style="border:none ; padding:0 !important; ">
-                        <p:commandButton value="#{msg.estateSituationViewAddNationalCost}" action="#{bean.updateNationalCost}"
+                        <p:commandButton value="#{msg.estateSituationViewAddNationalCost}" action="#{bean.updateNationalCost}" style="width: 200px !important;"
                                          styleClass="grey-button" rendered="#{bean.showAddNationalCostButton}" update="nationalCostPanel"></p:commandButton>
                         <ui:fragment rendered="#{not bean.showAddNationalCostButton}">
 		            		<span style="border: 2px solid #57c279 !important;padding: 5px 8px 8px 4px; border-radius: 2px;display: inline-block;">
 		                	<i class="fa fa-check-circle-o" style="color: green; margin-right: 5px; margin-left: 5px;"/>
-		                	<p:commandLink value="#{msg.estateSituationViewAddNationalCost}" disabled="true"
+		                	<p:commandLink value="#{msg.estateSituationViewAddNationalCost}" disabled="true" style="width: 265px !important;"
                                            oncomplete="PF('associateToClientDlgWV').show();" />
 		            		</span>
                         </ui:fragment>
