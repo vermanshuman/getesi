@@ -2889,30 +2889,32 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     }
 
     public void preCheckDocumentOtherRequests() throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
-        List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.and(Restrictions.eq("ndg", getEntity().getNdg()),
-                Restrictions.eq("stateId", RequestState.EVADED.getId()), Restrictions.isNotNull("mail"), Restrictions.ne("mail", getEntity()) )});
-        List<Request> requestListForInvoice = new ArrayList<>();
-        if (!ValidationHelper.isNullOrEmpty(requests)) {
-            requestListForInvoice.addAll(requests);
-            List<Request> requestListEntity = getEntity().getRequests().stream()
-                    .filter(x -> ValidationHelper.isNullOrEmpty(x.getInvoice())
-                            && !ValidationHelper.isNullOrEmpty(x.getStateId())
-                            && (RequestState.EVADED.getId().equals(x.getStateId())))
-                    .collect(Collectors.toList());
-            if (!ValidationHelper.isNullOrEmpty(requestListEntity)) {
-                requestListForInvoice.addAll(requestListEntity);
-            }
-            if (!ValidationHelper.isNullOrEmpty(requestListForInvoice)) {
-                setOtherRequestsConsideredForInvoice(new ArrayList<>());
-                getOtherRequestsConsideredForInvoice().addAll(requestListForInvoice);
-            }
-            String message = ResourcesHelper.getString("otherRequestsExistsForInvoice");
-            setOtherRequestsExistsForInvoice(message);
-            RequestContext.getCurrentInstance().update("@widgetVar(otherRequestsExistsForInvoiceDialogWV)");
-            executeJS("PF('otherRequestsExistsForInvoiceDialogWV').show();");
-        } else {
-            checkDocument(false);
-        }
+    	if (!ValidationHelper.isNullOrEmpty(getEntity().getNdg())) {
+	    	List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.and(Restrictions.eq("ndg", getEntity().getNdg()),
+	                Restrictions.eq("stateId", RequestState.EVADED.getId()), Restrictions.isNotNull("mail"), Restrictions.ne("mail", getEntity()) )});
+	        List<Request> requestListForInvoice = new ArrayList<>();
+	        if (!ValidationHelper.isNullOrEmpty(requests)) {
+	            requestListForInvoice.addAll(requests);
+	            List<Request> requestListEntity = getEntity().getRequests().stream()
+	                    .filter(x -> ValidationHelper.isNullOrEmpty(x.getInvoice())
+	                            && !ValidationHelper.isNullOrEmpty(x.getStateId())
+	                            && (RequestState.EVADED.getId().equals(x.getStateId())))
+	                    .collect(Collectors.toList());
+	            if (!ValidationHelper.isNullOrEmpty(requestListEntity)) {
+	                requestListForInvoice.addAll(requestListEntity);
+	            }
+	            if (!ValidationHelper.isNullOrEmpty(requestListForInvoice)) {
+	                setOtherRequestsConsideredForInvoice(new ArrayList<>());
+	                getOtherRequestsConsideredForInvoice().addAll(requestListForInvoice);
+	            }
+	            String message = ResourcesHelper.getString("otherRequestsExistsForInvoice");
+	            setOtherRequestsExistsForInvoice(message);
+	            RequestContext.getCurrentInstance().update("@widgetVar(otherRequestsExistsForInvoiceDialogWV)");
+	            executeJS("PF('otherRequestsExistsForInvoiceDialogWV').show();");
+	            return;
+	        }
+    	}
+        checkDocument(false);
     }
 
 }
