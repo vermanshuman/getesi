@@ -11,7 +11,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.primefaces.context.RequestContext;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -24,8 +23,6 @@ public class CadastralCategoryListBean extends
         EntityLazyListPageBean<CadastralCategory> implements Serializable {
 
     private static final long serialVersionUID = 3443206858639238841L;
-
-    private CadastralCategory cadastralCategory = new CadastralCategory();;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -48,13 +45,6 @@ public class CadastralCategoryListBean extends
     }
 
     @Override
-    public void addEntity() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
-        cadastralCategory = new CadastralCategory();
-        RequestContext.getCurrentInstance().update("addCadastralCategoryDialog");
-        executeJS("PF('addCadastralCategoryDialogWV').show();");
-    }
-
-    @Override
     protected void deleteEntityInternal(Long id)
             throws HibernateException, PersistenceBeanException,
             InstantiationException, IllegalAccessException {
@@ -68,16 +58,4 @@ public class CadastralCategoryListBean extends
         }
     }
 
-    public void saveCadastralCategory() throws PersistenceBeanException, IOException, InstantiationException, IllegalAccessException {
-        DaoManager.save(cadastralCategory);
-        onLoad();
-    }
-
-    public CadastralCategory getCadastralCategory() {
-        return cadastralCategory;
-    }
-
-    public void setCadastralCategory(CadastralCategory cadastralCategory) {
-        this.cadastralCategory = cadastralCategory;
-    }
 }

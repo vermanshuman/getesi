@@ -592,10 +592,12 @@ public class CostCalculationHelper {
 
     public List<PriceList> loadPriceList(Boolean billingClient, boolean restrictionForPriceList)
             throws PersistenceBeanException, IllegalAccessException {
-    	if(!ValidationHelper.isNullOrEmpty(getRequest().getUnauthorizedQuote()) && getRequest().getUnauthorizedQuote()
+
+        if(!ValidationHelper.isNullOrEmpty(getRequest().getUnauthorizedQuote()) && getRequest().getUnauthorizedQuote()
                 &&  ValidationHelper.isNullOrEmpty(getRequest().getEstateFormalityList())) {
-    		return new ArrayList<>();
-    	}
+            return new ArrayList<>();
+        }
+
         return DaoManager.load(PriceList.class, new CriteriaAlias[]{
                 new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
                 Restrictions.eq("client", getRequest().getClient()),
@@ -611,10 +613,10 @@ public class CostCalculationHelper {
 
     public List<PriceList> loadPriceList(Boolean billingClient, boolean restrictionForPriceList, Service service)
             throws PersistenceBeanException, IllegalAccessException {
-    	if(!ValidationHelper.isNullOrEmpty(getRequest().getUnauthorizedQuote()) && getRequest().getUnauthorizedQuote()
+        if(!ValidationHelper.isNullOrEmpty(getRequest().getUnauthorizedQuote()) && getRequest().getUnauthorizedQuote()
                 &&  ValidationHelper.isNullOrEmpty(getRequest().getEstateFormalityList())) {
-    		return new ArrayList<>();
-    	}
+            return new ArrayList<>();
+        }
         return DaoManager.load(PriceList.class, new CriteriaAlias[]{
                 new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
                 Restrictions.eq("client", getRequest().getClient()),

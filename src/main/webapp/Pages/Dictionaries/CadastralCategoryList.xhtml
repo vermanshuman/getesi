@@ -38,41 +38,5 @@
             <h:outputText value="#{item.codeInVisura}"/>
         </p:column>
     </ui:define>
-    <ui:define name="dialogs_body">
-        <p:dialog widgetVar="addCadastralCategoryDialogWV"  id="addCadastralCategoryDialog" modal="true" draggable="false" width="600" styleClass="dialog-white-bg addPaymentDialog"
-                  position="center center" header="#{msg.addCadastralCategory}">
-            <div class="p-grid">
-                <div class="p-col-12 p-md-12">
-                    <div class="card"
-                         style="border: none !important; padding-top:0px; padding-bottom:0px; margin-top:10px;">
-                            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
-                                         columnClasses="ui-grid-col-3,ui-grid-col-9">
-                                <span><span class="red">*</span>#{msg.code}:</span>
-                                <p:inputText value="#{bean.cadastralCategory.code}" id="code"
-                                             styleClass="input-width"/>
-
-                                <span>#{msg.description}:</span>
-                                <p:inputText value="#{bean.cadastralCategory.description}" maxlength="150"
-                                             styleClass="input-width" onkeypress="numbers_letters_only('#description');"/>
-
-                                <span>#{msg.cadastralCategoryTextInTag}:</span>
-                                <p:inputText value="#{bean.cadastralCategory.textInTag}" maxlength="50" styleClass="input-width" />
-
-                                <span>#{msg.cadastralCategoryCodeInVisura}:</span>
-                                <p:inputText value="#{bean.cadastralCategory.codeInVisura}" styleClass="input-width"/>
-                            </p:panelGrid>
-
-                            <div class="p-col-12" style="text-align:center;">
-                                <p:commandButton oncomplete="PF('addCadastralCategoryDialogWV').hide();"
-                                                 value="#{msg.close.toUpperCase()}" style="background-color: #F3362B !important;"/>
-                                <p:commandButton value="#{msg.save.toUpperCase()}" oncomplete="PF('addCadastralCategoryDialogWV').hide();" style="margin-left:15px;"
-                                                 action="#{bean.saveCadastralCategory}" update=":form"
-                                                 styleClass="ui-button-success p-mr-2 p-mb-2"/>
-                            </div>
-                    </div>
-                </div>
-            </div>
-        </p:dialog>
-    </ui:define>
 </ui:composition>
 </html>

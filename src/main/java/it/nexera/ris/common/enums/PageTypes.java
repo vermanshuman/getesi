@@ -165,7 +165,6 @@ public enum PageTypes {
     FOREIGN_STATES("/Pages/Configuration/ForeignStates.jsf"),
 
     TAX_RATE_LIST("/Pages/ManagementGroup/TaxRateList.jsf"),
-    TAX_RATE_EDIT("/Pages/ManagementGroup/TaxRateEdit.jsf"),
 
     CONTACT_LIST("/Pages/ManagementGroup/ContactList.jsf"),
 

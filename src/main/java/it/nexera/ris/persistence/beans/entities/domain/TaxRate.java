@@ -32,6 +32,9 @@ public class TaxRate extends IndexedEntity implements Serializable {
     @Column(name = "uso")
     private Boolean use;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
         if(getPercentage() != null){
