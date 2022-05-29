@@ -34,10 +34,7 @@ public class RequestType extends IndexedEntity {
     @ManyToOne
     @JoinColumn(name = "aggregation_land_char_reg_id")
     private AggregationLandChargesRegistry default_registry;
-
-    @Column(name = "multiselction_operation")
-    private Boolean multiselectionOperation;
-
+    
     @Transient
     private String styleClass;
 
@@ -111,13 +108,5 @@ public class RequestType extends IndexedEntity {
 
     public void setDefault_registry(AggregationLandChargesRegistry default_registry) {
         this.default_registry = default_registry;
-    }
-
-    public Boolean getMultiselectionOperation() {
-        return multiselectionOperation;
-    }
-
-    public void setMultiselectionOperation(Boolean multiselectionOperation) {
-        this.multiselectionOperation = multiselectionOperation;
     }
 }

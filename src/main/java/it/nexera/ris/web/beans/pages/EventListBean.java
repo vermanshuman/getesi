@@ -1,7 +1,6 @@
 package it.nexera.ris.web.beans.pages;
 
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
-import it.nexera.ris.common.helpers.CostManipulationHelper;
 import it.nexera.ris.common.helpers.LogHelper;
 import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
@@ -43,8 +42,6 @@ public class EventListBean extends EntityLazyInListEditPageBean<Event> implement
     private ScheduleEvent eventSelect;
 
     private boolean hiddenPanel;
-
-    private CostManipulationHelper costManipulationHelper;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException, IOException {
@@ -165,11 +162,4 @@ public class EventListBean extends EntityLazyInListEditPageBean<Event> implement
         this.eventSelect = eventSelect;
     }
 
-    public CostManipulationHelper getCostManipulationHelper() {
-        return costManipulationHelper;
-    }
-
-    public void setCostManipulationHelper(CostManipulationHelper costManipulationHelper) {
-        this.costManipulationHelper = costManipulationHelper;
-    }
 }

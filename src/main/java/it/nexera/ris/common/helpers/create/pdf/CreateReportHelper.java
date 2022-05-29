@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import it.nexera.ris.persistence.HibernateUtil;
-import org.hibernate.Hibernate;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
@@ -247,8 +245,39 @@ public abstract class CreateReportHelper extends BaseHelper {
         }
         return result;
     }
-    
-    
+
+    protected Double getExtraCostRelated(Request request, ExtraCostType extraCostType) throws PersistenceBeanException, IllegalAccessException {
+        Double result = 0d;
+
+        List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
+                Restrictions.eq("requestId", request.getId()),
+                Restrictions.eq("type", extraCostType)});
+
+        if (!ValidationHelper.isNullOrEmpty(extraCosts)) {
+            for (ExtraCost cost : extraCosts) {
+                result += cost.getPrice();
+            }
+        }
+        return result.equals(0d) ? result : Math.round(result * 100000d) / 100000d;
+    }
+
+
+    public Double getSumOfExtraCost(List<Request> requests, ExtraCostType extraCostType) throws PersistenceBeanException, IllegalAccessException {
+        Double result = 0d;
+        for (Request request : requests) {
+            List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
+                    Restrictions.eq("requestId", request.getId()),
+                    Restrictions.eq("type", extraCostType)});
+
+            if (!ValidationHelper.isNullOrEmpty(extraCosts)) {
+                for (ExtraCost cost : extraCosts) {
+                    result += cost.getPrice();
+                }
+            }
+        }
+        return result.equals(0d) ? result : Math.round(result * 100000d) / 100000d;
+    }
+
     public Boolean isBillingClient(Request request) {
         if (!ValidationHelper.isNullOrEmpty(request.getBillingClient())) {
             return true;
@@ -279,8 +308,7 @@ public abstract class CreateReportHelper extends BaseHelper {
         double result = 0d;
         List<PriceList> priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
                 new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                        Restrictions.eq("client", (billingClient == null || !billingClient)
-                                ? request.getClient() : request.getBillingClient()),
+                        Restrictions.eq("client",request.getClient()),
 
                         restictionForPriceList ?
                                 Restrictions.in("cc.id", service.getServiceCostUnauthorizedQuoteList()
@@ -310,8 +338,7 @@ public abstract class CreateReportHelper extends BaseHelper {
         if (!ValidationHelper.isNullOrEmpty(service)) {
             List<PriceList> priceList = DaoManager.load(PriceList.class, 
                     new Criterion[]{
-                            Restrictions.eq("client", (billingClient == null || !billingClient)
-                                    ? request.getClient() : request.getBillingClient()),
+                            Restrictions.eq("client", request.getClient()),
                             Restrictions.eq("isNegative", true),
                             Restrictions.eq("service", service)});
             if (!ValidationHelper.isNullOrEmpty(priceList)) {
@@ -338,19 +365,10 @@ public abstract class CreateReportHelper extends BaseHelper {
         int numRequestRegistry = 0;
         int numPlus = 0;
 
-        if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())) {
-            if(!Hibernate.isInitialized(request.getAggregationLandChargesRegistry().getLandChargesRegistries())){
-                Hibernate.initialize(request.getAggregationLandChargesRegistry().getLandChargesRegistries());
-            }
-            if(ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getLandChargesRegistries())) {
-                numRegistry = request.getAggregationLandChargesRegistry().getNumberOfVisualizedLandChargesRegistries();
-            }
+        if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())
+                && !ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getLandChargesRegistries())) {
+            numRegistry = request.getAggregationLandChargesRegistry().getNumberOfVisualizedLandChargesRegistries();
         }
-//
-//        if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())
-//                && !ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getLandChargesRegistries())) {
-//            numRegistry = request.getAggregationLandChargesRegistry().getNumberOfVisualizedLandChargesRegistries();
-//        }
 
         if (!ValidationHelper.isNullOrEmpty(request.getRequestFormalities())) {
             List<Long> documentIds = request.getRequestFormalities().stream().map(RequestFormality::getDocumentId)
@@ -379,8 +397,7 @@ public abstract class CreateReportHelper extends BaseHelper {
         
         return DaoManager.load(PriceList.class, new CriteriaAlias[]{
                 new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                Restrictions.eq("client", (billingClient == null || !billingClient)
-                        ? request.getClient() : request.getBillingClient()),
+                Restrictions.eq("client", request.getClient()),
 
                 restrictionForPriceList ?
                         Restrictions.in("cc.id", service.getServiceCostUnauthorizedQuoteList()
@@ -397,8 +414,7 @@ public abstract class CreateReportHelper extends BaseHelper {
             if(!ValidationHelper.isNullOrEmpty(service)) {
                 List<PriceList> priceList = DaoManager.load(PriceList.class, 
                         new Criterion[]{
-                                Restrictions.eq("client", (billingClient == null || !billingClient)
-                                        ? request.getClient() : request.getBillingClient()),
+                                Restrictions.eq("client",request.getClient()),
                                 Restrictions.eq("isNegative", true),
                                 Restrictions.eq("service", service)});
                 
@@ -436,8 +452,7 @@ public abstract class CreateReportHelper extends BaseHelper {
         if(!ValidationHelper.isNullOrEmpty(service)) {
             priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
                     new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                    Restrictions.eq("client", (billingClient == null || !billingClient)
-                            ? request.getClient() : request.getBillingClient()),
+                    Restrictions.eq("client", request.getClient()),
                     Restrictions.eq("service", service),
 
                     restrictionForPriceList ?

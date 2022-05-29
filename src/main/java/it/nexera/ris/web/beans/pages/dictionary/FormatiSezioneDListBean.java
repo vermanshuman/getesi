@@ -2,21 +2,12 @@ package it.nexera.ris.web.beans.pages.dictionary;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
-import it.nexera.ris.common.helpers.ComboboxHelper;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Court;
-import it.nexera.ris.web.beans.EntityLazyListPageBean;
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
@@ -29,54 +20,77 @@ import it.nexera.ris.web.beans.EntityLazyInListEditPageBean;
 
 @ManagedBean(name = "formatiSezioneDListBean")
 @ViewScoped
-@Getter
-@Setter
 public class FormatiSezioneDListBean extends
-        EntityLazyListPageBean<SectionDFormat> implements Serializable {
+        EntityLazyInListEditPageBean<SectionDFormat> implements Serializable {
     
     private static final long serialVersionUID = 3240839909088723326L;
 
-    private String name;
+    @Override
+    protected void setEditedValues() {
+        this.getEditedEntity().setName(this.getEntity().getName());
+        this.getEditedEntity().setText(this.getEntity().getText());
+    }
 
-    private String text;
+    @Override
+    protected void validate() throws PersistenceBeanException {
+        if (ValidationHelper.isNullOrEmpty(this.getEntity().getName())) {
+            addRequiredFieldException("form:name");
+        } else if (!ValidationHelper.isUnique(SectionDFormat.class, "name",
+                getEntity().getName(), this.getEntity().getId())) {
+            addFieldException("form:name", "nameInUse");
+        }else if (ValidationHelper.isNullOrEmpty(this.getEntity().getText())) {
+            addRequiredFieldException("form:text");
+        }
+    }
+
+    @Override
+    public void save() throws HibernateException, PersistenceBeanException,
+            NumberFormatException, IOException, InstantiationException,
+            IllegalAccessException {
+        DaoManager.save(this.getEntity());
+    }
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
             IllegalAccessException, IOException {
-        filterTableFromPanel();
+        this.loadList(SectionDFormat.class, new Criterion[]
+                {Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                        Restrictions.isNull("isDeleted"))}, new Order[]
+                {Order.asc("name")});
     }
 
-    public void filterTableFromPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        List<Criterion> restrictions = new ArrayList<>();
+    @Override
+    protected void deleteEntityInternal(Long id)
+            throws HibernateException, PersistenceBeanException,
+            InstantiationException, IllegalAccessException {
+        try {
+            super.deleteEntityInternal(id);
+        } catch (Exception e) {
+            try {
+                this.getEntity().setIsDeleted(Boolean.TRUE);
 
-        if (!ValidationHelper.isNullOrEmpty(getName())) {
-            restrictions.add(Restrictions.ilike("name", getName(), MatchMode.ANYWHERE));
-        }
-        if (!ValidationHelper.isNullOrEmpty(getText())) {
-            restrictions.add(Restrictions.ilike("text", getText(), MatchMode.ANYWHERE));
-        }
-
-        restrictions.add(Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                Restrictions.isNull("isDeleted")));
-        List<Court> courts = DaoManager.load(Court.class, new Criterion[]
-                {Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                        Restrictions.isNull("isDeleted"))});
-        List<Long> cityIds = new ArrayList<>();
-
-        for (Court court : courts) {
-            if (!ValidationHelper.isNullOrEmpty(court.getCity()) && !cityIds.contains(court.getCity().getId())) {
-                cityIds.add(court.getCity().getId());
+                DaoManager.save(getEntity());
+            } catch (Exception e1) {
+                LogHelper.log(log, e1);
             }
         }
-        this.loadList(SectionDFormat.class, restrictions.toArray(new Criterion[0]), new Order[]
-                {Order.asc("name")});
-
     }
 
-    public void clearFilterPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        setName(null);
-        setText(null);
-        filterTableFromPanel();
+    public void editEntity() {
+        this.cleanValidation();
+        if (!ValidationHelper.isNullOrEmpty(this.getEntityEditId())) {
+            try {
+                this.setEntity(DaoManager.get(getType(), this.getEntityEditId()));
+                DaoManager.getSession().evict(this.getEntity());
+            } catch (Exception e) {
+                LogHelper.log(log, e);
+            }
+        }
+    }
+
+    @Override
+    public void resetFields() {
+        super.resetFields();
     }
 }

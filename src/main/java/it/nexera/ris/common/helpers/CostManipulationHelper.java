@@ -17,8 +17,6 @@ import org.hibernate.sql.JoinType;
 import org.primefaces.context.RequestContext;
 
 import javax.faces.model.SelectItem;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,13 +61,13 @@ public class CostManipulationHelper extends PageBean {
     private Double taxableCostTemp;
 
     private boolean isEditable;
-
+    
     private String extraCostOtherNote;
-
+    
     private String costNote;
-
+    
     private Boolean includeNationalCost;
-
+    
     public void saveRequestEstateFormalityCost(Request request) throws PersistenceBeanException {
         if (!ValidationHelper.isNullOrEmpty(getEstateFormalityCost())) {
             try {
@@ -84,14 +82,13 @@ public class CostManipulationHelper extends PageBean {
         }
         setEstateFormalityCost(null);
     }
-
     public void viewExtraCost(Request request) throws PersistenceBeanException, IllegalAccessException,
             InstantiationException {
         viewExtraCost(request, false);
     }
-
     public void viewExtraCost(Request request, boolean recalculate) throws PersistenceBeanException, IllegalAccessException,
             InstantiationException {
+
         if (request == null) {
             return;
         } else {
@@ -99,7 +96,7 @@ public class CostManipulationHelper extends PageBean {
         }
 
         setIncludeNationalCost(request.getIncludeNationalCost());
-
+        
         List<EstateFormality> estateFormalitiesUpdated = DaoManager.load(EstateFormality.class, new CriteriaAlias[]{
                 new CriteriaAlias("requestListUpdate", "request", JoinType.INNER_JOIN)
         }, new Criterion[]{
@@ -143,7 +140,7 @@ public class CostManipulationHelper extends PageBean {
                 if(getSelectedMortgageNote().equals(MortgageType.AdditionalFormality.getName())) {
                     cost = IPOTECARIO_ADDITIONAL_FORMALITY;
                 }else if(getSelectedMortgageNote().equals(MortgageType.Titolo.getName())) {
-                    cost = IPOTECARIO_TITOLO;
+                   cost = IPOTECARIO_TITOLO;     
                 }
                 newExtraCost.setPrice((getSpinnerNumber() == null ? 1 : getSpinnerNumber()) * (cost));
                 newExtraCost.setType(ExtraCostType.IPOTECARIO);
@@ -254,7 +251,7 @@ public class CostManipulationHelper extends PageBean {
         TransactionExecuter.execute(new Action() {
             @Override
             public void execute() throws Exception {
-
+                
                 if (!ValidationHelper.isNullOrEmpty(getRequestExtraCosts()) || !getRequestExtraCosts().equals(removeList)) {
                     for (ExtraCost cost : removeList) {
                         DaoManager.remove(cost);
@@ -268,15 +265,15 @@ public class CostManipulationHelper extends PageBean {
                     for (ExtraCost cost : getRequestExtraCosts()) {
                         if(ValidationHelper.isNullOrEmpty(cost.getType()) ||
                                 !ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
-                            requestCost += cost.getPrice();
+                            requestCost += cost.getPrice();    
                         }
-
+                        
                         ExtraCost newCost = new ExtraCost();
                         newCost.setPrice(cost.getPrice());
                         newCost.setNote(cost.getNote());
                         newCost.setType(cost.getType());
                         newCost.setRequestId(cost.getRequestId());
-
+                        
                         DaoManager.save(newCost);
                     }
 
@@ -328,12 +325,12 @@ public class CostManipulationHelper extends PageBean {
             totalCost += getCostCadastralTemp();
 
         if(!ValidationHelper.isNullOrEmpty(getCostEstateFormalityTemp()))
-            totalCost += getCostEstateFormalityTemp();
+           totalCost += getCostEstateFormalityTemp();
 
         request.setTotalCost(String.format("%.2f", totalCost));
         DaoManager.save(request, true);
     }
-
+    
     public String getExtraCostLandRegistry() {
         return extraCostLandRegistry;
     }
@@ -466,7 +463,7 @@ public class CostManipulationHelper extends PageBean {
     public void setExtraCostOtherNote(String extraCostOtherNote) {
         this.extraCostOtherNote = extraCostOtherNote;
     }
-
+    
     public String getCostNote() {
         return costNote;
     }

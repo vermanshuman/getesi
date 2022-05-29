@@ -1,63 +1,108 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/resources/tpl/Admin/Main.xhtml">
+    <ui:param name="bean" value="#{loginBean}"/>
+    <ui:param name="renderSideMenu" value="false"/>
+    <ui:param name="centerPartStyleClass" value="false"/>
+    <ui:param name="notShowMenu" value="true"/>
+    <ui:param name="renderFooterMenu" value="false"/>
+    <ui:param name="renderHeaderMenu" value="false"/>
+    <ui:define name="body">
+        <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/login.css"
+              media="all" rel="stylesheet" type="text/css"/>
 
-<h:head>
-    <f:facet name="first">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-    </f:facet>
-    <title>PrimeFaces Babylon - Login</title>
-</h:head>
-
-<h:body styleClass="login-body">
-<!--    <link href="//db.onlinewebfonts.com/c/07f11191189aaade84abfff8ebd07022?family=ControllerW01-Three" rel="stylesheet" type="text/css"/>-->
-    <h:outputStylesheet name="css/login.css" library="babylon-layout" />
-    <h:outputStylesheet name="css/primeicons.css" library="babylon-layout" />
-    <h:form id="form" prependId="false">
-        <div class="login-panel"></div>
-
-        <div class="login-content">
-            <p:graphicImage url="/resources/images/antares.png" style="margin-bottom: 0px;" />
-
-            <h1 style="font-family: ControllerW01-Three;"><span>SIGN IN TO</span> BREXA CREDIT SERVICING</h1>
-            <p>#{msg.welcomeHeaderLogin}</p>
+        <h:form id="form" prependId="false">
             <p:growl id="messages" showDetail="true" autoUpdate="false"
                      widgetVar="messagesVar"/>
-            <div class="login-input-wrapper">
-                <p:inputText autocomplete="off" id="j_username" value="#{loginBean.username}"
-                             label="#{msg.login}" maxlength="40" placeholder="#{msg.username}"/>
-                <i class="pi pi-user" />
+
+            <div class="grandParentContaniner">
+                <div class="parentContainer">
+                    <p:defaultCommand target="login"/>
+                    <ui:include src="/resources/tpl/common/ValidationMessages.xhtml"/>
+                    <p:panel style="padding: 20px 50px;" rendered="#{!loginBean.resetPassword}">
+                        <p:graphicImage url="/resources/images/getesi-trans.png"
+                                        style="margin-left:auto;margin-right:auto;display:block;"/>
+                        <p:outputLabel value="#{msg.welcomeHeaderLogin}"
+                                       style="padding: 30px;line-height: 30px; text-align: center;"/>
+                        <h:panelGrid columns="1" cellpadding="15">
+                            <p:inputText autocomplete="off" id="j_username" value="#{loginBean.username}"
+                                         styleClass="fixweight"
+ 										label="#{msg.login}" maxlength="40" placeholder="#{msg.login}"/>
+                            <p:password autocomplete="off" id="password" feedback="false" label="#{msg.password}"
+                                        styleClass="fixweight"
+                                        onkeyup="document.getElementById('j_password').value = this.value"
+                                        value="#{loginBean.password}" maxlength="14" placeholder="#{msg.password}"/>
+                            <p:selectBooleanCheckbox id="remember_me"
+                                                     itemLabel="#{msg.recordLogin}" value="#{loginBean.rememberMe}"
+                                                     styleClass="booleanCheckbox"/>
+                            <p:commandButton update=":form,messages"
+                                             onclick="document.getElementById('j_password').value = document.getElementById('password').value"
+                                             id="login" ajax="false" action="#{loginBean.doLogin}"
+                                             value="#{msg.login.toUpperCase()}" styleClass="login-ui-button"/>
+                            <p:commandButton id="forgot" ajax="true" onclick="PF('dlg2').show();"
+                                             value="#{msg.forgotPassword}" styleClass="forgot-ui-button"/>
+                            <p:commandButton id="registrate" onclick="PF('dlg3').show();" rendered="#{external}"
+                                             value="#{msg.signIn}" styleClass="login-ui-button"/>
+                            <h:inputHidden id="j_password"></h:inputHidden>
+                        </h:panelGrid>
+                    </p:panel>
+                    <p:panel style="padding: 20px 50px;" rendered="#{loginBean.resetPassword}">
+                        <p:graphicImage url="/resources/images/getesi-trans.png"
+                                        style="margin-left:auto;margin-right:auto;display:block;"/>
+                        <p:outputLabel value="#{msg.welcomeHeaderLogin}"
+                                       style="padding: 30px;line-height: 30px; text-align: center;"/>
+                        <h:panelGrid columns="1" cellpadding="5">
+                            <p:password autocomplete="off" id="password_1" feedback="false" label="#{msg.password}" rendered="true"
+                                        styleClass="fixweight"
+                                        value="#{loginBean.passwordFirst}" maxlength="14" placeholder="#{msg.password}"/>
+                            <p:password autocomplete="off" id="password_2" feedback="false" label="#{msg.userConfirmPassword}" rendered="true"
+                                        styleClass="fixweight"
+                                        value="#{loginBean.passwordSecond}" maxlength="14" placeholder="#{msg.userConfirmPassword}"/>
+                            <p:commandButton update=":form,messages"
+                                             id="savepassword" ajax="false" action="#{loginBean.saveNewPassword()}"
+                                             value="#{msg.save.toUpperCase()}" styleClass="forgot-ui-button"/>
+                        </h:panelGrid>
+                    </p:panel>
+                </div>
             </div>
-
-            <div class="login-input-wrapper">
-                <p:password autocomplete="off" id="password" feedback="false" label="#{msg.password}"
-                            onkeyup="document.getElementById('j_password').value = this.value"
-                            value="#{loginBean.password}" maxlength="14" placeholder="#{msg.password}" />
-                <i class="pi pi-lock" />
-            </div>
-
-            <div class="login-input-wrapper">
-                <p:selectBooleanCheckbox id="remember_me"
-                                         itemLabel="#{msg.recordLogin}" value="#{loginBean.rememberMe}"
-                                         styleClass="booleanCheckbox" style="display: flex;width: auto;"/>
-            </div>
-
-            <p:commandButton update=":form,messages"
-                             onclick="document.getElementById('j_password').value = document.getElementById('password').value"
-                             id="login" ajax="false" action="#{loginBean.doLogin}"
-                             value="#{msg.signin}" styleClass="login-ui-button"/>
-
-            <h:inputHidden id="j_password"></h:inputHidden>
-        </div>
-
-        <h:outputStylesheet name="css/layout-blue.css" library="babylon-layout" />
-    </h:form>
-</h:body>
-
-</html>
+            <p:remoteCommand name="closeWindow" action="#{loginBean.resetError}"  update=":form:dialog"></p:remoteCommand>
+            <p:dialog  header="#{msg.forgotPassword}"  widgetVar="dlg2" height="150" width="310" modal="true" onHide="closeWindow();"
+                       draggable="false" position="center center">
+                <p:outputPanel id="dialog">
+                    <p:outputLabel rendered="#{loginBean.error}" value="#{loginBean.errorMessage}" styleClass="red"/>
+                    <p:inputText id="mail" value="#{loginBean.usermail}" styleClass="fixweight"
+                                 placeholder="#{msg.email}"/>
+                    <div class="btn_line">
+                        <p:commandButton id="sendmail" ajax="true" action="#{loginBean.sendMail}"
+                                         update="form:dialog"
+                                         value="#{msg.sendMail.toUpperCase()}" styleClass="sendforgot-ui-button"/>
+                    </div>
+                </p:outputPanel>
+            </p:dialog>
+            <p:dialog  header="#{msg.signIn}" id="registrDialog"  widgetVar="dlg3" height="170" width="310" modal="true"
+                       draggable="false" position="center center">
+                <p:outputPanel id="registrPanel">
+                    <p:inputText autocomplete="off" id="username" value="#{loginBean.registrationLogin}"
+                                 styleClass="fixweight"
+                                 label="#{msg.login}" maxlength="20" placeholder="#{msg.login}"/>
+                    <p:password autocomplete="off" feedback="false" style="margin-top: 20px" label="#{msg.password}" rendered="true"
+                                styleClass="fixweight" id="registrPass"
+                                value="#{loginBean.registrationPassword}" maxlength="14" placeholder="#{msg.password}"/>
+                    <div class="btn_line">
+                        <p:commandButton id="passwoed"   action="#{loginBean.registration}"
+                                         update="form:registrPanel" value="#{msg.signIn}" styleClass="login-ui-button"/>
+                    </div>
+                </p:outputPanel>
+            </p:dialog>
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('#j_username').focus();
+                });
+            </script>
+        </h:form>
+    </ui:define>
+</ui:composition>

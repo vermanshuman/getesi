@@ -24,6 +24,8 @@
                                   multiple="true">
                 <f:selectItems value="#{bean.qualities}"/>
             </p:selectCheckboxMenu>
+            <span>#{msg.landCadastralCultureNotAvailable} </span>
+            <p:selectBooleanCheckbox value="#{bean.entity.unavailable}"/>
         </p:panelGrid>
     </ui:define>
 

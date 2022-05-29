@@ -9,12 +9,6 @@
     <ui:param name="list_title" value="#{msg.users}"/>
     <ui:param name="bean" value="#{userListBean}"/>
 
-    <ui:define name="viewname">
-        <li>
-            <p:link outcome="/Pages/Configuration/UserList.jsf">#{msg.users}</p:link>
-        </li>
-    </ui:define>
-
     <ui:define name="columns">
         <p:column sortBy="#{item.lastName}" filterBy="#{item.lastName}" headerText="#{msg.lastname}">
             <h:outputText value="#{item.lastName}" converter="xmlConverter"/>

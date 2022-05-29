@@ -5,10 +5,7 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:p="http://primefaces.org/ui">
 
-    <span>#{enums.documentGenerationTagsMANAGER}
-        <h:panelGroup rendered="#{not empty block}" style="#{block.isRequired()?'':'display:none;'}">*</h:panelGroup>
-        <h:panelGroup rendered="#{not empty item and not empty item.field}" style="#{item.field.isRequired()?'':'display:none;'}">*</h:panelGroup>
-    </span>
+    <span>#{enums.documentGenerationTagsMANAGER}<span class="red" style="#{block.isRequired()?'':'display:none;'}">*</span></span>
     <p:inputText id="MANAGER" value="#{bean.entity.manager}" styleClass="input-width"/>
 
 </ui:composition>

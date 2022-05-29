@@ -26,15 +26,26 @@ public class PropertyEntityHelper {
     private static List<Property> managePropertyListOMIComm(Property property) {
         if (!property.getCadastralData().isEmpty()) {
             try {
+
+                List<Criterion> restrictions = new ArrayList<>();
+                if(!ValidationHelper.isNullOrEmpty(property.getProvince())) {
+                    restrictions.add(Restrictions.eq("province", property.getProvince()));
+                }
+                if(!ValidationHelper.isNullOrEmpty(property.getCity())) {
+                    restrictions.add(Restrictions.eq("city", property.getCity()));
+                }
+                if(!ValidationHelper.isNullOrEmpty(property.getType())) {
+                    restrictions.add(Restrictions.eq("type", property.getType()));
+                }
+                if(!ValidationHelper.isNullOrEmpty(property.getCategory())) {
+                    restrictions.add(Restrictions.eq("category", property.getCategory()));
+                }
+
+                restrictions.add(Restrictions.eq("cData.id", property.getCadastralData().get(0).getId()));
                 List<Property> properties = DaoManager.load(Property.class, new CriteriaAlias[]{
                                 new CriteriaAlias("cadastralData", "cData", JoinType.INNER_JOIN)},
-                        new Criterion[]{
-                                Restrictions.eq("province", property.getProvince()),
-                                Restrictions.eq("city", property.getCity()),
-                                Restrictions.eq("type", property.getType()),
-                                Restrictions.eq("category", property.getCategory()),
-                                Restrictions.eq("cData.id", property.getCadastralData().get(0).getId())});
-
+                        restrictions.toArray(new Criterion[restrictions.size()])
+                );
                 if (!ValidationHelper.isNullOrEmpty(properties)) {
                     return properties;
                 }
@@ -46,8 +57,10 @@ public class PropertyEntityHelper {
     }
 
     public static String getEstimateOMIRequestText(Property property) {
-        List<EstimateOMIHistory> list = managePropertyListOMIComm(property).stream().map(Property::getEstimateOMIHistory)
-                .flatMap(List::stream).sorted(new EstimateOMIComparator()).collect(Collectors.toList());
+        // https://trello.com/c/Bd1LZQoJ/674-omi-value-error
+        List<EstimateOMIHistory> list = property.getEstimateOMIHistory();
+//                managePropertyListOMIComm(property).stream().map(Property::getEstimateOMIHistory)
+//                .flatMap(List::stream).sorted(new EstimateOMIComparator()).collect(Collectors.toList());
 
         return ValidationHelper.isNullOrEmpty(list) ? "" : list.get(0).getEstimateOMI();
     }
@@ -74,8 +87,10 @@ public class PropertyEntityHelper {
     }
 
     public static String getEstimateLastCommercialValueRequestText(Property property) {
-        List<CommercialValueHistory> list = managePropertyListOMIComm(property).stream().map(Property::getCommercialValueHistory)
-                .flatMap(List::stream).sorted(new CommercialValueHistoryComparator()).collect(Collectors.toList());
+        // https://trello.com/c/Bd1LZQoJ/674-omi-value-error
+        List<CommercialValueHistory> list = property.getCommercialValueHistory();
+//        List<CommercialValueHistory> list = managePropertyListOMIComm(property).stream().map(Property::getCommercialValueHistory)
+//                .flatMap(List::stream).sorted(new CommercialValueHistoryComparator()).collect(Collectors.toList());
 
         return ValidationHelper.isNullOrEmpty(list) ? "" : list.get(0).getCommercialValue();
     }

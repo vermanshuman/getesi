@@ -3,19 +3,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:p="http://primefaces.org/ui">
-
-<ui:composition template="/resources/tpl/Admin/template.xhtml">
-    <ui:param name="bean" value="#{eventListBean}"/>
-
-    <ui:define name="viewname">
-        <li>
-            <p:link outcome="#{bean.currentPage.page}">#{view_title}</p:link>
-        </li>
-    </ui:define>
-
-
-    <ui:define name="content">
+      xmlns:p="http://primefaces.org/ui"
+>
+<ui:composition template="/resources/tpl/Admin/Main.xhtml">
+    <ui:define name="body">
 
         <div class="ui-g">
             <div class="ui-g-12">

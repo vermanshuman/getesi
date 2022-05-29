@@ -62,9 +62,8 @@ public class InvoiceListBean extends EntityLazyListPageBean<Invoice>
     private Long selectedPaymentTypeId;
     private Boolean splitPayment;
     private Boolean sent;
-	private String apiError;
 
-	public List<SelectItem> getClients() {
+    public List<SelectItem> getClients() {
 		return clients;
 	}
 
@@ -126,14 +125,6 @@ public class InvoiceListBean extends EntityLazyListPageBean<Invoice>
 
 	public void setSent(Boolean sent) {
 		this.sent = sent;
-	}
-
-	public String getApiError() {
-		return apiError;
-	}
-
-	public void setApiError(String apiError) {
-		this.apiError = apiError;
 	}
 
 	/* (non-Javadoc)
@@ -232,8 +223,8 @@ public class InvoiceListBean extends EntityLazyListPageBean<Invoice>
         		article.put("descrizione", item.getDescription());
         		article.put("prezzo_lordo", item.getGrossAmount());
         		article.put("prezzo_netto", item.getAmount());
-				if(!ValidationHelper.isNullOrEmpty(item.getTaxRate()) && !ValidationHelper.isNullOrEmpty(item.getTaxRate().getPercentage()))
-					article.put("cod_iva", item.getTaxRate().getPercentage());
+        		if(!ValidationHelper.isNullOrEmpty(item.getTaxRate()) && !ValidationHelper.isNullOrEmpty(item.getTaxRate().getPercentage()))
+        			article.put("cod_iva", item.getTaxRate().getPercentage());
         		
         		articleArray.put(article);
         	}

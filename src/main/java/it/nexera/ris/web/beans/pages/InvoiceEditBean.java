@@ -65,15 +65,15 @@ public class InvoiceEditBean extends EntityEditPageBean<Invoice> implements Seri
     
     private Double invoiceItemAmount;
     
-    // private Double invoiceItemVat;
+    //private TaxRate invoiceItemVat;
     
     private InvoiceItem selectedItem;
     
     private List<InvoiceItem> scheduledForDeletion;
-    
-    private String fiscalCode;
 
 	private Long selectedTaxRateId;
+
+    private String fiscalCode;
 
 	@Override
 	public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException {
@@ -83,9 +83,11 @@ public class InvoiceEditBean extends EntityEditPageBean<Invoice> implements Seri
 
 			clients = ComboboxHelper.fillList(Client.class);
 			paymentTypes = ComboboxHelper.fillList(new PaymentType[] { });
+
 			setVatAmounts(ComboboxHelper.fillList(TaxRate.class, Order.asc("description"), new CriteriaAlias[]{}, new Criterion[]{
 					Restrictions.eq("use", Boolean.TRUE)
 			}, true, false));
+
 			selectedClientId = null;
 			selectedPaymentTypeId = null;
 
@@ -114,7 +116,7 @@ public class InvoiceEditBean extends EntityEditPageBean<Invoice> implements Seri
 		}
 	}
 
-    public String getFiscalCode() {
+	public String getFiscalCode() {
 		return fiscalCode;
 	}
 
@@ -227,7 +229,6 @@ public class InvoiceEditBean extends EntityEditPageBean<Invoice> implements Seri
 		this.vatAmounts = vatAmounts;
 	}
 
-
 	public Double getTotalAmount() {
 		Double totalAmount = 0D;
 		
@@ -264,11 +265,13 @@ public class InvoiceEditBean extends EntityEditPageBean<Invoice> implements Seri
 				invoiceItemAmount = selectedItem.getAmount();
 				if(!ValidationHelper.isNullOrEmpty(selectedItem.getTaxRate()))
 					setSelectedTaxRateId(selectedItem.getTaxRate().getId());
+				// invoiceItemVat = selectedItem.getVat();
 			} else {
 				invoiceItemSubject = "";
 				invoiceItemDescription = "";
 				invoiceItemAmount = 0D;
 				setSelectedTaxRateId(null);
+				//  invoiceItemVat = 0D;
 			}
 		}
 		
@@ -293,6 +296,8 @@ public class InvoiceEditBean extends EntityEditPageBean<Invoice> implements Seri
 			if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateId())){
 				item.setTaxRate(DaoManager.get(TaxRate.class, getSelectedTaxRateId()));
 			}
+
+			// item.setVat(invoiceItemVat);
 			
 			if (selectedItem == null)
 				invoiceItems.add(item);
@@ -307,8 +312,6 @@ public class InvoiceEditBean extends EntityEditPageBean<Invoice> implements Seri
 		
 		invoiceItems.remove(selectedItem);
 	}
-
-
 
 	@Override
 	public void onValidate() throws PersistenceBeanException, HibernateException, IllegalAccessException {

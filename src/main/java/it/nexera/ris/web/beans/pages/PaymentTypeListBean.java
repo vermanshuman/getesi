@@ -5,76 +5,74 @@ import it.nexera.ris.common.helpers.LogHelper;
 import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.PaymentType;
-import it.nexera.ris.web.beans.EntityLazyListPageBean;
-import lombok.Getter;
-import lombok.Setter;
+import it.nexera.ris.web.beans.EntityLazyInListEditPageBean;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 @ManagedBean(name = "paymentTypeListBean")
 @ViewScoped
-@Getter
-@Setter
-public class PaymentTypeListBean extends EntityLazyListPageBean<PaymentType>
+public class PaymentTypeListBean extends EntityLazyInListEditPageBean<PaymentType>
         implements Serializable {
 
-    private static final long serialVersionUID = -2631748089590161876L;
-
-    private String description;
-
-    private String code;
-
-    private String beneficiary;
-
-    private String istitutionName;
-
-    private String iban;
+    private static final long serialVersionUID = -435289789434007013L;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
             InstantiationException, IllegalAccessException, IOException {
-        filterTableFromPanel();
-
-    }
-
-    public void filterTableFromPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        List<Criterion> restrictions = new ArrayList<>();
-        if (!ValidationHelper.isNullOrEmpty(getDescription())) {
-            restrictions.add(Restrictions.ilike("description", getDescription(), MatchMode.ANYWHERE));
-        }
-        if (!ValidationHelper.isNullOrEmpty(getCode())) {
-            restrictions.add(Restrictions.ilike("code", getCode(), MatchMode.ANYWHERE));
-        }
-        if (!ValidationHelper.isNullOrEmpty(getBeneficiary())) {
-            restrictions.add(Restrictions.ilike("beneficiary", getBeneficiary(), MatchMode.ANYWHERE));
-        }
-        if (!ValidationHelper.isNullOrEmpty(getIstitutionName())) {
-            restrictions.add(Restrictions.ilike("istitutionName", getIstitutionName(), MatchMode.ANYWHERE));
-        }
-        if (!ValidationHelper.isNullOrEmpty(getIban())) {
-            restrictions.add(Restrictions.ilike("iban", getIban(), MatchMode.ANYWHERE));
-        }
-        this.loadList(PaymentType.class, restrictions.toArray(new Criterion[0]),
+        this.loadList(PaymentType.class, new Criterion[]{},
                 new Order[]
                         {Order.asc("description")});
     }
 
-    public void clearFilterPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        setDescription(null);
-        setCode(null);
-        setBeneficiary(null);
-        setIban(null);
-        setIstitutionName(null);
-        filterTableFromPanel();
+    @Override
+    protected void deleteEntityInternal(Long id)
+            throws HibernateException, PersistenceBeanException,
+            InstantiationException, IllegalAccessException {
+        try {
+            super.deleteEntityInternal(id);
+        } catch (Exception e) {
+            try {
+                DaoManager.remove(getEntity());
+            } catch (Exception e1) {
+                LogHelper.log(log, e1);
+            }
+        }
     }
+
+    @Override
+    protected void setEditedValues() {
+        this.getEditedEntity().setDescription(
+                this.getEntity().getDescription());
+        this.getEditedEntity().setCode(
+                this.getEntity().getCode());
+        this.getEditedEntity().setBeneficiary(
+                this.getEntity().getBeneficiary());
+        this.getEditedEntity().setIban(
+                this.getEntity().getIban());
+        this.getEditedEntity().setIstitutionName(
+                this.getEntity().getIstitutionName());
+    }
+
+    @Override
+    protected void validate() throws PersistenceBeanException {
+        if (ValidationHelper.isNullOrEmpty(this.getEntity().getDescription())) {
+            addRequiredFieldException("form:description");
+        } else if (!ValidationHelper.isUnique(PaymentType.class, "description",
+                getEntity().getDescription(), this.getEntity().getId())) {
+            addFieldException("form:description", "nameAlreadyInUse");
+        }
+    }
+
+    @Override
+    public void save() throws HibernateException, PersistenceBeanException, NumberFormatException, IOException,
+            InstantiationException, IllegalAccessException {
+        DaoManager.save(this.getEntity());
+    }
+
 }

@@ -144,7 +144,7 @@ public class ImportOmiXlsxService extends BaseService {
             omiValue.setCityDescription(cityDescriptionCell.getStringCellValue());
             omiValue.setZone(zoneCell.getStringCellValue());
             if(stateCell != null)
-            	omiValue.setState(stateCell.getStringCellValue());
+                omiValue.setState(stateCell.getStringCellValue());
             if(!ValidationHelper.isNullOrEmpty(comprMinCell) && !ValidationHelper.isNullOrEmpty(comprMaxCell.getNumericCellValue())){
                 omiValue.setComprMin((long) comprMinCell.getNumericCellValue());
                 omiValue.setComprMax((long) comprMaxCell.getNumericCellValue());

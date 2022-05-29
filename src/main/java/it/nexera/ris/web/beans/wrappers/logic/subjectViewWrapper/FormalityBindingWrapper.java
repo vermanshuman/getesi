@@ -88,7 +88,7 @@ public class FormalityBindingWrapper extends BaseTab implements Serializable {
         commandButton.setActionExpression(createMethodExpression(String.format("#{subjectBean.%s}",
                 "downloadFormalityPDF(tableVar.documentId)"), new Class[]{Long.class}));
         commandButton.setAjax(false);
-        commandButton.setIcon("fa fa-fw fa-file-pdf-o red-file icon-align");
+        commandButton.setIcon("fa fa-fw fa-file-pdf-o");
         columns.add(getButtonColumn("subjectViewFormalityPDF", commandButton, "", "action_column"));
 
         commandButton = new CommandButton();
@@ -111,7 +111,7 @@ public class FormalityBindingWrapper extends BaseTab implements Serializable {
     }
 
     @Override
-    public Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+    Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
         return (long) getList().size();
     }
 

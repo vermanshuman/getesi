@@ -1,187 +1,72 @@
 <ui:composition
         xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://java.sun.com/jsf/html"
         xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:f="http://java.sun.com/jsf/core"
         xmlns:p="http://primefaces.org/ui">
     <style type="text/css">
         .ui-button.grey-button:hover {
             background-color: #003871 !important;
         }
-
-        .button-panel-space{
-            margin-top: 15px;
-        }
-
-        body .ui-button.ui-button-warning, body .ui-splitbutton.ui-button-warning > .ui-button {
-            background: #fed820;
-            color: #000000;
-            border: 1px solid #fed820;
-            width: 75px;
-        }
-
-        body .ui-button.ui-button-danger, body .ui-splitbutton.ui-button-danger > .ui-button {
-            background: #fb6e51;
-            color: #FFFFFF;
-            border: 1px solid #fb6e51;
-            margin-left:3px;
-        }
-
-        .ui-button-success {
-            background: #00CC52!important;
-        }
-
-        body .ui-button.ui-button-icon-only .ui-icon {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            margin-top: -6px;
-            margin-left: -7px;
-            font-size: 14px !important;
-        }
-
-        .pi-trash {
-            left: 10px !important;
-            margin-left: 0px !important;
-        }
-        .fa-info-circle {
-            left: 26% !important;
-        }
-        #dataSaved {
-            position: absolute;
-        }
-
     </style>
-    <script>
-        $(document).ready(function() {
-            setTimeout(() => {
-                $("#dataSaved").hide();
-            }, 2500);
-            function setDataSavedPosition() {
-                var totalWidth = 0;
-                var stampaPosition = $('.stampaButton')[0].offsetLeft;
-                $('#btn_line').children('button').each((index, element) => {
-                    if(element.id != 'dataSaved') {
-                        totalWidth = element.clientWidth + element.offsetLeft;
-                    }
-                });
-                var distanceBetween = stampaPosition - totalWidth;
-                if(distanceBetween >= 205) {
-                    $("#dataSaved").css('left', ((distanceBetween / 2) + totalWidth - 100) + 'px');
-                }
-            }
-            // setDataSavedPosition();
-            // $( window ).resize(function() {
-            //     setDataSavedPosition();
-            // });
-        });
-
-    </script>
     <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/mail.css"
           media="all" rel="stylesheet" type="text/css"/>
-    <div class="button-panel-space p-grid">
-        <div class="p-col-10" style="width: 80%">
-            <p:outputPanel id="btn_line">
-                <p:commandButton icon="fa fa-reply-all" title="#{msg.mailManagerReplyToAll}"
-                             value="#{msg.mailManagerReplyToAll}" styleClass="grey-button"
-                             action="#{bean.replyToAllMail}" update=":form"/>
-            <p:commandButton icon="fa fa-arrow-right" title="#{msg.mailManagerForward}"
-                             value="#{msg.mailManagerForward}" styleClass="grey-button"
-                             action="#{bean.forwardMail}" update=":form"/>
-            <p:commandButton icon="fa fa-reply" styleClass="grey-button"
-                             action="#{bean.replyMail}" update=":form" title="#{msg.mailManagerReply}"
-                             value="#{msg.mailManagerReply}"/>
-            <p:commandButton icon="fa fa-chevron-down" oncomplete="PF('moveDlgWV').show();" update=":form"
-                             title="#{msg.mailManagerMove}" value="#{msg.mailManagerMove}"
-                             styleClass="grey-button"
-                             rendered="#{bean.canDeleteMail and bean.actual}"/>
+    <div class="button-panel-one">
 
-            <p:commandButton icon="fa fa-exchange" styleClass="grey-button"
-                             oncomplete="PF('editStateDlgWV').show();" title="#{msg.mailManagerEditStateAction}"
-                             value="#{msg.mailManagerEditStateAction}"/>
+        <p:commandButton icon="fa fa-reply-all" title="#{msg.mailManagerReplyToAll}"
+                         value="#{msg.mailManagerReplyToAll}" styleClass="grey-button"
+                         action="#{bean.replyToAllMail}" update=":form"/>
+        <p:commandButton icon="fa fa-arrow-right" title="#{msg.mailManagerForward}"
+                         value="#{msg.mailManagerForward}" styleClass="grey-button"
+                         action="#{bean.forwardMail}" update=":form"/>
+        <p:commandButton icon="fa fa-reply" styleClass="grey-button"
+                         action="#{bean.replyMail}" update=":form" title="#{msg.mailManagerReply}"
+                         value="#{msg.mailManagerReply}"/>
+        <p:commandButton icon="fa fa-chevron-down" oncomplete="PF('moveDlgWV').show();" update=":form"
+                         title="#{msg.mailManagerMove}" value="#{msg.mailManagerMove}"
+                         styleClass="grey-button"
+                         rendered="#{bean.canDeleteMail and bean.actual}"/>
+        <p:commandButton
+                rendered="#{bean.canDeleteMail and bean.actual}"
+                styleClass="grey-button"
+                action="#{bean.cancelMail}" value="#{msg.mailManagerCancelMail}"
+                icon="fa fa-trash" title="#{msg.mailManagerCancelMail}"/>
+        <p:commandButton icon="fa fa-print" title="#{msg.mailManagerPrint}" value="#{msg.mailManagerPrint}"
+                         update="form:print_panel"
+                         styleClass="grey-button" action="#{bean.generateMailPdf}" oncomplete="printIframe();">
+        </p:commandButton>
+        <p:commandButton icon="fa fa-exchange" styleClass="grey-button"
+                         oncomplete="PF('editStateDlgWV').show();" title="#{msg.mailManagerEditStateAction}"
+                         value="#{msg.mailManagerEditStateAction}"/>
+        <p:commandButton icon="fa fa-pencil-square" actionListener="#{bean.checkFieldsBeforeProcessManagedStateCheck}"
+                         value="#{msg.mailManagerStart}" styleClass="grey-button"/>
+        <p:commandButton icon="fa fa-fw fa-file-pdf-o" value="#{msg.mailManagerDelivery}" styleClass="grey-button"
+                         action="#{bean.editExcelData}" ajax="false" update="@form" rendered="#{bean.generatePdf}">
+        </p:commandButton>
+        <p:commandButton icon="fa fa-fw fa-file-pdf-o" value="#{msg.requestPrintRequestEvent}" styleClass="grey-button"
+            oncomplete="PF('showToBeSentRequestDlgWV').show();" update="showToBeSentRequestPanel" rendered="#{not empty bean.entity.toBeSentRequests}"/>
+        <p:commandButton onclick="PF('imageFileDlgWV').show();" rendered="#{not empty bean.entity.imgFiles}"
+                         value="#{msg.mailManagerImgFiles}" styleClass="grey-button"/>
+        <ui:fragment rendered="#{bean.entity.received and bean.relatedToClient}">
+            <span style="border: 2px solid #788fa7 !important;padding: 4px 8px 4px 4px; border-radius: 2px;">
+                <i class="fa fa-check-circle-o" style="color: green; margin-right: 5px; margin-left: 5px;"/>
+                <p:commandLink value="#{msg.mailManagerRelatedToClient}" action="#{bean.prepareClients}"
+                               oncomplete="PF('associateToClientDlgWV').show();" update="associateToClientDlgPanel"/>
+            </span>
+        </ui:fragment>
 
-                <p:commandButton icon="fa fa-fw fa-file-pdf-o" value="#{msg.mailManagerDelivery}"
-                                 styleClass="grey-button"
-                                 action="#{bean.editExcelData}" ajax="false" update="@form"
-                                 rendered="#{bean.generatePdf and !bean.documentTypeInvoice}"/>
-
-                <ui:fragment rendered="#{bean.generatePdf and bean.documentTypeInvoice}">
-	            <span style="border: 2px solid #788fa7 !important;padding: 5px 8px 8px 4px; border-radius: 2px;display: inline-block;border: 2px solid #57c279 !important;">
-	                <i class="fa fa-check-circle-o" style="color: green; margin-right: 5px; margin-left: 5px;"/>
-	                <p:commandLink value="#{msg.mailManagerDelivery}" action="#{bean.editExcelData}" update="@form"/>
-	            </span>
-                </ui:fragment>
-
-                <p:commandButton icon="fa fa-fw fa-file-pdf-o" value="#{msg.requestPrintRequestEvent}" styleClass="grey-button"
-                             oncomplete="PF('showToBeSentRequestDlgWV').show();" update="showToBeSentRequestPanel" rendered="#{not empty bean.entity.toBeSentRequests}"/>
-            <p:commandButton onclick="PF('imageFileDlgWV').show();" rendered="#{not empty bean.entity.imgFiles}"
-                             value="#{msg.mailManagerImgFiles}" styleClass="grey-button"/>
-
-
-            <p:commandButton rendered="#{bean.entity.received and !bean.relatedToClient}" styleClass="grey-button"
-                             value="#{msg.mailManagerAssociateToClient}" action="#{bean.prepareClients}" style="margin-right: 2px;"
-                             oncomplete="PF('associateToClientDlgWV').show();" update="associateToClientDlgPanel"/>
-
-            <p:commandButton icon="fa fa-pencil-square" update=":form" styleClass="grey-button"
-                             value="#{msg.mailManagerSendRequestToManager}"
-                             rendered="#{bean.entity.validRequests ne null and bean.entity.validRequests.size()>0 }"
-                             oncomplete="PF('mailManagerViewRequestsDlg').show();"/>
-
-                <p:commandButton title="#{msg.mailManagerSendInvoice}" rendered="#{bean.sendInvoice and bean.billinRequest}"
-                                 value="#{msg.mailManagerSendInvoice}" styleClass="grey-button"
-                                 action="#{bean.newInvoiceMail}" update=":form"/>
-
-
-<!--            <p:commandButton style="margin-left: 2px;"-->
-<!--                             value="#{msg.requestTextEditCreateInvoice}" rendered="#{not bean.invoiceSentStatus and bean.invoiceRequests.size() != 0 and bean.billinRequest}"-->
-<!--                             id="createInvoice" styleClass="grey-button"-->
-<!--                             action="#{bean.setMaxInvoiceNumber()}" update="@widgetVar(invoiceDialogWV)"-->
-<!--                             oncomplete="PF('invoiceDialogWV').show();"/>-->
-
-<!--                <p:commandButton style="margin-left: 2px;"-->
-<!--                                 value="#{msg.requestTextEditCreateInvoice}" rendered="#{bean.showCreateFatturaButton}"-->
-<!--                                 action="#{bean.checkDocument}"-->
-<!--                                 id="createInvoice" styleClass="grey-button"-->
-<!--                                 update="@widgetVar(mailManagerViewRequestsForInvoiceDlg)"-->
-<!--                                 oncomplete="PF('mailManagerViewRequestsForInvoiceDlg').show();"/>-->
-
-
-<!--                <p:commandButton style="margin-left: 2px;"-->
-<!--                                 value="#{msg.requestTextEditCreateInvoice}" rendered="#{bean.showCreateFatturaButton}"-->
-<!--                                 action="#{bean.checkDocument}"-->
-<!--                                 id="createInvoice" styleClass="grey-button"/>-->
-
-                <p:commandButton style="margin-left: 2px;"
-                                 value="#{msg.requestTextEditCreateInvoice}" rendered="#{bean.showCreateFatturaButton}"
-                                 action="#{bean.preCheckDocument}" update="invoiceAlreadyCreatedDialog otherRequestsExistsForInvoiceDialog"
-                                 id="createInvoice" styleClass="grey-button"/>
-
-
-                <!--  <p:commandButton icon="ui-icon fa fa-pencil" update=":form" styleClass="right-side"
-                                  action="#{bean.editEntity}"
-                                  disabled="#{!bean.entity.canEdit}"/> -->
-
-                <ui:fragment rendered="#{bean.entity.received and bean.relatedToClient}">
-	            <span style="border: 2px solid #788fa7 !important;padding: 5px 8px 8px 4px; border-radius: 2px;display: inline-block;">
-	                <i class="fa fa-check-circle-o" style="color: green; margin-right: 5px; margin-left: 5px;"/>
-	                <p:commandLink value="#{msg.mailManagerRelatedToClient}" action="#{bean.prepareClients}"
-                                   oncomplete="PF('associateToClientDlgWV').show();" update="associateToClientDlgPanel"/>
-	            </span>
-                </ui:fragment>
-
-                <p:commandButton rendered="#{bean.canDeleteMail and bean.actual}" styleClass="ui-button-danger"
-                             action="#{bean.cancelMail}" icon="pi pi-trash"  style="background: #fb6e51 !important"/>
-                <p:commandButton rendered="#{bean.dataSaved}" id="dataSaved" value="#{msg.mailManagerSave}"  style="background-color: green; width:200px;left: 55vw;margin-top: 83px;z-index: 1;" oncomplete="setTimeout();"
-                                 icon="fa fa-info-circle"  />
-            </p:outputPanel>
-        </div>
-        <div class="p-col-2" style="text-align:right;width: 20%">
-            <!-- <p:commandButton icon="fa fa-pencil-square" actionListener="#{bean.checkFieldsBeforeProcessManagedStateCheck}"
-                             value="#{msg.mailManagerStart}" styleClass="ui-button-success"/> -->
-            <p:commandButton icon="pi pi-print" update="form:print_panel"
-                             styleClass="ui-button-warning stampaButton" action="#{bean.generateMailPdf}" oncomplete="printIframe();" value="Stampa" style="margin-right: 1cm;width: auto;background: #000066;"
-                             rendered="#{bean.showButtons}"/>
-            <p:commandButton update=":form" id="closeButton" style="background-color: #F3362B !important;margin-left: 2px;width: 110px;" value="#{msg.close}"
-                             styleClass="grey-button" actionListener="#{bean.goTable}"
-                    rendered="#{bean.showButtons}"/>
-        </div>
+        <p:commandButton rendered="#{bean.entity.received and !bean.relatedToClient}" styleClass="grey-button"
+                         value="#{msg.mailManagerAssociateToClient}" action="#{bean.prepareClients}" style="margin-right: 2px;"
+                         oncomplete="PF('associateToClientDlgWV').show();" update="associateToClientDlgPanel"/>
+                         
+		<p:commandButton icon="fa fa-pencil-square" update=":form" styleClass="grey-button"
+        				 value="#{msg.mailManagerSendRequestToManager}"
+                         oncomplete="PF('mailManagerViewRequestsDlg').show();"/>
+                         
+        <p:commandButton update=":form" styleClass="close-ui-button" value="#{msg.close}"
+                         actionListener="#{bean.goTable}"/>
+        <p:commandButton icon="ui-icon ui-icon-pencil" update=":form" styleClass="right-side"
+                         action="#{bean.editEntity}"
+                         disabled="#{!bean.entity.canEdit}"/>
     </div>
 </ui:composition>

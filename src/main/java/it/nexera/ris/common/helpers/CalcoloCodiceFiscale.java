@@ -225,7 +225,10 @@ public class CalcoloCodiceFiscale {
     }
 
     public static String getCityFiscalCode(String s) {
-        return s.substring(11, 15);
+        try {
+            return s.substring(11, 15);
+        }catch(Exception e){
+            return null;
+        }
     }
-
 }

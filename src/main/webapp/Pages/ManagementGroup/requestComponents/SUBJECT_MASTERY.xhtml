@@ -13,14 +13,12 @@
         }
     </script>
     <span>#{enums.documentGenerationTagsSUBJECT_MASTERY}
-        <h:panelGroup rendered="#{not empty block}" style="#{block.isRequired()?'':'display:none;'}">*</h:panelGroup>
-        <h:panelGroup rendered="#{not empty item and not empty item.field}" style="#{item.field.isRequired()?'':'display:none;'}">*</h:panelGroup>
+        <span class="red" style="#{item.field.isRequired() or bean.multipleCreate ? '':'display:none;'}">*</span>
     </span>
     <p:remoteCommand name="updateDate" update="SUBJECT_MASTERY_BIRTHDAY"/>
     <p:panel id="SUBJECT_MASTERY" style="background: transparent; border: none">
         <p:panelGrid columns="2" style="width: 100%;" styleClass="ui-panelgrid-blank form-group" layout="grid">
             <p:column>
-<!--                <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_PERSON_TYPE}"/><br/>-->
                 <p:selectOneRadio id="SUBJECT_MASTERY_PERSON_TYPE" value="#{bean.wrapper.selectedPersonId}"
                                   update="SUBJECT_MASTERY">
                     <f:selectItems value="#{bean.wrapper.persons}"/>
@@ -51,7 +49,7 @@
                 <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_BIRTHDAY}"/><br/>
                 <p:calendar id="SUBJECT_MASTERY_BIRTHDAY" value="#{bean.subject.birthDate}"
                             pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
-                            converter="fullDateTimeConverter" maxdate="today" yearRange="#{bean.yearRange}">
+                            converter="fullDateTimeConverter" maxdate="today">
                     <p:ajax event="dateSelect" listener="#{bean.handleDateSelect}" update="SUBJECT_MASTERY_BIRTHDAY"/>
                 </p:calendar>
             </p:column>
@@ -63,7 +61,7 @@
                              styleClass="input-width" onkeyup="fieldValueToUpperCase(this);"/>
             </p:column>
 
-            <p:column rendered="#{(bean.wrapper.selectedPersonId eq 1) or (bean.wrapper.selectedPersonId eq 2) }">
+            <p:column rendered="#{not empty bean.wrapper.selectedPersonId}">
                 <h:outputText value="#{bean.wrapper.selectedPersonId == 1 ? enums.documentGenerationTagsSUBJECT_MASTERY_PROVINCE : enums.documentGenerationTagsSUBJECT_MASTERY_PROVINCE_OFFICE}"/><br/>
                 <p:selectOneMenu id="SUBJECT_MASTERY_PROVINCE" value="#{bean.wrapper.selectProvinceId}"
                                  styleClass="select-width" filter="true">
@@ -75,7 +73,7 @@
             </p:column>
 
             <p:column id="comune_column"
-                      rendered="#{((bean.wrapper.selectedPersonId eq 1) or (bean.wrapper.selectedPersonId eq 2)) and bean.wrapper.selectProvinceId!=-1}">
+                      rendered="#{not empty bean.wrapper.selectedPersonId and bean.wrapper.selectProvinceId!=-1}">
                 <h:outputText value="#{bean.wrapper.selectedPersonId == 1 ? enums.documentGenerationTagsSUBJECT_MASTERY_COMUNE : enums.documentGenerationTagsSUBJECT_MASTERY_COMUNE_OFFICE}"/><br/>
                 <p:selectOneMenu id="SUBJECT_MASTERY_COMUNE" value="#{bean.wrapper.selectedCityId}"
                                  styleClass="select-width" filter="true" filterFunction="filterCity"
@@ -135,10 +133,10 @@
                                  value="#{msg.databaseListSubjectFiscalCodeRestore}"/>
             </p:column>
         </p:panelGrid>
-        <p:dialog id="subjectRestoreDlg" widgetVar="subjectRestoreDlg" modal="true" draggable="false" position="center center" width="1500">
+        <p:dialog widgetVar="subjectRestoreDlg" modal="true" draggable="false" position="center center" width="1500">
             <p:dataTable value="#{bean.subjectsToRestore}" var="subject" selection="#{bean.selectedSubjectToRestore}"
-                         rowKey="#{subject.id}" id="restoreSubjectTable" emptyMessage="#{msg.noRecordsFound}">
-                <p:column selectionMode="single" style="width:35px;text-align:center"/>
+                         rowKey="#{subject.id}" id="restoreSubjectTable">
+                <p:column selectionMode="single" style="width:16px;text-align:center"/>
                 <p:column headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_SOCIAL_REGION}"
                           rendered="#{bean.wrapper.selectedPersonId eq 2}">
                     <h:outputText value="#{subject.businessName}"/>
@@ -172,14 +170,12 @@
                 <p:column headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_COMUNE}">
                     <h:outputText value="#{subject.birthCity}"/>
                 </p:column>
-
+                <f:facet name="footer">
+                    <p:commandButton update="SUBJECT_MASTERY" value="#{msg.ok}" process="restoreSubjectTable"
+                                     oncomplete="PF('subjectRestoreDlg').hide()"
+                                     action="#{bean.selectRestoredSubject}"/>
+                </f:facet>
             </p:dataTable>
-            <div class="btn_line">
-                <p:commandButton value="#{msg.confirm}" update="SUBJECT_MASTERY" process="restoreSubjectTable"  styleClass="confirm-button"
-                                 oncomplete="PF('subjectRestoreDlg').hide();"
-                                 action="#{bean.selectRestoredSubject}"/>
-
-            </div>
         </p:dialog>
     </p:panel>
 </ui:composition>

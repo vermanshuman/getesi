@@ -72,7 +72,7 @@ public class FormalitySubjectBindingWrapper extends BaseTab implements Serializa
     }
 
     @Override
-    public Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+    Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
         return DaoManager.getCount(ReportFormalitySubject.class, "id", new Criterion[]{
                 Restrictions.or(
                         Restrictions.in("fiscalCode", getList()),

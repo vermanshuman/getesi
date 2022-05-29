@@ -8,8 +8,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "payment_type")
-public class
-PaymentType extends IndexedEntity implements Serializable {
+public class PaymentType extends IndexedEntity implements Serializable {
 
 	private static final long serialVersionUID = -203805995863279495L;
 
@@ -27,7 +26,7 @@ PaymentType extends IndexedEntity implements Serializable {
 
     @Column(name = "iban")
     private String iban;
-    
+
     public String toString() {
     	return description;
     }

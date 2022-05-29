@@ -67,8 +67,7 @@ public class SelectItemHelper {
 
     public static void addItemToListIfItIsNotInIt(List<SelectItem> items, Entity item) {
 
-    	if (items.stream().noneMatch(x -> !ValidationHelper.isNullOrEmpty(x.getValue()) &&
-                !ValidationHelper.isNullOrEmpty(item.getId()) && x.getValue().equals(item.getId()))) {
+    	if (items.stream().noneMatch(x -> x.getValue().equals(item.getId()))) {
     		items.add(new SelectItem(item.getId(), item.toString()));
     	}
     }

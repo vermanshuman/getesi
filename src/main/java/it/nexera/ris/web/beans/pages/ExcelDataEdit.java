@@ -1,14 +1,62 @@
 package it.nexera.ris.web.beans.pages;
 
-import it.nexera.ris.common.enums.*;
+import java.io.File;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.model.SelectItem;
+
+import it.nexera.ris.persistence.beans.entities.domain.*;
+import org.apache.commons.io.FileUtils;
+import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
+
+import it.nexera.ris.common.enums.ApplicationSettingsKeys;
+import it.nexera.ris.common.enums.BillingTypeFields;
+import it.nexera.ris.common.enums.DocumentType;
+import it.nexera.ris.common.enums.ExtraCostType;
+import it.nexera.ris.common.enums.MortgageType;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
-import it.nexera.ris.common.helpers.*;
+import it.nexera.ris.common.helpers.ComboboxHelper;
+import it.nexera.ris.common.helpers.CostCalculationHelper;
+import it.nexera.ris.common.helpers.CostManipulationHelper;
+import it.nexera.ris.common.helpers.DateTimeHelper;
+import it.nexera.ris.common.helpers.FileHelper;
+import it.nexera.ris.common.helpers.LogHelper;
+import it.nexera.ris.common.helpers.MailHelper;
+import it.nexera.ris.common.helpers.RedirectHelper;
+import it.nexera.ris.common.helpers.ResourcesHelper;
+import it.nexera.ris.common.helpers.SaveRequestDocumentsHelper;
+import it.nexera.ris.common.helpers.SelectItemHelper;
+import it.nexera.ris.common.helpers.SelectItemWrapperConverter;
+import it.nexera.ris.common.helpers.ValidationHelper;
+import it.nexera.ris.common.helpers.VisureManageHelper;
 import it.nexera.ris.common.helpers.create.xls.CreateExcelRequestsReportHelper;
 import it.nexera.ris.common.xml.wrappers.SelectItemWrapper;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.Dictionary;
-import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
@@ -19,26 +67,6 @@ import it.nexera.ris.web.beans.wrappers.logic.ExcelDataWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.ExcelTableWrapper;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.io.FileUtils;
-import org.hibernate.Hibernate;
-import org.hibernate.HibernateException;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
-import javax.faces.bean.ViewScoped;
-import javax.faces.model.SelectItem;
-import java.io.File;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 @Setter
 @Getter
@@ -86,7 +114,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
 
     private List<Request> requests;
 
-    private  List<ExcelTableWrapper> excelDataTable;
+    private  List<ExcelTableWrapper> dataTable;
 
     private Date excelDate;
 
@@ -102,44 +130,16 @@ public class ExcelDataEdit extends BaseEntityPageBean {
 
     private Boolean showRequestCost = Boolean.TRUE;
 
-    private List<Long> selectedRequestIds;
-
-    private Client selectedRequestClient;
-
-    private List<Request> selectedRequests;
-
-    @ManagedProperty(value="#{invoiceDialogBean}")
-    private InvoiceDialogBean invoiceDialogBean;
-
-    private List<Request> requestsConsideredForInvoice;
-
     @Override
     protected void onConstruct() {
-        setMailId(null);
-        setSelectedRequestIds(null);
-        if(!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.ID_PARAMETER))){
-            setMailId(Long.valueOf(getRequestParameter(RedirectHelper.ID_PARAMETER)));
-        }else if(!ValidationHelper.isNullOrEmpty(SessionHelper.get("selectedRequestIds"))) {
-            List<Long> selectedRequestIds =(List<Long>)SessionHelper.get("selectedRequestIds");
-            SessionHelper.removeObject("selectedRequestIds");
-            if(!ValidationHelper.isNullOrEmpty(SessionHelper.get("selectedRequestClientId"))) {
-                Long clientId = (Long)SessionHelper.get("selectedRequestClientId");
-                try {
-                    setSelectedRequestClient(DaoManager.get(Client.class, clientId));
-                } catch (Exception e) {
-                    LogHelper.log(log, e);
-                }
-            }
-            SessionHelper.removeObject("selectedRequestClientId");
-            setSelectedRequestIds(selectedRequestIds);
-        }
+        setMailId(Long.valueOf(getRequestParameter(RedirectHelper.ID_PARAMETER)));
         loadPage();
     }
 
     private void loadPage() {
         try {
 
-            setExcelDataTable(new ArrayList<>());
+            dataTable = new ArrayList<ExcelTableWrapper>();
 
             setCostManipulationHelper(new CostManipulationHelper());
             getCostManipulationHelper().setEditable(true);
@@ -150,43 +150,35 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                     .stream().sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList());
 
 
-            if(!ValidationHelper.isNullOrEmpty(getMailId())){
-                WLGInbox mail = DaoManager.get(WLGInbox.class, getMailId());
-                setMail(mail);
-            }
+            WLGInbox mail = DaoManager.get(WLGInbox.class, getMailId());
+            setMail(mail);
             setClientSelectItemWrapperConverter(new SelectItemWrapperConverter<>(Client.class));
             updateComboboxes();
 
-            if(!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getClient())){
-                setSelectedNotManagerOrFiduciaryClientId(getMail().getClient().getId());
+            if (!ValidationHelper.isNullOrEmpty(mail.getClient())) {
+                setSelectedNotManagerOrFiduciaryClientId(mail.getClient().getId());
                 SelectItemHelper.addItemToListIfItIsNotInIt(getNotManagerOrFiduciaryClients(),mail.getClient());
             }
 
-//            else  if(!ValidationHelper.isNullOrEmpty(getSelectedRequestClient())){
-//                setSelectedNotManagerOrFiduciaryClientId(getSelectedRequestClient().getId());
-//                SelectItemHelper.addItemToListIfItIsNotInIt(getNotManagerOrFiduciaryClients(),getSelectedRequestClient());
-//            }
+            Document document = DaoManager.get(Document.class, new Criterion[]{
+                    Restrictions.eq("mail.id", getMailId())});
 
-            if (!ValidationHelper.isNullOrEmpty(getMail())) {
-                Document document = DaoManager.get(Document.class, new Criterion[]{
-                        Restrictions.eq("mail.id", getMailId())});
-
-                if(ValidationHelper.isNullOrEmpty(document)) {
-                    document = new Document();
-                    document.setMail(getMail());
-                    document.setTypeId(DocumentType.INVOICE_REPORT.getId());
-                    document.setReportNumber(SaveRequestDocumentsHelper.getLastInvoiceNumber() + 1);
-                    DaoManager.save(document, true);
-                }
-                setDocument(document);
-                if(!ValidationHelper.isNullOrEmpty(document))
-                    setExcelFatturaN(document.getInvoiceNumber());
-
-                setExcelReportN(document.getReportNumber());
-
-                setExcelDate((document == null || document.getInvoiceDate() == null ?
-                        DateTimeHelper.getNow(): document.getInvoiceDate()));
+            if(ValidationHelper.isNullOrEmpty(document)) {
+                document = new Document();
+                document.setMail(getMail());
+                document.setTypeId(DocumentType.INVOICE_REPORT.getId());
+                document.setReportNumber(SaveRequestDocumentsHelper.getLastInvoiceNumber() + 1);
+                DaoManager.save(document, true);
             }
+            setDocument(document);
+            if(!ValidationHelper.isNullOrEmpty(document))
+                setExcelFatturaN(document.getInvoiceNumber());
+
+            setExcelReportN(document.getReportNumber());
+
+            setExcelDate((document == null || document.getInvoiceDate() == null ?
+                    DateTimeHelper.getNow(): document.getInvoiceDate()));
+
             if (getSelectedNotManagerOrFiduciaryClientId() != null) {
                 List<Client> invoiceClients = new ArrayList<Client>();
                 for(Client client : clientList) {
@@ -201,91 +193,68 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                         .filter(distinctByKey(c -> c.getId()))
                         .collect(Collectors.toList()), true));
 
-                if(!ValidationHelper.isNullOrEmpty(getSelectedNotManagerOrFiduciaryClientId())){
-                    List<Office> offices = DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()).getOffices();
-                    if (!ValidationHelper.isNullOrEmpty(offices)) {
-                        setOfficeList(ComboboxHelper.fillList(offices.stream()
-                                .sorted(Comparator.comparing(Dictionary::getDescription))
-                                .collect(Collectors.toList()), true));
-                    } else {
-                        setOfficeList(Collections.singletonList(SelectItemHelper.getNotSelected()));
-                    }
+                List<Office> offices = DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()).getOffices();
+                if (!ValidationHelper.isNullOrEmpty(offices)) {
+                    setOfficeList(ComboboxHelper.fillList(offices.stream()
+                            .sorted(Comparator.comparing(Dictionary::getDescription))
+                            .collect(Collectors.toList()), true));
+                } else {
+                    setOfficeList(Collections.singletonList(SelectItemHelper.getNotSelected()));
                 }
             }else {
                 setInvoiceClients(ComboboxHelper.fillList(clientList, true));
                 setOfficeList(ComboboxHelper.fillList(Office.class, Order.asc("description")));
             }
+            setExcelReportNDG(getMail().getNdg());
 
-            if(!ValidationHelper.isNullOrEmpty(getMail())){
-                setExcelReportNDG(getMail().getNdg());
-            }
-
-            if(!ValidationHelper.isNullOrEmpty(getMail())){
-                setExcelReportNDG(getMail().getNdg());
-                if(!ValidationHelper.isNullOrEmpty(getMail().getClient()) &&
-                        !ValidationHelper.isNullOrEmpty(getMail().getClient().getTypeId())) {
-                    List<Client> notManagerOrFiduciaryClients = clientList.stream()
-                            .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
-                            .collect(Collectors.toList());
-
-                    setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(notManagerOrFiduciaryClients.stream()
-                            .filter(c -> Objects.nonNull(c))
-                            .filter(c -> (c.getTypeId().equals(getMail().getClient().getTypeId())))
-                            .collect(Collectors.toList()), true));
-                }
-                if (!ValidationHelper.isNullOrEmpty(getMail().getClientInvoice())) {
-                    setExcelClientInvoiceId(getMail().getClientInvoice().getId());
-                    SelectItemHelper.addItemToListIfItIsNotInIt(getInvoiceClients(), getMail().getClientInvoice());
-                }
-
-                if (!ValidationHelper.isNullOrEmpty(getMail().getOffice())) {
-                    setSelectedOfficeId(getMail().getOffice().getId());
-                }
-
-                if (!ValidationHelper.isNullOrEmpty(getMail().getClientFiduciary())) {
-                    setSelectedClientFiduciaryId(getMail().getClientFiduciary().getId());
-                }
-                fillSelectedClientManagers();
-                setReferenceRequest(getMail().getReferenceRequest());
-            }else if(!ValidationHelper.isNullOrEmpty(getSelectedRequestClient())){
+            if(!ValidationHelper.isNullOrEmpty(getMail().getClient()) &&
+                    !ValidationHelper.isNullOrEmpty(getMail().getClient().getTypeId())) {
                 List<Client> notManagerOrFiduciaryClients = clientList.stream()
                         .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
                         .collect(Collectors.toList());
 
                 setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(notManagerOrFiduciaryClients.stream()
                         .filter(c -> Objects.nonNull(c))
-                        .filter(c -> (c.getTypeId().equals(getSelectedRequestClient().getTypeId())))
+                        .filter(c -> (c.getTypeId().equals(getMail().getClient().getTypeId())))
                         .collect(Collectors.toList()), true));
             }else {
                 setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(clientList.stream()
                         .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
                         .collect(Collectors.toList()), true));
             }
+
+            if (!ValidationHelper.isNullOrEmpty(getMail().getClientInvoice())) {
+                setExcelClientInvoiceId(getMail().getClientInvoice().getId());
+                SelectItemHelper.addItemToListIfItIsNotInIt(getInvoiceClients(), getMail().getClientInvoice());
+            }
+
+            if (!ValidationHelper.isNullOrEmpty(getMail().getOffice())) {
+                setSelectedOfficeId(getMail().getOffice().getId());
+            }
+
+            if (!ValidationHelper.isNullOrEmpty(getMail().getClientFiduciary())) {
+                setSelectedClientFiduciaryId(getMail().getClientFiduciary().getId());
+            }
+
+            fillSelectedClientManagers();
             initOfficesList();
             if(!ValidationHelper.isNullOrEmpty(getSelectedClientManagers()) &&
                     ValidationHelper.isNullOrEmpty(getClientManagers())) {
                 setClientManagers(getSelectedClientManagers());
             }
-            setSelectedRequests(null);
 
-            if(!ValidationHelper.isNullOrEmpty(getMail())){
-                if(!ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
-                        !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox().getRequests())) {
-                    prepareTables(getMail().getRecievedInbox().getRequests());
-                    setSelectedRequests(getMail().getRecievedInbox().getRequests());
-                }else if (!ValidationHelper.isNullOrEmpty(getMail().getRequests())) {
-                    setSelectedRequests(getMail().getRequests());
-                    prepareTables(getMail().getRequests());
-                }
-            } else if(!ValidationHelper.isNullOrEmpty(getSelectedRequestIds())){
-                setSelectedRequests(DaoManager.load(Request.class, new Criterion[]{
-                        Restrictions.in("id", getSelectedRequestIds())
-                }));
-                prepareTables(getSelectedRequests());
+            setReferenceRequest(getMail().getReferenceRequest());
+
+            if(!ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
+                    !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox().getRequests())) {
+                prepareTables(getMail().getRecievedInbox().getRequests());
+            }else if (!ValidationHelper.isNullOrEmpty(getMail().getRequests())) {
+                prepareTables(getMail().getRequests());
             }
         } catch (Exception e) {
             LogHelper.log(log, e);
         }
+
     }
 
     private void prepareTables(List<Request> requests) throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
@@ -307,6 +276,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
 
             if (!ValidationHelper.isNullOrEmpty(clientInvoiceManageColumns)) {
                 for (ClientInvoiceManageColumn column : clientInvoiceManageColumns) {
+
                     columns.add(getColumnNameByField(column.getField()));
                 }
             }else {
@@ -317,69 +287,109 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             excelTableWrapper.setRequestName(entry.getKey().getName());
             excelTableWrapper.setColumnNames(columns);
             excelTableWrapper.setOriginalRequests(entry.getValue());
+            //excelTableWrapper.setRequests(entry.getValue());
             excelTableWrapper.setRequests(new ArrayList<>());
             Map<String, String> columnValues = new HashMap<>();
             Map<String, String> footerValues = new HashMap<>();
             CreateExcelRequestsReportHelper createExcelRequestsReportHelper = new CreateExcelRequestsReportHelper(true);
             int colIndex = -1;
             List<Request> newRequests = new ArrayList<>();
-            for(Request request : entry.getValue()) {
-                if (!ValidationHelper.isNullOrEmpty(request.getService())) {
-                    excelTableWrapper.getRequests().add(request);
-                    addColumnValues(request, columnValues,createExcelRequestsReportHelper);
-                    List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
-                            Restrictions.eq("requestId", request.getId())});
-                    Double result;
-                    for (ExtraCost cost : extraCost) {
-                        if(ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
-                            result = cost.getPrice();
-                            try {
-                                Request newRequest = request.reportCopy();
-                                newRequest.setTempId(UUID.randomUUID().toString());
-                                newRequest.setEstateFormalityList(request.getEstateFormalityList());
-                                newRequest.setEvasionDate(request.getEvasionDate());
-                                newRequests.add(newRequest);
-                                addColumnValues(newRequest, request.getService(), columnValues,
-                                        createExcelRequestsReportHelper,-1,result);
-                            } catch (CloneNotSupportedException e) {
-                                LogHelper.log(log, e);
-                            }
-                        }
-                    }
-                }else if (!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
-                    int index = 0;
-                    Double result = 0d;
-                    List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
-                            Restrictions.eq("requestId", request.getId())});
-                    for (ExtraCost cost : extraCost) {
-                        result += cost.getPrice();
-                        if(ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
-                            try {
-                                Request newRequest = request.copy();
-                                newRequest.setTempId(UUID.randomUUID().toString());
-                                newRequest.setEstateFormalityList(request.getEstateFormalityList());
-                                newRequest.setMultipleRequestId(request.getId());
-                                newRequests.add(newRequest);
-                                addColumnValues(newRequest, request.getService(), columnValues,
-                                        createExcelRequestsReportHelper,-1,result);
-                            } catch (CloneNotSupportedException e) {
-                                LogHelper.log(log, e);
-                            }
-                        }
-                    }
-                    for (Service service : request.getMultipleServices()) {
+            Map<Long, Request> nationalRequests = new HashMap<>();
+            for (Request request : entry.getValue()) {
+                List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
+                        Restrictions.eq("requestId", request.getId())});
+                Double result;
+                for (ExtraCost cost : extraCost) {
+                    if(ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
+                        result = cost.getPrice();
                         try {
-                            Request newRequest = request.copy();
+                            Request newRequest = request.reportCopy();
                             newRequest.setTempId(UUID.randomUUID().toString());
-                            newRequest.setMultipleRequestId(request.getId());
-                            newRequests.add(newRequest);
-                            addColumnValues(newRequest, service, columnValues,
-                                    createExcelRequestsReportHelper,index++,result);
+                            newRequest.setEstateFormalityList(request.getEstateFormalityList());
+                            newRequest.setEvasionDate(request.getEvasionDate());
+                            newRequest.setReferenceId(request.getId());
+                            newRequest.setResult(result);
+
+
+                            nationalRequests.put(request.getId(), newRequest);
+
                         } catch (CloneNotSupportedException e) {
                             LogHelper.log(log, e);
                         }
                     }
+                }
+            }
+            List<Long> processedIds = new ArrayList<>();
+            for (Map.Entry<Long, Request> nationalEntry : nationalRequests.entrySet()) {
+                Request nationalRequest = nationalRequests.get(nationalEntry.getKey());
+                addColumnValues(nationalRequest, nationalRequest.getService(), columnValues,
+                        createExcelRequestsReportHelper,-1,nationalRequest.getResult());
+                excelTableWrapper.getRequests().add(nationalRequest);
 
+                List<Request> matchedCfRequests = entry.getValue().
+                        stream()
+                        .filter(r -> !ValidationHelper.isNullOrEmpty(r.getFiscalCodeVATNamber()) &&
+                                r.getFiscalCodeVATNamber().equalsIgnoreCase(nationalRequest.getFiscalCodeVATNamber()))
+                        .collect(Collectors.toList());
+
+                for (Request request : matchedCfRequests) {
+                    if (!ValidationHelper.isNullOrEmpty(request.getService())) {
+                        excelTableWrapper.getRequests().add(request);
+                        addColumnValues(request, columnValues,createExcelRequestsReportHelper);
+                    }else if (!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
+                        int index = 0;
+                        Double result = 0d;
+                        List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
+                                Restrictions.eq("requestId", request.getId())});
+                        for (ExtraCost cost : extraCost) {
+                            result += cost.getPrice();
+                        }
+                        for (Service service : request.getMultipleServices()) {
+                            try {
+                                Request newRequest = request.copy();
+                                newRequest.setTempId(UUID.randomUUID().toString());
+                                newRequest.setReferenceId(request.getId());
+                                excelTableWrapper.getRequests().add(newRequest);
+                                addColumnValues(newRequest, service, columnValues,
+                                        createExcelRequestsReportHelper,index++,result);
+                            } catch (CloneNotSupportedException e) {
+                                LogHelper.log(log, e);
+                            }
+                        }
+
+                    }
+                    processedIds.add(request.getId());
+                }
+            }
+
+
+            for (Request request : entry.getValue()) {
+                if(!processedIds.contains(request.getId())){
+                    if (!ValidationHelper.isNullOrEmpty(request.getService())) {
+                        excelTableWrapper.getRequests().add(request);
+                        addColumnValues(request, columnValues,createExcelRequestsReportHelper);
+                    }else if (!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
+                        int index = 0;
+                        Double result = 0d;
+                        List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
+                                Restrictions.eq("requestId", request.getId())});
+                        for (ExtraCost cost : extraCost) {
+                            result += cost.getPrice();
+                        }
+                        for (Service service : request.getMultipleServices()) {
+                            try {
+                                Request newRequest = request.copy();
+                                newRequest.setTempId(UUID.randomUUID().toString());
+                                newRequest.setReferenceId(request.getId());
+                                excelTableWrapper.getRequests().add(newRequest);
+                                addColumnValues(newRequest, service, columnValues,
+                                        createExcelRequestsReportHelper,index++,result);
+                            } catch (CloneNotSupportedException e) {
+                                LogHelper.log(log, e);
+                            }
+                        }
+
+                    }
                 }
             }
             if(!ValidationHelper.isNullOrEmpty(newRequests)) {
@@ -402,18 +412,6 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                 footerValues.put(ResourcesHelper.getString("landRegistryRights"), result > 0 ? formatter.format(result) : "0.0");
             }
 
-            colIndex = getIndex(ResourcesHelper.getString("excelStamps"), CreateExcelRequestsReportHelper.getRequestsColumns());
-            if (colIndex > -1) {
-                result = getSumOfExtraCost(excelTableWrapper.getOriginalRequests(), ExtraCostType.MARCA);
-                footerValues.put(ResourcesHelper.getString("excelStamps"), result > 0 ? formatter.format(result) : "0.0");
-            }
-
-            colIndex = getIndex(ResourcesHelper.getString("excelPostalExpenses"), CreateExcelRequestsReportHelper.getRequestsColumns());
-            if (colIndex > -1) {
-                result = getSumOfExtraCost(excelTableWrapper.getOriginalRequests(), ExtraCostType.POSTALE);
-                footerValues.put(ResourcesHelper.getString("excelPostalExpenses"), result > 0 ? formatter.format(result) : "0.0");
-            }
-
             colIndex = getIndex(ResourcesHelper.getString("compensation"), CreateExcelRequestsReportHelper.getRequestsColumns());
             if (colIndex > -1) {
                 result = createExcelRequestsReportHelper.getSumOfCostPayServices(excelTableWrapper.getOriginalRequests());
@@ -423,11 +421,24 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             colIndex = getIndex(ResourcesHelper.getString("formalityTotal"), CreateExcelRequestsReportHelper.getRequestsColumns());
             if (colIndex > -1) {
                 result = createExcelRequestsReportHelper.getSumOfCostTotalServices(excelTableWrapper.getOriginalRequests());
-                footerValues.put(ResourcesHelper.getString("formalityTotal"), result > 0 ? formatter.format(result) : "0.0");
+                footerValues.put(ResourcesHelper.getString("formalityTotal"), result > 0 ? "\u20AC" + formatter.format(result) : "0.0");
             }
+
+            colIndex = getIndex(ResourcesHelper.getString("excelStamps"), CreateExcelRequestsReportHelper.getRequestsColumns());
+            if (colIndex > -1) {
+                result = createExcelRequestsReportHelper.getSumOfExtraCost(excelTableWrapper.getOriginalRequests(), ExtraCostType.MARCA);
+                footerValues.put(ResourcesHelper.getString("excelStamps"), result > 0 ? "\u20AC" + formatter.format(result) : "0.0");
+            }
+
+            colIndex = getIndex(ResourcesHelper.getString("excelPostalExpenses"), CreateExcelRequestsReportHelper.getRequestsColumns());
+            if (colIndex > -1) {
+                result = createExcelRequestsReportHelper.getSumOfExtraCost(excelTableWrapper.getOriginalRequests(), ExtraCostType.POSTALE);
+                footerValues.put(ResourcesHelper.getString("excelPostalExpenses"), result > 0 ? "\u20AC" + formatter.format(result) : "0.0");
+            }
+
             excelTableWrapper.setColumnValues(columnValues);
             excelTableWrapper.setFooterValues(footerValues);
-            getExcelDataTable().add(excelTableWrapper);
+            getDataTable().add(excelTableWrapper);
         }
     }
 
@@ -474,24 +485,14 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         if (colIndex > -1) {
             columnValues.put(getColumnName(ResourcesHelper.getString("landRegistryRights"),request), String.valueOf(getCostCadastralAndExtraCostRelated(request)));
         }
-
-        colIndex = getIndex(ResourcesHelper.getString("excelStamps"), CreateExcelRequestsReportHelper.getRequestsColumns());
-        if (colIndex > -1) {
-            columnValues.put(getColumnName(ResourcesHelper.getString("excelStamps"),request), String.valueOf(getExtraCostRelated(request, ExtraCostType.MARCA)));
-        }
-
-        colIndex = getIndex(ResourcesHelper.getString("excelPostalExpenses"), CreateExcelRequestsReportHelper.getRequestsColumns());
-        if (colIndex > -1) {
-            columnValues.put(getColumnName(ResourcesHelper.getString("excelPostalExpenses"),request), String.valueOf(getExtraCostRelated(request, ExtraCostType.POSTALE)));
-        }
-
         colIndex = getIndex(ResourcesHelper.getString("compensation"), CreateExcelRequestsReportHelper.getRequestsColumns());
         if (colIndex > -1) {
             columnValues.put(getColumnName(ResourcesHelper.getString("compensation"),request), ValidationHelper.isNullOrEmpty(request.getCostPay()) ? "0" : String.valueOf(request.getCostPay()));
         }
         colIndex = getIndex(ResourcesHelper.getString("formalityTotal"), CreateExcelRequestsReportHelper.getRequestsColumns());
         if (colIndex > -1) {
-            columnValues.put(getColumnName(ResourcesHelper.getString("formalityTotal"),request), ValidationHelper.isNullOrEmpty(request.getTotalCost()) ? "0" : request.getTotalCost().replaceAll(",", "."));
+            columnValues.put(getColumnName(ResourcesHelper.getString("formalityTotal"),request),
+                    ValidationHelper.isNullOrEmpty(request.getTotalCost()) ? "\u20AC" : "\u20AC" + request.getTotalCost().replaceAll(",", "."));
         }
         colIndex = getIndex(ResourcesHelper.getString("excelNote"), CreateExcelRequestsReportHelper.getRequestsColumns());
         if (colIndex > -1) {
@@ -689,10 +690,15 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                     result += createExcelRequestsReportHelper.getCostEstateFormality(request, service, billingClient, restrictionForPriceList);
                     result += createExcelRequestsReportHelper.getCostPay(request, service, billingClient, restrictionForPriceList);
                     result = (double) Math.round((result)* 100000d) / 100000d;
-                    columnValues.put(getColumnName(ResourcesHelper.getString("formalityTotal"),request,service), String.valueOf(result));
+                    if(result > 0){
+                        columnValues.put(getColumnName(ResourcesHelper.getString("formalityTotal"),request,service), "\u20AC" + result);
+                    }
+
                 }
             }else {
-                columnValues.put(getColumnName(ResourcesHelper.getString("formalityTotal"),request,service), String.valueOf(extraCost));
+                if(extraCost > 0){
+                    columnValues.put(getColumnName(ResourcesHelper.getString("formalityTotal"),request,service), "\u20AC" + extraCost);
+                }
             }
 
         }
@@ -702,7 +708,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                 if(extraCost > 0)
                     columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request,service),"Costo aggiuntivo: " + extraCost);
             }else if(index != -1){
-                if(ValidationHelper.isNullOrEmpty(request.getCostNote())) {
+                if(ValidationHelper.isNullOrEmpty(request.getCostNote())){
                     String note = "";
                     boolean isAdded = Boolean.FALSE;
                     List<Document> requestDocuments = DaoManager.load(Document.class,
@@ -728,7 +734,8 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                     requestNote = requestNote.replaceAll("(?i)<br\\p{javaSpaceChar}*(?:/>|>)", "\n");
                     note = note.trim().isEmpty() ? requestNote : note.concat(" ").concat(requestNote);
                     columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request,service),note);
-                } else
+                }
+                else
                     columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request,service),request.getCostNote());
             }else {
                 columnValues.put(getColumnName(ResourcesHelper.getString("excelNote"),request,service),"nazionale positiva");
@@ -871,37 +878,6 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         return result;
     }
 
-    public Double getSumOfExtraCost(List<Request> requests, ExtraCostType extraCostType) throws PersistenceBeanException, IllegalAccessException {
-        Double result = 0d;
-        for (Request request : requests) {
-            List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
-                    Restrictions.eq("requestId", request.getId()),
-                    Restrictions.eq("type", extraCostType)});
-
-            if (!ValidationHelper.isNullOrEmpty(extraCosts)) {
-                for (ExtraCost cost : extraCosts) {
-                    result += cost.getPrice();
-                }
-            }
-        }
-        return result;
-    }
-
-    protected Double getExtraCostRelated(Request request, ExtraCostType extraCostType) throws PersistenceBeanException, IllegalAccessException {
-        Double result = 0d;
-
-        List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
-                Restrictions.eq("requestId", request.getId()),
-                Restrictions.eq("type", extraCostType)});
-
-        if (!ValidationHelper.isNullOrEmpty(extraCosts)) {
-            for (ExtraCost cost : extraCosts) {
-                result += cost.getPrice();
-            }
-        }
-        return result.equals(0d) ? result : Math.round(result * 100000d) / 100000d;
-    }
-
     private String getColumnName(String columnName, Request request) {
         return columnName + "_" + request.getTempId();
     }
@@ -1000,101 +976,88 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             }
 
             List<Request> recievedInboxRequests = null;
-            if(!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
+            if(!ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
                     !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox().getRequests())) {
                 recievedInboxRequests = getMail().getRecievedInbox().getRequests();
             }
-            if ((!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getRequests())) ||
-                    !ValidationHelper.isNullOrEmpty(recievedInboxRequests)
-                    || !ValidationHelper.isNullOrEmpty(getSelectedRequests())) {
-                if(!ValidationHelper.isNullOrEmpty(getMail())){
-                    getMail().setNdg(excelDataWrapper.getNdg());
-                    getMail().setReferenceRequest(excelDataWrapper.getReferenceRequest());
-                    getMail().setClient(DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()));
 
-                    if (!ValidationHelper.isNullOrEmpty(getSelectedNotManagerOrFiduciaryClientId())) {
-                        getMail().setClient(DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()));
-                    } else {
-                        List<String> onlyEmails = MailHelper.getOnlyEmails(getMail().getEmailFrom());
-                        if (!ValidationHelper.isNullOrEmpty(onlyEmails)) {
-                            List<Client> clientList = DaoManager.load(Client.class,
-                                    new CriteriaAlias[]{
-                                            new CriteriaAlias("emails", "email", JoinType.INNER_JOIN)},
-                                    new Criterion[]{
-                                            Restrictions.in("email.email", onlyEmails),
-                                            Restrictions.or(Restrictions.eq("manager", Boolean.FALSE),
-                                                    Restrictions.isNull("manager")),
-                                            Restrictions.or(Restrictions.eq("fiduciary", Boolean.FALSE),
-                                                    Restrictions.isNull("fiduciary"))});
-                            if(clientList != null && clientList.size() > 0) {
-                                getMail().setClient(clientList.get(0));
-                            }else {
-                                getMail().setClient(null);
-                            }
+
+
+            if (!ValidationHelper.isNullOrEmpty(getMail().getRequests()) ||
+                    !ValidationHelper.isNullOrEmpty(recievedInboxRequests)) {
+                getMail().setNdg(excelDataWrapper.getNdg());
+                getMail().setReferenceRequest(excelDataWrapper.getReferenceRequest());
+                getMail().setClient(DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()));
+
+                if (!ValidationHelper.isNullOrEmpty(getSelectedNotManagerOrFiduciaryClientId())) {
+                    getMail().setClient(DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()));
+                } else {
+                    List<String> onlyEmails = MailHelper.getOnlyEmails(getMail().getEmailFrom());
+                    if (!ValidationHelper.isNullOrEmpty(onlyEmails)) {
+                        List<Client> clientList = DaoManager.load(Client.class,
+                                new CriteriaAlias[]{
+                                        new CriteriaAlias("emails", "email", JoinType.INNER_JOIN)},
+                                new Criterion[]{
+                                        Restrictions.in("email.email", onlyEmails),
+                                        Restrictions.or(Restrictions.eq("manager", Boolean.FALSE),
+                                                Restrictions.isNull("manager")),
+                                        Restrictions.or(Restrictions.eq("fiduciary", Boolean.FALSE),
+                                                Restrictions.isNull("fiduciary"))});
+                        if(clientList != null && clientList.size() > 0) {
+                            getMail().setClient(clientList.get(0));
                         }else {
                             getMail().setClient(null);
                         }
+                    }else {
+                        getMail().setClient(null);
                     }
-                    if (!ValidationHelper.isNullOrEmpty(getExcelClientInvoiceId())) {
-                        getMail().setClientInvoice(DaoManager.get(Client.class, getExcelClientInvoiceId()));
-                    } else {
-                        getMail().setClientInvoice(null);
-                    }
+                }
+
+                if (!ValidationHelper.isNullOrEmpty(getExcelClientInvoiceId())) {
+                    getMail().setClientInvoice(DaoManager.get(Client.class, getExcelClientInvoiceId()));
+                } else {
+                    getMail().setClientInvoice(null);
                 }
 
                 if (!ValidationHelper.isNullOrEmpty(getSelectedOfficeId())) {
-                    if(!ValidationHelper.isNullOrEmpty(getMail()))
-                        getMail().setOffice(DaoManager.get(Office.class, getSelectedOfficeId()));
+                    getMail().setOffice(DaoManager.get(Office.class, getSelectedOfficeId()));
                     excelDataWrapper.setOffice(getMail().getOffice().getDescription());
                 } else {
-                    if(!ValidationHelper.isNullOrEmpty(getMail()))
-                        getMail().setOffice(null);
+                    getMail().setOffice(null);
                     excelDataWrapper.setOffice(null);
                 }
 
-                if (!ValidationHelper.isNullOrEmpty(getMail())){
-                    if (!ValidationHelper.isNullOrEmpty(getSelectedClientManagers())) {
-                        getMail().setManagers(new ArrayList<>());
-                        List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
-                                Restrictions.in("id", getSelectedClientManagers().stream()
-                                        .map(SelectItemWrapper::getId).collect(Collectors.toList()))});
-                        if (!ValidationHelper.isNullOrEmpty(clients)) {
-                            getMail().setManagers(clients);
-                        }
-                    }else {
-                        getMail().setManagers(null);
+                if (!ValidationHelper.isNullOrEmpty(getSelectedClientManagers())) {
+                    getMail().setManagers(new ArrayList<>());
+                    List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
+                            Restrictions.in("id", getSelectedClientManagers().stream()
+                                    .map(SelectItemWrapper::getId).collect(Collectors.toList()))});
+                    if (!ValidationHelper.isNullOrEmpty(clients)) {
+                        getMail().setManagers(clients);
                     }
-
-                    if (!ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
-                        getMail().setClientFiduciary(DaoManager.get(Client.class, getSelectedClientFiduciaryId()));
-                    } else {
-                        getMail().setClientFiduciary(null);
-                    }
-
-                    DaoManager.save(getMail(), true);
-
-                    Document document = DaoManager.get(Document.class, new Criterion[]{
-                            Restrictions.eq("mail.id", getMailId())});
-                    if(!ValidationHelper.isNullOrEmpty(document)) {
-                        document.setInvoiceNumber(excelDataWrapper.getFatturan());
-                        document.setInvoiceDate(excelDataWrapper.getData());
-                        DaoManager.save(document, true);
-                    }
+                }else {
+                    getMail().setManagers(null);
                 }
-                List<Request> requests = null;
 
-                if(!ValidationHelper.isNullOrEmpty(recievedInboxRequests)){
-                    requests = recievedInboxRequests;
-                }else if(!ValidationHelper.isNullOrEmpty(getMail())){
-                    requests = getMail().getRequests();
-                }else if(!ValidationHelper.isNullOrEmpty(getSelectedRequests())){
-                    requests = getSelectedRequests();
+                if (!ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
+                    getMail().setClientFiduciary(DaoManager.get(Client.class, getSelectedClientFiduciaryId()));
+                } else {
+                    getMail().setClientFiduciary(null);
                 }
-                List<Request> filteredRequests  = emptyIfNull(requests).stream().filter(
-                        r->r.isDeletedRequest()).collect(Collectors.toList());
+
+                DaoManager.save(getMail(), true);
+
+                Document document = DaoManager.get(Document.class, new Criterion[]{
+                        Restrictions.eq("mail.id", getMailId())});
+                if(!ValidationHelper.isNullOrEmpty(document)) {
+                    document.setInvoiceNumber(excelDataWrapper.getFatturan());
+                    document.setInvoiceDate(excelDataWrapper.getData());
+                    DaoManager.save(document, true);
+                }
+                List<Request> requests = !ValidationHelper.isNullOrEmpty(recievedInboxRequests) ? recievedInboxRequests : getMail().getRequests();
+                List<Request> filteredRequests  = emptyIfNull(requests).stream().filter(r->r.isDeletedRequest()).collect(Collectors.toList());
                 Collections.sort(filteredRequests, Comparator.comparing(r -> r.getSubject().getId()));
-                excelFile = new CreateExcelRequestsReportHelper(true).convertMailUserDataToExcel(
-                        filteredRequests, document,excelDataWrapper);
+                excelFile = new CreateExcelRequestsReportHelper(true).convertMailUserDataToExcel(filteredRequests, document,excelDataWrapper);
             }
         } catch (Exception e) {
             LogHelper.log(log, e);
@@ -1110,17 +1073,6 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                 FileHelper.sendFile("costs.xls", excelFile);
             }
             log.info("Leaving generateXlsRequestCost");
-
-            Optional evadedRequest = getSelectedRequests()
-                    .stream().filter(r -> !ValidationHelper.isNullOrEmpty(r.getStateId()) && !r.getStateId().equals(RequestState.EVADED.getId()))
-                    .findFirst();
-            if(!evadedRequest.isPresent()){
-                if(!ValidationHelper.isNullOrEmpty(getDocument())
-                        && !ValidationHelper.isNullOrEmpty(getDocument().getComplete())) {
-                    getDocument().setComplete(true);
-                    DaoManager.save(getDocument(), true);
-                }
-            }
         } catch (Exception e) {
             LogHelper.log(log, e);
         }
@@ -1175,17 +1127,14 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                     .filter(c -> (c.getFiduciary() != null && c.getFiduciary()))
                     .collect(Collectors.toList()), true));
 
-            if(!ValidationHelper.isNullOrEmpty(getSelectedNotManagerOrFiduciaryClientId())){
-                List<Office> offices = DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()).getOffices();
-                if (!ValidationHelper.isNullOrEmpty(offices)) {
-                    setOfficeList(ComboboxHelper.fillList(offices.stream()
-                            .sorted(Comparator.comparing(Dictionary::getDescription))
-                            .collect(Collectors.toList()), true));
-                } else {
-                    setOfficeList(Collections.singletonList(SelectItemHelper.getNotSelected()));
-                }
+            List<Office> offices = DaoManager.get(Client.class, getSelectedNotManagerOrFiduciaryClientId()).getOffices();
+            if (!ValidationHelper.isNullOrEmpty(offices)) {
+                setOfficeList(ComboboxHelper.fillList(offices.stream()
+                        .sorted(Comparator.comparing(Dictionary::getDescription))
+                        .collect(Collectors.toList()), true));
+            } else {
+                setOfficeList(Collections.singletonList(SelectItemHelper.getNotSelected()));
             }
-
             List<Client> invoiceClients = new ArrayList<Client>();
             for(Client client : clientList) {
                 if(!client.getId().equals(getSelectedNotManagerOrFiduciaryClientId())) {
@@ -1206,13 +1155,14 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         }
     }
 
+
     public void updateComboboxes() throws PersistenceBeanException, IllegalAccessException {
         List<Client> clientList = DaoManager.load(Client.class, new Criterion[]{
                 Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
                         Restrictions.isNull("deleted"))})
                 .stream().sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList());
 
-        List<Client> invoiceClients = new ArrayList<>();
+        List<Client> invoiceClients = new ArrayList<Client>();
         for(Client client : clientList) {
             if(!client.getId().equals(getSelectedNotManagerOrFiduciaryClientId())) {
                 continue;
@@ -1226,45 +1176,35 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         setFiduciaryClientsList(ComboboxHelper.fillList(clientList.stream()
                 .filter(c -> c.getFiduciary() != null && c.getFiduciary()).collect(Collectors.toList()), true));
 
-        Client selectedClient = null;
-        if(!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getClient())){
-            selectedClient = getMail().getClient();
-        }else if(!ValidationHelper.isNullOrEmpty(getSelectedRequestClient()))
-            selectedClient = getSelectedRequestClient();
-
-        if(!ValidationHelper.isNullOrEmpty(selectedClient) && !ValidationHelper.isNullOrEmpty(selectedClient.getTypeId())) {
+        if(!ValidationHelper.isNullOrEmpty(getMail().getClient()) &&
+                !ValidationHelper.isNullOrEmpty(getMail().getClient().getTypeId())) {
             List<Client> notManagerOrFiduciaryClients = clientList.stream()
                     .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
                     .collect(Collectors.toList());
-            if(!ValidationHelper.isNullOrEmpty(getMail())){
-                setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(notManagerOrFiduciaryClients.stream()
-                        .filter(c -> Objects.nonNull(c))
-                        .filter(c -> (c.getTypeId().equals(getMail().getClient().getTypeId())))
-                        .collect(Collectors.toList()), true));
-            }else {
-                if(!ValidationHelper.isNullOrEmpty(getMail())){
-                    setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(notManagerOrFiduciaryClients.stream()
-                            .filter(c -> Objects.nonNull(c))
-                            .filter(c -> (c.getTypeId().equals(getSelectedRequestClient().getTypeId())))
-                            .collect(Collectors.toList()), true));
-                }
-            }
+
+            setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(notManagerOrFiduciaryClients.stream()
+                    .filter(c -> Objects.nonNull(c))
+                    .filter(c -> (c.getTypeId().equals(getMail().getClient().getTypeId())))
+                    .collect(Collectors.toList()), true));
         }else {
             setNotManagerOrFiduciaryClients(ComboboxHelper.fillList(clientList.stream()
                     .filter(c -> Objects.nonNull(c))
                     .filter(c -> (c.getFiduciary() == null || !c.getFiduciary()) && (c.getManager() == null || !c.getManager()))
                     .collect(Collectors.toList()), true));
         }
-        if (!ValidationHelper.isNullOrEmpty(selectedClient) &&
+
+        if (!ValidationHelper.isNullOrEmpty(getMail().getClient()) &&
                 !ValidationHelper.isNullOrEmpty(getSelectedNotManagerOrFiduciaryClientId())) {
-            SelectItemHelper.addItemToListIfItIsNotInIt(getNotManagerOrFiduciaryClients(), selectedClient);
+            SelectItemHelper.addItemToListIfItIsNotInIt(getNotManagerOrFiduciaryClients(), getMail().getClient());
         }
-        if (!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getExcelClientInvoiceId())) {
+        if (!ValidationHelper.isNullOrEmpty(getExcelClientInvoiceId())) {
             SelectItemHelper.addItemToListIfItIsNotInIt(getInvoiceClients(), getMail().getClientInvoice());
         }
-        if (!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
+
+        if (!ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
             SelectItemHelper.addItemToListIfItIsNotInIt(getInvoiceClients(), getMail().getClientFiduciary());
         }
+
         if (getSelectedNotManagerOrFiduciaryClientId() != null) {
             setClientManagers(ComboboxHelper.fillWrapperList( emptyIfNull(clientList)
                     .stream()
@@ -1277,6 +1217,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         }
 
         getClientSelectItemWrapperConverter().setWrapperList(new ArrayList<>(getClientManagers()));
+
         if (!ValidationHelper.isNullOrEmpty(getSelectedClientManagers())) {
             addClientToManagerListIfHeIsNotInIt();
         }
@@ -1352,10 +1293,9 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             reCalculate = false;
         }
         getCostManipulationHelper().viewExtraCost(getExamRequest(), reCalculate);
+
     }
 
-    public void updateButtonPanel() {
-    }
 
     protected Double getExtraCostRelated(Long requestId, ExtraCostType extraCostType) throws PersistenceBeanException, IllegalAccessException {
         Double result = 0d;
@@ -1371,6 +1311,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         }
         return result.equals(0d) ? result : Math.round(result * 100000d) / 100000d;
     }
+
 
     private int getIndex(String columnName, String[] columns) {
         return Arrays.asList(columns).indexOf(columnName);
@@ -1532,6 +1473,14 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         this.requests = requests;
     }
 
+    public List<ExcelTableWrapper> getDataTable() {
+        return dataTable;
+    }
+
+    public void setDataTable(List<ExcelTableWrapper> dataTable) {
+        this.dataTable = dataTable;
+    }
+
     public Date getExcelDate() {
         return excelDate;
     }
@@ -1553,6 +1502,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
     }
 
     public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+
         setCostNote(null);
         setCostManipulationHelper(new CostManipulationHelper());
         Request request =DaoManager.get(Request.class, getRequestId());
@@ -1570,6 +1520,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             }
         }
         getCostManipulationHelper().setMortgageTypeList(ComboboxHelper.fillList(MortgageType.class, false, false));
+        System.out.println(">>>>>>>>>>" + getExamRequest().getCostNote());
         if(ValidationHelper.isNullOrEmpty(getExamRequest().getCostNote())) {
             try {
                 List<Document> requestDocuments = DaoManager.load(Document.class,
@@ -1584,12 +1535,13 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                         isAdded = Boolean.TRUE;
                     }
                 }
+                System.out.println(isAdded + "<><><><> " + getExamRequest().getUnauthorizedQuote());
                 if(!isAdded && getExamRequest().getAuthorizedQuote()!= null
                         && getExamRequest().getAuthorizedQuote()){
                     costNote = "Preventivo autorizzato";
                 }
-                if(!isAdded && getExamRequest().getUnauthorizedQuote()!=null
-                        && getExamRequest().getUnauthorizedQuote()){
+                if(!isAdded && getExamRequest().getUnauthorizedQuote() != null
+                        &&  getExamRequest().getUnauthorizedQuote()){
                     costNote = "Preventivo non autorizzato";
                 }
                 costNote = ValidationHelper.isNullOrEmpty(costNote) ? new CreateExcelRequestsReportHelper().generateCorrectNote(getExamRequest()) : costNote.concat(" ").concat(new CreateExcelRequestsReportHelper().generateCorrectNote(getExamRequest()));
@@ -1598,13 +1550,13 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             }
         }else
             setCostNote(getExamRequest().getCostNote());
-
         getCostManipulationHelper().viewExtraCost(getExamRequest(), recalculate);
-        setExcelDataTable(new ArrayList<>());
-        if(!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
+
+        setDataTable(new ArrayList<>());
+        if(!ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
                 !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox().getRequests())) {
             prepareTables(getMail().getRecievedInbox().getRequests());
-        }else if (!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getRequests())) {
+        }else if (!ValidationHelper.isNullOrEmpty(getMail().getRequests())) {
             prepareTables(getMail().getRequests());
         }
     }
@@ -1658,53 +1610,6 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         }
     }
 
-    public void createInvoice() throws Exception {
-        List<Request> selectedRequestList = new ArrayList<>();
-        if (!ValidationHelper.isNullOrEmpty(getRequestsConsideredForInvoice())) {
-            selectedRequestList = getRequestsConsideredForInvoice().stream()
-                    .filter(r -> r.isSelectedForInvoice())
-                    .collect(Collectors.toList());
-        }
-
-        Invoice invoice = new Invoice();
-        if(selectedRequestList.size() > 0) {
-            if(!ValidationHelper.isNullOrEmpty(getMail())
-                    && !ValidationHelper.isNullOrEmpty(getMail().getClientInvoice()))
-                invoice.setClient(getMail().getClientInvoice());
-            else
-                throw new Exception("Client invoice is null, Can't create invoice");
-        }
-        getInvoiceDialogBean().setSelectedInvoiceClient(invoice.getClient());
-        invoice.setDate(new Date());
-        invoice.setStatus(InvoiceStatus.DRAFT);
-        invoice.setEmailFrom(getMail());
-        getInvoiceDialogBean().setSelectedInvoiceItems(InvoiceHelper.groupingItemsByTaxRate(selectedRequestList, ""));
-        getInvoiceDialogBean().setInvoicedRequests(selectedRequestList);
-        invoice.setTotalGrossAmount(getInvoiceDialogBean().getTotalGrossAmount());
-        getInvoiceDialogBean().setEntity(getMail());
-        getInvoiceDialogBean().loadInvoiceDialogData(invoice);
-        executeJS("PF('invoiceDialogExcelWV').show();");
-    }
-
-    public void setMaxInvoiceNumber() throws HibernateException {
-        LocalDate currentdate = LocalDate.now();
-        int currentYear = currentdate.getYear();
-
-        Long lastInvoiceNumber = 0l;
-        try {
-            lastInvoiceNumber = (Long) DaoManager.getMax(Invoice.class, "id",
-                    new Criterion[]{});
-        } catch (PersistenceBeanException | IllegalAccessException e) {
-            LogHelper.log(log, e);
-        }
-        if(lastInvoiceNumber == null)
-            lastInvoiceNumber = 0l;
-        String invoiceNumber = (lastInvoiceNumber + 1) + "-" + currentYear + "-FE";
-        getInvoiceDialogBean().setInvoiceNumber(invoiceNumber);
-        getInvoiceDialogBean().setNumber(lastInvoiceNumber + 1);
-    }
-
-
     public void deleteExtraCost(ExtraCost extraCostToDelete) {
         getCostManipulationHelper().getRequestExtraCosts().remove(extraCostToDelete);
         getCostManipulationHelper().setIncludeNationalCost(null);
@@ -1712,24 +1617,6 @@ public class ExcelDataEdit extends BaseEntityPageBean {
 
     public void addExtraCost(String extraCostValue) {
         getCostManipulationHelper().addExtraCost(extraCostValue, getRequestId());
-    }
-
-    public void prepareInvoiceData() {
-        setRequestsConsideredForInvoice(new ArrayList<>());
-        List<Request> requestListForInvoice =
-                getSelectedRequests()
-                        .stream()
-                        .filter(x ->
-                                x.isDeletedRequest() && ValidationHelper.isNullOrEmpty(x.getInvoice()) &&
-                                        !ValidationHelper.isNullOrEmpty(x.getStateId()) &&
-                                        (RequestState.EVADED.getId().equals(x.getStateId())))
-                        .collect(Collectors.toList());
-        if(!ValidationHelper.isNullOrEmpty(requestListForInvoice)) {
-            requestListForInvoice.stream().forEach(r -> {
-                r.setSelectedForInvoice(true);
-            });
-            setRequestsConsideredForInvoice(requestListForInvoice);
-        }
     }
 
     public Request getExamRequest() {
@@ -1759,20 +1646,11 @@ public class ExcelDataEdit extends BaseEntityPageBean {
     public void setRequestId(Long requestId) {
         this.requestId = requestId;
     }
-
     public Boolean getShowRequestCost() {
         return showRequestCost;
     }
 
     public void setShowRequestCost(Boolean showRequestCost) {
         this.showRequestCost = showRequestCost;
-    }
-
-    public List<ExcelTableWrapper> getExcelDataTable() {
-        return excelDataTable;
-    }
-
-    public void setExcelDataTable(List<ExcelTableWrapper> excelDataTable) {
-        this.excelDataTable = excelDataTable;
     }
 }

@@ -47,7 +47,7 @@
         </p:panelGrid>
         <p:panel>
             <p:dataTable value="#{bean.landOmiValueList}" var="item" id="landOmiValue" style="margin-top: 10px"
-                         rowIndexVar="index" emptyMessage="#{msg.noRecordsFound}">
+                         rowIndexVar="index">
                 <p:column styleClass="action_column">
                     <p:commandButton action="#{bean.deleteLandOmiValue}" update="landOmiValue"
                                      icon="fa fa-fw fa-close">
@@ -72,6 +72,17 @@
             </p:dataTable>
         </p:panel>
 
+        <p:dialog widgetVar="duplicateLandOmiDialogWV"
+                  id="duplicateLandOmiDialogid" modal="true" draggable="false"
+                  position="center center">
+            <div class="ui-messages-error ui-corner-all">
+                <span class="ui-messages-error-summary">#{bean.duplicateCityError}</span><br/>
+            </div>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" oncomplete="PF('duplicateLandOmiDialogWV').hide();"/>
+            </div>
+        </p:dialog>
     </ui:define>
+
 
 </ui:composition>

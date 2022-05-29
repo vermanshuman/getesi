@@ -6,10 +6,8 @@
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
 
-    <span>#{enums.manageTypeFieldsPROPERTY_DATA}
-        <h:panelGroup rendered="#{not empty block}" style="#{block.isRequired()?'':'display:none;'}">*</h:panelGroup>
-        <h:panelGroup rendered="#{not empty item and not empty item.field}" style="#{item.field.isRequired()?'':'display:none;'}">*</h:panelGroup>
-    </span>
+    <span>#{enums.manageTypeFieldsPROPERTY_DATA}<span class="red"
+                                                      style="#{item.field.isRequired()?'':'display:none;'}">*</span></span>
     <p:panel id="PROPERTY_DATA" style="background: transparent; border: none">
 
         <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" layout="grid" style="width: 100%;">

@@ -302,12 +302,6 @@ public class UserWrapper implements Serializable {
                 this.getFirstName() == null ? "" : this.getFirstName());
     }
 
-    public String getFullReverseName() {
-        return String.format("%s %s",
-                this.getFirstName() == null ? "" : this.getFirstName(),
-                this.getLastName() == null ? "" : this.getLastName());
-    }
-
     public String getLastName() {
         return lastName;
 

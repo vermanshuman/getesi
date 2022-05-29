@@ -60,7 +60,7 @@ public class VisureRTFBindingWrapper extends BaseTab implements Serializable {
     }
 
     @Override
-    public Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+    Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
         return DaoManager.getCount(VisureRTF.class, "id", new Criterion[]{
                 Restrictions.eq("fiscalCodeVat", getSubject().getFiscalCodeVATNamber())});
     }

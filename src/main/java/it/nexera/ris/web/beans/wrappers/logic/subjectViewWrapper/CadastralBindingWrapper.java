@@ -87,8 +87,9 @@ public class CadastralBindingWrapper extends BaseTab implements Serializable {
         commandButton.setActionExpression(createMethodExpression(String.format("#{subjectBean.%s}",
                 "downloadPropertyPDF(tableVar.document.id)"), new Class[]{Long.class}));
         commandButton.setAjax(false);
-        commandButton.setIcon("fa fa-fw fa-file-pdf-o red-file icon-align");
-        columns.add(getButtonColumn("subjectViewCadastralPDF", commandButton, "", "action_column"));
+        commandButton.setIcon("fa fa-fw fa-file-pdf-o");
+        columns.add(getButtonColumn("subjectViewCadastralPDF", commandButton));
+
         columns.add(getTextColumn("subjectViewCadastralNote", null));
         return columns;
     }
@@ -102,7 +103,7 @@ public class CadastralBindingWrapper extends BaseTab implements Serializable {
     }
 
     @Override
-    public Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+    Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
         return DaoManager.getCount(DocumentSubject.class, "id", new Criterion[]{
                 Restrictions.in("subject.id", getListIds()),
                 Restrictions.eq("type", getType())

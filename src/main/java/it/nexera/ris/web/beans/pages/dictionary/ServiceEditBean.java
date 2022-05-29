@@ -68,7 +68,7 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
     private Boolean salesDevelopment;
 
     private Boolean landOmi;
-    
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
@@ -158,7 +158,6 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
         this.setReferenceItems(ComboboxHelper.fillList(ServiceReferenceTypes.class, true));
 
         executeJS("setIcon();");
-
         setSalesDevelopment(this.getEntity().getSalesDevelopment());
         setLandOmi(this.getEntity().getLandOmi());
     }
@@ -265,7 +264,6 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
         }else {
             this.getEntity().setLandOmi(null);
         }
-
         DaoManager.save(this.getEntity());
     }
 

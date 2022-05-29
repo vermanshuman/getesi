@@ -6,7 +6,7 @@
     <groupId>it.nexera</groupId>
     <artifactId>getesi</artifactId>
     <packaging>war</packaging>
-    <version>2.1.23</version>
+    <version>1.0.93</version>
     <name>getesi Maven Webapp</name>
 
     <properties>
@@ -667,20 +667,12 @@
             <version>1.10.2</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>poseidon-theme-1.0.0.</groupId>-->
-<!--            <artifactId>poseidon-theme</artifactId>-->
-<!--            <version>1.0.0.</version>-->
-<!--            <scope>system</scope>-->
-<!--            <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/poseidon-theme-1.0.0.jar</systemPath>-->
-<!--        </dependency>-->
-
         <dependency>
-            <groupId>org.primefaces</groupId>
-            <artifactId>babylon</artifactId>
-            <version>4.0.0</version>
+            <groupId>poseidon-theme-1.0.0.</groupId>
+            <artifactId>poseidon-theme</artifactId>
+            <version>1.0.0.</version>
             <scope>system</scope>
-            <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/babylon-theme-4.0.0.jar</systemPath>
+            <systemPath>${basedir}/src/main/webapp/WEB-INF/lib/poseidon-theme-1.0.0.jar</systemPath>
         </dependency>
 
         <dependency>
@@ -786,11 +778,10 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <version>2.0.26</version>
+            <groupId>org.w3c</groupId>
+            <artifactId>dom</artifactId>
+            <version>2.3.0-jaxb-1.0.6</version>
         </dependency>
-
     </dependencies>
 
     <build>

@@ -268,15 +268,6 @@ public class Client extends IndexedEntity implements Serializable {
     @Column(name = "address_SDI")
     private String addressSDI;
 
-    @Column(name = "unauthorized_cost_pay")
-    private Double unauthorizedCostPay;
-
-    @Column(name = "unauthorized_cost_cadastral")
-    private Double unauthorizedCostCadastral;
-
-    @Column(name = "unauthorized_cost_formality")
-    private Double unauthorizedCostFormality;
-
     @Override
     public String toString() {
         if (ClientType.PROFESSIONAL.getId().equals(getTypeId())) {
@@ -870,29 +861,5 @@ public class Client extends IndexedEntity implements Serializable {
 
     public void setAddressSDI(String addressSDI) {
         this.addressSDI = addressSDI;
-    }
-
-    public Double getUnauthorizedCostPay() {
-        return unauthorizedCostPay;
-    }
-
-    public void setUnauthorizedCostPay(Double unauthorizedCostPay) {
-        this.unauthorizedCostPay = unauthorizedCostPay;
-    }
-
-    public Double getUnauthorizedCostCadastral() {
-        return unauthorizedCostCadastral;
-    }
-
-    public void setUnauthorizedCostCadastral(Double unauthorizedCostCadastral) {
-        this.unauthorizedCostCadastral = unauthorizedCostCadastral;
-    }
-
-    public Double getUnauthorizedCostFormality() {
-        return unauthorizedCostFormality;
-    }
-
-    public void setUnauthorizedCostFormality(Double unauthorizedCostFormality) {
-        this.unauthorizedCostFormality = unauthorizedCostFormality;
     }
 }

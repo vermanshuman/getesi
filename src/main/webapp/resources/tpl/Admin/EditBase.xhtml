@@ -6,20 +6,9 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
 >
-<ui:composition template="/resources/tpl/Admin/template.xhtml">
+<ui:composition template="/resources/tpl/Admin/Main.xhtml">
 
-    <ui:define name="viewname">
-        <li>
-            <p:link outcome="#{bean.currentPage.page}">#{page_header}</p:link>
-        </li>
-    </ui:define>
-
-    <ui:define name="content">
-        <style>
-            .card {
-                border: none;
-            }
-        </style>
+    <ui:define name="body">
 
         <div class="ui-g">
             <div class="ui-g-12">
@@ -41,19 +30,18 @@
                                                 <ui:insert name="additional_buttons"></ui:insert>
 
                                                 <p:commandButton id="save_btn" onclick="#{save_onclick}"
-                                                                 action="#{bean.pageSave}"
-                                                                 style="margin-top: 10px"
+                                                                 action="#{bean.pageSave}" immediate="#{empty skipValidate ? false : true}"
                                                                  rendered="#{empty showSave ? true : showSave}"
                                                                  disabled="#{empty disableSave ? false : disableSave}"
                                                                  value="#{empty save_button_text ? msg.save : save_button_text}"
-                                                                 oncomplete="#{save_oncomplete}" icon="pi pi-save"
+                                                                 oncomplete="#{save_oncomplete}" icon="ui-icon-disk"
                                                                  update=":form, #{save_update}, messages"
-                                                                 styleClass="#{saveButtonStyle} p-mr-2 p-mb-2 ui-button-success"/>
+                                                                 styleClass="#{saveButtonStyle}"/>
 
-                                                <p:commandButton id="cancel_btn" action="#{bean.goBack}" styleClass="p-mr-2 p-mb-2 ui-button-danger"
+                                                <p:commandButton id="cancel_btn" action="#{bean.goBack}"
                                                                  rendered="#{empty showCancel ? true : showCancel}"
                                                                  value="#{empty customCancelMsg ? msg.cancel : customCancelMsg}"
-                                                                 icon="pi pi-times-circle" style="background-color: #F3362B !important; width: 100px;"/>
+                                                                 icon="ui-icon-circle-close"/>
 
                                                 <p:commandButton value="#{msg.setDefault}"
                                                                  rendered="#{!empty showDefaultBtn}"

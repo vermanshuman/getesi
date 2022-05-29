@@ -3,21 +3,17 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 template="/resources/tpl/Admin/EditBase.xhtml">
     <ui:param name="edit_title" value="#{msg.omiValuationDocuments}"/>
     <ui:param name="bean" value="#{corporateDataBean}"/>
-
-    <ui:define name="viewname">
-        <li>
-            <p:link href="/Pages/Configuration/DatiAziendali.jsf">#{msg.omiValuationDocuments}</p:link>
-        </li>
-    </ui:define>
+    <ui:param name="skipValidate" value="true"/>
 
     <ui:define name="edit_body">
         <style>
-            .ui-selectcheckboxmenu-multiple-container{
-                min-height: 32px !important;
+            .ui-selectcheckboxmenu-multiple-container {
+                min-height: 1.8rem !important;
             }
         </style>
         <div align="center">
@@ -35,6 +31,7 @@
                 <span>#{msg.address}:</span>
                 <p:inputText value="#{bean.address}" id="address"
                              styleClass="input-width" label="#{msg.address}"/>
+
 
             </p:panelGrid>
 

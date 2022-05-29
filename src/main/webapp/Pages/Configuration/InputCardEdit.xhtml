@@ -14,7 +14,7 @@
         <span><span class="red">*</span> #{msg.inputCardName}:</span>
         <p:inputText value="#{bean.entity.name}" id="name" label="#{msg.inputCardName}" style="margin-left: 1%"/>
         <br/><br/>
-        <p:dataTable value="#{bean.fields}" var="item" emptyMessage="#{msg.noRecordsFound}">
+        <p:dataTable value="#{bean.fields}" var="item">
             <f:facet name="header">
                 <h:outputText value="#{msg.inputCardFields}"/>
             </f:facet>

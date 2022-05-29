@@ -7,6 +7,7 @@ import it.nexera.ris.persistence.UserHolder;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.Request;
 import it.nexera.ris.web.beans.base.AccessBean;
+import it.nexera.ris.web.beans.session.SessionBean;
 import it.nexera.ris.web.beans.wrappers.logic.PermissionWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.UserWrapper;
 import org.hibernate.criterion.Criterion;
@@ -52,7 +53,6 @@ public class RoleRightsFilter extends BaseFilter implements Filter {
             RedirectHelper.goTo(PageTypes.LOGIN, httpRequest, httpResponse);
             return;
         }
-
         SessionHelper.removeObject("loadMailFilters");
         SessionHelper.removeObject("loadRequestFilters");
         if(!ValidationHelper.isNullOrEmpty(SessionHelper.get("currentPageURL"))) {
@@ -65,21 +65,17 @@ public class RoleRightsFilter extends BaseFilter implements Filter {
                 if(httpRequest.getRequestURI().endsWith(PageTypes.REQUEST_LIST.getPage())){
                     SessionHelper.put("loadRequestFilters", "true");
                 }
-            }else
-                if(previousURL.endsWith(PageTypes.MAIL_MANAGER_LIST.getPage()) ||
+            }else if(previousURL.endsWith(PageTypes.MAIL_MANAGER_LIST.getPage()) ||
                     previousURL.endsWith(PageTypes.MAIL_MANAGER_EDIT.getPage()) ||
                     previousURL.endsWith(PageTypes.MAIL_MANAGER_FOLDER.getPage()) ||
                     previousURL.endsWith(PageTypes.MAIL_MANAGER_VIEW.getPage())){
-                if( httpRequest.getParameter("page") != null
-                        && httpRequest.getRequestURI().endsWith(PageTypes.MAIL_MANAGER_LIST.getPage())){
+                if(httpRequest.getRequestURI().endsWith(PageTypes.MAIL_MANAGER_LIST.getPage())){
                     SessionHelper.put("loadMailFilters", "true");
                 }
             }
         }
         SessionHelper.removeObject("currentPageURL");
         SessionHelper.put("currentPageURL", httpRequest.getRequestURI());
-
-
         UserWrapper currentUser = getCurrentUser(httpRequest, httpResponse);
 
         int result = doCustomHandle(httpRequest, httpResponse);

@@ -48,10 +48,10 @@
 
     <ui:define name="additional_buttons">
         <p:commandButton value="#{msg.edit}" rendered="#{bean.onlyView and not bean.fromClient}" update=":form"
-                         action="#{bean.editEntity}" icon="pi pi-pencil"/>
+                         action="#{bean.editEntity}" icon="ui-icon ui-icon-pencil"/>
         <p:commandButton value="#{msg.save}" rendered="#{bean.fromClient}" update=":form"
-                         action="#{bean.saveFromDialog}" icon="pi pi-save" styleClass="p-mr-2 p-mb-2"/>
+                         action="#{bean.saveFromDialog}" icon="ui-icon ui-icon-disk"/>
         <p:commandButton action="#{bean.closeDialog}" rendered="#{bean.fromClient}" value="#{msg.cancel}"
-                         icon="pi pi-times-circle" styleClass="p-mr-2 p-mb-2"/>
+                         icon="ui-icon-circle-close"/>
     </ui:define>
 </ui:composition>

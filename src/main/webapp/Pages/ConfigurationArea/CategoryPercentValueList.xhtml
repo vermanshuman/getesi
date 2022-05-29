@@ -8,7 +8,6 @@
 
 <ui:composition template="/resources/tpl/Admin/LazyListTabBase.xhtml">
     <ui:param name="view_title" value="#{msg.categoryPercentValueHeader}"/>
-	<ui:param name="list_header" value="#{msg.categoryPercentValueHeader}"/>
     <ui:param name="bean" value="#{categoryPercentValueBean}"/>
     <ui:define name="list_body">
 		<style>
@@ -33,7 +32,7 @@
 		
 		<p:tabView id="tabs">
 			<p:tab title="#{msg.categoryPercentValueTabPerCategorie}">
-				<p:commandButton value="#{msg.add}" icon="pi pi-plus-circle"
+				<p:commandButton value="#{msg.add}"
 					oncomplete="PF('categoryPercentValueWV').show();"
 					update="categoryPercentValueDlg"
 					action="#{bean.handleCategoryPercentValueDialogInit(null)}" />
@@ -55,16 +54,15 @@
 						<h:outputText value="#{cat.percentCommercial}" />
 					</p:column>
 					<p:column styleClass="action_column" exportable="false">
-						<p:commandButton icon="pi pi-pencil"
+						<p:commandButton icon="ui-icon ui-icon-pencil"
 							update="table categoryPercentValueDlg"
 							oncomplete="PF('categoryPercentValueWV').show();"
 							action="#{bean.handleCategoryPercentValueDialogInit(cat)}">
 						</p:commandButton>
 					</p:column>
 					<p:column styleClass="action_column" exportable="false">
-						<p:commandButton icon="ui-icon pi pi-times" update=":form"
-							action="#{bean.handleDeleteCategoryPercentValue(cat)}"
-										 style="background-color: red;border: none !important;">
+						<p:commandButton icon="ui-icon ui-icon-close" update=":form"
+							action="#{bean.handleDeleteCategoryPercentValue(cat)}">
 							<p:confirm message="#{msg.delete}?" />
 						</p:commandButton>
 					</p:column>
@@ -74,27 +72,26 @@
 			<p:tab title="#{msg.categoryPercentValueTabRiconducibili}">
 				<p:commandButton value="#{msg.categoryPercentValueAddGroup}"
 					oncomplete="PF('omiGroupValueWV').show();"
-					update="omiGroupValueDlg" icon="pi pi-plus-circle"
+					update="omiGroupValueDlg"
 					action="#{bean.handleGroupOmiDialogInit(null)}"/>
 				<br />
 				<br />
 				<p:dataTable value="#{bean.groupOmis}" var="group" id="groupOmi" styleClass="groupTable borderless"
-					paginator="false" paginatorAlwaysVisible="false" emptyMessage="#{msg.noRecordsFound}"
+					paginator="false" paginatorAlwaysVisible="false"
 					widgetVar="tableGroupOMIWV" style="width: 35%;">
 					<p:column>#{group.name}
-						<p:commandButton icon="pi pi-pencil"
+						<p:commandButton icon="ui-icon ui-icon-pencil"
 							oncomplete="PF('omiGroupValueWV').show();"
 							update="omiGroupValueDlg"
 							action="#{bean.handleGroupOmiDialogInit(group)}"/>
 						&nbsp; &nbsp;
-						<p:commandButton icon="pi pi-times" update="groupOmi"
-							action="#{bean.handleDeleteGroupOmi(group)}"
-										 style="background-color: red;border: none !important;">
+						<p:commandButton icon="ui-icon ui-icon-close" update="groupOmi"
+							action="#{bean.handleDeleteGroupOmi(group)}">
 							<p:confirm message="#{msg.delete}?" />
 						</p:commandButton>
 						<br />
 						<br />
-						<p:commandButton id="addBtn" icon="pi pi-plus"
+						<p:commandButton id="addBtn" icon="fa fa-plus"
 							style="margin-left:10px"
 							oncomplete="PF('omiGroupItemWV').show();"
 							update="omiGroupItemDlg"
@@ -102,7 +99,7 @@
 						<br />
 						<br />
 						<p:dataTable value="#{group.categoryGroupItems}" var="item" id="items" styleClass="withborder"
-							widgetVar="tableItemsWV" emptyMessage="#{msg.noRecordsFound}">
+							widgetVar="tableItemsWV">
 							<p:column headerText="#{msg.categoryPercentValueGroupItemPosition}" style="width: 25%;">
 								<h:outputText value="#{item.position}" />
 							</p:column>
@@ -110,15 +107,14 @@
 								<h:outputText value="#{item.categoryCode}" />
 							</p:column>
 							<p:column styleClass="action_column" exportable="false">
-								<p:commandButton icon="pi pi-pencil"
+								<p:commandButton icon="ui-icon ui-icon-pencil"
 									update="omiGroupItemDlg"
 									oncomplete="PF('omiGroupItemWV').show();"
 									action="#{bean.handleGroupItemDialogInit(group,item)}">
 								</p:commandButton>
 							</p:column>
 							<p:column styleClass="action_column" exportable="false">
-								<p:commandButton icon="pi pi-times"
-												 style="background-color: red;border: none !important;"
+								<p:commandButton icon="ui-icon ui-icon-close"
 								action="#{bean.handleDeleteCategoryItemGroupOmi(group,item)}" update="items">
 									<p:confirm message="#{msg.delete}?" />
 								</p:commandButton>
@@ -153,10 +149,10 @@
             </p:panelGrid>
             <div class="btn_line">
                 <p:commandButton id="saveButton" value="#{msg.confirm}" update=":tabs:table"
-                                 action="#{bean.saveCategoryPV}" styleClass="green-button p-mr-2 p-mb-2"
+                                 action="#{bean.saveCategoryPV}" styleClass="green-button"
                                  oncomplete="PF('categoryPercentValueWV').hide();"/>
                 <p:commandButton value="#{msg.cancel}"
-                                 oncomplete="PF('categoryPercentValueWV').hide();" styleClass="p-mr-2 p-mb-2"/>
+                                 oncomplete="PF('categoryPercentValueWV').hide();"/>
             </div>
         </p:dialog>
         
@@ -172,10 +168,10 @@
             </p:panelGrid>
             <div class="btn_line">
                 <p:commandButton id="saveGroupButton" value="#{msg.confirm}" update=":tabs:groupOmi"
-                                 action="#{bean.saveGroupOmi}" styleClass="green-button p-mr-2 p-mb-2"
+                                 action="#{bean.saveGroupOmi}" styleClass="green-button"
                                  oncomplete="PF('omiGroupValueWV').hide();"/>
                 <p:commandButton value="#{msg.cancel}"
-                                 oncomplete="PF('omiGroupValueWV').hide();" styleClass="p-mr-2 p-mb-2"/>
+                                 oncomplete="PF('omiGroupValueWV').hide();"/>
             </div>
         </p:dialog>
         <p:dialog id="omiGroupItemDlg" widgetVar="omiGroupItemWV"
@@ -191,11 +187,11 @@
 						converter="categoryColumnConverter" />
             </p:panelGrid>
             <div class="btn_line">
-                <p:commandButton id="saveGroupItemButton" value="#{msg.conf}"
+                <p:commandButton id="saveGroupItemButton" value="#{msg.confirm}"
                   		update="addGroupItemPanel :tabs:groupOmi"
-                		action="#{bean.saveGroupItemOmi}" styleClass="green-button p-mr-2 p-mb-2"/>
+                		action="#{bean.saveGroupItemOmi}" styleClass="green-button"/>
                 <p:commandButton value="#{msg.cancel}"
-                                 oncomplete="PF('omiGroupItemWV').hide();" styleClass="p-mr-2 p-mb-2"/>
+                                 oncomplete="PF('omiGroupItemWV').hide();"/>
             </div>
         </p:dialog>
     </ui:define>

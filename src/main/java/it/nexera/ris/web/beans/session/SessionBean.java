@@ -14,12 +14,10 @@ import it.nexera.ris.persistence.beans.entities.domain.readonly.WLGInboxShort;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.beans.base.AccessBean;
 import it.nexera.ris.web.beans.wrappers.logic.UserWrapper;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
-import org.primefaces.context.RequestContext;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -44,7 +42,7 @@ public class SessionBean implements Serializable {
     public static final boolean useNativeViewState = true;
 
     private static long timeToRefresh = 60; //in seconds
-
+    
     private Integer mailCounts=0;
     
     private Integer requestCounts=0;
@@ -52,8 +50,6 @@ public class SessionBean implements Serializable {
     public SessionBean() {
         Session.put("my_session_id", DateTimeHelper.toSessionTime(new Date()));
     }
-
-    private Boolean overLayMode = Boolean.TRUE;
 
     public boolean canViewPageUrl(String url) {
         PageTypes type = PageTypes.getPageTypeByPath(url);
@@ -246,16 +242,6 @@ public class SessionBean implements Serializable {
                 "folder_id is null and state_id in (" + states + ") and server_id is null";
     }
 
-    public void updateOverLayMode(){
-        String overlayMode = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("overlay_mode");
-        if(StringUtils.isNotBlank(overlayMode)){
-            setOverLayMode(Boolean.parseBoolean(overlayMode));
-        }else {
-            setOverLayMode(Boolean.TRUE);
-        }
-        RequestContext.getCurrentInstance().update("overLayModeData");
-    }
-
     public String getCountStorageMailsQuery() {
         return "select count(*) from wlg_inbox outt where folder_id is null and state_id in ("
                 + MailManagerStatuses.CANCELED.getId() + ", " + MailManagerStatuses.DELETED.getId() + ")";
@@ -301,21 +287,5 @@ public class SessionBean implements Serializable {
 
     public void setRequestCounts(Integer requestCounts) {
         this.requestCounts = requestCounts;
-    }
-
-    public Boolean getOverLayMode() {
-        return overLayMode;
-    }
-
-    public void setOverLayMode(Boolean overLayMode) {
-        this.overLayMode = overLayMode;
-    }
-
-    public void getBillingListPage() {
-        RedirectHelper.goTo(PageTypes.BILLING_LIST);
-    }
-
-    public void getBillingListOldPage() {
-        RedirectHelper.goTo(PageTypes.BILLING_LIST_OLD);
     }
 }

@@ -6,8 +6,7 @@
         xmlns:p="http://primefaces.org/ui">
     <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/mail.css"
           media="all" rel="stylesheet" type="text/css"/>
-    <div class="button-panel-one p-grid">
-    <div class="p-col-9">
+    <div class="button-panel-one">
         <p:commandButton value="#{msg.mailManagerSend.toUpperCase()}"
                          action="#{bean.sendMail}" update="@form"
                          icon="fa fa-paper-plane" onstart="setIsSend(true);"
@@ -36,16 +35,13 @@
                     icon="fa fa-trash" disabled="true"/>
         </ui:remove>
 
-    </div>
-    <div class="p-col-3" style="text-align:right;">
-        <p:commandButton icon="pi pi-print" title="#{msg.mailManagerPrint}" value="#{msg.mailManagerPrint}" update="form:print_panel"
-                         styleClass="print-button" action="#{bean.generateMailPdf}" style="background: #000066;">
-        <f:setPropertyActionListener value="true" target="#{bean.printPdf}"/>
+        <p:commandButton icon="fa fa-print" title="#{msg.mailManagerPrint}" value="#{msg.mailManagerPrint}" update="form:print_panel"
+                         styleClass="grey-button" action="#{bean.generateMailPdf}">
+            <f:setPropertyActionListener value="true" target="#{bean.printPdf}"/>
         </p:commandButton>
 
         <p:commandButton update=":form" styleClass="close-ui-button" value="#{msg.close.toUpperCase()}"
                          actionListener="#{bean.goMain}"/>
-    </div>
         <ui:remove>
             <p:commandButton rendered="#{(not empty mailManagerListBean.selectedInboxes)}"
                              icon="fa fa-exchange"

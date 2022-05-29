@@ -45,9 +45,9 @@ public class ReportListBean extends EntityLazyListPageBean<Document> implements 
     private static final long serialVersionUID = -5108392810985886849L;
 
     private Date filterReportListDate;
-
+    
     private Long entityEditId;
-
+    
     private Date dateFrom;
 
     private Date dateTo;
@@ -58,9 +58,9 @@ public class ReportListBean extends EntityLazyListPageBean<Document> implements 
 
     @ManagedProperty(value = "#{requestListBean}")
     private RequestListBean requestListBean;
-
+    
     private Boolean hideExtraCost = Boolean.TRUE;
-
+    
     private String costNote;
 
     private Boolean showRequestCost = Boolean.FALSE;
@@ -72,7 +72,7 @@ public class ReportListBean extends EntityLazyListPageBean<Document> implements 
         getCostManipulationHelper().setEditable(true);
 
         loadList(Document.class, new Criterion[]{
-                        Restrictions.eq("typeId", DocumentType.INVOICE_REPORT.getId())},
+                Restrictions.eq("typeId", DocumentType.INVOICE_REPORT.getId())},
                 new Order[]{Order.asc("invoiceNumber")});
     }
 
@@ -83,23 +83,23 @@ public class ReportListBean extends EntityLazyListPageBean<Document> implements 
 
             List<Criterion> restrictionsList = new ArrayList<>();
             if (!ValidationHelper.isNullOrEmpty(getDateFrom())) {
-                restrictionsList.add(Restrictions.ge("m.createDate",
+            	restrictionsList.add(Restrictions.ge("m.createDate",
                         DateTimeHelper.getDayStart(getDateFrom())));
             }
-
+            
             if (!ValidationHelper.isNullOrEmpty(getDateTo())) {
-                restrictionsList.add(Restrictions.le("m.createDate",
+            	restrictionsList.add(Restrictions.le("m.createDate",
                         DateTimeHelper.getDayEnd(getDateTo())));
             }
             restrictionsList.add(Restrictions.eq("typeId", DocumentType.INVOICE_REPORT.getId()));
             FileHelper.sendFile("InvoicesReport-" + DateTimeHelper.toStringDateWithDots(new Date()) + ".xls",
-                    helper.convertInvoicesToExcel(DaoManager.load(Document.class,
-                            new CriteriaAlias[]{
+                    helper.convertInvoicesToExcel(DaoManager.load(Document.class,   
+                    		new CriteriaAlias[]{
                                     new CriteriaAlias("mail", "m", JoinType.INNER_JOIN)
                             },
-                            restrictionsList.toArray(new Criterion[0]),
-                            new Order[]{Order.asc("invoiceNumber")})));
-
+                    		restrictionsList.toArray(new Criterion[0]),
+                    		new Order[]{Order.asc("invoiceNumber")})));
+            
         } catch (Exception e) {
             LogHelper.log(log, e);
         }
@@ -132,21 +132,21 @@ public class ReportListBean extends EntityLazyListPageBean<Document> implements 
                         new CriteriaAlias[]{new CriteriaAlias("request", "request", JoinType.INNER_JOIN)},
                         new Criterion[]{Restrictions.and(Restrictions.eq("request.id", getExamRequest().getId()), Restrictions.eq("typeId", 2L))});
                 boolean isAdded = Boolean.FALSE;
-
+                
                 if (!ValidationHelper.isNullOrEmpty(requestDocuments)) {
                     if(getExamRequest().getService() !=null
-                            && getExamRequest().getService().getUnauthorizedQuote()!=null
-                            && getExamRequest().getService().getUnauthorizedQuote()){
+                            && getExamRequest().getService().getUnauthorizedQuote()!=null 
+                             && getExamRequest().getService().getUnauthorizedQuote()){
                         costNote = "Preventivo non autorizzato";
                         isAdded = Boolean.TRUE;
                     }
                 }
-
-                if(!isAdded && getExamRequest().getAuthorizedQuote()!= null
+                
+                if(!isAdded && getExamRequest().getAuthorizedQuote()!= null 
                         && getExamRequest().getAuthorizedQuote()){
                     costNote = "Preventivo autorizzato";
                 }
-                if(!isAdded && getExamRequest().getUnauthorizedQuote()!=null
+                if(!isAdded && getExamRequest().getUnauthorizedQuote()!= null
                         && getExamRequest().getUnauthorizedQuote()){
                     costNote = "Preventivo non autorizzato";
                 }
@@ -154,7 +154,7 @@ public class ReportListBean extends EntityLazyListPageBean<Document> implements 
             } catch (PersistenceBeanException | IllegalAccessException e) {
                 LogHelper.log(log, e);
             }
-        }else
+        }else 
             setCostNote(getExamRequest().getCostNote());
         getCostManipulationHelper().viewExtraCost(getExamRequest(), recalculate);
     }
@@ -196,18 +196,18 @@ public class ReportListBean extends EntityLazyListPageBean<Document> implements 
     }
 
     public void filterInvoicesTableFromPanel() throws PersistenceBeanException, IllegalAccessException {
-
-        List<Criterion> restrictionsList = new ArrayList<>();
+    	
+    	List<Criterion> restrictionsList = new ArrayList<>();
         if (!ValidationHelper.isNullOrEmpty(getDateFrom())) {
-            restrictionsList.add(Restrictions.ge("m.createDate",
+        	restrictionsList.add(Restrictions.ge("m.createDate",
                     DateTimeHelper.getDayStart(getDateFrom())));
         }
-
+        
         if (!ValidationHelper.isNullOrEmpty(getDateTo())) {
-            restrictionsList.add(Restrictions.le("m.createDate",
+        	restrictionsList.add(Restrictions.le("m.createDate",
                     DateTimeHelper.getDayEnd(getDateTo())));
         }
-
+        
         restrictionsList.add(Restrictions.eq("typeId", DocumentType.INVOICE_REPORT.getId()));
 
         this.loadList(Document.class,
@@ -217,7 +217,7 @@ public class ReportListBean extends EntityLazyListPageBean<Document> implements 
                         new CriteriaAlias("mail", "m", JoinType.INNER_JOIN)
                 });
     }
-
+    
     public void openRequestMail() {
         RedirectHelper.goTo(PageTypes.MAIL_MANAGER_VIEW, getEntityEditId());
     }
@@ -229,7 +229,7 @@ public class ReportListBean extends EntityLazyListPageBean<Document> implements 
     public void setRequestListBean(RequestListBean requestListBean) {
         this.requestListBean = requestListBean;
     }
-
+    
     public Boolean getHideExtraCost() {
         return hideExtraCost;
     }

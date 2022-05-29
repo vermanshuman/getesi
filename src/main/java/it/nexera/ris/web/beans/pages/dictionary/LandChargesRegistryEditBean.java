@@ -6,6 +6,7 @@ import it.nexera.ris.common.helpers.ComboboxHelper;
 import it.nexera.ris.common.helpers.LogHelper;
 import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
+import it.nexera.ris.persistence.beans.entities.domain.ClientEmail;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.LandChargesRegistry;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
@@ -83,6 +84,7 @@ public class LandChargesRegistryEditBean extends EntityEditPageBean<LandChargesR
         if (ValidationHelper.isNullOrEmpty(this.getEntity().getName())) {
             addRequiredFieldException("form:name");
         }
+
         if (ValidationHelper.isNullOrEmpty(this.getEntity().getType())) {
             addRequiredFieldException("form:type");
         }
@@ -98,6 +100,12 @@ public class LandChargesRegistryEditBean extends EntityEditPageBean<LandChargesR
         if(count > 0){
             addException("nameTypeAlreadyInUse");
         }
+//        if (ValidationHelper.isNullOrEmpty(this.getEntity().getName())) {
+//            addRequiredFieldException("form:name");
+//        } else if (!ValidationHelper.isUnique(LandChargesRegistry.class, "name",
+//                getEntity().getName(), this.getEntity().getId())) {
+//            addFieldException("form:name", "nameAlreadyInUse");
+//        }
     }
 
     @Override

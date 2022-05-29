@@ -9,11 +9,11 @@
     <p:dialog widgetVar="associateToClientDlgWV" id="associateToClientDlg"
               header="#{msg.mailManagerAssociateToClient}" width="900" height="700"
               style="max-width: 900px; height: auto !important; min-height: 300px !important;
-                    max-height: 700px !important; margin-top: 45px !important; border: 2px solid #57c279;" draggable="false"
+                   max-height: 700px !important; margin-top: 45px !important" draggable="false"
               modal="true" resizable="false" effect="SLIDE" position="top"
               onHide="updateAddClientDialogData(); updateLetterViewForm();">
 
-        <p:outputPanel id="associateToClientDlgPanel" style="margin-top:20px;">
+        <p:outputPanel id="associateToClientDlgPanel">
             <p:selectOneMenu value="#{bean.selectedClientId}" disabled="#{bean.relatedToClient}">
                 <p:ajax event="change" update=":form:confirmButton"/>
                 <f:selectItems value="#{bean.clients}"/>
@@ -23,7 +23,7 @@
             <p:scrollPanel mode="native" style="width:870px; max-height: 550px">
             <p:outputPanel id="createNewClient">
                 <p:commandButton value="#{msg.mailManagerNewClient}" update="createNewClient"
-                                 id="btn_new_client" styleClass="ui-button-success" onclick="changeStatusNewClientButton();"
+                                 id="btn_new_client" styleClass="btn-green" onclick="changeStatusNewClientButton();"
                                  rendered="#{bean.createClient}" oncomplete="updateRedStarFroms();" />
                 <br/>
                 <br/>
@@ -275,11 +275,9 @@
         </p:scrollPanel>
             <div class="btn_line">
                 <p:commandButton value="#{msg.confirm}" action="#{bean.confirmSelectedClient}"
-                                 style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"
                                  update="form" disabled="#{empty bean.selectedClientId or bean.relatedToClient}"
                                  id="confirmButton" oncomplete="PF('associateToClientDlgWV').hide();"/>
                 <p:commandButton value="#{msg.cancel}" action="#{bean.assosiateCancel}"
-                                 style="background-color: #F3362B !important; width: 100px;"
                                  oncomplete="PF('associateToClientDlgWV').hide();"/>
             </div>
         </p:outputPanel>

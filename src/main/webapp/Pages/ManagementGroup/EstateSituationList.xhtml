@@ -8,22 +8,20 @@
 <ui:composition template="/resources/tpl/Admin/ListBase.xhtml">
     <ui:param name="bean" value="#{estateSituationListBean}"/>
     <ui:param name="renderTitle" value="false"/>
-    <ui:param name="renderCss" value="margin-left: -13px;"/>
     <ui:param name="renderMenu" value="false"/>
     <ui:param name="centerPartStyleClass" value="false"/>
     <ui:param name="disableSelection" value="true"/>
-    <ui:param name="tableInsideField" value="true"></ui:param>
     <ui:define name="back_buttons_panel">
-        <p:commandButton id="add_btn" action="#{bean.addEstate}" value="#{msg.estateAddButton}" styleClass="p-mr-2 p-mb-2"/>
+        <p:commandButton id="add_btn" action="#{bean.addEstate}" value="#{msg.estateAddButton}"/>
         <p:commandButton id="cancel_btn" action="#{bean.goBack}" value="#{msg.requestListOpenEdit}"
-                         icon="pi pi-times-circle"/>
+                         icon="ui-icon-circle-close"/>
         <p:commandButton id="print_btn" action="#{bean.goTextEdit}" value="#{msg.requestManagePrint}"
                          style="float: right"/>
     </ui:define>
     <ui:define name="columns">
         <p:column headerText="#{msg.formality}">
             <p:dataTable rendered="#{not empty item.estateFormalityList}" value="#{item.estateFormalityList}"
-                         var="weakForm" styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}">
+                         var="weakForm" styleClass="without-header cadastral_table">
                 <p:column>
                     <span>#{weakForm.numRP}/#{weakForm.numRG} #{msg.estateFormalityDatePrefix}</span><h:outputText
                         value="#{weakForm.date}" converter="dateTimeConverter"/>
@@ -39,7 +37,7 @@
         </p:column>
         <p:column headerText="#{msg.estateLocation}">
             <p:dataTable rendered="#{not empty item.propertyList}" value="#{item.propertyList}" var="estate"
-                         styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}">
+                         styleClass="without-header cadastral_table">
                 <p:column style="width: 8%">
                     <h:outputText value="#{estate.category.codeInVisura}" id="category"/>
                     <p:tooltip for="category" value="#{estate.category.description}"/>
@@ -48,7 +46,7 @@
                     <h:outputText value="#{estate.address}"/>
                 </p:column>
                 <p:column>
-                    <p:dataTable value="#{estate.cadastralData}" var="exam" emptyMessage="#{msg.noRecordsFound}"
+                    <p:dataTable value="#{estate.cadastralData}" var="exam"
                                  rendered="#{not empty estate.cadastralData}"
                                  styleClass="without-header cadastral_table">
                         <p:column>
@@ -79,7 +77,7 @@
         </p:column>
         <p:column headerText="#{msg.pdfFormality}">
             <p:dataTable rendered="#{not empty item.formalityList}" value="#{item.formalityList}"
-                         styleClass="without-header cadastral_table" var="item" emptyMessage="#{msg.noRecordsFound}">
+                         styleClass="without-header cadastral_table" var="item">
                 <p:column>
                     <h:outputText value="#{item.formalityStr}"/>
                 </p:column>
@@ -90,205 +88,9 @@
             </p:dataTable>
         </p:column>
     </ui:define>
-
     <ui:define name="dialogs_body">
-        <style>
-            body .ui-fieldset .ui-fieldset-legend {
-                border: 1px solid #c9cdd2;
-                background: #f8f9fa;
-                color: #FFFFFF !important;
-                padding: 1rem;
-                font-weight: 200 !important;
-                border-radius: 4px;
-                user-select: none;
-                transition: background-color 0.2s, color 0.2s, border-color 0.2s,
-                box-shadow 0.2s;
-            }
-
-            legend {
-                font-size: 14px !important;
-            }
-
-            body .ui-fieldset .ui-fieldset-content {
-                padding: 8px 14px;
-            }
-
-            div {
-                display: block;
-            }
-
-            fieldset div {
-                font-size: 14px;
-                text-align: left;
-            }
-
-            .special-upload {
-                width: 210px;
-            }
-
-            .special-upload .ui-fileupload-choose {
-                background: #fed820;
-                color: #000000;
-                margin-left: -27px;
-            }
-
-            .special-upload .ui-icon-plusthick {
-                color: #000000 !important;
-            }
-
-            body .ui-fileupload .ui-fileupload-buttonbar {
-                padding: 8px 14px;
-            }
-
-            .special-upload .ui-widget-header {
-                background-color: transparent !important;
-                width: 210px;
-            }
-
-            body .ui-fileupload .ui-fileupload-content {
-                border: none;
-                height: 40px;
-            }
-
-            body .ui-fileupload .ui-fileupload-buttonbar {
-                border: none;
-            }
-
-            body .ui-button {
-                color: #ffffff;
-                margin-right: 3px;
-                margin-bottom: 3px;
-                border: none !important;
-            }
-
-            body .ui-icon {
-                width: 16px;
-                height: 16px;
-                line-height: 16px;
-            }
-
-            .card {
-                padding: 0;
-                border: none;
-            }
-
-            .red-btn {
-                background: red !important;
-                background-color: red !important;
-                color: #FFFFFF !important;
-            }
-
-            .without-header thead {
-                display: none;
-            }
-
-            body .ui-datatable .ui-paginator.ui-paginator-top {
-                /*background-color: #2f8ee5 !important;*/
-                color: #ffffff !important;
-            }
-
-            body .ui-datatable .ui-paginator.ui-paginator-bottom {
-                /*background-color: #2f8ee5 !important;*/
-                color: #ffffff !important;
-            }
-
-            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page,
-            body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev,
-            body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last {
-                color: #FFFFFF !important;
-            }
-
-            body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
-                background: #FFF !important;
-                color: #000000 !important;
-            }
-
-            .layout-wrapper .route-bar {
-                border-bottom: 1px solid #c9cdd2;
-            }
-
-            .layout-footer {
-                border-top: 1px solid #c9cdd2;
-            }
-
-            .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
-                border: 1px solid #c9cdd2 !important;
-            }
-
-            body .ui-widget, body .ui-widget .ui-widget {
-                font-family: "Open Sans","Helvetica Neue",sans-serif !important;
-                text-decoration: none !important;
-                font-size: 14px !important;
-            }
-
-            body .ui-datatable .ui-datatable-data > tr {
-                color: #5f666c;
-            }
-
-            body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-button {
-                background: #00CC52;
-            }
-            fieldset {
-                margin-top: 10px;
-                margin-left: 1cm;
-                margin-right: 1cm;
-            }
-            #list_panel {
-                margin-top: 10px;
-                margin-left: 1cm;
-                margin-right: 1cm;
-            }
-            div[id*='menuform1:menu_div'] {
-                margin-left: -4px;
-            }
-            .btn-green {
-                background-color: #00CC52!important;
-            }
-
-            .cost_titles {
-                padding-top: 20px !important;
-            }
-
-            .cost_titles h3 {
-                font-size: 1.17em !important;
-                font-weight: bold !important;
-            }
-
-            .ui-datatable-scrollable-theadclone tr  {
-                display: none !important;
-            }
-
-            #requestExtraCostDialog .ui-dialog-titlebar {
-                padding: 0.4em 0.4em 0.4em 1em;
-                background: #ffffff !important;
-            }
-            #cke_body {
-                width: 67vw !important;
-            }
-            body .ui-button.ui-button-warning {
-                background: #fed820;
-                color: #000000;
-            }
-            .ui-dialog-content{
-                max-width: 1200px !important;
-                max-height: 700px !important;
-                margin-bottom: 5px !important;
-            }
-            .ui-spinner-up,.ui-spinner-down{
-                margin-bottom: 0px !important;
-                margin-right: 0px !important;
-
-            }
-            .cost_titles > .p-field > .p-col-fixed {
-                font-size: 14px !important;
-                font-weight: bold !important;
-            }
-            .ui-dialog .ui-dialog-titlebar{
-                padding: 3px !important;
-            }
-        </style>
-        <br/><br/><br/>
-        <p:fieldset class="fieldset" legend="#{msg.estateSituationListDocuments}" toggleable="true" toggleSpeed="500" collapsed="true">
+        <br/>
+        <p:fieldset legend="#{msg.estateSituationListDocuments}">
             <p:fileUpload label="#{msg.upload}" fileUploadListener="#{bean.saveDocumentXML}"
                           multiple="false" mode="advanced" styleClass="special-upload" auto="true"
                           update=":form:documentTable"/>
@@ -306,31 +108,27 @@
                     <p:commandButton icon="fa fa-download" action="#{item.downloadFile}" ajax="false"/>
                 </p:column>
                 <p:column styleClass="action_column">
-                    <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn" update=":form"
+                    <p:commandButton icon="ui-icon ui-icon-close" update=":form"
                                      action="#{bean.deleteEntityDocument}">
                         <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityDeleteId}"/>
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
         </p:fieldset>
-
-        <br/><br/><br/>
-
-
-        <!-- <ui:fragment><br /></ui:fragment> -->
-        <p:fieldset class="fieldset" legend="#{msg.estateSituationSalesDevelopmentHeader}" rendered="#{bean.salesDevelopmentShowing}" toggleable="true" toggleSpeed="500" collapsed="true">
-            <p:commandButton disabled="#{!bean.canCreate}" id="buttonCreateSalesDevelopment" style="margin-left: -13px;"
-                             icon="pi pi-plus-circle" styleClass="ui-button-success p-mr-2 p-mb-2"
+        <ui:fragment><br /></ui:fragment>
+        <p:fieldset legend="#{msg.estateSituationSalesDevelopmentHeader}" rendered="#{bean.salesDevelopmentShowing}">
+            <p:commandButton disabled="#{!bean.canCreate}" id="buttonCreateSalesDevelopment"
+                             icon="ui-icon-circle-plus"
                              value="#{not empty addButtonTitle ? addButtonTitle : msg.newItem}"
                              update="sales_dev"
                              action="#{bean.addSalesEntity()}"/>
             <p:commandButton disabled="#{!bean.canCreate}" id="autoCreateSalesDevelopment"
-                             icon="pi pi-plus-circle" value="#{msg.estateSituationSalesDevelopmentAutoCreate}"
+                             icon="ui-icon-circle-plus" value="#{msg.estateSituationSalesDevelopmentAutoCreate}"
                              update="sales_dev" onclick="PF('autoCreateSalesDevelopment').disable()"
                              oncomplete="PF('autoCreateSalesDevelopment').enable()"
                              action="#{bean.autoAddEntity()}" widgetVar="autoCreateSalesDevelopment"/>
-            <!--  <ui:fragment><br /></ui:fragment>
-             <ui:fragment><br /></ui:fragment> -->
+            <ui:fragment><br /></ui:fragment>
+            <ui:fragment><br /></ui:fragment>
             <p:dataTable var="item" id="sales_dev" value="#{bean.salesEstateSituationList}"
                          disabledSelection="true" lazy="#{lazyMode}"
                          paginator="true" rowKey="#{item.id}" rows="10"
@@ -339,7 +137,7 @@
                          paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                          rowsPerPageTemplate="10,20,50" widgetVar="salesTableWV">
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon pi pi-pencil"
+                    <p:commandButton icon="ui-icon ui-icon-pencil"
                                      disabled="#{!bean.canEdit}" update=":form"
                                      action="#{bean.editEntity}">
                         <f:setPropertyActionListener value="#{item.id}"
@@ -347,7 +145,7 @@
                     </p:commandButton>
                 </p:column>
                 <p:column styleClass="action_column" exportable="false">
-                    <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"
+                    <p:commandButton icon="ui-icon ui-icon-close"
                                      oncomplete="PF('salesdlg').show()"
                                      disabled="#{!bean.canDelete || (item.id==sessionBean.currentUser.id and bean.userEntityPage)}">
                         <f:setPropertyActionListener value="#{item.id}"
@@ -356,7 +154,7 @@
                 </p:column>
                 <p:column headerText="#{msg.formality}">
                     <p:dataTable rendered="#{not empty item.estateFormalityList}" value="#{item.estateFormalityList}"
-                                 var="weakForm" styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}">
+                                 var="weakForm" styleClass="without-header cadastral_table">
 
                         <p:column>
                             <span>#{weakForm.numRP}/#{weakForm.numRG} #{msg.estateFormalityDatePrefix}</span><h:outputText
@@ -373,7 +171,7 @@
                 </p:column>
                 <p:column headerText="#{msg.estateLocation}">
                     <p:dataTable rendered="#{not empty item.propertyList}" value="#{item.propertyList}" var="estate"
-                                 styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}">
+                                 styleClass="without-header cadastral_table">
                         <p:column style="width: 8%">
                             <h:outputText value="#{estate.category.codeInVisura}" id="sales_category"/>
                             <p:tooltip for="sales_category" value="#{estate.category.description}"/>
@@ -382,7 +180,7 @@
                             <h:outputText value="#{estate.address}"/>
                         </p:column>
                         <p:column>
-                            <p:dataTable value="#{estate.cadastralData}" var="exam" emptyMessage="#{msg.noRecordsFound}"
+                            <p:dataTable value="#{estate.cadastralData}" var="exam"
                                          rendered="#{not empty estate.cadastralData}"
                                          styleClass="without-header cadastral_table">
                                 <p:column>
@@ -413,7 +211,7 @@
                 </p:column>
                 <p:column headerText="#{msg.pdfFormality}">
                     <p:dataTable rendered="#{not empty item.formalityList}" value="#{item.formalityList}"
-                                 styleClass="without-header cadastral_table" var="item" emptyMessage="#{msg.noRecordsFound}">
+                                 styleClass="without-header cadastral_table" var="item">
                         <p:column>
                             <h:outputText value="#{item.formalityStr}"/>
                         </p:column>
@@ -426,8 +224,8 @@
             </p:dataTable>
         </p:fieldset>
         <div align="center">
-            <h:outputText value="#{bean.externalRequestFrom}" rendered="#{bean.createdByExternalUser}"
-                          style="font-size: 20px"/>
+        <h:outputText value="#{bean.externalRequestFrom}" rendered="#{bean.createdByExternalUser}"
+                      style="font-size: 20px"/>
         </div>
         <p:outputPanel id="btn_line">
             <div class="btn_line">

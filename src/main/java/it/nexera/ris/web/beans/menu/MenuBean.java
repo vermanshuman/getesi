@@ -63,8 +63,8 @@ public class MenuBean extends PageBean implements Serializable {
         }
 
         addBackBtn();
-        //pushSubMenu(firstSubmenu);
-        //pushSubMenu(secondSubmenu);
+        pushSubMenu(firstSubmenu);
+        pushSubMenu(secondSubmenu);
         addForwardBtn();
 
         // sort Configurazioni menu
@@ -96,9 +96,8 @@ public class MenuBean extends PageBean implements Serializable {
         boolean isESVPage = this.getContext().getViewRoot().getViewId().contains("EstateSituationView");
 
         DefaultMenuItem item = new DefaultMenuItem();
-        // item.setValue(ResourcesHelper.getString("menuBackBtn"));
-        item.setValue(" ");
-        item.setIcon("go-back-icon");
+        item.setValue(ResourcesHelper.getString("menuBackBtn"));
+        item.setIcon("fa fa-chevron-circle-left");
         item.setIconPos("left");
         item.setStyleClass("first-menu-icon");
         if (isESVPage) {
@@ -112,8 +111,8 @@ public class MenuBean extends PageBean implements Serializable {
 
     private void addForwardBtn() {
         DefaultMenuItem item = new DefaultMenuItem();
-        item.setValue(" ");
-        item.setIcon("go-forward-icon");
+        item.setValue(ResourcesHelper.getString("menuForwardBtn"));
+        item.setIcon("fa fa-chevron-circle-right");
         item.setIconPos("right");
         item.setStyleClass("last-menu-icon");
         item.setOnclick("history.go(1);");
@@ -142,9 +141,9 @@ public class MenuBean extends PageBean implements Serializable {
             submenuAddElement(submenu, PageTypes.DATA_GROUP_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.EVENT_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.INPUT_CARD_LIST, "fa fa-fw fa-bars");
-            submenuAddElement(submenu, PageTypes.DAY_PHRASE_LIST, "fa fa-fw fa-quote-right");
-            submenuAddElement(submenu, PageTypes.TYPE_ACT_LIST, "fa fa-fw fa-bars");
-            submenuAddElement(submenu, PageTypes.TYPE_FORMALITY_LIST, "fa fa-fw fa-bars");
+            submenuAddElement(submenu, PageTypes.DAY_PHRASE, "fa fa-fw fa-quote-right");
+            submenuAddElement(submenu, PageTypes.TYPE_ACT, "fa fa-fw fa-bars");
+            submenuAddElement(submenu, PageTypes.TYPE_FORMALITY, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.CADASTRAL_TOPOLOGY, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.IBAN_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.PAYMENT_TYPE_LIST, "fa fa-fw fa-bars");
@@ -154,11 +153,12 @@ public class MenuBean extends PageBean implements Serializable {
             submenuAddElement(submenu, PageTypes.OMI_KML_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.CATEGORY_PERCENT_VALUE_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.COURT_LIST, "fa fa-fw fa-legal");
-            submenuAddElement(submenu, PageTypes.RELATIONSHIP_TYPES_LIST, "fa fa-fw fa-bars");
+            submenuAddElement(submenu, PageTypes.RELATIONSHIP_TYPES, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.REGIME_CONIUGI_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.SECTION_D_FORMAT_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.LAND_OMI_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.LAND_CULTURE_LIST, "fa fa-fw fa-bars");
+            submenuAddElement(submenu, PageTypes.FOREIGN_STATE_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.TAX_RATE_LIST, "fa fa-fw fa-bars");
         } catch (Exception e) {
             LogHelper.log(log, e);

@@ -35,7 +35,7 @@ public class Country extends Dictionary {
     @Transient
     public String getCamelCountryDescription(){
         if(!ValidationHelper.isNullOrEmpty(getDescription())) {
-            return WordUtils.capitalizeFully(getDescription(), ' ');
+           return WordUtils.capitalizeFully(getDescription(), ' ');
         }
         return "";
     }

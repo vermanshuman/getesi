@@ -109,7 +109,7 @@ public class ApplicationSettingsEditBean extends
                 .getByKey(ApplicationSettingsKeys.SESSION_TIMEOUT));
 
         setSettingsCloudApiKey(ApplicationSettingsHolder.getInstance().getByKey(
-                ApplicationSettingsKeys.CLOUD_API_KEY));
+                        ApplicationSettingsKeys.CLOUD_API_KEY));
 
         setSettingsCloudApiURL(ApplicationSettingsHolder.getInstance().getByKey(
                 ApplicationSettingsKeys.CLOUD_API_URL));
@@ -219,7 +219,7 @@ public class ApplicationSettingsEditBean extends
         this.settingSessionCheckTimeout = settingSessionCheckTimeout;
     }
 
-    public WLGServer getMailServerReceive() {
+	public WLGServer getMailServerReceive() {
         return mailServerReceive;
     }
 

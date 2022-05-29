@@ -65,7 +65,7 @@ public class SyntheticBindingWrapper extends BaseTab implements Serializable {
     }
 
     @Override
-    public Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+    Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
         return DaoManager.getCount(DocumentSubject.class, "id", new Criterion[]{
                 Restrictions.in("subject.id", getListIds()),
                 Restrictions.eq("type", DocumentType.ESTATE_FORMALITY),

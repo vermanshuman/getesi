@@ -5,8 +5,6 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
-                xmlns:c="http://java.sun.com/jsp/jstl/core"
-                xmlns:ff="http://readytech.com/functions"
                 template="/resources/tpl/Admin/EditBase.xhtml">
     <ui:param name="edit_title" value="#{msg.newClient}"/>
     <ui:param name="bean" value="#{clientEditBean}"/>
@@ -19,166 +17,6 @@
               value="#{bean.onlyView ? msg.close : msg.cancel}"/>
 
     <ui:define name="edit_body">
-        <style>
-            #configurePriceList .ui-panelgrid-cell{
-                border: 0px !important;
-                border-radius: 0px;
-            }
-            #configurePriceList{
-                overflow: hidden !important;
-            }
-            #configurePriceList .ui-dialog-titlebar{
-                padding: 5px !important;
-            }
-
-            #wizard ul {
-                background-color: transparent !important;
-                text-transform: uppercase;
-            }
-
-            #wizard ul::before {
-                border-bottom: none;
-            }
-
-            #wizard ul li:not(.ui-tabs-selected.ui-state-active ) a {
-                color: gray !important;
-                border-bottom: 2px solid #dee2e6;
-            }
-
-            #wizard ul li.ui-tabs-selected.ui-state-active {
-                background-color: transparent !important;
-            }
-
-            #wizard ul li.ui-tabs-selected.ui-state-active a {
-                color: #000 !important;
-                border-bottom: 3px solid #4872F2;
-                font-weight: bold;
-            }
-
-            #wizard *:not(.ui-icon) {
-                font-size: 18px;
-            }
-
-            #wizard .action_column {
-                width: 60px;
-            }
-            #wizard .close_btn {
-                float: right;
-                bottom: 20px;
-                right: 40px;
-                position: absolute;
-            }
-            div[id*='wizard:paymentMode'] {
-                min-width: 300px !important;
-                min-height: 50px;
-                vertical-align: middle;
-                margin-left: 20px;
-                margin-top: -5px;
-            }
-            div[id*='wizard:paymentMode'] .ui-selectonemenu-label, div[id*='wizard:paymentMode_panel'] * {
-                font-size: 23px !important;
-            }
-            div[id*='wizard:paymentMode'] .ui-selectonemenu-trigger {
-                width: 50px;
-                background-color: #DBDBDA;
-            }
-
-            #table_paginator_top, #table_paginator_bottom {
-                text-align: center;
-                padding-bottom: 4px !important;
-                padding: 8px 35px;
-            }
-
-            .ui-paginator-rpp-options {
-                margin-top: 6px !important;
-            }
-
-            .ui-paginator-current {
-                margin-top: 2px !important;
-            }
-
-            body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
-                background: #FFF !important;
-                color: #000000 !important;
-            }
-
-            table {
-                margin-top: 20px;
-                padding-left: 13px;
-                border-collapse: separate;
-                border-spacing: 0 0.6em;
-            }
-
-            body .ui-datatable:not(.borderless) thead th {
-                background-color: #CCCCCC !important;
-                border-color: #000 !important;
-                color: #5f666c !important;
-                padding: 8px 2px !important;
-                border-width: 1px!important;
-                border-style: solid!important;
-            }
-
-
-            table .ui-datatable-data td {
-                color: #003871;
-                border-top: none;
-                border-bottom: none;
-                background-color: #ffffff !important;
-            }
-
-            table .ui-datatable-data td:last-child {
-                border-right: none;
-                border-top-right-radius: 5px;
-                border-bottom-right-radius: 5px;
-                -webkit-box-shadow: 4px 0px 7px -2px rgba(0, 0, 0, 0.75);
-                -moz-box-shadow: 4px 0px 7px -2px rgba(0, 0, 0, 0.75);
-                box-shadow: 4px 0px 7px -2px rgba(0, 0, 0, 0.75);
-            }
-
-            table .ui-datatable-data tr {
-                background-color: transparent !important;
-                border-top: none;
-                -webkit-box-shadow: 0px 4px 7px -2px rgba(0, 0, 0, 0.75);
-                -moz-box-shadow: 0px 4px 7px -2px rgba(0, 0, 0, 0.75);
-                box-shadow: 0px 4px 7px -2px rgba(0, 0, 0, 0.75);
-            }
-
-            table .ui-datatable-data tr {
-                margin-bottom: 8px;
-                border-left: none;
-            }
-
-            table .ui-datatable-data {
-                border: none;
-                background: transparent;
-            }
-
-            body .ui-widget, body .ui-widget .ui-widget {
-                font-weight: 400 !important;
-            }
-
-            body .ui-datatable .ui-datatable-data > tr > td {
-                border: 1px solid #000 !important;
-            }
-
-            .action_column-header {
-                width: 150px !important;
-            }
-            .card.card-w-title {
-                border: none !important;
-            }
-            .servicesTable table {
-                margin-top: 60px;
-            }
-        </style>
-        <script type="text/javascript">
-            // <![CDATA[
-            jQuery(document).ready(function() {
-                jQuery('table th .ui-column-title').attr('style', 'color: #000 !important');
-                jQuery('table td').attr('style', 'color: #000 !important');
-            });
-            // ]]>
-        </script>
         <p:remoteCommand name="valid" action="#{bean.validTab()}"/>
         <p:remoteCommand name="updateRedStarFroms" action="#{bean.updateForms()}"
                          update=":form:wizard:secondPanel, :form:wizard:fifthPanel, :form:wizard:firstPanel"/>
@@ -191,23 +29,21 @@
                     <p:row>
                         <p:column style="padding-right: 20px">
                             <p:selectBooleanCheckbox id="manager" value="#{bean.entity.manager}"
-                                                     styleClass="booleanCheckbox" onchange="updateRedStarFroms();"
-                                                     disabled="#{bean.onlyView}"/>
+                                                     styleClass="booleanCheckbox" onchange="updateRedStarFroms();"/>
                             <span>#{msg.clientManager.toUpperCase()}</span><br/>
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column style="padding-right: 20px">
                             <p:selectBooleanCheckbox id="fiduciary" value="#{bean.entity.fiduciary}"
-                                                     styleClass="booleanCheckbox" onchange="updateRedStarFroms();"
-                                                     disabled="#{bean.onlyView}"/>
+                                                     styleClass="booleanCheckbox" onchange="updateRedStarFroms();"/>
                             <span>#{msg.clientTrust}</span><br/>
                         </p:column>
                     </p:row>
                     <p:row>
                         <p:column style="padding-right: 20px">
                             <p:selectBooleanCheckbox id="external" value="#{bean.entity.external}"
-                                                     styleClass="booleanCheckbox"  disabled="#{bean.onlyView}"/>
+                                                     styleClass="booleanCheckbox"/>
                             <span>#{msg.clientExternal}</span><br/>
                         </p:column>
                     </p:row>
@@ -239,7 +75,7 @@
                         </p:column>
                         <p:column rendered="#{bean.isProfessional}" style="width: 20%!important;">
                             <span>#{msg.clientProfName}</span><h:outputText value="*"
-                                                                            rendered="#{bean.renderImportant}" styleClass="red"/><br/>
+                                          rendered="#{bean.renderImportant}" styleClass="red"/><br/>
                             <p:inputText value="#{bean.entity.nameProfessional}" styleClass="input-width"
                                          maxlength="200" id="nameProfessional"
                                          label="#{msg.clientProfName}" rendered="#{!bean.onlyView}"/>
@@ -248,7 +84,7 @@
                         </p:column>
                         <p:column rendered="#{!bean.isProfessional}" style="width: 30%!important;">
                             <span>#{msg.clientNameOfTheCompany}<h:outputText value="*"
-                                                                             rendered="#{bean.renderImportant}" styleClass="red"/></span><br/>
+                                   rendered="#{bean.renderImportant}" styleClass="red"/></span><br/>
                             <p:inputText value="#{bean.entity.nameOfTheCompany}" maxlength="100"
                                          styleClass="input-width"
                                          id="nameOfTheCompany" label="#{msg.clientNameOfTheCompany}"
@@ -258,7 +94,7 @@
                         </p:column>
                         <p:column style="width: 15%!important;">
                             <span>#{msg.clientVATNumber}<h:outputText value="*"
-                                                                      rendered="#{bean.renderImportant}" styleClass="red"/></span><br/>
+                                              rendered="#{bean.renderImportant}" styleClass="red"/></span><br/>
                             <p:inputText value="#{bean.entity.numberVAT}" maxlength="11" id="numberVAT"
                                          styleClass="input-width"
                                          label="#{msg.clientVATNumber}" rendered="#{!bean.onlyView}"/>
@@ -267,7 +103,7 @@
                         </p:column>
                         <p:column style="width: 15%!important;">
                             <span>#{msg.clientFiscalCode}<h:outputText value="*"
-                                                                       rendered="#{bean.renderImportant}" styleClass="red"/></span><br/>
+                                            rendered="#{bean.renderImportant}" styleClass="red"/></span><br/>
                             <p:inputText value="#{bean.entity.fiscalCode}" maxlength="16"
                                          id="fiscalCode" label="#{msg.clientFiscalCode}" styleClass="input-width"
                                          rendered="#{!bean.onlyView}"/>
@@ -296,10 +132,10 @@
                         <p:column><span>#{msg.clientAddressHouseNumber.toUpperCase()} </span></p:column>
                         <p:column><span>#{msg.clientAddressPostalCode.toUpperCase()} </span></p:column>
                         <p:column><span>#{msg.clientAddressProvince}<h:outputText value="*"
-                                                                                  rendered="#{bean.renderImportant}" styleClass="red"/></span></p:column>
+                                      rendered="#{bean.renderImportant}" styleClass="red"/></span></p:column>
                         <p:column style="padding-right: 20px">
                             <span>#{msg.clientAddressCity} <h:outputText value="*"
-                                                                         rendered="#{bean.renderImportant}" styleClass="red"/></span>
+                                      rendered="#{bean.renderImportant}" styleClass="red"/></span>
                         </p:column>
                     </p:row>
                     <p:row>
@@ -373,7 +209,6 @@
                         <p:column><span>#{msg.clientFax} </span></p:column>
                         <p:column><span>#{msg.clientCell} </span></p:column>
                         <p:column style="padding-right: 20px"><span>#{msg.clientMailPEC} </span></p:column>
-                        <p:column><span>#{msg.clientAddressSDI} </span></p:column>
                     </p:row>
                     <p:row>
                         <p:column>
@@ -401,6 +236,11 @@
                             <h:outputText value="#{bean.entity.mailPEC}" rendered="#{bean.onlyView}"
                                           style="font-weight: bold;"/>
                         </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column><span>#{msg.clientAddressSDI} </span></p:column>
+                    </p:row>
+                    <p:row>
                         <p:column>
                             <p:inputText value="#{bean.entity.addressSDI}" maxlength="20" styleClass="input-width"
                                          rendered="#{!bean.onlyView}"/>
@@ -413,7 +253,7 @@
                     <p:row>
                         <p:column style="padding-right: 20px">
                             <p:selectBooleanCheckbox id="splitPayment" value="#{bean.entity.splitPayment}"
-                                                     styleClass="booleanCheckbox"  disabled="#{bean.onlyView}"/>
+                                                     styleClass="booleanCheckbox"/>
                             <span>#{msg.clientSplitPayment}</span><br/>
                         </p:column>
                     </p:row>
@@ -421,16 +261,16 @@
                         <p:column style="padding-right: 20px">
                             <span>#{msg.clientIban}</span><br/>
                             <p:selectOneMenu id="clientIban" value="#{bean.clientIbanId}" label="#{msg.clientIban}:"
-                                             disabled="#{bean.onlyView}">
+                                             rendered="#{!bean.onlyView}">
                                 <f:selectItems value="#{bean.ibans}"/>
                             </p:selectOneMenu></p:column>
                     </p:row>
                     <p:row>
                         <p:column style="padding-right: 20px">
-                            <div style="font-size: 25px;min-height: 50px;display: inline-block;">#{msg.invoicePaymentType}: </div>
+                            <span>#{msg.invoicePaymentType}: </span><br/>
                             <p:selectOneMenu id="paymentMode" value="#{bean.paymentTypeId}"
                                              label="#{msg.invoicePaymentType}"
-                                             disabled="#{bean.onlyView}">
+                                             rendered="#{!bean.onlyView}">
                                 <f:selectItem itemValue="" itemLabel="- Non selezionato -" />
                                 <f:selectItems value="#{bean.paymentTypes}"/>
                             </p:selectOneMenu>
@@ -442,15 +282,15 @@
                 <div class="ui-g">
                     <p:commandButton value="#{msg.clientAddEmail.toUpperCase()}" styleClass="green-button"
                                      style="margin-top: 15px"
-                                     oncomplete="PF('addEmailDlgWV').show();"  disabled="#{bean.onlyView}"/>
+                                     oncomplete="PF('addEmailDlgWV').show();"/>
                     <p:dataTable var="item" widgetVar="emailTableWV"
-                                 id="emailTable" styleClass="referent-table"
+                    			id="emailTable" styleClass="referent-table"
                                  emptyMessage="#{msg.noRecordsFound}"
                                  value="#{bean.emailsForDisplay}" rowKey="#{item.id}" rows="10"
                                  paginator="true" paginatorAlwaysVisible="true" rowIndexVar="rowId"
                                  paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                  rowsPerPageTemplate="10,20,50">
-                        <p:column selectionMode="multiple" style="width:50px;text-align:center" rendered="#{!bean.onlyView}"/>
+                        <p:column selectionMode="multiple" style="width:16px;text-align:center"/>
 
                         <p:column headerText="#{msg.clientMailDescription.toUpperCase()}">
                             <h:outputText value="#{item.clientEmail.description}"/>
@@ -461,17 +301,18 @@
                         </p:column>
 
                         <p:column styleClass="action_column" exportable="false">
-                            <p:commandButton icon="ui-icon pi pi-pencil" style="border: none !important;"
+                            <p:commandButton icon="ui-icon-myEdit" style="background-color: Transparent!important;"
                                              update="editEmailPanel" action="#{bean.prepareEditMail}"
-                                             oncomplete="PF('editEmailDlgWV').show();"  disabled="#{bean.onlyView}">
+                                             oncomplete="PF('editEmailDlgWV').show();">
                                 <f:setPropertyActionListener value="#{item.id}"
                                                              target="#{bean.emailEditId}"/>
                             </p:commandButton>
                         </p:column>
 
                         <p:column styleClass="action_column" exportable="false">
-                            <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"
-                                             oncomplete="PF('emailTableWV').filter(); PF('deleteEmailDlgWV').show();"  disabled="#{bean.onlyView}">
+                            <p:commandButton icon="ui-icon-myCancel" style="background-color: Transparent!important;"
+
+                                             oncomplete="PF('emailTableWV').filter(); PF('deleteEmailDlgWV').show();">
                                 <f:setPropertyActionListener value="#{item.id}"
                                                              target="#{bean.emailDeleteId}"/>
                             </p:commandButton>
@@ -485,21 +326,20 @@
                 <p:outputPanel widgetVar="firstPanel" id="firstPanel" style="margin: 15px 0 25px 0; position: relative">
 
                     <h:outputText rendered ="#{bean.clientFiduciaryOrManager}" value="#{msg.clientEditNotManagerOrFiduciary.toUpperCase()}"/>
-                    <p:outputPanel rendered="#{bean.clientFiduciaryOrManager}"
-                                   id="nonManagerOrFiduciaryClientList"
-                                   style="margin: 15px 0 25px 0;">
-                        <p:selectCheckboxMenu
-                                value="#{bean.selectedNonManagerOrFiduciaryClientIds}"
-                                label="#{msg.clients}" style="margin-right: 15px!important;"
-                                multiple="true" filter="true" filterMatchMode="startsWith"
-                                disabled="#{bean.onlyView}">
-                            <f:selectItems value="#{bean.nonManagerOrFiduciaryClientLists}" />
-                            <p:ajax event="change" update="secondPanel, fifthPanel"
-                                    listener="#{bean.initAreasAndOffices}" />
-                        </p:selectCheckboxMenu>
-                    </p:outputPanel>
+					<p:outputPanel rendered="#{bean.clientFiduciaryOrManager}"
+						id="nonManagerOrFiduciaryClientList"
+						style="margin: 15px 0 25px 0;">
+						<p:selectCheckboxMenu
+							value="#{bean.selectedNonManagerOrFiduciaryClientIds}"
+							label="#{msg.clients}" style="margin-right: 15px!important;"
+							 multiple="true" filter="true" filterMatchMode="startsWith">
+							<f:selectItems value="#{bean.nonManagerOrFiduciaryClientLists}" />
+							<p:ajax event="change" update="secondPanel, fifthPanel"
+								listener="#{bean.initAreasAndOffices}" />
+						</p:selectCheckboxMenu>
+					</p:outputPanel>
 
-                    <p:outputPanel id="addEmptyInvoicesRecipientBtnPanel">
+					<p:outputPanel id="addEmptyInvoicesRecipientBtnPanel">
                         <p:selectBooleanCheckbox widgetVar="showSubjectInvoice"
                                                  value="#{bean.subjectInvoice}"
                                                  onchange="toggleSubjectInvoice()"
@@ -539,7 +379,7 @@
                             <h:outputText value="#{itemB.addressStreet}"/>
                         </p:column>
                         <p:column styleClass="action_column" rendered="#{!bean.onlyView}">
-                            <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"
+                            <p:commandButton style="background-color: Transparent!important;" icon="ui-icon-myCancel"
                                              oncomplete="PF('deleteInvoicesRecipientDlg').show();">
                                 <f:setPropertyActionListener value="#{itemB.id}" target="#{bean.deleteClientId}"/>
                             </p:commandButton>
@@ -793,7 +633,7 @@
                                 <h:outputText value="#{itemB.addressStreet}"/>
                             </p:column>
                             <p:column styleClass="action_column" rendered="#{!bean.onlyView}">
-                                <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"
+                                <p:commandButton style="background-color: Transparent!important;" icon="ui-icon-myCancel"
                                                  oncomplete="PF('deleteReferentRecipientDlg').show();">
                                     <f:setPropertyActionListener value="#{itemB.id}" target="#{bean.referentDeleteId}"/>
                                 </p:commandButton>
@@ -806,44 +646,16 @@
                 <div class="ui-g" style="margin-top: 20px">
 
                     <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
+                        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+                            <h:outputText value="#{msg.clientMaximumCountOfFormalities}"/>
+                            <p:inputText value="#{bean.maximumFormalities}"
+                                         onkeypress="return numbers_only(this, event, 9, 0)" onkeyup="check_numbers(this, 9, 0);"/>
+                        </p:panelGrid>
                         <p:outputPanel id="costOutput">
                             <p:selectBooleanCheckbox value="#{bean.selectedCostOutput}" disabled="#{bean.onlyView}"/>
                             <span> #{ msg.clientEnterCostFinal.toUpperCase()}</span>
                         </p:outputPanel>
-                        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
-                            <h:outputText value="#{msg.clientMaximumCountOfFormalities}"/>
-                            <p:inputText value="#{bean.maximumFormalities}"
-                                         onkeypress="return numbers_only(this, event, 9, 0)" onkeyup="check_numbers(this, 9, 0);"
-                                         disabled="#{bean.onlyView}"/>
-                        </p:panelGrid>
-                        <p:panelGrid widgetVar="unauthorizedCostGrid" id="unauthorizedCostGrid" style="width: 100%"
-                                     styleClass="ui-panelgrid-blank form-group grey-panel">
-                            <p:row>
-                                <p:column colspan="3" style="width: 100%!important;">
-                                    <h:outputText value="#{msg.clientUnauthorizedQuoteCosts.toUpperCase()}"/>
-                                </p:column>
-                            </p:row>
-                            <p:row>
-                                <p:column style="width: 15%!important;">
-                                    <span><h:outputText value="#{msg.clientUnauthorizedCostPay}"/></span><br/>
-                                    <p:inputText value="#{bean.entity.unauthorizedCostPay}">
-                                        <p:keyFilter mask="num" />
-                                    </p:inputText>
-                                </p:column>
-                                <p:column style="width: 10%!important;">
-                                    <span><h:outputText value="#{msg.clientUnauthorizedCostFormality}"/> </span><br/>
-                                    <p:inputText value="#{bean.entity.unauthorizedCostFormality}">
-                                        <p:keyFilter mask="num" />
-                                    </p:inputText>
-                                </p:column>
-                                <p:column style="width: 10%!important;">
-                                    <span><h:outputText value="#{msg.clientUnauthorizedCostCadastral}"/> </span><br/>
-                                    <p:inputText value="#{bean.entity.unauthorizedCostCadastral}">
-                                        <p:keyFilter mask="num" />
-                                    </p:inputText>
-                                </p:column>
-                            </p:row>
-                        </p:panelGrid>
+
                         <h:outputText value="#{msg.headerBilling}"
                                       style="font-weight: bold; margin-left: 15px; font-size: large;"/>
 
@@ -859,22 +671,9 @@
                             <span>#{msg.clientEditMonthlyInvoice}: </span>
                             <p:selectBooleanCheckbox value="#{bean.entity.monthlyInvoice}" disabled="#{bean.onlyView}"/>
                         </p:panelGrid>
-                </p:panelGrid><br/>
-                    <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" rendered="#{bean.showClientCopy}"
-                                 style="position: absolute;margin-top: 390px;">
-
-                        <h:outputText value="#{msg.clientEditCopyCostList}"/>
-                        <p:selectOneMenu id="client" value="#{bean.selectedClientIdToCopy}" style="width: 300px; "
-                                         styleClass="#{bean.selectedClientIdToCopy ne null ? 'select-one-menu' : ''}">
-                            <f:selectItem itemLabel="#{ff:upper(msg.client_list)}" itemValue="#{null}"
-                                          noSelectionOption="true"/>
-                            <f:selectItems value="#{bean.clientsToCopy}" />
-                            <p:ajax event="itemSelect" update="@this"/>
-                        </p:selectOneMenu>
-                        <p:commandButton value="#{msg.clientEditCopy}" update="servicesTable wizardTabSERVICE" action="#{bean.copyPriceListClient}"/>
-                </p:panelGrid>
-                <p:dataTable var="item" value="#{bean.services}" editable="true" editMode="cell" id="servicesTable"
-                             emptyMessage="#{msg.noRecordsFound}" styleClass="servicesTable">
+                    </p:panelGrid>
+                    <p:dataTable var="item" value="#{bean.services}" editable="true" editMode="cell"
+                                 emptyMessage="#{msg.noRecordsFound}">
                         <f:facet name="header">
                             <h:outputText value="#{msg.clientServiceTable}"/>
                         </f:facet>
@@ -923,7 +722,7 @@
                         </p:column>
 
                         <p:column styleClass="action_column">
-                            <p:commandButton icon="ui-icon pi pi-search"
+                            <p:commandButton icon="ui-icon-mySearch" style="background-color: Transparent!important;"
                                              action="#{bean.fillPriceList}"
                                              update="configurePriceListPanel" process="@this">
                                 <f:setPropertyActionListener value="#{item.service.id}"
@@ -933,18 +732,9 @@
                             </p:commandButton>
                         </p:column>
                         <p:column styleClass="action_column">
-                            <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"
-                                             action="#{bean.fillPriceList}" disabled="#{bean.onlyView}"
-                                             update="configurePriceListPanel" process="@this" >
-                                <f:setPropertyActionListener value="#{item.service.id}"
-                                                             target="#{bean.selectedServiceId}"/>
-                                <f:setPropertyActionListener value="#{false}"
-                                                             target="#{bean.priceListDialogOnlyView}"/>
-                            </p:commandButton>
-                        </p:column>
-                        <p:column styleClass="action_column">
-                            <p:commandButton icon="ui-icon pi pi-pencil" style="border: none !important;"
-                                             action="#{bean.fillPriceList}" disabled="#{bean.onlyView}"
+                            <p:commandButton style="background-color: Transparent!important;"
+                                             icon="ui-icon-myCancel"
+                                             action="#{bean.fillPriceList}" rendered="#{!bean.onlyView}"
                                              update="configurePriceListPanel" process="@this">
                                 <f:setPropertyActionListener value="#{item.service.id}"
                                                              target="#{bean.selectedServiceId}"/>
@@ -952,98 +742,97 @@
                                                              target="#{bean.priceListDialogOnlyView}"/>
                             </p:commandButton>
                         </p:column>
+                        <p:column styleClass="action_column">
+                            <p:commandButton icon="ui-icon-myEdit" style="background-color: Transparent!important;"
+                                             action="#{bean.fillPriceList}" rendered="#{!bean.onlyView}"
+                                             update="configurePriceListPanel" process="@this">
+                                <f:setPropertyActionListener value="#{item.service.id}"
+                                                             target="#{bean.selectedServiceId}"/>
+                                <f:setPropertyActionListener value="#{false}"
+                                                             target="#{bean.priceListDialogOnlyView}"/>
+                            </p:commandButton>
+                        </p:column>
+
                     </p:dataTable>
                 </div>
             </p:tab>
             <p:tab id="wizardTabBILLING" title="#{msg.wizardTabBILLING.toUpperCase()}">
-                <br/>
-                <span><b>#{msg.clientEditMonthlyBillingData}</b>:</span>
-                <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+            	<br/>
+            	<span><b>#{msg.clientEditMonthlyBillingData}</b>:</span>
+				<p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+					
+					<span>#{msg.clientBilling}:</span>
+					<p:pickList value="#{bean.invoiceColumns}" var="invoiceColumn"
+						effect="explode" itemValue="#{invoiceColumn.field}"
+						itemLabel="#{invoiceColumn}" showSourceFilter="true"
+						showTargetFilter="true" id="invoiceColumns" filterMatchMode="contains"
+						converter="clientInvoiceColumnConverter" />
+				</p:panelGrid>
+				<br/>
+				<span><b>#{msg.clientEditDailyBillingData}</b>:</span>
+				<p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group">
+					<span>#{msg.requestService}:</span>
+					<p:selectOneMenu id="requestTypeName" value="#{bean.selectedBillingRequestTypeId}"
+						styleClass="select-width" label="#{msg.requestService}"
+						rendered="#{!bean.onlyView}">
+						<f:selectItems value="#{bean.requestTypeNames}" />
+					</p:selectOneMenu>
+					<p:commandButton id="addBtn" icon="fa fa-plus" action="#{bean.addRequestTypeInvoiceColumns}" update="requestTypeName requestTypeInvoices"/>
+				</p:panelGrid>
+				
+				<p:outputPanel id="requestTypeInvoices">
+					<ui:repeat value="#{bean.requestTypeInvoiceColumns}" var="sic">
+						<p:row>
+							<p:column styleClass="ui-g-2">#{sic}</p:column>
+						</p:row>
+						<br />
+						<p:row>
+							<p:pickList value="#{sic.invoiceColumns}" var="sinvoiceColumn"
+								effect="explode" itemValue="#{sinvoiceColumn.field}"
+								itemLabel="#{sinvoiceColumn}" showSourceFilter="true"
+								showTargetFilter="true" id="sinvoiceColumns"
+								filterMatchMode="contains"
+								converter="clientInvoiceColumnConverter" />
+						</p:row>
+						<br />
+					</ui:repeat>
+				</p:outputPanel>
+				
 
-                    <span>#{msg.clientBilling}:</span>
-                    <p:pickList value="#{bean.invoiceColumns}" var="invoiceColumn"
-                                effect="explode" itemValue="#{invoiceColumn.field}"
-                                itemLabel="#{invoiceColumn}" showSourceFilter="true"
-                                showTargetFilter="true" id="invoiceColumns" filterMatchMode="contains"
-                                converter="clientInvoiceColumnConverter" disabled="#{bean.onlyView}"/>
-                </p:panelGrid>
-                <br/>
-                <span><b>#{msg.clientEditDailyBillingData}</b>:</span>
-                <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group">
-                    <span>#{msg.requestService}:</span>
-                    <p:selectOneMenu id="requestTypeName" value="#{bean.selectedBillingRequestTypeId}"
-                                     styleClass="select-width" label="#{msg.requestService}"
-                                     disabled="#{bean.onlyView}">
-                        <f:selectItems value="#{bean.requestTypeNames}" />
-                    </p:selectOneMenu>
-                    <p:commandButton id="addBtn" icon="fa fa-plus" action="#{bean.addRequestTypeInvoiceColumns}" update="requestTypeName requestTypeInvoices"
-                                     disabled="#{bean.onlyView}"/>
-                </p:panelGrid>
-
-                <p:outputPanel id="requestTypeInvoices">
-                    <ui:repeat value="#{bean.requestTypeInvoiceColumns}" var="sic">
-                        <p:row>
-                            <p:column styleClass="ui-g-2">#{sic}</p:column>
-                        </p:row>
-                        <br />
-                        <p:row>
-                            <p:pickList value="#{sic.invoiceColumns}" var="sinvoiceColumn"
-                                        effect="explode" itemValue="#{sinvoiceColumn.field}"
-                                        itemLabel="#{sinvoiceColumn}" showSourceFilter="true"
-                                        showTargetFilter="true" id="sinvoiceColumns"
-                                        filterMatchMode="contains"
-                                        converter="clientInvoiceColumnConverter" disabled="#{bean.onlyView}"/>
-                        </p:row>
-                        <br />
-                    </ui:repeat>
-                </p:outputPanel>
-
-
-            </p:tab>
-            <p:tab id="wizardTabCUSTOMIZATION" title="#{msg.wizardTabCUSTOMIZATION.toUpperCase()}">
-                <div class="grey-panel" style="height: 20px"/>
+			</p:tab>
+			 <p:tab id="wizardTabCUSTOMIZATION" title="#{msg.wizardTabCUSTOMIZATION.toUpperCase()}">
+				<div class="grey-panel" style="height: 20px"/>
                 <div class="ui-g">
                     <div class="ui-g-2">
                         <h:outputText value="#{msg.clientCustomizationLand.toUpperCase()}"/>
                     </div>
                 </div>
-                <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
-                    <h:outputLabel for="showCadastralIncome" value="#{msg.clientCustomizationShowCadastralIncome}"/>
-                    <p:selectBooleanCheckbox id="showCadastralIncome" value="#{bean.entity.showCadastralIncome}"
-                                             disabled="#{bean.onlyView}"/>
-                    <h:outputLabel for="showAgricultularIncome" value="#{msg.clientCustomizationShowAgriculturalIncome}"
-                                   disabled="#{bean.onlyView}"/>
-                    <p:selectBooleanCheckbox id="showAgricultularIncome" value="#{bean.entity.showAgriculturalIncome}"
-                                             disabled="#{bean.onlyView}"/>
-                    <h:outputLabel for="showSalesDevelopment" value="#{msg.clientCustomizationShowSalesDevelopment}"
-                                   disabled="#{bean.onlyView}"/>
-                    <p:selectBooleanCheckbox id="showSalesDevelopment" value="#{bean.entity.salesDevelopment}"
-                                             disabled="#{bean.onlyView}"/>
+				<p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+					<h:outputLabel for="showCadastralIncome" value="#{msg.clientCustomizationShowCadastralIncome}"/>
+					<p:selectBooleanCheckbox id="showCadastralIncome" value="#{bean.entity.showCadastralIncome}"/>
+					<h:outputLabel for="showAgricultularIncome" value="#{msg.clientCustomizationShowAgriculturalIncome}"/>
+					<p:selectBooleanCheckbox id="showAgricultularIncome" value="#{bean.entity.showAgriculturalIncome}"/>
+                    <h:outputLabel for="showSalesDevelopment" value="#{msg.clientCustomizationShowSalesDevelopment}"/>
+                    <p:selectBooleanCheckbox id="showSalesDevelopment" value="#{bean.entity.salesDevelopment}"/>
                     <h:outputLabel for="calculateLandOMI" value="#{msg.clientCustomizationCalculateLandOMI}"/>
-                    <p:selectBooleanCheckbox id="calculateLandOMI" value="#{bean.entity.landOmi}"
-                                             disabled="#{bean.onlyView}"/>
+                    <p:selectBooleanCheckbox id="calculateLandOMI" value="#{bean.entity.landOmi}"/>
                     <h:outputLabel for="sendFormality" value="#{msg.clientCustomizationSendFormality}"/>
-                    <p:selectBooleanCheckbox id="sendFormality" value="#{bean.entity.sendFormality}"
-                                             disabled="#{bean.onlyView}"/>
+                    <p:selectBooleanCheckbox id="sendFormality" value="#{bean.entity.sendFormality}"/>
                     <h:outputLabel for="sendSalesDevelopmentFormality" value="#{msg.clientCustomizationSendSalesDevelopmentFormality}"/>
-                    <p:selectBooleanCheckbox id="sendSalesDevelopmentFormality" value="#{bean.entity.sendSalesDevelopmentFormality}"
-                                             disabled="#{bean.onlyView}"/>
+                    <p:selectBooleanCheckbox id="sendSalesDevelopmentFormality" value="#{bean.entity.sendSalesDevelopmentFormality}"/>
                     <h:outputLabel for="clientRegime" value="#{msg.clientRegime}"/>
-                    <p:selectBooleanCheckbox id="clientRegime" value="#{bean.entity.regime}"
-                                             disabled="#{bean.onlyView}"/>
+                    <p:selectBooleanCheckbox id="clientRegime" value="#{bean.entity.regime}"/>
                 </p:panelGrid>
-            </p:tab>
-
+			</p:tab>
+			
         </p:tabView>
-        <p:outputPanel id="nextButton" style="margin-top: 15px; position: relative;">
-            <p:commandButton value="#{msg.save.toUpperCase()}" styleClass="green-button"
-                             rendered="#{not bean.onlyView}"
-                             style="position: absolute; right: 10px;top: 12px;"
-                             actionListener="#{bean.pageSave}"
-                             icon="fa fa-floppy-o"/>
-            <p:commandButton value="#{msg.edit}" rendered="#{bean.onlyView}" style="position: absolute; right: 10px;bottom: 10px;"
-                             update=":form" action="#{bean.editClient}"/>
-        </p:outputPanel>
+	                <p:outputPanel id="nextButton" style="margin-top: 15px; position: relative;">
+                    <p:commandButton value="#{msg.save.toUpperCase()}" styleClass="green-button"
+                                     iconPos="right"
+                                     style="position: absolute; right: 0;"
+                                     actionListener="#{bean.pageSave}"
+                                     icon="ui-icon-disk"/>
+                </p:outputPanel>
 
         <script>
             function toggleSubjectInvoice() {
@@ -1072,6 +861,12 @@
 
 
         </script>
+    </ui:define>
+
+    <ui:define name="additional_buttons">
+        <p:commandButton value="#{msg.edit}" rendered="#{bean.onlyView}"
+                         update=":form" action="#{bean.editClient}"
+                         icon="ui-icon ui-icon-pencil"/>
     </ui:define>
 
     <ui:define name="dialog_body">
@@ -1104,11 +899,11 @@
 
         </p:dialog>
 
-        <p:dialog id="configurePriceList" width="90%" widgetVar="configurePriceListWV" styleClass="table-center"
-                  resizable="false" closable="true" fitViewport="true"  draggable="false" modal="true" style="max-height: 85%;" >
-            <p:outputPanel widgetVar="configurePriceListPanel" id="configurePriceListPanel" style="min-height: 100px; height: 700px; overflow: auto;">
-                <p:dataTable var="itemR" value="#{bean.selectedService.priceLists}" styleClass="without-header borderless"
-                             emptyMessage="#{msg.noRecordsFound}" id="configurePriceListTable">
+        <p:dialog id="configurePriceList" widgetVar="configurePriceListWV" styleClass="table-center"
+                  resizable="false" closable="false" draggable="true" modal="true">
+            <p:outputPanel widgetVar="configurePriceListPanel" id="configurePriceListPanel">
+                <p:dataTable var="itemR" value="#{bean.selectedService.priceLists}" styleClass="without-header"
+                             emptyMessage="#{msg.noRecordsFound}">
                     <p:column>
                         <h:outputText value="#{itemR.costConfiguration}" style="font-weight: bold;"/>
                         <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group" columnClasses="column-height"
@@ -1129,8 +924,8 @@
                             <h:outputText value="#{msg.costConfigurationFormalityCostoSuccessive}"/>
                         </p:panelGrid>
                     </p:column>
-
-
+                    
+                    
                     <p:column>
                         <p:outputPanel rendered="#{not bean.priceListDialogOnlyView}">
                             <p:inputText value="#{itemR.price}" rendered="#{!itemR.isFixedOrSalaryCost}"
@@ -1204,60 +999,33 @@
 
                     </p:column>
                 </p:dataTable>
-
+                
                 <p:panel id="negativeService" rendered="#{bean.selectedService.service.isNegative}"
-                         style="margin: auto; "
-                         header ="Costo visura negativa">
+                style="margin: auto; " 
+                header ="Costo visura negativa">
                     <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" columnClasses="ui-grid-col-2, ui-grid-col-3"
-                                 layout="grid">
+                     layout="grid">
 
                         <span>#{msg.serviceFixed}: </span>
                         <p:inputText value="#{bean.negativePriceList.price}" id="servicefixedCompensation"
                                      rendered="#{not bean.priceListDialogOnlyView}" styleClass="input-width"/>
-                        <h:outputText value="#{bean.negativePriceList.price}"
+                         <h:outputText value="#{bean.negativePriceList.price}"
                                       rendered="#{bean.priceListDialogOnlyView}"/>
                         <span>#{msg.serviceConservationCosts}: </span>
                         <p:inputText value="#{bean.negativePriceList.firstPrice}" id="serviceConservationCosts"
                                      rendered="#{not bean.priceListDialogOnlyView}" styleClass="input-width"/>
-                        <h:outputText value="#{bean.negativePriceList.firstPrice}"
-                                      rendered="#{bean.priceListDialogOnlyView}"/>
-                        <span>#{msg.taxRate}: </span>
-                        <p:selectOneMenu value="#{bean.negativePriceList.selectedTaxRateId}" id="serviceFixedTaxRate"
-                                         label="#{msg.taxRate}"
-                                         rendered="#{not bean.priceListDialogOnlyView}">
-                            <f:selectItems value="#{bean.taxRates}"/>
-                        </p:selectOneMenu>
-                        <h:outputText value="#{bean.negativePriceList.taxRate}"
+                         <h:outputText value="#{bean.negativePriceList.firstPrice}"
                                       rendered="#{bean.priceListDialogOnlyView}"/>
                     </p:panelGrid>
                 </p:panel>
-
-                <p:panel id="extraCostsService"
-                         style="margin: auto; "
-                         header ="#{msg.extraCosts}">
-                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" columnClasses="ui-grid-col-2, ui-grid-col-3"
-                                 layout="grid">
-                        <c:forEach var="taxRateExtraCost" items="#{bean.selectedService.taxRateExtraCosts}" varStatus="loop">
-                            <p:outputPanel rendered="#{loop.index == 0}"><span>#{msg.mortgageCosts}: </span></p:outputPanel>
-                            <p:outputPanel rendered="#{loop.index == 1}"><span>#{msg.landRegistryCosts}: </span></p:outputPanel>
-                            <p:outputPanel rendered="#{loop.index == 2}"><span>#{msg.stamps}: </span></p:outputPanel>
-                            <p:outputPanel rendered="#{loop.index == 3}"><span>#{msg.postalCosts}: </span></p:outputPanel>
-                            <p:outputPanel rendered="#{loop.index == 4}"><span>#{msg.other}: </span></p:outputPanel>
-                            <p:selectOneMenu value="#{taxRateExtraCost.taxRateId}"
-                                             label="#{msg.taxRate}" appendTo="@this"
-                                             rendered="#{!bean.onlyView}">
-                                <f:selectItems value="#{bean.taxRates}"/>
-                            </p:selectOneMenu>
-                        </c:forEach>
-                    </p:panelGrid>
-                </p:panel>
-
+                
+                
                 <div class="btn_line">
-                    <p:commandButton value="#{msg.confirm}" process="@(.myclass)" class="ui-button-success "
-                                     oncomplete="PF('configurePriceListWV').hide()" style="margin-right: 5px;"/>
-                    <p:commandButton value="#{msg.cancel}" process="@(.myclass)" class="ui-button-danger"
+                    <p:commandButton value="#{msg.confirm}" process="@(.myclass)"
+                                     oncomplete="PF('configurePriceListWV').hide()"/>
+                    <p:commandButton value="#{msg.cancel}" process="@(.myclass)"
                                      oncomplete="PF('configurePriceListWV').hide()"
-                                     action="#{bean.cancelPriceList}" immediate="true"  style="background-color: #F3362B !important;"/>
+                                     action="#{bean.cancelPriceList}" immediate="true"/>
                 </div>
             </p:outputPanel>
         </p:dialog>
@@ -1266,7 +1034,7 @@
                   closable="false" draggable="false" modal="true">
 
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" id="addEmailPanel"
-                         widgetVar="addEmailPanel">
+            	widgetVar="addEmailPanel">
 
                 <h:outputText value="#{msg.clientMail}:"/>
                 <p:inputText value="#{bean.newEmail}" id="mail"/>
@@ -1290,7 +1058,7 @@
                   resizable="false" closable="false" draggable="false" modal="true">
 
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" id="editEmailPanel"
-                         widgetVar="editEmailPanel">
+             widgetVar="editEmailPanel">
 
                 <h:outputText value="#{msg.clientMail}:"/>
                 <p:inputText value="#{bean.editEmail}" id="editMail"/>
@@ -1324,23 +1092,23 @@
     </ui:define>
     <ui:define name="invoices_recipient" >
         <h:form id="invoicesRecipient">
-            <p:dialog widgetVar="invoicesRecipientDlg" resizable="false"
-                      closable="false" draggable="false" modal="true">
-                <p:outputPanel id="invoicesRecipientDialog">
-                    <h:outputText value="#{msg.client}:"/><br/>
-                    <p:selectOneMenu value="#{bean.selectedClientId}">
-                        <f:selectItems value="#{bean.billingRecipients}"/>
-                    </p:selectOneMenu>
-                </p:outputPanel>
+        <p:dialog widgetVar="invoicesRecipientDlg" resizable="false"
+                  closable="false" draggable="false" modal="true">
+            <p:outputPanel id="invoicesRecipientDialog">
+                <h:outputText value="#{msg.client}:"/><br/>
+                <p:selectOneMenu value="#{bean.selectedClientId}">
+                    <f:selectItems value="#{bean.billingRecipients}"/>
+                </p:selectOneMenu>
+            </p:outputPanel>
 
-                <div class="btn_line">
-                    <p:commandButton value="#{msg.yes}"
-                                     oncomplete="PF('invoicesRecipientDlg').hide();"
-                                     action="#{bean.addInvoicesRecipient}" update=":form:wizard:subjectInvoice"/>
-                    <p:commandButton value="#{msg.no}"
-                                     onclick="PF('invoicesRecipientDlg').hide();"/>
-                </div>
-            </p:dialog>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.yes}"
+                                 oncomplete="PF('invoicesRecipientDlg').hide();"
+                                 action="#{bean.addInvoicesRecipient}" update=":form:wizard:subjectInvoice"/>
+                <p:commandButton value="#{msg.no}"
+                                 onclick="PF('invoicesRecipientDlg').hide();"/>
+            </div>
+        </p:dialog>
 
             <p:dialog widgetVar="referentRecipientDlg" resizable="false"
                       closable="false" draggable="false" modal="true">

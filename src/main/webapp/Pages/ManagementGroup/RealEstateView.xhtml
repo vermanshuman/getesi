@@ -42,7 +42,7 @@
 
         </p:panelGrid>
         <p:panel header="#{msg.databaseListRealEstateCadastralTable}">
-            <p:dataTable value="#{bean.entity.cadastralData}" var="item" emptyMessage="#{msg.noRecordsFound}">
+            <p:dataTable value="#{bean.entity.cadastralData}" var="item">
                 <p:column headerText="#{msg.databaseListRealEstateSheet}">
                     <h:outputText value="#{item.sheet}"/>
                 </p:column>
@@ -60,7 +60,7 @@
         <br/>
         <p:tabView>
             <p:tab title="#{bean.formalityTabTitle}">
-                <p:dataTable value="#{bean.formalityList}" var="item" emptyMessage="#{msg.noRecordsFound}">
+                <p:dataTable value="#{bean.formalityList}" var="item">
                     <p:column headerText="#{msg.subjectViewFormalityConservatory}">
                         <h:outputText value="#{item.conservatoryStr}"/>
                     </p:column>
@@ -90,7 +90,7 @@
                 </p:dataTable>
             </p:tab>
             <p:tab title="#{bean.cadastralTabTitle}">
-                <p:dataTable value="#{bean.cadastralList}" var="item" emptyMessage="#{msg.noRecordsFound}">
+                <p:dataTable value="#{bean.cadastralList}" var="item">
                     <p:column headerText="#{msg.subjectViewCadastralOffice}">
                         <h:outputText value="#{item.province}"/>
                     </p:column>

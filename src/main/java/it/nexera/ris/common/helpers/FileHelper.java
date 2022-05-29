@@ -3,17 +3,20 @@ package it.nexera.ris.common.helpers;
 import it.nexera.ris.persistence.UserHolder;
 import it.nexera.ris.web.listeners.ApplicationListener;
 
-import java.util.*;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.primefaces.model.UploadedFile;
 
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.Date;
+import java.util.Properties;
+import java.util.StringJoiner;
+import java.util.UUID;
 
 /**
  * FileHelper class Used for working with filesystem
@@ -24,8 +27,6 @@ public class FileHelper extends BaseHelper {
     private static String CONTEXT_NAME = "ris";
 
     private static String realPath;
-
-    private static Map<String, XWPFRun> templateMapping = new HashMap<>();
 
     public static String getLocalFilePath(String path) throws IOException {
         if (FileHelper.exists(FileHelper.getLocalFileDir(), path)) {
@@ -482,14 +483,6 @@ public class FileHelper extends BaseHelper {
 
     public static void setRealPath(String realPath) {
         FileHelper.realPath = realPath;
-    }
-
-    public static Map<String, XWPFRun> getTemplateMapping() {
-        return templateMapping;
-    }
-
-    public static void setTemplateMapping(Map<String, XWPFRun> templateMapping) {
-        FileHelper.templateMapping = templateMapping;
     }
 
     public static Properties getApplicationProperties() {

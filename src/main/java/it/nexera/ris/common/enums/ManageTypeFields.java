@@ -35,8 +35,7 @@ public enum ManageTypeFields {
     ULTIMA_RESIDENZA(new EnumPropsWrapper(26l)),
     NOTARY(new EnumPropsWrapper(27l)),
     ACT_ATTACHMENT(new EnumPropsWrapper(28l)),
-    SUBJECT_LIST(new EnumPropsWrapper(29l)),
-    CONSERVATORY_TALOVARE(new EnumPropsWrapper(30l));
+    SUBJECT_LIST(new EnumPropsWrapper(29l));
 
     private EnumPropsWrapper enumPropsWrapper;
 

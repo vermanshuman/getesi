@@ -11,40 +11,6 @@
     <ui:param name="entity_name" value="#{msg.event}"/>
     <ui:param name="dynamicOnComplete" value="resetFieldsJS()"/>
     <ui:define name="common_components">
-        <style>
-            .layout-main {
-                background-color: #f2f2f2 !important;
-            }
-            .fc .fc-button-group > * {
-                background-color: #2196F3 !important;
-                border: 1px solid #2196F3 !important;
-            }
-            .fc-toolbar button {
-                padding: .6em 1.2em !important;
-                height: 2.5em;
-                margin-left: 5px !important;
-            }
-            body .ui-widget-header {
-                background: #f8f9fa !important;
-                color: #495057 !important;
-            }
-            .fc td.fc-today {
-                background-color: #a6d5fa!important;
-                color: #000 !important;
-                opacity: 1;
-            }
-            body .ui-button.ui-state-active {
-                background: #0b7ad1 !important;
-                border-color: #0b7ad1 !important;
-            }
-            .fa-angle-left:before {
-                font-size: 18px;
-            }
-            .fa-angle-right:before {
-                font-size: 18px;
-            }
-        </style>
-
         <script>
             function tpStartOnHourShowCallback(hour) {
                 if (!PrimeFaces.widgets['endTimeWidget']) {
@@ -103,29 +69,15 @@
                 }
                 return false;
             }
-
-            $(document).ready(function() {
-                setTimeout(() => {
-                    $(".fc-prev-button").addClass("fa fa-angle-left");
-                    $(".fc-next-button").addClass("fa fa-angle-right");
-                }, 200);
-            });
         </script>
-<!--        <p:panel header="Calendar">-->
-<!--            <p:schedule id="schedule" value="#{bean.scheduleModel}" ignoreTimezone="true" draggable="false"-->
-<!--                        resizable="false" timeFormat="HH:mm" axisFormat="HH:mm">-->
-<!--                <p:ajax event="dateSelect" listener="#{bean.onDateSelect}" update=":table :editPanel"/>-->
-<!--                <p:ajax event="eventSelect" listener="#{bean.onEventSelect}" update="eventDetails"-->
-<!--                        oncomplete="PF('eventDialog').show();"/>-->
-<!--            </p:schedule>-->
-<!--        </p:panel>-->
-        <h5>Calendar</h5>
-        <p:schedule id="schedule" value="#{bean.scheduleModel}" ignoreTimezone="true" draggable="false"
-                    resizable="false" timeFormat="HH:mm" axisFormat="HH:mm">
-            <p:ajax event="dateSelect" listener="#{bean.onDateSelect}" update=":table :editPanel"/>
-            <p:ajax event="eventSelect" listener="#{bean.onEventSelect}" update="eventDetails"
-                    oncomplete="PF('eventDialog').show();"/>
-        </p:schedule>
+        <p:panel header="Calendar">
+            <p:schedule id="schedule" value="#{bean.scheduleModel}" ignoreTimezone="true" draggable="false"
+                        resizable="false" timeFormat="HH:mm" axisFormat="HH:mm">
+                <p:ajax event="dateSelect" listener="#{bean.onDateSelect}" update=":table :editPanel"/>
+                <p:ajax event="eventSelect" listener="#{bean.onEventSelect}" update="eventDetails"
+                        oncomplete="PF('eventDialog').show();"/>
+            </p:schedule>
+        </p:panel>
         <ui:include src="/resources/tpl/Admin/Include/EventDialog.xhtml"/>
     </ui:define>
     <ui:define name="edit_fields">

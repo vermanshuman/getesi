@@ -314,7 +314,7 @@
                     <p:column exportable="false" styleClass="action_midle_column"
                               headerText="#{msg.requestOldRequestDetails}"
                               rendered="#{!bean.requestListBean.getCurrentUser().isExternal()}" width="60">
-                        <p:commandButton icon="pi pi-search"
+                        <p:commandButton icon="ui-icon ui-icon-search"
                                          disabled="#{!bean.requestListBean.canEdit}"
                                          action="#{bean.requestListBean.manageRequest}">
                             <f:setPropertyActionListener value="#{item.id}"
@@ -380,7 +380,7 @@
                         </p:column>
                     </ui:remove>
                     <p:column styleClass="action_column" exportable="false">
-                        <p:commandButton  icon="ui-icon pi pi-times" styleClass="red-btn"
+                        <p:commandButton icon="ui-icon ui-icon-close" styleClass="btn-red"
                                          oncomplete="PF('dlg2').show()" disabled="#{!bean.requestListBean.canDelete}">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.requestListBean.entityDeleteId}"/>
@@ -392,7 +392,7 @@
                 <p:overlayPanel id="userSelectCheckboxPanel" my="left top" at="left bottom"
                                 widgetVar="userSelectCheckboxWV" for="table:userSelectCheckboxShow"
                                 onHide="filterTableFromPanel();" dynamic="true" style="width:300px">
-                    <p:dataTable id="userSelectCheckboxPanelDataTable" var="state" emptyMessage="#{msg.noRecordsFound}"
+                    <p:dataTable id="userSelectCheckboxPanelDataTable" var="state"
                                  value="#{bean.requestListBean.userWrappers}" selectionMode="single"
                                  selection="#{bean.requestListBean.selectedUserForFilter}" rowKey="#{state.value}">
 
@@ -420,7 +420,7 @@
         </p:tabView>
         <p:dialog id="documentDialog" widgetVar="documentDialog" modal="true" resizable="false" draggable="false"
                   width="600">
-            <p:dataTable value="#{bean.requestListBean.requestDocuments}" var="doc" id="requestDocs" emptyMessage="#{msg.noRecordsFound}">
+            <p:dataTable value="#{bean.requestListBean.requestDocuments}" var="doc" id="requestDocs">
                 <p:column headerText="#{msg.name}">
                     <h:outputText value="#{doc.title}"/>
                 </p:column>

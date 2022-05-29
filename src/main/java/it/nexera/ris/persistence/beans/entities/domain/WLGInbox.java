@@ -397,8 +397,7 @@ public class WLGInbox extends IndexedEntity {
             imgFiles = (List<WLGExport>) DaoManager.getSession().createSQLQuery("SELECT * FROM wlg_export "
                     + "WHERE wlg_inbox_id = " + getId() + " AND (image_selected IS NULL OR image_selected = FALSE) AND "
                     + "(destination_path LIKE '%image0%.jpeg' OR destination_path LIKE '%image0%.jpg' OR "
-                    + "destination_path LIKE '%image0%.gif' OR destination_path LIKE '%image0%.png'" +
-                    " OR destination_path LIKE '%OutlookEmoji%.png')")
+                    + "destination_path LIKE '%image0%.gif' OR destination_path LIKE '%image0%.png')")
                     .addEntity(WLGExport.class).list();
             if (imgFiles == null) {
                 imgFiles = new ArrayList<>();
