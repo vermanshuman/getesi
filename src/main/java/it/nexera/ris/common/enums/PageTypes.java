@@ -128,7 +128,7 @@ public enum PageTypes {
     IBAN_LIST("/Pages/ManagementGroup/IbanList.jsf"),
     IBAN_EDIT("/Pages/ManagementGroup/IbanEdit.jsf"),
     PAYMENT_TYPE_LIST("/Pages/ManagementGroup/PaymentTypeList.jsf"),
-    PAYMENT_TYPE_EDIT("/Pages/ManagementGroup/PaymentTypeEdit.jsf"),
+    //PAYMENT_TYPE_EDIT("/Pages/ManagementGroup/PaymentTypeEdit.jsf"),
 
     INVOICE_LIST("/Pages/ManagementGroup/InvoiceList.jsf"),
     INVOICE_EDIT("/Pages/ManagementGroup/InvoiceEdit.jsf"),
