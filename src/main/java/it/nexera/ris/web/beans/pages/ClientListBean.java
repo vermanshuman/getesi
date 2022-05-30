@@ -116,6 +116,10 @@ public class ClientListBean extends EntityLazyListPageBean<ClientShort> implemen
     private Long selectedClientOfficeId;
     
     private List<SelectItem> clientOffices;
+
+    private Integer tab;
+
+
     /*
      * (non-Javadoc)
      *
@@ -123,6 +127,12 @@ public class ClientListBean extends EntityLazyListPageBean<ClientShort> implemen
      */
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException {
+        try {
+            setTab(Integer.valueOf(getRequestParameter(RedirectHelper.TAB)));
+        } catch (NumberFormatException e) {
+            log.info(e.getMessage());
+        }
+
         if (getSession().containsKey("clientSaved")) {
             MessageHelper.addGlobalMessage(FacesMessage.SEVERITY_INFO, "",
                     ResourcesHelper.getString("clientSavedCorrectly"));
@@ -274,65 +284,97 @@ public class ClientListBean extends EntityLazyListPageBean<ClientShort> implemen
             criterions.add(Restrictions.or(criteria1, criteria2));
         }
 
-        if (!ValidationHelper.isNullOrEmpty(getNumberVAT())) {
-            criterions.add(Restrictions.like("numberVAT", getNumberVAT(), MatchMode.ANYWHERE));
-        }
+        if(ValidationHelper.isNullOrEmpty(getTab())){
+            if (!ValidationHelper.isNullOrEmpty(getNumberVAT())) {
+                criterions.add(Restrictions.like("numberVAT", getNumberVAT(), MatchMode.ANYWHERE));
+            }
 
-        if (!Province.FOREIGN_COUNTRY_ID.equals(getAddressProvinceId())
-                && !ValidationHelper.isNullOrEmpty(getAddressProvinceId())) {
-            criterions.add(Restrictions.eq("addressProvinceId.id", getAddressProvinceId()));
-        } else if (Province.FOREIGN_COUNTRY_ID.equals(getAddressProvinceId())) {
-            criterions.add(Restrictions.isNull("addressProvinceId"));
-        }
+            if (!Province.FOREIGN_COUNTRY_ID.equals(getAddressProvinceId())
+                    && !ValidationHelper.isNullOrEmpty(getAddressProvinceId())) {
+                criterions.add(Restrictions.eq("addressProvinceId.id", getAddressProvinceId()));
+            } else if (Province.FOREIGN_COUNTRY_ID.equals(getAddressProvinceId())) {
+                criterions.add(Restrictions.isNull("addressProvinceId"));
+            }
 
-        if (!Province.FOREIGN_COUNTRY_ID.equals(getAddressProvinceId())
-                && !ValidationHelper.isNullOrEmpty(getAddressCityId())) {
-            criterions.add(Restrictions.eq("addressCityId.id", getAddressCityId()));
-            criterions.add(Restrictions.or(
-                    Restrictions.eq("foreignCountry", false),
-                    Restrictions.isNull("foreignCountry")));
-        } else if (Province.FOREIGN_COUNTRY_ID.equals(getAddressProvinceId())
-                && !ValidationHelper.isNullOrEmpty(getSelectedCountryId())) {
-            criterions.add(Restrictions.eq("country.id", getSelectedCountryId()));
-            criterions.add(Restrictions.eq("foreignCountry", true));
-        }
+            if (!Province.FOREIGN_COUNTRY_ID.equals(getAddressProvinceId())
+                    && !ValidationHelper.isNullOrEmpty(getAddressCityId())) {
+                criterions.add(Restrictions.eq("addressCityId.id", getAddressCityId()));
+                criterions.add(Restrictions.or(
+                        Restrictions.eq("foreignCountry", false),
+                        Restrictions.isNull("foreignCountry")));
+            } else if (Province.FOREIGN_COUNTRY_ID.equals(getAddressProvinceId())
+                    && !ValidationHelper.isNullOrEmpty(getSelectedCountryId())) {
+                criterions.add(Restrictions.eq("country.id", getSelectedCountryId()));
+                criterions.add(Restrictions.eq("foreignCountry", true));
+            }
 
-        if (!ValidationHelper.isNullOrEmpty(getSelectedKindList())) {
-            Criterion[] kindRestrictions = new Criterion[getSelectedKindList().size()];
-            for (int i = 0; i < getSelectedKindList().size(); i++) {
-                switch (ClientKind.valueOf(getSelectedKindList().get(i))) {
-                    case USUAL:
-                        kindRestrictions[i] = Restrictions.and(
-                                Restrictions.and(
-                                        Restrictions.or(
-                                                Restrictions.eq("manager", Boolean.FALSE),
-                                                Restrictions.isNull("manager")),
-                                        Restrictions.or(
-                                                Restrictions.eq("fiduciary", Boolean.FALSE),
-                                                Restrictions.isNull("fiduciary"))
-                                )
-                        );
-                        break;
-                    case MANAGER:
-                        kindRestrictions[i] = Restrictions.eq("manager", Boolean.TRUE);
-                        break;
-                    case FIDUCIARY:
-                        kindRestrictions[i] = Restrictions.eq("fiduciary", Boolean.TRUE);
-                        break;
+            if (!ValidationHelper.isNullOrEmpty(getSelectedKindList())) {
+                Criterion[] kindRestrictions = new Criterion[getSelectedKindList().size()];
+                for (int i = 0; i < getSelectedKindList().size(); i++) {
+                    switch (ClientKind.valueOf(getSelectedKindList().get(i))) {
+                        case USUAL:
+                            kindRestrictions[i] = Restrictions.and(
+                                    Restrictions.and(
+                                            Restrictions.or(
+                                                    Restrictions.eq("manager", Boolean.FALSE),
+                                                    Restrictions.isNull("manager")),
+                                            Restrictions.or(
+                                                    Restrictions.eq("fiduciary", Boolean.FALSE),
+                                                    Restrictions.isNull("fiduciary"))
+                                    )
+                            );
+                            break;
+                        case MANAGER:
+                            kindRestrictions[i] = Restrictions.eq("manager", Boolean.TRUE);
+                            break;
+                        case FIDUCIARY:
+                            kindRestrictions[i] = Restrictions.eq("fiduciary", Boolean.TRUE);
+                            break;
+                    }
+                }
+                if (kindRestrictions.length == 1) {
+                    criterions.add(kindRestrictions[0]);
+                } else {
+                    criterions.add(Restrictions.or(kindRestrictions));
                 }
             }
-            if (kindRestrictions.length == 1) {
-                criterions.add(kindRestrictions[0]);
-            } else {
-                criterions.add(Restrictions.or(kindRestrictions));
+
+            if (!ValidationHelper.isNullOrEmpty(getSelectedClientTypeId())) {
+                criterions.add(Restrictions.eq("typeId", getSelectedClientTypeId()));
+            }
+        }else {
+            if(getSelectedClientId() != null && getSelectedClientId() > 0) {
+
+                criterions.add(Restrictions.eq("rc.id", getSelectedClientId()));
             }
         }
-        
-        if (!ValidationHelper.isNullOrEmpty(getSelectedClientTypeId())) {
-            criterions.add(Restrictions.eq("typeId", getSelectedClientTypeId()));
-        }
-
-        if (getActiveClientListIndex() == 0) {
+        if(!ValidationHelper.isNullOrEmpty(getTab()) && getTab().equals(2)){
+            criterions.add(Restrictions.or(
+                    Restrictions.eq("deleted", Boolean.FALSE),
+                    Restrictions.isNull("deleted")));
+            criterions.add(Restrictions.and(Restrictions.isNotNull("manager"),
+                    Restrictions.eq("manager", Boolean.TRUE)));
+            setLazyManagerClientModel(new EntityLazyListModel<>(ClientShort.class, criterions.toArray(new Criterion[0]),
+                    new Order[]{
+                            Order.asc("clientName")
+                    },
+                    new CriteriaAlias[]{
+                            new CriteriaAlias("referenceClients", "rc", JoinType.INNER_JOIN)
+                    }));
+        }else if(!ValidationHelper.isNullOrEmpty(getTab()) && getTab().equals(3)){
+            criterions.add(Restrictions.or(
+                    Restrictions.eq("deleted", Boolean.FALSE),
+                    Restrictions.isNull("deleted")));
+            criterions.add(Restrictions.and(Restrictions.isNotNull("fiduciary"),
+                    Restrictions.eq("fiduciary", Boolean.TRUE)));
+            setLazyClientTrustModel(new EntityLazyListModel<>(ClientShort.class, criterions.toArray(new Criterion[0]),
+                    new Order[]{
+                            Order.asc("clientName")
+                    },
+                    new CriteriaAlias[]{
+                            new CriteriaAlias("referenceClients", "rc", JoinType.INNER_JOIN)
+                    }));
+        }else if (getActiveClientListIndex() == 0 ) {
             criterions.add(Restrictions.or(
                     Restrictions.eq("deleted", Boolean.FALSE),
                     Restrictions.isNull("deleted")));
@@ -352,24 +394,11 @@ public class ClientListBean extends EntityLazyListPageBean<ClientShort> implemen
         if (!Province.FOREIGN_COUNTRY_ID.equals(getAddressProvinceId())) {
             if (!ValidationHelper.isNullOrEmpty(getAddressProvinceId())) {
                 setAddressCities(ComboboxHelper.fillList(City.class, Order.asc("description"),
-                        new Criterion[]{
-                                Restrictions.eq("province.id", getAddressProvinceId()),
-                                Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                                        Restrictions.isNull("isDeleted"))
-                        }));
+                        Restrictions.eq("province.id", getAddressProvinceId())));
             } else {
+                setAddressCities(ComboboxHelper.fillList(City.class, Order.asc("description")));
                 setAddressCities(ComboboxHelper.fillList(City.class, Order.asc("description"),
-                new Criterion[]{
-                        Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                                Restrictions.isNull("isDeleted"))
-                }));
-                setAddressCities(ComboboxHelper.fillList(City.class, Order.asc("description"),
-                        new Criterion[]{
-                                Restrictions.eq("external", Boolean.TRUE),
-                                Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                                        Restrictions.isNull("isDeleted"))
-                        }
-                        ));
+                        Restrictions.eq("external", Boolean.TRUE)));
             }
             setForeignCountry(Boolean.FALSE);
         } else {
@@ -651,5 +680,13 @@ public class ClientListBean extends EntityLazyListPageBean<ClientShort> implemen
 
     public void setClientOffices(List<SelectItem> clientOffices) {
         this.clientOffices = clientOffices;
+    }
+
+    public Integer getTab() {
+        return tab;
+    }
+
+    public void setTab(Integer tab) {
+        this.tab = tab;
     }
 }

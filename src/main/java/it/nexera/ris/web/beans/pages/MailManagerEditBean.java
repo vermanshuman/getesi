@@ -8,24 +8,10 @@ import static j2html.TagCreator.td;
 import static j2html.TagCreator.tr;
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -37,7 +23,16 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 
+import it.nexera.ris.common.helpers.*;
+import it.nexera.ris.common.xml.wrappers.SelectItemWrapper;
+import it.nexera.ris.persistence.beans.entities.domain.*;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
+import it.nexera.ris.web.beans.wrappers.logic.*;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.WordUtils;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
@@ -56,21 +51,6 @@ import it.nexera.ris.common.enums.MailManagerStatuses;
 import it.nexera.ris.common.enums.PageTypes;
 import it.nexera.ris.common.enums.RequestState;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
-import it.nexera.ris.common.helpers.ComboboxHelper;
-import it.nexera.ris.common.helpers.DateTimeHelper;
-import it.nexera.ris.common.helpers.DocumentTypeRequestReportComparator;
-import it.nexera.ris.common.helpers.FileHelper;
-import it.nexera.ris.common.helpers.LogHelper;
-import it.nexera.ris.common.helpers.MailEmlReader;
-import it.nexera.ris.common.helpers.MailHelper;
-import it.nexera.ris.common.helpers.MailManagerHelper;
-import it.nexera.ris.common.helpers.MessageHelper;
-import it.nexera.ris.common.helpers.PrintPDFHelper;
-import it.nexera.ris.common.helpers.RedirectHelper;
-import it.nexera.ris.common.helpers.ResourcesHelper;
-import it.nexera.ris.common.helpers.SaveRequestDocumentsHelper;
-import it.nexera.ris.common.helpers.SessionHelper;
-import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.common.helpers.create.pdf.CreatePDFReportHelper;
 import it.nexera.ris.common.helpers.create.xls.CreateExcelRequestsReportHelper;
 import it.nexera.ris.common.helpers.create.xls.CreateExternalRequestReportHelper;
@@ -78,24 +58,9 @@ import it.nexera.ris.persistence.UserHolder;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
-import it.nexera.ris.persistence.beans.entities.domain.Client;
-import it.nexera.ris.persistence.beans.entities.domain.ClientEmail;
-import it.nexera.ris.persistence.beans.entities.domain.Document;
-import it.nexera.ris.persistence.beans.entities.domain.EmailRemove;
-import it.nexera.ris.persistence.beans.entities.domain.Referent;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
-import it.nexera.ris.persistence.beans.entities.domain.User;
-import it.nexera.ris.persistence.beans.entities.domain.WLGExport;
-import it.nexera.ris.persistence.beans.entities.domain.WLGFolder;
-import it.nexera.ris.persistence.beans.entities.domain.WLGInbox;
-import it.nexera.ris.persistence.beans.entities.domain.WLGServer;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.beans.EntityViewPageBean;
-import it.nexera.ris.web.beans.wrappers.logic.ClientEmailWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.ClientWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.FileWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.MailManagerPriorityWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.ReferentEmailWrapper;
+import org.w3c.dom.ranges.Range;
 
 @ManagedBean(name = "mailManagerEditBean")
 @ViewScoped
@@ -187,6 +152,11 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
 
     private Boolean evadiRichesta;
 
+    private List<Request> invoiceRequests;
+
+    private WLGExport excelInvoice;
+
+    private WLGExport pdfInvoice;
     @Override
     protected void preLoad() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         MailEditType type = MailEditType.findByName(getRequestParameter(RedirectHelper.MAIL));
@@ -215,28 +185,27 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
                 setSelectedIds(selectedIds);
             }
         }
-
-
     }
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
             InstantiationException, IllegalAccessException, IOException {
-
-
+        //setInvoiceRequests(getEntity().getRequests());
         setCopiedImages(new LinkedList<>());
         setBaseMailId(getEntityId());
         startEdit();
         if (getEntity().getEmailBody().isEmpty() && !getMailType().equals(MailEditType.SEND_TO_MANAGER)) {
             appendMailFooter();
         }
-        if (!getMailType().equals(MailEditType.SEND_TO_MANAGER)) {
-            fillAttachedFiles();
-        }else {
+       if(getMailType().equals(MailEditType.SEND_TO_MANAGER)){
             attachFornitoriExcel();
-        }
+        }else if(getMailType().equals(MailEditType.SEND_INVOICE)){
+           attachInvoiceData();
+        }else {
+           fillAttachedFiles();
+       }
 
-        setClientEmails(new ArrayList<>());
+       setClientEmails(new ArrayList<>());
 
         List<Client> clients = DaoManager.load(Client.class);
 
@@ -338,7 +307,7 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
             }
             getEntity().setEmailSubject(createSpecialSubject(MAIL_REPLY_SUBJECT_RESOURCE_PREFIX, SUBJECT_DELIM, getEntity().getEmailSubject()));
         }else if (getMailType() == MailEditType.SEND_TO_MANAGER) {
-            List<Request> selectedRequests = new ArrayList<Request>();
+            List<Request> selectedRequests = new ArrayList<>();
             if(!ValidationHelper.isNullOrEmpty(getSelectedIds())) {
                 selectedRequests = DaoManager.load(Request.class, new Criterion[]{
                         Restrictions.in("id", getSelectedIds())
@@ -383,7 +352,7 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
                             if(ValidationHelper.isNullOrEmpty(x.getSubjectList())) {
                                 if(!ValidationHelper.isNullOrEmpty(x.getSubject())) {
                                     if(x.getSubject().getTypeIsPhysicalPerson()) {
-                                        subjectJoiner.add("<li>" + x.getSubject().getFullNameCapitalize().toUpperCase()+" CF. "+ x.getSubject().getFiscalCode() + "</li>");
+                                        subjectJoiner.add("<li>" + x.getSubject().getFullNameCapitalize().toUpperCase() +" CF. "+ x.getSubject().getFiscalCode() + "</li>");
                                     }else {
                                         subjectJoiner.add("<li>" + x.getSubject().getBusinessName().toUpperCase()+" P.IVA "+ x.getSubject().getNumberVAT() + "</li>");
                                     }
@@ -445,7 +414,50 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
             }
             setEntity(inbox);
 
+        }else if(getMailType() == MailEditType.SEND_INVOICE) {
+            StringJoiner joiner = new StringJoiner("<br/>");
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.HOUR_OF_DAY, 13);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+
+            boolean afterOne = Calendar.getInstance().after(cal);
+
+            if (afterOne) {
+                joiner.add(ResourcesHelper.getString("mailManagerEditGoodEvening"));
+            } else {
+                joiner.add(ResourcesHelper.getString("mailManagerEditGoodMorning"));
+            }
+            joiner.add(ResourcesHelper.getString("mailManagerSendInvoiceMailText"));
+            joiner.add(ResourcesHelper.getString("mailManagerEditCordiality"));
+            joiner.add(WordUtils.capitalizeFully(defaultSendFromName));
+
+            getEntity().setEmailPrefix(joiner.toString());
+            getEntity().setEmailBody(null);
+            getEntity().setEmailPostfix(null);
+
+            WLGInbox inbox = new WLGInbox();
+            inbox.setEmailFrom(getEntity().getEmailFrom());
+            inbox.setEmailTo(getEntity().getEmailTo());
+            inbox.setEmailCC(getEntity().getEmailCC());
+            inbox.setEmailBCC(getEntity().getEmailBCC());
+            inbox.setEmailSubject(getEntity().getEmailSubject());
+            inbox.setEmailBody(getEntity().getEmailBody());
+            inbox.setEmailPostfix(getEntity().getEmailPostfix());
+            inbox.setEmailPrefix(getEntity().getEmailPrefix());
+            inbox.setClient(getEntity().getClient());
+            inbox.setClientInvoice(getEntity().getClientInvoice());
+            inbox.setClientFiduciary(getEntity().getClientFiduciary());
+            inbox.setManagers(getEntity().getManagers());
+            inbox.setOffice(getEntity().getOffice());
+            inbox.setNdg(getEntity().getNdg());
+            inbox.setCdr(getEntity().getCdr());
+            inbox.setReferenceRequest(getEntity().getReferenceRequest());
+
+            setEntity(inbox);
         }
+
         if ((getMailType() == MailEditType.FORWARD || getMailType() == MailEditType.REPLY || getMailType() == MailEditType.REQUEST_REPLY_ALL
                 || getMailType() == MailEditType.REPLY_TO_ALL) && getEntity().getEmailBodyToEditor().contains("img")) {
             getEntity().getEmailBodyToEditor();
@@ -586,13 +598,12 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
     }
 
     private List<Document> getDocumentsEvade(Request request) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        List<Document> documents = new ArrayList<>();
-        documents = DaoManager.load(Document.class,
+        List<Document> documents = DaoManager.load(Document.class,
                 new CriteriaAlias[]{
                         new CriteriaAlias("request", "r", JoinType.INNER_JOIN)
                 },
                 new Criterion[]{
-                Restrictions.eq("request.id", request.getId()),
+                Restrictions.eq("r.id", request.getId()),
                         Restrictions.or(Restrictions.isNull("r.unauthorizedQuote"),
                                 Restrictions.eq("r.unauthorizedQuote", false)),
                 Restrictions.eq("selectedForEmail", true)
@@ -1076,6 +1087,13 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
                 } catch (HibernateException | PersistenceBeanException e1) {
                     LogHelper.log(log, e1);
                 }
+            }else  if (getMailType().equals(MailEditType.SEND_INVOICE)) {
+                try {
+                    DaoManager.save(excelInvoice, true);
+                    DaoManager.save(pdfInvoice, true);
+                } catch (HibernateException | PersistenceBeanException e1) {
+                    LogHelper.log(log, e1);
+                }
             }
 
             List<String> emailsFrom = null;
@@ -1115,6 +1133,8 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
 
             if (getEntity().isNew()) {
                 getEntity().setState(MailManagerStatuses.NEW.getId());
+                log.info("setting mail :: "+getEntity().getId() + " state to :: "+MailManagerStatuses.findById(getEntity().getState())
+                        + " by user:: "+UserHolder.getInstance().getCurrentUser().getId());
                 getEntity().setSendDate(new Date());
                 getEntity().setReceiveDate(new Date());
             }
@@ -1151,7 +1171,11 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
         getEntity().setServerId(null);
         getEntity().setReceiveDate(new Date());
         getEntity().setSendDate(new Date());
-        getEntity().setState(MailManagerStatuses.NEW.getId());
+        if(getEntity().isNew()) {
+            getEntity().setState(MailManagerStatuses.NEW.getId());
+            log.info("setting mail :: "+getEntity().getId() + " state to :: "+MailManagerStatuses.findById(getEntity().getState())
+                    + " by user:: "+UserHolder.getInstance().getCurrentUser().getId());
+        }
         getEntity().setEmailBody(MailHelper.htmlToText(getEntity().getEmailBodyToEditor()));
         getEntity().setEmailBodyHtml(getEntity().getEmailBodyToEditor());
         getEntity().setXpriority(getSelectedPriorityWrapper());
@@ -1216,8 +1240,7 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
             log.info("Mail is sent");
             if(!ValidationHelper.isNullOrEmpty(getBaseMailId()))
                 getEntity().setRecievedInbox(DaoManager.get(WLGInbox.class, getBaseMailId()));
-            if(!ValidationHelper.isNullOrEmpty(getRequestId())
-                    && (ValidationHelper.isNullOrEmpty(isEvadiRichesta()) || !isEvadiRichesta())){
+            if(!ValidationHelper.isNullOrEmpty(getRequestId())) {
                 Request request = DaoManager.get(Request.class, getRequestId());
                 request.setStateId(RequestState.TO_BE_SENT.getId());
                 DaoManager.save(request, true);
@@ -1260,6 +1283,11 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
                 }
             } catch (PersistenceBeanException | IllegalAccessException | InstantiationException e) {
                 LogHelper.log(log, e);
+            }
+        }else if(!ValidationHelper.isNullOrEmpty(getInvoiceRequests())){
+            for (Request invoiceRequest : getInvoiceRequests()) {
+                invoiceRequest.setStateId(RequestState.INVOICED.getId());
+                DaoManager.save(invoiceRequest, true);
             }
         }
         getEntity().setServerId(Long.parseLong(ApplicationSettingsHolder.getInstance()
@@ -1513,6 +1541,240 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
         }
         DaoManager.save(excelFornitori, true);
         addAttachedFile(excelFornitori);
+    }
+
+    private void attachInvoiceData() throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
+
+        String refrequest = "";
+        String ndg = "";
+        WLGInbox baseMail = DaoManager.get(WLGInbox.class, getBaseMailId());
+        if(!ValidationHelper.isNullOrEmpty(baseMail)){
+            if(!ValidationHelper.isNullOrEmpty(baseMail)
+                    && !ValidationHelper.isNullOrEmpty(baseMail.getRequests())){
+                setInvoiceRequests(baseMail.getRequests()
+                .stream()
+                .filter(r -> !ValidationHelper.isNullOrEmpty(r.getStateId()) &&
+                        r.getStateId().equals(RequestState.SENT_TO_SDI.getId()))
+                .collect(Collectors.toList()));
+            }
+            refrequest = baseMail.getReferenceRequest();
+            ndg = baseMail.getNdg();
+        }
+        if(ValidationHelper.isNullOrEmpty(getInvoiceRequests()))
+                return;
+        Request invoiceRequest = getInvoiceRequests().get(0);
+        byte [] baos = getXlsBytes(refrequest, invoiceRequest);
+        if(!ValidationHelper.isNullOrEmpty(baos)){
+            excelInvoice = new WLGExport();
+            Date currentDate = new Date();
+            excelInvoice.setExportDate(currentDate);
+            DaoManager.save(excelInvoice, true);
+            String fileName = "Richieste_Invoice_"+DateTimeHelper.toFileDateWithMinutes(currentDate)+".xls";
+            String sb =  excelInvoice.generateDestinationPath(fileName);
+            File filePath = new File(sb);
+            try {
+                String str = FileHelper.writeFileToFolder(fileName,
+                        filePath, baos);
+                if (!new File(str).exists()) {
+                    return;
+                }
+                LogHelper.log(log, excelInvoice.getId() + " " + str);
+            } catch (Exception e) {
+                LogHelper.log(log, e);
+            }
+            DaoManager.save(excelInvoice, true);
+            addAttachedFile(excelInvoice);
+        }
+
+        try {
+
+            String templatePath  = (new File(FileHelper.getRealPath(),
+                    "resources" + File.separator + "layouts" + File.separator
+                            + "Invoice" + File.separator + "InvoiceDocumentTemplate.docx")
+                    .getAbsolutePath());
+
+            Double imponibile = 0.0;
+            Double totalIva = 0.0;
+            Double ivaPercentage = 0.0;
+
+            if(!ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice())){
+                List<InvoiceItem> items =
+                        DaoManager.load(InvoiceItem.class,
+                                new Criterion[]{
+                                        Restrictions.eq("invoice.id", invoiceRequest.getInvoice().getId())
+                                });
+                for(InvoiceItem item : items) {
+                    if(item.getAmount() != null){
+                        imponibile = imponibile + item.getAmount();
+                        if(item.getVat() != null){
+                            ivaPercentage = item.getVat();
+                            totalIva = totalIva + ((item.getVat()*item.getAmount())/100);
+                        }
+                    }
+                }
+            }
+            Date currentDate = new Date();
+            String fileName = "Richieste_Invoice_"+DateTimeHelper.toFileDateWithMinutes(currentDate);
+
+            String tempDir = FileHelper.getLocalTempDir();
+            tempDir  += File.separator + UUID.randomUUID();
+            FileUtils.forceMkdir(new File(tempDir));
+            String tempDoc = tempDir +  File.separator +  fileName +".docx";
+
+
+
+            try (XWPFDocument doc = new XWPFDocument(
+                    Files.newInputStream(Paths.get(templatePath)))) {
+                for (XWPFParagraph p : doc.getParagraphs()) {
+                    List<XWPFRun> runs = p.getRuns();
+                    if (runs != null) {
+                        for (XWPFRun r : runs) {
+                            String text = r.getText(0);
+                            String replace = "";
+                            if (text != null && text.contains("inum")) {
+                                if(!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
+                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice()) &&
+                                !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getInvoiceNumber()))
+                                    replace = invoiceRequest.getInvoice().getInvoiceNumber();
+                                text = text.replace("inum",replace );
+                                r.setText(text, 0);
+                            }else if (text != null && text.contains("clientname")) {
+
+                                if(!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
+                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice()) &&
+                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient()))
+                                    replace = invoiceRequest.getInvoice().getClient().toString();
+                                text = text.replace("clientname",replace );
+                                r.setText(text, 0);
+                            }else if (text != null && text.contains("clientaddress")) {
+                                if(!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
+                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice()) &&
+                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient()) &&
+                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient().getAddressStreet()))
+                                    replace = invoiceRequest.getInvoice().getClient().getAddressStreet();
+                                text = text.replace("clientaddress",replace );
+                                r.setText(text, 0);
+                            }else if (text != null && text.contains("clientaddress2")) {
+                                if(!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
+                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice()) &&
+                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient()) &&
+                                !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient().getAddressPostalCode()))
+                                    replace = invoiceRequest.getInvoice().getClient().getAddressPostalCode();
+
+                                if(!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
+                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice()) &&
+                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient()) &&
+                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient().getAddressProvinceId())){
+                                    Province province = invoiceRequest.getInvoice().getClient().getAddressProvinceId();
+                                    replace = province.getDescription() + "(" + province.getCode() + ")";
+                                }
+                                text = text.replace("clientaddress2",replace );
+                                r.setText(text, 0);
+                            }else if (text != null && text.contains("clientpiva")) {
+                                if(!ValidationHelper.isNullOrEmpty(invoiceRequest) &&
+                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice()) &&
+                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient()) &&
+                                        !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice().getClient().getFiscalCode()))
+                                    replace = invoiceRequest.getInvoice().getClient().getFiscalCode();
+                                text = text.replace("clientpiva",replace );
+                                r.setText(text, 0);
+                            }else if (text != null && text.contains("impon")) {
+                                text = text.replace("impon",imponibile.toString() );
+                                r.setText(text, 0);
+                            }else if (text != null && text.contains("ivap")) {
+                                text = text.replace("ivap",ivaPercentage.toString() + "%" );
+                                r.setText(text, 0);
+                            }else if (text != null && text.contains("ivaa")) {
+                                text = text.replace("ivaa",totalIva.toString());
+                                r.setText(text, 0);
+                            }else if (text != null && text.contains("totale")) {
+                                Double total = imponibile + totalIva;
+                                text = text.replace("totale",total.toString());
+                                r.setText(text, 0);
+                            }else if (text != null && text.contains("refrequest")) {
+                                text = text.replace("refrequest",refrequest);
+                                r.setText(text, 0);
+                            }else if (text != null && text.contains("inboxndg")) {
+                                text = text.replace("inboxndg",ndg);
+                                r.setText(text, 0);
+                            }
+                        }
+                    }
+                }
+
+                FileOutputStream out = new FileOutputStream(tempDoc);
+                doc.write(out);
+                out.close();
+            }
+
+            pdfInvoice = new WLGExport();
+            pdfInvoice.setExportDate(currentDate);
+            DaoManager.save(pdfInvoice, true);
+            String sb =  pdfInvoice.generateDestinationPath(fileName + ".pdf");
+            File filePath = new File(sb);
+            String sofficeCommand =
+                    ApplicationSettingsHolder.getInstance().getByKey(
+                            ApplicationSettingsKeys.SOFFICE_COMMAND).getValue().trim();
+            Process p = Runtime.getRuntime().exec(new String[] { sofficeCommand, "--headless",
+                    "--convert-to", "pdf","--outdir", filePath.getAbsolutePath(), tempDoc });
+            p.waitFor();
+            FileHelper.delete(tempDoc);
+            DaoManager.save(pdfInvoice, true);
+            LogHelper.log(log, pdfInvoice.getId() + " " + filePath);
+            addAttachedFile(pdfInvoice);
+        }catch(Exception e){
+         LogHelper.log(log,e);
+        }
+    }
+    private byte[] getXlsBytes(String refrequest, Request invoiceRequest) {
+        byte[] excelFile = null;
+        try {
+
+            ExcelDataWrapper excelDataWrapper = new ExcelDataWrapper();
+
+            excelDataWrapper.setNdg(getEntity().getNdg());
+
+            Document document = DaoManager.get(Document.class, new Criterion[]{
+                    Restrictions.eq("mail.id", getEntity().getId())});
+
+            if(ValidationHelper.isNullOrEmpty(document)) {
+                document = new Document();
+                document.setMail(getEntity());
+                document.setTypeId(DocumentType.INVOICE_REPORT.getId());
+                document.setReportNumber(SaveRequestDocumentsHelper.getLastInvoiceNumber() + 1);
+            }
+            excelDataWrapper.setReportn(document.getReportNumber());
+            excelDataWrapper.setReferenceRequest(refrequest);
+
+            if(!ValidationHelper.isNullOrEmpty(invoiceRequest)
+                    && !ValidationHelper.isNullOrEmpty(invoiceRequest.getInvoice())){
+                excelDataWrapper.setInvoiceNumber(invoiceRequest.getInvoice().getInvoiceNumber());
+                excelDataWrapper.setData((invoiceRequest.getInvoice().getDate() == null ?
+                        DateTimeHelper.getNow(): invoiceRequest.getInvoice().getDate()));
+            }
+
+            if (!ValidationHelper.isNullOrEmpty(getEntity().getClientInvoice())) {
+                excelDataWrapper.setClientInvoice(DaoManager.get(Client.class, getEntity().getClientInvoice().getId()));
+            }
+
+            if (!ValidationHelper.isNullOrEmpty(getEntity().getManagers())) {
+                excelDataWrapper.setManagers(getEntity().getManagers());
+            }
+
+            if (!ValidationHelper.isNullOrEmpty(getEntity().getClientFiduciary())) {
+                excelDataWrapper.setClientFiduciary(DaoManager.get(Client.class, getEntity().getClientFiduciary().getId()));
+            }
+
+            if (!ValidationHelper.isNullOrEmpty(getEntity().getOffice())) {
+                excelDataWrapper.setOffice(getEntity().getOffice().getDescription());
+            }
+
+            List<Request> filteredRequests  = emptyIfNull(getInvoiceRequests()).stream().filter(r->r.isDeletedRequest()).collect(Collectors.toList());
+            excelFile = new CreateExcelRequestsReportHelper(true).convertMailUserDataToExcel(filteredRequests, document,excelDataWrapper);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+        return excelFile;
     }
 
     public String getMailPdf() {
@@ -1793,5 +2055,13 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
 
     public void setEvadiRichesta(Boolean evadiRichesta) {
         this.evadiRichesta = evadiRichesta;
+    }
+
+    public List<Request> getInvoiceRequests() {
+        return invoiceRequests;
+    }
+
+    public void setInvoiceRequests(List<Request> invoiceRequests) {
+        this.invoiceRequests = invoiceRequests;
     }
 }

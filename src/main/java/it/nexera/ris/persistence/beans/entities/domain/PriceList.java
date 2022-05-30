@@ -60,7 +60,7 @@ public class PriceList extends IndexedEntity {
 
     @Column(name = "pay_next_price")
     private String payNextPrice;
-    
+
     @Column(name = "taxable")
     private Boolean taxable;
     @Column(name = "is_negative")

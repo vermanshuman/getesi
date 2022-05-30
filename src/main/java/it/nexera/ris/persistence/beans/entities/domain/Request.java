@@ -1,37 +1,17 @@
+
 package it.nexera.ris.persistence.beans.entities.domain;
 
-import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.validation.constraints.NotNull;
-
+import it.nexera.ris.common.enums.*;
+import it.nexera.ris.common.exceptions.PersistenceBeanException;
+import it.nexera.ris.common.helpers.*;
+import it.nexera.ris.common.xml.wrappers.ConservatoriaSelectItem;
+import it.nexera.ris.persistence.beans.dao.ConnectionManager;
+import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
+import it.nexera.ris.persistence.beans.dao.DaoManager;
+import it.nexera.ris.persistence.beans.entities.DocumentTagEntity;
+import it.nexera.ris.persistence.beans.entities.IndexedEntity;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
+import it.nexera.ris.persistence.interfaces.BeforeSave;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
@@ -44,25 +24,13 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 
-import it.nexera.ris.common.enums.NoteType;
-import it.nexera.ris.common.enums.RequestEnumTypes;
-import it.nexera.ris.common.enums.RequestState;
-import it.nexera.ris.common.enums.SectionCType;
-import it.nexera.ris.common.enums.UserCategories;
-import it.nexera.ris.common.exceptions.PersistenceBeanException;
-import it.nexera.ris.common.helpers.DateTimeHelper;
-import it.nexera.ris.common.helpers.EstateSituationHelper;
-import it.nexera.ris.common.helpers.LogHelper;
-import it.nexera.ris.common.helpers.ResourcesHelper;
-import it.nexera.ris.common.helpers.SubjectHelper;
-import it.nexera.ris.common.helpers.TemplatePdfTableHelper;
-import it.nexera.ris.common.helpers.ValidationHelper;
-import it.nexera.ris.persistence.beans.dao.ConnectionManager;
-import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
-import it.nexera.ris.persistence.beans.dao.DaoManager;
-import it.nexera.ris.persistence.beans.entities.DocumentTagEntity;
-import it.nexera.ris.persistence.beans.entities.IndexedEntity;
-import it.nexera.ris.persistence.interfaces.BeforeSave;
+import javax.persistence.*;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 @Entity
 @Table(name = "request")
@@ -214,7 +182,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     @Column(name = "termDate")
     private Date termDate;
 
-    @Column(name = "reaNumber")
+        @Column(name = "reaNumber")
     private String reaNumber;
 
     @Column(name = "natureLegal")
@@ -245,10 +213,10 @@ public class Request extends DocumentTagEntity implements BeforeSave {
             })
     private List<Document> documents;
 
-    @ManyToMany(mappedBy = "invoiceRequests",fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "invoiceRequests", fetch = FetchType.LAZY)
     private Set<Document> invoiceDocuments = new HashSet<>();
 
-    @OneToMany(mappedBy = "request",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "request", fetch = FetchType.LAZY)
     private List<Document> documentsRequest;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -292,10 +260,10 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     @Column(name = "comment")
     private String comment;
 
-    @OneToMany(mappedBy = "request",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "request", fetch = FetchType.LAZY)
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "request",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "request", fetch = FetchType.LAZY)
     private List<EstateSituation> situationEstateLocations;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -306,9 +274,9 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     })
     private List<EstateFormality> estateFormalityListUpdate;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fiduciary_id")
-    private Client clientFiduciary;
+    @Column(name = "request_creation_type")
+    @Enumerated(EnumType.STRING)
+    private RequestCreationType requestCreationType;
 
     @Transient
     private List<EstateFormality> estateFormalityList;
@@ -321,10 +289,10 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     })
     private List<Formality> formalityPdfList;
 
-    @ManyToMany(mappedBy = "requestForcedList",fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "requestForcedList", fetch = FetchType.LAZY)
     private List<Formality> formalityForcedList;
 
-    @ManyToMany(mappedBy = "requestList",fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "requestList", fetch = FetchType.LAZY)
     private List<Property> propertyList;
 
     @Column(name = "evasion_date")
@@ -408,15 +376,22 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     @Column(name = "cost_note", columnDefinition = "TEXT")
     private String costNote;
 
-    @Column(name= "include_national_cost")
+    @Column(name = "include_national_cost")
     private Boolean includeNationalCost;
-
-    @Column(name = "regime")
-    private Boolean regime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "invoice_id")
     private Invoice invoice;
+
+    @Column(name = "regime")
+    private Boolean regime;
+
+    @Column(name = "multiple_request_types")
+    private Boolean multipleRequestTypes;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fiduciary_id")
+    private Client clientFiduciary;
 
     @Column(name = "unauthorized_quote")
     private Boolean unauthorizedQuote;
@@ -458,14 +433,62 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     private Long referenceId;
 
     @Transient
-    private Double result;
-
-
-    @Transient
     private Long selectedTemplateId;
 
     @Transient
     private Boolean calculateCost;
+
+    @Transient
+    private String dateEvasionString;
+
+    @Transient
+    private boolean selectedForInvoice;
+
+    @Transient
+    private Boolean selectedRequest;
+
+    @Transient
+    private Long managerId;
+
+    @Transient
+    private String clientNameProfessional;
+
+    @Transient
+    private Boolean haveAllegatiDocuments;
+
+    @Transient
+    private Boolean isExternal;
+
+    @Transient
+    private User createUser;
+
+    @Transient
+    private Boolean haveDocuments;
+
+    @Transient
+    private int documentsCount;
+
+    @Transient
+    private List<ConservatoriaSelectItem> selectedConservatoryItemId;
+
+    @Transient
+    private String createUserFullName;
+
+    @Transient
+    private String serviceIcon;
+
+    @Transient
+    private Boolean serviceIsUpdate;
+
+    @Transient
+    private String requestTypeIcon;
+
+    @Transient
+    private String aggregationLandCharRegName;
+
+    @Transient
+    private Long multipleRequestId;
+
 
     public Boolean getHaveRequestReport() {
         if (haveRequestReport == null) {
@@ -566,11 +589,10 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
         request.setDistraintFormality(getDistraintFormality());
 
-        if(!ValidationHelper.isNullOrEmpty(getRequestMangerList())) {
+        if (!ValidationHelper.isNullOrEmpty(getRequestMangerList())) {
             request.setRequestMangerList(new ArrayList<Client>());
             request.getRequestMangerList().addAll(getRequestMangerList());
         }
-        request.setEvasionDate(getEvasionDate());
         return request;
     }
 
@@ -669,7 +691,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
         if (getRequestFormalities() == null && getRequestSubjects() == null) {
             return;
         }
-        if(getRequestFormalities() != null) {
+        if (getRequestFormalities() != null) {
             List<RequestFormality> listToRemove = new ArrayList<>();
             List<RequestFormality> listToAdd = new ArrayList<>();
             emptyIfNull(getRequestFormalities()).stream()
@@ -691,11 +713,11 @@ public class Request extends DocumentTagEntity implements BeforeSave {
             getRequestFormalities().addAll(listToAdd);
         }
 
-        if(getRequestSubjects() != null) {
+        if (getRequestSubjects() != null) {
             List<RequestSubject> listToRemove = new ArrayList<>();
             List<RequestSubject> listToAdd = new ArrayList<>();
             try {
-                if(!Hibernate.isInitialized(getRequestSubjects()))
+                if (!Hibernate.isInitialized(getRequestSubjects()))
                     Hibernate.initialize(getRequestSubjects());
             } catch (Exception e) {
                 LogHelper.debugInfo(log, "Error in initializing request subjects");
@@ -714,7 +736,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
                                 RequestSubject requestSubject = new RequestSubject(this, r);
                                 Entry<Long, String> result = getSubjectTypeMapping().entrySet().stream()
                                         .filter(x -> x.getKey() == r.getId()).findFirst().orElse(null);
-                                if(!ValidationHelper.isNullOrEmpty(result)) {
+                                if (!ValidationHelper.isNullOrEmpty(result)) {
                                     requestSubject.setType(result.getValue());
                                 }
                                 DaoManager.saveWeak(requestSubject, false);
@@ -781,7 +803,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     }
 
     public List<Double> getSumOfGroupedEstateFormalities() throws PersistenceBeanException, IllegalAccessException {
-        if(!Hibernate.isInitialized(this.getRequestFormalities())){
+        if (!Hibernate.isInitialized(this.getRequestFormalities())) {
             reloadRequestFormalities();
         }
         List<Double> sum = new ArrayList<>();
@@ -807,7 +829,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
                         .flatMap(e -> e.getEstateFormalitySuccessList().stream())
                         .filter(success -> NoteType.NOTE_TYPE_A.equals(success.getNoteType()))
                         .count();
-                sum.add((double)(estateFormalities.size() + numberOfRelatedCommunications + numberOfRelatedEstateFormalitySuccess));
+                sum.add((double) (estateFormalities.size() + numberOfRelatedCommunications + numberOfRelatedEstateFormalitySuccess));
             }
 //            this.getRequestFormalities().stream().filter(x -> x.getDocumentId() != null)
 //                    .collect(Collectors.groupingBy(RequestFormality::getDocumentId))
@@ -966,7 +988,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     }
 
     public String getMultipleServiceNames() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
-        Request request = DaoManager.get(Request.class,  new CriteriaAlias[]{
+        Request request = DaoManager.get(Request.class, new CriteriaAlias[]{
                 new CriteriaAlias("multipleServices", "m", JoinType.INNER_JOIN)
         }, new Criterion[]{
                 Restrictions.eq("id", this.getId())});
@@ -983,14 +1005,14 @@ public class Request extends DocumentTagEntity implements BeforeSave {
                 : getAggregationLandChargesRegistry().toString();
     }
 
-    public String getAggregationLandCharRegNameOrCity() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+    public String getAggregationLandCharRegNameOrCity() {
 
-        if(ValidationHelper.isNullOrEmpty(getAggregationLandChargesRegistryName())) {
-            if(ValidationHelper.isNullOrEmpty(getCity())) {
-                if(!ValidationHelper.isNullOrEmpty(getProvince())) {
+        if (ValidationHelper.isNullOrEmpty(getAggregationLandChargesRegistryName())) {
+            if (ValidationHelper.isNullOrEmpty(getCity())) {
+                if (!ValidationHelper.isNullOrEmpty(getProvince())) {
                     return getProvince().getDescription();
                 }
-            }else {
+            } else {
                 return city.getDescription();
             }
         } else {
@@ -1042,28 +1064,28 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
         try {
             User user = DaoManager.get(User.class, getCreateUserId());
-            if(!ValidationHelper.isNullOrEmpty(user)) {
-                if(!ValidationHelper.isNullOrEmpty(user.getCategory()) && UserCategories.ESTERNO.name()
+            if (!ValidationHelper.isNullOrEmpty(user)) {
+                if (!ValidationHelper.isNullOrEmpty(user.getCategory()) && UserCategories.ESTERNO.name()
                         .equals(user.getCategory().name())) {
-                    if(!ValidationHelper.isNullOrEmpty(user.getFullname()))
+                    if (!ValidationHelper.isNullOrEmpty(user.getFullname()))
                         return user.getFullname();
                     else
                         return user.getBusinessName() != null ? user.getBusinessName() : "";
                 }
             }
 
-            if(!ValidationHelper.isNullOrEmpty(getRequestMangerList())) {
+            if (!ValidationHelper.isNullOrEmpty(getRequestMangerList())) {
                 return getRequestMangerList().stream().map(m -> m.toString())
                         .collect(Collectors.joining("\n"));
             }
 
-            if(!ValidationHelper.isNullOrEmpty(getMail())) {
-                WLGInbox mail = DaoManager.get(WLGInbox.class,new CriteriaAlias[]{
+            if (!ValidationHelper.isNullOrEmpty(getMail())) {
+                WLGInbox mail = DaoManager.get(WLGInbox.class, new CriteriaAlias[]{
                         new CriteriaAlias("managers", "m", JoinType.INNER_JOIN)
                 }, new Criterion[]{
                         Restrictions.eq("id", this.getMail().getId())
                 });
-                if(!ValidationHelper.isNullOrEmpty(mail) && !ValidationHelper.isNullOrEmpty(mail.getManagers())) {
+                if (!ValidationHelper.isNullOrEmpty(mail) && !ValidationHelper.isNullOrEmpty(mail.getManagers())) {
                     return mail.getManagers().stream().map(m -> m.toString())
                             .collect(Collectors.joining("\n"));
                 }
@@ -1075,8 +1097,12 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
         return "";
     }
+
     public String getUserName() {
         try {
+            if(!Hibernate.isInitialized(getUser())){
+                Hibernate.initialize(getUser());
+            }
             return getUser() == null ? "" : getUser().getFullname();
         } catch (Exception e) {
             LogHelper.log(log, e);
@@ -1086,7 +1112,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     }
 
     public String getNotaryNameIfExists() {
-        if(getNotary() != null && !ValidationHelper.isNullOrEmpty(getNotary().getName())) {
+        if (getNotary() != null && !ValidationHelper.isNullOrEmpty(getNotary().getName())) {
             return getNotary().getName();
         }
         return "";
@@ -1101,7 +1127,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     }
 
     public String getNotaryCityIfExists() {
-        if(getNotary() != null && !ValidationHelper.isNullOrEmpty(getNotary().getCity())) {
+        if (getNotary() != null && !ValidationHelper.isNullOrEmpty(getNotary().getCity())) {
             return getNotary().getCity();
         }
         return "";
@@ -1114,8 +1140,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     public boolean showAuthorizedQuote() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
 
         if (!ValidationHelper.isNullOrEmpty(getClient())
-                && !ValidationHelper.isNull(getClient().getMaxNumberAct()))
-        {
+                && !ValidationHelper.isNull(getClient().getMaxNumberAct())) {
 
             if (!Hibernate.isInitialized(getRequestFormalities())) {
                 try {
@@ -1126,17 +1151,18 @@ public class Request extends DocumentTagEntity implements BeforeSave {
             }
             Request req = DaoManager.get(Request.class,
                     new Criterion[]{Restrictions.eq("id", getId())});
-            Integer total = 0;;
-            if(req.getSumOfEstateFormalities() != null)
+            Integer total = 0;
+            ;
+            if (req.getSumOfEstateFormalities() != null)
                 total += req.getSumOfEstateFormalities();
 
-            if(req.getSumOfEstateFormalitiesAndCommunicationsAndSuccess() != null)
+            if (req.getSumOfEstateFormalitiesAndCommunicationsAndSuccess() != null)
                 total += req.getSumOfEstateFormalitiesAndCommunicationsAndSuccess();
-            if(total > getClient().getMaxNumberAct())
+            if (total > getClient().getMaxNumberAct())
                 return true;
             else
                 return false;
-        }else {
+        } else {
             return false;
         }
     }
@@ -1919,7 +1945,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     }
 
     public Map<Long, String> getSubjectTypeMapping() {
-        if(subjectTypeMapping == null)
+        if (subjectTypeMapping == null)
             subjectTypeMapping = new HashMap<Long, String>();
         return subjectTypeMapping;
     }
@@ -1966,11 +1992,11 @@ public class Request extends DocumentTagEntity implements BeforeSave {
         RequestSubject requestSubject = new RequestSubject(this, subject);
         Entry<Long, String> result = getSubjectTypeMapping().entrySet().stream()
                 .filter(x -> x.getKey() == subject.getId()).findFirst().orElse(null);
-        if(!ValidationHelper.isNullOrEmpty(result)) {
+        if (!ValidationHelper.isNullOrEmpty(result)) {
             requestSubject.setType(result.getValue());
         }
 
-        if(ValidationHelper.isNullOrEmpty(getRequestSubjects())) {
+        if (ValidationHelper.isNullOrEmpty(getRequestSubjects())) {
             setRequestSubjects(new ArrayList<>());
         }
         RequestSubject alreadyExistsRequestSubject = this.getRequestSubjects().stream()
@@ -1978,7 +2004,7 @@ public class Request extends DocumentTagEntity implements BeforeSave {
                 .filter(f -> f.getSubject().getId().equals(requestSubject.getSubject().getId())).findFirst().orElse(null);
 
         if (!ValidationHelper.isNullOrEmpty(alreadyExistsRequestSubject)) {
-            if(!ValidationHelper.isNullOrEmpty(result)) {
+            if (!ValidationHelper.isNullOrEmpty(result)) {
                 requestSubject.setType(result.getValue());
             }
 
@@ -2032,23 +2058,15 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     }
 
     public Boolean getSalesDevelopment() {
-        if(!ValidationHelper.isNullOrEmpty(getClient()) &&
+        if (!ValidationHelper.isNullOrEmpty(getClient()) &&
                 !ValidationHelper.isNullOrEmpty(getClient().getSalesDevelopment()) && getClient().getSalesDevelopment())
             return true;
 
-        if(!ValidationHelper.isNullOrEmpty(getService()) &&
+        if (!ValidationHelper.isNullOrEmpty(getService()) &&
                 !ValidationHelper.isNullOrEmpty(getService().getSalesDevelopment()) && getService().getSalesDevelopment())
             return true;
 
         return false;
-    }
-
-    public Boolean getRegime() {
-        return regime;
-    }
-
-    public void setRegime(Boolean regime) {
-        this.regime = regime;
     }
 
     public Invoice getInvoice() {
@@ -2059,16 +2077,34 @@ public class Request extends DocumentTagEntity implements BeforeSave {
         this.invoice = invoice;
     }
 
-    public String getEvasionDateStr() {
-        return DateTimeHelper.toString(getEvasionDate());
+    public Boolean getRegime() {
+        return regime;
     }
 
-    public Long getReferenceId() {
-        return referenceId;
+    public void setRegime(Boolean regime) {
+        this.regime = regime;
     }
 
-    public void setReferenceId(Long referenceId) {
-        this.referenceId = referenceId;
+    public Boolean getMultipleRequestTypes() {
+        return multipleRequestTypes;
+    }
+
+    public void setMultipleRequestTypes(Boolean multipleRequestTypes) {
+        this.multipleRequestTypes = multipleRequestTypes;
+    }
+
+    /**
+     * @return the requestCreationType
+     */
+    public RequestCreationType getRequestCreationType() {
+        return requestCreationType;
+    }
+
+    /**
+     * @param requestCreationType the requestCreationType to set
+     */
+    public void setRequestCreationType(RequestCreationType requestCreationType) {
+        this.requestCreationType = requestCreationType;
     }
 
     public Client getClientFiduciary() {
@@ -2079,12 +2115,250 @@ public class Request extends DocumentTagEntity implements BeforeSave {
         this.clientFiduciary = clientFiduciary;
     }
 
-    public Double getResult() {
-        return result;
+    public Boolean isSelectedRequest() {
+        return selectedRequest;
     }
 
-    public void setResult(Double result) {
-        this.result = result;
+    public void setSelectedRequest(Boolean selectedRequest) {
+        this.selectedRequest = selectedRequest;
+    }
+
+    public Long getReferenceId() {
+        return referenceId;
+    }
+
+    public void setReferenceId(Long referenceId) {
+        this.referenceId = referenceId;
+    }
+
+    public String getDateEvasionString() {
+        if (getEvasionDate() != null) {
+            return DateTimeHelper.toFormatedStringLocal(getEvasionDate(),
+                    DateTimeHelper.getDatePattern(), null);
+        }
+        return dateEvasionString;
+    }
+
+    public boolean isSelectedForInvoice() {
+        return selectedForInvoice;
+    }
+
+    public void setSelectedForInvoice(boolean selectedForInvoice) {
+        this.selectedForInvoice = selectedForInvoice;
+    }
+
+    public Long getManagerId() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        if (!ValidationHelper.isNullOrEmpty(getMail())) {
+            WLGInbox wlgInbox = DaoManager.get(WLGInbox.class, new CriteriaAlias[]{
+                    new CriteriaAlias("client", "c", JoinType.INNER_JOIN)
+            }, new Criterion[]{
+                    Restrictions.eq("id", getMail().getId())
+            });
+            if (!ValidationHelper.isNullOrEmpty(wlgInbox) && !ValidationHelper.isNullOrEmpty(wlgInbox.getClient())) {
+                setManagerId(wlgInbox.getClient().getId());
+            }
+        }
+        return managerId;
+    }
+
+    public void setManagerId(Long managerId) {
+        this.managerId = managerId;
+    }
+
+    public String haveManagers() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        if (!ValidationHelper.isNullOrEmpty(getMail())) {
+            WLGInbox wlgInbox = DaoManager.get(WLGInbox.class, getMail());
+            if (!ValidationHelper.isNullOrEmpty(wlgInbox) && !ValidationHelper.isNullOrEmpty(wlgInbox.getManagers())) {
+                return wlgInbox.getManagers()
+                        .stream()
+                        .distinct()
+                        .map(w -> w.toString())
+                        .collect(Collectors.joining(","));
+            }
+        }
+        return null;
+    }
+
+
+    public String getClientNameProfessional(Client client) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        if (clientNameProfessional == null && client != null) {
+            if (client == null) {
+                clientNameProfessional = "";
+            } else {
+                if (client.getTypeId() == null || ClientType.PROFESSIONAL.getId().equals(client.getTypeId())
+                        && !ValidationHelper.isNullOrEmpty(client.getNameProfessional())) {
+                    clientNameProfessional = client.getNameProfessional();
+                } else if (!(client.getTypeId() == null || ClientType.PROFESSIONAL.getId().equals(client.getTypeId()))
+                        && !ValidationHelper.isNullOrEmpty(client.getNameOfTheCompany())) {
+                    clientNameProfessional = client.getNameOfTheCompany();
+                }
+            }
+        }
+        return clientNameProfessional;
+    }
+
+    public String getMailSubject() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+        if (!ValidationHelper.isNullOrEmpty(getMail())) {
+            return getMail().getEmailSubject();
+        }
+        return null;
+    }
+
+    public Boolean getHaveAllegatiDocuments() {
+        if (haveAllegatiDocuments == null) {
+            try {
+                haveAllegatiDocuments = DaoManager.getSession()
+                        .createQuery("select 1 from Document where request= :request_id and typeId = 8")
+                        .setLong("request_id", getId())
+                        .setFetchSize(1).scroll(ScrollMode.FORWARD_ONLY).next();
+            } catch (PersistenceBeanException | IllegalAccessException e) {
+                LogHelper.log(log, e);
+            }
+        }
+        return haveAllegatiDocuments;
+    }
+
+    public Boolean getExternal() {
+        if (isExternal == null) {
+            User user = null;
+            if (getCreateUserId() == null) {
+                setExternal(false);
+                return false;
+            }
+            try {
+                user = DaoManager.get(User.class, getCreateUserId());
+                if (user == null) {
+                    setExternal(false);
+                } else {
+                    createUser = user;
+                    setExternal(user.getUserRoles().stream().anyMatch(r -> r.getType() == RoleTypes.EXTERNAL));
+                }
+            } catch (Exception e) {
+                LogHelper.log(log, e);
+                setExternal(false);
+                return false;
+            }
+        }
+        return isExternal;
+    }
+
+    public void setExternal(Boolean external) {
+        isExternal = external;
+    }
+
+    public Boolean getHaveDocuments() {
+        if (haveDocuments == null) {
+            try {
+                haveDocuments = DaoManager.getSession()
+                        .createQuery("select 1 from Document where request= :request_id and selectedForEmail = true")
+                        .setLong("request_id", getId())
+                        .setFetchSize(1).scroll(ScrollMode.FORWARD_ONLY).next();
+            } catch (PersistenceBeanException | IllegalAccessException e) {
+                LogHelper.log(log, e);
+            }
+        }
+        return haveDocuments;
+    }
+
+    public int getDocumentsCount() throws IllegalAccessException, PersistenceBeanException {
+        List<Document> documents = DaoManager.load(Document.class, new Criterion[]{
+                Restrictions.eq("request.id", getId()),
+                Restrictions.eq("selectedForEmail", true)
+//                ,
+//                Restrictions.ne("typeId", DocumentType.FORMALITY.getId())
+        });
+
+        List<Document> formalities = DaoManager.load(Document.class, new CriteriaAlias[]{
+                new CriteriaAlias("formality", "f", JoinType.INNER_JOIN),
+                new CriteriaAlias("f.requestList", "r_f", JoinType.INNER_JOIN)
+        }, new Criterion[]{
+                Restrictions.eq("r_f.id", getId()),
+                Restrictions.eq("request.id", getId()),
+                Restrictions.eq("selectedForEmail", true)
+        });
+
+        if (!ValidationHelper.isNullOrEmpty(formalities)) {
+            for (Document temp : formalities) {
+                if (!documents.contains(temp)) {
+                    documents.add(temp);
+                }
+            }
+        }
+        documentsCount = documents != null ? documents.size() : 0;
+        return documentsCount;
+    }
+
+    public List<ConservatoriaSelectItem> getSelectedConservatoryItemId() {
+        return selectedConservatoryItemId;
+    }
+
+    public void setSelectedConservatoryItemId(List<ConservatoriaSelectItem> selectedConservatoryItemId) {
+        this.selectedConservatoryItemId = selectedConservatoryItemId;
+    }
+
+    public String getCreateUserFullName() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+        if (getExternal()) {
+            setCreateUserFullName(createUser.getFullname());
+            if (getOffice() == null && !ValidationHelper.isNullOrEmpty(getUserOfficeId())) {
+                Office office = DaoManager.get(Office.class, getUserOfficeId());
+                setCreateUserFullName(String.format("%s <br/> %s - %s", createUser.getFullname(), office.getCode(),
+                        office.getDescription()));
+            }
+        }
+        return createUserFullName;
+    }
+
+    public void setCreateUserFullName(String createUserFullName) {
+        this.createUserFullName = createUserFullName;
+    }
+
+    public String getServiceIcon() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        if (!ValidationHelper.isNullOrEmpty(getService())) {
+            setServiceIcon(getService().getIcon());
+        }
+        return serviceIcon;
+    }
+
+    public void setServiceIcon(String serviceIcon) {
+        this.serviceIcon = serviceIcon;
+    }
+
+    public Boolean getServiceIsUpdate() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        if (!ValidationHelper.isNullOrEmpty(getService())) {
+            setServiceIsUpdate(getService().getIsUpdate());
+        }
+        return serviceIsUpdate;
+    }
+
+    public void setServiceIsUpdate(Boolean serviceIsUpdate) {
+        this.serviceIsUpdate = serviceIsUpdate;
+    }
+
+    public String getRequestTypeIconStr() {
+        return requestTypeIcon == null ? "fa-square-o" : requestTypeIcon;
+    }
+
+    public String getAggregationLandCharRegName() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+
+        if (getAggregationLandChargesRegistry() != null) {
+            setAggregationLandCharRegName(aggregationLandChargesRegistry.getName());
+        }
+        return aggregationLandCharRegName;
+    }
+
+    public void setAggregationLandCharRegName(String aggregationLandCharRegName) {
+        this.aggregationLandCharRegName = aggregationLandCharRegName;
+    }
+
+    public String getRequestTypeIcon() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        if (getRequestType() != null) {
+            setRequestTypeIcon(requestType.getIcon());
+        }
+        return requestTypeIcon;
+    }
+
+    public void setRequestTypeIcon(String requestTypeIcon) {
+        this.requestTypeIcon = requestTypeIcon;
     }
 
     public Long getSelectedTemplateId() {
@@ -2101,6 +2375,14 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     public void setCalculateCost(Boolean calculateCost) {
         this.calculateCost = calculateCost;
+    }
+
+    public Long getMultipleRequestId() {
+        return multipleRequestId;
+    }
+
+    public void setMultipleRequestId(Long multipleRequestId) {
+        this.multipleRequestId = multipleRequestId;
     }
 
     public Boolean getUnauthorizedQuote() {

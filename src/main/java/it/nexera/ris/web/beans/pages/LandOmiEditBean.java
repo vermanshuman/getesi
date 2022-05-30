@@ -1,9 +1,10 @@
 package it.nexera.ris.web.beans.pages;
 
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
-import it.nexera.ris.common.helpers.*;
+import it.nexera.ris.common.helpers.ComboboxHelper;
+import it.nexera.ris.common.helpers.LogHelper;
+import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.common.xml.wrappers.CitySelectItem;
-import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.LandCulture;
 import it.nexera.ris.persistence.beans.entities.domain.LandOmi;
@@ -13,13 +14,10 @@ import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
 import it.nexera.ris.web.beans.EntityEditPageBean;
 import lombok.Data;
 import org.hibernate.HibernateException;
-import org.hibernate.StaleObjectStateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
@@ -58,13 +56,11 @@ public class LandOmiEditBean extends EntityEditPageBean<LandOmi>
 
     private Integer editedTempId;
 
-    private String duplicateCityError;
-
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
             IllegalAccessException {
-        setDuplicateCityError(null);
+
         setEditedTempId(null);
         setProvinces(ComboboxHelper.fillList(Province.class, Order.asc("description")));
         getProvinces().add(new SelectItem(Province.FOREIGN_COUNTRY_ID, Province.FOREIGN_COUNTRY));
@@ -87,40 +83,6 @@ public class LandOmiEditBean extends EntityEditPageBean<LandOmi>
         }
         if(ValidationHelper.isNullOrEmpty(getSelectedCity())) {
             addRequiredFieldException("form:city");
-        }
-
-        setDuplicateCityError(null);
-        List<City> cities = DaoManager.load(City.class,
-                new Criterion[] {
-                        Restrictions.in("id", getSelectedCity().stream()
-                                .map(CitySelectItem::getId).collect(Collectors.toList()))
-                });
-
-        List<Long> cityIds = cities.stream()
-                .map(City::getId).collect(Collectors.toList());
-
-
-        List<Criterion> restrictions = new ArrayList<>();
-        restrictions.add(Restrictions.eq("year",getEntity().getYear()));
-        restrictions.add(Restrictions.in("c.id",cityIds));
-        if(!this.getEntity().isNew()){
-            restrictions.add(Restrictions.ne("id",getEntity().getId()));
-        }
-
-        List<LandOmi> existingLandOmi = DaoManager.load(LandOmi.class,
-                new CriteriaAlias[]{
-                        new CriteriaAlias("cities", "c", JoinType.INNER_JOIN)
-                }, restrictions.toArray(new Criterion[0]));
-        if(!ValidationHelper.isNullOrEmpty(existingLandOmi)){
-            List<City> existingCity = existingLandOmi.get(0).getCities();
-
-            Optional<City> matchingCity = cities.stream()
-                    .filter(c -> existingCity.contains(c))
-                    .findFirst();
-            setDuplicateCityError(
-                    String.format(ResourcesHelper.getValidation("duplicateLandOMI"),
-                            matchingCity.get().getDescription()));
-            executeJS("PF('duplicateLandOmiDialogWV').show();");
         }
     }
 
@@ -175,9 +137,7 @@ public class LandOmiEditBean extends EntityEditPageBean<LandOmi>
                 this.setForeignCountry(Boolean.FALSE);
                 List<City> cities = DaoManager.load(City.class, new Criterion[]{
                         Restrictions.eq("province.id",getSelectedProvinceId()),
-                        Restrictions.eq("external", Boolean.TRUE),
-                        Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                                Restrictions.isNull("isDeleted"))
+                        Restrictions.eq("external", Boolean.TRUE)
                 },Order.asc("description"));
                 setCities(cities.stream().map(CitySelectItem::new).collect(Collectors.toList()));
             }else {
@@ -238,69 +198,5 @@ public class LandOmiEditBean extends EntityEditPageBean<LandOmi>
             LogHelper.log(log, e);
             e.printStackTrace();
         }
-    }
-
-    public void pageSave() {
-        if (this.getSaveFlag() == 0) {
-            try {
-                this.cleanValidation();
-                this.setValidationFailed(false);
-                this.onValidate();
-                if (this.getValidationFailed()) {
-                    return;
-                }
-                if(!ValidationHelper.isNullOrEmpty(getDuplicateCityError()))
-                    return;
-
-            } catch (Exception e) {
-                LogHelper.log(log, e);
-                e.printStackTrace();
-                return;
-            }
-
-            try {
-                this.tr = DaoManager.getSession().beginTransaction();
-
-                this.setSaveFlag(1);
-
-                this.onSave();
-            } catch (Exception e) {
-                if (this.tr != null) {
-                    this.tr.rollback();
-                }
-                LogHelper.log(log, e);
-                MessageHelper.addGlobalMessage(FacesMessage.SEVERITY_ERROR, "",
-                        ResourcesHelper.getValidation("objectEditedException"));
-            } finally {
-                if (this.tr != null && !this.tr.wasRolledBack()
-                        && this.tr.isActive()) {
-                    try {
-                        this.tr.commit();
-                    } catch (StaleObjectStateException e) {
-                        MessageHelper
-                                .addGlobalMessage(
-                                        FacesMessage.SEVERITY_ERROR,
-                                        "",
-                                        ResourcesHelper
-                                                .getValidation("exceptionOccuredWhileSaving"));
-                        LogHelper.log(log, e);
-                    } catch (Exception e) {
-                        LogHelper.log(log, e);
-                        e.printStackTrace();
-                    }
-                }
-                this.setSaveFlag(0);
-            }
-            if (isRunAfterSave()) {
-                this.afterSave();
-            }
-        }
-    }
-
-    @Override
-    public void goBack() {
-        if(!ValidationHelper.isNullOrEmpty(getDuplicateCityError()))
-            return;
-        super.goBack();
     }
 }

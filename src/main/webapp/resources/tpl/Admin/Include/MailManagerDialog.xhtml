@@ -5,41 +5,48 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
-    <p:dialog widgetVar="moveDlgWV"
+    <style>
+        #moveDlg{
+            width:30% !important;
+        }
+    </style>
+    <p:dialog widgetVar="moveDlgWV" styleClass="dialog-gray dialog-gray-width" id="moveDlg"
               draggable="false" modal="true" resizable="false"
               header="#{msg.mailManagerMoveMailHeader}">
-        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
-            <h:outputText value="#{msg.mailManagerMailType}:"/>
-            <p:selectOneMenu value="#{bean.selectedTypeId}">
+        <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" layout="grid">
+            <h:outputText style="font-size: initial; margin: 0; position: absolute; top: 17%; -ms-transform: translateY(-50%); transform: translateY(-17%);"
+                          value="#{msg.mailManagerMailType}:"/>
+            <p:selectOneMenu value="#{bean.selectedTypeId}"  styleClass="select-width">
                 <f:selectItems value="#{bean.mailTypes}"/>
             </p:selectOneMenu>
         </p:panelGrid>
         <div class="btn_line">
-            <p:commandButton value="#{msg.confirm}"
+            <p:commandButton value="#{msg.confirm}" style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"
                              action="#{bean.changeMailType}" update=" form"
-							 actionListener="#{bean.goTable}"
+                             actionListener="#{bean.goTable}"
                              oncomplete="PF('moveDlgWV').hide();"/>
-            <p:commandButton value="#{msg.cancel}"
+            <p:commandButton value="#{msg.cancel}" style="background-color: #F3362B !important; width: 100px;"
                              oncomplete="PF('moveDlgWV').hide();"/>
         </div>
     </p:dialog>
 
-    <p:dialog widgetVar="editStateDlgWV" width="300"
+    <p:dialog widgetVar="editStateDlgWV" id="editStateDlg" styleClass="dialog-gray dialog-gray-width"
               draggable="false" modal="true" resizable="false"
-              header="#{msg.mailManagerEditStateHeader}">
+              header="#{msg.mailManagerEditStateHeader}" >
         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid">
-            <h:outputText style="font-size: initial; text-align: right" value="#{msg.mailManagerEditStates}:"/>
+            <h:outputText style="font-size: initial; margin: 0; position: absolute; top: 17%; -ms-transform: translateY(-50%); transform: translateY(-17%);"
+                          value="#{msg.mailManagerEditStates}:"/>
             <p:selectOneMenu value="#{bean.selectedStateId}">
                 <f:selectItems value="#{bean.availableStates}"/>
             </p:selectOneMenu>
         </p:panelGrid>
 
         <div class="btn_line">
-            <p:commandButton value="#{msg.confirm}"
+            <p:commandButton value="#{msg.confirm}" style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"
                              action="#{bean.changeMailState}"
                              update="form"
                              oncomplete="PF('editStateDlgWV').hide();"/>
-            <p:commandButton value="#{msg.cancel}"
+            <p:commandButton value="#{msg.cancel}" style="background-color: #F3362B !important; width: 100px;"
                              oncomplete="PF('editStateDlgWV').hide();"/>
         </div>
     </p:dialog>

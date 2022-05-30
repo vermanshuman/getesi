@@ -1,5 +1,23 @@
 package it.nexera.ris.persistence.view;
 
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.persistence.Column;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import it.nexera.ris.persistence.beans.entities.domain.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.HibernateException;
+import org.hibernate.ScrollMode;
+import org.hibernate.annotations.Immutable;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
+
 import it.nexera.ris.common.annotations.View;
 import it.nexera.ris.common.enums.ClientType;
 import it.nexera.ris.common.enums.RequestState;
@@ -11,24 +29,13 @@ import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.IndexedView;
-import it.nexera.ris.persistence.beans.entities.domain.*;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import it.nexera.ris.persistence.beans.entities.domain.readonly.WLGInboxShort;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.hibernate.HibernateException;
-import org.hibernate.ScrollMode;
-import org.hibernate.annotations.Immutable;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
-
-import javax.persistence.Column;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @javax.persistence.Entity
 @Immutable
@@ -88,6 +95,7 @@ public class RequestView extends IndexedView {
             + "subject.birth_date birth_date, "
             + "subject.type_id type_id, "
             + "request.province_id province_id, "
+            + "request.invoice_id invoice_id, "
             //+ "wlg_inbox.client_fiduciary_id fiduciary_id, "
            // + "inbox_manager.client_id manager_id, "
             + "section_c.section_c_type section_c_type, "
@@ -230,8 +238,11 @@ public class RequestView extends IndexedView {
 
     @Column(name = "distraint_act_id")
     private Long distraintFormalityId;
-    
-//    @Column(name = "fiduciary_id")
+
+    @Column(name = "invoice_id")
+    private Long invoiceId;
+
+    //    @Column(name = "fiduciary_id")
 //    private Long fiduciaryId;
 //    
 //    @Column(name = "manager_id")
@@ -379,7 +390,7 @@ public class RequestView extends IndexedView {
     }
 
     public Boolean getExternal() {
-        if (isExternal == null) {
+        if (isExternal == null || createUser == null) {
             User user = null;
             if (getCreateUserId() == null) {
                 setExternal(false);
@@ -414,7 +425,7 @@ public class RequestView extends IndexedView {
             setCreateUserFullName(createUser.getFullname());
             if (getOffice() == null && !ValidationHelper.isNullOrEmpty(getUserOfficeId())) {
                 Office office = DaoManager.get(Office.class, getUserOfficeId());
-                setCreateUserFullName(String.format("%s <br/> %s - %s", createUser.getFullname(), office.getCode(),
+                setCreateUserFullName(String.format("%s - %s - %s", createUser.getFullname(), office.getCode(),
                         office.getDescription()));
             }
         }
@@ -915,6 +926,17 @@ public class RequestView extends IndexedView {
         return documentsCount;
     }
 
+    public String getInvoiceNumber() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+
+        if(!ValidationHelper.isNullOrEmpty(getInvoiceId())){
+            Invoice invoice = DaoManager.get(Invoice.class,getInvoiceId());
+            if(!ValidationHelper.isNullOrEmpty(invoice))
+                return invoice.getInvoiceNumber();
+        }
+       return "";
+    }
+
+
     public void setDocumentsCount(int documentsCount) {
         this.documentsCount = documentsCount;
     }
@@ -925,5 +947,13 @@ public class RequestView extends IndexedView {
 
     public void setReverseName(String reverseName) {
         this.reverseName = reverseName;
+    }
+
+    public Long getInvoiceId() {
+        return invoiceId;
+    }
+
+    public void setInvoiceId(Long invoiceId) {
+        this.invoiceId = invoiceId;
     }
 }

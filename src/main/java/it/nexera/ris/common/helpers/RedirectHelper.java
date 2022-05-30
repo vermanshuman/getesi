@@ -44,6 +44,8 @@ public class RedirectHelper extends BaseHelper {
 
     public static final String MULTIPLE = "multiple";
 
+    public static final String MULTIPLE_SERVICE_REQUEST_TYPES = "multipleServiceRequestTypes";
+
     public static final String REQUEST_ID = "request_id";
     
     public static final String DAYS_PARAMETER = "days";
@@ -51,6 +53,12 @@ public class RedirectHelper extends BaseHelper {
     public static final String SELECTED = "selected";
 
     public static final String SALES = "sales";
+
+    public static final String TAB = "tab";
+
+    public static final String REQUEST_TYPE_PARAM = "type";
+
+    public static final String BILLING_LIST = "billing";
 
     public static void goTo(PageTypes type) {
         try {
@@ -65,6 +73,14 @@ public class RedirectHelper extends BaseHelper {
     public static void goToMultiple(PageTypes type) {
         try {
             sendRedirect(type.getPagesContext() + "?" + MULTIPLE + "=" + true);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+    public static void goToMultipleServiceRequestTypes(PageTypes type) {
+        try {
+            sendRedirect(type.getPagesContext() + "?" + MULTIPLE_SERVICE_REQUEST_TYPES + "=" + true);
         } catch (Exception e) {
             LogHelper.log(log, e);
         }
@@ -412,4 +428,55 @@ public class RedirectHelper extends BaseHelper {
         }
     }
 
+    public static void goToMultiple(PageTypes type,String queryParameter) {
+        try {
+            sendRedirect(type.getPagesContext() + "?" + MULTIPLE + "=" + true + "&"+ queryParameter);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+    public static void goToCreateMultipleRequestFromMail(Serializable id, boolean needArchive, boolean isMultipleCreate, Integer requestType) {
+        goToCreateMultipleRequestFromMail(id, "", needArchive, isMultipleCreate, requestType);
+    }
+
+    public static void goToCreateMultipleRequestFromMail(Serializable id, Serializable requestId, boolean needArchive, boolean isMultipleCreate, Integer requestType) {
+        try {
+            sendRedirect(PageTypes.REQUEST_EDIT.getPagesContext() + "?"
+                    + ID_PARAMETER + "=" + requestId + "&"
+                    + (needArchive ? ARCHIVE_MAIL : MAIL) + "=" + id + "&"
+                    + REQUEST_TYPE_PARAM + "=" + requestType
+                    + (isMultipleCreate ? "&" + MULTIPLE + "=true" : "") + "&"+ RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE");
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+    public static void goToMailManagerViewFromBillingList(Serializable mailId) {
+        try {
+            sendRedirect(PageTypes.MAIL_MANAGER_VIEW.getPagesContext() + "?"
+                    + ID_PARAMETER + "=" + mailId + "&page=0" + "&" +BILLING_LIST + "=3");
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+    public static void goToBillingListFromMailManagerView(Serializable tab) {
+        try {
+            sendRedirect(PageTypes.BILLING_LIST.getPagesContext() + "?" +BILLING_LIST + "=" + tab);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+    public static void goToExcelDataRequest(Serializable requestId, Serializable mailId, Boolean mailIdPresent ) {
+        try {
+            if(mailIdPresent)
+                sendRedirect(PageTypes.EXCEL_DATA_REQUEST.getPagesContext() + "?" + MAIL_ID + "=" + mailId);
+            else
+                sendRedirect(PageTypes.EXCEL_DATA_REQUEST.getPagesContext() + "?" + REQUEST_ID + "=" + requestId);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
 }

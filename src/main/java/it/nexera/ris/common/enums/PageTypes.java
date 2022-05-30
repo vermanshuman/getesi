@@ -48,9 +48,12 @@ public enum PageTypes {
     // Dictionary
 
     TEMPLATE_DOCUMENT_MODEL_LIST("/Pages/Dictionaries/TemplateDocumentModelList.jsf", true),
+    TEMPLATE_DOCUMENT_MODEL_EDIT("/Pages/Dictionaries/TemplateDocumentModelEdit.jsf", true),
 
     REQUEST_TYPE_LIST("/Pages/Dictionaries/RequestTypeList.jsf", true),
-
+    REQUEST_TYPE_EDIT("/Pages/Dictionaries/RequestTypeEdit.jsf", true),
+    FOREIGN_STATE_LIST("/Pages/Dictionaries/ForeignStateList.jsf", true),
+    FOREIGN_STATE_EDIT("/Pages/Dictionaries/ForeignStateEdit.jsf", true),
     STRUCTURE_LIST("/Pages/Dictionaries/StructureList.jsf", true),
 
     COST_CONFIGURATION_LIST("/Pages/Dictionaries/CostConfigurationList.jsf", true),
@@ -75,9 +78,12 @@ public enum PageTypes {
     REFERENT_LIST("/Pages/Dictionaries/ReferentList.jsf", true),
     REFERENT_EDIT("/Pages/Dictionaries/ReferentEdit.jsf", true),
 
-    DAY_PHRASE("/Pages/Dictionaries/DayPhrase.jsf", true),
-    TYPE_ACT("/Pages/Dictionaries/TypeAct.jsf", true),
-    TYPE_FORMALITY("/Pages/Dictionaries/TypeFormality.jsf", true),
+    DAY_PHRASE_LIST("/Pages/Dictionaries/DayPhraseList.jsf", true),
+    DAY_PHRASE_EDIT("/Pages/Dictionaries/DayPhraseEdit.jsf"),
+    TYPE_ACT_LIST("/Pages/Dictionaries/TypeActList.jsf", true),
+    TYPE_ACT_EDIT("/Pages/Dictionaries/TypeActEdit.jsf", true),
+    TYPE_FORMALITY_LIST("/Pages/Dictionaries/TypeFormalityList.jsf", true),
+    TYPE_FORMALITY_EDIT("/Pages/Dictionaries/TypeFormalityEdit.jsf", true),
     CADASTRAL_TOPOLOGY("/Pages/Dictionaries/CadastralTopology.jsf", true),
 
     // ConfigurationArea
@@ -106,6 +112,8 @@ public enum PageTypes {
     REAL_ESTATE_VIEW("/Pages/ManagementGroup/RealEstateView.jsf"),
     REAL_ESTATE_EDIT("/Pages/ManagementGroup/RealEstateEdit.jsf"),
     REQUEST_LIST("/Pages/ManagementGroup/RequestList.jsf"),
+    BILLING_LIST_OLD("/Pages/ManagementGroup/BillingList_Old.jsf"),
+    BILLING_LIST("/Pages/ManagementGroup/BillingList.jsf"),
     REQUEST_EDIT("/Pages/ManagementGroup/RequestEdit.jsf"),
     REQUEST_TEXT_EDIT("/Pages/ManagementGroup/RequestTextEdit.jsf"),
     REQUEST_ESTATE_SITUATION_LIST("/Pages/ManagementGroup/EstateSituationList.jsf"),
@@ -119,12 +127,15 @@ public enum PageTypes {
     NOTARIAL_CERTIFICATION_LIST("/Pages/ManagementGroup/NotarialCertificationList.jsf"),
 
     IBAN_LIST("/Pages/ManagementGroup/IbanList.jsf"),
+    IBAN_EDIT("/Pages/ManagementGroup/IbanEdit.jsf"),
     PAYMENT_TYPE_LIST("/Pages/ManagementGroup/PaymentTypeList.jsf"),
+    PAYMENT_TYPE_EDIT("/Pages/ManagementGroup/PaymentTypeEdit.jsf"),
 
     INVOICE_LIST("/Pages/ManagementGroup/InvoiceList.jsf"),
     INVOICE_EDIT("/Pages/ManagementGroup/InvoiceEdit.jsf"),
 
     CITIES_LIST("/Pages/Dictionaries/CitiesList.jsf"),
+    CITIES_EDIT("/Pages/Dictionaries/CitiesEdit.jsf"),
 
     OMI_KML_LIST("/Pages/Dictionaries/OMIKmlList.jsf"),
 
@@ -132,13 +143,15 @@ public enum PageTypes {
     NOTARY_EDIT("/Pages/Dictionaries/NotaryEdit.jsf", true),
     
     COURT_LIST("/Pages/Dictionaries/CourtList.jsf", true),
-    
-    RELATIONSHIP_TYPES("/Pages/Dictionaries/RelationshipTypeList.jsf", true),
+
+    RELATIONSHIP_TYPES_LIST("/Pages/Dictionaries/RelationshipTypeList.jsf", true),
+    RELATIONSHIP_TYPES_EDIT("/Pages/Dictionaries/RelationshipTypeEdit.jsf", true),
     
     EXCEL_DATA("/Pages/ManagementGroup/ExcelData.jsf"),
     
     REGIME_CONIUGI_LIST("/Pages/Dictionaries/RegimeConiugiList.jsf", true),
     SECTION_D_FORMAT_LIST("/Pages/Dictionaries/SectionDFormatList.jsf", true),
+    SECTION_D_FORMAT_EDIT("/Pages/Dictionaries/SectionDFormatEdit.jsf", true),
     DUE_REQUESTS_VIEW("/Pages/Dictionaries/DueRequestsView.jsf", true),
 
     LAND_OMI_LIST("/Pages/ConfigurationArea/LandOmiList.jsf", true),
@@ -147,9 +160,14 @@ public enum PageTypes {
     LAND_CULTURE_LIST("/Pages/ConfigurationArea/LandCultureList.jsf", true),
     LAND_CULTURE_EDIT("/Pages/ConfigurationArea/LandCultureEdit.jsf", true),
 
-    FOREIGN_STATE_LIST("/Pages/Dictionaries/ForeignStateList.jsf", true),
+    CALENDAR("/Pages/Configuration/Calendar.jsf"),
+    FOREIGN_STATES("/Pages/Configuration/ForeignStates.jsf"),
 
-    TAX_RATE_LIST("/Pages/ManagementGroup/TaxRateList.jsf");
+    TAX_RATE_LIST("/Pages/ManagementGroup/TaxRateList.jsf"),
+
+    CONTACT_LIST("/Pages/ManagementGroup/ContactList.jsf"),
+
+    EXCEL_DATA_REQUEST("/Pages/ManagementGroup/ExcelDataRequest.jsf");
 
     private String page;
 
@@ -215,6 +233,12 @@ public enum PageTypes {
         for (PageTypes type : PageTypes.values()) {
             if (type.getPagesContext().contains("/" + className + "Edit")) {
                 return type;
+            }else if(className.equalsIgnoreCase("Country")){
+                return PageTypes.FOREIGN_STATE_EDIT;
+            }else if(className.equalsIgnoreCase("TipologieDiritti")){
+                return PageTypes.RELATIONSHIP_TYPES_EDIT;
+            }else if(className.equalsIgnoreCase("City")){
+                return PageTypes.CITIES_EDIT;
             }
         }
 
@@ -253,6 +277,12 @@ public enum PageTypes {
         for (PageTypes type : PageTypes.values()) {
             if (type.getPagesContext().contains("/" + className + "List")) {
                 return type;
+            }else if(className.equalsIgnoreCase("Country")){
+                return PageTypes.FOREIGN_STATE_LIST;
+            }else if(className.equalsIgnoreCase("City")){
+                return PageTypes.CITIES_LIST;
+            }else if(className.equalsIgnoreCase("TipologieDiritti")){
+                return PageTypes.RELATIONSHIP_TYPES_LIST;
             }
         }
 

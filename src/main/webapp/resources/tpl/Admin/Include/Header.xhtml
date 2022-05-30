@@ -160,7 +160,7 @@
                                 <p:tooltip id="toolTipHomePage" for="homePage" value="#{msg.home}" position="bottom"/>
                             </li>
                         </ul>
-                        <p:poll interval="#{sessionBean.getTimeToRefresh()}" listener="#{sessionBean.updateMailCount()}" 
+                        <p:poll interval="#{sessionBean.getTimeToRefresh()}" listener="#{sessionBean.updateMailCount()}"
                         	update="mailManager, mailManagerSpan"/>
                         <p:ajaxStatus style=" margin-top: 8px;"
                                       onsuccess="fixExpandRow(); fixCalendarInput();">

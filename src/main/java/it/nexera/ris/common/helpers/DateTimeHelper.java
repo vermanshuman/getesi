@@ -4,12 +4,10 @@ import it.nexera.ris.web.converters.BaseConverter;
 import org.joda.time.DateTime;
 
 import java.text.DateFormat;
+import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 
 public class DateTimeHelper extends BaseHelper {
 
@@ -754,5 +752,49 @@ public class DateTimeHelper extends BaseHelper {
 
     public static String toFileDateWithMinutes(Date value) {
         return toFormatedString(value, datePatternForFileWithMinutes);
+    }
+
+
+    public static String getMonth(int month) {
+        DateFormat formatter = new SimpleDateFormat("MMMM", defaultLocale);
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.MONTH, month-1);
+        return formatter.format(calendar.getTime());
+    }
+
+    public static Date getMonthStart(int month) {
+        GregorianCalendar gc = new GregorianCalendar();
+
+        gc.set(GregorianCalendar.MONTH, month-1);
+        gc.set(GregorianCalendar.YEAR, getYearOfNow());
+        gc.set(GregorianCalendar.DAY_OF_MONTH, 1);
+        gc.set(GregorianCalendar.HOUR_OF_DAY, 0);
+        gc.set(GregorianCalendar.MINUTE, 0);
+        gc.set(GregorianCalendar.SECOND, 0);
+        gc.set(GregorianCalendar.MILLISECOND, 0);
+        return gc.getTime();
+    }
+
+    public static Date getMonthEnd(int month) {
+        GregorianCalendar gc = new GregorianCalendar();
+
+        gc.set(GregorianCalendar.MONTH, month-1);
+        gc.set(GregorianCalendar.YEAR, getYearOfNow());
+        gc.set(GregorianCalendar.DAY_OF_MONTH, 31);
+        gc.set(GregorianCalendar.HOUR_OF_DAY, 23);
+        gc.set(GregorianCalendar.MINUTE, 59);
+        gc.set(GregorianCalendar.SECOND, 59);
+        gc.set(GregorianCalendar.MILLISECOND, 59);
+        return gc.getTime();
+    }
+
+    public static Integer getYearOfNow() {
+        return getFieldOfNow(GregorianCalendar.YEAR);
+    }
+
+    public static Integer getFieldOfNow(Integer field) {
+        GregorianCalendar gc = new GregorianCalendar();
+        return gc.get(field);
     }
 }

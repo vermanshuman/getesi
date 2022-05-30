@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ff="http://readytech.com/functions"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<ui:composition template="/resources/tpl/Admin/LazyListBase.xhtml">
+    <ui:param name="list_title" value="#{msg.phrases}"/>
+    <ui:param name="bean" value="#{dayPhraseListBean}"/>
+    <ui:param name="entity_name" value="#{msg.phrase}"/>
+
+    <ui:define name="search_body">
+        <div class="settingsBlock">
+            <p:commandButton id="settingButton" onclick="togglePanel();" type="button" style="margin-left: 110px;position: absolute;"
+                             icon="ui-icon ui-icon-search pi pi-sliders-h" styleClass="searchPanelButton"/>
+            <script type="text/javascript">
+                // <![CDATA[
+                $("body").click(function(e){
+                    var target = $(e.target);
+                    if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('.ui-selectcheckboxmenu-panel').length
+                        && !target.parents('#ui-datepicker-div').length && !target.parents('#filterCourtCity_items').length) {
+                        PF('panelSetting').getJQ().hide();
+                    }
+                    if(target.closest('.ui-selectcheckboxmenu-item').length) {
+                        console.log("hello");
+                        $("#states").addClass("border_class");
+                    } else {
+                        $("#states").removeClass("border_class");
+                    }
+                });
+                function togglePanel() {
+                    PF('panelSetting').getJQ().toggle();
+                    if($('#statoAllLabel').length==0) {
+                        $('.ui-selectcheckboxmenu-header .ui-chkbox.ui-widget').after('<label id="statoAllLabel">Stato</label>');
+                    }
+                }
+                jQuery(document).ready(function() {
+                    PF('panelSetting').getJQ().hide();
+                });
+                // ]]>
+            </script>
+            <style>
+                #settingPanel {
+                    position: absolute;
+                    z-index: 1;
+                    margin-top: 40px;
+                    max-width: 560px;
+                    left: 200px;
+                    border: 1px solid #547ac4;
+                }
+                #settingPanel .ui-selectonemenu {
+                    background-color: #F0F3F5 !important;
+                    border-radius: 7px !important;
+                    min-height: 38px;
+                }
+                #settingPanel .ui-selectonemenu .ui-selectonemenu-label {
+                    margin-top: 3px;
+                }
+                #settingPanel .ui-selectonemenu:not(.green-border) {
+                    border: none !important;
+                }
+                .green-border {
+                    border: 1px solid #009900 !important;
+                }
+                #buttonCreate .ui-button-text {
+                    margin-left: -15px;
+                }
+                body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
+                    background-color: #f0f3f5 !important;
+                }
+                body .ui-datatable:not(.borderless) thead th {
+                    padding: 10px 10px !important;
+                }
+            </style>
+            <p:remoteCommand name="updateFilterInput"
+                             update=":filterPhrase"/>
+            <p:remoteCommand name="filterTableFromPanel"
+                             action="#{bean.filterTableFromPanel}" update=":form:table"/>
+            <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" styleClass="panelSetting" style="display: none;">
+                <div class="p-grid">
+                    <div class="p-col-12" style="text-align: center;">
+                        <h2>Filtra per</h2>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value="#{ff:upper(msg.phrase)}:"/>
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value=""/>
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:inputText id="filterPhrase" onblur="updateFilterInput()" value="#{bean.phrase}" style="width: 99%;min-height: 38px;" styleClass="#{bean.phrase ne null and bean.phrase ne '' ? 'green-border' : ''}" />
+                        </div>
+                    </div>
+
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value=""/>
+                        </div>
+                    </div>
+                    <div class="p-col-12" style="text-align: center;">
+                        <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #00CC52;margin-right: 20px;" id="searchButton"
+                                         onclick="filterTableFromPanel();" onsuccess="PF('panelSetting').getJQ().hide()"/>
+                        <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFiltraPanel}" update="settingPanel" oncomplete="filterTableFromPanel();PF('panelSetting').getJQ().hide()"/>
+                    </div>
+                </div>
+            </p:panel>
+        </div>
+    </ui:define>
+
+    <ui:define name="columns">
+        <p:column sortBy="#{item.phrase}"
+                  headerText="#{msg.phrase}">
+            <h:outputText value="#{item.phrase}"/>
+        </p:column>
+    </ui:define>
+
+</ui:composition>
+</html>

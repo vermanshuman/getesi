@@ -9,27 +9,174 @@
                 template="/resources/tpl/Admin/FormBase.xhtml">
     <ui:param name="bean" value="#{mailManagerViewBean}"/>
     <ui:define name="form_body">
-    	<style>
-    	   .ui-messages-info,.ui-message-info {
+        <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/mail.css"
+              media="all" rel="stylesheet" type="text/css"/>
+        <style>
+            .ui-messages-info,.ui-message-info {
                 border-left-color: rgb(82, 224, 82);
                 background: rgb(233, 251, 233);
                 color: green;
             }
-            
-            body .ui-messages .ui-messages-info {
-    			background-color: green !important;
-    			border-color: green !important;
-    			color: #ffffff;
-			}
-			
-			#validationMessages {
-				width:30%
-			}
 
-    	</style>
+            body .ui-messages .ui-messages-info {
+                background-color: green !important;
+                border-color: green !important;
+                color: #ffffff;
+            }
+
+            #validationMessages {
+                width:30%
+            }
+
+            .card {
+                border: none !important;
+                padding: 0px;
+            }
+
+            .layout-wrapper .layout-main .layout-content {
+                padding: 0px !important;
+            }
+
+            .ui-dialog .ui-widget-header {
+                background: #f8f9fa !important;
+                color: #495057 !important;
+            }
+
+            body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
+                background-color: #fff !important;
+            }
+
+            .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+                border-width: 0 0 1px 0 !important;
+            }
+
+            body .ui-datatable thead th {
+                background-color: #f8f9fa !important;
+                color: #495057 !important;
+                padding: 1rem 1rem !important;
+            }
+
+            body .ui-datatable .ui-datatable-data tr td {
+                padding: 1rem 1rem !important;
+            }
+
+            body .ui-datatable thead th.ui-state-active {
+                color: #2196F3 !important;
+            }
+
+            body .ui-datatable .ui-datatable-data > tr:hover {
+                background: #e9ecef !important;
+            }
+
+            body .ui-widget, body .ui-widget .ui-widget {
+                font-family: "Open Sans","Helvetica Neue",sans-serif !important;
+                text-decoration: none !important;
+                font-size: 14px !important;
+                font-weight: normal !important;
+
+            }
+            body {
+                color: #5f666c;
+            }
+
+            body .ui-panelgrid .ui-panelgrid-cell {
+                color: #5f666c;
+            }
+
+            body .ui-selectonemenu.ui-state-hover:not(.ui-state-error) {
+                border-color: #5f666c;
+            }
+
+            body .ui-selectonemenu.ui-state-hover {
+                border: 1px solid #5f666c;
+            }
+
+            body .ui-selectonemenu {
+                border: 1px solid #a8acb1;
+            }
+
+            body .ui-inputfield {
+                border: 1px solid #a8acb1;
+            }
+            .confirm-button {
+                background-color: #00CC52 !important;
+            }
+
+            .ui-datatable-scrollable-theadclone {
+                display: none !important;
+            }
+            div[id*='menuform1:menu_div'] {
+                margin-left: -4px;
+            }
+            .btn-green {
+                background-color: #00CC52 !important;
+                padding-left: 0 !important;
+                width: 122px;
+            }
+
+            body .ui-state-highlight {
+                color: #000 !important;
+            }
+
+            .dialog-gray-width {
+                min-width: 370px !important;
+            }
+
+            .red-file {
+                width: 16px;
+                min-width: 16px;
+                background-size: 16px !important;
+                margin-left: 3px;
+            }
+
+            .attach-files {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
+            .dialog-gray, #showToBeSentRequest {
+                border: 7px solid #6688AA !important;
+            }
+            #mailManagerViewRequestsDialog .ui-dialog-content {
+                overflow-x: hidden;
+            }
+            #mailManagerViewRequestsDialog .ui-datatable-scrollable-body {
+                overflow-x: scroll;
+            }
+            #paymentDate_input {
+                width: 210px !important;
+            }
+            input {
+                background-color: #F0F3F5 !important;
+                border: none !important;
+                border-radius: 7px !important;
+                min-height: 28px;
+            }
+            #addPaymentDialog .ui-dialog-titlebar {
+                padding: 3px !important;
+            }
+            #addPaymentDialog .card {
+                padding: 16px !important;
+                padding-top: 0px !important;
+                padding-bottom: 0px !important;
+            }
+            #addPaymentDialog .ui-inputfield.ui-state-focus {
+                box-shadow: 0 0 0 0.2em #57c279 !important;
+            }
+
+            #addPaymentDialog .ui-selectonemenu.ui-state-focus:not(.ui-state-error) {
+                box-shadow: 0 0 0 0.2em #57c279 !important;
+            }
+            #addPaymentDialog .calender-filled input, #addPaymentDialog .select-checkbox, #addPaymentDialog .select-one-menu {
+                border: 1px solid #009900 !important;
+            }
+
+        </style>
         <ui:include src="/resources/tpl/Admin/LetterView.xhtml"/>
         <p:outputPanel id="print_panel" style="visibility: hidden; position: absolute;">
             <p:remoteCommand name="clearPrintArea" action="#{bean.clearPrintArea}"/>
+
             <script>
                 function closePrint() {
                     document.body.removeChild(this.__container__);
@@ -61,30 +208,37 @@
                     var fiduciary = $('#fiduciary_input').is(":checked");
                     if(source === 'manager'){
                         if(manager === true){
-                        	PF('fiduciaryCheckBox').uncheck();
+                            PF('fiduciaryCheckBox').uncheck();
                         }
                     }else if(source === 'fiduciary'){
-                    	 if(fiduciary === true){
-                    		 PF('managerCheckBox').uncheck();
+                        if(fiduciary === true){
+                            PF('managerCheckBox').uncheck();
                         }
-                    }  
+                    }
+                };
+                window.onload = () => {
+                    console.log('page is fully loaded');
+                    loadButtons();
                 };
             </script>
+            <p:remoteCommand name="loadButtons" action="#{bean.loadButtons}" update="@form"/>
             <iframe id="mail_pdf_iframe" srcdoc="#{bean.mailPdf}"/>
         </p:outputPanel>
-        <p:dialog id="confirmReadDlg" widgetVar="confirmReadDlgWV"
+        <p:dialog id="confirmReadDlg" widgetVar="confirmReadDlgWV" styleClass="dialog-gray"
                   draggable="false" modal="true" resizable="false">
             <h:outputText value="#{msg.confirmReadMessage}"/>
             <div class="btn_line">
-                <p:commandButton value="#{msg.ok}" action="#{bean.sendConfirmMail}"
-                                 oncomplete="PF('confirmReadDlgWV').hide();"/>
+                <p:commandButton value="#{msg.confirm}" action="#{bean.sendConfirmMail}"
+                                 oncomplete="PF('confirmReadDlgWV').hide();"
+                                 style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"/>
                 <p:commandButton value="#{msg.cancel}" action="#{bean.setConfirmMailRead}"
-                                 oncomplete="PF('confirmReadDlgWV').hide();"/>
+                                 oncomplete="PF('confirmReadDlgWV').hide();"
+                                 style="background-color: #F3362B !important; width: 100px;"/>
             </div>
         </p:dialog>
-        <p:dialog widgetVar="imageFileDlgWV" width="300" draggable="false" modal="true" resizable="false"
+        <p:dialog widgetVar="imageFileDlgWV" width="300" draggable="false" modal="true" resizable="false" styleClass="dialog-green"
                   header="#{msg.mailManagerImgFiles}">
-            <p:dataTable value="#{bean.entity.imgFiles}" var="img" styleClass="without-header">
+            <p:dataTable value="#{bean.entity.imgFiles}" var="img" styleClass="without-header" emptyMessage="#{msg.noRecordsFound}">
                 <p:column>
                     <p:selectBooleanCheckbox value="#{img.imageSelected}"/>&nbsp;&nbsp;
                     <i class="#{img.icon} #{img.style}"/>
@@ -131,21 +285,79 @@
             </div>
         </p:dialog>
 
-        <p:dialog id="chooseSingleOrMultipleRequestCreate" widgetVar="chooseSingleOrMultipleRequestCreateWV" modal="true" width="300">
-            <h3>#{msg.mailManagerViewSingleOrMultipleRequest}:</h3>
-            <p:outputPanel style="justify-content: center; display: flex">
-                <p:selectOneRadio value="#{bean.multipleCreateRedirect}" unselectable="false">
-                    <f:selectItem itemLabel="#{msg.mailManagerViewSingleRequestCreate}" itemValue="#{false}"/>
-                    <f:selectItem itemLabel="#{msg.mailManagerViewMultipleRequestCreate}" itemValue="#{true}"/>
-                </p:selectOneRadio>
-            </p:outputPanel>
+        <p:dialog id="chooseSingleOrMultipleRequestCreate" widgetVar="chooseSingleOrMultipleRequestCreateWV" modal="true" styleClass="dialog-orange">
+            <h:outputText value="#{bean.fieldsNotSetDialogMessage}"/>
+            <br/>
+            <h:outputText value="#{msg.mailManagerViewFieldsNotSetDialogMessageQuestion}"/>
+            <br/>
+            <!--            <p:outputPanel style="margin-top:15px; margin-bottom:15px;">-->
+            <!--                <h:outputText value="#{msg.mailManagerViewSingleOrMultipleRequest}:" />-->
+            <!--            </p:outputPanel>-->
+            <!--            <p:outputPanel style="justify-content: center; display: flex">-->
+            <!--                <p:selectOneRadio value="#{bean.requestType}" unselectable="false">-->
+            <!--                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestBySubject}" itemValue="0"/>-->
+            <!--                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestForBuilding}" itemValue="1"/>-->
+            <!--                    <f:selectItem itemLabel="#{msg.mailManagerViewRequestForLand}" itemValue="2"/>-->
+            <!--                </p:selectOneRadio>-->
+            <!--            </p:outputPanel>-->
             <br/>
             <div class="btn_line">
-                <p:commandButton value="#{msg.confirm}" update="@form"
+                <p:commandButton value="#{msg.mailManagerViewRequestBySubject}" update="@form" styleClass="confirm-button"
+                                 style="margin-right: 15px;"
                                  action="#{bean.saveReference(true)}" oncomplete="PF('chooseSingleOrMultiplerequestCreateWV').hide();"/>
+                <p:commandButton value="#{msg.cancel}" oncomplete="PF('chooseSingleOrMultipleRequestCreateWV').hide();"
+                                 style="background-color: #F3362B !important; width: 100px;" />
             </div>
         </p:dialog>
+
+        <p:dialog id="invoiceOpenErrorDialog" widgetVar="invoiceOpenErrorDialogWV" modal="true" styleClass="dialog-red"
+                  resizable="false" draggable="false" effect="SLIDE"
+                  header="">
+            <span>
+                <h:outputText value="#{msg.openInvoiceErrorMsg}"/>
+            </span>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.close}" styleClass="confirm-button"
+                                 style="background-color: #F3362B !important;margin-right: 15px;"
+                                 oncomplete="PF('invoiceOpenErrorDialogWV').hide();"/>
+            </div>
+        </p:dialog>
+
+        <p:dialog id="invoiceAlreadyCreatedDialog" widgetVar="invoiceAlreadyCreatedDialogWV" modal="true" styleClass="dialog-green"
+                  resizable="false" draggable="false" effect="SLIDE" header="">
+            <span>
+                <h:outputText value="#{bean.invoiceAlreadyCreated}"/>
+            </span>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.ok}" update="@form" styleClass="confirm-button"
+                                 style="margin-right: 15px;" action="#{bean.preCheckDocumentOtherRequests}"
+                                 oncomplete="PF('invoiceAlreadyCreatedDialogWV').hide();"/>
+                <p:commandButton value="#{msg.cancel}" oncomplete="PF('invoiceAlreadyCreatedDialogWV').hide();"
+                                 style="background-color: #F3362B !important; width: 100px;" update="@form" />
+                <!-- <p:commandButton value="#{msg.close}" styleClass="confirm-button"
+                                 style="background-color: #F3362B !important;margin-right: 15px;"
+                                 oncomplete="PF('invoiceAlreadyCreatedDialogWV').hide();"/> -->
+            </div>
+        </p:dialog>
+
+        <p:dialog id="otherRequestsExistsForInvoiceDialog" widgetVar="otherRequestsExistsForInvoiceDialogWV" modal="true" styleClass="dialog-green"
+                  resizable="false" draggable="false" effect="SLIDE" header="">
+            <span>
+                <h:outputText value="#{bean.otherRequestsExistsForInvoice}"/>
+            </span>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.yes}"  styleClass="confirm-button"
+                                 style="margin-right: 15px;" action="#{bean.checkDocument(true)}" oncomplete="PF('otherRequestsExistsForInvoiceDialogWV').hide();"
+                                 update="@widgetVar(mailManagerViewRequestsForInvoiceDlg) @widgetVar(requestsTableConsideredForInvoiceWV)"/>
+                <p:commandButton value="#{msg.no}" oncomplete="PF('otherRequestsExistsForInvoiceDialogWV').hide();" action="#{bean.checkDocument(false)}"
+                                 style="background-color: #F3362B !important; width: 100px;"
+                                 update="@widgetVar(mailManagerViewRequestsForInvoiceDlg) @widgetVar(requestsTableConsideredForInvoiceWV)" />
+            </div>
+        </p:dialog>
+
         <ui:include src="../ConfigurationArea/ClientCreate.xhtml"/>
         <ui:include src="../Dialogs/MailManagerViewRequestsDialog.xhtml"/>
+        <ui:include src="../Dialogs/InvoiceDialogBilling.xhtml"/>
+        <ui:include src="../Dialogs/MailManagerViewRequestsForInvoiceDialog.xhtml"></ui:include>
     </ui:define>
 </ui:composition>

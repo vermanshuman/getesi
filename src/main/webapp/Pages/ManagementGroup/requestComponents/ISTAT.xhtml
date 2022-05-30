@@ -5,7 +5,10 @@
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:p="http://primefaces.org/ui">
 
-    <span>#{enums.documentGenerationTagsISTAT}<span class="red" style="#{block.isRequired()?'':'display:none;'}">*</span></span>
-    <p:inputText id="ISTAT" value="#{bean.entity.istat}" styleClass="input-width"/>
+    <span>#{enums.documentGenerationTagsISTAT}
+        <h:panelGroup rendered="#{not empty block}" style="#{block.isRequired()?'':'display:none;'}">*</h:panelGroup>
+        <h:panelGroup rendered="#{not empty item and not empty item.field}" style="#{item.field.isRequired()?'':'display:none;'}">*</h:panelGroup>
+    </span>
+    <p:inputText id="ISTAT" value="#{bean.wrapper.istat}" styleClass="input-width"/>
 
 </ui:composition>

@@ -78,8 +78,6 @@ public class RealEstateRelationshipTableGenerator extends TagTableGenerator {
                 showAgriculturalIncome = estateSituation.getRequest().getClient().getShowAgriculturalIncome();
             }
 
-
-
             List<String> property = TemplatePdfTableHelper.groupPropertiesByQuoteTypeList(
                     CollectionUtils.emptyIfNull(estateSituation.getPropertyList())
                             .stream().filter(distinctByKey(x -> x.getId()))

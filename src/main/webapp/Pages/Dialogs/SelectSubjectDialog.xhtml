@@ -1,0 +1,438 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ff="http://readytech.com/functions"
+>
+    <ui:param name="edit_title"
+              value="#{bean.selectedSubjectWrapper.entity.isNew ? msg.databaseListSubjectNew : msg.databaseListSubjectEdit}"/>
+    <ui:param name="renderSideMenu" value="#{bean.selectedSubjectWrapper.renderHeader}"/>
+    <ui:param name="centerPartStyleClass" value="false"/>
+    <ui:param name="showSave" value="#{!bean.selectedSubjectWrapper.isOnlyView() and bean.selectedSubjectWrapper.showSave}"/>
+    <ui:param name="showCancel" value="#{bean.selectedSubjectWrapper.showCancel}"/>
+    <ui:param name="notShowMenu" value="#{!bean.selectedSubjectWrapper.renderHeader}"/>
+    <ui:param name="renderHeaderMenu" value="#{bean.selectedSubjectWrapper.renderHeader}"/>
+    <ui:param name="renderFooterMenu" value="#{bean.selectedSubjectWrapper.renderFooter}"/>
+    <ui:param name="customCancelMsg"
+              value="#{bean.selectedSubjectWrapper.isOnlyView() ? msg.close : msg.cancel}"/>
+
+    <style>
+        .ui-tabs.ui-tabs-top .ui-tabs-nav li a, body .ui-tabs.ui-tabs-bottom .ui-tabs-nav li a, body .ui-tabs.ui-tabs-left .ui-tabs-nav li a, body .ui-tabs.ui-tabs-right .ui-tabs-nav li a {
+            color: #000000 !important;
+        }
+
+        #subjectTabs ul {
+            background-color: transparent !important;
+            text-transform: uppercase;
+        }
+
+        #subjectTabs ul::before {
+            border-bottom: none;
+        }
+
+        #subjectTabs ul li:not(.ui-tabs-selected.ui-state-active ) a {
+            color: gray !important;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        #subjectTabs ul li.ui-tabs-selected.ui-state-active {
+            background-color: transparent !important;
+        }
+
+        #subjectTabs ul li.ui-tabs-selected.ui-state-active a {
+            color: #000 !important;
+            border-bottom: 2px solid #3366FF;
+            font-weight: bold;
+        }
+        #searchDlg_title {
+            margin-left: 20px;
+            line-height: 30px;
+        }
+
+        .close_btn {
+            color: #000000 !important;
+            background-color: #FFFFFF !important;
+            border: 1px solid #ced4da !important;
+            box-shadow: 0 0 8px gray !important ;
+            width: 15%;
+        }
+
+        body #searchDlg .ui-button {
+            border: 1px solid #ced4da !important;
+        }
+
+        body .ui-accordion .ui-accordion-header {
+            border: none;
+            border-top: 0 none;
+            background: #FFFFFF !important;
+            color: #000000 !important;
+            padding: 1rem;
+            font-weight: 700;
+            margin-top: 0;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+            user-select: none;
+            border-radius: 0;
+            position: relative;
+            outline: 0 none;
+        }
+
+        body .ui-accordion .ui-accordion-header:focus {
+            box-shadow: 0 0 0 0.2rem #FFFFFF !important;
+        }
+
+        body .ui-accordion .ui-accordion-header:first-child {
+            border-top: none;
+        }
+
+        body .ui-accordion .ui-accordion-content {
+            border: none;
+        }
+
+        body #searchDlg .ui-button.ui-button-icon-only {
+            width: 26px !important;
+        }
+
+        body .ui-accordion .ui-accordion-content .ui-datatable thead th,
+        .ui-accordion .ui-accordion-content .ui-datatable tbody td,
+        .ui-accordion .ui-accordion-content .ui-datatable tfoot td,
+        .ui-accordion .ui-accordion-content .ui-datatable tfoot th {
+            border: none !important;
+        }
+
+        body .ui-accordion .ui-accordion-content .ui-datatable tbody.ui-datatable-data {
+            border-left: none !important;
+        }
+
+        body .ui-accordion .ui-accordion-content .ui-widget-header {
+            background-color: #788FA7 !important;
+        }
+
+        body .ui-dialog .ui-dialog-content {
+            padding: 0rem 0rem 0rem 0rem !important;
+        }
+
+        .ui-dialog-maximized {
+            width: 95% !important;
+            height: 95% !important;
+            top: 2% !important;
+            left: 2% !important;
+
+            right: 2% !important;
+            z-index: 1008;
+            display: block;
+        }
+
+        #subjectTabs * {
+            font-size: 18px;
+        }
+
+        #subjectTabs .action_column {
+            width: 60px;
+        }
+        #subjectTabs .close_btn {
+            float: right;
+            bottom: 20px;
+            right: 40px;
+            position: absolute;
+        }
+
+        .btn-green {
+            background-color: #5ecc8a !important;
+        }
+    </style>
+
+    <p:dialog header="#{msg.databaseListSubjectDatabase}" modal="true" id="searchDlg" resizable="false" draggable="false"
+              dynamic="true" widgetVar="searchDlgWV" onHide="PF('searchDlgWV').toggleMaximize();">
+        <p:scrollPanel mode="native"  style="width: 100%; min-height: 300px; max-height: 600px;border: 0;">
+            <p:tabView dynamic="true" cache="true" id="subjectTabs"
+                       activeIndex="#{bean.selectedSubjectWrapper.activeTabIndex}">
+                <p:tab title="#{msg.databaseListData}">
+
+                    <div class="ui-g">
+                        <div class="ui-g-12">
+                            <script>
+                                window.onload = function() {
+                                    document.getElementById('hidden:link').onclick();
+                                }
+                            </script>
+
+                            <h:form id="hidden" style="display:none">
+                                <h:commandLink id="link">
+                                    <f:ajax event="click" listener="#{bean.selectedSubjectWrapper.loadTabs}" />
+                                </h:commandLink>
+                            </h:form>
+
+                            <f:facet name="actions">
+                                <h:commandLink styleClass="ui-panel-titlebar-icon
+					               ui-corner-all ui-state-default"
+                                               action="#{bean.selectedSubjectWrapper.downloadPdfFile}" ajax="false">
+                                    <h:outputText value="#{msg.subjectDossier}" />
+                                </h:commandLink>
+                            </f:facet>
+
+                            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                                         columnClasses="ui-grid-col-3, ui-grid-col-5">
+
+								<span><span class="red">*</span>
+                                    #{msg.databaseListSubjectType}:</span>
+                                <p:selectOneRadio value="#{bean.selectedSubjectWrapper.entity.typeId}" id="subjectType"
+                                                  disabled="true" >
+                                    <f:selectItems value="#{bean.selectedSubjectWrapper.subjectTypes}"/>
+                                    <p:ajax update="subjectTabs"/>
+                                </p:selectOneRadio>
+                            </p:panelGrid>
+
+                            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                                         columnClasses="ui-grid-col-3, ui-grid-col-5" rendered="#{bean.selectedSubjectWrapper.isPhysicalPerson}">
+
+                                <span><span class="red">*</span> #{msg.lastname}:</span>
+                                <p:inputText id="lastName" maxlength="50" styleClass="input-width" disabled="true"
+                                             onkeyup="fieldValueToUpperCase(this);"
+                                             value="#{bean.selectedSubjectWrapper.entity.surname}" label="#{msg.lastname}"
+                                             onkeypress="numbers_letters_only('#lastName');"
+                                             rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
+                                <h:outputText value="#{ff:upper(bean.selectedSubjectWrapper.entity.surname)}"
+                                              rendered="#{bean.selectedSubjectWrapper.isOnlyView()}" style="font-weight: bold;"/>
+
+                                <span><span class="red">*</span> #{msg.name}:</span>
+                                <p:inputText id="name" maxlength="50" value="#{bean.selectedSubjectWrapper.entity.name}" styleClass="input-width"
+                                             label="#{msg.name}" onkeypress="numbers_letters_only('#name');" disabled="true"
+                                             rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}" onkeyup="fieldValueToUpperCase(this);"/>
+                                <h:outputText value="#{ff:upper(bean.selectedSubjectWrapper.entity.name)}" style="font-weight: bold;"
+                                              rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"/>
+
+                                <span><span class="red">*</span>
+                                    #{msg.databaseListSubjectBirthDate}:</span>
+                                <p:calendar id="birthdate" readonlyInput="#{bean.selectedSubjectWrapper.isOnlyView()}"
+                                            styleClass="calendar-width" pattern="dd/MM/yyyy" mask="true"
+                                            locale="it" navigator="true" popupIconOnly="true"
+                                            value="#{bean.selectedSubjectWrapper.entity.birthDate}" yearRange="c-70:c+10"
+                                            disabled="true"/>
+                            </p:panelGrid>
+
+                            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                                         columnClasses="ui-grid-col-3, ui-grid-col-5" rendered="#{not bean.selectedSubjectWrapper.isPhysicalPerson}">
+								<span><span class="red">*</span>
+                                    #{msg.databaseListSubjectBusinessName}:</span>
+                                <p:inputText value="#{bean.selectedSubjectWrapper.entity.businessName}" id="businessName" styleClass="input-width" disabled="true"
+                                             maxlength="150" rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
+                                <h:outputText value="#{ff:upper(bean.selectedSubjectWrapper.entity.businessName)}" style="font-weight: bold;"
+                                              rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"/>
+
+                                <span><span class="red">*</span>
+                                    #{msg.databaseListSubjectVATNumber}:</span>
+                                <p:inputText value="#{bean.selectedSubjectWrapper.entity.numberVAT}" id="numberVAT" styleClass="input-width" maxlength="11" disabled="true"
+                                             rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
+                                <h:outputText value="#{bean.selectedSubjectWrapper.entity.numberVAT}"
+                                              style="font-weight: bold;" rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"/>
+
+                                <span><span class="red">*</span>
+                                    #{msg.databaseListSubjectFiscalCode}:</span>
+                                <p:inputText maxlength="16" value="#{bean.selectedSubjectWrapper.entity.fiscalCode}" id="codeFiscal" styleClass="input-width" disabled="true"
+                                             rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
+                                <h:outputText value="#{bean.selectedSubjectWrapper.entity.fiscalCode}"
+                                              style="font-weight: bold;" rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"/>
+
+                            </p:panelGrid>
+
+                            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                                         columnClasses="ui-grid-col-3, ui-grid-col-5">
+
+                                <ui:fragment>
+                                    <span class="red">*</span>
+                                    <h:outputText
+                                            value="#{bean.selectedSubjectWrapper.isPhysicalPerson ? msg.databaseListSubjectProvince : msg.databaseListSubjectNativeProvince}:"/>
+                                </ui:fragment>
+                                <ui:fragment>
+                                    <p:selectOneMenu id="province" value="#{bean.selectedSubjectWrapper.addressProvinceId}" styleClass="select-width"
+                                                     label="#{msg.databaseListSubjectProvince}:" disabled="true"
+                                                     rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}">
+                                        <p:ajax update="province, city, country"
+                                                listener="#{subjectBean.handleAddressProvinceChange}"/>
+                                        <f:selectItems value="#{bean.selectedSubjectWrapper.provinces}"/>
+                                    </p:selectOneMenu>
+                                    <h:outputText value="#{bean.selectedSubjectWrapper.provinceDescription}"
+                                                  rendered="#{bean.selectedSubjectWrapper.isOnlyView()}" style="font-weight: bold;"/>
+                                </ui:fragment>
+
+                                <ui:fragment>
+                                    <span class="red">*</span>
+                                    <h:outputText
+                                            value="#{bean.selectedSubjectWrapper.isPhysicalPerson ? msg.databaseListSubjectCity : msg.databaseListSubjectNativeCity}:"/>
+                                </ui:fragment>
+                                <ui:fragment>
+                                    <p:selectOneMenu id="city" value="#{bean.selectedSubjectWrapper.addressCityId}" styleClass="select-width"
+                                                     style="display: #{bean.selectedSubjectWrapper.foreignCountry ? 'none' : ''};" disabled="true"
+                                                     label="#{msg.databaseListSubjectCity}:"
+                                                     rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}">
+                                        <f:selectItems value="#{bean.selectedSubjectWrapper.addressCities}"/>
+                                    </p:selectOneMenu>
+                                    <h:outputText value="#{bean.selectedSubjectWrapper.cityDescription}"
+                                                  rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"
+                                                  style="font-weight: bold;display: #{bean.selectedSubjectWrapper.foreignCountry ? 'none' : ''};"/>
+
+                                    <p:selectOneMenu id="country" value="#{bean.selectedSubjectWrapper.selectedCountryId}" disabled="true" styleClass="select-width"
+                                                     style="display: #{bean.selectedSubjectWrapper.foreignCountry ? '' : 'none'};"
+                                                     label="#{msg.databaseListSubjectCity}:"
+                                                     rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}">
+                                        <f:selectItems value="#{bean.selectedSubjectWrapper.countries}"/>
+                                    </p:selectOneMenu>
+                                    <h:outputText value="#{bean.selectedSubjectWrapper.countryDescription}"
+                                                  rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"
+                                                  style="font-weight: bold;display: #{bean.selectedSubjectWrapper.foreignCountry ? '' : 'none'};"/>
+                                </ui:fragment>
+                            </p:panelGrid>
+
+                            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                                         columnClasses="ui-grid-col-3, ui-grid-col-6" rendered="#{bean.selectedSubjectWrapper.isPhysicalPerson}">
+                                <ui:fragment>
+                                    <span class="red">*</span>
+                                    <h:outputText value="#{msg.databaseListSubjectSex}:"/>
+                                </ui:fragment>
+                                <p:selectOneRadio value="#{bean.selectedSubjectWrapper.entity.sex}" id="sex"
+                                                  disabled="true">
+                                    <f:selectItems value="#{bean.selectedSubjectWrapper.sexTypes}"/>
+                                </p:selectOneRadio>
+
+
+                                <h:outputText value="#{msg.databaseListSubjectBornInForeignState}:"/>
+                                <p:outputPanel>
+                                    <p:selectBooleanCheckbox widgetVar="showAgency"
+                                                             value="#{bean.selectedSubjectWrapper.entity.bornInForeignState}" onchange="toggleAgency()"
+                                                             disabled="true"/>
+
+                                    <p:outputPanel id="agency"
+                                                   style="display: #{bean.selectedSubjectWrapper.entity.bornInForeignState ? '' : 'none'}">
+                                        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+											<span><span class="red">*</span>
+                                                #{msg.databaseListSubjectForeignState}:</span>
+                                            <p:inputText id="foreignState" maxlength="80" styleClass="input-width" disabled="true"
+                                                         value="#{bean.selectedSubjectWrapper.entity.foreignState}"
+                                                         label="#{msg.databaseListSubjectForeignState}"
+                                                         onkeypress="numbers_letters_only('#foreignState');"
+                                                         rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
+                                            <h:outputText value="#{bean.selectedSubjectWrapper.entity.foreignState}"
+                                                          rendered="#{bean.selectedSubjectWrapper.isOnlyView()}" style="font-weight: bold;"/>
+                                        </p:panelGrid>
+                                    </p:outputPanel>
+
+                                </p:outputPanel>
+
+                                <span><span class="red">*</span>
+                                    #{msg.databaseListSubjectFiscalCode}:</span>
+                                <ui:fragment>
+                                    <div style="width: 100%">
+                                        <p:inputText id="fiscalCode" maxlength="16" disabled="true"
+                                                     value="#{bean.selectedSubjectWrapper.entity.fiscalCode}" rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
+                                        <h:outputText value="#{bean.selectedSubjectWrapper.entity.fiscalCode}"
+                                                      rendered="#{bean.selectedSubjectWrapper.isOnlyView()}" style="font-weight: bold;"/>
+                                    </div>
+                                </ui:fragment>
+                            </p:panelGrid>
+
+                            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                                         columnClasses="ui-grid-col-3, ui-grid-col-5" rendered="#{not bean.selectedSubjectWrapper.isPhysicalPerson}">
+                                <h:outputText value="#{msg.databaseListSubjectElectedMortgageHome}:"/>
+                                <p:inputText value="#{bean.selectedSubjectWrapper.entity.electedMortgageHome}" styleClass="input-width" disabled="true"
+                                             id="electedMortgageHome" onkeypress="numbers_letters_comma_only('#electedMortgageHome');"
+                                             maxlength="200" rendered="#{!bean.selectedSubjectWrapper.isOnlyView()}"/>
+                                <h:outputText value="#{bean.selectedSubjectWrapper.entity.electedMortgageHome}"
+                                              style="font-weight: bold;" rendered="#{bean.selectedSubjectWrapper.isOnlyView()}"/>
+
+                            </p:panelGrid>
+
+                            <p:tabView id="tabView" rendered="#{bean.selectedSubjectWrapper.isOnlyView() and not bean.selectedSubjectWrapper.entity.isNew}" binding="#{bean.selectedSubjectWrapper.componentTabView}"/>
+
+                            <script>
+                                function toggleAgency() {
+                                    if (PF('showAgency').input[0].checked) {
+                                        alert("0 clicked");
+                                        //$(document.getElementById('agency')).fadeIn();
+                                    } else {
+                                        alert("1 clicked");
+                                    }
+                                }
+                            </script>
+
+                            <p:commandButton onclick="PF('searchDlgWV').hide();" styleClass="p-mr-2 p-mb-2 close_btn" style="float:right;"
+                                             value="#{msg.close.toUpperCase()}" />
+
+                        </div>
+                    </div>
+                </p:tab>
+
+                <p:tab title="#{msg.databaseListDocumentsFile}">
+                    <div class="ui-g">
+                        <div class="ui-g-12">
+                            <p:accordionPanel multiple="false" activeIndex="#{bean.selectedSubjectWrapper.activePanelIndex}" id="accordionPanel">
+                                <p:tab binding="#{bean.selectedSubjectWrapper.formalitaTab}"/>
+                                <p:tab binding="#{bean.selectedSubjectWrapper.catastiTab}"/>
+                                <p:tab binding="#{bean.selectedSubjectWrapper.elenchiSinteticiTab}"/>
+                                <p:tab binding="#{bean.selectedSubjectWrapper.visureIpotecarieTab}"/>
+                                <p:tab binding="#{bean.selectedSubjectWrapper.soggettiValidatiTab}"/>
+                                <p:tab binding="#{bean.selectedSubjectWrapper.visureTestoTab}"/>
+                                <p:tab binding="#{bean.selectedSubjectWrapper.visureDHTab}"/>
+                            </p:accordionPanel>
+                            <p:commandButton onclick="PF('searchDlgWV').hide();" styleClass="p-mr-2 p-mb-2 close_btn" style="float:right;"
+                                             value="#{msg.close.toUpperCase()}" />
+                        </div>
+                    </div>
+                </p:tab>
+
+                <p:tab title="#{msg.databaseListServicesFulfilled}">
+                    <div class="ui-g">
+                        <div class="ui-g-12">
+                            <p:accordionPanel multiple="false" activeIndex="#{bean.selectedSubjectWrapper.activePanelServicesIndex}" id="accordionPanelServicesFulfilled">
+                                <p:tab binding="#{bean.selectedSubjectWrapper.richiestaTab}"/>
+                                <p:tab binding="#{bean.selectedSubjectWrapper.servizioAnagraficoTab}"/>
+                                <p:tab binding="#{bean.selectedSubjectWrapper.servizioImmobiliareTab}"/>
+                                <p:tab binding="#{bean.selectedSubjectWrapper.servizioInvestigativoTab}"/>
+                                <p:tab binding="#{bean.selectedSubjectWrapper.servizioCameraleTab}"/>
+                            </p:accordionPanel>
+                            <p:commandButton onclick="PF('searchDlgWV').hide();" styleClass="p-mr-2 p-mb-2 close_btn" style="float:right;"
+                                             value="#{msg.close.toUpperCase()}" />
+                        </div>
+                    </div>
+                </p:tab>
+
+                <p:tab title="#{msg.databaseListBilling}" disabled="true">
+                    <div class="ui-g">
+                        <div class="ui-g-12">
+                            <p:commandButton onclick="PF('searchDlgWV').hide();" styleClass="p-mr-2 p-mb-2 close_btn" style="float:right;"
+                                             value="#{msg.close.toUpperCase()}" />
+                        </div>
+                    </div>
+                </p:tab>
+            </p:tabView>
+        </p:scrollPanel>
+    </p:dialog>
+    <p:dialog widgetVar="templates" resizable="false"
+              header="#{msg.docTemplates}" modal="true">
+        <p:selectOneMenu value="#{bean.selectedSubjectWrapper.selectedTemplateId}"
+                         style="width:150px;">
+            <f:selectItems value="#{bean.selectedSubjectWrapper.templates}"/>
+        </p:selectOneMenu>
+
+        <div class="btn_line">
+            <p:commandButton value="#{msg.ok}" ajax="false"
+                             actionListener="#{bean.selectedSubjectWrapper.generate}" onclick="PF('templates').hide()"
+                             update=":form:messages"/>
+            <p:commandButton value="#{msg.cancel}"
+                             onclick="PF('templates').hide()"/>
+        </div>
+    </p:dialog>
+    <p:dialog id="documentDialog" widgetVar="documentDialog" modal="true" resizable="false" draggable="false"
+              width="600">
+        <p:dataTable value="#{bean.selectedSubjectWrapper.requestDocuments}" var="doc" id="requestDocs" emptyMessage="#{msg.noRecordsFound}">
+            <p:column headerText="#{msg.name}">
+                <h:outputText value="#{doc.title}"/>
+            </p:column>
+            <p:column styleClass="action_column">
+                <p:commandButton icon="fa fa-download" action="#{bean.selectedSubjectWrapper.downloadRequestFile}" ajax="false">
+                    <f:setPropertyActionListener value="#{doc.id}" target="#{bean.selectedSubjectWrapper.selectedDocumentId}"/>
+                </p:commandButton>
+            </p:column>
+        </p:dataTable>
+    </p:dialog>
+</ui:composition>

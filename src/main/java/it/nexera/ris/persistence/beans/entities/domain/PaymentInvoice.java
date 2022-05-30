@@ -1,9 +1,12 @@
 package it.nexera.ris.persistence.beans.entities.domain;
 
+import it.nexera.ris.common.helpers.DateTimeHelper;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
+import it.nexera.ris.persistence.beans.entities.domain.Invoice;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Entity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -29,4 +32,14 @@ public class PaymentInvoice extends IndexedEntity implements Serializable {
     @JoinColumn(name = "invoice_id")
     private Invoice invoice;
 
+    @Transient
+    private String dateString;
+
+    public String getDateString() {
+        if(getDate() != null) {
+            return DateTimeHelper.toFormatedStringLocal(getDate(),
+                    DateTimeHelper.getDatePattern(), null);
+        }
+        return dateString;
+    }
 }

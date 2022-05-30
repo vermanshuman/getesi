@@ -9,6 +9,47 @@
                 template="/resources/tpl/Admin/EditBase.xhtml">
     <ui:param name="bean" value="#{estateSituationEditBean}"/>
     <ui:define name="edit_body">
+        <style>
+            body .ui-state-highlight {
+                background-color: #ffffff !important;
+                color: #495057!important;
+            }
+            body .ui-state-active {
+                background: #2196F3 !important;
+                border-color: #2196F3 !important;
+            }
+            #save_btn {
+                margin-left: 0.5rem !important;
+            }
+            #cancel_btn {
+                background-color: #F3362B !important;
+            }
+            #formalityPDFTab > .ui-datatable-tablewrapper > table > tbody > tr > td {
+                border-color: #808080 !important;
+            }
+            #estateTab > .ui-datatable-tablewrapper > table > tbody > tr > td {
+                border-color: #808080 !important;
+            }
+            #formalityTab  > .ui-datatable-tablewrapper > table > tbody > tr > td {
+                border-color: #808080 !important;
+            }
+            #formalityPDFTab > .ui-datatable-tablewrapper > table > tbody > tr > td {
+                border-color: #808080 !important;
+            }
+            #estateTab > .ui-datatable-tablewrapper > table > tbody > tr > td {
+                border-color: #808080 !important;
+            }
+            #formalityTab  > .ui-datatable-tablewrapper > table > tbody > tr > td {
+                border-color: #808080 !important;
+            }
+            .card, body .ui-panel .ui-panel-content {
+                border: 1px solid #6c757d !important;
+            }
+
+            /*.ui-widget-header:first-child {
+                display: none;
+            }*/
+        </style>
         <div align="center">
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
                          style="text-align: left;width: 75%;">
@@ -36,7 +77,7 @@
             <p:column>
                 <h:panelGroup style="font-size: 16px;"  rendered="#{!bean.salesDevelopment}">#{msg.formality}</h:panelGroup>
                 <p:dataTable value="#{bean.formalityList}" selection="#{bean.selectedFormality}"
-                             rendered="#{!bean.salesDevelopment}"
+                             rendered="#{!bean.salesDevelopment}" emptyMessage="#{msg.noRecordsFound}"
                              styleClass="simple-table estate-situation-edit-select"
                              var="item" id="formalityTab" rowSelectMode="checkbox"
                              rowKey="#{item.id}"
@@ -65,7 +106,7 @@
             </p:column>
             <p:column>
                 <h:panelGroup style="font-size: 16px;"  rendered="#{!bean.salesDevelopment}">#{msg.estateLocation}</h:panelGroup>
-                <p:dataTable value="#{bean.propertyList}" selection="#{bean.selectedProperty}"
+                <p:dataTable value="#{bean.propertyList}" selection="#{bean.selectedProperty}" emptyMessage="#{msg.noRecordsFound}"
                              styleClass="simple-table estate-situation-edit-select"
                              var="item" id="estateTab"  rowSelectMode="checkbox"
                              rowKey="#{item.id}"  rendered="#{!bean.salesDevelopment}"
@@ -91,7 +132,7 @@
                         <h:outputText value="#{item.cityDescription}"/>
                     </p:column>
                     <p:column headerText="#{msg.estateCadastralData}">
-                        <p:dataTable value="#{item.cadastralData}" var="exam"
+                        <p:dataTable value="#{item.cadastralData}" var="exam" emptyMessage="#{msg.noRecordsFound}"
                                      rendered="#{not empty item.cadastralData}"
                                      styleClass="without-header cadastral_table">
                             <p:column>
@@ -116,7 +157,7 @@
                         </p:dataTable>
                     </p:column>
                     <p:rowExpansion>
-                        <p:dataTable value="#{item.datafromPropertiesUpdated}" var="datafromP"
+                        <p:dataTable value="#{item.datafromPropertiesUpdated}" var="datafromP" emptyMessage="#{msg.noRecordsFound}"
                                      styleClass="without-header cadastral_table">
                             <p:column styleClass="action_column">
                                 <p:selectBooleanCheckbox value="#{datafromP.associated}"/>
@@ -160,7 +201,7 @@
                         <p:selectBooleanCheckbox value="#{bean.reportRelationship}"/>
                     </p:outputPanel>
                 </p:outputPanel>
-                <p:dataTable value="#{bean.formalityPDFList}" styleClass="simple-table" var="item" id="formalityPDFTab">
+                <p:dataTable value="#{bean.formalityPDFList}" styleClass="simple-table" var="item" id="formalityPDFTab" emptyMessage="#{msg.noRecordsFound}">
                     <p:column styleClass="action_column special-toggler"
                               exportable="false" width="5%">
                          <p:selectBooleanCheckbox value="#{item.visible}" id="visibleCB"  styleClass="select_checkbox_exam #{item.id}"/>
@@ -193,7 +234,7 @@
                         <h:outputText value="#{item.statusStr}"/>
                     </p:column>
                     <p:rowExpansion>
-                        <p:dataTable value="#{item.propertiesLoad}" var="property"
+                        <p:dataTable value="#{item.propertiesLoad}" var="property" emptyMessage="#{msg.noRecordsFound}"
                                      styleClass="without-header cadastral_table" id="cadastral_table">
                             <p:column styleClass="action_column">
                                 <p:selectBooleanCheckbox value="#{property.selected}">
@@ -208,7 +249,7 @@
                                 <h:outputText value="#{property.address}"/>
                             </p:column>
                             <p:column>
-                                <p:dataTable value="#{property.cadastralData}" var="cad"
+                                <p:dataTable value="#{property.cadastralData}" var="cad" emptyMessage="#{msg.noRecordsFound}"
                                              rendered="#{not empty property.cadastralData}"
                                              styleClass="without-header cadastral_table">
                                     <p:column>
@@ -248,24 +289,28 @@
                          icon="fa fa-chevron-circle-left"/>
     </ui:define>
     <ui:define name="dialog_body">
-        <p:dialog widgetVar="cadastralInvalidDlg" modal="true" resizable="false" effect="SLIDE">
+        <p:dialog styleClass="confirmationDialog" widgetVar="cadastralInvalidDlg" modal="true" resizable="false" effect="SLIDE">
             <h:outputText value="#{msg.estateSituationFormalityValidation}"/><br/>
             <br/>
-            <div>
-                <p:commandButton value="#{msg.yes}" action="#{bean.pageSave}" process="@this">
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" action="#{bean.pageSave}" process="@this"
+                                 style="margin-right: 1cm;background-color: #00CC52!important;">
                     <f:setPropertyActionListener value="false" target="#{bean.needValidation}"/>
                 </p:commandButton>
-                <p:commandButton value="#{msg.no}" onclick="PF('cadastralInvalidDlg').hide()" process="@this"/>
+                <p:commandButton value="#{msg.cancel}" onclick="PF('cadastralInvalidDlg').hide()" process="@this"
+                                 style="background-color: #F3362B !important;"/>
             </div>
         </p:dialog>
-        <p:dialog widgetVar="propertyCityDlg" modal="true" resizable="false" effect="SLIDE">
+        <p:dialog styleClass="confirmationDialog" widgetVar="propertyCityDlg" modal="true" width="500" draggable="false" resizable="false">
             <h:outputText value="#{msg.estateSituationPropertyCity}" escape="false"/><br/>
             <br/>
-            <div>
-                <p:commandButton value="#{msg.yes}" action="#{bean.pageSave}" process="@this">
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" action="#{bean.pageSave}" process="@this"
+                                 style="margin-right: 1cm;background-color: #00CC52!important;">
                     <f:setPropertyActionListener value="true" target="#{bean.propertyConfirmed}"/>
                 </p:commandButton>
-                <p:commandButton value="#{msg.no}" onclick="PF('propertyCityDlg').hide()" process="@this"/>
+                <p:commandButton value="#{msg.cancel}" onclick="PF('propertyCityDlg').hide()" process="@this"
+                                 style="background-color: #F3362B !important;"/>
             </div>
         </p:dialog>
     </ui:define>

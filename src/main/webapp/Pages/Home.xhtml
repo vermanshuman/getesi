@@ -1,42 +1,399 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui" xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
-<ui:composition template="/resources/tpl/Admin/Main.xhtml">
-    <ui:param name="bean" value="#{homeBean}"/>
-    <ui:define name="body">
-        <h:form>
-            <div class="ui-g dashboard">
-                <p:outputPanel rendered="#{not bean.currentUser.external}" style="padding:0; width: 100%;">
-                    <ui:include src="/Pages/home/TopContentBox.xhtml"/>
-                </p:outputPanel>
-                <div class="ui-g-12 ui-md-8">
-                    <p:panel header="Calendar" style="height:100%">
-                        <p:schedule value="#{bean.eventModel}" timeFormat="HH:mm" axisFormat="HH:mm" draggable="false"
-                                    resizable="false">
-                            <p:ajax event="eventSelect" listener="#{bean.onEventSelect}" update="eventDetails"
-                                    oncomplete="PF('eventDialog').show();"/>
-                        </p:schedule>
-                    </p:panel>
-                    <ui:include src="/resources/tpl/Admin/Include/EventDialog.xhtml"/>
-                </div>
-                <div class="ui-g-12 ui-md-4">
-                    <p:panel header="#{msg.phrases}" style="margin-bottom: 3%">
-                        <div align="center" style="font-size: 26px; font-style: italic">
-                            <i class="fa fa-fw fa-quote-left " style="margin-right: 1%"/>
-                            <span>#{bean.phrase}</span>
-                            <i class="fa fa-fw fa-quote-right" style="margin-left: 1%"/>
-                        </div>
-                    </p:panel>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ff="http://readytech.com/functions"
+                template="/resources/tpl/Admin/template.xhtml">
 
-                    <p:panel header="#{msg.forecast}">
-                        <ui:include src="/Pages/home/WeatherBlock.xhtml"/>
-                    </p:panel>
+    <ui:define name="title">Dashboard</ui:define>
+
+
+    <ui:define name="content">
+
+        <h:outputScript name="chartjs/chart.js" library="chart"/>
+        <h:form id="dashboardform">
+            <style>
+                h1{
+                    margin: 0px;
+                }
+
+                fieldset {
+                    min-height: 118px;
+                    border: 0;
+                }
+            </style>
+            <script type="text/javascript">
+                // <![CDATA[
+                var ctx;
+                var chartData;
+                var myBarChart;
+
+                function statisticsData() {
+
+                    //var chartData = JSON.parse('#{homeBean.chartData}');
+                    //console.log('oooooooooooooooooooo', $('input[id*="chartData"]').attr('value'));
+
+                    chartData =  JSON.parse($('input[id*="chartData"]').attr('value'));
+
+                    const data = {
+                        labels: chartData.labels,
+                        datasets: chartData.datasets
+                    };
+
+                    myBarChart.data.datasets.pop();
+                    myBarChart.data = data;
+                    myBarChart.update();
+
+                };
+                jQuery(document).ready(function() {
+                    setTimeout(function(){
+                        addUtentiIcon();
+
+                    }, 500);
+                    addUtentiIconChart();
+
+                    ctx = document.getElementById("dashboard-chart").getContext('2d');
+                    chartData =  JSON.parse($('input[id*="chartData"]').attr('value'));
+
+                    const data = {
+                        labels: chartData.labels,
+                        datasets: chartData.datasets
+                    };
+
+                    myBarChart = new Chart(ctx, {
+                        type: chartData.type,
+                        data: data,
+                        options: {
+                            scales: {
+                                xAxes: [{
+                                    display: true,
+                                    stacked: true,
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: chartData.xLabel,
+                                        fontStyle: "bold"
+                                    },
+                                }],
+                                yAxes: [{
+                                    display: true,
+                                    stacked: true,
+                                    scaleLabel: {
+                                        display: true,
+                                        labelString: chartData.yLabel,
+                                        fontStyle: "bold"
+                                    }
+                                }]
+                            },
+                            tooltips: {
+                                callbacks: {
+                                    label: function(t, d) {
+                                        if (t.datasetIndex === 0) {
+                                            return d.datasets[t.datasetIndex].tooltip[t.index];
+                                        }
+                                    }
+                                }
+                            }
+                            // tooltips: {
+                            //     enabled: false,
+                            //     custom: function(tooltipModel) {
+                            //         // Tooltip Element
+                            //         var tooltipEl = document.getElementById('chartjs-tooltip');
+                            //
+                            //         // Create element on first render
+                            //         if (!tooltipEl) {
+                            //             tooltipEl = document.createElement('div');
+                            //             tooltipEl.id = 'chartjs-tooltip';
+                            //             tooltipEl.innerHTML = '<table></table>';
+                            //             document.body.appendChild(tooltipEl);
+                            //         }
+                            //
+                            //         // Hide if no tooltip
+                            //         if (tooltipModel.opacity === 0) {
+                            //             tooltipEl.style.opacity = 0;
+                            //             return;
+                            //         }
+                            //
+                            //         // Set caret Position
+                            //         tooltipEl.classList.remove('above', 'below', 'no-transform');
+                            //         if (tooltipModel.yAlign) {
+                            //             tooltipEl.classList.add(tooltipModel.yAlign);
+                            //         } else {
+                            //             tooltipEl.classList.add('no-transform');
+                            //         }
+                            //
+                            //         function getBody(bodyItem) {
+                            //             return bodyItem.lines;
+                            //         }
+                            //
+                            //         // Set Text
+                            //         if (tooltipModel.body) {
+                            //             var titleLines = tooltipModel.title || [];
+                            //             var bodyLines = tooltipModel.body.map(getBody);
+                            //
+                            //             var innerHtml = '<thead>';
+                            //
+                            //             titleLines.forEach(function(title) {
+                            //                 innerHtml += '<tr><th>' + title + '</th></tr>';
+                            //             });
+                            //             innerHtml += '</thead><tbody>';
+                            //
+                            //             bodyLines.forEach(function(body, i) {
+                            //                // console.log('BODY', body);
+                            //                 var colors = tooltipModel.labelColors[i];
+                            //                 var style = 'background:' + colors.backgroundColor;
+                            //                 style += '; border-color:' + colors.borderColor;
+                            //                 style += '; border-width: 2px';
+                            //                 var span = '<span style="' + style + '"></span>';
+                            //                 body.forEach((b, i) => {
+                            //                     innerHtml += '<tr><td>' + span + b + '</td></tr>';
+                            //                 });
+                            //
+                            //
+                            //             });
+                            //             innerHtml += '</tbody>';
+                            //
+                            //             var tableRoot = tooltipEl.querySelector('table');
+                            //             tableRoot.innerHTML = innerHtml;
+                            //         }
+                            //
+                            //         // `this` will be the overall tooltip
+                            //         var position = this._chart.canvas.getBoundingClientRect();
+                            //
+                            //         // Display, position, and set styles for font
+                            //         tooltipEl.style.opacity = 1;
+                            //         tooltipEl.style.position = 'absolute';
+                            //         tooltipEl.style.left = position.left + window.pageXOffset + tooltipModel.caretX + 'px';
+                            //         tooltipEl.style.top = position.top + window.pageYOffset + tooltipModel.caretY + 'px';
+                            //         tooltipEl.style.fontFamily = tooltipModel._bodyFontFamily;
+                            //         tooltipEl.style.fontSize = tooltipModel.bodyFontSize + 'px';
+                            //         tooltipEl.style.fontStyle = tooltipModel._bodyFontStyle;
+                            //         tooltipEl.style.padding = tooltipModel.yPadding + 'px ' + tooltipModel.xPadding + 'px';
+                            //         tooltipEl.style.pointerEvents = 'none';
+                            //     },
+                            //     callbacks: {
+                            //         label: function(t, d) {
+                            //             if (t.datasetIndex === 0) {
+                            //                 return d.datasets[t.datasetIndex].tooltip[t.index];
+                            //             }
+                            //         }
+                            //     }
+                            // }
+
+                        }
+                    });
+                });
+                function addUtentiIcon() {
+
+                    if(PF('userList').getSelectedValue()=="") {
+                        var id = $("[id*=changeUserList_label]");
+                        $('<i class="overview-icon topbar-icon fa fa-fw fa-user" style="font-size: 16px;"/>').prependTo(id);
+                    }
+                }
+                function addUtentiIconChart() {
+                    if(!PF('userListChart') || PF('userListChart').getSelectedValue()=="") {
+                        var id = $("[id*=userList_label]");
+                        $('<i class="overview-icon topbar-icon fa fa-fw fa-user" style="font-size: 16px;"/>').prependTo(id);
+                    }
+                }
+                // ]]>
+            </script>
+            <div class="layout-dashboard" style="max-width: 98%;">
+                <h:panelGroup id="slides" layout="block" styleClass="p-grid">
+                    <div class="p-col-12 p-lg-6 p-xl-3" style="display: #{homeBean.nextSlide ? 'none' : ''}">
+                        <p:commandLink action="#{homeBean.openMailList()}" style="text-decoration: none" >
+                        <div class="overview-box sales" style="background-color: #FF9966;">
+                            <i class="overview-icon topbar-icon fa fa-fw fa-envelope-o" style="color:white;"/>
+                            <span class="overview-title">#{msg.numberUnreadEmails}</span>
+                            <div class="overview-numbers">
+                                <h:outputText id="newMailCount"
+                                              value="#{sessionBean.newMailCount}"/>
+                            </div>
+                            <div class="overview-subinfo">
+                            </div>
+                        </div>
+                        </p:commandLink>
+                    </div>
+                    <div class="p-col-12 p-lg-6 p-xl-3" style="display: #{homeBean.nextSlide ? 'none' : ''}">
+                        <p:commandLink action="#{homeBean.openRequestList(1)}" style="text-decoration: none" >
+                        <div class="overview-box views" style="background-color: #5EA2CC;">
+                            <i class="overview-icon fa fa-fw fa-list" style="color:white;"/>
+                            <span class="overview-title">Pratiche nuove</span>
+                            <div class="overview-numbers">
+                                <h:outputText id="numberUnclosedRequests"
+                                              value="#{sessionBean.numberUnclosedRequests}"/>
+                            </div>
+                            <div class="overview-subinfo">
+                            </div>
+                        </div>
+                        </p:commandLink>
+                    </div>
+                    <div class="p-col-12 p-lg-6 p-xl-3">
+                        <p:commandLink action="#{homeBean.openRequestList(2)}" style="text-decoration: none" >
+                        <div class="overview-box checkin">
+                            <i class="overview-icon pi pi-pencil"/>
+                            <span class="overview-title">#{msg.numberTotalRequests}</span>
+                            <div class="overview-numbers">
+                                <h:outputText id="numberUnclosedRequestsInWork"
+                                              value="#{sessionBean.numberUnclosedRequestsInWork}"/>
+                            </div>
+                            <div class="overview-subinfo">
+                            </div>
+                        </div>
+                        </p:commandLink>
+                    </div>
+                    <div class="p-col-12 p-lg-6 p-xl-3">
+                        <div class="overview-box checkin" style="background-color: #DF6161;">
+                            <i class="overview-icon pi pi-clock"/>
+                            <span class="overview-title">#{msg.numberOverdueRequests}</span>
+                            <div class="overview-numbers">
+                                <h:outputText
+                                        value="&#160;"/>
+                            </div>
+                            <div class="overview-subinfo">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-col-12 p-lg-6 p-xl-3" style="display: #{homeBean.nextSlide ? '' : 'none'}">
+                        <div class="overview-box views">
+                            <i class="overview-icon pi pi-calendar"/>
+                            <span class="overview-title">#{msg.numberRequestsDue}</span>
+                            <div class="overview-numbers">
+                                <h:outputText
+                                        value="&#160;"/>
+                            </div>
+                            <div class="overview-subinfo">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-col-12 p-lg-6 p-xl-3" style="display: #{homeBean.nextSlide ? '' : 'none'}">
+                        <div class="overview-box checkin" style="background-color: #C488C4;">
+                            <i class="overview-icon fa fa-fw fa-database"/>
+                            <span class="overview-title">#{msg.numberDBRecords}</span>
+                            <div class="overview-numbers">
+                                <h:outputText id="sumOfEntriesCountInManyTables"
+                                              value="#{sessionBean.sumOfEntriesCountInManyTables}"/>
+                            </div>
+                            <div class="overview-subinfo">
+                            </div>
+                        </div>
+                    </div>
+
+                </h:panelGroup>
+                <div class="p-grid mtb-10">
+                    <div class="p-col-6">
+                        <div>
+                            <fieldset>
+                                <legend>FRASE DEL GIORNO</legend>
+                                <div align="center" style="font-size: 26px; font-style: italic; padding-top: 10px; padding-bottom: 10px; margin-top: -0.25rem;"
+                                     class="box p-shadow-7">
+                                    <i class="fa fa-fw fa-quote-left " style="margin-right: 1%"/>
+                                    <h:panelGroup rendered="#{homeBean.phrase ne null}">
+                                        <span>#{homeBean.phrase.split(",")[0]},</span><br/>
+                                        <span>#{homeBean.phrase.split(",")[1]}</span>
+                                    </h:panelGroup>
+                                    <i class="fa fa-fw fa-quote-right" style="margin-left: 1%"/>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div>
+                            <fieldset>
+                                <legend>#{ff:upper(msg.forecastCity)} #{homeBean.currentDayString}</legend>
+                                <div align="center" style="font-size: 26px; font-style: italic; margin-top: 0.25rem;" class="box p-shadow-7">
+                                    <h:panelGroup rendered="true">
+                                        <ui:include src="/Pages/home/WeatherBlock.xhtml"/>
+                                    </h:panelGroup>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-grid">
+                    <div class="p-col-12 p-lg-8">
+                        <div class="card-w-title statistics">
+                            <div style="display: flex;place-content: flex-start;align-items: baseline;flex: 1 1 100%;gap: 15px;">
+                                <h5>#{msg.chartHeader}</h5>
+                                <p:selectOneMenu id="expirationList" value="#{homeBean.selectedExpirationId}"
+                                                 style="width: 20%;"  widgetVar="scadenzaListChart"
+                                                 label="#{msg.expirationFilter}">
+                                    <p:ajax
+                                            listener="#{homeBean.handleExpirationFilter()}" update="chartData"
+                                            oncomplete="statisticsData();"/>
+                                    <f:selectItem itemLabel="#{msg.expirationFilter}" itemValue=""/>
+                                    <f:selectItems value="#{homeBean.expirationFilters}"/>
+                                </p:selectOneMenu>
+                            </div>
+                            <h:inputHidden value="#{homeBean.chartData}" id="chartData"/>
+                            <canvas id="dashboard-chart"/>
+                        </div>
+                    </div>
+                    <div class="p-col-12 p-lg-4">
+                        <div class="user-card card">
+                            <div class="user-card-header">
+                                <p:graphicImage name="images/dashboard/bg-header.png" library="babylon-layout"
+                                                class="profile-image"/>
+                            </div>
+                            <div class="user-card-content">
+
+                                <h:panelGroup id="imgSection">
+                                    <h:graphicImage styleClass="profileImg" rendered="#{not empty homeBean.photo}"
+                                                    value="#{homeBean.photo}" id="profileImg" />
+                                    <ui:fragment id="blankImg" rendered="#{empty homeBean.photo}" >
+                                        <i class="topbar-icon fa fa-fw fa-user-circle"/>
+                                    </ui:fragment>
+
+                                    <div class="user-card-name">
+                                        <span>Workload</span>
+                                    </div>
+                                </h:panelGroup>
+
+                                <div class="p-grid">
+                                    <div class="p-col-6"></div>
+                                    <div class="p-col-6">
+                                        <p:selectOneMenu id="changeUserList" value="#{homeBean.selectedUserId}"
+                                                         style="width: 91%;" onchange="addUtentiIcon()" widgetVar="userList"
+                                                         label="#{msg.user}" rendered="#{homeBean.currentUser.isAdmin()}">
+                                            <p:ajax
+                                                    listener="#{homeBean.handleUserChange()}" update="workdLoadSection profileImg blankImg imgSection chartData"
+                                                    oncomplete="statisticsData();"/>
+                                            <f:selectItem itemLabel="Utente" itemValue=""/>
+                                            <f:selectItems value="#{homeBean.users}"/>
+                                        </p:selectOneMenu>
+                                    </div>
+                                </div>
+
+                                <div class="user-detail">
+                                    <h:panelGroup id="workdLoadSection">
+                                        <ul>
+                                            <ui:repeat value="#{homeBean.workLoadWrappers}" var="workLoad">
+                                                <li class="clearfix">
+                                                    <i class="carico-icon topbar-icon #{workLoad.icon}" style="#{workLoad.style}"/>
+                                                    <span class="project-title"><h:outputText value="#{workLoad.name}"/></span>
+                                                    <div class="project-progressbar">
+                                                        <div class="project-progressbar-value" style="width: #{workLoad.percentage}%;background-color: #{workLoad.barColor}"></div>
+                                                    </div>
+                                                    <span class="project-detail"><h:outputText value="#{workLoad.numberUnclosedRequestsInWork}"/> in lavorazione su <h:outputText value="#{workLoad.total}"/></span>
+                                                </li>
+                                            </ui:repeat>
+                                        </ul>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <p:poll interval="#{sessionBean.getTimeToRefresh()}" update="@form"/>
+            <div id="layout-config" class="layout-config" style="position: absolute; z-index: 0">
+                <div class="layout-config-content">
+                    <p:commandLink id="slideNextBtn" update="slides slideNextBtn"
+                                   action="#{homeBean.setNextSlide(!homeBean.nextSlide)}" styleClass="layout-config-button"
+                                   style="background-color: transparent;top: 125px;color: gray;">
+                        <i class="pi #{homeBean.nextSlide ? 'pi-angle-double-left' : 'pi-angle-double-right'}"/>
+                    </p:commandLink>
+                </div>
+            </div>
         </h:form>
     </ui:define>
 </ui:composition>
-</html>

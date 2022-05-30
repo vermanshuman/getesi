@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
 import org.hibernate.ScrollMode;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
@@ -28,8 +29,15 @@ public class RequestBindingWrapper extends BaseTab implements Serializable {
 
     private List<Long> listIds;
 
+    private boolean onlyView;
+
     public RequestBindingWrapper(List<Long> ids) {
         this.listIds = ids;
+    }
+
+    public RequestBindingWrapper(List<Long> ids, boolean onlyView) {
+        this.listIds = ids;
+        this.onlyView = onlyView;
     }
 
     @Override
@@ -45,11 +53,11 @@ public class RequestBindingWrapper extends BaseTab implements Serializable {
                         Restrictions.or(
                                 Restrictions.isNull("isDeleted"),
                                 Restrictions.eq("isDeleted", false)
-                                )}, new Order[]{Order.asc("id")});
+                                )}, new Order[]{Order.desc("evasionDate")});
     }
 
     @Override
-    Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+    public Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
         return DaoManager.getCount(Request.class, "id",
                 new Criterion[]{
                         Restrictions.in("subject.id", getListIds()),
@@ -63,23 +71,26 @@ public class RequestBindingWrapper extends BaseTab implements Serializable {
     public List<Column> getColumns() {
         List<Column> columns = new ArrayList<>();
         columns.add(getTextColumn("subjectViewRequestDate", "createDate", new DateConverter(), Date.class, ""));
-        columns.add(getTextColumn("subjectViewRequestService", "service"));
+        if(isOnlyView()){
+            columns.add(getTextColumn("subjectViewRequestService", "service"));
+        }
         columns.add(getTextColumn("subjectViewRequestType", "requestType"));
         columns.add(getTextColumn("subjectViewRequestOffice", "aggregationLandChargesRegistry"));
         columns.add(getTextColumn("subjectViewRequestClient", "client"));
-        
         CommandButton commandButton = new CommandButton();
-        //commandButton.setActionExpression(createMethodExpression(String.format("#{subjectBean.%s}", "showFile(tableVar)"), new Class[]{Request.class}));
-        
         commandButton.setActionExpression(createMethodExpression(String.format("#{subjectBean.%s}", "loadAllegatiDocuments(tableVar)"), new Class[]{Request.class}));
-        
-        commandButton.setIcon("fa fa-fw fa-file-pdf-o");
-        commandButton.setUpdate("requestDocs");
-        
-        columns.add(getButtonColumn("subjectViewRequestOutput", commandButton));
-
+        // commandButton.setIcon("fa fa-fw fa-file-pdf-o");
+        //commandButton.setUpdate("requestDocs");
+        commandButton.setIcon("fa fa-fw fa-file-pdf-o red-file icon-align");
+        columns.add(getButtonColumn("subjectViewRequestOutput", commandButton, "", "action_column"));
         columns.add(getTextColumn("subjectViewRequestBilling", "billingClient"));
-        columns.add(getTextColumn("subjectViewRequestNote", "note"));
+        if(isOnlyView()){
+            columns.add(getTextColumn("subjectViewRequestNote", "note"));
+        }
+        CommandButton commandButtonStartUpdate = new CommandButton();
+        commandButtonStartUpdate.setValue(ResourcesHelper.getString("subjectViewRequestStartUpdate"));
+        commandButtonStartUpdate.setStyleClass("btn-green");
+        columns.add(getButtonColumn("subjectViewRequestAction", commandButtonStartUpdate, "13%"));
         return columns;
     }
 
@@ -89,5 +100,13 @@ public class RequestBindingWrapper extends BaseTab implements Serializable {
 
     public void setListIds(List<Long> listIds) {
         this.listIds = listIds;
+    }
+
+    public boolean isOnlyView() {
+        return onlyView;
+    }
+
+    public void setOnlyView(boolean onlyView) {
+        this.onlyView = onlyView;
     }
 }

@@ -37,11 +37,9 @@ public enum PropertyRowsForPDFXMLElements {
     PROPERTY_LAND_PORTION("DatiClassamentoT.Porzione", "%PROPERTY_LAND_PORTION%", false),
     PROPERTY_LAND_QUALITY("DatiClassamentoT.Qualita", "%PROPERTY_LAND_QUALITY%", false),
     PROPERTY_LAND_CLASS("DatiClassamentoT.Classe", "%PROPERTY_LAND_CLASS%", false),
-    PROPERTY_LAND_MQ("", "%PROPERTY_LAND_MQ%", false),
     PROPERTY_LAND_HA("SuperficieT.Ha", "%PROPERTY_LAND_HA%", true),
     PROPERTY_LAND_ARE("SuperficieT.Are", "%PROPERTY_LAND_ARE%", true),
     PROPERTY_LAND_CA("SuperficieT.Ca", "%PROPERTY_LAND_CA%", true),
-    PROPERTY_LAND_CONSISTENCY("ClassamentoT.SuperficieMQ", "%PROPERTY_LAND_CONSISTENCY%", true),
     PROPERTY_LAND_DEDUCTION("", "%PROPERTY_LAND_DEDUCTION%", false),
     PROPERTY_LAND_DOMINICALE("DatiClassamentoT.RedditoDominicaleEuro", "%PROPERTY_LAND_DOMINICALE%", true),
     PROPERTY_LAND_AGRICULTURAL("DatiClassamentoT.RedditoAgrarioEuro", "%PROPERTY_LAND_AGRICULTURAL%", true),
@@ -52,7 +50,8 @@ public enum PropertyRowsForPDFXMLElements {
     PROPERTY_HISTORY_LAW_CODE("DirittiReali.CodiceDiritto", "%PROPERTY_HISTORY_LAW_CODE%", true),
     PROPERTY_HISTORY_REAL_RIGHTS_DESCRIPTION("DirittiReali.Descrizione", "%PROPERTY_HISTORY_REAL_RIGHTS_DESCRIPTION%", true),
     PROPERTY_HISTORY_REAL_RIGHTS_QUOTE("DirittiReali.Quota", "%PROPERTY_HISTORY_REAL_RIGHTS_QUOTE%", true),
-    PROPERTY_HISTORY_RESULT_DATA("DatiDerivantiDaMutazSogg", "%PROPERTY_HISTORY_RESULT_DATA%", true);
+    PROPERTY_HISTORY_RESULT_DATA("DatiDerivantiDaMutazSogg", "%PROPERTY_HISTORY_RESULT_DATA%", true),
+    PROPERTY_LAND_CONSISTENCY("ClassamentoT.SuperficieMQ", "%PROPERTY_LAND_CONSISTENCY%", true),;
 
 
     private String elementXML;

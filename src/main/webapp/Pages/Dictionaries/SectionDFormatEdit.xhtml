@@ -1,0 +1,22 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/resources/tpl/Admin/EditBase.xhtml">
+    <ui:param name="edit_title" value="#{msg.formatiSezioneD}"/>
+    <ui:param name="bean" value="#{formatiSezioneDEditBean}"/>
+
+    <ui:define name="edit_body">
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" style="width: 40%">
+            <span><span class="red">*</span>#{msg.name}</span>
+            <p:inputText id="name" maxlength="50" value="#{bean.entity.name}" style="min-width: 351px;"
+                         label="#{msg.name}" onkeypress="numbers_letters_only('#name');"/>
+
+            <span><span class="red">*</span>#{msg.text}:</span>
+            <p:inputTextarea id="text" rows="3" cols="33" value="#{bean.entity.text}"
+                             label="#{msg.text}" onkeypress="numbers_letters_only('#text');"/>
+        </p:panelGrid>
+    </ui:define>
+
+</ui:composition>

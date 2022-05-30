@@ -623,7 +623,7 @@ public class Formality extends IndexedEntity {
             if (!ValidationHelper.isNullOrEmpty(this.getSectionB())) {
                 return "S";
             }
-            //return "O";
+            // return "O";
         }
         return "O";
     }
@@ -1224,32 +1224,6 @@ public class Formality extends IndexedEntity {
         return typeFormality;
     }
 
-    public TypeFormality getDicTypeFormality() {
-        TypeFormality typeFormality = null;
-        TypeActEnum typeActEnum = getTypeEnum();
-        if(!ValidationHelper.isNullOrEmpty(sectionA)){
-            Integer code = ValidationHelper.isNullOrEmpty(sectionA.getDerivedFromCode()) ?
-                    0 : Integer.parseInt(sectionA.getDerivedFromCode());
-            if (code / 1000 != 0) {
-                if (code / 1000 == 9 || code / 1000 == 8) {
-                }
-                code = code % 1000;
-            }
-            try {
-                List<TypeFormality> typeFormalities = DaoManager.load(TypeFormality.class, new Criterion[]{
-                        Restrictions.eq("type", typeActEnum),
-                        Restrictions.eq("code", code.toString())
-                });
-                if(!ValidationHelper.isNullOrEmpty(typeFormalities)){
-                    typeFormality = typeFormalities.get(0);
-                }
-            } catch (Exception e) {
-                LogHelper.log(log,e);
-            }
-        }
-        return typeFormality;
-    }
-
     public String getDicTypeFormalityText() {
         TypeFormality typeFormality = null;
         String textInVisura = "";
@@ -1360,17 +1334,44 @@ public class Formality extends IndexedEntity {
     }
 
     public Date getComparedDate() {
-        if(!ValidationHelper.isNullOrEmpty(checkRenewalTypeFormality()) && !ValidationHelper.isNullOrEmpty(getSectionA()) &&
-                !ValidationHelper.isNullOrEmpty(getSectionA().getOtherData())){
-            return getSectionA().getOtherData();
+        if(ValidationHelper.isNullOrEmpty(checkRenewalTypeFormality())){
+            if (!ValidationHelper.isNullOrEmpty(getSectionA()) &&
+                    !ValidationHelper.isNullOrEmpty(getSectionA().getOtherData()))
+                return getSectionA().getOtherData();
         }
         return getPresentationDateOrNewDateIfNull();
     }
 
     public Date getComparedDeathDate() {
-            if(!ValidationHelper.isNullOrEmpty(getSectionA())  &&
-                    !ValidationHelper.isNullOrEmpty(getSectionA().getDeathDate()))
-                return  getSectionA().getDeathDate();
+        if(!ValidationHelper.isNullOrEmpty(getSectionA())  &&
+                !ValidationHelper.isNullOrEmpty(getSectionA().getDeathDate()))
+            return  getSectionA().getDeathDate();
         return new Date();
+    }
+
+    public TypeFormality getDicTypeFormality() {
+        TypeFormality typeFormality = null;
+        TypeActEnum typeActEnum = getTypeEnum();
+        if(!ValidationHelper.isNullOrEmpty(sectionA)){
+            Integer code = ValidationHelper.isNullOrEmpty(sectionA.getDerivedFromCode()) ?
+                    0 : Integer.parseInt(sectionA.getDerivedFromCode());
+            if (code / 1000 != 0) {
+                if (code / 1000 == 9 || code / 1000 == 8) {
+                }
+                code = code % 1000;
+            }
+            try {
+                List<TypeFormality> typeFormalities = DaoManager.load(TypeFormality.class, new Criterion[]{
+                        Restrictions.eq("type", typeActEnum),
+                        Restrictions.eq("code", code.toString())
+                });
+                if(!ValidationHelper.isNullOrEmpty(typeFormalities)){
+                    typeFormality = typeFormalities.get(0);
+                }
+            } catch (Exception e) {
+                LogHelper.log(log,e);
+            }
+        }
+        return typeFormality;
     }
 }

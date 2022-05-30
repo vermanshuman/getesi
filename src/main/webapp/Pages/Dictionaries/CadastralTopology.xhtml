@@ -3,12 +3,13 @@
 <html xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
-<ui:composition template="/resources/tpl/Admin/Main.xhtml">
+<ui:composition template="/resources/tpl/Admin/template.xhtml">
     <ui:param name="list_left_title" value="#{msg.cadastralTopologyTitle}"/>
     <ui:param name="left_bean" value="#{cadastralTopologyBean}"/>
     <ui:param name="left_entity_name" value="#{msg.cadastralTopologyTitle}"/>
     <ui:param name="additionalEditAction" value="window.scrollTo(0,0);"/>
-    <ui:define name="body">
+
+    <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-6">
                 <div class="card">
@@ -29,17 +30,18 @@
                                             <p:inputText value="#{left_bean.entity.description}" id = "description"  styleClass="input-width" label="#{msg.cadastralTopologyDescription}"/>
                                         </p:panelGrid>
                                         <div>
-                                            <p:commandButton value="#{msg.save}" update=":form, messages"
-                                                             icon="ui-icon-disk" action="#{left_bean.pageSave}">
+                                            <p:commandButton value="#{msg.save}" update=":form, messages" styleClass="p-mr-2 p-mb-2"
+                                                             icon="pi pi-save" action="#{left_bean.pageSave}">
                                             </p:commandButton>
-                                            <p:commandButton value="#{msg.reset}" update="leftEditPanel"
-                                                             icon="ui-icon-circle-close" action="#{left_bean.resetFields}">
+                                            <p:commandButton value="#{msg.reset}" update="leftEditPanel" styleClass="p-mr-2 p-mb-2"
+                                                             icon="pi pi-times-circle"
+                                                             action="#{left_bean.resetFields}">
                                             </p:commandButton>
                                         </div>
                                     </div>
                                 </p:panel>
 
-                                <p:dataTable var="pitem" id="table" value="#{left_bean.lazyModel}"
+                                <p:dataTable var="pitem" id="table" value="#{left_bean.lazyModel}" emptyMessage="#{msg.noRecordsFound}"
                                              disabledSelection="#{empty disableSelection?'false':'true'}"
                                              lazy="#{true}" filteredValue="#{left_bean.filteredList}"
                                              paginator="true" rowKey="#{item.id}" rows="10"
@@ -52,7 +54,7 @@
                                               styleClass="action_column"
                                               exportable="false">
 
-                                        <p:commandButton icon="ui-icon ui-icon-pencil"
+                                        <p:commandButton icon="pi pi-pencil" styleClass="p-mr-2 p-mb-2"
                                                          disabled="#{!left_bean.canEdit}" update=":form"
                                                          action="#{left_bean.editEntity}" oncomplete="#{additionalEditAction}">
                                             <f:setPropertyActionListener value="#{pitem.id}"
@@ -62,7 +64,8 @@
 
                                     <p:column rendered="#{empty showDelete? true : showDelete}"
                                               styleClass="action_column" exportable="false">
-                                        <p:commandButton icon="ui-icon ui-icon-close"
+                                        <p:commandButton icon="pi pi-times" styleClass="p-mr-2 p-mb-2"
+                                                         style="background-color: red;border: none !important;"
                                                          oncomplete="PF('dlg2').show()"
                                                          disabled="#{!left_bean.canDelete || (pitem.id==sessionBean.currentUser.id
                                                          and left_bean.userEntityPage)}">
@@ -73,7 +76,8 @@
 
                                     <p:column rendered="#{empty showMyDelete ? false : showMyDelete}"
                                               styleClass="action_column" exportable="false">
-                                        <p:commandButton icon="ui-icon ui-icon-close"
+                                        <p:commandButton icon="pi pi-times" styleClass="p-mr-2 p-mb-2"
+                                                         style="background-color: red;border: none !important;"
                                                          oncomplete="PF('dlg2').show()"
                                                          disabled="#{!left_bean.getCanDelete(pitem) ||
                                                          (item.id==sessionBean.currentUser.id

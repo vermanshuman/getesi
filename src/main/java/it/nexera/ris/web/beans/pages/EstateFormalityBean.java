@@ -8,7 +8,6 @@ import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.LandChargesRegistry;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.TypeAct;
 import it.nexera.ris.web.beans.EntityEditPageBean;
-import org.apache.commons.lang.WordUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
@@ -248,7 +247,7 @@ public class EstateFormalityBean extends EntityEditPageBean<EstateFormality> imp
         getEntity().setAccountable(true);
         getEntity().setComment(String.format(ResourcesHelper.getString("estateFormalityCommentFormat"),
                 getEntity().getTypeAct() != null ? getEntity().getTypeAct().getTextInVisura() : "",
-                WordUtils.capitalizeFully(getEntity().getDenominationPU()), DateTimeHelper.toStringDateWithDots(getEntity().getTitleDate()),
+                        getEntity().getDenominationPU(), DateTimeHelper.toStringDateWithDots(getEntity().getTitleDate()),
                         getEntity().getRepertoire()));
 
         removeDeletedEstateFormalitySuccessFromDB();
@@ -348,7 +347,7 @@ public class EstateFormalityBean extends EntityEditPageBean<EstateFormality> imp
         estateFormality.setAccountable(true);
         estateFormality.setComment(String.format(ResourcesHelper.getString("estateFormalityCommentFormat"),
                 getEntity().getTypeAct() != null ? getEntity().getTypeAct().getTextInVisura() : "",
-                        WordUtils.capitalizeFully(getEntity().getDenominationPU()), DateTimeHelper.toStringDateWithDots(getEntity().getTitleDate()),
+                        getEntity().getDenominationPU(), DateTimeHelper.toStringDateWithDots(getEntity().getTitleDate()),
                         getEntity().getRepertoire()));
 
         DaoManager.save(estateFormality);

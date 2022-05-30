@@ -1177,7 +1177,7 @@ public class TemplateEntity {
                                                 CollectionUtils.emptyIfNull(property.getCadastralData())
                                                         .stream()
                                                         .filter(distinctByKey(x -> x.getId()))
-                                        .collect(Collectors.toList())) {
+                                                        .collect(Collectors.toList())) {
                                             if (property.getCadastralData().size() > 1) {
                                                 da.append("<br/>");
                                                 da.append("&lt;Graffati&gt;");
@@ -1538,10 +1538,10 @@ public class TemplateEntity {
                                 ((!ValidationHelper.isNullOrEmpty(getRequest().getService())
                                         && !ValidationHelper.isNullOrEmpty(getRequest().getService().getLandOmi())
                                         && getRequest().getService().getLandOmi()) ||
-                                (!ValidationHelper.isNullOrEmpty(getRequest().getService())
-                                        && !ValidationHelper.isNullOrEmpty(getRequest().getService().getSalesDevelopment())
-                                        && getRequest().getService().getSalesDevelopment())))
-                                {
+                                        (!ValidationHelper.isNullOrEmpty(getRequest().getService())
+                                                && !ValidationHelper.isNullOrEmpty(getRequest().getService().getSalesDevelopment())
+                                                && getRequest().getService().getSalesDevelopment())))
+                        {
                             showEstateSituationTag = Boolean.TRUE;
                         }
                         if (showEstateSituationTag) {
@@ -1576,6 +1576,308 @@ public class TemplateEntity {
                 }
 
                 return attachmentBuffer.toString();
+
+//            case ATTACHMENT_A:
+//                attachmentBuffer = new StringBuffer();
+//                if (!ValidationHelper.isNullOrEmpty(request.getClient()) &&
+//                        !ValidationHelper.isNullOrEmpty(request.getClient().getLandOmi()) &&
+//                        request.getClient().getLandOmi() &&
+//                        !ValidationHelper.isNullOrEmpty(request.getService()) &&
+//                        !ValidationHelper.isNullOrEmpty(request.getService().getLandOmi()) &&
+//                        request.getService().getLandOmi())  {
+//                    List<EstateSituation> landEstateSituations = getRequest().getSituationEstateLocations();
+//                    if (!ValidationHelper.isNullOrEmpty(landEstateSituations)) {
+//                        DecimalFormat df = new DecimalFormat(
+//                                "#,##0.00",
+//                                new DecimalFormatSymbols(new Locale("pt", "BR")));
+//                        List<Property> propertyList = landEstateSituations
+//                                .stream()
+//                                .map(EstateSituation::getPropertyList).flatMap(List::stream)
+//                                .collect(Collectors.toList());
+//
+//                        List<Property> landProperties = propertyList
+//                                .stream()
+//                                .filter(p -> !ValidationHelper.isNullOrEmpty(p.getCity()) &&
+//                                        !ValidationHelper.isNullOrEmpty(p.getType()) &&
+//                                        RealEstateType.LAND.getId().equals(p.getType()))
+//                                .collect(Collectors.toList());
+//
+//                        if (!ValidationHelper.isNullOrEmpty(landProperties)) {
+//                            attachmentBuffer.append("<style type=\"text/css\"> *{box-sizing: border-box;}.container{border-radius: 5px; padding: 20px;}.col-10{float: left; width: 10%;}.col-20{float: left; width: 20%;}.col-25{float: left; width: 25%;}.col-35{float: left; width: 35%;}.col-75{float: left; width: 75%;}.col-65{float: left; width: 65%;}/* Clear floats after the columns */ .row:after{content: \"\"; display: table; clear: both;}.b2{border-top: 1px black solid !important; border-right: 1px black solid !important; border-left: 1px black solid !important;}.p10{padding: 10px;}.p6{padding: 6px;}.txt-center{text-align: center;}.no-rb{border-right: 0px;}.row:not(.last-row) > div{border-bottom: none;}.row{display: flex;}.row > div > div{word-break: break-all;}.blank-col{min-height: 40px;}.allegatoa{width: 100%; border-collapse: collapse; font-family: Courier New, Courier, monospace !important; font-size: 12px;}.allegatoa tr{line-height: 5px;}.allegatoa, .allegatoa td, .allegatoa th{border: 1px black solid !important;}.allegatoa tr{display: flex;}.datiterrenomain{padding-left: 1em; text-indent: 0pt; margin-top: 0em; margin-bottom: 0em; line-height: 1pt !important; text-align: left;}.datiterreno{padding-left: 7em; text-indent: 0pt; margin-top: 0em; margin-bottom: 0em; line-height: 1pt !important; text-align: left;}.allegatoa.of-h tr{line-height: 8px;}/* Responsive layout - when the screen is less than 600px wide, make the two columns stack on top of each other instead of next to each other */ @media screen and (max-width: 600px){.col-25, .col-75;}</style>");
+//                            attachmentBuffer.append("<pd4ml-page-break /><h3>&nbsp;</h3>");
+//                            attachmentBuffer.append("<div style=\"text-align: center\"><h3>Allegato A</h3></div>");
+//                            attachmentBuffer.append("<div style=\"text-align: center;\"><h3>");
+//                            attachmentBuffer.append(ResourcesHelper.getString("formalityListAllegatoAHeader"));
+//                            attachmentBuffer.append("</h3></div>");
+//
+//                            Map<City, List<Property>> cityProperties = landProperties.stream()
+//                                    .collect(Collectors.groupingBy(Property::getCity));
+//
+//                            for (Map.Entry<City, List<Property>> entry : cityProperties.entrySet()) {
+//
+//                                attachmentBuffer.append(" <div class=\"container\">");
+//                                attachmentBuffer.append(" <div class=\"row\">"); // Row 1
+//                                attachmentBuffer.append("<div class=\"col-35\" style=\"margin-top: 1px;\">");
+//                                attachmentBuffer.append("</div>");
+//                                attachmentBuffer.append("<div class=\"col-65 b2 p10\">");
+//
+//                                attachmentBuffer.append("<div>Comune: <b>");
+//                                attachmentBuffer.append(entry.getKey().getDescription());
+//                                attachmentBuffer.append("</b></div>");
+//                                attachmentBuffer.append("<div>Provincia: <b>");
+//                                if (!ValidationHelper.isNullOrEmpty(entry.getKey().getProvince()))
+//                                    attachmentBuffer.append(entry.getKey().getProvince().getDescription());
+//                                attachmentBuffer.append("</b></div>");
+//                                attachmentBuffer.append(" <div style=\"float: right\">Aggiornamento dati valori OMI: ");
+//                                if (!ValidationHelper.isNullOrEmpty(entry.getKey().getLandOmis())) {
+//                                    attachmentBuffer.append(entry.getKey().getLandOmis().get(0).getYear());
+//                                }
+//                                attachmentBuffer.append("</div>");
+//
+//                                attachmentBuffer.append("</div>");
+//                                attachmentBuffer.append("</div>"); // Row 1
+//
+//                                attachmentBuffer.append("<table class=\"allegatoa of-h\">");  // table1
+//
+//                                attachmentBuffer.append("<thead>"); // thead
+//
+//                                attachmentBuffer.append("<td class=\"col-35 p10 txt-center\"><b>COLTURA</b></td>");
+//                                attachmentBuffer.append("<td class=\"col-25 p10 txt-center\"><b>Dati terreno</b></td>");
+//                                attachmentBuffer.append("<td class=\"col-20 p10 txt-center\"><b>Estensione (Mq)</b></td>");
+//                                attachmentBuffer.append("<td class=\"col-20 p10 txt-center\"><b>Valore OMI (€)</td>");
+//
+//                                attachmentBuffer.append("</thead>"); // thead
+//
+//                                attachmentBuffer.append("<tbody>"); // tbody
+//
+//                                List<Property> properties = entry.getValue();
+//                                List<Property> inAppropriateProperties = new ArrayList<>();
+//                                Double extensionTotal = 0.0;
+//                                Double omiValueTotal = 0.0;
+//                                List<TerrenoDataWrapper> terrenoDataWrappers = landPropertyBlocks(properties);
+//                                Map<String, List<TerrenoDataWrapper>> map =
+//                                        terrenoDataWrappers.stream().collect(Collectors.groupingBy(TerrenoDataWrapper::getSheet));
+//                                Map<String, List<TerrenoDataWrapper>> sortedMap = new TreeMap<>(map);
+//                                for(List<TerrenoDataWrapper> terrenoDatas :
+//                                        sortedMap.values().stream().collect(Collectors.toList())){
+//                                    for (TerrenoDataWrapper terrenoDataWrapper : terrenoDatas) {
+//
+//                                        Boolean inAppropriateProperty = Boolean.FALSE;
+//                                        String landCultureName = "";
+//                                        if (!ValidationHelper.isNullOrEmpty(terrenoDataWrapper.getProperty().getQuality())) {
+//                                            List<LandCadastralCulture> landCadastralCultures = DaoManager.load(LandCadastralCulture.class,
+//                                                    new Criterion[]{Restrictions.eq("description", terrenoDataWrapper.getProperty().getQuality()).ignoreCase()
+//                                                    });
+//                                            if (!ValidationHelper.isNullOrEmpty(landCadastralCultures)) {
+//                                                LandCulture landCulture = landCadastralCultures.get(0).getLandCulture();
+//                                                if (!ValidationHelper.isNullOrEmpty(landCulture)
+//                                                        && (ValidationHelper.isNullOrEmpty(landCulture.getUnavailable())
+//                                                        || !landCulture.getUnavailable())) {
+//                                                    landCultureName = landCulture.getName();
+//                                                } else {
+//                                                    if(!ValidationHelper.isNullOrEmpty(landCulture.getUnavailable())
+//                                                            && landCulture.getUnavailable()){
+//                                                        terrenoDataWrapper.getProperty().setLandCulture(landCulture);
+//                                                    }
+//                                                    inAppropriateProperty = Boolean.TRUE;
+//                                                }
+//                                            } else {
+//                                                inAppropriateProperty = Boolean.TRUE;
+//                                            }
+//                                        } else {
+//                                            inAppropriateProperty = Boolean.TRUE;
+//                                        }
+//                                        if (inAppropriateProperty) {
+//                                            inAppropriateProperties.add(terrenoDataWrapper.getProperty());
+//                                            continue;
+//                                        }
+//                                        String landMQ= terrenoDataWrapper.getProperty().getTagLandMQ();
+//                                        if(landMQ.endsWith(".00") || landMQ.endsWith(".0"))
+//                                            landMQ = landMQ.substring(0, landMQ.lastIndexOf("."));
+//                                        if(landMQ.contains(".")){
+//                                            String [] toks = landMQ.split("\\.");
+//                                            if(toks.length > 1 && toks[1].length() == 3){
+//                                                landMQ = landMQ.replaceAll("\\.", "");
+//                                            }else if(toks.length > 1 && toks[1].length() == 2){
+//                                                landMQ = landMQ.replaceAll("\\.", "");
+//                                                landMQ = landMQ + "0";
+//                                            }else if(toks.length > 1 && toks[1].length() == 1){
+//                                                landMQ = landMQ.replaceAll("\\.", "");
+//                                                landMQ = landMQ + "00";
+//                                            }
+//                                        }
+//                                        extensionTotal += Double.parseDouble(landMQ);
+//                                        attachmentBuffer.append("<tr>"); // Property row
+//
+//                                        attachmentBuffer.append("<td class=\"col-35 p6 txt-center\">");
+//                                        attachmentBuffer.append(landCultureName);
+//                                        attachmentBuffer.append("</td>");
+//
+//                                        attachmentBuffer.append("<td class=\"col-25 p10 txt-center\">");
+//                                        String landBlock = terrenoDataWrapper.getData();
+//                                        String landClass = "";
+//                                        if(landBlock.contains("foglio")){
+//                                            landClass = "datiterrenomain";
+//                                        }else
+//                                            landClass = "datiterreno";
+//
+//                                        attachmentBuffer.append("<p class=\"");
+//                                        attachmentBuffer.append(landClass);
+//                                        attachmentBuffer.append("\" style=\"float:right\">");
+//                                        attachmentBuffer.append(landBlock);
+//                                        attachmentBuffer.append("</p>");
+//                                        attachmentBuffer.append("</td>");
+//
+//                                        attachmentBuffer.append("<td class=\"col-20 p10 txt-center\">");
+//                                        attachmentBuffer.append(terrenoDataWrapper.getProperty().getEstateLandMQ());
+//                                        attachmentBuffer.append("</td>");
+//
+//                                        attachmentBuffer.append("<td class=\"col-20 p10 txt-center\">");
+//                                        if (!ValidationHelper.isNullOrEmpty(terrenoDataWrapper.getProperty().getQuality())) {
+//                                            List<LandCadastralCulture> landCadastralCultures = DaoManager.load(LandCadastralCulture.class,
+//                                                    new Criterion[]{Restrictions.eq("description", terrenoDataWrapper.getProperty().getQuality()).ignoreCase()
+//                                                    });
+//                                            List<LandCulture> landCultures = emptyIfNull(landCadastralCultures)
+//                                                    .stream()
+//                                                    .filter(lcc -> !ValidationHelper.isNullOrEmpty(lcc.getLandCulture()))
+//                                                    .map(LandCadastralCulture::getLandCulture)
+//                                                    .collect(Collectors.toList());
+//
+//                                            if (!ValidationHelper.isNullOrEmpty(landCultures)) {
+//                                                List<LandOmiValue> landOmiValues = DaoManager.load(LandOmiValue.class,
+//                                                        new Criterion[]{Restrictions.in("landCulture", landCultures)
+//                                                        });
+//                                                if (!ValidationHelper.isNullOrEmpty(landOmiValues)) {
+//                                                    List<LandOmiValue> cityLandOmiValues = landOmiValues
+//                                                            .stream()
+//                                                            .filter(lov -> !ValidationHelper.isNullOrEmpty(lov.getLandOmi())
+//                                                                    && !ValidationHelper.isNullOrEmpty(lov.getLandOmi().getCities())
+//                                                                    && lov.getLandOmi().getCities().contains(entry.getKey()))
+//                                                            .collect(Collectors.toList());
+//                                                    if (!ValidationHelper.isNullOrEmpty(cityLandOmiValues)
+//                                                            && !ValidationHelper.isNullOrEmpty(terrenoDataWrapper.getProperty().getTagLandMQ())) {
+//                                                        landMQ= terrenoDataWrapper.getProperty().getTagLandMQ();
+//                                                        if(landMQ.endsWith(".00") || landMQ.endsWith(".0"))
+//                                                            landMQ = landMQ.substring(0, landMQ.lastIndexOf("."));
+//                                                        if(landMQ.contains(".")){
+//                                                            String [] toks = landMQ.split("\\.");
+//                                                            if(toks.length > 1 && toks[1].length() == 3){
+//                                                                landMQ = landMQ.replaceAll("\\.", "");
+//                                                            }else if(toks.length > 1 && toks[1].length() == 2){
+//                                                                landMQ = landMQ.replaceAll("\\.", "");
+//                                                                landMQ = landMQ + "0";
+//                                                            }else if(toks.length > 1 && toks[1].length() == 1){
+//                                                                landMQ = landMQ.replaceAll("\\.", "");
+//                                                                landMQ = landMQ + "00";
+//                                                            }
+//                                                        }
+//                                                        Double landMqValue =  Double.parseDouble(landMQ);
+//                                                        Double omiValue = (cityLandOmiValues.get(0).getValue()/10000) * landMqValue;
+//                                                        BigDecimal value = new BigDecimal(omiValue);
+//                                                        String omiValueString = df.format(value.doubleValue());
+//                                                        attachmentBuffer.append(omiValueString
+//                                                                .replaceAll("\\." , "")
+//                                                                .replaceAll("," , "."));
+//                                                        omiValueTotal += omiValue;
+//                                                    }
+//                                                }
+//                                            }
+//                                        }
+//                                        attachmentBuffer.append("</td>");
+//                                        attachmentBuffer.append("</tr>"); // Property row
+//                                    }
+//                                }
+//
+//
+//
+//                                attachmentBuffer.append("<tr>"); // Total row
+//
+//                                attachmentBuffer.append("<td class=\"col-35 p10 txt-center\">");
+//                                attachmentBuffer.append("<b>TOTALE</b>");
+//                                attachmentBuffer.append("</td>");
+//                                attachmentBuffer.append("<td class=\"col-25 p10 txt-center\">");
+//                                attachmentBuffer.append("</td>");
+//                                attachmentBuffer.append("<td class=\"col-20 p10 txt-center\"><b>");
+//                                String extensionTotalValue = extensionTotal.toString();
+//                                if(extensionTotalValue.endsWith(".00") || extensionTotalValue.endsWith(".0"))
+//                                    extensionTotalValue = extensionTotalValue.substring(0, extensionTotalValue.lastIndexOf("."));
+//                                if(!extensionTotalValue.contains(".") && !extensionTotalValue.contains(",")){
+//                                    extensionTotalValue = GeneralFunctionsHelper.formatDoubleString(extensionTotalValue);
+//                                }
+//                                attachmentBuffer.append(extensionTotalValue);
+//                                attachmentBuffer.append("</b></td>");
+//                                attachmentBuffer.append("<td class=\"col-20 p10 txt-center\"><b>");
+//
+//                                String omiValueString = df.format(omiValueTotal);
+//                                attachmentBuffer.append(omiValueString);
+//                                attachmentBuffer.append("</b></td>");
+//
+//                                attachmentBuffer.append("</tr>"); // Total row
+//
+//                                attachmentBuffer.append("</tbody>"); // tbody
+//                                attachmentBuffer.append("</table>"); // table1
+//
+//                                if(!ValidationHelper.isNullOrEmpty(inAppropriateProperties)){
+//                                    terrenoDataWrappers =
+//                                            landPropertyBlocks(inAppropriateProperties);
+//
+//                                    attachmentBuffer.append("<div style=\"text-align: center; margin-top: 20px;\"><h3>");
+//                                    attachmentBuffer.append(ResourcesHelper.getString("formalityListAllegatoUAHeader"));
+//                                    attachmentBuffer.append("</h3></div>");
+//
+//                                    map = terrenoDataWrappers.stream().collect(Collectors.groupingBy(TerrenoDataWrapper::getSheet));
+//                                    sortedMap = new TreeMap<>(map);
+//
+//                                    attachmentBuffer.append("<table style=\"margin-top: 0;\" class=\"allegatoa\">" ); // table2
+//                                    attachmentBuffer.append("<tbody>"); // tbody2
+//                                    for(List<TerrenoDataWrapper> terrenoDatas :
+//                                            sortedMap.values().stream().collect(Collectors.toList())){
+//                                        extensionTotal = 0.0;
+//                                        for(TerrenoDataWrapper terrenoDataWrapper : terrenoDatas){
+//                                            extensionTotal += terrenoDataWrapper.getProperty().getLandMQ();
+//                                            attachmentBuffer.append("<tr>");
+//
+//                                            attachmentBuffer.append("<td class=\"col-35 p10 txt-center\">");
+//                                            if(terrenoDataWrapper.getProperty().getLandCulture() == null){
+//                                                attachmentBuffer.append("COLTURA ASSENTE");
+//                                            }else
+//                                                attachmentBuffer.append(terrenoDataWrapper.getProperty().getLandCulture().getName());
+//                                            attachmentBuffer.append("</td>");
+//                                            attachmentBuffer.append("<td class=\"col-25 p10 txt-center\">");
+//                                            String landBlock = terrenoDataWrapper.getData();
+//                                            String landClass = "";
+//                                            if(landBlock.contains("foglio")){
+//                                                landClass = "datiterrenomain";
+//                                            }else
+//                                                landClass = "datiterreno";
+//
+//                                            attachmentBuffer.append("<p class=\"");
+//                                            attachmentBuffer.append(landClass);
+//                                            attachmentBuffer.append("\" style=\"float:right\">");
+//                                            attachmentBuffer.append(landBlock);
+//                                            attachmentBuffer.append("</p>");
+//
+//                                            attachmentBuffer.append("</td>");
+//                                            attachmentBuffer.append("<td class=\"col-20 p10 txt-center\">");
+//                                            attachmentBuffer.append(terrenoDataWrapper.getProperty().getEstateLandMQ());
+//                                            attachmentBuffer.append("</td>");
+//                                            attachmentBuffer.append("<td class=\"col-20 p10 txt-center\">");
+//                                            attachmentBuffer.append("</td>");
+//                                            attachmentBuffer.append("</tr>"); // Total row
+//                                        }
+//                                    }
+//                                    attachmentBuffer.append("</tbody>"); // tbody2
+//                                    attachmentBuffer.append("</table>"); // table2
+//                                }
+//                                attachmentBuffer.append("</div><br/><br/><br/><br/><br/>");// container
+//                            }
+//                            attachmentBuffer.append("<div style=\"border: 1px solid #000\" class=\"col-80 txt-center\">");
+//                            attachmentBuffer.append("<p>"+ResourcesHelper.getString("attachment_a_footer")+"</p>");
+//                            attachmentBuffer.append("</div>");
+//                        }
+//                    }
+//                }
+//                return attachmentBuffer.toString();
 
             case ATTACHMENT_A:
                 attachmentBuffer = new StringBuffer();
@@ -2057,8 +2359,8 @@ public class TemplateEntity {
         List<Pair<CadastralData, Property>> dataList = new ArrayList<>();
         for (Property property : propertyList) {
             for (CadastralData cadastralData : CollectionUtils.emptyIfNull(property.getCadastralData())
-            .stream().filter(distinctByKey(x -> x.getId()))
-            .collect(Collectors.toList())) {
+                    .stream().filter(distinctByKey(x -> x.getId()))
+                    .collect(Collectors.toList())) {
                 dataList.add(new Pair<>(cadastralData, property));
             }
         }

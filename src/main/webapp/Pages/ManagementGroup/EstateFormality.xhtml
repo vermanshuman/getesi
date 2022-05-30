@@ -11,6 +11,23 @@
     <ui:param name="bean" value="#{estateFormalityBean}"/>
     <ui:param name="saveButtonStyle" value="btn-green"/>
     <ui:define name="edit_body">
+        <style>
+            .ui-autocomplete-input{
+                width: 85% !important;
+            }
+            .delete-button{
+                background: red !important;
+            }
+            #formalitySuccess_data tr td ,#formalityCommunicazionList_data tr td {
+                border-color: #808080 !important;
+            }
+            .select-width{
+                width: 100% !important;
+            }
+            .card, body .ui-panel .ui-panel-content  {
+                border: 1px solid #6c757d !important;
+            }
+        </style>
         <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid"
                      columnClasses="ui-grid-col-1, ui-grid-col-3, ui-grid-col-1, ui-grid-col-3, ui-grid-col-1, ui-grid-col-3">
             <p:column>
@@ -75,7 +92,7 @@
             <p:column>
                 <p:autoComplete id="typeAct" dropdown="true" var="item"
                                 styleClass="lazy-autocomplete autocomplete-estate"
-                                converter="typeActConverter" style="width: 100%;display: grid;"
+                                converter="typeActConverter" style="width: 100%;"
                                 itemValue="#{item}" itemLabel="#{item}" scrollHeight="400"
                                 value="#{bean.selectedTypeAct}" completeMethod="#{bean.completeTypeAct}"/>
             </p:column>
@@ -107,7 +124,7 @@
 
             <p:autoComplete dropdown="true" var="item" placeholder="#{msg.estateFormalityNoteType}"
                             styleClass="lazy-autocomplete autocomplete-estate"
-                            converter="typeActConverter" style="width: 100%;display: grid;"
+                            converter="typeActConverter" style="width: 100%;"
                             itemValue="#{item}" itemLabel="#{item}" scrollHeight="400"
                             value="#{bean.selectedFormalitySuccessTypeAct}"
                             completeMethod="#{bean.completeFormalitySuccessTypeAct}"/>
@@ -118,10 +135,10 @@
             </div>
         </p:panelGrid>
         <p:dataTable value="#{bean.formalitySuccessList}" var="item" id="formalitySuccess"
-                     style="margin-top: 10px">
+                     style="margin-top: 10px" emptyMessage="#{msg.noRecordsFound}">
             <p:column styleClass="action_column">
                 <p:commandButton action="#{bean.deleteFormalitySuccess}" update="formalitySuccess"
-                                 icon="fa fa-fw fa-close">
+                                 icon="fa fa-fw fa-close" styleClass="delete-button">
                     <f:setPropertyActionListener value="#{item}" target="#{bean.deleteFormalitySuccess}"/>
                 </p:commandButton>
             </p:column>
@@ -168,10 +185,10 @@
                              update="formalityCommunicazionForm, formalityCommunicazionList"/>
         </p:panelGrid>
         <p:dataTable value="#{bean.formalityCommunicationList}" var="item" id="formalityCommunicazionList"
-                     style="margin-top: 10px">
+                     style="margin-top: 10px" emptyMessage="#{msg.noRecordsFound}">
             <p:column styleClass="action_column">
                 <p:commandButton action="#{bean.deleteCommunicationFormality}" update="formalityCommunicazionList"
-                                 icon="fa fa-fw fa-close">
+                                 icon="fa fa-fw fa-close" styleClass="delete-button">
                     <f:setPropertyActionListener value="#{item}" target="#{bean.deleteFormalityCommunication}"/>
                 </p:commandButton>
             </p:column>
@@ -191,7 +208,7 @@
     </ui:define>
     <ui:define name="additional_buttons">
         <p:commandButton action="#{bean.pageSave}" value="#{msg.saveDuplicate}"
-                         icon="ui-icon-disk" update=":form, messages" styleClass="btn-green">
+                         icon="pi pi-save" update=":form, messages" styleClass="p-mr-2 p-mb-2 ui-button-success">
             <f:setPropertyActionListener value="true" target="#{bean.saveDuplicate}"/>
         </p:commandButton>
     </ui:define>

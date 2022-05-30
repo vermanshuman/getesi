@@ -29,7 +29,7 @@ public class RelationshipEditInTableWrapper {
 
     private Subject subject;
 
-   private Regime regime;
+    private Regime regime;
 
     public RelationshipEditInTableWrapper(Relationship relationship) {
         this.id = relationship.getId();
@@ -59,8 +59,8 @@ public class RelationshipEditInTableWrapper {
     }
 
     public RelationshipEditInTableWrapper(String quote1, String quote2, PropertyTypeEnum type, Subject subject, Regime regime) {
-       this(quote1, quote2,type, subject);
-       this.regime = regime;
+        this(quote1, quote2,type, subject);
+        this.regime = regime;
     }
 
     public void save(Property property) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -73,7 +73,7 @@ public class RelationshipEditInTableWrapper {
                     DaoManager.remove(Relationship.class, getId(), true);
             }else if (getId() != null && !isToDelete()) {
                 relationship = DaoManager.get(Relationship.class, new Criterion[]{
-                                Restrictions.eq("id", getId())});
+                        Restrictions.eq("id", getId())});
                 relationship.setRelationshipTypeId(RelationshipType.MANUAL_ENTRY.getId());
                 relationship.setQuote(String.format("%s/%s", getQuote1(), getQuote2()));
                 relationship.setPropertyType(getType().getDescription());

@@ -49,7 +49,7 @@ public enum PropertyXMLElements implements XMLElements {
     FLOOR("Piano", true),
     /* Tags for new fromat */
     DATA_FROM_ALT("DatiDerivantiDa.Descrizione", false),
-    CONSISTENCY_ALT("ClassamentoT.SuperficieMQ", false, true),
+    CONSISTENCY_ALT("ClassamentoT.SuperficieMQ", false),
     AGRICULTURAL_INCOME_ALT("ClassamentoT.RedditoAgrarioEuro", false, true),
     CADASTRAL_INCOME_ALT("ClassamentoT.RedditoDominicaleEuro", false, true),
     QUALITY_ALT("ClassamentoT.Qualita", false),;

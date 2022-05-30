@@ -36,7 +36,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
-
 import static it.nexera.ris.common.helpers.TemplatePdfTableHelper.distinctByKey;
 
 @ManagedBean(name = "realEstateEditBean")

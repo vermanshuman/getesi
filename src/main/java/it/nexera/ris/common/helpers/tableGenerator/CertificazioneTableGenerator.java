@@ -1,6 +1,38 @@
 package it.nexera.ris.common.helpers.tableGenerator;
 
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import it.nexera.ris.common.enums.*;
+import it.nexera.ris.common.exceptions.TypeFormalityNotConfigureException;
+import it.nexera.ris.persistence.beans.entities.domain.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
+import org.hibernate.HibernateException;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.DateTimeHelper;
 import it.nexera.ris.common.helpers.ResourcesHelper;
@@ -8,26 +40,8 @@ import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.Dictionary;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
-import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.CadastralCategory;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.TypeFormality;
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.text.WordUtils;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 public class CertificazioneTableGenerator extends InterlayerTableGenerator {
 
@@ -167,6 +181,7 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                                 .stream().filter(distinctByKey(x -> x.getId()))
                                 .collect(Collectors.toList())
                 ));
+
                 if (property.getCategoryCode().equals(CADASTRAL_CATEGORY_CODE)) {
                     sb.append(getLandData(property));
                 }
@@ -294,8 +309,7 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                         : DateTimeHelper.toString(subject.getBirthDate()));
                 result.append(", codice fiscale ").append(subject.getFiscalCode());
                 if((i == subjects.size() - 1)
-                        && !ValidationHelper.isNullOrEmpty(cType)
-                        && cType.equals(SectionCType.DEBITORI_NON_DATORI_DI_IPOTECA))
+                        && !ValidationHelper.isNullOrEmpty(cType) && cType.equals(SectionCType.DEBITORI_NON_DATORI_DI_IPOTECA))
                     result.append(";");
             } else {
                 result.append(subject.getBusinessName());
@@ -369,10 +383,12 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
 
                 boolean showRegime = false;
                 if(!ValidationHelper.isNullOrEmpty(relationship.getRelationshipTypeId()) &&
+                        relationship .getRelationshipTypeId().equals(RelationshipType.FORMALITY) &&
                         !ValidationHelper.isNullOrEmpty(getRequestClient().getRegime()) &&
                         getRequestClient().getRegime()){
                     showRegime = true;
-                }else if(ValidationHelper.isNullOrEmpty(relationship.getRelationshipTypeId())){
+                }else if(ValidationHelper.isNullOrEmpty(relationship.getRelationshipTypeId()) ||
+                        !relationship .getRelationshipTypeId().equals(RelationshipType.FORMALITY)){
                     showRegime = true;
                 }
                 if(showRegime){
@@ -459,15 +475,8 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                                 es.getReportRelationship() == null ? false : es.getReportRelationship())))
                 .map(EstateSituation::getFormalityList).flatMap(List::stream)
               .filter(x -> x.isExistsByPrejudicialAndСode(true))
-                //.sorted(getCetificaFormalityComparator())
-                .distinct().collect(Collectors.toList());
-
-        formalityList.sort(Comparator.comparing(Formality::getComparedDate)
-                .thenComparing(Formality::getGeneralRegister)
-                .thenComparing(Formality::getParticularRegister)
-                .thenComparing(Formality::getComparedDeathDate));
-
-        Collections.reverse(formalityList);
+                .sorted(getFormalityComparator()).distinct().collect(Collectors.toList());
+        
         sb.append(String.format("<br/> <br/> <center> <b> Il sottoscritto dott. %s </b> </center>" +
                         "<center> <b> CERTIFICA </b> </center>" +
                         "<b> CHE %s OGGETTO DELLA PRESENTE RELAZIONE %s DALLE SEGUENTI FORMALITA': </b>" +
@@ -523,10 +532,8 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
     private Map<String, List<Formality>> getGroupedBySituationPropertyNotPrejudicialFormalitiesMap() {
         Map<String, List<Formality>> groupedFormalities = new LinkedHashMap<>();
         long order = 0;
-
         for (SituationProperty situationProperty : getRequest().getSituationEstateLocations().stream()
-                .map(EstateSituation::getSituationProperties)
-                .flatMap(Set::stream)
+                .map(EstateSituation::getSituationProperties).flatMap(List::stream)
                 .sorted(Comparator.comparing(IndexedEntity::getId)).collect(Collectors.toList())) {
             situationProperty.setOrderNumber(++order);
         }
@@ -554,18 +561,11 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
             List<Formality> formalities = situationEstateLocation.getFormalityList().stream()
                     .filter(x -> Objects.nonNull(x))
                     .filter(x -> x.isExistsByPrejudicialAndСode(false))
-            //        .sorted(getCetificaFormalityComparator())
+                    .sorted(getFormalityComparator())
                     .peek(f -> f.setShouldReportRelationships(
                             ValidationHelper.isNullOrEmpty(situationEstateLocation.getReportRelationship())
                                     || situationEstateLocation.getReportRelationship()))
                     .collect(Collectors.toList());
-
-            formalities.sort(Comparator.comparing(Formality::getComparedDate)
-                    .thenComparing(Formality::getGeneralRegister)
-                    .thenComparing(Formality::getParticularRegister)
-            .thenComparing(Formality::getComparedDeathDate));
-
-            Collections.reverse(formalities);
             if (!ValidationHelper.isNullOrEmpty(formalities)) {
                 formalitiesFromOtherEstateSituations.addAll(formalities.stream().map(IndexedEntity::getId)
                         .collect(Collectors.toList()));
@@ -742,13 +742,13 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                     .filter(x -> SectionCType.DEBITORI_NON_DATORI_DI_IPOTECA.getName().equals(x.getSectionCType()))
                     .sorted(Comparator.comparingInt(o -> -o.getSubject().size()))
                     .map(SectionC::getSubject).flatMap(List::stream).distinct().collect(Collectors.toList());
-
+            
             String result = manageSubjectsPart(formality, SectionCType.DEBITORI_NON_DATORI_DI_IPOTECA,
                     formality.isShouldReportRelationships(), true,
                     false, false, true);
             
             if(!ValidationHelper.isNullOrEmpty(result) && (!this.isSingularProperty || subjects != null && subjects.size() > 1))
-                sb.append("; Debitori non datori di ipoteca ").append(result);
+            sb.append("; Debitori non datori di ipoteca ").append(result);
             else if(!ValidationHelper.isNullOrEmpty(result))
                 sb.append("; Debitore non datore di ipoteca ").append(result);
             
@@ -961,11 +961,10 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
             for (EstateSituation estateSituation : situationEstateLocations) {
                 if(!ValidationHelper.isNullOrEmpty(estateSituation.getSalesDevelopment()) && estateSituation.getSalesDevelopment())
                     continue;
-             //   List<Property> propertyList = estateSituation.getPropertyList();
+                //   List<Property> propertyList = estateSituation.getPropertyList();
                 List<Property> propertyList =  CollectionUtils.emptyIfNull(estateSituation.getPropertyList())
                         .stream().filter(distinctByKey(x -> x.getId()))
                         .collect(Collectors.toList());
-
                 sortPropertiesByDistraintActIdProperties(propertyList);
 
                 if (!ValidationHelper.isNullOrEmpty(propertyList)) {
@@ -1153,15 +1152,16 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                             null, false, null, false,
                             false, true, false));
                     sb.append(", ").append("<i>").append(relationship.getPropertyType());
-                    if(!ValidationHelper.isNullOrEmpty(relationship.getQuote())) {
-                        sb.append(" per ").append(relationship.getQuote());
-                    }
+                    sb.append(" per ").append(relationship.getQuote());
+
                     boolean showRegime = false;
                     if(!ValidationHelper.isNullOrEmpty(relationship.getRelationshipTypeId()) &&
+                            relationship .getRelationshipTypeId().equals(RelationshipType.FORMALITY.getId()) &&
                             !ValidationHelper.isNullOrEmpty(getRequestClient().getRegime()) &&
                             getRequestClient().getRegime()){
                         showRegime = true;
-                    }else if(ValidationHelper.isNullOrEmpty(relationship.getRelationshipTypeId())){
+                    }else if(ValidationHelper.isNullOrEmpty(relationship.getRelationshipTypeId()) ||
+                            !relationship.getRelationshipTypeId().equals(RelationshipType.FORMALITY.getId())){
                         showRegime = true;
                     }
                     if(showRegime) {

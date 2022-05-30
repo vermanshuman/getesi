@@ -161,9 +161,10 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 		setLandAggregations(ComboboxHelper.fillList(LandChargesRegistry.class, Order.asc("name")));
 		checkPreviousRequest();
 		if (!ValidationHelper.isNullOrEmpty(getRequestEntity())
-				&& ValidationHelper.isNullOrEmpty(getRequestEntity().getIncludeNationalCost()))
-		setShowAddNationalCostButton(true);
-
+				&& (ValidationHelper.isNullOrEmpty(getRequestEntity().getIncludeNationalCost())
+				|| (!ValidationHelper.isNullOrEmpty(getRequestEntity().getIncludeNationalCost())
+				&& !getRequestEntity().getIncludeNationalCost())))
+			setShowAddNationalCostButton(true);
 	}
 
 	private void checkPreviousRequest() throws PersistenceBeanException, IllegalAccessException {

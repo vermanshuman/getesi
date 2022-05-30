@@ -2,7 +2,11 @@ package it.nexera.ris.web.beans.pages;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -653,7 +657,7 @@ public class FormalityCreateBean extends EntityEditPageBean<Formality> implement
                             
                             if(!ValidationHelper.isNullOrEmpty(result)) {
                                 List<SituationProperty> situationProperties = result.get(0).getSituationEstateLocations().stream()
-                                        .map(EstateSituation::getSituationProperties).flatMap(Set::stream).collect(Collectors.toList());
+                                        .map(EstateSituation::getSituationProperties).flatMap(List::stream).collect(Collectors.toList());
 
                                 if(!ValidationHelper.isNullOrEmpty(situationProperties)) {
                                     for(SituationProperty situationProperty : situationProperties) {

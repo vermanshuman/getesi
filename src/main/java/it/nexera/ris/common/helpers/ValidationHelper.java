@@ -331,10 +331,4 @@ public class ValidationHelper {
         }
         return str;
     }
-
-//    public static void main(String[] args) {
-//        System.out.println(ValidationHelper.checkCorrectFormatByExpression(PERSON_PATTERN_ALT, "CITTER EDOARDO 25/07/1960; Comune DARFO BOARIO TERME (BS)"));
-//    }
-//
-//    private static final String PERSON_PATTERN_ALT = "(([A-Z]{2,}\\s?){1,3})\\s(([a-zA-Z]{3,}\\s?){1,3})\\s(\\d*\\/\\d*\\/\\d*);\\sComune\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
 }

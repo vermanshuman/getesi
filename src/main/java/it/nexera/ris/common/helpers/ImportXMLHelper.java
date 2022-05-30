@@ -78,7 +78,14 @@ import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -103,15 +110,15 @@ public class ImportXMLHelper extends BaseHelper {
 
     private static final String LEGAL_PATTERN = "(.+)(\\s*con sede in)\\s(([A-ZÀÈÉÌÍÎÒÓÙÚ`]\\s?)+)";
 
+//    private static final String PERSON_PATTERN_ALT = "(([A-Z]{2,}\\s?){1,3})\\s(([a-zA-Z]{3,}\\s?){1,"
+//            + "3})\\s(\\d*\\/\\d*\\/\\d*)\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
+
     private static final String PERSON_PATTERN_ALT = "(([A-Z']{2,}\\s?){1,3})\\s(([a-zA-Z]{3,}\\s?){1,"
             + "3})\\s(\\d*\\/\\d*\\/\\d*)\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
 
     private static final String PERSON_PATTERN_ALT_COMUNE = "(([A-Z]{2,}\\s?){1,3})\\s(([a-zA-Z]{3,}\\s?){1,3})\\s(\\d*\\/\\d*\\/\\d*);\\sComune\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
 
     private static final String PERSON_PATTERN_ALT_COMUNE_QUOTE = "(([A-Z']{2,}\\s?){1,3})\\s(([a-zA-Z]{3,}\\s?){1,3})\\s(\\d*\\/\\d*\\/\\d*);\\sComune\\s(([A-Z']{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
-
-    //private static final String PERSON_PATTERN_ALT_NO_DATE = "(([A-Z]{2,}\\s?){1,5});\\sComune\\s(([A-Z]{2,}\\s?){1,3})(\\([A-Z]{2,}\\))";
-
 
     private static final String VANI = "VANI";
 
@@ -815,8 +822,7 @@ public class ImportXMLHelper extends BaseHelper {
             throws PersistenceBeanException, IllegalAccessException,
             InstantiationException {
         String subjectFiscalCode = null;
-        String subjectFirstName = null;
-        String subjectLastName = null;
+
         Document doc = prepareDocument(inputFile);
         if (doc == null) return null;
         NodeList nList = doc.getElementsByTagName("DatiRichiesta");
@@ -830,8 +836,6 @@ public class ImportXMLHelper extends BaseHelper {
         if (subject != null) {
             subjectFiscalCode = SubjectType.PHYSICAL_PERSON.getId().equals(subject.getTypeId())
                     ? subject.getFiscalCode() : subject.getNumberVAT();
-            subjectFirstName = subject.getName();
-            subjectLastName = subject.getSurname();
         }
 
         NodeList nodeList = doc.getElementsByTagName("VisuraFabbricatiStorica");
@@ -843,7 +847,7 @@ public class ImportXMLHelper extends BaseHelper {
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Element eElement = (Element) nodeList.item(i);
                 savePropertySubjectForCadastralDocument(eElement, subjectFiscalCode, request, doc, document,
-                        useRequestSubject, docProvince, docDate, subjectFirstName, subjectLastName, session);
+                        useRequestSubject, docProvince, docDate, session);
             }
         }
 
@@ -937,8 +941,7 @@ public class ImportXMLHelper extends BaseHelper {
 
     private static void savePropertySubjectForCadastralDocument(Element eElement, String subjectFiscalCode, Request request, Document doc,
                                                                 it.nexera.ris.persistence.beans.entities.domain.Document document,
-                                                                Boolean useRequestSubject, Province docProvince, Date docDate, String subjectFirstName,
-                                                                String subjectLastName, Session session)
+                                                                Boolean useRequestSubject, Province docProvince, Date docDate, Session session)
             throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         List<Property> propertyList = new ArrayList<>();
         List<UploadSubjectWrapper> subjects = new ArrayList<>();
@@ -960,7 +963,7 @@ public class ImportXMLHelper extends BaseHelper {
                         break;
 
                     case PROPERTY_SUBJECT:
-                        subjects = handleAttachSubject(nNode, subjectFirstName, subjectLastName, session);
+                        subjects = handleAttachSubject(nNode, session);
                         break;
 
                     default:
@@ -998,6 +1001,7 @@ public class ImportXMLHelper extends BaseHelper {
         for (UploadSubjectWrapper wrapper : subjects) {
             if (!ValidationHelper.isNullOrEmpty(wrapper) && !ValidationHelper.isNullOrEmpty(wrapper.getMainSubject())
                     && !ValidationHelper.isNullOrEmpty(propertyList)) {
+
                 if (!(!ValidationHelper.isNullOrEmpty(subjectFiscalCode)
                         && (subjectFiscalCode.equals(wrapper.getMainSubject().getFiscalCode())
                         || subjectFiscalCode.equals(wrapper.getMainSubject().getNumberVAT())))) {
@@ -1180,7 +1184,7 @@ public class ImportXMLHelper extends BaseHelper {
         return null;
     }
 
-    private static List<UploadSubjectWrapper> handleAttachSubject(Node nNode, String subjectName, String subjectSurname, Session session)
+    private static List<UploadSubjectWrapper> handleAttachSubject(Node nNode, Session session)
             throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         List<UploadSubjectWrapper> subjectList = new ArrayList<>();
         if (Node.ELEMENT_NODE != nNode.getNodeType()) {
@@ -1229,37 +1233,32 @@ public class ImportXMLHelper extends BaseHelper {
                 }
             }
             if (ValidationHelper.checkCorrectFormatByExpression(PERSON_PATTERN, subjectStr)) {
-                subject = convertStringToPersonSubject(fc, subjectStr, subjectName, subjectSurname, session);
+                subject = convertStringToPersonSubject(fc, subjectStr, session);
             } else if (ValidationHelper.checkCorrectFormatByExpression(LEGAL_PATTERN, subjectStr)) {
-                subject = convertStringToLegalSubject(fc, subjectStr, subjectName, subjectSurname,  session);
+                subject = convertStringToLegalSubject(fc, subjectStr, session);
             } else if (ValidationHelper.checkCorrectFormatByExpression(PERSON_PATTERN_ALT, subjectStr)) {
                 if(fc != null)
                     fc = fc.replaceAll("\\r|\\n", "");
-                subject = convertNewFormatStringToPersonSubject(fc, subjectStr, subjectName, subjectSurname,  session);
+                subject = convertNewFormatStringToPersonSubject(fc, subjectStr, session);
             }else if (ValidationHelper.checkCorrectFormatByExpression(PERSON_PATTERN_ALT_COMUNE, subjectStr)) {
                 if(fc != null)
                     fc = fc.replaceAll("\\r|\\n", "");
-                subject = convertRandomStringToPersonSubject(fc, subjectStr, subjectName, subjectSurname,  session, PERSON_PATTERN_ALT_COMUNE);
+                subject = convertRandomStringToPersonSubject(fc, subjectStr, session, PERSON_PATTERN_ALT_COMUNE);
             }else if (ValidationHelper.checkCorrectFormatByExpression(PERSON_PATTERN_ALT_COMUNE_QUOTE, subjectStr)) {
                 if(fc != null)
                     fc = fc.replaceAll("\\r|\\n", "");
-                subject = convertRandomStringToPersonSubject(fc, subjectStr, subjectName, subjectSurname,  session, PERSON_PATTERN_ALT_COMUNE_QUOTE);
+                subject = convertRandomStringToPersonSubject(fc, subjectStr, session, PERSON_PATTERN_ALT_COMUNE_QUOTE);
             } else {
-                subject = crateNewLegalSubject(fc, subjectStr, subjectName, subjectSurname,  session);
+                subject = crateNewLegalSubject(fc, subjectStr, session);
             }
             if (!ValidationHelper.isNullOrEmpty(subject)) {
                 subjectList.add(new UploadSubjectWrapper(subject, null, quote, typeReport, regimeConiugi));
             }
         }
         return subjectList;
-
-    }
-    private static List<UploadSubjectWrapper> handleAttachSubject(Node nNode, Session session)
-            throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        return handleAttachSubject(nNode, null, null, session);
     }
 
-    private static Subject crateNewLegalSubject(String numVat, String subjectStr, String subjectName, String subjectSurname, Session session) {
+    private static Subject crateNewLegalSubject(String numVat, String subjectStr, Session session) {
         if (ValidationHelper.isNullOrEmpty(numVat) || ValidationHelper.isNullOrEmpty(subjectStr)) return null;
 
         Subject subject = new Subject();
@@ -1271,7 +1270,7 @@ public class ImportXMLHelper extends BaseHelper {
         return subject;
     }
 
-    private static Subject convertStringToLegalSubject(String numVat, String subjectStr, String subjectName, String subjectSurname, Session session)
+    private static Subject convertStringToLegalSubject(String numVat, String subjectStr, Session session)
             throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         if (ValidationHelper.isNullOrEmpty(numVat) || ValidationHelper.isNullOrEmpty(subjectStr)) return null;
         Subject subject = null;
@@ -1280,12 +1279,8 @@ public class ImportXMLHelper extends BaseHelper {
         while (m.find()) {
             if (!ValidationHelper.isNullOrEmpty(m.group(3))) {
                 City city = null;
-                List<City> cityList = ConnectionManager.load(City.class, new Criterion[]{
-                        Restrictions.eq("description",
-                        m.group(3)),
-                        Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                                Restrictions.isNull("isDeleted"))
-                }, session);
+                List<City> cityList = ConnectionManager.load(City.class, new Criterion[]{Restrictions.eq("description",
+                        m.group(3))}, session);
                 if (!ValidationHelper.isNullOrEmpty(cityList)) {
                     city = cityList.get(0);
                 }
@@ -1323,7 +1318,7 @@ public class ImportXMLHelper extends BaseHelper {
         return subject;
     }
 
-    private static Subject convertStringToPersonSubject(String fiscalCode, String subjectStr, String subjectName, String subjectSurname, Session session)
+    private static Subject convertStringToPersonSubject(String fiscalCode, String subjectStr, Session session)
             throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         if (ValidationHelper.isNullOrEmpty(fiscalCode) || ValidationHelper.isNullOrEmpty(subjectStr)) return null;
         Subject subject = null;
@@ -1333,13 +1328,8 @@ public class ImportXMLHelper extends BaseHelper {
         Country country = null;
         while (m.find()) {
             if (!ValidationHelper.isNullOrEmpty(CalcoloCodiceFiscale.getCityFiscalCode(fiscalCode))) {
-                List<City> cities = ConnectionManager.load(City.class, new Criterion[]{
-                        Restrictions.eq("cfis",
-                        CalcoloCodiceFiscale.getCityFiscalCode(fiscalCode)),
-                        Restrictions.isNotNull("province"),
-                        Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                                Restrictions.isNull("isDeleted"))
-                }, session);
+                List<City> cities = ConnectionManager.load(City.class, new Criterion[]{Restrictions.eq("cfis",
+                        CalcoloCodiceFiscale.getCityFiscalCode(fiscalCode)), Restrictions.isNotNull("province")}, session);
                 List<Subject> subjects = null;
                 List<Criterion> criterionList = new ArrayList<>(Arrays.asList(
                         Restrictions.eq("name", m.group(3)),
@@ -1359,17 +1349,7 @@ public class ImportXMLHelper extends BaseHelper {
                                 new CriteriaAlias("birthCity", "city", JoinType.INNER_JOIN)
                         }, criterionList.toArray(new Criterion[0]), session);
                         if (!ValidationHelper.isNullOrEmpty(subjects)) {
-                            Optional<Subject> matchedSubject = subjects.stream()
-                                    .filter(s -> !ValidationHelper.isNullOrEmpty(s.getName()) && !ValidationHelper.isNullOrEmpty(s.getSurname())
-                                     && s.getName().equalsIgnoreCase(subjectName)
-                                            && s.getSurname().equalsIgnoreCase(subjectSurname))
-                                    .findFirst();
-
-                            if(matchedSubject.isPresent()){
-                                subject = matchedSubject.get();
-                            }else {
-                                subject = subjects.get(0);
-                            }
+                            subject = subjects.get(0);
                         }
                     }
                 } else if (m.group(6).equals("in")) {
@@ -1382,17 +1362,7 @@ public class ImportXMLHelper extends BaseHelper {
                     }
                 }
                 if (!ValidationHelper.isNullOrEmpty(subjects)) {
-                    Optional<Subject> matchedSubject = subjects.stream()
-                            .filter(s -> !ValidationHelper.isNullOrEmpty(s.getName()) && !ValidationHelper.isNullOrEmpty(s.getSurname())
-                                    && s.getName().equalsIgnoreCase(subjectName)
-                                    && s.getSurname().equalsIgnoreCase(subjectSurname))
-                            .findFirst();
-
-                    if(matchedSubject.isPresent()){
-                        subject = matchedSubject.get();
-                    }else {
-                        subject = subjects.get(0);
-                    }
+                    subject = subjects.get(0);
                 }
             }
             //ART_RISFW-463 update data on new import
@@ -1413,28 +1383,23 @@ public class ImportXMLHelper extends BaseHelper {
         return subject;
     }
 
-    private static Subject convertNewFormatStringToPersonSubject(String fiscalCode, String subjectStr, String subjectName, String subjectSurname, Session session)
+    private static Subject convertNewFormatStringToPersonSubject(String fiscalCode, String subjectStr, Session session)
             throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         if (ValidationHelper.isNullOrEmpty(fiscalCode) || ValidationHelper.isNullOrEmpty(subjectStr)) return null;
         Subject subject = null;
         Pattern pattern = Pattern.compile(PERSON_PATTERN_ALT);
         Matcher m = pattern.matcher(subjectStr);
         City city = null;
-        String fullName = "";
         Country country = null;
+        String fullName = "";
         while (m.find()) {
             if (!ValidationHelper.isNullOrEmpty(CalcoloCodiceFiscale.getCityFiscalCode(fiscalCode))) {
-                List<City> cities = ConnectionManager.load(City.class, new Criterion[]{
-                        Restrictions.eq("cfis",
-                        CalcoloCodiceFiscale.getCityFiscalCode(fiscalCode)),
-                        Restrictions.isNotNull("province"),
-                        Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                                Restrictions.isNull("isDeleted"))
-                }, session);
-                String completeName = m.group(1) + " " + m.group(3);
+                List<City> cities = ConnectionManager.load(City.class, new Criterion[]{Restrictions.eq("cfis",
+                        CalcoloCodiceFiscale.getCityFiscalCode(fiscalCode)), Restrictions.isNotNull("province")}, session);
                 List<Subject> subjects = null;
                 List<Criterion> criterionList = new ArrayList<>(Arrays.asList(
-                        Restrictions.eq("completeName", completeName),
+                        Restrictions.eq("name", m.group(3)),
+                        Restrictions.eq("surname", m.group(1)),
                         Restrictions.eq("birthDate",
                                 DateTimeHelper.fromXMLString(m.group(5).replaceAll("/", ""))),
                         Restrictions.eq("fiscalCode", fiscalCode)
@@ -1450,42 +1415,13 @@ public class ImportXMLHelper extends BaseHelper {
                                 new CriteriaAlias("birthCity", "city", JoinType.INNER_JOIN)
                         }, criterionList.toArray(new Criterion[0]), session);
                         if (!ValidationHelper.isNullOrEmpty(subjects)) {
-                            if(subjects.size() > 1){
-                                Optional<Subject> matchedSubject = subjects.stream()
-                                        .filter(s -> !ValidationHelper.isNullOrEmpty(s.getName()) && !ValidationHelper.isNullOrEmpty(s.getSurname())
-                                                && s.getName().equalsIgnoreCase(subjectName)
-                                                && s.getSurname().equalsIgnoreCase(subjectSurname))
-                                        .findFirst();
-
-                                if(matchedSubject.isPresent()){
-                                    subject = matchedSubject.get();
-                                }else {
-                                    subject = subjects.get(0);
-                                }
-                            }else {
-                                subject = subjects.get(0);
-                            }
+                            subject = subjects.get(0);
                             fullName = subject.getFullName();
                         }
                     }
                 }
                 if (!ValidationHelper.isNullOrEmpty(subjects)) {
-                    if(subjects.size() > 1){
-                        Optional<Subject> matchedSubject = subjects.stream()
-                                .filter(s -> !ValidationHelper.isNullOrEmpty(s.getName()) && !ValidationHelper.isNullOrEmpty(s.getSurname())
-                                        && s.getName().equalsIgnoreCase(subjectName)
-                                        && s.getSurname().equalsIgnoreCase(subjectSurname))
-                                .findFirst();
-
-                        if(matchedSubject.isPresent()){
-                            subject = matchedSubject.get();
-                        }else {
-                            subject = subjects.get(0);
-                        }
-                    }else {
-                        subject = subjects.get(0);
-                    }
-                    fullName = subject.getFullName();
+                    subject = subjects.get(0);
                 }
             }
             //ART_RISFW-463 update data on new import
@@ -1497,7 +1433,7 @@ public class ImportXMLHelper extends BaseHelper {
             String importedFullName =m.group(1) + " " +  m.group(3) ;
             if(!ValidationHelper.isNullOrEmpty(fullName)
                     && !ValidationHelper.isNullOrEmpty(importedFullName)){
-                if(!importedFullName.trim().equalsIgnoreCase(fullName.trim())){
+                if(!importedFullName.equalsIgnoreCase(fullName)){
                     subject.setName(m.group(3));
                     subject.setSurname(m.group(1));
                 }
@@ -1505,6 +1441,8 @@ public class ImportXMLHelper extends BaseHelper {
                 subject.setName(m.group(3));
                 subject.setSurname(m.group(1));
             }
+            subject.setName(m.group(3));
+            subject.setSurname(m.group(1));
             subject.setBirthCity(city);
             subject.setCountry(country);
             subject.setBirthProvince(subject.getBirthCity() != null ? subject.getBirthCity().getProvince() : null);
@@ -1515,24 +1453,20 @@ public class ImportXMLHelper extends BaseHelper {
         return subject;
     }
 
-    private static Subject convertRandomStringToPersonSubject(String fiscalCode, String subjectStr, String subjectName, String subjectSurname, Session session,
-                                                                    String regex){
+    private static Subject convertRandomStringToPersonSubject(String fiscalCode, String subjectStr, Session session,
+                                                              String regex){
 
         if (ValidationHelper.isNullOrEmpty(fiscalCode) || ValidationHelper.isNullOrEmpty(subjectStr)) return null;
         Subject subject = null;
-        String fullName = "";
         Pattern pattern = Pattern.compile(regex);
         Matcher m = pattern.matcher(subjectStr);
         City city = null;
         Country country = null;
+        String fullName = "";
         while (m.find()) {
             if (!ValidationHelper.isNullOrEmpty(CalcoloCodiceFiscale.getCityFiscalCode(fiscalCode))) {
-                List<City> cities = ConnectionManager.load(City.class, new Criterion[]{
-                        Restrictions.eq("cfis",
-                        CalcoloCodiceFiscale.getCityFiscalCode(fiscalCode)), Restrictions.isNotNull("province"),
-                        Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                                Restrictions.isNull("isDeleted"))
-                }, session);
+                List<City> cities = ConnectionManager.load(City.class, new Criterion[]{Restrictions.eq("cfis",
+                        CalcoloCodiceFiscale.getCityFiscalCode(fiscalCode)), Restrictions.isNotNull("province")}, session);
                 List<Subject> subjects = null;
                 String completeName = m.group(1) + " " + m.group(3);
                 List<Criterion> criterionList = new ArrayList<>(Arrays.asList(
@@ -1552,33 +1486,13 @@ public class ImportXMLHelper extends BaseHelper {
                                 new CriteriaAlias("birthCity", "city", JoinType.INNER_JOIN)
                         }, criterionList.toArray(new Criterion[0]), session);
                         if (!ValidationHelper.isNullOrEmpty(subjects)) {
-                            Optional<Subject> matchedSubject = subjects.stream()
-                                    .filter(s -> !ValidationHelper.isNullOrEmpty(s.getName()) && !ValidationHelper.isNullOrEmpty(s.getSurname())
-                                            && s.getName().equalsIgnoreCase(subjectName)
-                                            && s.getSurname().equalsIgnoreCase(subjectSurname))
-                                    .findFirst();
-
-                            if(matchedSubject.isPresent()){
-                                subject = matchedSubject.get();
-                            }else {
-                                subject = subjects.get(0);
-                            }
+                            subject = subjects.get(0);
                             fullName = subject.getFullName();
                         }
                     }
                 }
                 if (!ValidationHelper.isNullOrEmpty(subjects)) {
-                    Optional<Subject> matchedSubject = subjects.stream()
-                            .filter(s -> !ValidationHelper.isNullOrEmpty(s.getName()) && !ValidationHelper.isNullOrEmpty(s.getSurname())
-                                    && s.getName().equalsIgnoreCase(subjectName)
-                                    && s.getSurname().equalsIgnoreCase(subjectSurname))
-                            .findFirst();
-
-                    if(matchedSubject.isPresent()){
-                        subject = matchedSubject.get();
-                    }else {
-                        subject = subjects.get(0);
-                    }
+                    subject = subjects.get(0);
                     fullName = subject.getFullName();
                 }
             }
@@ -1586,12 +1500,12 @@ public class ImportXMLHelper extends BaseHelper {
             if (ValidationHelper.isNullOrEmpty(subject)) {
                 subject = new Subject();
             }
-            String importedFullName =m.group(1) + " " +  m.group(3) ;
             subject.setBirthDate(DateTimeHelper.fromXMLString(m.group(5).replaceAll("/", "")));
             subject.setSex(CalcoloCodiceFiscale.getSexFromFiscalCode(fiscalCode));
+            String importedFullName =m.group(1) + " " +  m.group(3) ;
             if(!ValidationHelper.isNullOrEmpty(fullName)
                     && !ValidationHelper.isNullOrEmpty(importedFullName)){
-                if(!importedFullName.trim().equalsIgnoreCase(fullName.trim())){
+                if(!importedFullName.equalsIgnoreCase(fullName)){
                     subject.setName(m.group(3));
                     subject.setSurname(m.group(1));
                 }
@@ -1604,6 +1518,7 @@ public class ImportXMLHelper extends BaseHelper {
             subject.setBirthCity(city);
             subject.setCountry(country);
             subject.setBirthProvince(subject.getBirthCity() != null ? subject.getBirthCity().getProvince() : null);
+
             ConnectionManager.save(subject, true, session);
         }
         return subject;
@@ -1760,6 +1675,7 @@ public class ImportXMLHelper extends BaseHelper {
             if(nNode.getParentNode() != null && nNode.getParentNode().getNodeName() != null &&
                     nNode.getParentNode().getNodeName().equalsIgnoreCase("UtilitaComuni"))
                 continue;
+
             if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element eElem = (Element) nNode;
 
@@ -1808,12 +1724,12 @@ public class ImportXMLHelper extends BaseHelper {
         if (subjectEnt == null) {
             subjectEnt = subject.toEntity();
             if (subjectEnt != null) {
-               // ConnectionManager.save(subjectEnt, true, session);
+                ConnectionManager.save(subjectEnt, true, session);
             }
         }
 
         if (subjectEnt.isNew()) {
-          //  ConnectionManager.save(subjectEnt, true, session);
+            ConnectionManager.save(subjectEnt, true, session);
         }
 
         return subjectEnt;
@@ -2719,14 +2635,9 @@ public class ImportXMLHelper extends BaseHelper {
             for (int temp = 0; temp < nList.getLength(); temp++) {
                 String html = PrintPDFHelper.readWorkingListFile(fileName, "Cadastral");
                 Element nNode = (Element) nList.item(temp);
-                Double centiares = 0.0;
-                Double ares = 0.0;
-                Double hectares = 0.0;
-                String consistency = "";
 
                 for (PropertyRowsForPDFXMLElements element : PropertyRowsForPDFXMLElements.values()) {
-                    if (html.contains(element.getElementHTML())
-                            || element.equals(PropertyRowsForPDFXMLElements.PROPERTY_LAND_CONSISTENCY)) {
+                    if (html.contains(element.getElementHTML())) {
                         String value = "";
 
                         if (element.isSpecialFlow()) {
@@ -2742,64 +2653,10 @@ public class ImportXMLHelper extends BaseHelper {
                             }
                         }
 
-                        if(element.equals(PropertyRowsForPDFXMLElements.PROPERTY_LAND_HA) &&
-                                !ValidationHelper.isNullOrEmpty(value)){
-                            value = value.replaceAll("[^0-9.]", "");
-                            try {
-                                hectares = Double.parseDouble(value.replaceAll("[^0-9.]", "").replaceAll(",", "."));
-                            } catch (NumberFormatException e) {
-                            }
-                        }
-
-                        if(element.equals(PropertyRowsForPDFXMLElements.PROPERTY_LAND_CONSISTENCY) &&
-                                !ValidationHelper.isNullOrEmpty(value)){
-                            consistency = value;
-                        }
-
-                        if(element.equals(PropertyRowsForPDFXMLElements.PROPERTY_LAND_ARE) &&
-                                !ValidationHelper.isNullOrEmpty(value)){
-                            value = value.replaceAll("[^0-9.]", "");
-                            try {
-                                ares = Double.parseDouble(value.replaceAll(",", "."));
-                            } catch (NumberFormatException e) {
-                            }
-                        }
-
-                        if(element.equals(PropertyRowsForPDFXMLElements.PROPERTY_LAND_CA) &&
-                                !ValidationHelper.isNullOrEmpty(value)){
-                            value = value.replaceAll("[^0-9.]", "");
-                            try {
-                                centiares = Double.parseDouble(value.replaceAll(",", "."));
-                            } catch (NumberFormatException e) {
-                            }
-                        }
-
-                        if(!element.equals(PropertyRowsForPDFXMLElements.PROPERTY_LAND_MQ)){
-                            html = html.replaceAll(element.getElementHTML(), value);
-                        }
+                        html = html.replaceAll(element.getElementHTML(), value);
                     }
                 }
-                if (html.contains(PropertyRowsForPDFXMLElements.PROPERTY_LAND_MQ.getElementHTML())) {
-                    String landMQ = "";
-                    if((ValidationHelper.isNullOrEmpty(centiares) || centiares.equals(0.0)) &&
-                            (ValidationHelper.isNullOrEmpty(ares) || ares.equals(0.0)) &&
-                            (ValidationHelper.isNullOrEmpty(hectares) || hectares.equals(0.0))){
-                        landMQ = consistency;
-                    }else {
-                        Double value = centiares + ares *100 + hectares * 10000;
-                        landMQ = !ValidationHelper.isNullOrEmpty(value) ? String.valueOf(value) : "0.0";
-                        if(landMQ.endsWith(".00") || landMQ.endsWith(".0"))
-                            landMQ = landMQ.substring(0, landMQ.lastIndexOf("."));
-                        if(!landMQ.contains(".") && !landMQ.contains(",")){
-                            landMQ = GeneralFunctionsHelper.formatDoubleString(landMQ);
-                        }
-                    }
-                    if(!ValidationHelper.isNullOrEmpty(landMQ)){
-                        html = html.replaceAll(PropertyRowsForPDFXMLElements.PROPERTY_LAND_MQ.getElementHTML(), landMQ);
-                    }else {
-                        html = html.replaceAll(PropertyRowsForPDFXMLElements.PROPERTY_LAND_MQ.getElementHTML(), "");
-                    }
-                }
+
                 result.append(html);
             }
         }

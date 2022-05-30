@@ -1,0 +1,1176 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                xmlns:ff="http://readytech.com/functions">
+
+    <style>
+        .request-table thead th {
+            border-color: #5f666c !important;
+            text-align: center;
+        }
+
+        .request-table tbody tr {
+            background-color: white !important;
+            border-color: #5f666c !important;
+            text-align: center;
+        }
+        .request-table table {
+            border-collapse: unset;
+            border-spacing: unset;
+            width: auto;
+        }
+        #invoiceDialogBilling .ui-widget-header {
+            background-color: #FFFFFF !important;
+            color: #000000 !important;
+        }
+
+        body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem a {
+            color: #6c757d;
+        }
+
+        body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem.ui-state-active {
+            background: #FFFFFF !important;
+            border-bottom: 2px solid #2196F3 !important;
+        }
+
+        body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem.ui-state-active a {
+            color: #2196F3 !important;
+        }
+
+        body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem {
+            list-style: none;
+            white-space: nowrap;
+            display: inline-block;
+            vertical-align: top;
+            float: none;
+            background: #ffffff !important;
+            margin: 0;
+            cursor: pointer;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-align: center;
+            align-items: center;
+            transition: background-color 0.2s, color 0.2s, border-color 0.2s,
+            box-shadow 0.2s;
+        }
+
+        body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem {
+            border: none;
+        }
+
+        body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem.ui-state-hover {
+            border-bottom: 2px solid gray !important;
+        }
+
+        body .ui-tabmenu .ui-tabmenu-nav {
+            background: #ffffff !important;
+            border-bottom: 2px solid #dee2e6 !important;
+        }
+
+        .p-grid{
+            margin-top:10px;
+        }
+
+        .ui-inputfield {
+            width: 100%;
+        }
+
+        .select-one-menu-width {
+            width: 100%;
+        }
+
+        .vertical-center {
+            line-height: 30px;
+        }
+
+        .hasDatepicker {
+            width: 75% !important;
+        }
+
+        .output-panel {
+            width: 100%;
+            border: 1px solid #ced4da;
+            border-radius: 4px !important;
+            min-height: 32px;
+        }
+
+        .icon {
+            float: right;
+            margin-right: 10px;
+            margin-top: 9px;
+        }
+
+        .invoiceDialog > .p-grid > div > input {
+            background-color: #FFFFFF !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 7px !important;
+            min-height: 28px;
+        }
+
+        .invoiceDialog > .p-grid > div > .ui-selectonemenu {
+            background-color: #FFFFFF !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 7px !important;
+        }
+        .invoiceDialog > .p-grid > div > .ui-outputpanel > input{
+            background-color: #FFFFFF !important;
+            border: none !important;
+            border-radius: 7px !important;
+            min-height: 28px;
+        }
+        .invoiceDialog > .p-grid > div > div > .ui-selectonemenu-label {
+            background-color: #FFFFFF !important;
+            border-radius: 7px !important;
+            color: #003871;
+            margin-top: 4px;
+            margin-bottom: 4px;
+        }
+
+        .invoiceDialog > .p-grid > div > span > input {
+            background-color: #FFFFFF !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 7px !important;
+            min-height: 28px;
+        }
+
+        #dialogTab ul {
+            background-color: transparent !important;
+            text-transform: uppercase;
+            font-size: 15px !important;
+        }
+
+        #dialogTab ul::before {
+            border-bottom: none;
+        }
+
+        #dialogTab ul li:not(.ui-tabs-selected.ui-state-active) a {
+            color: gray !important;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        #dialogTab ul li.ui-tabs-selected.ui-state-active {
+            background-color: transparent !important;
+        }
+
+        #dialogTab ul li.ui-tabs-selected.ui-state-active a {
+            color: #000 !important;
+            border-bottom: 2px solid #3366FF;
+        }
+
+        #dialogTab .ui-paginator {
+            display: none !important;
+        }
+
+
+        #dialogTab .ui-datatable .ui-datatable-data tr.ui-datatable-even {
+            background-color: #f0f3f5 !important;
+        }
+
+        #dialogTab .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+            border: 1px solid #c9cdd2 !important;
+            color: #4c5156;
+        }
+
+        /* #dialogTab .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+        	background: #FFF !important;
+			color: #000000 !important;
+		} */
+
+        #dialogTab .ui-datatable:not(.borderless) thead th {
+            padding: 12px 6px 12px 6px !important;
+            border-left: none !important;
+            border-right: none !important;
+        }
+
+        #dialogTab .ui-datatable thead th {
+            background-color: #f8f9fa !important;
+            color: #495057 !important;
+        }
+
+        #dialogTab .ui-datatable .ui-datatable-data tr td {
+            padding: 12px 6px 12px 6px !important;
+            border-left: none !important;
+            border-right: none !important;
+            text-align: center;
+        }
+
+        #dialogTab .ui-datatable thead th.ui-state-active {
+            color: #2196F3 !important;
+        }
+
+        #dialogTab .ui-datatable .ui-datatable-data > tr:hover {
+            background: #e9ecef !important;
+        }
+
+        #dialogTab .ui-datatable thead th, .ui-datatable tfoot td {
+            text-align: center !important;
+        }
+
+        #dialogTab .ui-panel .ui-panel-content {
+            border: none !important;
+            padding: 0px !important;
+        }
+
+        #dialogTab .ui-button.ui-button-icon-only .ui-icon {
+            font-size: 18px !important;
+            top: 0px;
+            left: 0px;
+            margin-top: 6px;
+            margin-left: 10px;
+        }
+
+        div.dataTab input {
+            background-color: #FFFFFF !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 3px !important;
+            min-height: min-content;
+        }
+
+        div.dataTab .ui-selectonemenu-label {
+            background-color: #FFFFFF !important;
+            border-radius: 7px !important;
+            color: #000000;
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
+
+        div.goodsServicesPanel input {
+            background-color: #FFFFFF !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 3px !important;
+            min-height: min-content;
+        }
+
+        div.goodsServicesPanel .ui-selectonemenu-label {
+            background-color: #FFFFFF !important;
+            border-radius: 7px !important;
+            color: #000000;
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
+
+        div.countsSummaryPanel input {
+            background-color: #FFFFFF !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 3px !important;
+            min-height: min-content;
+        }
+
+        div.emailTab input {
+            background-color: #FFFFFF !important;
+            border: none !important;
+            border-radius: 3px !important;
+            min-height: min-content;
+        }
+
+        body .ui-autocomplete-panel .ui-autocomplete-items .ui-autocomplete-item.ui-autocomplete-row > td {
+            padding: 0.5rem 0.5rem !important;
+        }
+        body .ui-autocomplete-panel .ui-autocomplete-items .ui-autocomplete-item.ui-autocomplete-row {
+            font-size: 19px !important;
+            border-color: #A7A8AB;
+        }
+        .ui-icon-close{
+            background: none repeat scroll 0 0 transparent!important;
+            display: inline-block;
+            font: normal normal normal 14px/1 FontAwesome !important;
+            font-size: inherit;
+            color: #FFF;
+            text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* .fa-times{
+            color: #FFFFFF !important;
+        } */
+
+        .ui-autocomplete-item .ui-button{
+            background: red !important;
+        }
+
+        .ui-autocomplete-item > td{
+            font-size: 14px !important;
+        }
+
+        .ui-state-highlight{
+            background: lightgray !important;
+            color: black !important;
+        }
+
+        .ui-icon-close:before{
+            content: "\f00d" !important;
+        }
+
+        .dialog-white-bg .ui-dialog-titlebar {
+            background: #f8f9fa !important;
+            color: #495057 !important;
+        }
+
+        #paymentDate_input {
+            width: 210px !important;
+        }
+
+        .ui-datatable-tablewrapper {
+            overflow: unset;
+        }
+
+        body .ui-calendar:not(#currentDay) .ui-button {
+            background-color: transparent !important;
+            margin-left: -37px;
+        }
+
+        .ui-calendar:not(#currentDay) .ui-datepicker-trigger {
+            color: #003871 !important;
+        }
+
+        body .ui-state-active {
+            background-color: #2d353c !important;
+            color: #ffffff !important;
+        }
+    </style>
+
+    <p:dialog widgetVar="invoiceDialogExcelWV" modal="true" width="1350" draggable="false" id="invoiceDialogBilling"
+              header="#{msg.requestTextEditElectronicSalesInvoice} (n. #{invoiceBean.invoiceNumber})">
+        <div style="margin-top:20px; overflow-x:hidden; overflow-y:auto; height: 700px;" class="invoiceDialog">
+            <p:tabView dynamic="true" cache="true" id="dialogTab" activeIndex="#{invoiceBean.activeTabIndex}">
+                <p:ajax event="tabChange" listener="#{invoiceBean.onTabChange}"/>
+                <p:tab title="#{msg.requestTab}" rendered="#{invoiceBean.showRequestTab}">
+                    <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
+                        <p:dataTable value="#{invoiceBean.invoicedRequests}" styleClass="request-table" var="item"
+                                     style="margin-top:20px;" emptyMessage="#{msg.noRecordsFound}">
+
+
+                            <p:column headerText="#{msg.requestListRequestType}" style="width: 242px !important;text-align: center !important;">
+                                <h:outputText value="#{item.requestTypeName}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.requestListService}" style="width: 242px !important;text-align: center !important;">
+                                <h:outputText value="#{item.service ne null ? item.serviceName : (item.multipleServices ne null ? item.multipleServiceNames : '')}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.requestEditSubjectListName}" style="width: 242px !important;text-align: center !important;">
+                                <h:outputText value="#{item.nameStr}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.requestListCorservatoryName}" style="width: 242px !important;text-align: center !important;">
+                                <h:outputText value="#{item.aggregationLandCharRegNameOrCity}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.dateEvasion}" style="width: 242px !important;text-align: center !important;">
+                                <h:outputText value="#{item.dateEvasionString}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panelGrid>
+                </p:tab>
+                <p:tab title="#{msg.requestTextEditDataTab}" id="dataTab" >
+                    <div class="p-grid dataTab" style="margin-right:20px;">
+                        <p:panel id="mainPanel" style="width: 100%;" widgetVar="mainPanelVW">
+                            <div class="p-grid">
+                                <!-- ROW 1 -->
+                                <div class="p-col-1 vertical-center">
+                                    <p:outputLabel value="#{msg.number}"/>
+                                </div>
+                                <div class="p-col-2">
+                                    <p:inputText value="#{invoiceBean.number}" id="number" readonly="true"/>
+                                </div>
+                                <div class="p-col-1 vertical-center" >
+                                    <p:outputLabel value="#{msg.data}"/>
+                                </div>
+                                <div class="p-col-2">
+                                    <p:calendar  value="#{invoiceBean.invoiceDate}" disabled="#{invoiceBean.invoiceSentStatus}"
+                                                 showOn="button" id="date"
+                                                 pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
+                                                 popupIconOnly="true"
+                                                 onblur="check_date(this)"
+                                                 styleClass="#{invoiceBean.invoiceDate ne null ? 'calender-filled' : ''}" >
+                                        <p:ajax event="dateSelect" update="@this" />
+                                    </p:calendar>
+                                </div>
+                                <div class="p-col-6"></div>
+
+                                <!-- ROW 2 -->
+                                <div class="p-col-1 vertical-center">
+                                    <p:outputLabel value="#{msg.codifica}"/>
+                                </div>
+                                <div class="p-col-2">
+                                    <p:inputText value="#{invoiceBean.invoiceNumber}" readonly="true"/>
+                                </div>
+                                <div class="p-col-1 vertical-center">
+                                    <h:outputText value="#{msg.client}"/>
+                                </div>
+                                <div class="p-col-8">
+                                    <!--                                    <p:inputText value="#{invoiceBean.examRequest.client}" rendered="#{invoiceBean.examRequest.client ne null}" disabled="true"/>-->
+                                    <p:selectOneMenu id="invoiceClient" value="#{invoiceBean.selectedInvoiceClientId}" style="width: 300px; float:left;"
+                                                     disabled="#{invoiceBean.invoiceSentStatus}"
+                                                     styleClass="#{invoiceBean.selectedInvoiceClientId ne null ? 'select-one-menu' : ''}">
+                                        <f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}" itemValue="#{null}" noSelectionOption="true" />
+                                        <f:selectItems style="width:300px;" value="#{invoiceBean.invoiceClients}" />
+                                        <p:ajax listener="#{invoiceBean.onItemSelectInvoiceClient}" update="@this addressStreet addressPostalCode
+                                        		addressCityId addressProvinceId numberVAT fiscalCode mailPEC addressSDI vatCollectabilitySelectMenu paymentType" />
+                                    </p:selectOneMenu>
+                                </div>
+
+                                <!-- ROW 3 -->
+                                <div class="p-col-1 vertical-center">
+                                    <h:outputText value="#{msg.docType}"/>
+                                </div>
+                                <div class="p-col-2">
+                                    <p:selectOneMenu  value="#{invoiceBean.documentType}"
+                                                      label="#{msg.docType}" styleClass="select-one-menu'}"
+                                                      disabled="true" >
+                                        <f:selectItems value="#{invoiceBean.docTypes}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="p-col-1 vertical-center">
+                                    <h:outputText value="#{msg.streetAddress}"/>
+                                </div>
+                                <div class="p-col-7">
+                                    <!-- <p:inputText value="#{invoiceBean.examRequest.client ne null ? invoiceBean.examRequest.client.addressStreet : ''}"
+                                                  rendered="#{invoiceBean.examRequest.client ne null}" disabled="true"/> -->
+                                    <p:inputText value="#{invoiceBean.clientAddressStreet}"  id="addressStreet" disabled="#{invoiceBean.invoiceSentStatus}"/>
+                                </div>
+                                <div class="p-col-1">
+                                    <!-- <p:inputText value="#{invoiceBean.examRequest.client ne null ? invoiceBean.examRequest.client.addressPostalCode : ''}"
+                                                  rendered="#{invoiceBean.examRequest.client ne null}" disabled="true"/> -->
+                                    <p:inputText value="#{invoiceBean.clientAddressPostalCode}" id="addressPostalCode" disabled="#{invoiceBean.invoiceSentStatus}"/>
+                                </div>
+
+                                <!-- ROW 4 -->
+                                <div class="p-col-4 vertical-center">
+                                    <h:outputText value=""/>
+                                </div>
+                                <div class="p-col-4">
+                                    <!-- <p:inputText value="#{(invoiceBean.examRequest.client ne null and invoiceBean.examRequest.client.addressCityId ne null)
+                                      ? invoiceBean.examRequest.client.addressCityId : ''}" rendered="#{invoiceBean.examRequest.client ne null}" disabled="true"/> -->
+                                    <p:selectOneMenu id="addressProvinceId" value="#{invoiceBean.clientAddressProvinceId}" style="width: 90%"
+                                                     label="#{msg.clientAddressProvince}" disabled="#{invoiceBean.invoiceSentStatus}">
+                                        <p:ajax update="addressProvinceId addressCityId"
+                                                listener="#{invoiceBean.handleAddressProvinceChange}"/>
+                                        <f:selectItems value="#{invoiceBean.clientProvinces}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="p-col-3">
+                                    <!-- <p:inputText value="#{(invoiceBean.examRequest.client ne null and invoiceBean.examRequest.client.addressProvinceId ne null)
+                                   ? invoiceBean.examRequest.client.addressProvinceId : ''}" rendered="#{invoiceBean.examRequest.client ne null}" disabled="true"/> -->
+                                    <p:selectOneMenu id="addressCityId" value="#{invoiceBean.clientAddressCityId}"
+                                                     style="width: 90%;" disabled="#{invoiceBean.invoiceSentStatus}"
+                                                     label="#{msg.clientAddressCity}">
+                                        <f:selectItems value="#{invoiceBean.clientAddressCities}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="p-col-1">
+                                </div>
+
+                                <!-- ROW 5 -->
+                                <div class="p-col-3 vertical-center" >
+                                    <h:outputText value=""/>
+                                </div>
+                                <div class="p-col-1 vertical-center">
+                                    <h:outputText value="#{msg.vatCF}"/>
+                                </div>
+                                <div class="p-col-4">
+                                    <!-- <p:inputText value="#{invoiceBean.examRequest.client ne null ? invoiceBean.examRequest.client.numberVAT : ''}"
+                                                  rendered="#{invoiceBean.examRequest.client ne null}" disabled="true"/> -->
+                                    <p:inputText value="#{invoiceBean.clientNumberVAT}" id="numberVAT" disabled="#{invoiceBean.invoiceSentStatus}"/>
+                                </div>
+                                <div class="p-col-4">
+                                    <!-- <p:inputText value="#{invoiceBean.examRequest.client ne null ? invoiceBean.examRequest.client.fiscalCode : ''}"
+                                                  rendered="#{invoiceBean.examRequest.client ne null}" disabled="true"/> -->
+                                    <p:inputText value="#{invoiceBean.clientFiscalCode}" id="fiscalCode" disabled="#{invoiceBean.invoiceSentStatus}"/>
+                                </div>
+
+                                <!-- ROW 6 -->
+                                <div class="p-col-3 vertical-center">
+                                    <h:outputText value=""/>
+                                </div>
+                                <div class="p-col-1 vertical-center" style="padding-left:0 !important; margin-top: 7px;">
+                                    <h:outputText value="#{msg.pecAddress}"/>
+                                </div>
+                                <div class="p-col-4" style="margin-top: 7px;">
+                                    <!-- <p:inputText value="#{invoiceBean.examRequest.client ne null ? invoiceBean.examRequest.client.mailPEC : ''}"
+                                                   rendered="#{invoiceBean.examRequest.client ne null}" disabled="true"/> -->
+                                    <p:inputText value="#{invoiceBean.clientMailPEC }" id="mailPEC" disabled="#{invoiceBean.invoiceSentStatus}"/>
+                                </div>
+                                <div class="p-col-1 vertical-center" style="padding-left:0 !important; margin-top: 7px;">
+                                    <h:outputText value="#{msg.sdlAddress}"/>
+                                </div>
+                                <div class="p-col-3" style="padding-left:0 !important; margin-top: 7px;">
+                                    <!-- <p:inputText value="#{invoiceBean.examRequest.client ne null ? invoiceBean.examRequest.client.addressSDI : ''}"
+                                                  rendered="#{invoiceBean.examRequest.client ne null}" disabled="true"/> -->
+                                    <p:inputText value="#{invoiceBean.clientAddressSDI}" id="addressSDI" disabled="#{invoiceBean.invoiceSentStatus}"/>
+                                </div>
+
+                                <!-- ROW 7 -->
+                                <div class="p-col-3 vertical-center">
+                                    <h:outputText value=""/>
+                                </div>
+                                <div class="p-col-1 vertical-center" style="padding-left:0 !important; padding-right:0 !important; margin-top: 7px;">
+                                    <h:outputText value="#{msg.vatCollectability}"/>
+                                </div>
+                                <div class="p-col-2" style="width: 15% !important; padding-left:0 !important; margin-top: 7px;">
+                                    <p:selectOneMenu label="#{msg.vatCollectability}" disabled="#{invoiceBean.invoiceSentStatus}" id="vatCollectabilitySelectMenu"
+                                                     value="#{invoiceBean.vatCollectabilityId}" styleClass="#{invoiceBean.vatCollectabilityId ne null ? 'select-one-menu' : 'select-one-menu-width'}">
+                                        <f:selectItems value="#{invoiceBean.vatCollectabilityList}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="p-col-6 vertical-center">
+                                    <h:outputText value=""/>
+                                </div>
+
+                                <!-- ROW 8 -->
+                                <div class="p-col-1 vertical-center">
+                                    <h:outputText value="#{msg.stamp}"/>
+                                </div>
+                                <div class="p-col-2">
+                                    <p:selectOneMenu label="#{msg.stamp}" styleClass="select-one-menu-width" disabled="#{invoiceBean.invoiceSentStatus}">
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="p-col-1 vertical-center" style="padding-left:0 !important;">
+                                    <h:outputText value="#{msg.invoicePaymentType}"/>
+                                </div>
+                                <div class="p-col-2" style="width: 15% !important; padding-left:0 !important;">
+                                    <p:selectOneMenu id="paymentType" value="#{invoiceBean.selectedPaymentTypeId}" disabled="#{invoiceBean.invoiceSentStatus}"
+                                                     label="#{msg.invoicePaymentType}"
+                                                     styleClass="#{invoiceBean.selectedPaymentTypeId ne null ? 'select-one-menu' : 'select-one-menu-width'}">>
+                                        <f:selectItems value="#{invoiceBean.paymentTypes}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="p-col-6">
+                                </div>
+
+                                <!-- ROW 9 -->
+                                <div class="p-col-1 vertical-center">
+                                    <h:outputText value="#{msg.causal}"/>
+                                </div>
+                                <div class="p-col-8">
+                                    <p:inputText value="#{invoiceBean.invoiceNote}" disabled="#{invoiceBean.invoiceSentStatus}"/>
+                                </div>
+                                <div class="p-col-3">
+                                </div>
+                            </div>
+                        </p:panel>
+                    </div>
+
+                    <h3>#{msg.requestTextEditGoodsServices}</h3>
+                    <hr/>
+
+                    <div class="p-grid goodsServicesPanel" style="margin-right:20px;">
+                        <p:panel id="goodsServicesPanel" style="width: 100%;" widgetVar="goodsServicesPanelVW">
+                            <div class="p-grid">
+                                <ui:repeat value="#{invoiceBean.goodsServicesFields}" var="key" >
+                                    <div class="p-col-2">
+                                        <h:outputText value="#{msg.netAmount}"></h:outputText>
+                                        <p:inputText id="total_cost" value="#{key.invoiceTotalCost}" disabled="#{invoiceBean.invoiceSentStatus}"
+                                                     styleClass="total_cost_#{key.counter}" onchange="updateTotalLine(this);" >
+                                            <p:keyFilter mask="num" />
+                                        </p:inputText>
+                                    </div>
+                                    <div class="p-col-1">
+                                        <h:outputText value="#{msg.qty}"></h:outputText>
+                                        <p:inputText id="quantita" value="#{key.invoiceItemAmount}" label="#{msg.qty}"
+                                                     disabled="#{invoiceBean.invoiceSentStatus}" onchange="updateItemAmount(this);"
+                                                     styleClass="item_amount_#{key.counter}">
+                                            <p:keyFilter mask="num" />
+                                        </p:inputText>
+                                    </div>
+                                    <div class="p-col-1">
+                                        <h:outputText value="#{msg.um}"></h:outputText>
+                                        <p:selectOneMenu styleClass="select-one-menu-width" disabled="true">
+                                            <f:selectItems value="#{key.ums}"/>
+                                        </p:selectOneMenu>
+                                    </div>
+                                    <div class="p-col-1">
+                                        <h:outputText value="#{msg.discount}"></h:outputText>
+                                        <p:inputText></p:inputText>
+                                    </div>
+                                    <div class="p-col-4">
+                                        <h:outputText value="#{msg.vat}"></h:outputText>
+                                        <p:selectOneMenu id="invoiceVat" value="#{key.selectedTaxRateId}" style="width:100%;" onchange="updateVat();"
+                                                         label="#{msg.invoiceVat}"  disabled="#{invoiceBean.invoiceSentStatus}" >
+                                            <f:selectItems value="#{key.vatAmounts}"/>
+                                            <!-- <p:ajax event="change" /> -->
+                                        </p:selectOneMenu>
+                                    </div>
+                                    <div class="p-col-3">
+                                        <h:outputText value="#{msg.totalLine}#{key.counter}"></h:outputText>
+                                        <p:inputText id="total_line" value="#{key.totalLine}" styleClass="total_line_#{key.counter}" >
+                                            <p:keyFilter mask="num" />
+                                        </p:inputText>
+                                        <p:selectBooleanCheckbox style="margin-top: 5px;"></p:selectBooleanCheckbox>
+                                        <h:outputText style="margin-top: 5px;" value="#{msg.notImpIncome}"></h:outputText>
+                                    </div>
+
+
+                                    <!-- <div class="p-col-3">
+                                        <h:outputText value="#{msg.code}"></h:outputText>
+                                        <p:outputPanel styleClass="output-panel">
+                                            <p:inputText style="border:none; width:90%;" disabled="#{invoiceBean.invoiceSentStatus}"></p:inputText>
+                                            <i class="pi pi-search icon"/>
+                                        </p:outputPanel>
+                                    </div>
+                                    <div class="p-col-3">
+                                        <h:outputText value="#{msg.product}"></h:outputText>
+                                        <p:outputPanel styleClass="output-panel">
+                                            <p:inputText style="border:none; width:90%;" disabled="#{invoiceBean.invoiceSentStatus}"></p:inputText>
+                                            <i class="pi pi-search icon"/>
+                                        </p:outputPanel>
+                                    </div>
+                                    <div class="p-col-3">
+                                        <h:outputText value="#{msg.revenueCenter}"></h:outputText>
+                                        <p:selectOneMenu styleClass="select-one-menu-width" disabled="#{invoiceBean.invoiceSentStatus}"></p:selectOneMenu>
+                                    </div>
+                                    <div class="p-col-3">
+                                        <h:outputText></h:outputText>
+                                    </div>  -->
+
+                                    <div class="p-col-9">
+                                        <p:inputTextarea value="#{key.description}" placeholder="#{msg.performanceOrProducts}" disabled="#{invoiceBean.invoiceSentStatus}"></p:inputTextarea>
+                                    </div>
+                                    <div class="p-col-3">
+                                        <h:outputText value=""></h:outputText>
+                                    </div>
+                                    <hr style="width:100%; margin-top: 15px; margin-bottom: 15px;"/>
+                                </ui:repeat>
+                            </div>
+                        </p:panel>
+                        <div class="p-col-12">
+                            <p:commandButton value="#{msg.addGoodService}" icon="fa fa-plus" style="width:190px;" action="#{invoiceBean.createNewGoodsServicesFields}"
+                                             styleClass="ui-button-success p-mr-2 p-mb-2" update="goodsServicesPanel"/>
+                        </div>
+                    </div>
+
+                    <h3>#{msg.requestTextEditCountsSummary}</h3>
+                    <hr/>
+
+                    <div class="p-grid countsSummaryPanel" style="margin-right:20px;">
+                        <p:panel id="countsSummaryPanel" style="width: 100%;" widgetVar="countsSummaryPanelVW">
+                            <div class="p-grid">
+                                <div class="p-col-8" ></div>
+                                <div class="p-col-2 vertical-center" style="padding-left:4%;">
+                                    <h:outputText value="#{msg.totalSkills}"></h:outputText>
+                                </div>
+                                <div class="p-col-2">
+                                    <p:inputText id="invoiceTotalAmount" value="#{invoiceBean.allTotalLine}" disabled="true">
+                                        <p:keyFilter mask="num" />
+                                    </p:inputText>
+                                </div>
+
+                                <div class="p-col-8"></div>
+                                <div class="p-col-2 vertical-center" style="padding-left:9%;">
+                                    <h:outputText value="#{msg.totalVat}"></h:outputText>
+                                </div>
+
+                                <div class="p-col-2">
+                                    <p:inputText id="invoiceToVAT" value="#{invoiceBean.totalVat}" disabled="true">
+                                        <p:keyFilter mask="num" />
+                                    </p:inputText>
+                                </div>
+
+                                <div class="p-col-8"></div>
+                                <div class="p-col-4">
+                                    <hr/>
+                                </div>
+
+                                <div class="p-col-8"></div>
+                                <div class="p-col-2 vertical-center" style="padding-left:8%;">
+                                    <h:outputText value="#{msg.totalGross}"></h:outputText>
+                                </div>
+                                <div class="p-col-2">
+                                    <p:inputText id="totalGA" value="#{invoiceBean.totalGrossAmount}" disabled="true">
+                                        <p:keyFilter mask="num" />
+                                    </p:inputText>
+                                </div>
+
+                                <div class="p-col-8"></div>
+                                <div class="p-col-4">
+                                    <hr/>
+                                </div>
+
+                                <div class="p-col-8"></div>
+                                <div class="p-col-2 vertical-center" style="padding-left:4%;">
+                                    <h:outputText value="#{msg.amountDue}"></h:outputText>
+                                </div>
+                                <div class="p-col-2">
+                                    <p:inputText value="#{invoiceBean.totalGrossAmount}" disabled="true">
+                                        <p:keyFilter mask="num" />
+                                    </p:inputText>
+                                </div>
+
+                                <div class="p-col-10"></div>
+                                <div class="p-col-2 vertical-center">
+                                    <h:outputText value="#{msg.showAllFields}"></h:outputText>
+                                </div>
+
+                                <div class="p-col-10"></div>
+                                <div class="p-col-2 vertical-center">
+                                    <h:outputText value="#{msg.updateTheCounts}"></h:outputText>
+                                </div>
+                            </div>
+                        </p:panel>
+                    </div>
+                    <hr/>
+
+                    <div class="p-grid" style="margin-right:20px;">
+                        <p:panel widgetVar="buttonsPanelWV" style="width: 100%;">
+                            <div class="p-grid">
+                                <div class="p-col-8">
+                                    <p:commandButton value="#{msg.downloadInvoice}"  actionListener="#{invoiceBean.downloadInvoicePdf}" ajax="false">
+                                        <p:fileDownload value="#{invoiceBean.invoicePDFFile}"/>
+                                    </p:commandButton>
+                                </div>
+                                <div class="p-col-4" style="text-align:right;">
+                                    <p:commandButton value="#{msg.cancel.toUpperCase()}" oncomplete="PF('invoiceDialogExcelWV').hide(); closeInvoiceDialog();"
+                                                     rendered="#{!invoiceBean.invoiceSentStatus}"/>
+                                    <p:commandButton value="#{msg.saveInDraft}" styleClass="ui-button-success p-mr-2 p-mb-2" style="margin-left:5px;"
+                                                     action="#{invoiceBean.saveInvoiceInDraft}" update="mainPanel goodsServicesPanel countsSummaryPanel @widgetVar(buttonsPanelWV) :form"
+                                                     rendered="#{!invoiceBean.invoiceSentStatus}"/>
+                                    <p:commandButton value="#{msg.delivery}" styleClass="ui-button-success p-mr-2 p-mb-2"
+                                                     action="#{invoiceBean.sendInvoice}" rendered="#{!invoiceBean.invoiceSentStatus}"
+                                                     update="@widgetVar(buttonsPanelWV) @widgetVar(countsSummaryPanelVW)
+                             						 		 @widgetVar(goodsServicesPanelVW) @widgetVar(mainPanelVW) @widgetVar(sendInvoiceErrorDialogWV) :form"/>                                    <p:commandButton value="#{msg.close}" oncomplete="PF('invoiceDialogExcelWV').hide(); closeInvoiceDialog();"
+                                                                                                                                                                                                                          rendered="#{invoiceBean.invoiceSentStatus}"/>
+                                </div>
+                            </div>
+                        </p:panel>
+                    </div>
+                    <script>
+                        function updateTotalLine(element) {
+                            var elementClass = $(element).attr("class");
+                            var totalCost = $(element).val();
+                            const myArray = elementClass.split(" ");
+                            const startsWith = myArray.filter((value) => value.startsWith("total_cost_"));
+                            var totalCostVar = startsWith[0];
+                            var index = totalCostVar.replace("total_cost_","");
+                            var itemAmount = $(".item_amount_"+index).val();
+                            var totalLine = totalCost;
+                            if(itemAmount != null) {
+                                if(itemAmount != 0.0) {
+                                    totalLine = totalCost * itemAmount;
+                                } else {
+                                    totalLine = totalCost;
+                                }
+                            }
+                            totalLine = roundNumber(totalLine, 12);
+                            $(".total_line_"+index).val(totalLine);
+                            updateCountsSummaryPanel();
+                        }
+
+                        function roundNumber(number, decimals) {
+                            var newnumber = new Number(number+'').toFixed(parseInt(decimals));
+                            return parseFloat(newnumber);
+                        }
+
+                        function updateItemAmount(element) {
+                            var elementClass = $(element).attr("class");
+                            var itemAmount = $(element).val();
+                            const myArray = elementClass.split(" ");
+                            const startsWith = myArray.filter((value) => value.startsWith("item_amount_"));
+                            var totalCostVar = startsWith[0];
+                            var index = totalCostVar.replace("item_amount_","");
+                            var totalCost = $(".total_cost_"+index).val();
+                            var totalLine = totalCost;
+                            if(itemAmount != null) {
+                                if(itemAmount != 0.0) {
+                                    totalLine = totalCost * itemAmount;
+                                } else {
+                                    totalLine = totalCost;
+                                }
+                            }
+                            totalLine = roundNumber(totalLine, 12);
+                            $(".total_line_"+index).val(totalLine);
+                            updateCountsSummaryPanel();
+                        }
+
+                        function updateVat() {
+                            updateCountsSummaryPanel();
+                        }
+                    </script>
+                    <p:remoteCommand name="updateCountsSummaryPanel" update="@widgetVar(countsSummaryPanelVW) @widgetVar(goodsServicesPanelVW)"/>
+                </p:tab>
+
+                <p:tab title="#{msg.requestTextEditPaymentsTab}">
+                    <div class="p-grid">
+                        <div class="p-col-12">
+                            <p:commandButton value=" #{msg.addPayment}" icon="fa fa-plus" oncomplete="PF('addPaymentDialogWV').show();"
+                                             styleClass="ui-button-success p-mr-2 p-mb-2"/>
+                        </div>
+                        <p:panel id="table_div" widgetVar="paymentInvoicePanelWV">
+                            <div class="p-col-12">
+                                <p:outputLabel  value="#{msg.amountToBeCollected} : #{invoiceBean.selectedInvoice.onBalance}" style="font-weight: 700 !important; float:right;"/>
+                            </div>
+                            <p:dataTable id="paymentInvoiceTable" value="#{invoiceBean.paymentInvoices}" emptyMessage="#{msg.noRecordsFound}" widgetVar="paymentInvoiceTableWV"
+                                         var="paymentInvoice"  lazy="true"
+                                         paginator="true" paginatorAlwaysVisible="true" rowIndexVar="rowId">
+                                <p:column headerText="#{msg.importAmount}">
+                                    <h:outputText value="#{paymentInvoice.paymentImport}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.date}">
+                                    <h:outputText value="#{paymentInvoice.dateString}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.description}">
+                                    <h:outputText value="#{paymentInvoice.description}"/>
+                                </p:column>
+                                <p:column style="text-align: right;">
+                                    <p:commandButton icon="pi pi-pencil">
+                                    </p:commandButton>
+                                </p:column>
+                            </p:dataTable>
+                            <div class="p-col-12">
+                                <p:outputLabel value="#{msg.totalPayments} : #{invoiceBean.selectedInvoice.totalPayment} #{msg.outOf} #{invoiceBean.selectedInvoice.totalGrossAmount}" style="font-weight: 700 !important; float:right;"/>
+                            </div>
+
+                        </p:panel>
+                    </div>
+                </p:tab>
+
+                <p:tab title="#{msg.emailTab}" id="emailTab">
+                    <div class="p-grid emailTab" style="border: none; background-color: #f0f2f5;">
+                        <!--                        <p:remoteCommand action="#{invoiceBean.deleteEmailFrom}" name="removeEmailAddressFrom" update="mailFrom"/>-->
+                        <p:remoteCommand action="#{invoiceBean.deleteEmailTo}" name="removeEmailAddressTo" update="mailTo"/>
+                        <p:remoteCommand action="#{invoiceBean.deleteEmailCC}" name="removeEmailAddressCC" update="mailCC"/>
+                        <p:remoteCommand name="showNotSendMsg" onstart="PF('showSendErrorDialog').show();" />
+                        <h:inputHidden id="changeVar" value="#{invoiceBean.changeVar}"/>
+                        <div class="p-col-6">
+                            <div class="p-grid">
+                                <!--                                <div class="p-col-2 vertical-center">-->
+                                <!--                                    <h:outputText value="#{msg.mailManagerEmailFrom}:"/>-->
+                                <!--                                </div>-->
+                                <!--                                <div class="p-col-10">-->
+                                <!--                                    <p:autoComplete maxResults="6" multiple="true" value="#{invoiceBean.sendFrom}"-->
+                                <!--                                                    completeMethod="#{invoiceBean.completeMailFrom}"-->
+                                <!--                                                    inputStyle="width: 80%;" id="mailFrom"-->
+                                <!--                                                    var="dest" itemLabel="#{dest}" itemValue="#{dest}"-->
+                                <!--                                                    style="width: 80%; background: #FFF;"-->
+                                <!--                                                    onkeydown="return lockValue(event);"-->
+                                <!--                                                    immediate="false">-->
+                                <!--                                        <p:column>-->
+                                <!--                                            <h:outputText value="#{dest}" escape="false" />-->
+                                <!--                                        </p:column>-->
+                                <!--                                        <p:column style="width: 32px;">-->
+                                <!--                                            <p:commandButton icon="fa fa-times"-->
+                                <!--                                                             onclick="removeEmailAddressFrom([{name:'param', value:'#{dest}'}]);" />-->
+                                <!--                                        </p:column>-->
+                                <!--                                    </p:autoComplete>-->
+                                <!--                                </div>-->
+
+                                <div class="p-col-2 vertical-center">
+                                    <h:outputText value="#{msg.mailManagerEditMailTo}:"/>
+                                </div>
+                                <div class="p-col-10">
+                                    <p:autoComplete value="#{invoiceBean.sendTo}"
+                                                    completeMethod="#{invoiceBean.completeDestinations}"
+                                                    var="dest" itemLabel="#{dest}" itemValue="#{dest}"
+                                                    inputStyle="width: 80%;" styleClass="mailTo"
+                                                    style="width: 80%; background: #FFF;"
+                                                    maxResults="6" id="mailTo"
+                                                    multiple="true"
+                                                    onkeydown="return lockValue(event);" immediate="false" >
+                                        <p:column>
+                                            <h:outputText value="#{dest}" escape="false"/>
+                                        </p:column>
+                                        <p:column style="width: 32px;">
+                                            <p:commandButton icon="fa fa-times"
+                                                             onclick="removeEmailAddressTo([{name:'param', value:'#{dest}'}]);"/>
+                                        </p:column>
+                                    </p:autoComplete>
+                                </div>
+
+                                <div class="p-col-2 vertical-center">
+                                    <h:outputText value="#{msg.mailManagerEmailInCopy}:"/>
+                                </div>
+                                <div class="p-col-10">
+                                    <p:autoComplete value="#{invoiceBean.sendCC}" multiple="true" inputStyle="width: 80%;"
+                                                    completeMethod="#{invoiceBean.completeMailCC}"
+                                                    style="width: 80%; background: #FFF;"
+                                                    immediate="false"
+                                                    var="dest" itemLabel="#{dest}" itemValue="#{dest}" id="mailCC"
+                                                    maxResults="6">
+                                        <p:column>
+                                            <h:outputText value="#{dest}" escape="false"/>
+                                        </p:column>
+                                        <p:column style="width: 32px;">
+                                            <p:commandButton icon="fa fa-times"
+                                                             onclick="removeEmailAddressCC([{name:'param', value:'#{dest}'}]);"/>
+                                        </p:column>
+                                    </p:autoComplete>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-col-6">
+                            <div class="p-grid">
+                                <div class="p-col-12">
+                                    <h:outputText value="#{msg.mailManagerEmailAttachmentMessage}"/>
+                                </div>
+                                <div class="p-col-12">
+                                    <p:outputPanel id="listFile">
+                                        <p:dataTable value="#{invoiceBean.invoiceEmailAttachedFiles}" styleClass="simple-table" var="file"
+                                                     rendered="#{not empty invoiceBean.invoiceEmailAttachedFiles}" emptyMessage="#{msg.noRecordsFound}"
+                                                     scrollHeight="150" style="border: 1px solid #a8acb1;">
+                                            <p:column styleClass="action_column">
+                                                <p:selectBooleanCheckbox value="#{invoiceBean.addAttachment}"/>
+                                            </p:column>
+                                            <p:column headerText="#{msg.mailManagerEmailFile}" style="width: 280px !important;">
+                                                <h:outputText value="#{file.fileName}"/>
+                                            </p:column>
+                                            <p:column>
+                                                <p:commandButton icon="fa fa-cloud-download" title="#{msg.download}" update=":form, messages"
+                                                                 ajax="false"
+                                                                 action="#{invoiceBean.downloadInvoiceFile}"
+                                                                 style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                                                    <f:setPropertyActionListener value="#{file.id}" target="#{invoiceBean.downloadFileIndex}"/>
+                                                </p:commandButton>
+                                            </p:column>
+                                        </p:dataTable>
+
+                                    </p:outputPanel>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-col-1 vertical-center">
+                            <h:outputText value="#{msg.mailManagerEditMailSubject}:"/>
+                        </div>
+                        <div class="p-col-11">
+                            <p:inputTextarea rows="1" style="width: 78%;" value="#{invoiceBean.emailSubject}"/>
+                        </div>
+
+                        <div class="p-col-1">
+                            <h:outputText value="#{msg.mailManagerEmailText}"/>
+                        </div>
+                        <div class="p-col-11">
+                            <div id="bodyPanel">
+                                <pe:ckEditor id="body" value="#{invoiceBean.emailBodyToEditor}"
+                                             styleClass="for_editor" width="auto" height="200"
+                                             contentsCss="#{facesContext.externalContext.requestContextPath}/resources/javascript/CKEditorStyles.css"
+                                             customConfig="#{facesContext.externalContext.requestContextPath}/resources/javascript/configCKEditorMailManager.js"
+                                             widgetVar="ckEditorWV">
+                                    <p:ajax event="initialize" onstart="onInitCkEditor();"/>
+                                </pe:ckEditor>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-grid">
+                        <div class="p-col-8"></div>
+                        <div class="p-col-4">
+                            <p:commandButton value="#{msg.cancel}" oncomplete="PF('invoiceDialogExcelWV').hide(); closeInvoiceDialog();"/>
+                            <p:commandButton value="#{msg.saveInDraft}" styleClass="ui-button-success p-mr-2 p-mb-2"
+                                             style="margin-left:5px;" action="#{invoiceBean.saveMailInDraft}"/>
+                            <p:commandButton value="#{msg.sendEmail}" action="#{invoiceBean.sendMail}"
+                                             styleClass="ui-button-success p-mr-2 p-mb-2"
+                                             onsuccess="PF('invoiceDialogExcelWV').hide(); closeInvoiceDialog();"/>
+                        </div>
+                    </div>
+                    <!-- <p:column>
+                        <p:commandButton value="#{msg.mailManagerEditMailAttachedFiles}"
+                                         oncomplete="PF('attachFielDlgWV').show();" icon="fa fa-paperclip"
+                                         styleClass="grey-button" style="margin-bottom: 10px"/>
+                    </p:column>
+                    <p:column>
+                        <p:outputPanel id="listFile">
+                            <ui:repeat value="#{invoiceBean.attachedFiles}" var="file">
+                                <p:commandButton icon="fa fa-paperclip" title="#{msg.download}" update=":form, messages"
+                                                 ajax="false"
+                                                 action="#{invoiceBean.downloadFile}" value="&nbsp;#{file.fileName}"
+                                                 style="background-color: transparent!important;color: #5f666c!important; padding-right: 5px;">
+                                    <f:setPropertyActionListener value="#{file.id}" target="#{invoiceBean.downloadFileIndex}"/>
+                                </p:commandButton>
+                            </ui:repeat>
+                        </p:outputPanel>
+                    </p:column> -->
+
+                    <script>
+                        function onInitCkEditor() {
+                            console.log("start init CKEditor");
+                            CKEDITOR.timestamp='17.07.2018';
+                            CKEDITOR.env.isCompatible = true;
+                            removeAllTooltips('#bodyPanel');
+                            /* CKEDITOR.instances.body.on('fixWidth', function () {
+                                fixWidthCKEditorBody();
+                            });
+                            CKEDITOR.instances.body.ui.editor.toolbar[3].items[0].onClick('Times New Roman');
+                            CKEDITOR.instances.body.ui.editor.toolbar[3].items[1].onClick('16');
+                            CKEDITOR.instances.body.ui.editor.on('change', function () {
+                                $("#changeVar").val("change");
+                                change = true;
+                            });
+
+                            CKEDITOR.instances.body.ui.editor.on('key', HandleTabEvent, null, null, 0); */
+
+                            console.log("init success");
+                        }
+
+                        function fixWidthCKEditorBody() {
+                            var newWidth = parseInt(($("#bodyPanel").width() - 27) / (CKEDITOR.instances.body.ui.editor.toolbar[8].items[0].lastValue / 100), 10);
+                            $("#bodyPanel").find(".cke_wysiwyg_frame").contents().find("body").css('width', newWidth + 'px');
+                        }
+
+                        // Custom Key Events function
+                        /*  function HandleTabEvent(e) {
+                             if (e.data.keyCode == 9){
+                                 var selection = CKEDITOR.instances.body.ui.editor.getSelection();
+                                 var startElement = selection.getStartElement();
+                                 if (e.data.keyCode == 9){
+                                     var handleTab = false;
+                                     var x = $(".cke_button__bulletedlist");
+                                     if(x &amp;&amp; x.attr('class') == 'cke_button cke_button__bulletedlist cke_button_on'){
+                                         handleTab = true;
+                                     }else {
+                                         x = $(".cke_button__numberedlist");
+                                         if(x &amp;&amp; x.attr('class') == 'cke_button cke_button__numberedlist cke_button_on'){
+                                             handleTab = true;
+                                         }
+                                     }
+                                     if(handleTab){
+                                         var element = selection.getStartElement();
+                                         var sText = element.getHtml();
+                                         var text = jQuery('&lt;div&gt;').html(sText).text();
+                                         var result = text.replace(/[^ -~]+/g, "");
+                                         if(!result || 0 === result.length){
+                                         }else {
+                                             e.cancel();
+                                             e.stop();
+                                             CKEDITOR.instances.body.ui.editor.insertText('    ');
+                                         }
+                                     }
+                                 }
+                             }
+                         } */
+
+                        function lockValue(event) {
+                            if (event.keyCode == 32 || event.key == ',') {
+                                if (event.srcElement.value != null &amp;&amp; event.srcElement.value.trim() != '') {
+                                    var valueLi = event.srcElement.value;
+                                    event.srcElement.value = '';
+                                    var liel = document.createElement("LI");
+                                    liel.className = 'ui-autocomplete-token ui-state-active ui-corner-all ui-helper-hidden';
+                                    liel.style = 'display: list-item;';
+                                    liel.setAttribute('data-token-value', valueLi);
+                                    var closeNode = document.createElement("SPAN");
+                                    closeNode.className = 'ui-autocomplete-token-icon ui-icon ui-icon-close';
+                                    var liNode = document.createElement("SPAN");
+                                    liNode.className = 'ui-autocomplete-token-label';
+                                    liNode.innerHTML = valueLi;
+                                    liel.appendChild(closeNode);
+                                    liel.appendChild(liNode);
+                                    event.srcElement.parentElement.parentElement.insertBefore(liel, event.srcElement.parentElement);
+                                    event.srcElement.value = event.srcElement.value.substring(0, event.srcElement.value.length - 2);
+                                    var optionTag = document.createElement("OPTION");
+                                    optionTag.value = valueLi;
+                                    optionTag.setAttribute('selected', 'selected');
+                                    document.getElementById("mailTo_hinput").appendChild(optionTag);
+                                }
+                                return false;
+                            }
+                            return true;
+                        }
+
+                        var change = false;
+                        $(function () {
+                            // Set the unload message whenever any input element get changed.
+                            $(':input').on('change', function () {
+                                change = true;
+                                $("#changeVar").val("change");
+                            });
+                            // Turn off the unload message whenever a form get submitted properly.
+                            $('form').on('submit', function () {
+                                change = false;
+                                $("#changeVar").val("change");
+                            });
+                            $( "#mailTo .ui-autocomplete-multiple-container .ui-autocomplete-input-token input" ).focusout(function() {
+                                emailHeightAdjust();
+                            }).focus(function() {
+                                $( "#mailTo .ui-autocomplete-multiple-container" ).css("height", "auto");
+                            });
+                            emailHeightAdjust();
+                        });
+                        function emailHeightAdjust() {
+                            var noOfEmail = $( "#mailTo .ui-autocomplete-multiple-container li" ).length - 1;
+                            if(noOfEmail != 0 &amp;&amp; noOfEmail%2==0) {
+                                $( "#mailTo .ui-autocomplete-multiple-container" ).css("height", (((noOfEmail/2)*38)+'px'));
+                            }
+                        }
+                    </script>
+                </p:tab>
+            </p:tabView>
+            <p:remoteCommand name="closeInvoiceDialog" action="#{invoiceBean.closeInvoiceDialog}" update=":form" />
+        </div>
+        <script>
+            $(".ui-dialog-titlebar-close").on("click", function() {
+                if($(this).closest(".addPaymentDialog").length > 0){
+                }else {
+                    closeInvoiceDialog();
+                }
+            });
+        </script>
+    </p:dialog>
+
+    <p:dialog widgetVar="invoiceErrorDialogWV"  modal="true" draggable="false"
+              position="center center">
+        <div class="ui-messages-error ui-corner-all">
+            <span class="ui-messages-error-summary">#{msg.invalidDataMsg}</span><br/>
+        </div>
+        <p:commandButton oncomplete="PF('invoiceErrorDialogWV').hide();"
+                         value="#{msg.close}" />
+    </p:dialog>
+
+    <p:dialog widgetVar="showSendErrorDialog" modal="true" resizable="false" draggable="false">
+        <h:outputText value="#{val.errorSendMail}"/>
+    </p:dialog>
+
+    <p:dialog widgetVar="addPaymentDialogWV"  id="addPaymentDialog" modal="true" draggable="false" width="400" styleClass="dialog-white-bg addPaymentDialog"
+              position="center center" header="#{msg.addPayment}">
+        <div class="p-grid">
+            <div class="p-col-12 p-md-12">
+                <div class="card"
+                     style="border: none !important; padding-top:0px; padding-bottom:0px; margin-top:10px;">
+                    <div class="p-grid">
+                        <div class="p-col-4 vertical-center" style="padding-bottom: 0px !important;">
+                            <h:outputText value="#{msg.importAmount}"/>
+                        </div>
+                        <div class="p-col-8">
+                            <p:inputText value="#{invoiceBean.paymentAmount}" >
+                                <p:keyFilter mask="num" />
+                            </p:inputText>
+                        </div>
+                        <div class="p-col-4 vertical-center" style="padding-bottom: 0px !important;">
+                            <h:outputText value="#{msg.date}"/>
+                        </div>
+                        <div class="p-col-8">
+                            <p:calendar  value="#{invoiceBean.paymentDate}" disabled="#{invoiceBean.invoiceSentStatus}"
+                                         showOn="button" id="paymentDate"
+                                         pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
+                                         popupIconOnly="true"
+                                         onblur="check_date(this)"
+                                         styleClass="#{invoiceBean.paymentDate ne null ? 'calender-filled' : ''}" >
+                                <p:ajax event="dateSelect" update="@this" />
+                            </p:calendar>
+                        </div>
+                        <div class="p-col-4 vertical-center" style="padding-bottom: 0px !important;">
+                            <h:outputText value="#{msg.description}"/>
+                        </div>
+                        <div class="p-col-8">
+                            <p:inputText value="#{invoiceBean.paymentDescription}" >
+                            </p:inputText>
+                        </div>
+                        <div class="p-col-12" style="text-align:center;">
+                            <p:commandButton oncomplete="PF('addPaymentDialogWV').hide();"
+                                             value="#{msg.close.toUpperCase()}" style="background-color: #F3362B !important;"/>
+                            <p:commandButton value="#{msg.save.toUpperCase()}" oncomplete="PF('addPaymentDialogWV').hide();" style="margin-left:15px;"
+                                             action="#{invoiceBean.saveInvoicePayment}" update="@widgetVar(paymentInvoicePanelWV)" styleClass="ui-button-success p-mr-2 p-mb-2"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </p:dialog>
+
+    <p:dialog widgetVar="sendInvoiceErrorDialogWV"  modal="true" draggable="false" position="center center">
+        <div class="ui-messages-error ui-corner-all">
+            <span class="ui-messages-error-summary">#{invoiceBean.apiError}</span><br/>
+        </div>
+        <p:commandButton oncomplete="PF('sendInvoiceErrorDialogWV').hide();"
+                         value="#{msg.close}" />
+    </p:dialog>
+
+</ui:composition>

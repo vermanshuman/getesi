@@ -331,7 +331,7 @@ public class Subject extends IndexedEntity implements BeforeSave{
     public String getNameBirthDateUpperCase() {
         if (getTypeIsPhysicalPerson()) {
             return String.format("<b>%s %s</b> (%s %s)", getSurname().toUpperCase(), getName().toUpperCase(),
-                    getBirthCity() == null ? WordUtils.capitalizeFully(getCountryDescription())
+                    getBirthCity() == null ? WordUtils.capitalizeFully(getCountry().getDescription())
                             : WordUtils.capitalizeFully(getBirthCityDescription()),
                             DateTimeHelper.toString(getBirthDate()));
         } else {
@@ -380,14 +380,6 @@ public class Subject extends IndexedEntity implements BeforeSave{
         if (getBirthProvince() != null
                 && getBirthProvince().getDescription() != null) {
             return getBirthProvince().getDescription();
-        } else {
-            return null;
-        }
-    }
-
-    public String getCountryDescription() {
-        if (getCountry() != null && getCountry().getDescription() != null) {
-            return getCountry().getDescription();
         } else {
             return null;
         }

@@ -32,12 +32,14 @@ public abstract class BaseTab {
         Tab tab = new Tab();
         if (getCountTable() != 0L) {
             tab.setTitle(String.format("%s (%d)", getTabTitle(), getCountTable()));
+            tab.setTitleStyle("font-weight: bold;");
+            DataTable dataTable = getTable();
+            dataTable.getChildren().addAll(getColumns());
+            tab.getChildren().add(dataTable);
         } else {
             tab.setTitle(getTabTitle());
+            tab.setTitleStyle("font-weight: normal;");
         }
-        DataTable dataTable = getTable();
-        dataTable.getChildren().addAll(getColumns());
-        tab.getChildren().add(dataTable);
         return tab;
     }
 
@@ -107,4 +109,19 @@ public abstract class BaseTab {
         return column;
     }
 
+    Column getButtonColumn(String titleResourceId, CommandButton button, String width) {
+        return getButtonColumn(titleResourceId, button, "text-align:center;", "action_button_column", width);
+    }
+
+    Column getButtonColumn(String titleResourceId, CommandButton button, String style, String styleClass, String width) {
+        Column column = new Column();
+        column.setStyleClass(styleClass);
+        column.setStyle(style);
+        column.setWidth(width);
+        if (titleResourceId != null) {
+            column.setHeaderText(ResourcesHelper.getString(titleResourceId));
+        }
+        column.getChildren().add(button);
+        return column;
+    }
 }

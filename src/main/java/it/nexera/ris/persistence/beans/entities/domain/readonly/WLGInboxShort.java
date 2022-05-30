@@ -55,9 +55,6 @@ public class WLGInboxShort extends IndexedEntity {
     @Column(name = "email_to", length = 400)
     private String emailTo;
 
-    @Column(name = "email_cc", length = 400)
-    private String emailCC;
-
     @Column(name = "email_subject", length = 500)
     private String emailSubject;
 
@@ -81,6 +78,9 @@ public class WLGInboxShort extends IndexedEntity {
     @JoinColumn(name = "change_state_user_id")
     private User userChangedState;
 
+    @Column(name = "email_cc", length = 400)
+    private String emailCC;
+
     @Transient
     private String[] emailFromStr;
 
@@ -92,6 +92,9 @@ public class WLGInboxShort extends IndexedEntity {
 
     @Transient
     private Boolean received;
+
+    @Transient
+    private Boolean rowCheck;
 
     public boolean getRead() {
         boolean isRead = false;
@@ -316,5 +319,13 @@ public class WLGInboxShort extends IndexedEntity {
 
     public void setEmailCC(String emailCC) {
         this.emailCC = emailCC;
+    }
+
+    public Boolean getRowCheck() {
+        return rowCheck;
+    }
+
+    public void setRowCheck(Boolean rowCheck) {
+        this.rowCheck = rowCheck;
     }
 }

@@ -1,134 +1,203 @@
 package it.nexera.ris.web.beans.pages.dictionary;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.List;
-
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.model.SelectItem;
-
-import org.hibernate.HibernateException;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
-
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.ComboboxHelper;
 import it.nexera.ris.common.helpers.LogHelper;
 import it.nexera.ris.common.helpers.ValidationHelper;
+import it.nexera.ris.persistence.PersistenceSessionManager;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
+import it.nexera.ris.persistence.beans.entities.domain.TaxRate;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Court;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
-import it.nexera.ris.web.beans.EntityLazyInListEditPageBean;
+import it.nexera.ris.web.beans.EntityLazyListPageBean;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.HibernateException;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import org.primefaces.context.RequestContext;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.model.SelectItem;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @ManagedBean(name = "courtListBean")
 @ViewScoped
+@Getter
+@Setter
 public class CourtListBean extends
-        EntityLazyInListEditPageBean<Court> implements Serializable {
+        EntityLazyListPageBean<Court> implements Serializable {
 
     private static final long serialVersionUID = 3952135359518006317L;
-    private List<SelectItem> cities;
+
+    private String name;
+
+    private String taxCode;
 
     private Long selectedCityId;
 
-    
-    @Override
-    protected void setEditedValues() {
-        this.getEditedEntity().setName(this.getEntity().getName());
-        this.getEditedEntity()
-                .setFiscalCode(this.getEntity().getFiscalCode());
-        this.getEditedEntity().setCity(this.getEntity().getCity());
-    }
+    private List<SelectItem> courtCities;
 
-    @Override
-    protected void validate() throws PersistenceBeanException {
-        if (ValidationHelper.isNullOrEmpty(this.getEntity().getName())) {
-            addRequiredFieldException("form:name");
-        } else if (!ValidationHelper.isUnique(RequestType.class, "name",
-                getEntity().getName(), this.getEntity().getId())) {
-            addFieldException("form:name", "nameAlreadyInUse");
-        }
-    }
+    private Court entity;
 
-    @Override
-    public void save() throws HibernateException, PersistenceBeanException,
-            NumberFormatException, IOException, InstantiationException,
-            IllegalAccessException {
-        if (!ValidationHelper.isNullOrEmpty(getSelectedCityId())) {
-            getEntity().setCity(DaoManager.get(City.class, getSelectedCityId()));
-        }
-        setSelectedCityId(null);
-        DaoManager.save(this.getEntity());
-    }
+    private List<SelectItem> cities;
+
+    private Long selectedFilterCityId;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
             IllegalAccessException, IOException {
-        this.loadList(Court.class, new Criterion[]
-                {Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                        Restrictions.isNull("isDeleted"))}, new Order[]
-                {Order.asc("name")});
+        setEntity(new Court());
         setCities(ComboboxHelper.fillList(City.class, Order.asc("description"), new Criterion[]{
                 Restrictions.eq("external", Boolean.TRUE),
                 Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
                         Restrictions.isNull("isDeleted"))
         }));
-        
+        filterTableFromPanel();
+    }
+
+    public void filterTableFromPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        List<Criterion> restrictions = new ArrayList<>();
+        if (!ValidationHelper.isNullOrEmpty(getName())) {
+            restrictions.add(Restrictions.ilike("name", getName(), MatchMode.ANYWHERE));
+        }
+        if (!ValidationHelper.isNullOrEmpty(getTaxCode())) {
+            restrictions.add(Restrictions.ilike("fiscalCode", getTaxCode(), MatchMode.ANYWHERE));
+        }
+        if (!ValidationHelper.isNullOrEmpty(getSelectedFilterCityId())) {
+            restrictions.add(Restrictions.eq("city", DaoManager.get(City.class, getSelectedFilterCityId())));
+        }
+        restrictions.add(Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                Restrictions.isNull("isDeleted")));
+        List<Court> courts = DaoManager.load(Court.class, new Criterion[]
+                {Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                        Restrictions.isNull("isDeleted"))});
+        List<Long> cityIds = new ArrayList<>();
+
+        for (Court court : courts) {
+            if (!ValidationHelper.isNullOrEmpty(court.getCity()) && !cityIds.contains(court.getCity().getId())) {
+                cityIds.add(court.getCity().getId());
+            }
+        }
+        if (!ValidationHelper.isNullOrEmpty(cityIds)) {
+            setCourtCities(ComboboxHelper.fillList(City.class,
+                    Order.asc("description"),
+                    new Criterion[]{Restrictions.isNotNull("province.id")
+                            , Restrictions.eq("external", Boolean.TRUE), Restrictions.in("id", cityIds)}, Boolean.FALSE));
+        }
+        this.loadList(Court.class, restrictions.toArray(new Criterion[0]), new Order[]
+                {Order.asc("name")});
+
+    }
+
+    public void clearFilterPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        setName(null);
+        setTaxCode(null);
+        setSelectedFilterCityId(null);
+        filterTableFromPanel();
     }
 
     @Override
-    protected void deleteEntityInternal(Long id)
-            throws HibernateException, PersistenceBeanException,
-            InstantiationException, IllegalAccessException {
-        try {
-            super.deleteEntityInternal(id);
-        } catch (Exception e) {
-            try {
-                this.getEntity().setIsDeleted(Boolean.TRUE);
-
-                DaoManager.save(getEntity());
-            } catch (Exception e1) {
-                LogHelper.log(log, e1);
-            }
-        }
-    }
-
-    public void editEntity() {
-        this.cleanValidation();
-        if (!ValidationHelper.isNullOrEmpty(this.getEntityEditId())) {
-            try {
-                this.setEntity(DaoManager.get(getType(), this.getEntityEditId()));
-                DaoManager.getSession().evict(this.getEntity());
-                if (!ValidationHelper.isNullOrEmpty(getEntity().getCity())) {
-                    setSelectedCityId(getEntity().getCity().getId());
+    public void editEntity() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        if (this.getCanEdit()) {
+            this.cleanValidation();
+            if (!ValidationHelper.isNullOrEmpty(this.getEntityEditId())) {
+                try {
+                    this.setEntity(DaoManager.get(getType(), this.getEntityEditId()));
+                    DaoManager.getSession().evict(this.getEntity());
+                    if(!ValidationHelper.isNullOrEmpty(this.getEntity().getCity()))
+                        setSelectedCityId(this.getEntity().getCity().getId());
+                } catch (Exception e) {
+                    LogHelper.log(log, e);
                 }
-            } catch (Exception e) {
-                LogHelper.log(log, e);
             }
+            RequestContext.getCurrentInstance().update("addCourtDialog");
+            executeJS("PF('addCourtDialogWV').show();");
         }
     }
 
     @Override
-    public void resetFields() {
+    public void addEntity() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        if (this.getCanCreate()) {
+            setSelectedCityId(null);
+            setEntity(new Court());
+            this.cleanValidation();
+            RequestContext.getCurrentInstance().update("addCourtDialog");
+            executeJS("PF('addCourtDialogWV').show();");
+        }
+    }
+
+    public void save() throws HibernateException, PersistenceBeanException, NumberFormatException, IOException,
+            InstantiationException, IllegalAccessException {
+        this.cleanValidation();
+        this.setValidationFailed(false);
+
+        try {
+            this.validate();
+        } catch (PersistenceBeanException e) {
+            LogHelper.log(log, e);
+        }
+        if (this.getValidationFailed()) {
+            return;
+        }
+
+        saveEntity();
+        this.resetFields();
+        executeJS("PF('addCourtDialogWV').hide()");
+        executeJS("refreshTable()");
+    }
+
+    protected void validate() throws PersistenceBeanException {
+        if (ValidationHelper.isNullOrEmpty(this.getEntity().getName())) {
+            addRequiredFieldException("form:name");
+        } else if (!ValidationHelper.isUnique(Court.class, "name",
+                getEntity().getName(), this.getEntity().getId())) {
+            addFieldException("form:name", "nameAlreadyInUse");
+        }
+    }
+
+    public void resetFields() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        setEntity(new Court());
         setSelectedCityId(null);
-        super.resetFields();
-    }
-    public List<SelectItem> getCities() {
-        return cities;
+        this.cleanValidation();
+        this.filterTableFromPanel();
     }
 
-    public Long getSelectedCityId() {
-        return selectedCityId;
+    @Override
+    public void deleteEntity() throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException, NumberFormatException, IOException {
+        this.setEntity(DaoManager.get(getType(), this.getEntityDeleteId()));
+        getEntity().setIsDeleted(Boolean.TRUE);
+        saveEntity();
+        filterTableFromPanel();
     }
 
-    public void setCities(List<SelectItem> cities) {
-        this.cities = cities;
-    }
-
-    public void setSelectedCityId(Long selectedCityId) {
-        this.selectedCityId = selectedCityId;
+    private void saveEntity() {
+        Transaction tr = null;
+        try {
+            tr = PersistenceSessionManager.getBean().getSession()
+                    .beginTransaction();
+            if (!ValidationHelper.isNullOrEmpty(getSelectedCityId())) {
+                getEntity().setCity(DaoManager.get(City.class, getSelectedCityId()));
+            }
+            DaoManager.save(this.getEntity());
+        } catch (Exception e) {
+            if (tr != null) {
+                tr.rollback();
+            }
+            LogHelper.log(log, e);
+        } finally {
+            if (tr != null && !tr.wasRolledBack()
+                    && tr.isActive()) {
+                tr.commit();
+            }
+        }
     }
 }

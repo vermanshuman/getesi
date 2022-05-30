@@ -3,86 +3,115 @@ package it.nexera.ris.persistence.beans.entities.domain;
 import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
 
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "invoice_item")
 public class InvoiceItem extends IndexedEntity implements Serializable {
-    private static final long serialVersionUID = -4269406413536164945L;
+	private static final long serialVersionUID = -4269406413536164945L;
 
-    @ManyToOne
+	@ManyToOne
     @JoinColumn(name = "invoice_id")
-    private Invoice invoice;
-
-    @Column(name = "subject")
-    private String subject;
-
-    @Column(name = "description")
+    private Invoice invoice;	
+	
+	@Column(name = "subject")
+    private String subject;	
+	
+	@Column(name = "description")
     private String description;
-
-    @Column(name = "amount")
+	
+	@Column(name = "amount")
     private Double amount;
 
-//    @Column(name = "vat")
-//    private Double vat;
+	@ManyToOne
+	@JoinColumn(name = "tax_rate_id")
+	private TaxRate taxRate;
 
-    @ManyToOne
-    @JoinColumn(name = "tax_rate_id")
-    private TaxRate taxRate;
+	@Column(name = "total_cost")
+	private Double invoiceTotalCost;
 
+	@Transient
+	private Double vat;
 
-    public Invoice getInvoice() {
-        return invoice;
-    }
+//	@Transient
+//	private String uuid;
 
-    public void setInvoice(Invoice invoice) {
-        this.invoice = invoice;
-    }
+	public Invoice getInvoice() {
+		return invoice;
+	}
 
-    public String getSubject() {
-        return subject;
-    }
+	public void setInvoice(Invoice invoice) {
+		this.invoice = invoice;
+	}
 
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
+	public String getSubject() {
+		return subject;
+	}
 
-    public String getDescription() {
-        return description;
-    }
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+	public String getDescription() {
+		return description;
+	}
 
-    public Double getAmount() {
-        return amount;
-    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
+	public Double getAmount() {
+		return amount;
+	}
 
-    public Double getVatAmount() {
+	public void setAmount(Double amount) {
+		this.amount = amount;
+	}
 
-        Double vat = 0.0;
-        if(!ValidationHelper.isNullOrEmpty(getTaxRate())
-                && !ValidationHelper.isNullOrEmpty(getTaxRate().getPercentage())) {
-            vat = getTaxRate().getPercentage().doubleValue();
-        }
-        return getAmount() * (vat / 100);
-    }
+	public Double getVatAmount() {
 
-    public Double getGrossAmount() {
-        return getAmount() + getVatAmount();
-    }
+		Double vat = 0.0;
+		if(!ValidationHelper.isNullOrEmpty(getTaxRate())
+				&& !ValidationHelper.isNullOrEmpty(getTaxRate().getPercentage())) {
+			vat = getTaxRate().getPercentage().doubleValue();
+		}
+		return getAmount() * (vat / 100);
+	}
+	
+	public Double getGrossAmount() {
+		return getAmount() + getVatAmount();
+	}
 
-    public TaxRate getTaxRate() {
-        return taxRate;
-    }
+	public Double getInvoiceTotalCost() {
+		return invoiceTotalCost;
+	}
 
-    public void setTaxRate(TaxRate taxRate) {
-        this.taxRate = taxRate;
-    }
+	public void setInvoiceTotalCost(Double invoiceTotalCost) {
+		this.invoiceTotalCost = invoiceTotalCost;
+	}
+
+	public TaxRate getTaxRate() {
+		return taxRate;
+	}
+
+	public void setTaxRate(TaxRate taxRate) {
+		this.taxRate = taxRate;
+	}
+
+	public Double getVat() {
+		if(!ValidationHelper.isNullOrEmpty(getTaxRate()) && !ValidationHelper.isNullOrEmpty(getTaxRate().getPercentage()))
+			return getTaxRate().getPercentage().doubleValue();
+		return 0.0;
+	}
+
+//	public String getUuid() {
+//		return uuid;
+//	}
+//
+//	public void setUuid(String uuid) {
+//		this.uuid = uuid;
+//	}
 }

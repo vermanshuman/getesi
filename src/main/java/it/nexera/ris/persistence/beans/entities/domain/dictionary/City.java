@@ -3,6 +3,7 @@ package it.nexera.ris.persistence.beans.entities.domain.dictionary;
 import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.entities.Dictionary;
 import it.nexera.ris.persistence.beans.entities.domain.LandOmi;
+import it.nexera.ris.persistence.beans.entities.domain.SectionB;
 import org.apache.commons.lang3.text.WordUtils;
 
 import javax.persistence.*;
@@ -57,7 +58,6 @@ public class City extends Dictionary {
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;
-
     @Transient
     @XmlElement(name = "asl_region_code")
     private String asl_region_code;
@@ -71,9 +71,9 @@ public class City extends Dictionary {
     private String province_code;
 
     @Transient
-    public String getCamelCityDescription() {
-        if (!ValidationHelper.isNullOrEmpty(getDescription())) {
-            return WordUtils.capitalizeFully(getDescription(), ' ');
+    public String getCamelCityDescription(){
+        if(!ValidationHelper.isNullOrEmpty(getDescription())) {
+           return WordUtils.capitalizeFully(getDescription(), ' ');
         }
         return "";
     }
@@ -194,13 +194,13 @@ public class City extends Dictionary {
         this.landChargesRegistries = landChargesRegistries;
     }
 
-    public Boolean getExternal() {
-        return external;
-    }
+	public Boolean getExternal() {
+		return external;
+	}
 
-    public void setExternal(Boolean external) {
-        this.external = external;
-    }
+	public void setExternal(Boolean external) {
+		this.external = external;
+	}
 
     public List<LandOmi> getLandOmis() {
         return landOmis;

@@ -1,34 +1,35 @@
-package it.nexera.ris.web.beans.pages;
-
-import java.io.File;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.model.SelectItem;
+    package it.nexera.ris.web.beans.pages;
 
 import it.nexera.ris.common.enums.*;
+import it.nexera.ris.common.exceptions.PersistenceBeanException;
+import it.nexera.ris.common.helpers.*;
+import it.nexera.ris.common.xml.wrappers.ConservatoriaSelectItem;
+import it.nexera.ris.common.xml.wrappers.RequestViewWrapper;
+import it.nexera.ris.common.xml.wrappers.RequestWrapper;
+import it.nexera.ris.common.xml.wrappers.SelectItemWrapper;
+import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
+import it.nexera.ris.persistence.beans.dao.DaoManager;
+import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
+import it.nexera.ris.persistence.view.ClientView;
+import it.nexera.ris.persistence.view.RequestView;
+import it.nexera.ris.settings.ApplicationSettingsHolder;
+import it.nexera.ris.web.beans.EntityEditPageBean;
+import it.nexera.ris.web.beans.base.AccessBean;
+import it.nexera.ris.web.beans.wrappers.logic.ServiceRequestWrapper;
+import it.nexera.ris.web.beans.wrappers.logic.SubjectWrapper;
+import it.nexera.ris.web.beans.wrappers.logic.UploadDocumentWrapper;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.SneakyThrows;
 import org.apache.commons.lang.math.NumberUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
+import org.hibernate.StaleObjectStateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.sql.JoinType;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.SelectEvent;
@@ -37,54 +38,16 @@ import org.primefaces.model.menu.DefaultMenuItem;
 import org.primefaces.model.menu.DefaultMenuModel;
 import org.primefaces.model.menu.MenuModel;
 
-import it.nexera.ris.common.exceptions.PersistenceBeanException;
-import it.nexera.ris.common.helpers.ComboboxHelper;
-import it.nexera.ris.common.helpers.DateTimeHelper;
-import it.nexera.ris.common.helpers.FileHelper;
-import it.nexera.ris.common.helpers.GeneralFunctionsHelper;
-import it.nexera.ris.common.helpers.ListHelper;
-import it.nexera.ris.common.helpers.LogHelper;
-import it.nexera.ris.common.helpers.MailHelper;
-import it.nexera.ris.common.helpers.MessageHelper;
-import it.nexera.ris.common.helpers.RedirectHelper;
-import it.nexera.ris.common.helpers.RequestHelper;
-import it.nexera.ris.common.helpers.ResourcesHelper;
-import it.nexera.ris.common.helpers.SelectItemHelper;
-import it.nexera.ris.common.helpers.SelectItemWrapperConverter;
-import it.nexera.ris.common.helpers.SessionHelper;
-import it.nexera.ris.common.helpers.SubjectHelper;
-import it.nexera.ris.common.helpers.ValidationHelper;
-import it.nexera.ris.common.xml.wrappers.ConservatoriaSelectItem;
-import it.nexera.ris.common.xml.wrappers.RequestViewWrapper;
-import it.nexera.ris.common.xml.wrappers.RequestWrapper;
-import it.nexera.ris.common.xml.wrappers.SelectItemWrapper;
-import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
-import it.nexera.ris.persistence.beans.dao.DaoManager;
-import it.nexera.ris.persistence.beans.entities.domain.Agency;
-import it.nexera.ris.persistence.beans.entities.domain.Client;
-import it.nexera.ris.persistence.beans.entities.domain.ClientServiceInfo;
-import it.nexera.ris.persistence.beans.entities.domain.Document;
-import it.nexera.ris.persistence.beans.entities.domain.Formality;
-import it.nexera.ris.persistence.beans.entities.domain.InputCard;
-import it.nexera.ris.persistence.beans.entities.domain.InputCardManageField;
-import it.nexera.ris.persistence.beans.entities.domain.Notary;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
-import it.nexera.ris.persistence.beans.entities.domain.RequestConservatory;
-import it.nexera.ris.persistence.beans.entities.domain.RequestFormality;
-import it.nexera.ris.persistence.beans.entities.domain.RequestHistory;
-import it.nexera.ris.persistence.beans.entities.domain.RequestSubject;
-import it.nexera.ris.persistence.beans.entities.domain.Residence;
-import it.nexera.ris.persistence.beans.entities.domain.SectionA;
-import it.nexera.ris.persistence.beans.entities.domain.SectionC;
-import it.nexera.ris.persistence.beans.entities.domain.Subject;
-import it.nexera.ris.persistence.beans.entities.domain.User;
-import it.nexera.ris.persistence.beans.entities.domain.WLGInbox;
-import it.nexera.ris.persistence.view.ClientView;
-import it.nexera.ris.settings.ApplicationSettingsHolder;
-import it.nexera.ris.web.beans.EntityEditPageBean;
-import it.nexera.ris.web.beans.base.AccessBean;
-import it.nexera.ris.web.beans.wrappers.logic.SubjectWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.UploadDocumentWrapper;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.model.SelectItem;
+import java.io.File;
+import java.io.Serializable;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 @ManagedBean(name = "requestEditBean")
@@ -112,11 +75,16 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private Long selectedRequestTypeId;
 
+    @Getter
+    @Setter
+    private Long selectedRequestTypesIdMultiple;
+
+
     private List<SelectItem> requestTypes;
 
     private Long selectedServiceId;
 
-    private List<String> selectedServiceIds;
+    private Long[] selectedServiceIds;
 
     private List<SelectItem> services;
 
@@ -141,6 +109,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private Boolean performEdit;
 
     private List<InputCard> inputCardList;
+
+    private List<InputCard> hiddenInputCardList;
 
     private RequestWrapper wrapper;
 
@@ -170,6 +140,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private List<RequestViewWrapper> shownFields;
 
+    private List<RequestViewWrapper> hiddenFields;
     private WLGInbox mail;
 
     private Long selectedOldRequestId;
@@ -191,8 +162,6 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private List<SelectItem> agencyOfficeList;
 
     private boolean hasAgencyOfficeList;
-
-    private Long selectedAgencyOfficeId;
 
     private List<SelectItem> notaryList;
 
@@ -256,22 +225,112 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private String multipleReqMessage;
 
-    private boolean enabled;
+    private boolean multipleRequestCreate;
+
+    private final String MULTIPLE_REQUEST = "RICHESTE_MULTIPLE";
+
+    private List<String> mutipleRequestFirstObjTabPath;
+
+    private List<String> mutipleRequestObjTabPath;
+
+    private List<String> mutipleRequestNDGPath;
+
+    private Map<Long , Request>  multiRequestMap;
+
+    private List<ServiceRequestWrapper> regSubjectList;
+
+    private String cdr;
+
+    private String ndg;
+
+    private String position;
+
+    private boolean editRequest;
+
+    private String yearRange;
+
+    private Boolean urgent;
+
+    private Integer requestType;
+
+    private Long selectedOfficeId;
+
+    private List<SelectItem> officeList;
+
+    private Long selectedFiduciaryId;
+
+    private List<SelectItem> fiduciaryList;
+
+    @Getter
+    @Setter
+    private Boolean showConfirmButton;
+
+    @Getter
+    @Setter
+    private Boolean showAddServiceButton;
+
+    @Getter
+    @Setter
+    private Map<Long, List<Long>> subjectListServiceIds;
+
+    @Getter
+    @Setter
+    private Map<Long, List<SelectItem>> subjectListServices;
+
+    @Getter
+    @Setter
+    private List<Document> requestDocuments;
+
+    @Getter
+    @Setter
+    private Boolean requestTypeMultiple;
+
+    private List<Request> newRequestList;
+
+    private List<Request> updatedNewRequestList;
+
+    private String selectedIdForDelete;
+
+    private boolean showServiceTable;
+
+    private Request originalRequest;
+
+    List<Request> associatedRequests;
+
+    List<String> updatedPropertyNames;
+
+    private Boolean saveAssociatedRequests;
 
     @Override
     protected void preLoad() throws PersistenceBeanException {
-        if (Boolean.parseBoolean(getRequestParameter(RedirectHelper.MULTIPLE))) {
+        setMultiRequestMap(new HashMap());
+        setSaveAssociatedRequests(false);
+        setRequestTypeMultiple(Boolean.FALSE);
+        setYearRange("1930:" + (DateTimeHelper.getYearOfNow()+ 10));
+        setRequestType(-1);
+        if (!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.MULTIPLE)) &&
+                Boolean.parseBoolean(getRequestParameter(RedirectHelper.MULTIPLE))) {
             setMultipleCreate(true);
+            if(!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.FROM_PARAMETER)) &&
+                    getRequestParameter(RedirectHelper.FROM_PARAMETER).equalsIgnoreCase(MULTIPLE_REQUEST)){
+                setMultipleRequestCreate(true);
+            }
+            if(!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.REQUEST_TYPE_PARAM))){
+                Integer requestType = Integer.parseInt(getRequestParameter(RedirectHelper.REQUEST_TYPE_PARAM));
+                if(requestType > -1){
+                    setRequestType(requestType);
+                }
+            }
         }
         if (getRequestParameter(RedirectHelper.MAIL) != null) {
             setRedirectFromMail(getRequestParameter(RedirectHelper.MAIL));
             try {
                 WLGInbox mail = DaoManager.get(WLGInbox.class,new CriteriaAlias[]{
-                        new CriteriaAlias("client", "client", JoinType.INNER_JOIN)
-                },
+                                new CriteriaAlias("client", "client", JoinType.INNER_JOIN)
+                        },
                         new Criterion[]{
                                 Restrictions.eq("id", Long.parseLong(getRequestParameter(RedirectHelper.MAIL)))
-                });
+                        });
                 if(mail != null ) {
                     setMail(mail);
                 }else
@@ -286,12 +345,17 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 setMail(DaoManager.get(WLGInbox.class,
                         Long.parseLong(getRequestParameter(RedirectHelper.ARCHIVE_MAIL))));
                 getMail().setState(MailManagerStatuses.ARCHIVED.getId());
+                log.info("setting mail :: "+getMail().getId() + " state to :: "+MailManagerStatuses.findById(getMail().getState())
+                        + " by user:: "+ getCurrentUser().getId());
             } catch (Exception e) {
                 LogHelper.log(log, e);
             }
         }
         if (getMail() != null) {
             try {
+                setNdg(getMail().getNdg());
+                setCdr(getMail().getCdr());
+                setPosition(getMail().getReferenceRequest());
                 List<String> onlyEmails = MailHelper.getOnlyEmails(getMail().getEmailFrom());
                 if (!ValidationHelper.isNullOrEmpty(onlyEmails)) {
                     List<Client> clients = DaoManager.load(Client.class, new CriteriaAlias[]{
@@ -308,15 +372,22 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 LogHelper.log(log, e);
             }
         }
-
     }
 
     private void presetParamsFromMail(WLGInbox mail) {
+        if(!ValidationHelper.isNullOrEmpty(mail.getOffice())){
+            setSelectedOfficeId(mail.getOffice().getId());
+        }
+        if(!ValidationHelper.isNullOrEmpty(mail.getClientFiduciary())){
+            setSelectedFiduciaryId(mail.getClientFiduciary().getId());
+        }
+        if (!ValidationHelper.isNullOrEmpty(mail.getManagers())) {
+            prepareFiduciaryClientsList(mail.getManagers());
+        }
         if (!ValidationHelper.isNullOrEmpty(mail.getClientFiduciary())) {
             getEntity().setClient(mail.getClientFiduciary());
             if (!ValidationHelper.isNullOrEmpty(mail.getManagers())) {
                 getEntity().setRequestMangerList(mail.getManagers());
-                prepareFiduciaryClientsList(mail.getManagers());
             }
         } else {
             getEntity().setClient(mail.getManagers().get(0));
@@ -337,12 +408,34 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
-    InstantiationException, IllegalAccessException {
+            InstantiationException, IllegalAccessException {
+        if(!getEntity().isNew()){
+            try {
+                Request originalRequest = DaoManager.get(Request.class, getEntity().getId());
+                setOriginalRequest(originalRequest.copy());
+            } catch (CloneNotSupportedException e) {
+            }
+        }
+
+        setShowServiceTable(Boolean.TRUE);
+        setOfficeList(ComboboxHelper.fillList(Office.class, Order.asc("description")));
+        setFiduciaryList(ComboboxHelper.fillList(ClientView.class, Order.asc("name"), new Criterion[]{
+                Restrictions.and(Restrictions.eq("fiduciary", Boolean.TRUE),
+                        Restrictions.isNotNull("fiduciary"))
+        }));
+
+        if(getEntity().isNew())
+            setEditRequest(false);
+        else{
+            setEditRequest(true);
+            if(!ValidationHelper.isNullOrEmpty(getEntity().getRequestType())){
+                setRequestType(getEntity().getRequestType().getId().intValue());
+            }
+        }
+
         boolean dataFromEmail = false;
         setClientSelectItemWrapperConverter(new SelectItemWrapperConverter<>(Client.class));
         if (!ValidationHelper.isNullOrEmpty(getMail())) {
-            getEntity().setNdg(!ValidationHelper.isNullOrEmpty(getMail().getNdg()) ? getMail().getNdg() : null);
-            getEntity().setCdr(!ValidationHelper.isNullOrEmpty(getMail().getCdr()) ? getMail().getCdr() : null);
             if ((!ValidationHelper.isNullOrEmpty(getMail().getManagers()) ||
                     !ValidationHelper.isNullOrEmpty(getMail().getClientFiduciary()))) {
                 presetParamsFromMail(getMail());
@@ -364,7 +457,20 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             setMultipleCreate(true);
         }
         generateMenuModel();
+        validateRequestCreationType();
         if (isMultipleCreate()) {
+            if(isMultipleRequestCreate()){
+                setMutipleRequestFirstObjTabPath(new ArrayList<>());
+                getMutipleRequestFirstObjTabPath().add(ManageTypeFields.POSITION_PRACTICE.getPath());
+                getMutipleRequestFirstObjTabPath().add(ManageTypeFields.NOTE.getPath());
+                getMutipleRequestFirstObjTabPath().add(ManageTypeFields.URGENT.getPath());
+                getMutipleRequestFirstObjTabPath().add(ManageTypeFields.ATTACHED_DOCUMENTS.getPath());
+                setMutipleRequestNDGPath(new ArrayList<>());
+                getMutipleRequestNDGPath().add(ManageTypeFields.NDG.getPath());
+                setMutipleRequestObjTabPath(new ArrayList<>());
+                //mutipleRequestObjTabPath = new ArrayList<>();
+                getMutipleRequestObjTabPath().add(ManageTypeFields.CDR.getPath());
+            }
             setMultipleTabPath("requestComponents/SUBJECT_MASTERY.xhtml");
         } else {
             setMultipleTabPath("");
@@ -413,23 +519,94 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             setSelectedNotaryId(getEntity().getNotary().getId());
         }
 
+        if(!getEntity().isNew()){
+            if (getEntity().getCdr() != null) {
+                setCdr(getEntity().getCdr());
+            }
+
+            if (getEntity().getNdg() != null) {
+                setNdg(getEntity().getNdg());
+            }
+
+            if (getEntity().getPosition() != null) {
+                setPosition(getEntity().getPosition());
+            }
+        }
+
+        if (getEntity().getUrgent() != null) {
+            setUrgent(getEntity().getUrgent());
+        }
+
         onClientChange(dataFromEmail);
         setSelectedAgencyId(getEntity().getAgency() != null ? getEntity().getAgency().getId() : null);
-        setSelectedAgencyOfficeId(getEntity().getOffice() != null ? getEntity().getOffice().getId() : null);
+        if(!getEntity().isNew()){
+            setSelectedOfficeId(getEntity().getOffice() != null ? getEntity().getOffice().getId() : null);
+        }
+
+        if(!getEntity().isNew())
+            setSelectedFiduciaryId(getEntity().getClientFiduciary() != null ? getEntity().getClientFiduciary().getId() : null);
 
         if (!dataFromEmail) {
             setSelectedBillingClientId(getEntity().getBillingClient() != null ? getEntity().getBillingClient().getId() : null);
         }
 
         setRequestTypes(ComboboxHelper.fillList(RequestType.class));
-        setSelectedRequestTypeId(getEntity().getRequestType() != null ? getEntity().getRequestType().getId() : null);
+        if(isMultipleRequestCreate()){
+            if(getEntity().getRequestType() != null){
+                setSelectedRequestTypesIdMultiple(getEntity().getRequestType().getId());
+                getMultiRequestMap().put(getEntity().getRequestType().getId(),getEntity());
+                setShowAddServiceButton(Boolean.TRUE);
+            }else {
+                setShowAddServiceButton(Boolean.FALSE);
+            }
+        }else{
+            setSelectedRequestTypeId(getEntity().getRequestType() != null ? getEntity().getRequestType().getId() : null);
+        }
+
         onRequestTypeChange();
 
-        setSelectedServiceId(getEntity().getService() != null ? getEntity().getService().getId() : null);
-        setSelectedServiceIds(getEntity().getMultipleServices() != null ? getEntity().getMultipleServices().stream()
-                .map(Service::getId).map(i -> Long.toString(i)).collect(Collectors.toList()) : null);
-        onServiceChange();
+        List<Long> serviceIdsList = null;
+        if(!ValidationHelper.isNullOrEmpty(getEntity().getRequestType())
+                && !ValidationHelper.isNullOrEmpty(getEntity().getRequestType().getMultiselectionOperation()) &&
+                getEntity().getRequestType().getMultiselectionOperation()){
+            serviceIdsList = getEntity().getMultipleServices() != null
+                    ? getEntity().getMultipleServices().stream()
+                    .map(Service::getId).collect(Collectors.toList()) : null;
+            if(ValidationHelper.isNullOrEmpty(serviceIdsList) && !ValidationHelper.isNullOrEmpty(getEntity().getService())){
+                serviceIdsList = new ArrayList<>();
+                serviceIdsList.add(getEntity().getService().getId());
+            }
+            setRequestTypeMultiple(Boolean.TRUE);
+        }else {
+            if(!ValidationHelper.isNullOrEmpty(getEntity().getService())){
+                setSelectedServiceId( getEntity().getService().getId());
+                serviceIdsList = new ArrayList<>();
+                serviceIdsList.add(getSelectedServiceId());
+            }else if(!ValidationHelper.isNullOrEmpty(getEntity().getMultipleServices())){
+                serviceIdsList = getEntity().getMultipleServices() != null
+                        ? getEntity().getMultipleServices().stream()
+                        .map(Service::getId).collect(Collectors.toList()) : null;
+            }
+            setRequestTypeMultiple(Boolean.FALSE);
+        }
 
+        if(serviceIdsList != null && !serviceIdsList.isEmpty()) {
+            setSelectedServiceIds(serviceIdsList.toArray(new Long[serviceIdsList.size()]));
+            setShowConfirmButton(Boolean.TRUE);
+            generateDynamicContent(false);
+        } else {
+            setShowConfirmButton(Boolean.FALSE);
+            setSelectedServiceIds(new Long[1]);
+        }
+
+//        if(isMultipleRequestCreate()
+//                && ValidationHelper.isNullOrEmpty(getEntity().getMultipleServices()) &&
+//                !ValidationHelper.isNullOrEmpty(getEntity().getService())){
+//            Long [] serviceId = {getEntity().getService().getId()};
+//            setSelectedServiceIds(serviceId);
+//        }
+
+        onServiceChange();
         fillRequestEnumTypes();
 
         setUsers(ComboboxHelper.fillList(User.class, Order.asc("createDate"), new Criterion[]{
@@ -453,8 +630,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 getAttachments().add(attachment);
             }
         }
-        setWrapper(new RequestWrapper(getEntity(), isMultipleCreate()));
-
+        setWrapper(new RequestWrapper(getEntity(), isMultipleCreate(), false));
         setSubject(getEntity().getSubject() != null ? getEntity().getSubject() : new Subject());
         setResidence(getEntity().getResidence() != null ? getEntity().getResidence() : new Residence());
         setDomicile(getEntity().getDomicile() != null ? getEntity().getDomicile() : new Residence());
@@ -465,7 +641,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         setServiceUpdate(false);
         Hibernate.initialize(getEntity().getRequestFormalities());
         Hibernate.initialize(getEntity().getRequestSubjects());
-        
+
         fillSubjectWrapperList(getEntity());
         setSubjectWrapper(new SubjectWrapper());
 
@@ -475,6 +651,10 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 SelectItemHelper.addItemToListIfItIsNotInIt(getClients(), mail.getClient());
                 setSelectedClientId(mail.getClient().getId());
             }
+        }
+        openRequestSubjectDialog(Boolean.FALSE);
+        if(ValidationHelper.isNullOrEmpty(this.getEntity().getUser())) {
+            this.getEntity().setUser(DaoManager.get(User.class, getCurrentUser().getId()));
         }
     }
 
@@ -515,14 +695,14 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 sbjWrp.setSelectedSexTypeId(sbj.getSexType() != null ? sbj.getSexType().getId() : null);
                 sbjWrp.setFiscalCode(sbj.getFiscalCode());
                 sbjWrp.setNumberVAT(sbj.getNumberVAT());
-                
+
                 RequestSubject requestSubject = request.getRequestSubjects().stream()
                         .filter(f -> f.getSubject().getId().equals(sbj.getId()))
                         .filter(f -> f.getRequest().getId().equals(request.getId())).findFirst().orElse(null);
                 if(!ValidationHelper.isNullOrEmpty(requestSubject)) {
                     sbjWrp.setSectionCType(requestSubject.getType());
                 }
-                
+
                 if (sbj.getTypeIsPhysicalPerson()) {
                     sbjWrp.setSelectedNationId(sbj.getCountry() != null ? sbj.getCountry().getId() : null);
                 } else {
@@ -546,15 +726,22 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private void generateMenuModel() {
         setTopMenuModel(new DefaultMenuModel());
         if (isMultipleCreate()) {
-            addMenuItem(ResourcesHelper.getString("requestSubjectTab"));
-            addMenuItem(ResourcesHelper.getString("requestFirstTab"));
-            addMenuItem(ResourcesHelper.getString("requestMultipleTab"));
-            addMenuItem(ResourcesHelper.getString("requestLastTab"));
+            if(isMultipleRequestCreate()){
+                addMenuItem(ResourcesHelper.getString("requestSubjectTab"));
+                addMenuItem(ResourcesHelper.getString("requestFirstTab"));
+                addMenuItem(ResourcesHelper.getString("requestServiceTab"));
+                addMenuItem(ResourcesHelper.getString("requestLastTab"));
+            }else{
+                addMenuItem(ResourcesHelper.getString("requestSubjectTab"));
+                addMenuItem(ResourcesHelper.getString("requestFirstTab"));
+                addMenuItem(ResourcesHelper.getString("requestMultipleTab"));
+                addMenuItem(ResourcesHelper.getString("requestLastTab"));
+            }
         } else {
             addMenuItem(ResourcesHelper.getString("requestFirstTab"));
             if (!ValidationHelper.isNullOrEmpty(getInputCardList())) {
                 getInputCardList()
-                .forEach(card -> addMenuItem(card.getName().toUpperCase()));
+                        .forEach(card -> addMenuItem(card.getName().toUpperCase()));
             }
             addMenuItem(ResourcesHelper.getString("requestLastTab"));
         }
@@ -612,10 +799,10 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if ((SubjectType.PHYSICAL_PERSON.getId().equals(getWrapper().getSelectedPersonId())
                 && !ValidationHelper.isNullOrEmpty(getSubject().getFiscalCode()))
                 || (SubjectType.LEGAL_PERSON.getId().equals(getWrapper().getSelectedPersonId())
-                        && !ValidationHelper.isNullOrEmpty(getSubject().getNumberVAT()))) {
+                && !ValidationHelper.isNullOrEmpty(getSubject().getNumberVAT()))) {
             List<Subject> subjectList = DaoManager.load(Subject.class, new Criterion[]{
                     SubjectType.PHYSICAL_PERSON.getId().equals(getWrapper().getSelectedPersonId())
-                    ? Restrictions.eq("fiscalCode", getSubject().getFiscalCode())
+                            ? Restrictions.eq("fiscalCode", getSubject().getFiscalCode())
                             : Restrictions.eq("numberVAT", getSubject().getNumberVAT())
             });
             if (!ValidationHelper.isNullOrEmpty(subjectList)) {
@@ -711,12 +898,12 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                                     Restrictions.eq("deleted", Boolean.FALSE),
                                     Restrictions.isNull("deleted"))
 //                            ,Restrictions.eq("fiduciary", true)
-                            });
+                    });
                 }
                 if (ValidationHelper.isNullOrEmpty(getFiduciaryClients())) {
                     setFiduciaryClients(new ArrayList<>());
                 }
-                
+
 //                if (!ValidationHelper.isNullOrEmpty(clients)) {
 //                    for (Client item : clients.stream()
 //                            .filter(c -> getFiduciaryClients().stream().noneMatch(x -> x.getId().equals(c.getId())))
@@ -726,7 +913,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 //                        getClientSelectItemWrapperConverter().getWrapperList().add(selectItem);
 //                    }
 //                }
-                
+
                 if (!ValidationHelper.isNullOrEmpty(clients)) {
                     List<Client> managers =  clients
                             .stream()
@@ -781,8 +968,14 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     }
 
-    public void onRequestTypeChange() throws IllegalAccessException, PersistenceBeanException {
-        setServices(RequestHelper.onRequestTypeChange(getSelectedRequestTypeId(), isMultipleCreate()));
+    public void onRequestTypeChange() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+        if(isMultipleRequestCreate() && !ValidationHelper.isNullOrEmpty(getSelectedRequestTypesIdMultiple())){
+            setServices(RequestHelper.onRequestTypeChange(getSelectedRequestTypesIdMultiple(), isMultipleCreate(),
+                    getSelectedClientId()));
+        }else{
+            setServices(RequestHelper.onRequestTypeChange(getSelectedRequestTypeId(), isMultipleCreate(),
+                    getSelectedClientId()));
+        }
     }
 
     public void onServiceChange() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -791,8 +984,21 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     }
 
     public void onMultipleServiceChange() throws PersistenceBeanException, IllegalAccessException {
-        setInputCardList(RequestHelper.onMultipleServiceChange(getSelectedServiceIds().stream().map(Long::parseLong)
-                .collect(Collectors.toList())));
+        if(!ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
+            setInputCardList(RequestHelper.onMultipleServiceChange(
+                    Arrays.asList(getSelectedServiceIds()), isMultipleRequestCreate()));
+            setHiddenInputCardList(RequestHelper.onMultipleServiceChange(
+                    Arrays.asList(getSelectedServiceIds()), isMultipleRequestCreate(), true));
+        }else if(!ValidationHelper.isNullOrEmpty(getSelectedServiceId())){
+            setInputCardList(RequestHelper.onMultipleServiceChange(Stream.of(getSelectedServiceId()).collect(Collectors.toList()),
+                    isMultipleRequestCreate()));
+            setHiddenInputCardList(RequestHelper.onMultipleServiceChange(Stream.of(getSelectedServiceId()).collect(Collectors.toList()),
+                    isMultipleRequestCreate(), true));
+        }
+
+//        if(isMultipleRequestCreate()){
+//            generateTab();
+//        }
     }
 
     /**
@@ -815,6 +1021,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         setActiveMenuTabNum(getActiveMenuTabNum() - 1);
         if (isMultipleCreate() && getActiveMenuTabNum() == 1) {
             setShownFields(null);
+            setHiddenFields(null);
             return;
         }
         if (isMultipleCreate() && getActiveMenuTabNum() == 2) {
@@ -822,8 +1029,10 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }
         if (getActiveMenuTabNum() > 0) {
             generateTab();
+            generateHiddenFields();
         } else {
             setShownFields(null);
+            setHiddenFields(null);
         }
 
         updateForm();
@@ -837,13 +1046,22 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if (isMultipleCreate() && getActiveMenuTabNum() == 1) {
             return true;
         }
-        if (isMultipleCreate() && getActiveMenuTabNum() == 2) {
+        if ((isMultipleCreate() && getActiveMenuTabNum() == 2) ) {
             onMultipleServiceChange();
             generateTab();
-        } else if (getInputCardList() != null && getActiveMenuTabNum() <= getInputCardList().size()) {
+            generateHiddenFields();
+        }
+        else if ((isMultipleRequestCreate() && getActiveMenuTabNum() == 3) ) {
+            if(!ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
+                onMultipleServiceChange();
+                generateTab();
+                generateHiddenFields();
+            }
+        } else if (getInputCardList() != null && (getActiveMenuTabNum() <= getInputCardList().size() || (isMultipleRequestCreate() && getActiveMenuTabNum() == 3) )) {
             generateTab();
         } else {
             setShownFields(null);
+            setHiddenFields(null);
         }
 
         updateForm();
@@ -869,95 +1087,230 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     public void generateTab() throws PersistenceBeanException, IllegalAccessException {
         List<InputCardManageField> listWithPos;
         List<InputCardManageField> listNoPos;
-        if (isMultipleCreate()) {
-            listWithPos = new ArrayList<>();
-            listNoPos = new ArrayList<>(getInputCardList().get(0).getFields());
-        } else {
-            listWithPos = new ArrayList<>(getInputCardList()
-                    .get(getActiveMenuTabNum() - 1).getFields().stream()
-                    .filter(f -> f.getPosition() != null).collect(Collectors.toList()));
+        if(!ValidationHelper.isNullOrEmpty(getInputCardList())){
+            if (isMultipleCreate()) {
+                listWithPos = new ArrayList<>();
+                listNoPos = new ArrayList<>(getInputCardList().get(0).getFields());
+            } else {
+                listWithPos = new ArrayList<>(getInputCardList()
+                        .get(getActiveMenuTabNum() - 1).getFields().stream()
+                        .filter(f -> f.getPosition() != null).collect(Collectors.toList()));
 
-            listNoPos = new ArrayList<>(getInputCardList()
-                    .get(getActiveMenuTabNum() - 1).getFields().stream()
-                    .filter(f -> f.getPosition() == null).collect(Collectors.toList()));
-        }
-        List<RequestViewWrapper> wrappers = new ArrayList<>();
-        for (int i = 0; ; i++) {
-            if (listWithPos.isEmpty()) {
-                break;
+                listNoPos = new ArrayList<>(getInputCardList()
+                        .get(getActiveMenuTabNum() - 1).getFields().stream()
+                        .filter(f -> f.getPosition() == null).collect(Collectors.toList()));
             }
-            RequestViewWrapper wrapper = new RequestViewWrapper();
-            wrapper.setLineNum(i);
-            wrapper.setFields(new ArrayList<>());
-            for (int j = 1; j <= 4; j++) {
-                int pos = i * 4 + j;
-                InputCardManageField field = listWithPos
-                        .stream().filter(f -> f.getPosition() != null && f.getPosition().equals(pos))
-                        .findFirst().orElse(null);
-                if (field != null) {
-                    listWithPos.remove(field);
+
+            List<RequestViewWrapper> wrappers = new ArrayList<>();
+            for (int i = 0; ; i++) {
+                if (listWithPos.isEmpty()) {
+                    break;
                 }
-                if (field == null || !field.getField().getEnumPropsWrapper().isHasManyFields()) {
-                    wrapper.getFields().add(field);
-                } else {
-                    wrapper.setOneElement(true);
-                    wrapper.setField(field);
-                    // break;
-                }
-            }
-            wrappers.add(wrapper);
-        }
-        for (int i = wrappers.size(); ; i++) {
-            if (listNoPos.isEmpty()) {
-                break;
-            }
-            RequestViewWrapper wrapper = new RequestViewWrapper();
-            RequestViewWrapper additional = null;
-            wrapper.setLineNum(i);
-            wrapper.setFields(new ArrayList<>());
-            for (int j = 0; j < 4; j++) {
-                if (!listNoPos.isEmpty()) {
-                    InputCardManageField field = listNoPos.get(0);
-                    listNoPos.remove(field);
+                RequestViewWrapper wrapper = new RequestViewWrapper();
+                wrapper.setLineNum(i);
+                wrapper.setFields(new ArrayList<>());
+                for (int j = 1; j <= 4; j++) {
+                    int pos = i * 4 + j;
+                    InputCardManageField field = listWithPos
+                            .stream().filter(f -> f.getPosition() != null && f.getPosition().equals(pos))
+                            .findFirst().orElse(null);
+                    if (field != null) {
+                        listWithPos.remove(field);
+                    }
                     if (field == null || !field.getField().getEnumPropsWrapper().isHasManyFields()) {
                         wrapper.getFields().add(field);
                     } else {
-                        i++;
-                        j--;
-                        additional = new RequestViewWrapper();
-                        additional.setLineNum(i);
-                        additional.setOneElement(true);
-                        additional.setField(field);
-                        break;
+                        wrapper.setOneElement(true);
+                        wrapper.setField(field);
+                        // break;
                     }
                 }
-            }
-            if (!ValidationHelper.isNullOrEmpty(wrapper.getFields())) {
                 wrappers.add(wrapper);
-            } else {
-                additional.setLineNum(additional.getLineNum() - 1);
             }
-            if (additional != null) {
-                wrappers.add(additional);
+            for (int i = wrappers.size(); ; i++) {
+                if (listNoPos.isEmpty()) {
+                    break;
+                }
+                RequestViewWrapper wrapper = new RequestViewWrapper();
+                RequestViewWrapper additional = null;
+                wrapper.setLineNum(i);
+                wrapper.setFields(new ArrayList<>());
+                for (int j = 0; j < 4; j++) {
+                    if (!listNoPos.isEmpty()) {
+                        InputCardManageField field = listNoPos.get(0);
+                        listNoPos.remove(field);
+                        if (field == null || !field.getField().getEnumPropsWrapper().isHasManyFields()) {
+                            wrapper.getFields().add(field);
+                        } else {
+                            i++;
+                            j--;
+                            additional = new RequestViewWrapper();
+                            additional.setLineNum(i);
+                            additional.setOneElement(true);
+                            additional.setField(field);
+                            break;
+                        }
+                    }
+                }
+                if (!ValidationHelper.isNullOrEmpty(wrapper.getFields())) {
+                    wrappers.add(wrapper);
+                } else {
+                    additional.setLineNum(additional.getLineNum() - 1);
+                }
+                if (additional != null) {
+                    wrappers.add(additional);
+                }
             }
-        }
-        setShownFields(wrappers);
-        if (isMultipleCreate()) {
-            getWrapper().setLists(getInputCardList().get(0).getFields());
-        } else {
-            getWrapper().setLists(getInputCardList().get(getActiveMenuTabNum() - 1).getFields());
+            setShownFields(wrappers);
+            if (isMultipleCreate() && !ValidationHelper.isNullOrEmpty(getInputCardList())) {
+                getWrapper().setLists(getInputCardList().get(0).getFields());
+            } else if(!ValidationHelper.isNullOrEmpty(getInputCardList())){
+                getWrapper().setLists(getInputCardList().get(getActiveMenuTabNum() - 1).getFields());
+            }
         }
     }
 
-    public boolean valid() {
+    public void generateHiddenFields() throws PersistenceBeanException, IllegalAccessException {
+        List<InputCardManageField> listWithPos;
+        List<InputCardManageField> listNoPos;
+        if(!ValidationHelper.isNullOrEmpty(getHiddenInputCardList())){
+            if (isMultipleCreate()) {
+                listWithPos = new ArrayList<>();
+                listNoPos = new ArrayList<>(getHiddenInputCardList().get(0).getFields());
+            } else {
+                listWithPos = new ArrayList<>(getHiddenInputCardList()
+                        .get(getActiveMenuTabNum() - 1).getFields().stream()
+                        .filter(f -> f.getPosition() != null).collect(Collectors.toList()));
+
+                listNoPos = new ArrayList<>(getHiddenInputCardList()
+                        .get(getActiveMenuTabNum() - 1).getFields().stream()
+                        .filter(f -> f.getPosition() == null).collect(Collectors.toList()));
+            }
+
+            List<RequestViewWrapper> wrappers = new ArrayList<>();
+            for (int i = 0; ; i++) {
+                if (listWithPos.isEmpty()) {
+                    break;
+                }
+                RequestViewWrapper wrapper = new RequestViewWrapper();
+                wrapper.setLineNum(i);
+                wrapper.setFields(new ArrayList<>());
+                for (int j = 1; j <= 4; j++) {
+                    int pos = i * 4 + j;
+                    InputCardManageField field = listWithPos
+                            .stream().filter(f -> f.getPosition() != null && f.getPosition().equals(pos))
+                            .findFirst().orElse(null);
+                    if (field != null) {
+                        listWithPos.remove(field);
+                    }
+                    if (field == null || !field.getField().getEnumPropsWrapper().isHasManyFields()) {
+                        wrapper.getFields().add(field);
+                    } else {
+                        wrapper.setOneElement(true);
+                        wrapper.setField(field);
+                        // break;
+                    }
+                }
+                wrappers.add(wrapper);
+            }
+            for (int i = wrappers.size(); ; i++) {
+                if (listNoPos.isEmpty()) {
+                    break;
+                }
+                RequestViewWrapper wrapper = new RequestViewWrapper();
+                RequestViewWrapper additional = null;
+                wrapper.setLineNum(i);
+                wrapper.setFields(new ArrayList<>());
+                for (int j = 0; j < 4; j++) {
+                    if (!listNoPos.isEmpty()) {
+                        InputCardManageField field = listNoPos.get(0);
+                        listNoPos.remove(field);
+                        if (field == null || !field.getField().getEnumPropsWrapper().isHasManyFields()) {
+                            wrapper.getFields().add(field);
+                        } else {
+                            i++;
+                            j--;
+                            additional = new RequestViewWrapper();
+                            additional.setLineNum(i);
+                            additional.setOneElement(true);
+                            additional.setField(field);
+                            break;
+                        }
+                    }
+                }
+                if (!ValidationHelper.isNullOrEmpty(wrapper.getFields())) {
+                    wrappers.add(wrapper);
+                } else {
+                    additional.setLineNum(additional.getLineNum() - 1);
+                }
+                if (additional != null) {
+                    wrappers.add(additional);
+                }
+            }
+            setHiddenFields(wrappers);
+            if (isMultipleCreate() && !ValidationHelper.isNullOrEmpty(getHiddenInputCardList())) {
+                getWrapper().setLists(getHiddenInputCardList().get(0).getFields());
+            } else if(!ValidationHelper.isNullOrEmpty(getHiddenInputCardList())){
+                getWrapper().setLists(getHiddenInputCardList().get(getActiveMenuTabNum() - 1).getFields());
+            }
+        }
+    }
+
+    public boolean valid() throws PersistenceBeanException, IllegalAccessException {
         if (isMultipleCreate() && getActiveMenuTabNum() == 0) {
             return validSubject();
         } else if ((!isMultipleCreate() && getActiveMenuTabNum() == 0)
                 || (isMultipleCreate() && getActiveMenuTabNum() == 1)) {
             return validFirstTab();
-        } else if (getActiveMenuTabNum() <= getInputCardList().size()) {
+        } else if (!isMultipleRequestCreate() && !ValidationHelper.isNullOrEmpty(getInputCardList()) &&
+                getActiveMenuTabNum() <= getInputCardList().size()) {
             return validGeneratedTab();
-        } else return true;
+        } else if (isMultipleCreate() && getActiveMenuTabNum() == 2) {
+
+            this.cleanValidation();
+
+            if( getEntity().isNew() && ValidationHelper.isNullOrEmpty(getRegSubjectList())){
+                if (ValidationHelper.isNullOrEmpty(getSelectedRequestTypesIdMultiple())) {
+                    addRequiredFieldException("form:servicerequestType");
+                }
+                if(!ValidationHelper.isNullOrEmpty(getSelectedRequestTypesIdMultiple())){
+                    try {
+                        if(!ValidationHelper.isNullOrEmpty(getRequestTypeMultiple())
+                                && getRequestTypeMultiple()){
+                            if (ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
+                                addRequiredFieldException("form:multipleServiceRequest");
+                            }
+                        }else {
+                            if (ValidationHelper.isNullOrEmpty(getSelectedServiceId())) {
+                                addRequiredFieldException("form:singleServiceRequest");
+                            }
+                        }
+                    } catch (Exception e) {
+                        LogHelper.log(log, e);
+                    }
+                }
+                return !getValidationFailed();
+            }else if(!getEntity().isNew()){
+                if (!ValidationHelper.isNullOrEmpty(getSelectedRequestTypesIdMultiple())) {
+                    try {
+                        if(!ValidationHelper.isNullOrEmpty(getRequestTypeMultiple())
+                                && getRequestTypeMultiple()){
+                            if (ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
+                                addRequiredFieldException("form:multipleServiceRequest");
+                            }
+                        }else {
+                            if (ValidationHelper.isNullOrEmpty(getSelectedServiceId())) {
+                                addRequiredFieldException("form:singleServiceRequest");
+                            }
+                        }
+                    } catch (Exception e) {
+                        LogHelper.log(log, e);
+                    }
+                }
+                return !getValidationFailed();
+            }
+            return true;
+        }else return true;
     }
 
     private boolean validGeneratedTab() {
@@ -1012,7 +1365,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                     addRequiredFieldException(DocumentValidation.SUBJECT_MASTERY_BIRTHDAY.name());
                 if (!ValidationHelper.isNullOrEmpty(getSubject().getBirthDate())
                         && (getSubject().getBirthDate().after(new Date())
-                                || getSubject().getBirthDate().before(DateTimeHelper.getHundredFiveBefore()))) {
+                        || getSubject().getBirthDate().before(DateTimeHelper.getHundredFiveBefore()))) {
                     addRequiredFieldException(DocumentValidation.SUBJECT_MASTERY_BIRTHDAY.name());
 
                 }
@@ -1078,119 +1431,119 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private void validateField(InputCardManageField field) {
 
         switch (field.getField()) {
-        case CONSERVATORY:
-            if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConserItemId()))
-                addRequiredFieldException(ManageTypeFields.CONSERVATORY.name());
-            break;
-        case TALOVARE:
-            if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedTaloreItemId()))
-                addRequiredFieldException(ManageTypeFields.TALOVARE.name());
-            break;
-        case PROPERTY_DATA:
-            if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedBuildingId()))
-                addRequiredFieldException("form:" + DocumentValidation.PROPERTY_DATA_LANDED_BUILDING.name());
-            if (ValidationHelper.isNullOrEmpty(getEntity().getSheet()))
-                addRequiredFieldException(DocumentValidation.PROPERTY_DATA_SHEET.name());
-            if (ValidationHelper.isNullOrEmpty(getEntity().getParticle()))
-                addRequiredFieldException(DocumentValidation.PROPERTY_DATA_PARTICLE.name());
-            break;
-        case SUBJECT_MASTERY:
-            checkSubjectMastery();
-            break;
-        case CDR:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getCdr()))
-                addRequiredFieldException(DocumentValidation.CDR.name());
-            break;
-        case NDG:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getNdg()))
-                addRequiredFieldException(DocumentValidation.NDG.name());
-            break;
-        case ULTIMA_RESIDENZA:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getUltimaResidenza()))
-                addRequiredFieldException(DocumentValidation.ULTIMA_RESIDENZA.name());
-            break;
-        case MANAGER:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getManager()))
-                addRequiredFieldException(DocumentValidation.MANAGER.name());
-            break;
-        case POSITION_PRACTICE:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getPosition()))
-                addRequiredFieldException(DocumentValidation.POSITION_PRACTICE.name());
-            break;
-        case FORMALITIES_AUTHORIZED:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getFormalityAuthorized()))
-                addRequiredFieldException(DocumentValidation.FORMALITIES_AUTHORIZED.name());
-            break;
-        case NOTE:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getNote()))
-                addRequiredFieldException(DocumentValidation.NOTE.name());
-            break;
-        case UPDATE_DATE:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getUpdateDate()))
-                addRequiredFieldException(DocumentValidation.UPDATE_DATE.name());
-            break;
-        case PROVINCE:
-            if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedProvincePropertyId()))
-                addRequiredFieldException(DocumentValidation.STANDART_PROVINCE.name());
-            break;
-        case ACT_TYPE:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getActType()))
-                addRequiredFieldException(DocumentValidation.ACT_TYPE.name());
-            break;
-        case ACT_NUMBER:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getActNumber()))
-                addRequiredFieldException(DocumentValidation.ACT_NUMBER.name());
-            break;
-        case ACT_DATE:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getActDate()))
-                addRequiredFieldException(DocumentValidation.ACT_DATE.name());
-            break;
-        case TERM_DATE:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getTermDate()))
-                addRequiredFieldException(DocumentValidation.TERM_DATE.name());
-            break;
-        case REA_NUMBER:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getReaNumber()))
-                addRequiredFieldException(DocumentValidation.REA_NUMBER.name());
-            break;
-        case NATURE_LEGAL:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getNatureLegal()))
-                addRequiredFieldException(DocumentValidation.NATURE_LEGAL.name());
-            break;
-        case ISTAT:
-            if (ValidationHelper.isNullOrEmpty(getEntity().getIstat()))
-                addRequiredFieldException(DocumentValidation.ISTAT.name());
-            break;
-        case RESIDENCE:
-            if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedResidenceProvinceId()))
-                addRequiredFieldException(DocumentValidation.RESIDENCE_PROVINCE.name());
-            else if (getWrapper().getSelectedResidenceProvinceId().equals(-1L)) {
-                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedResidenceNationId()))
-                    addRequiredFieldException(DocumentValidation.RESIDENCE_NATIONS.name());
-            } else if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedResidenceCityId()))
-                addRequiredFieldException(DocumentValidation.RESIDENCE_COMUNE.name());
-            if (ValidationHelper.isNullOrEmpty(getEntity().getResidence().getAddress()))
-                addRequiredFieldException(DocumentValidation.RESIDENCE_ADDRESS.name());
-            if (ValidationHelper.isNullOrEmpty(getEntity().getResidence().getCap()))
-                addRequiredFieldException(DocumentValidation.RESIDENCE_CAP.name());
-            break;
-        case DOMICILE:
-            if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedDomicileProvinceId()))
-                addRequiredFieldException(DocumentValidation.DOMICILE_PROVINCE.name());
-            else if (getWrapper().getSelectedDomicileProvinceId().equals(-1L)) {
-                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedDomicileNationId()))
-                    addRequiredFieldException(DocumentValidation.DOMICILE_NATIONS.name());
-            } else if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedDomicileCityId()))
-                addRequiredFieldException(DocumentValidation.DOMICILE_COMUNE.name());
-            if (ValidationHelper.isNullOrEmpty(getEntity().getDomicile().getAddress()))
-                addRequiredFieldException(DocumentValidation.DOMICILE_ADDRESS.name());
-            if (ValidationHelper.isNullOrEmpty(getEntity().getDomicile().getCap()))
-                addRequiredFieldException(DocumentValidation.DOMICILE_CAP.name());
-            break;
-        case NOTARY:
-            if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedNotaryId()))
-                addRequiredFieldException(ManageTypeFields.NOTARY.name());
-            break;
+            case CONSERVATORY:
+                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConserItemId()))
+                    addRequiredFieldException(ManageTypeFields.CONSERVATORY.name());
+                break;
+            case TALOVARE:
+                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedTaloreItemId()))
+                    addRequiredFieldException(ManageTypeFields.TALOVARE.name());
+                break;
+            case PROPERTY_DATA:
+                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedBuildingId()))
+                    addRequiredFieldException("form:" + DocumentValidation.PROPERTY_DATA_LANDED_BUILDING.name());
+                if (ValidationHelper.isNullOrEmpty(getEntity().getSheet()))
+                    addRequiredFieldException(DocumentValidation.PROPERTY_DATA_SHEET.name());
+                if (ValidationHelper.isNullOrEmpty(getEntity().getParticle()))
+                    addRequiredFieldException(DocumentValidation.PROPERTY_DATA_PARTICLE.name());
+                break;
+            case SUBJECT_MASTERY:
+                checkSubjectMastery();
+                break;
+            case CDR:
+                if (ValidationHelper.isNullOrEmpty(getCdr()))
+                    addRequiredFieldException(DocumentValidation.CDR.name());
+                break;
+            case NDG:
+                if (ValidationHelper.isNullOrEmpty(getNdg()))
+                    addRequiredFieldException(DocumentValidation.NDG.name());
+                break;
+            case ULTIMA_RESIDENZA:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getUltimaResidenza()))
+                    addRequiredFieldException(DocumentValidation.ULTIMA_RESIDENZA.name());
+                break;
+            case MANAGER:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getManager()))
+                    addRequiredFieldException(DocumentValidation.MANAGER.name());
+                break;
+            case POSITION_PRACTICE:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getPosition()))
+                    addRequiredFieldException(DocumentValidation.POSITION_PRACTICE.name());
+                break;
+            case FORMALITIES_AUTHORIZED:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getFormalityAuthorized()))
+                    addRequiredFieldException(DocumentValidation.FORMALITIES_AUTHORIZED.name());
+                break;
+            case NOTE:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getNote()))
+                    addRequiredFieldException(DocumentValidation.NOTE.name());
+                break;
+            case UPDATE_DATE:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getUpdateDate()))
+                    addRequiredFieldException(DocumentValidation.UPDATE_DATE.name());
+                break;
+            case PROVINCE:
+                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedProvincePropertyId()))
+                    addRequiredFieldException(DocumentValidation.STANDART_PROVINCE.name());
+                break;
+            case ACT_TYPE:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getActType()))
+                    addRequiredFieldException(DocumentValidation.ACT_TYPE.name());
+                break;
+            case ACT_NUMBER:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getActNumber()))
+                    addRequiredFieldException(DocumentValidation.ACT_NUMBER.name());
+                break;
+            case ACT_DATE:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getActDate()))
+                    addRequiredFieldException(DocumentValidation.ACT_DATE.name());
+                break;
+            case TERM_DATE:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getTermDate()))
+                    addRequiredFieldException(DocumentValidation.TERM_DATE.name());
+                break;
+            case REA_NUMBER:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getReaNumber()))
+                    addRequiredFieldException(DocumentValidation.REA_NUMBER.name());
+                break;
+            case NATURE_LEGAL:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getNatureLegal()))
+                    addRequiredFieldException(DocumentValidation.NATURE_LEGAL.name());
+                break;
+            case ISTAT:
+                if (ValidationHelper.isNullOrEmpty(getEntity().getIstat()))
+                    addRequiredFieldException(DocumentValidation.ISTAT.name());
+                break;
+            case RESIDENCE:
+                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedResidenceProvinceId()))
+                    addRequiredFieldException(DocumentValidation.RESIDENCE_PROVINCE.name());
+                else if (getWrapper().getSelectedResidenceProvinceId().equals(-1L)) {
+                    if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedResidenceNationId()))
+                        addRequiredFieldException(DocumentValidation.RESIDENCE_NATIONS.name());
+                } else if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedResidenceCityId()))
+                    addRequiredFieldException(DocumentValidation.RESIDENCE_COMUNE.name());
+                if (ValidationHelper.isNullOrEmpty(getEntity().getResidence().getAddress()))
+                    addRequiredFieldException(DocumentValidation.RESIDENCE_ADDRESS.name());
+                if (ValidationHelper.isNullOrEmpty(getEntity().getResidence().getCap()))
+                    addRequiredFieldException(DocumentValidation.RESIDENCE_CAP.name());
+                break;
+            case DOMICILE:
+                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedDomicileProvinceId()))
+                    addRequiredFieldException(DocumentValidation.DOMICILE_PROVINCE.name());
+                else if (getWrapper().getSelectedDomicileProvinceId().equals(-1L)) {
+                    if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedDomicileNationId()))
+                        addRequiredFieldException(DocumentValidation.DOMICILE_NATIONS.name());
+                } else if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedDomicileCityId()))
+                    addRequiredFieldException(DocumentValidation.DOMICILE_COMUNE.name());
+                if (ValidationHelper.isNullOrEmpty(getEntity().getDomicile().getAddress()))
+                    addRequiredFieldException(DocumentValidation.DOMICILE_ADDRESS.name());
+                if (ValidationHelper.isNullOrEmpty(getEntity().getDomicile().getCap()))
+                    addRequiredFieldException(DocumentValidation.DOMICILE_CAP.name());
+                break;
+            case NOTARY:
+                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedNotaryId()))
+                    addRequiredFieldException(ManageTypeFields.NOTARY.name());
+                break;
         }
     }
 
@@ -1199,15 +1552,16 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if (ValidationHelper.isNullOrEmpty(getSelectedClientId())) {
             addRequiredFieldException("form:client");
         }
-        if (ValidationHelper.isNullOrEmpty(getSelectedRequestTypeId())) {
+        if (!isMultipleRequestCreate() && ValidationHelper.isNullOrEmpty(getSelectedRequestTypeId())) {
             addRequiredFieldException("form:requestType");
         }
         if (!isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedServiceId())) {
             addRequiredFieldException("form:service");
         }
-        if (isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
+        if (isMultipleCreate() && !isMultipleRequestCreate() && ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
             addRequiredFieldException("form:multipleService");
         }
+
         return !getValidationFailed();
     }
 
@@ -1229,70 +1583,868 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     @Override
     public void onValidate() throws PersistenceBeanException, HibernateException, IllegalAccessException {
+        cleanValidation();
+        if(!ValidationHelper.isNullOrEmpty(getShownFields())){
+            getShownFields()
+                    .forEach(rw -> {
+                        if(!ValidationHelper.isNullOrEmpty(rw.getField())){
+                            if(!ValidationHelper.isNullOrEmpty(rw.getField().isRequired()) && rw.getField().isRequired()) {
+                                validateField(rw.getField());
+                            }
+                        }
+                        emptyIfNull(rw.getFields())
+                                .stream()
+                                .forEach(field -> {
+                                    if(!ValidationHelper.isNullOrEmpty(field.isRequired()) && field.isRequired()) {
+                                        validateField(field);
+                                    }
+
+                                });
+                    });
+        }
+        if(!ValidationHelper.isNullOrEmpty(getRedirected()) && !getRedirected()){
+            if (isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedRequestTypesIdMultiple())) {
+                addRequiredFieldException("form:servicerequestType");
+            }
+            if(!ValidationHelper.isNullOrEmpty(getSelectedRequestTypesIdMultiple())){
+                try {
+                    if(!ValidationHelper.isNullOrEmpty(getRequestTypeMultiple())
+                            && getRequestTypeMultiple()){
+                        if (isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
+                            addRequiredFieldException("form:multipleServiceRequest");
+                        }
+                    }else {
+                        if (isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedServiceId())) {
+                            addRequiredFieldException("form:singleServiceRequest");
+                        }
+                    }
+                } catch (Exception e) {
+                    LogHelper.log(log, e);
+                }
+            }
+
+//            if (isMultipleCreate() && ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
+//                addRequiredFieldException("form:multipleServiceRequest");
+//            }
+        }
+    }
+
+    public void validateMultipleRequest(boolean redirect) throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+        setRedirected(redirect);
+        this.cleanValidation();
+        this.onValidate();
+        if (this.getValidationFailed()) {
+            return;
+        }
+
+        boolean isShowConfirm = false;
+        if (multipleCreate && getEntity().isNew()) {
+            List<Request> listRequestBySubject = DaoManager.load(Request.class, new CriteriaAlias[]{
+                            new CriteriaAlias("subject", "subject", JoinType.INNER_JOIN)},
+                    new Criterion[]{
+                            Restrictions.eq("subject.fiscalCode", getSubject().getFiscalCode())
+                    }, Order.desc("createDate"));
+            for (Request req : emptyIfNull(listRequestBySubject)) {
+                if (!ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
+                    isShowConfirm = emptyIfNull(req.getMultipleServices()).stream().anyMatch(s -> Arrays.asList(getSelectedServiceIds()).contains(s.getId()));
+                    if (isShowConfirm)
+                        break;
+                }
+            }
+            if (isShowConfirm) {
+                setMultipleReqMessage(String
+                        .format(ResourcesHelper.getString("multipleRequestConfirm"), DateTimeHelper.toFormatedString(listRequestBySubject.get(0).getCreateDate(),
+                                DateTimeHelper.getDatePatternWithSeconds())));
+            }
+        }
+        if (isShowConfirm) {
+            executeJS("PF('multipleRequestSave').show();");
+        } else {
+            if(redirect){
+                setAssociatedRequests(new ArrayList<>());
+                setUpdatedPropertyNames(new ArrayList<>());
+                setSaveAssociatedRequests(false);
+            }
+            boolean requestUpdated = false;
+            if (redirect && !getEntity().isNew()) {
+                if (!getOriginalRequest().getSubject().getTypeId().equals(getWrapper().getSelectedPersonId())) {
+                    requestUpdated = true;
+                    getUpdatedPropertyNames().add("typeId");
+                }
+                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getClient())
+                        && ValidationHelper.isNullOrEmpty(getSelectedClientId()))
+                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getClient())
+                        && !ValidationHelper.isNullOrEmpty(getSelectedClientId()))
+                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getClient()) &&
+                        !ValidationHelper.isNullOrEmpty(getSelectedClientId()) &&
+                        !getOriginalRequest().getClient().getId().equals(getSelectedClientId()))) {
+                    requestUpdated = true;
+                    getUpdatedPropertyNames().add("client");
+                }
+
+                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getBillingClient())
+                        && ValidationHelper.isNullOrEmpty(getSelectedBillingClientId()))
+                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getBillingClient())
+                        && !ValidationHelper.isNullOrEmpty(getSelectedBillingClientId()))
+                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getBillingClient()) &&
+                        !ValidationHelper.isNullOrEmpty(getSelectedBillingClientId()) &&
+                        !getOriginalRequest().getBillingClient().getId().equals(getSelectedBillingClientId()))) {
+                    requestUpdated = true;
+                    getUpdatedPropertyNames().add("billingClient");
+                }
+
+                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNotary())
+                        && ValidationHelper.isNullOrEmpty(getSelectedNotaryId()))
+                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getNotary())
+                        && !ValidationHelper.isNullOrEmpty(getSelectedNotaryId()))
+                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNotary()) &&
+                        !ValidationHelper.isNullOrEmpty(getSelectedNotaryId()) &&
+                        !getOriginalRequest().getNotary().getId().equals(getSelectedNotaryId()))) {
+                    requestUpdated = true;
+                    getUpdatedPropertyNames().add("notary");
+                }
+
+                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getOffice())
+                        && ValidationHelper.isNullOrEmpty(getSelectedOfficeId()))
+                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getOffice())
+                        && !ValidationHelper.isNullOrEmpty(getSelectedOfficeId()))
+                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getOffice()) &&
+                        !ValidationHelper.isNullOrEmpty(getSelectedOfficeId()) &&
+                        !getOriginalRequest().getOffice().getId().equals(getSelectedOfficeId()))) {
+                    requestUpdated = true;
+                    getUpdatedPropertyNames().add("office");
+                }
+
+                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getRequestMangerList())
+                        && ValidationHelper.isNullOrEmpty(getFiduciaryClientsSelected()))
+                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getRequestMangerList())
+                        && !ValidationHelper.isNullOrEmpty(getFiduciaryClientsSelected()))
+                ) {
+                    requestUpdated = true;
+                    getUpdatedPropertyNames().add("managerList");
+                }
+
+                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getClientFiduciary())
+                        && ValidationHelper.isNullOrEmpty(getSelectedFiduciaryId()))
+                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getClientFiduciary())
+                        && !ValidationHelper.isNullOrEmpty(getSelectedFiduciaryId()))
+                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getClientFiduciary()) &&
+                        !ValidationHelper.isNullOrEmpty(getSelectedFiduciaryId()) &&
+                        !getOriginalRequest().getClientFiduciary().getId().equals(getSelectedFiduciaryId()))) {
+                    requestUpdated = true;
+                    getUpdatedPropertyNames().add("fiduciaryClient");
+                }
+
+                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getPosition())
+                        && ValidationHelper.isNullOrEmpty(getPosition()))
+                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getPosition())
+                        && !ValidationHelper.isNullOrEmpty(getPosition()))
+                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getPosition()) &&
+                        !ValidationHelper.isNullOrEmpty(getPosition()) &&
+                        !getOriginalRequest().getPosition().equals(getPosition()))) {
+                    requestUpdated = true;
+                    getUpdatedPropertyNames().add("position");
+                }
+
+                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNdg())
+                        && ValidationHelper.isNullOrEmpty(getNdg()))
+                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getNdg())
+                        && !ValidationHelper.isNullOrEmpty(getNdg()))
+                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNdg()) &&
+                        !ValidationHelper.isNullOrEmpty(getNdg()) &&
+                        !getOriginalRequest().getNdg().equals(getNdg()))) {
+                    requestUpdated = true;
+                    getUpdatedPropertyNames().add("ndg");
+                }
+
+                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getCdr())
+                        && ValidationHelper.isNullOrEmpty(getCdr()))
+                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getCdr())
+                        && !ValidationHelper.isNullOrEmpty(getCdr()))
+                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getCdr()) &&
+                        !ValidationHelper.isNullOrEmpty(getCdr()) &&
+                        !getOriginalRequest().getCdr().equals(getCdr()))) {
+                    requestUpdated = true;
+                    getUpdatedPropertyNames().add("cdr");
+                }
+
+                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNote())
+                        && ValidationHelper.isNullOrEmpty(getEntity().getNote()))
+                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getNote())
+                        && !ValidationHelper.isNullOrEmpty(getEntity().getNote()))
+                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNote()) &&
+                        !ValidationHelper.isNullOrEmpty(getEntity().getNote()) &&
+                        !getOriginalRequest().getNote().equals(getEntity().getNote()))) {
+                    requestUpdated = true;
+                    getUpdatedPropertyNames().add("note");
+                }
+
+                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getUrgent())
+                        && ValidationHelper.isNullOrEmpty(getUrgent()))
+                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getUrgent())
+                        && !ValidationHelper.isNullOrEmpty(getUrgent()))
+                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getUrgent()) &&
+                        !ValidationHelper.isNullOrEmpty(getUrgent()) &&
+                        !getOriginalRequest().getUrgent().equals(getUrgent()))) {
+                    requestUpdated = true;
+                    getUpdatedPropertyNames().add("urgent");
+                }
+
+                if (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getRequestMangerList())
+                        && !ValidationHelper.isNullOrEmpty(getFiduciaryClientsSelected())) {
+                    if (!getOriginalRequest().getRequestMangerList().stream()
+                            .map(Client::getId)
+                            .collect(Collectors.toList()).equals(getFiduciaryClientsSelected().stream()
+                                    .map(SelectItemWrapper::getId)
+                                    .collect(Collectors.toList()))) {
+                        requestUpdated = true;
+                        getUpdatedPropertyNames().add("managerList");
+
+                    }
+                }
+
+                if (!getUpdatedPropertyNames().contains("typeId") && getWrapper().getSelectedPersonId().equals(SubjectType.PHYSICAL_PERSON.getId())) {
+
+                    if (!equals(getOriginalRequest().getSubject().getSurname(),getSubject().getSurname())
+                            || !equals(getOriginalRequest().getSubject().getName(),getSubject().getName())
+                            || getOriginalRequest().getSubject().getBirthDate().compareTo(getSubject().getBirthDate()) != 0
+                            || !equals(getOriginalRequest().getSubject().getBirthProvince(),getSubject().getBirthProvince())
+                            || !equals(getOriginalRequest().getSubject().getBirthCity(),getSubject().getBirthCity())
+                            || !equals(getOriginalRequest().getSubject().getFiscalCode(),getSubject().getFiscalCode())
+                            || !equals(getOriginalRequest().getSubject().getSex(),getWrapper().getSelectedSexTypeId())){
+//                    if (!getOriginalRequest().getSubject().getSurname().equals(getSubject().getSurname())
+//                            || !getOriginalRequest().getSubject().getName().equals(getSubject().getName())
+//                            || getOriginalRequest().getSubject().getBirthDate().compareTo(getSubject().getBirthDate()) != 0
+//                            || !getOriginalRequest().getSubject().getBirthProvince().equals(getSubject().getBirthProvince())
+//                            || !getOriginalRequest().getSubject().getBirthCity().equals(getSubject().getBirthCity())
+//                            || !getOriginalRequest().getSubject().getFiscalCode().equals(getSubject().getFiscalCode())
+//                        || !getOriginalRequest().getSubject().getSex().equals(getWrapper().getSelectedSexTypeId())) {
+                        requestUpdated = true;
+                        getUpdatedPropertyNames().add("subject");
+                    }
+                } else if (!getUpdatedPropertyNames().contains("typeId") && getWrapper().getSelectedPersonId().equals(SubjectType.LEGAL_PERSON.getId())) {
+                    if (!equals(getOriginalRequest().getSubject().getBusinessName(),getSubject().getBusinessName())
+                            || !equals(getOriginalRequest().getSubject().getBirthProvince(),getSubject().getBirthProvince())
+                            || !equals(getOriginalRequest().getSubject().getBirthCity(),getSubject().getBirthCity())
+                            || !equals(getOriginalRequest().getSubject().getNumberVAT(),getSubject().getNumberVAT())
+                            || !equals(getOriginalRequest().getSubject().getOldNumberVAT(),getSubject().getOldNumberVAT())
+                            || !equals(getOriginalRequest().getSubject().getFiscalCode(),getSubject().getFiscalCode())){
+                            //|| !getOriginalRequest().getSubject().getBirthProvince().equals(getSubject().getBirthProvince())
+//                            || !getOriginalRequest().getSubject().getBirthCity().equals(getSubject().getBirthCity())
+//                            || !getOriginalRequest().getSubject().getNumberVAT().equals(getSubject().getNumberVAT())
+//                            || !getOriginalRequest().getSubject().getOldNumberVAT().equals(getSubject().getOldNumberVAT())
+//                            || !getOriginalRequest().getSubject().getFiscalCode().equals(getSubject().getFiscalCode()))
+                        requestUpdated = true;
+                        getUpdatedPropertyNames().add("subject");
+                    }
+                }
+            }
+            if (requestUpdated && !ValidationHelper.isNullOrEmpty(getEntity().getStateId())
+                    && getEntity().getStateId().equals(RequestState.IN_WORK.getId())
+                    && !ValidationHelper.isNullOrEmpty(getEntity().getMail())){
+
+                List<Request> associatedRequests =
+                        DaoManager.load(Request.class, new CriteriaAlias[]{
+                        new CriteriaAlias("mail", "m", JoinType.INNER_JOIN),
+                                new CriteriaAlias("subject", "s", JoinType.INNER_JOIN)
+                }, new Criterion[]{
+                        Restrictions.and(Restrictions.eq("m.id", getEntity().getMail().getId()),
+                                Restrictions.ne("id", getEntity().getId()))
+                });
+                if(!ValidationHelper.isNullOrEmpty(associatedRequests)){
+                    setAssociatedRequests(associatedRequests);
+                    executeJS("PF('requestDataChangedWarningWV').show();");
+                    return;
+                }
+            }
+            saveServiceRequest(redirect);
+        }
+    }
+
+    private boolean equals(Object obj1, Object obj2){
+        if(obj1 == null && obj2 == null)
+            return true;
+        if((obj1 == null && obj2 != null) || (obj1 != null && obj2 == null))
+            return false;
+        return obj1.equals(obj2);
+    }
+
+    public void cancelAndSaveServiceRequest(boolean redirect, boolean saveAssociated)
+            throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        setSaveAssociatedRequests(saveAssociated);
+        saveServiceRequest(redirect);
+    }
+    @SneakyThrows
+    public void saveServiceRequest(boolean redirect) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        setRunAfterSave(redirect);
+        //
+        if(!redirect){
+            insertNewRequest();
+            setShowServiceTable(Boolean.TRUE);
+        }else {
+            int index = 0;
+            List<Request> newRequests = new ArrayList<>();
+
+            for(Request newRequest : emptyIfNull(getNewRequestList())){
+                setRequestData(newRequest);
+                if(index == 0){
+                    boolean saved = false;
+                    if (!newRequest.isNew() && !ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())
+                            && !ValidationHelper.isNullOrEmpty(newRequest.getAggregationLandChargesRegistry())
+                            && getWrapper().getSelectedConservatoryItemId().stream().anyMatch(c -> c.getId().equals(newRequest.getAggregationLandChargesRegistry().getId()))
+                            || ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+
+                        if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+                            getWrapper().getSelectedConservatoryItemId().remove(getWrapper().getSelectedConservatoryItemId()
+                                    .stream().filter(c -> c.getId().equals(getEntity().getAggregationLandChargesRegistry().getId()))
+                                    .findAny().orElse(null));
+                        }
+                        saved = true;
+                    }
+                    if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+                        List<ConservatoriaSelectItem> selectedConservatoryItemId = getWrapper().getSelectedConservatoryItemId();
+                        int size = selectedConservatoryItemId.size();
+
+                        for (int i = 0; i < size; i++) {
+                            ConservatoriaSelectItem item = selectedConservatoryItemId.get(i);
+                            Request request = null;
+                            boolean isNew = false;
+                            try {
+                                if (!saved) {                   // first element
+                                    request = getEntity();
+                                    saved = true;
+                                } else {
+                                    isNew = true;
+                                    request = getEntity().copy();
+                                }
+                            } catch (CloneNotSupportedException e) {
+                                LogHelper.log(log, e);
+                            }
+
+                            if(isNew){
+                                request.setAggregationLandChargesRegistry(DaoManager.get(AggregationLandChargesRegistry.class, item.getId()));
+                                setAllDataRelatedToRequestOrNotify(request);
+                                request.setTempId(UUID.randomUUID().toString());
+                                insertNewRequest(request);
+                                newRequests.add(request);
+                            }
+                        }
+                    }
+                    index++;
+                }
+            }
+            if(newRequests.size() > 0){
+                if(getUpdatedNewRequestList() == null)
+                    setUpdatedNewRequestList(new ArrayList<>());
+                getUpdatedNewRequestList().addAll(newRequests);
+            }
+            // pageSave();
+            saveData();
+        }
+        executeJS("PF('requestSaved').show();");
+        executeJS("setTimeout(function(){PF('requestSaved').hide();}, 500);");
+        // openRequestSubjectDialog();
+        setShownFields(null);
+        setHiddenFields(null);
+        setSelectedRequestTypesIdMultiple(null);
+        onRequestTypeChangeBlock();
+        setSelectedServiceIds(new Long[]{});
+        setSelectedServiceId(null);
+        setInputCardList(null);
+        setHiddenInputCardList(null);
+        setWrapper(new RequestWrapper(getEntity(), isMultipleCreate(), false, true));
+    }
+
+    private void saveData() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        if(!getEntity().isNew()){
+
+            pageSave();
+            if(!ValidationHelper.isNullOrEmpty(getAssociatedRequests())
+                    && !ValidationHelper.isNullOrEmpty(getSaveAssociatedRequests()) && getSaveAssociatedRequests()){
+                try {
+                    this.tr = DaoManager.getSession().beginTransaction();
+                    this.setSaveFlag(1);
+
+                    Request entity = DaoManager.get(Request.class,
+                            new CriteriaAlias[]{
+                                    new CriteriaAlias("subject", "s", JoinType.INNER_JOIN)
+                            },
+                            new Criterion[]{
+                            Restrictions.eq("id", getEntity().getId())
+                    });
+
+                    for(Request ar : getAssociatedRequests()) {
+
+                        Request associatedRequest = DaoManager.get(Request.class,
+                                new CriteriaAlias[]{
+                                        new CriteriaAlias("subject", "s", JoinType.INNER_JOIN)
+                                },
+                                new Criterion[]{
+                                        Restrictions.eq("id", ar.getId())
+                                });
+
+                        if(getUpdatedPropertyNames().contains("typeId") || getUpdatedPropertyNames().contains("subject") &&
+                            !ValidationHelper.isNullOrEmpty(associatedRequest.getSubject())
+                                    && associatedRequest.getSubject().getId().equals(getOriginalRequest().getSubject().getId())){
+                            associatedRequest.setSubject(entity.getSubject());
+                        }
+                        if(getUpdatedPropertyNames().contains("client")){
+                            associatedRequest.setClient(DaoManager.get(Client.class, getSelectedClientId()));
+                        }
+                        if(getUpdatedPropertyNames().contains("billingClient")){
+                            associatedRequest.setBillingClient(getEntity().getBillingClient());
+                        }
+
+                        if(getUpdatedPropertyNames().contains("notary")){
+                            associatedRequest.setNotary(getEntity().getNotary());
+                        }
+
+                        if(getUpdatedPropertyNames().contains("office")){
+                            associatedRequest.setOffice(getEntity().getOffice());
+                        }
+
+                        if(getUpdatedPropertyNames().contains("managerList")){
+                            associatedRequest.setRequestMangerList(getEntity().getRequestMangerList());
+                        }
+
+                        if(getUpdatedPropertyNames().contains("fiduciaryClient")){
+                            associatedRequest.setClientFiduciary(getEntity().getClientFiduciary());
+                        }
+
+                        if(getUpdatedPropertyNames().contains("position")){
+                            associatedRequest.setPosition(getEntity().getPosition());
+                        }
+
+                        if(getUpdatedPropertyNames().contains("ndg")){
+                            associatedRequest.setNdg(getEntity().getNdg());
+                        }
+
+                        if(getUpdatedPropertyNames().contains("cdr")){
+                            associatedRequest.setCdr(getEntity().getCdr());
+                        }
+
+                        if(getUpdatedPropertyNames().contains("ndg")){
+                            associatedRequest.setNdg(getEntity().getNdg());
+                        }
+
+                        if(getUpdatedPropertyNames().contains("note")){
+                            associatedRequest.setNote(getEntity().getNote());
+                        }
+
+                        if(getUpdatedPropertyNames().contains("urgent")){
+                            associatedRequest.setUrgent(getEntity().getUrgent());
+                        }
+                        prepareRequestToSave(associatedRequest);
+                        DaoManager.save(associatedRequest);
+                    }
+                } catch (Exception e) {
+                    if (this.tr != null) {
+                        this.tr.rollback();
+                    }
+                    LogHelper.log(log, e);
+                    MessageHelper.addGlobalMessage(FacesMessage.SEVERITY_ERROR, "",
+                            ResourcesHelper.getValidation("objectEditedException"));
+                } finally {
+                    if (this.tr != null && !this.tr.wasRolledBack()
+                            && this.tr.isActive()) {
+                        try {
+                            this.tr.commit();
+                        } catch (StaleObjectStateException e) {
+                            MessageHelper
+                                    .addGlobalMessage(
+                                            FacesMessage.SEVERITY_ERROR,
+                                            "",
+                                            ResourcesHelper
+                                                    .getValidation("exceptionOccuredWhileSaving"));
+                            LogHelper.log(log, e);
+                        } catch (Exception e) {
+                            LogHelper.log(log, e);
+                            e.printStackTrace();
+                        }
+                    }
+                    this.setSaveFlag(0);
+                }
+            }
+        }else {
+            Subject subject = null;
+            if (this.getSaveFlag() == 0) {
+                try {
+                    this.cleanValidation();
+                    this.setValidationFailed(false);
+                    this.onValidate();
+                    if (this.getValidationFailed()) {
+                        return;
+                    }
+                } catch (Exception e) {
+                    LogHelper.log(log, e);
+                    e.printStackTrace();
+                    return;
+                }
+
+            }
+            for(int index =0; index < emptyIfNull(getNewRequestList()).size() ; index++){
+                Request newRequest = getNewRequestList().get(index);
+                prepareRequestToSave(newRequest);
+                if(index == 0){
+                    subject = newRequest.getSubject();
+                }else {
+                    newRequest.setSubject(subject);
+                }
+                try {
+                    this.tr = DaoManager.getSession().beginTransaction();
+
+                    this.setSaveFlag(1);
+
+                    saveAllDataRelatedToRequestOrNotify(newRequest , index == 0 ? true: false);
+                } catch (Exception e) {
+                    if (this.tr != null) {
+                        this.tr.rollback();
+                    }
+                    LogHelper.log(log, e);
+                    MessageHelper.addGlobalMessage(FacesMessage.SEVERITY_ERROR, "",
+                            ResourcesHelper.getValidation("objectEditedException"));
+                } finally {
+                    if (this.tr != null && !this.tr.wasRolledBack()
+                            && this.tr.isActive()) {
+                        try {
+                            this.tr.commit();
+                        } catch (StaleObjectStateException e) {
+                            MessageHelper
+                                    .addGlobalMessage(
+                                            FacesMessage.SEVERITY_ERROR,
+                                            "",
+                                            ResourcesHelper
+                                                    .getValidation("exceptionOccuredWhileSaving"));
+                            LogHelper.log(log, e);
+                        } catch (Exception e) {
+                            LogHelper.log(log, e);
+                            e.printStackTrace();
+                        }
+                    }
+                    this.setSaveFlag(0);
+                }
+
+            }
+
+            if (isRunAfterSave()) {
+                this.afterSave();
+            }
+        }
+    }
+
+    private void insertNewRequest( Request newRequest) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+        newRequest.setRequestType(DaoManager.get(RequestType.class, getSelectedRequestTypesIdMultiple()));
+        if (isMultipleCreate() && !ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
+            List<Service> serviceList = DaoManager.load(Service.class, new Criterion[]{
+                    Restrictions.in("id", Arrays.asList(getSelectedServiceIds()).stream().collect(Collectors.toList()))
+            });
+            if (isMultipleRequestCreate()) {
+                serviceList = serviceList.stream().filter(service -> getSelectedRequestTypesIdMultiple().equals(service.getRequestType().getId())).collect(Collectors.toList());
+            }
+            if (!ValidationHelper.isNullOrEmpty(serviceList)) {
+                if (serviceList.size() == 1) {
+                    newRequest.setService(serviceList.get(0));
+                } else {
+                    newRequest.setMultipleServices(serviceList);
+                }
+            }
+        } else {
+            if (!ValidationHelper.isNullOrEmpty(getSelectedServiceId()))
+                newRequest.setService(DaoManager.get(Service.class, getSelectedServiceId()));
+        }
+        fillRequestExpirationDate(newRequest);
+        if(ValidationHelper.isNullOrEmpty(newRequest.getUser()))
+            newRequest.setUser(getEntity().getUser());
+        if(!ValidationHelper.isNullOrEmpty(newRequest.getUser())){
+            User user = DaoManager.get(User.class,new CriteriaAlias[]{
+                            new CriteriaAlias("roles", "roles", JoinType.INNER_JOIN)
+                    },
+                    new Criterion[]{
+                            Restrictions.eq("id", newRequest.getUser().getId())
+                    });
+            newRequest.setStateId(RequestState.IN_WORK.getId());
+        }
+        setRequestData(newRequest);
+        if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+            newRequest.setSelectedConservatoryItemId(getWrapper().getSelectedConservatoryItemId());
+        }
+        if (getNewRequestList() == null)
+            setNewRequestList(new ArrayList<>());
+        setAllDataRelatedToRequestOrNotify(newRequest);
+
+        setServiceRequestWrapper(newRequest);
+    }
+
+    private void insertNewRequest() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+        Request newRequest;
+        if(ValidationHelper.isNullOrEmpty(getNewRequestList())){
+            newRequest = getEntity();
+        }else {
+            newRequest = new Request();
+        }
+        newRequest.setRequestType(DaoManager.get(RequestType.class, getSelectedRequestTypesIdMultiple()));
+        newRequest.setCreateDate(new Date());
+        if (isMultipleCreate() && !ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
+            List<Service> serviceList = DaoManager.load(Service.class, new Criterion[]{
+                    Restrictions.in("id", Arrays.asList(getSelectedServiceIds()).stream().collect(Collectors.toList()))
+            });
+            if (isMultipleRequestCreate()) {
+                serviceList = serviceList.stream().filter(service -> getSelectedRequestTypesIdMultiple().equals(service.getRequestType().getId())).collect(Collectors.toList());
+            }
+            if (!ValidationHelper.isNullOrEmpty(serviceList)) {
+                if (serviceList.size() == 1) {
+                    newRequest.setService(serviceList.get(0));
+                    newRequest.setMultipleRequestTypes(null);
+                } else {
+                    newRequest.setService(null);
+                    newRequest.setMultipleServices(serviceList);
+                }
+            }
+        } else {
+            if (!ValidationHelper.isNullOrEmpty(getSelectedServiceId())){
+                newRequest.setService(DaoManager.get(Service.class, getSelectedServiceId()));
+                newRequest.setMultipleServices(null);
+            }
+        }
+        fillRequestExpirationDate(newRequest);
+        if(ValidationHelper.isNullOrEmpty(newRequest.getUser()))
+            newRequest.setUser(getEntity().getUser());
+        if(!ValidationHelper.isNullOrEmpty(newRequest.getUser())){
+            User user = DaoManager.get(User.class,new CriteriaAlias[]{
+                            new CriteriaAlias("roles", "roles", JoinType.INNER_JOIN)
+                    },
+                    new Criterion[]{
+                            Restrictions.eq("id", newRequest.getUser().getId())
+                    });
+            newRequest.setStateId(RequestState.IN_WORK.getId());
+        }
+        setRequestData(newRequest);
+        if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+            newRequest.setSelectedConservatoryItemId(getWrapper().getSelectedConservatoryItemId());
+        }
+        if (getNewRequestList() == null)
+            setNewRequestList(new ArrayList<>());
+        boolean saved = false;
+        setAllDataRelatedToRequestOrNotify(newRequest);
+        if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+            List<ConservatoriaSelectItem> selectedConservatoryItemId = getWrapper().getSelectedConservatoryItemId();
+            for (int i = 0; i < selectedConservatoryItemId.size(); i++) {
+                ConservatoriaSelectItem item = selectedConservatoryItemId.get(i);
+                Request otherRequest = null;
+                boolean isNew = false;
+                try {
+                    if (!saved) {                   // first element
+                        otherRequest = newRequest;
+                        saved = true;
+                    } else {
+                        isNew = true;
+                        otherRequest = newRequest.copy();
+                    }
+                } catch (CloneNotSupportedException e) {
+                    LogHelper.log(log, e);
+                }
+                otherRequest.setAggregationLandChargesRegistry(DaoManager.get(AggregationLandChargesRegistry.class, item.getId()));
+
+                setAllDataRelatedToRequestOrNotify(otherRequest);
+                if(isNew){
+                    otherRequest.setTempId(UUID.randomUUID().toString());
+                    getNewRequestList().add(otherRequest);
+                    setServiceRequestWrapper(otherRequest);
+                }
+            }
+        }
+//        else {
+//            setAllDataRelatedToRequestOrNotify(newRequest);
+//        }
+        newRequest.setTempId(UUID.randomUUID().toString());
+
+        getNewRequestList().add(newRequest);
+        setServiceRequestWrapper(newRequest);
+    }
+
+    private void setAllDataRelatedToRequestOrNotify(Request entity) throws PersistenceBeanException,
+            InstantiationException, IllegalAccessException {
+        getWrapper().setRequestFields(entity);
+        // saveMultipleSubjects(entity);
+        List<Request> sameRequestList = getSameRequestsIfExist(entity);
+        if (!findAppropriateRequest(sameRequestList)) {
+        } else {
+            setShouldBeRedirected(false);
+            notifyUser();
+        }
+    }
+
+    private void setServiceRequestWrapper(Request newRequest) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+
+        ServiceRequestWrapper serviceRequestWrapper = new ServiceRequestWrapper();
+        serviceRequestWrapper.setCreateDate(newRequest.getCreateDate());
+        serviceRequestWrapper.setIsDeleted(newRequest.getIsDeleted());
+        if(!ValidationHelper.isNullOrEmpty(newRequest.getClient()))
+            serviceRequestWrapper.setClientId(newRequest.getClient().getId());
+        if(!ValidationHelper.isNullOrEmpty(newRequest.getBillingClient()))
+            serviceRequestWrapper.setBillingClientId(newRequest.getBillingClient().getId());
+        if(!ValidationHelper.isNullOrEmpty(newRequest.getType()))
+            serviceRequestWrapper.setTypeId(newRequest.getType().getId());
+        if(!ValidationHelper.isNullOrEmpty(newRequest.getRequestType()))
+            serviceRequestWrapper.setRequestTypeId(newRequest.getRequestType().getId());
+        if(!ValidationHelper.isNullOrEmpty(newRequest.getService()))
+            serviceRequestWrapper.setServiceId(newRequest.getService().getId());
+        serviceRequestWrapper.setBirthDate(newRequest.getBirthDate());
+        if(!ValidationHelper.isNullOrEmpty(newRequest.getSubject())){
+            serviceRequestWrapper.setSubjectId(newRequest.getSubject().getId());
+            serviceRequestWrapper.setName(newRequest.getSubjectName());
+        }
+        serviceRequestWrapper.setCode(newRequest.getFiscalCodeVATNamber());
+        serviceRequestWrapper.setStateId(newRequest.getStateId());
+        if(!ValidationHelper.isNullOrEmpty(newRequest.getUser())) {
+            serviceRequestWrapper.setUser(newRequest.getUser());
+            serviceRequestWrapper.setUserId(newRequest.getUser().getId());
+        }
+        if (!ValidationHelper.isNullOrEmpty(newRequest.getAggregationLandChargesRegistry()))
+            serviceRequestWrapper.setAggregationLandChargesRegistryId(
+                    newRequest.getAggregationLandChargesRegistry().getId());
+        if (!ValidationHelper.isNullOrEmpty(newRequest.getMail()))
+            serviceRequestWrapper.setMailId(newRequest.getMail().getId());
+        serviceRequestWrapper.setUserAreaId(newRequest.getUserAreaId());
+        serviceRequestWrapper.setUserOfficeId(newRequest.getUserOfficeId());
+        if (!ValidationHelper.isNullOrEmpty(newRequest.getCity()))
+            serviceRequestWrapper.setCityId(newRequest.getCity().getId());
+        if (!ValidationHelper.isNullOrEmpty(newRequest.getProvince()))
+            serviceRequestWrapper.setProvinceId(newRequest.getProvince().getId());
+        serviceRequestWrapper.setExpirationDate(newRequest.getExpirationDate());
+        serviceRequestWrapper.setUrgent(newRequest.getUrgent());
+        serviceRequestWrapper.setEvasionDate(newRequest.getEvasionDate());
+        if (!ValidationHelper.isNullOrEmpty(newRequest.getNumberActUpdate()))
+            serviceRequestWrapper.setNumberActUpdate(newRequest.getNumberActUpdate().toString());
+        serviceRequestWrapper.setCostEstateFormality(newRequest.getCostEstateFormality());
+        serviceRequestWrapper.setCostCadastral(newRequest.getCostCadastral());
+        serviceRequestWrapper.setCostPay(newRequest.getCostPay());
+        serviceRequestWrapper.setTotalCost(newRequest.getTotalCost());
+        if (!ValidationHelper.isNullOrEmpty(newRequest.getDistraintFormality()))
+            serviceRequestWrapper.setDistraintFormalityId(newRequest.getDistraintFormality().getId());
+        if (!ValidationHelper.isNullOrEmpty(newRequest.getInvoice()))
+            serviceRequestWrapper.setInvoiceId(newRequest.getInvoice().getId());
+
+        // serviceRequestWrapper.setHaveDocuments(newRequest.getHaveDocuments());
+        // serviceRequestWrapper.setHaveAllegatiDocuments(newRequest.getHaveAllegatiDocuments());
+        serviceRequestWrapper.setExternal(newRequest.getExternal());
+        serviceRequestWrapper.setCreateUserFullName(newRequest.getCreateUserFullName());
+        serviceRequestWrapper.setOffice(newRequest.getOffice());
+        serviceRequestWrapper.setDocumentsCount(newRequest.getDocumentsCount());
+        serviceRequestWrapper.setServiceName(newRequest.getServiceName());
+        serviceRequestWrapper.setServiceIcon(newRequest.getServiceIcon());
+        serviceRequestWrapper.setServiceIsUpdate(newRequest.getServiceIsUpdate());
+        serviceRequestWrapper.setRequestTypeName(newRequest.getRequestTypeName());
+        serviceRequestWrapper.setRequestTypeIcon(newRequest.getRequestTypeIcon());
+        serviceRequestWrapper.setAggregationLandCharRegName(
+                newRequest.getAggregationLandCharRegName());
+        if(!ValidationHelper.isNullOrEmpty(newRequest.getClientFiduciary()))
+            serviceRequestWrapper.setFiduciaryId(newRequest.getClientFiduciary().getId());
+        if(newRequest.getSubject() != null){
+            serviceRequestWrapper.setReverseName(newRequest.getSubject().getFullName());
+        }
+        serviceRequestWrapper.setManagerId(newRequest.getManagerId());
+        serviceRequestWrapper.setId(newRequest.getId());
+        serviceRequestWrapper.setCreateUserId(newRequest.getCreateUserId());
+        serviceRequestWrapper.setTempId(newRequest.getTempId());
+        serviceRequestWrapper.setMultipleServices(newRequest.getMultipleServices());
+        if(ValidationHelper.isNullOrEmpty(getRegSubjectList()))
+            setRegSubjectList(new ArrayList<>());
+        getRegSubjectList().add(serviceRequestWrapper);
 
     }
 
-    @Override
-    public void onSave() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        prepareRequestToSave();
+    private void setRequestData(Request request) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+        if(isMultipleRequestCreate()){
+            if(request.isNew())
+                request.setRequestCreationType(RequestCreationType.MULTIPLE);
+        }else if(isMultipleCreate()){
+            request.setRequestCreationType(RequestCreationType.MULTI);
+        }else {
+            request.setRequestCreationType(RequestCreationType.SIMPLE);
+        }
+        request.setClient(DaoManager.get(Client.class, this.getSelectedClientId()));
 
-        getEntity().setClient(DaoManager.get(Client.class, this.getSelectedClientId()));
-
-        getEntity().setDistraintFormality(getDistraintFormality());
+        request.setDistraintFormality(getDistraintFormality());
 
         if (!ValidationHelper.isNullOrEmpty(this.getSelectedNotaryId()))
-            getEntity().setNotary(DaoManager.get(Notary.class, this.getSelectedNotaryId()));
+            request.setNotary(DaoManager.get(Notary.class, this.getSelectedNotaryId()));
         else
-            getEntity().setNotary(null);
+            request.setNotary(null);
 
         if (getSelectedBillingClientId() != null) {
-            getEntity().setBillingClient(DaoManager.get(Client.class, getSelectedBillingClientId()));
+            request.setBillingClient(DaoManager.get(Client.class, getSelectedBillingClientId()));
         } else {
-            getEntity().setBillingClient(null);
+            request.setBillingClient(null);
         }
 
+        if (!ValidationHelper.isNullOrEmpty(this.getCdr()))
+            request.setCdr(this.getCdr());
+        else
+            request.setCdr(null);
+
+        if (!ValidationHelper.isNullOrEmpty(this.getNdg()))
+            request.setNdg(this.getNdg());
+        else
+            request.setNdg(null);
+
+        if (!ValidationHelper.isNullOrEmpty(this.getPosition()))
+            request.setPosition(this.getPosition());
+        else
+            request.setPosition(null);
+
+        if (!ValidationHelper.isNullOrEmpty(this.getUrgent()))
+            request.setUrgent(this.getUrgent());
+        else
+            request.setUrgent(null);
+
         if (!ValidationHelper.isNullOrEmpty(getFiduciaryClientsSelected())) {
-            getEntity().setRequestMangerList(new ArrayList<>());
+            request.setRequestMangerList(new ArrayList<>());
             List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
                     Restrictions.in("id", getFiduciaryClientsSelected().stream()
                             .map(SelectItemWrapper::getId).collect(Collectors.toList()))});
-            getEntity().getRequestMangerList().addAll(clients);
+            request.getRequestMangerList().addAll(clients);
         }
-        if (getEntity().getStateId() == null) {
-            getEntity().setStateId(RequestState.INSERTED.getId());
+        if (request.getStateId() == null) {
+            request.setStateId(RequestState.INSERTED.getId());
         }
-        if (!ValidationHelper.isNullOrEmpty(getSelectedRequestEnumTypeFirst())) {
+        if (!ValidationHelper.isNullOrEmpty(getRequestType())) {
+            if(getRequestType().equals(0)) {
+                request.setType(RequestEnumTypes.SUBJECT);
+            }else if(getRequestType().equals(1)) {
+                request.setType(RequestEnumTypes.MADE);
+            }else if(getRequestType().equals(2)) {
+                request.setType(RequestEnumTypes.COMMON);
+            }
+        } else if (!ValidationHelper.isNullOrEmpty(getSelectedRequestEnumTypeFirst())) {
             if (getSelectedRequestEnumTypeFirst().equals(RequestEnumTypes.SUBJECT.getId())) {
-                getEntity().setType(RequestEnumTypes.SUBJECT);
+                request.setType(RequestEnumTypes.SUBJECT);
             } else {
-                getEntity().setType(getSelectedRequestEnumTypeSecond() == null
+                request.setType(getSelectedRequestEnumTypeSecond() == null
                         ? RequestEnumTypes.PROPERTY
-                                : RequestEnumTypes.getById(getSelectedRequestEnumTypeSecond()));
+                        : RequestEnumTypes.getById(getSelectedRequestEnumTypeSecond()));
             }
         }
-        getEntity().setRequestType(DaoManager.get(RequestType.class, getSelectedRequestTypeId()));
-        if (isMultipleCreate()) {
-            getEntity().setMultipleServices(DaoManager.load(Service.class, new Criterion[]{
-                    Restrictions.in("id", getSelectedServiceIds().stream()
-                            .map(Long::parseLong).collect(Collectors.toList()))
-            }));
-        } else {
-            if(!ValidationHelper.isNullOrEmpty(getSelectedServiceId()))
-                getEntity().setService(DaoManager.get(Service.class, getSelectedServiceId()));
-        }
+
         if (!ValidationHelper.isNullOrEmpty(getSelectedAgencyId())) {
-            getEntity().setAgency(DaoManager.get(Agency.class, getSelectedAgencyId()));
+            request.setAgency(DaoManager.get(Agency.class, getSelectedAgencyId()));
         } else {
-            getEntity().setAgency(null);
+            request.setAgency(null);
         }
-        if (!ValidationHelper.isNullOrEmpty(getSelectedAgencyOfficeId())) {
-            getEntity().setOffice(DaoManager.get(Office.class, getSelectedAgencyOfficeId()));
+        if (!ValidationHelper.isNullOrEmpty(getSelectedOfficeId())) {
+            request.setOffice(DaoManager.get(Office.class, getSelectedOfficeId()));
         } else {
-            getEntity().setOffice(null);
+            request.setOffice(null);
         }
 
+        if (!ValidationHelper.isNullOrEmpty(getSelectedFiduciaryId())) {
+            request.setClientFiduciary(DaoManager.get(Client.class, getSelectedFiduciaryId()));
+        } else {
+            request.setClientFiduciary(null);
+        }
+        request.setNote(getEntity().getNote());
         if (getSubject() != null) {
-            Subject tempSubject = getSubject();
+            Subject tempSubject  = getSubject();
             SubjectHelper.fillSubjectFromWrapper(tempSubject, getWrapper());
             Subject subjectFromDB = SubjectHelper.getSubjectIfExists(tempSubject, getWrapper().getSelectedPersonId());
             if (subjectFromDB != null) {
@@ -1306,22 +2458,26 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             }
         }
         if (!ValidationHelper.isNullOrEmpty(getMail())) {
-            getEntity().setMail(getMail());
+            request.setMail(getMail());
         }
 
-        fillRequestExpirationDate();
-        getEntity().setSubject(getSubject());
+        fillRequestExpirationDate(getEntity());
+        request.setSubject(getSubject());
         if (!ValidationHelper.isNullOrEmpty(getResidence())) {
-            getEntity().setResidence(getResidence());
+            request.setResidence(getResidence());
         }
         if (!ValidationHelper.isNullOrEmpty(getDomicile())) {
-            getEntity().setDomicile(getDomicile());
+            request.setDomicile(getDomicile());
         }
-        
-        if(getEntity().isNew() &&  
-                ValidationHelper.isNullOrEmpty(getEntity().getAggregationLandChargesRegistry())
-                && !ValidationHelper.isNullOrEmpty(getEntity().getRequestType().getDefault_registry())) {
-            getEntity().setAggregationLandChargesRegistry(getEntity().getRequestType().getDefault_registry());
+
+        if(ValidationHelper.isNullOrEmpty(request.getUser())) {
+            request.setUser(DaoManager.get(User.class, getCurrentUser().getId()));
+        }
+
+        if(request.isNew() &&
+                ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())
+                && !ValidationHelper.isNullOrEmpty(request.getRequestType().getDefault_registry())) {
+            request.setAggregationLandChargesRegistry(request.getRequestType().getDefault_registry());
         }
 
         if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
@@ -1341,50 +2497,490 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 }
             });
         }
+    }
 
-        boolean saved = false;
-        if (!getEntity().isNew() && !ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())
-                && !ValidationHelper.isNullOrEmpty(getEntity().getAggregationLandChargesRegistry())
-                && getWrapper().getSelectedConservatoryItemId().stream().anyMatch(c -> c.getId().equals(getEntity().getAggregationLandChargesRegistry().getId()))
-                || ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+    @Override
+    public void onSave() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
 
-            saveAllDataRelatedToRequestOrNotify(getEntity());
-            if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
-                getWrapper().getSelectedConservatoryItemId().remove(getWrapper().getSelectedConservatoryItemId()
-                        .stream().filter(c -> c.getId().equals(getEntity().getAggregationLandChargesRegistry().getId()))
-                        .findAny().orElse(null));
+          /*  if(!getEntity().isNew()){
+                getEntity().setClient(DaoManager.get(Client.class, this.getSelectedClientId()));
+
+                getEntity().setDistraintFormality(getDistraintFormality());
+
+                if (!ValidationHelper.isNullOrEmpty(this.getSelectedNotaryId()))
+                    getEntity().setNotary(DaoManager.get(Notary.class, this.getSelectedNotaryId()));
+                else
+                    getEntity().setNotary(null);
+
+                if (getSelectedBillingClientId() != null) {
+                    getEntity().setBillingClient(DaoManager.get(Client.class, getSelectedBillingClientId()));
+                } else {
+                    getEntity().setBillingClient(null);
+                }
+
+                if (!ValidationHelper.isNullOrEmpty(this.getCdr()))
+                    getEntity().setCdr(this.getCdr());
+                else
+                    getEntity().setCdr(null);
+
+                if (!ValidationHelper.isNullOrEmpty(this.getNdg()))
+                    getEntity().setNdg(this.getNdg());
+                else
+                    getEntity().setNdg(null);
+
+                if (!ValidationHelper.isNullOrEmpty(this.getPosition()))
+                    getEntity().setPosition(this.getPosition());
+                else
+                    getEntity().setPosition(null);
+
+                if (!ValidationHelper.isNullOrEmpty(this.getUrgent()))
+                    getEntity().setUrgent(this.getUrgent());
+                else
+                    getEntity().setUrgent(null);
+
+                if (!ValidationHelper.isNullOrEmpty(getFiduciaryClientsSelected())) {
+                    getEntity().setRequestMangerList(new ArrayList<>());
+                    List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
+                            Restrictions.in("id", getFiduciaryClientsSelected().stream()
+                                    .map(SelectItemWrapper::getId).collect(Collectors.toList()))});
+                    getEntity().getRequestMangerList().addAll(clients);
+                }
+                if (getEntity().getStateId() == null) {
+                    getEntity().setStateId(RequestState.INSERTED.getId());
+                }
+                if (!ValidationHelper.isNullOrEmpty(getRequestType())) {
+                    if(getRequestType().equals(0)) {
+                        getEntity().setType(RequestEnumTypes.SUBJECT);
+                    }else if(getRequestType().equals(1)) {
+                        getEntity().setType(RequestEnumTypes.MADE);
+                    }else if(getRequestType().equals(2)) {
+                        getEntity().setType(RequestEnumTypes.COMMON);
+                    }
+                } else if (!ValidationHelper.isNullOrEmpty(getSelectedRequestEnumTypeFirst())) {
+                    if (getSelectedRequestEnumTypeFirst().equals(RequestEnumTypes.SUBJECT.getId())) {
+                        getEntity().setType(RequestEnumTypes.SUBJECT);
+                    } else {
+                        getEntity().setType(getSelectedRequestEnumTypeSecond() == null
+                                ? RequestEnumTypes.PROPERTY
+                                : RequestEnumTypes.getById(getSelectedRequestEnumTypeSecond()));
+                    }
+                }
+
+                if (!ValidationHelper.isNullOrEmpty(getSelectedAgencyId())) {
+                    getEntity().setAgency(DaoManager.get(Agency.class, getSelectedAgencyId()));
+                } else {
+                    getEntity().setAgency(null);
+                }
+                if (!ValidationHelper.isNullOrEmpty(getSelectedOfficeId())) {
+                    getEntity().setOffice(DaoManager.get(Office.class, getSelectedOfficeId()));
+                } else {
+                    getEntity().setOffice(null);
+                }
+
+                if (!ValidationHelper.isNullOrEmpty(getSelectedFiduciaryId())) {
+                    getEntity().setClientFiduciary(DaoManager.get(Client.class, getSelectedFiduciaryId()));
+                } else {
+                    getEntity().setClientFiduciary(null);
+                }
+
+                if (getSubject() != null) {
+                    Subject tempSubject  = getSubject();
+                    SubjectHelper.fillSubjectFromWrapper(tempSubject, getWrapper());
+                    Subject subjectFromDB = SubjectHelper.getSubjectIfExists(tempSubject, getWrapper().getSelectedPersonId());
+                    if (subjectFromDB != null) {
+                        setSubject(subjectFromDB);
+                        if (!ValidationHelper.isNullOrEmpty(tempSubject.getId())) {
+                            DaoManager.getSession().evict(DaoManager.getSession().get(Subject.class, tempSubject.getId()));
+                        }
+                    }else {
+                        Subject newSubject = SubjectHelper.copySubject(tempSubject);
+                        setSubject(newSubject);
+                    }
+                }
+                if (!ValidationHelper.isNullOrEmpty(getMail())) {
+                    getEntity().setMail(getMail());
+                }
+
+                fillRequestExpirationDate(getEntity());
+                getEntity().setSubject(getSubject());
+                if (!ValidationHelper.isNullOrEmpty(getResidence())) {
+                    getEntity().setResidence(getResidence());
+                }
+                if (!ValidationHelper.isNullOrEmpty(getDomicile())) {
+                    getEntity().setDomicile(getDomicile());
+                }
+
+                if(getEntity().isNew() &&
+                        ValidationHelper.isNullOrEmpty(getEntity().getAggregationLandChargesRegistry())
+                        && !ValidationHelper.isNullOrEmpty(getEntity().getRequestType().getDefault_registry())) {
+                    getEntity().setAggregationLandChargesRegistry(getEntity().getRequestType().getDefault_registry());
+                }
+
+                if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+                    getWrapper().setSelectedConservatoryItemId(new ArrayList<>());
+                }
+                if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConserItemId())) {
+                    getWrapper().getSelectedConserItemId().forEach(elem -> {
+                        if (!getWrapper().getSelectedConservatoryItemId().contains(elem)) {
+                            getWrapper().getSelectedConservatoryItemId().add(elem);
+                        }
+                    });
+                }
+                if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedTaloreItemId())) {
+                    getWrapper().getSelectedTaloreItemId().forEach(elem -> {
+                        if (!getWrapper().getSelectedConservatoryItemId().contains(elem)) {
+                            getWrapper().getSelectedConservatoryItemId().add(elem);
+                        }
+                    });
+                }
+                saveAllDataRelatedToRequestOrNotify(getEntity());
             }
-            saved = true;
-        }
-        if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
-            List<ConservatoriaSelectItem> selectedConservatoryItemId = getWrapper().getSelectedConservatoryItemId();
-            for (int i = 0; i < selectedConservatoryItemId.size(); i++) {
-                ConservatoriaSelectItem item = selectedConservatoryItemId.get(i);
-                Request request = null;
-                try {
+
+           */
+
+        if(!getEntity().isNew()){
+
+            getEntity().setRequestType(DaoManager.get(RequestType.class, getSelectedRequestTypesIdMultiple()));
+
+            if (isMultipleCreate() && !ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
+                List<Service> serviceList = DaoManager.load(Service.class, new Criterion[]{
+                        Restrictions.in("id", Arrays.asList(getSelectedServiceIds()).stream().collect(Collectors.toList()))
+                });
+                if (isMultipleRequestCreate()) {
+                    serviceList = serviceList.stream().filter(service -> getSelectedRequestTypesIdMultiple().equals(service.getRequestType().getId())).collect(Collectors.toList());
+                }
+
+                if(!ValidationHelper.isNullOrEmpty(getEntity().getRequestType())
+                        && !ValidationHelper.isNullOrEmpty(getEntity().getRequestType().getMultiselectionOperation()) &&
+                        getEntity().getRequestType().getMultiselectionOperation()){
+                    if (!ValidationHelper.isNullOrEmpty(serviceList))
+                        getEntity().setMultipleServices(serviceList);
+                    getEntity().setService(null);
+                }else {
+                    if (!ValidationHelper.isNullOrEmpty(getSelectedServiceId())){
+                        getEntity().setService(DaoManager.get(Service.class, getSelectedServiceId()));
+                        getEntity().setMultipleServices(null);
+                    }
+                }
+            } else {
+                if (!ValidationHelper.isNullOrEmpty(getSelectedServiceId())){
+                    getEntity().setService(DaoManager.get(Service.class, getSelectedServiceId()));
+                    getEntity().setMultipleServices(null);
+                }
+            }
+
+            if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+                getWrapper().setSelectedConservatoryItemId(new ArrayList<>());
+            }
+            if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConserItemId())) {
+                getWrapper().getSelectedConserItemId().forEach(elem -> {
+                    if (!getWrapper().getSelectedConservatoryItemId().contains(elem)) {
+                        getWrapper().getSelectedConservatoryItemId().add(elem);
+                    }
+                });
+            }
+            if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedTaloreItemId())) {
+                getWrapper().getSelectedTaloreItemId().forEach(elem -> {
+                    if (!getWrapper().getSelectedConservatoryItemId().contains(elem)) {
+                        getWrapper().getSelectedConservatoryItemId().add(elem);
+                    }
+                });
+            }
+            if (!ValidationHelper.isNullOrEmpty(this.getSelectedNotaryId()))
+                getWrapper().setSelectedNotaryId(this.getSelectedNotaryId());
+            else
+                getWrapper().setSelectedNotaryId(null);
+            prepareRequestToSave(getEntity());
+            saveAllDataRelatedToRequestOrNotify(getEntity(), true);
+
+            boolean saved = false;
+
+            if (!getEntity().isNew() && !ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())
+                    && !ValidationHelper.isNullOrEmpty(getEntity().getAggregationLandChargesRegistry())
+                    && getWrapper().getSelectedConservatoryItemId().stream().anyMatch(c -> c.getId().equals(getEntity().getAggregationLandChargesRegistry().getId()))
+                    || ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+                if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+                    getWrapper().getSelectedConservatoryItemId().remove(getWrapper().getSelectedConservatoryItemId()
+                            .stream().filter(c -> c.getId().equals(getEntity().getAggregationLandChargesRegistry().getId()))
+                            .findAny().orElse(null));
+                }
+                saved = true;
+            }
+
+
+            if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+                List<ConservatoriaSelectItem> selectedConservatoryItemId = getWrapper().getSelectedConservatoryItemId();
+                for (int i = 0; i < selectedConservatoryItemId.size(); i++) {
+                    ConservatoriaSelectItem item = selectedConservatoryItemId.get(i);
+                    Request request = null;
                     if (!saved) {                   // first element
                         request = getEntity();
                         saved = true;
-                    } else {
-                        request = getEntity().copy();
+                        request.setAggregationLandChargesRegistry(DaoManager.get(AggregationLandChargesRegistry.class, item.getId()));
                     }
-                } catch (CloneNotSupportedException e) {
-                    LogHelper.log(log, e);
                 }
-                request.setAggregationLandChargesRegistry(DaoManager.get(AggregationLandChargesRegistry.class, item.getId()));
+            }
 
-                saveAllDataRelatedToRequestOrNotify(request);
+            int index = 0;
+            Subject subject = null;
+            for(Request newRequest : emptyIfNull(getUpdatedNewRequestList())){
+                if(index == 0){
+                    subject = newRequest.getSubject();
+                }else {
+                    newRequest.setSubject(subject);
+                }
+                saveAllDataRelatedToRequestOrNotify(newRequest , index == 0 ? true: false);
+                index++;
+            }
+        }else {
+            Subject subject = null;
+
+            for(int index =0; index < emptyIfNull(getNewRequestList()).size() ; index++){
+                Request newRequest = getNewRequestList().get(index);
+                prepareRequestToSave(newRequest);
+                if(index == 0){
+                    subject = newRequest.getSubject();
+                }else {
+                    newRequest.setSubject(subject);
+                }
+                saveAllDataRelatedToRequestOrNotify(newRequest , index == 0 ? true: false);
+            }
+//            for(Request newRequest : emptyIfNull(getNewRequestList())){
+//                prepareRequestToSave(newRequest);
+//                if(index == 0){
+//                    subject = newRequest.getSubject();
+//                }else {
+//                    newRequest.setSubject(subject);
+//                }
+//                saveAllDataRelatedToRequestOrNotify(newRequest , index == 0 ? true: false);
+//                index++;
+//            }
+        }
+        afterSave();
+    }
+    // @Override
+    public void onSave_Old() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        List<Long> selectedServiceReqType = new ArrayList();
+        if(isMultipleRequestCreate()){
+            selectedServiceReqType.add(getSelectedRequestTypesIdMultiple());
+        }else{
+            selectedServiceReqType.add(getSelectedRequestTypeId());
+        }
+        for (Long requestTypeId : selectedServiceReqType) {
+
+//            if(isMultipleRequestCreate()){
+//                if(getEditRequest() && getMultiRequestMap().containsKey(requestTypeId)){
+//                    setEntity(getMultiRequestMap().get(requestTypeId));
+//                }else{
+//                    setEntity(new Request());
+//                    getMultiRequestMap().put(requestTypeId, getEntity());
+//                }
+//                getEntity().setRequestCreationType(RequestCreationType.MULTIPLE);
+//            }else if(isMultipleCreate()){
+//                getEntity().setRequestCreationType(RequestCreationType.MULTI);
+//            }else{
+//                getEntity().setRequestCreationType(RequestCreationType.SIMPLE);
+//            }
+
+            prepareRequestToSave(getEntity());
+//
+//            getEntity().setClient(DaoManager.get(Client.class, this.getSelectedClientId()));
+//
+//            getEntity().setDistraintFormality(getDistraintFormality());
+
+//            if (!ValidationHelper.isNullOrEmpty(this.getSelectedNotaryId()))
+//                getEntity().setNotary(DaoManager.get(Notary.class, this.getSelectedNotaryId()));
+//            else
+//                getEntity().setNotary(null);
+//
+//            if (getSelectedBillingClientId() != null) {
+//                getEntity().setBillingClient(DaoManager.get(Client.class, getSelectedBillingClientId()));
+//            } else {
+//                getEntity().setBillingClient(null);
+//            }
+//
+//            if (!ValidationHelper.isNullOrEmpty(this.getCdr()))
+//                getEntity().setCdr(this.getCdr());
+//            else
+//                getEntity().setCdr(null);
+//
+//            if (!ValidationHelper.isNullOrEmpty(this.getNdg()))
+//                getEntity().setNdg(this.getNdg());
+//            else
+//                getEntity().setNdg(null);
+//
+//            if (!ValidationHelper.isNullOrEmpty(this.getPosition()))
+//                getEntity().setPosition(this.getPosition());
+//            else
+//                getEntity().setPosition(null);
+//
+//            if (!ValidationHelper.isNullOrEmpty(this.getUrgent()))
+//                getEntity().setUrgent(this.getUrgent());
+//            else
+//                getEntity().setUrgent(null);
+//
+//            if (!ValidationHelper.isNullOrEmpty(getFiduciaryClientsSelected())) {
+//                getEntity().setRequestMangerList(new ArrayList<>());
+//                List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
+//                        Restrictions.in("id", getFiduciaryClientsSelected().stream()
+//                                .map(SelectItemWrapper::getId).collect(Collectors.toList()))});
+//                getEntity().getRequestMangerList().addAll(clients);
+//            }
+//            if (getEntity().getStateId() == null) {
+//                getEntity().setStateId(RequestState.INSERTED.getId());
+//            }
+//            if (!ValidationHelper.isNullOrEmpty(getRequestType())) {
+//                if(getRequestType().equals(0)) {
+//                    getEntity().setType(RequestEnumTypes.SUBJECT);
+//                }else if(getRequestType().equals(1)) {
+//                    getEntity().setType(RequestEnumTypes.MADE);
+//                }else if(getRequestType().equals(2)) {
+//                    getEntity().setType(RequestEnumTypes.COMMON);
+//                }
+//            } else if (!ValidationHelper.isNullOrEmpty(getSelectedRequestEnumTypeFirst())) {
+//                if (getSelectedRequestEnumTypeFirst().equals(RequestEnumTypes.SUBJECT.getId())) {
+//                    getEntity().setType(RequestEnumTypes.SUBJECT);
+//                } else {
+//                    getEntity().setType(getSelectedRequestEnumTypeSecond() == null
+//                            ? RequestEnumTypes.PROPERTY
+//                            : RequestEnumTypes.getById(getSelectedRequestEnumTypeSecond()));
+//                }
+//            }
+            getEntity().setRequestType(DaoManager.get(RequestType.class, requestTypeId));
+            if (isMultipleCreate() && !ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) {
+                List<Service> serviceList = DaoManager.load(Service.class, new Criterion[]{
+                        Restrictions.in("id", Arrays.asList(getSelectedServiceIds()).stream().collect(Collectors.toList()))
+                });
+                if(isMultipleRequestCreate()){
+                    serviceList = serviceList.stream().filter(service -> requestTypeId.equals(service.getRequestType().getId())).collect(Collectors.toList());
+                }
+                if(!ValidationHelper.isNullOrEmpty(serviceList)){
+                    if(serviceList.size() == 1){
+                        getEntity().setService(serviceList.get(0));
+                    }else {
+                        getEntity().setMultipleServices(serviceList);
+                    }
+                }
+            } else {
+                if(!ValidationHelper.isNullOrEmpty(getSelectedServiceId()))
+                    getEntity().setService(DaoManager.get(Service.class, getSelectedServiceId()));
+            }
+//            if (!ValidationHelper.isNullOrEmpty(getSelectedAgencyId())) {
+//                getEntity().setAgency(DaoManager.get(Agency.class, getSelectedAgencyId()));
+//            } else {
+//                getEntity().setAgency(null);
+//            }
+//            if (!ValidationHelper.isNullOrEmpty(getSelectedOfficeId())) {
+//                getEntity().setOffice(DaoManager.get(Office.class, getSelectedOfficeId()));
+//            } else {
+//                getEntity().setOffice(null);
+//            }
+//
+//            if (!ValidationHelper.isNullOrEmpty(getSelectedFiduciaryId())) {
+//                getEntity().setClientFiduciary(DaoManager.get(Client.class, getSelectedFiduciaryId()));
+//            } else {
+//                getEntity().setClientFiduciary(null);
+//            }
+
+//            if (getSubject() != null) {
+//                Subject tempSubject  = getSubject();
+//                SubjectHelper.fillSubjectFromWrapper(tempSubject, getWrapper());
+//                Subject subjectFromDB = SubjectHelper.getSubjectIfExists(tempSubject, getWrapper().getSelectedPersonId());
+//                if (subjectFromDB != null) {
+//                    setSubject(subjectFromDB);
+//                    if (!ValidationHelper.isNullOrEmpty(tempSubject.getId())) {
+//                        DaoManager.getSession().evict(DaoManager.getSession().get(Subject.class, tempSubject.getId()));
+//                    }
+//                }else {
+//                    Subject newSubject = SubjectHelper.copySubject(tempSubject);
+//                    setSubject(newSubject);
+//                }
+//            }
+//            if (!ValidationHelper.isNullOrEmpty(getMail())) {
+//                getEntity().setMail(getMail());
+//            }
+//
+//            fillRequestExpirationDate();
+//            getEntity().setSubject(getSubject());
+//            if (!ValidationHelper.isNullOrEmpty(getResidence())) {
+//                getEntity().setResidence(getResidence());
+//            }
+//            if (!ValidationHelper.isNullOrEmpty(getDomicile())) {
+//                getEntity().setDomicile(getDomicile());
+//            }
+//
+//            if(getEntity().isNew() &&
+//                    ValidationHelper.isNullOrEmpty(getEntity().getAggregationLandChargesRegistry())
+//                    && !ValidationHelper.isNullOrEmpty(getEntity().getRequestType().getDefault_registry())) {
+//                getEntity().setAggregationLandChargesRegistry(getEntity().getRequestType().getDefault_registry());
+//            }
+//
+//            if (ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+//                getWrapper().setSelectedConservatoryItemId(new ArrayList<>());
+//            }
+//            if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConserItemId())) {
+//                getWrapper().getSelectedConserItemId().forEach(elem -> {
+//                    if (!getWrapper().getSelectedConservatoryItemId().contains(elem)) {
+//                        getWrapper().getSelectedConservatoryItemId().add(elem);
+//                    }
+//                });
+//            }
+//            if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedTaloreItemId())) {
+//                getWrapper().getSelectedTaloreItemId().forEach(elem -> {
+//                    if (!getWrapper().getSelectedConservatoryItemId().contains(elem)) {
+//                        getWrapper().getSelectedConservatoryItemId().add(elem);
+//                    }
+//                });
+//            }
+
+            boolean saved = false;
+            if (!getEntity().isNew() && !ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())
+                    && !ValidationHelper.isNullOrEmpty(getEntity().getAggregationLandChargesRegistry())
+                    && getWrapper().getSelectedConservatoryItemId().stream().anyMatch(c -> c.getId().equals(getEntity().getAggregationLandChargesRegistry().getId()))
+                    || ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+
+                saveAllDataRelatedToRequestOrNotify(getEntity(), null);
+                if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+                    getWrapper().getSelectedConservatoryItemId().remove(getWrapper().getSelectedConservatoryItemId()
+                            .stream().filter(c -> c.getId().equals(getEntity().getAggregationLandChargesRegistry().getId()))
+                            .findAny().orElse(null));
+                }
+                saved = true;
+            }
+            if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+                List<ConservatoriaSelectItem> selectedConservatoryItemId = getWrapper().getSelectedConservatoryItemId();
+                for (int i = 0; i < selectedConservatoryItemId.size(); i++) {
+                    ConservatoriaSelectItem item = selectedConservatoryItemId.get(i);
+                    Request request = null;
+                    try {
+                        if (!saved) {                   // first element
+                            request = getEntity();
+                            saved = true;
+                        } else {
+                            request = getEntity().copy();
+                        }
+                    } catch (CloneNotSupportedException e) {
+                        LogHelper.log(log, e);
+                    }
+                    request.setAggregationLandChargesRegistry(DaoManager.get(AggregationLandChargesRegistry.class, item.getId()));
+
+                    saveAllDataRelatedToRequestOrNotify(request, null);
+                }
             }
         }
     }
 
-    private void prepareRequestToSave() throws PersistenceBeanException, IllegalAccessException {
+    private void prepareRequestToSave(Request entity) throws PersistenceBeanException, IllegalAccessException {
         DaoManager.getSession().clear();
-        if (!ValidationHelper.isNullOrEmpty(getEntity().getId())) {
-            getEntity().setRequestFormalities(DaoManager.load(RequestFormality.class, new Criterion[]{
-                    Restrictions.eq("request.id", getEntity().getId())
-            })
-                    );
+        if (!ValidationHelper.isNullOrEmpty(entity.getId())) {
+            entity.setRequestFormalities(DaoManager.load(RequestFormality.class, new Criterion[]{
+                            Restrictions.eq("request.id", entity.getId())
+                    })
+            );
+            entity.setRequestSubjects(DaoManager.load(RequestSubject.class, new Criterion[]{
+                            Restrictions.eq("request.id", entity.getId())
+                    })
+            );
         }
     }
 
@@ -1395,8 +2991,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
      * @throws IllegalAccessException   work with DB
      * @throws InstantiationException   work with DB
      */
-    private void fillRequestExpirationDate() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        if (!getEntity().isNew() && getEntity().getExpirationDate() != null) {
+    private void fillRequestExpirationDate(Request request) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        if (!request.isNew() && request.getExpirationDate() != null) {
             return;
         }
         Long clientId;
@@ -1419,7 +3015,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if (getMail() != null) {
             dateToAdd = getMail().getReceiveDate();
         } else {
-            dateToAdd = getEntity().getCreateDate();
+            dateToAdd = request.getCreateDate();
         }
         if (dateToAdd == null) {
             dateToAdd = new Date();
@@ -1432,7 +3028,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 i++;
             }
         }
-        getEntity().setExpirationDate(c.getTime());
+        request.setExpirationDate(c.getTime());
     }
 
     public void saveFiles(Request request, boolean beginTransaction) throws PersistenceBeanException, IllegalAccessException {
@@ -1597,7 +3193,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         options.put("draggable", false);
         options.put("modal", true);
         options.put("contentHeight", 900);
-        options.put("contentWidth", 1700);
+        options.put("contentWidth", 1200);
         SessionHelper.put("requestEditDistraintFormalityDialog", Boolean.TRUE);
         SessionHelper.put("listProperties", Boolean.TRUE);
         SessionHelper.put("editedRequestId", getEntity().getId());
@@ -1717,7 +3313,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     private void createHistory(Request request, boolean beginTransaction) throws HibernateException, PersistenceBeanException {
         if (RequestHelper.isDifferent(getStartStateId(), request.getStateId())
                 || RequestHelper.isDifferent(getStartUserId(),
-                        request.getUser() == null ? null : request.getUser().getId())) {
+                request.getUser() == null ? null : request.getUser().getId())) {
             RequestHistory history = new RequestHistory();
 
             history.setDate(new Date());
@@ -1739,8 +3335,19 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void changeUser() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         if (!ValidationHelper.isNullOrEmpty(getSelectedUserId())) {
-            getEntity().setUser(DaoManager.get(User.class, getSelectedUserId()));
-            getEntity().setStateId(RequestState.IN_WORK.getId());
+            if(getEntity().isNew()){
+                for (Request request : emptyIfNull(getNewRequestList())) {
+                    request.setUser(DaoManager.get(User.class, getSelectedUserId()));
+                    request.setStateId(RequestState.IN_WORK.getId());
+                }
+            }else {
+                getEntity().setUser(DaoManager.get(User.class, getSelectedUserId()));
+                getEntity().setStateId(RequestState.IN_WORK.getId());
+                for(Request request : emptyIfNull(getUpdatedNewRequestList())){
+                    request.setUser(DaoManager.get(User.class, getSelectedUserId()));
+                    request.setStateId(RequestState.IN_WORK.getId());
+                }
+            }
         }
     }
 
@@ -1839,9 +3446,23 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         afterSave();
     }
 
-    private void saveAllDataRelatedToRequestOrNotify(Request entity) throws PersistenceBeanException,
-    InstantiationException, IllegalAccessException {
-        getWrapper().saveFields(entity);
+    private void saveAllDataRelatedToRequestOrNotify(Request entity, Boolean saveSubject) throws PersistenceBeanException,
+            InstantiationException, IllegalAccessException {
+        getWrapper().saveFields(entity, saveSubject);
+        saveMultipleSubjects(entity);
+        List<Request> sameRequestList = getSameRequestsIfExist(entity);
+        if (!findAppropriateRequest(sameRequestList)) {
+            saveToDB(entity, false);
+        } else {
+            setShouldBeRedirected(false);
+            notifyUser();
+        }
+    }
+
+
+    private void saveAllDataRelatedToRequestOrNotify(Request entity, Boolean saveSubject, Boolean redirect) throws PersistenceBeanException,
+            InstantiationException, IllegalAccessException {
+        getWrapper().saveFields(entity, saveSubject);
         saveMultipleSubjects(entity);
         List<Request> sameRequestList = getSameRequestsIfExist(entity);
         if (!findAppropriateRequest(sameRequestList)) {
@@ -1913,11 +3534,11 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                     subject.setId(subjectFromDB.getId());
                 }
                 else {
-                    DaoManager.save(subject);    
+                    DaoManager.save(subject);
                     request.getSubjectList().add(subject);
                     request.getSubjectTypeMapping().put(subject.getId(),sbjWrp.getSectionCType());
                 }
-                getEntity().addRequestSubject(subject, DaoManager.getSession());
+                request.addRequestSubject(subject, DaoManager.getSession());
             }
         }
     }
@@ -1930,7 +3551,8 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             setShouldBeRedirected(getRedirected());
         else
             setShouldBeRedirected(true);
-        afterSave();
+
+        //afterSave();
     }
 
     private void notifyUser() throws PersistenceBeanException, IllegalAccessException {
@@ -1968,34 +3590,38 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private List<Request> getSameRequestsIfExist(Request request) throws PersistenceBeanException, IllegalAccessException {
         List<Request> result = new ArrayList<>();
-        if (!ValidationHelper.isNullOrEmpty(request.getClient())
-                && !ValidationHelper.isNullOrEmpty(request.getSubject())
-                && !ValidationHelper.isNullOrEmpty(request.getService())
-                && (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())
-                        || !ValidationHelper.isNullOrEmpty(request.getCity()))) {
+        try  {
+            if (!ValidationHelper.isNullOrEmpty(request.getClient())
+                    && !ValidationHelper.isNullOrEmpty(request.getSubject())
+                    && !ValidationHelper.isNullOrEmpty(request.getService())
+                    && (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())
+                    || !ValidationHelper.isNullOrEmpty(request.getCity()))) {
 
-            List<Criterion> restrictionsList = new ArrayList<>();
+                List<Criterion> restrictionsList = new ArrayList<>();
 
-            restrictionsList.add(Restrictions.eq("client", request.getClient()));
-            restrictionsList.add(Restrictions.eq("subject", request.getSubject()));
-            restrictionsList.add(Restrictions.eq("service", request.getService()));
-            restrictionsList.add(Restrictions.eq("notary", request.getNotary()));
+                restrictionsList.add(Restrictions.eq("client", request.getClient()));
+                restrictionsList.add(Restrictions.eq("subject", request.getSubject()));
+                restrictionsList.add(Restrictions.eq("service", request.getService()));
+                restrictionsList.add(Restrictions.eq("notary", request.getNotary()));
 
-            restrictionsList.add(Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                    Restrictions.isNull("isDeleted")));
+                restrictionsList.add(Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                        Restrictions.isNull("isDeleted")));
 
-            if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())) {
-                restrictionsList.add(Restrictions.eq("aggregationLandChargesRegistry",
-                        request.getAggregationLandChargesRegistry()));
-            } else {
-                restrictionsList.add(Restrictions.eq("city", request.getCity()));
+                if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())) {
+                    restrictionsList.add(Restrictions.eq("aggregationLandChargesRegistry",
+                            request.getAggregationLandChargesRegistry()));
+                } else {
+                    restrictionsList.add(Restrictions.eq("city", request.getCity()));
+                }
+
+                if (!ValidationHelper.isNullOrEmpty(request.getId())) {
+                    restrictionsList.add(Restrictions.ne("id", request.getId()));
+                }
+                result = DaoManager.load(Request.class, restrictionsList.toArray(new Criterion[0]));
             }
-
-            if (!ValidationHelper.isNullOrEmpty(request.getId())) {
-                restrictionsList.add(Restrictions.ne("id", request.getId()));
-            }
-            result = DaoManager.load(Request.class, restrictionsList.toArray(new Criterion[0]));
+        } catch (Exception e) {
         }
+
         return result;
     }
 
@@ -2060,7 +3686,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void openEstateLocation() throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
 
-        if(getEntity().getService() != null 
+        if(getEntity().getService() != null
                 && getEntity().getService().getRequestOutputType().equals(RequestOutputTypes.XML)) {
 
             if(getEntity().getTranscriptionActId() == null) {
@@ -2069,7 +3695,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 requestForcedList.add(this.getEntity());
                 formality.setRequestForcedList(requestForcedList);
                 DaoManager.save(formality,true);
-                
+
                 SectionA sectionA = new SectionA();
                 String comapnyName = ApplicationSettingsHolder.getInstance()
                         .getByKey(ApplicationSettingsKeys.COMPANY_NAME).getValue();
@@ -2078,7 +3704,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                     comapnyName = "";
 
                 String applicant = comapnyName.toUpperCase() + " PER ";
-                if(!ValidationHelper.isNullOrEmpty(getEntity()) 
+                if(!ValidationHelper.isNullOrEmpty(getEntity())
                         && !ValidationHelper.isNullOrEmpty(getEntity().getClient())) {
                     applicant = applicant + getEntity().getClientName().toUpperCase();
                 }
@@ -2095,16 +3721,16 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                 if(!ValidationHelper.isNullOrEmpty(addressAppliant))
                     addressAppliant = addressAppliant.toUpperCase();
                 sectionA.setAddressAppliant(addressAppliant);
-                
+
                 sectionA.setFormality(formality);
                 DaoManager.save(sectionA,true);
-                
-                List<RequestSubject> distinctByType = 
+
+                List<RequestSubject> distinctByType =
                         getEntity().getRequestSubjects().stream().
-                        filter(rs -> !ValidationHelper.isNullOrEmpty(
-                                rs.getType()))
-                        .filter(ListHelper.distinctByKey(rs -> rs.getType()))
-                        .collect(Collectors.toList());
+                                filter(rs -> !ValidationHelper.isNullOrEmpty(
+                                        rs.getType()))
+                                .filter(ListHelper.distinctByKey(rs -> rs.getType()))
+                                .collect(Collectors.toList());
                 for(RequestSubject requestSubject : distinctByType) {
                     SectionC sectionC = new SectionC();
                     sectionC.setSectionCType(requestSubject.getType());
@@ -2123,11 +3749,11 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             SessionHelper.put("requestViewFormality", Boolean.TRUE);
 
             Request request =  DaoManager.get(Request.class,new CriteriaAlias[]{
-                    new CriteriaAlias("transcriptionActId", "transcriptionActId", JoinType.INNER_JOIN)
-            },
+                            new CriteriaAlias("transcriptionActId", "transcriptionActId", JoinType.INNER_JOIN)
+                    },
                     new Criterion[]{
                             Restrictions.eq("id", this.getEntity().getId())
-            });
+                    });
 
             SessionHelper.put("transcriptionActId", request.getTranscriptionActId().getId());
             SessionHelper.put("editRequestId", this.getEntity().getId());
@@ -2141,34 +3767,89 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         RedirectHelper.goToOnlyView(PageTypes.REQUEST_FORMALITY, this.getEntity().getTranscriptionActId().getId());
     }
 
-    public void validateMultipleRequest() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
-        boolean isShowConfirm = false;
-        if (multipleCreate && getEntity().isNew()) {
-            List<Request> listRequestBySubject = DaoManager.load(Request.class, new CriteriaAlias[]{
-                            new CriteriaAlias("subject", "subject", JoinType.INNER_JOIN)},
-                    new Criterion[]{
-                            Restrictions.eq("subject.fiscalCode", getSubject().getFiscalCode())
-                    }, Order.desc("createDate"));
-            for(Request req : emptyIfNull(listRequestBySubject)){
-                if(!ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
-                    isShowConfirm = emptyIfNull(req.getMultipleServices()).stream().anyMatch(s -> getSelectedServiceIds().contains(s.getId().toString()));
-                    if(isShowConfirm)
-                        break;
-                }
+    public void onRequestTypeChangeBlock() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+        setShownFields(null);
+        setHiddenFields(null);
+        setShowConfirmButton(Boolean.FALSE);
+        if(!ValidationHelper.isNullOrEmpty(getSelectedRequestTypesIdMultiple())){
+            RequestType requestType = DaoManager.get(RequestType.class, getSelectedRequestTypesIdMultiple());
+            if(!ValidationHelper.isNullOrEmpty(requestType)
+                    && !ValidationHelper.isNullOrEmpty(requestType.getMultiselectionOperation())
+                    && requestType.getMultiselectionOperation()) {
+                setRequestTypeMultiple(Boolean.TRUE);
+            }else {
+                setRequestTypeMultiple(Boolean.FALSE);
             }
-            if(isShowConfirm){
-                setMultipleReqMessage(String
-                        .format(ResourcesHelper.getString("multipleRequestConfirm"), DateTimeHelper.toFormatedString( listRequestBySubject.get(0).getCreateDate(),
-                                DateTimeHelper.getDatePatternWithSeconds())));
-            }
+            //setShowAddServiceButton(Boolean.TRUE);
+        }else {
+            setRequestTypeMultiple(Boolean.FALSE);
+            setShowAddServiceButton(Boolean.FALSE);
         }
-        if (isShowConfirm) {
-            executeJS("PF('multipleRequestSave').show();");
-        } else {
-            pageSave();
-        }
+//        RequestContext.getCurrentInstance().execute("jQuery('.layout-mask')[0].style.display = 'block';");
+        onRequestTypeChange();
+        setSelectedServiceIds(new Long[]{});
+        setShownFields(null);
+        setHiddenFields(null);
+//        RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 500);");
     }
 
+    public void onMultipleServiceChangeBlock() throws PersistenceBeanException, IllegalAccessException {
+//        RequestContext.getCurrentInstance().execute("jQuery('.layout-mask')[0].style.display = 'block';");
+        onMultipleServiceChange();
+//        RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 500);");
+    }
+
+    public void onMultipleServiceChanges() throws IllegalAccessException, PersistenceBeanException {
+        onMultipleServiceChange();
+        boolean reset = true;
+        if(isMultipleRequestCreate()){
+            if(!ValidationHelper.isNullOrEmpty(getRequestTypeMultiple())
+                    && getRequestTypeMultiple() && !ValidationHelper.isNullOrEmpty(getSelectedServiceIds())){
+                //setShowConfirmButton(Boolean.TRUE);
+                reset = false;
+                generateDynamicContent(true);
+                setShowAddServiceButton(Boolean.TRUE);
+            }else if((!ValidationHelper.isNullOrEmpty(getRequestTypeMultiple())
+                    && getRequestTypeMultiple() && ValidationHelper.isNullOrEmpty(getSelectedServiceIds()))){
+                setShowConfirmButton(Boolean.FALSE);
+                setShowAddServiceButton(Boolean.FALSE);
+                reset = true;
+            }else if(!ValidationHelper.isNullOrEmpty(getSelectedServiceId())){
+                reset = false;
+                setShowConfirmButton(Boolean.FALSE);
+                generateDynamicContent(true);
+                setShowAddServiceButton(Boolean.TRUE);
+            }
+        }
+        if(reset){
+            setShownFields(null);
+            setHiddenFields(null);
+        }
+//        if(isMultipleRequestCreate()
+//                && ((!ValidationHelper.isNullOrEmpty(getRequestTypeMultiple())
+//                && getRequestTypeMultiple() && !ValidationHelper.isNullOrEmpty(getSelectedServiceIds())) ||
+//                !ValidationHelper.isNullOrEmpty(getSelectedServiceId()))
+//        ){
+//            setShowConfirmButton(Boolean.TRUE);
+//            generateDynamicContent(true);
+//        }else {
+//            setShowConfirmButton(Boolean.FALSE);
+//            setShownFields(null);
+//            setHiddenFields(null);
+//        }
+    }
+
+    public void generateDynamicContent(Boolean showLoader) throws PersistenceBeanException, IllegalAccessException {
+//        if(showLoader)
+//            RequestContext.getCurrentInstance().execute("jQuery('.layout-mask')[0].style.display = 'block';");
+        if(isMultipleRequestCreate() && (!ValidationHelper.isNullOrEmpty(getSelectedServiceIds()) ||
+                !ValidationHelper.isNullOrEmpty(getSelectedServiceId()))){
+            generateTab();
+            generateHiddenFields();
+        }
+//        if(showLoader)
+//            RequestContext.getCurrentInstance().execute("setTimeout(function(){jQuery('.layout-mask')[0].style.display = 'none';}, 500);");
+    }
 
     public Long getSelectedClientId() {
         return selectedClientId;
@@ -2280,6 +3961,14 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void setInputCardList(List<InputCard> inputCardList) {
         this.inputCardList = inputCardList;
+    }
+
+    public List<InputCard> getHiddenInputCardList() {
+        return hiddenInputCardList;
+    }
+
+    public void setHiddenInputCardList(List<InputCard> hiddenInputCardList) {
+        this.hiddenInputCardList = hiddenInputCardList;
     }
 
     public int getActiveMenuTabNum() {
@@ -2410,6 +4099,14 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         this.shownFields = shownFields;
     }
 
+    public List<RequestViewWrapper> getHiddenFields() {
+        return hiddenFields;
+    }
+
+    public void setHiddenFields(List<RequestViewWrapper> hiddenFields) {
+        this.hiddenFields = hiddenFields;
+    }
+
     public WLGInbox getMail() {
         return mail;
     }
@@ -2498,14 +4195,6 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         this.hasAgencyOfficeList = hasAgencyOfficeList;
     }
 
-    public Long getSelectedAgencyOfficeId() {
-        return selectedAgencyOfficeId;
-    }
-
-    public void setSelectedAgencyOfficeId(Long selectedAgencyOfficeId) {
-        this.selectedAgencyOfficeId = selectedAgencyOfficeId;
-    }
-
     public Subject getSubject() {
         return subject;
     }
@@ -2538,11 +4227,11 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         this.multipleCreate = multipleCreate;
     }
 
-    public List<String> getSelectedServiceIds() {
+    public Long[] getSelectedServiceIds() {
         return selectedServiceIds;
     }
 
-    public void setSelectedServiceIds(List<String> selectedServiceIds) {
+    public void setSelectedServiceIds(Long[] selectedServiceIds) {
         this.selectedServiceIds = selectedServiceIds;
     }
 
@@ -2831,15 +4520,407 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         this.multipleReqMessage = multipleReqMessage;
     }
 
-    public boolean isEnabled() {
-        return enabled;
+    /**
+     * @return the multipleRequestCreate
+     */
+    public boolean isMultipleRequestCreate() {
+        return multipleRequestCreate;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    /**
+     * @param multipleRequestCreate the multipleRequestCreate to set
+     */
+    public void setMultipleRequestCreate(boolean multipleRequestCreate) {
+        this.multipleRequestCreate = multipleRequestCreate;
     }
 
-    public void enableButtons() {
-        setEnabled(true);
+    /**
+     * @return the mutipleRequestObjTabPath
+     */
+    public List<String> getMutipleRequestObjTabPath() {
+        return mutipleRequestObjTabPath;
+    }
+
+    /**
+     * @param mutipleRequestObjTabPath the mutipleRequestObjTabPath to set
+     */
+    public void setMutipleRequestObjTabPath(List<String> mutipleRequestObjTabPath) {
+        this.mutipleRequestObjTabPath = mutipleRequestObjTabPath;
+    }
+
+    /**
+     * @return the multiRequestMap
+     */
+    public Map<Long , Request> getMultiRequestMap() {
+        return multiRequestMap;
+    }
+
+    /**
+     * @param multiRequestMap the multiRequestMap to set
+     */
+    public void setMultiRequestMap(Map<Long , Request> multiRequestMap) {
+        this.multiRequestMap = multiRequestMap;
+    }
+
+    private void validateRequestCreationType() {
+
+        RequestCreationType reqCreationTyp = getEntity().getRequestCreationType();
+
+        if (!ValidationHelper.isNullOrEmpty(reqCreationTyp)) {
+
+            switch (reqCreationTyp) {
+                case MULTI:
+                    setMultipleCreate(Boolean.TRUE);
+                    break;
+                case MULTIPLE:
+                    setMultipleCreate(Boolean.TRUE);
+                    setMultipleRequestCreate(Boolean.TRUE);
+                    break;
+                default:
+                    break;
+            }
+
+        }else {
+            setMultipleCreate(Boolean.TRUE);
+            setMultipleRequestCreate(Boolean.TRUE);
+        }
+    }
+
+    public void openRequestSubjectDialog(boolean isDeleted) throws HibernateException, PersistenceBeanException, IllegalAccessException, InstantiationException{
+        Subject aSubject = null;
+        if(getEntity().isNew()){
+            aSubject =  SubjectHelper.getSubjectIfExists(getSubject(),getWrapper().getSelectedPersonId());
+        }else{
+            aSubject = getEntity().getSubject();
+        }
+        if (getNewRequestList() == null)
+            setNewRequestList(new ArrayList<>());
+
+        if(!getEntity().isNew() && !isDeleted){
+            getEntity().setTempId(UUID.randomUUID().toString());
+            getNewRequestList().add(getEntity());
+        }
+        setSubjectListServiceIds(new HashMap<>());
+        setSubjectListServices(new HashMap<>());
+        if(!ValidationHelper.isNullOrEmpty(aSubject)){
+            List<RequestView> requestViews =  DaoManager.load(RequestView.class,
+                    new Criterion[]{Restrictions.eq("subjectId",aSubject.getId()),
+                            Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                                    Restrictions.isNull("isDeleted"))});
+
+            List<ServiceRequestWrapper> serviceRequestWrappers = new ArrayList<>();
+            for(RequestView requestView : requestViews){
+                String uuid = UUID.randomUUID().toString();
+                if(!ValidationHelper.isNullOrEmpty(getEntity().getId()) && !requestView.getId().equals(getEntity().getId())){
+                    Request req = DaoManager.get(Request.class, requestView.getId());
+                    req.setTempId(uuid);
+                    getNewRequestList().add(req);
+                }
+                ServiceRequestWrapper serviceRequestWrapper = new ServiceRequestWrapper();
+                serviceRequestWrapper.setCreateDate(requestView.getCreateDate());
+                serviceRequestWrapper.setIsDeleted(requestView.getDeleted());
+                serviceRequestWrapper.setClientId(requestView.getClientId());
+                serviceRequestWrapper.setBillingClientId(requestView.getBillingClientId());
+                serviceRequestWrapper.setTypeId(requestView.getTypeId());
+                serviceRequestWrapper.setClientName(requestView.getClientName());
+                serviceRequestWrapper.setRequestTypeId(requestView.getRequestTypeId());
+                serviceRequestWrapper.setServiceId(requestView.getServiceId());
+                serviceRequestWrapper.setBirthDate(requestView.getBirthDate());
+                serviceRequestWrapper.setName(requestView.getName());
+                serviceRequestWrapper.setReverseName(requestView.getReverseName());
+                serviceRequestWrapper.setCode(requestView.getCode());
+                serviceRequestWrapper.setStateId(requestView.getStateId());
+                serviceRequestWrapper.setSubjectId(requestView.getSubjectId());
+                serviceRequestWrapper.setUserId(requestView.getUserId());
+                serviceRequestWrapper.setAggregationLandChargesRegistryId(
+                        requestView.getAggregationLandChargesRegistryId());
+                serviceRequestWrapper.setUser(requestView.getUser());
+                serviceRequestWrapper.setMailId(requestView.getMailId());
+                serviceRequestWrapper.setUserAreaId(requestView.getUserAreaId());
+                serviceRequestWrapper.setUserOfficeId(requestView.getUserOfficeId());
+                serviceRequestWrapper.setCityId(requestView.getCityId());
+                serviceRequestWrapper.setProvinceId(requestView.getProvinceId());
+                serviceRequestWrapper.setExpirationDate(requestView.getExpirationDate());
+                serviceRequestWrapper.setUrgent(requestView.getUrgent());
+                serviceRequestWrapper.setEvasionDate(requestView.getEvasionDate());
+                serviceRequestWrapper.setNumberActUpdate(requestView.getNumberActUpdate());
+                serviceRequestWrapper.setCostEstateFormality(requestView.getCostEstateFormality());
+                serviceRequestWrapper.setCostCadastral(requestView.getCostCadastral());
+                serviceRequestWrapper.setCostPay(requestView.getCostPay());
+                serviceRequestWrapper.setTotalCost(requestView.getTotalCost());
+                serviceRequestWrapper.setDistraintFormalityId(requestView.getDistraintFormalityId());
+                serviceRequestWrapper.setInvoiceId(requestView.getInvoiceId());
+                serviceRequestWrapper.setHaveDocuments(requestView.getHaveDocuments());
+                serviceRequestWrapper.setHaveAllegatiDocuments(requestView.getHaveAllegatiDocuments());
+                serviceRequestWrapper.setExternal(requestView.getExternal());
+                serviceRequestWrapper.setCreateUserFullName(requestView.getCreateUserFullName());
+                serviceRequestWrapper.setOffice(requestView.getOffice());
+                serviceRequestWrapper.setDocumentsCount(requestView.getDocumentsCount());
+                serviceRequestWrapper.setServiceName(requestView.getServiceName());
+                serviceRequestWrapper.setServiceIcon(requestView.getServiceIcon());
+                serviceRequestWrapper.setServiceIsUpdate(requestView.getServiceIsUpdate());
+                serviceRequestWrapper.setRequestTypeName(requestView.getRequestTypeName());
+                serviceRequestWrapper.setRequestTypeIcon(requestView.getRequestTypeIcon());
+                serviceRequestWrapper.setAggregationLandCharRegName(
+                        requestView.getAggregationLandCharRegName());
+                serviceRequestWrapper.setFiduciaryId(requestView.getFiduciaryId());
+                serviceRequestWrapper.setManagerId(requestView.getManagerId());
+                serviceRequestWrapper.setId(requestView.getId());
+                serviceRequestWrapper.setCreateUserId(requestView.getCreateUserId());
+                serviceRequestWrapper.setTempId(uuid);
+                serviceRequestWrappers.add(serviceRequestWrapper);
+            }
+            setRegSubjectList(serviceRequestWrappers);
+
+//            getRegSubjectList()
+//                    .stream()
+//                    .filter(r -> !ValidationHelper.isNullOrEmpty(r.getRequestType()))
+//                    .forEach(r -> {
+//                        try {
+//                            if(!getSubjectListServices().containsKey(r.getRequestType().getId())){
+//                                List<SelectItem> services = ComboboxHelper.fillList(Service.class, Order.asc("name"), new Criterion[]{
+//                                        Restrictions.eq("requestType.id", r.getRequestType().getId())
+//                                }, false);
+//                                if(!ValidationHelper.isNullOrEmpty(services)){
+//                                    getSubjectListServices().put( r.getRequestType().getId(),services);
+//                                }
+//                            }
+//                            List<Long> serviceIdsList = r.getMultipleServices() != null
+//                                    ? r.getMultipleServices().stream()
+//                                    .map(Service::getId).collect(Collectors.toList()) : null;
+//                            if(!ValidationHelper.isNullOrEmpty(serviceIdsList)){
+//                                getSubjectListServiceIds().put(r.getId(), serviceIdsList);
+//                            }else {
+//                                if(!ValidationHelper.isNullOrEmpty(r.getService())){
+//                                    getSubjectListServiceIds().put(r.getId(), Stream.of(r.getService().getId()).collect(Collectors.toList()));
+//                                }
+//                            }
+//                        } catch (Exception e) {
+//                            LogHelper.log(log, e);
+//                        }
+//                    });
+        }else{
+            setRegSubjectList(new ArrayList());
+        }
+    }
+
+
+    /**
+     * @return the regSubjectList
+     */
+    public List<ServiceRequestWrapper> getRegSubjectList() {
+        return regSubjectList;
+    }
+
+    /**
+     * @param regSubjectList the regSubjectList to set
+     */
+    public void setRegSubjectList(List<ServiceRequestWrapper> regSubjectList) {
+        this.regSubjectList = regSubjectList;
+    }
+
+    public String getCdr() {
+        return cdr;
+    }
+
+    public void setCdr(String cdr) {
+        this.cdr = cdr;
+    }
+
+    public String getNdg() {
+        return ndg;
+    }
+
+    public void setNdg(String ndg) {
+        this.ndg = ndg;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
+    }
+
+    public boolean getEditRequest() {
+        return editRequest;
+    }
+
+    public void setEditRequest(boolean editRequest) {
+        this.editRequest = editRequest;
+    }
+
+    public String getYearRange() {
+        return yearRange;
+    }
+
+    public void setYearRange(String yearRange) {
+        this.yearRange = yearRange;
+    }
+
+    public Boolean getUrgent() {
+        return urgent;
+    }
+
+    public void setUrgent(Boolean urgent) {
+        this.urgent = urgent;
+    }
+
+    public Integer getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(Integer requestType) {
+        this.requestType = requestType;
+    }
+
+    public Long getSelectedOfficeId() {
+        return selectedOfficeId;
+    }
+
+    public void setSelectedOfficeId(Long selectedOfficeId) {
+        this.selectedOfficeId = selectedOfficeId;
+    }
+
+    public List<SelectItem> getOfficeList() {
+        return officeList;
+    }
+
+    public void setOfficeList(List<SelectItem> officeList) {
+        this.officeList = officeList;
+    }
+
+    public List<String> getMutipleRequestFirstObjTabPath() {
+        return mutipleRequestFirstObjTabPath;
+    }
+
+    public void setMutipleRequestFirstObjTabPath(List<String> mutipleRequestFirstObjTabPath) {
+        this.mutipleRequestFirstObjTabPath = mutipleRequestFirstObjTabPath;
+    }
+
+    public List<String> getMutipleRequestNDGPath() {
+        return mutipleRequestNDGPath;
+    }
+
+    public void setMutipleRequestNDGPath(List<String> mutipleRequestNDGPath) {
+        this.mutipleRequestNDGPath = mutipleRequestNDGPath;
+    }
+
+    public Long getSelectedFiduciaryId() {
+        return selectedFiduciaryId;
+    }
+
+    public void setSelectedFiduciaryId(Long selectedFiduciaryId) {
+        this.selectedFiduciaryId = selectedFiduciaryId;
+    }
+
+    public List<SelectItem> getFiduciaryList() {
+        return fiduciaryList;
+    }
+
+    public void setFiduciaryList(List<SelectItem> fiduciaryList) {
+        this.fiduciaryList = fiduciaryList;
+    }
+
+    public List<Request> getNewRequestList() {
+        return newRequestList;
+    }
+
+    public void setNewRequestList(List<Request> newRequestList) {
+        this.newRequestList = newRequestList;
+    }
+
+    public String getSelectedIdForDelete() {
+        return selectedIdForDelete;
+    }
+
+    public void setSelectedIdForDelete(String selectedIdForDelete) {
+        this.selectedIdForDelete = selectedIdForDelete;
+    }
+
+    public void deleteEntity()
+            throws HibernateException, PersistenceBeanException,
+            InstantiationException, IllegalAccessException {
+        if(!ValidationHelper.isNullOrEmpty(getSelectedIdForDelete())){
+            Optional<ServiceRequestWrapper> matchedRequest = getRegSubjectList()
+                    .stream()
+                    .filter(r -> !ValidationHelper.isNullOrEmpty(r.getTempId())
+                            && r.getTempId().equalsIgnoreCase(getSelectedIdForDelete()))
+                    .findFirst();
+            if (getCurrentUser().isExternal() && matchedRequest.isPresent()
+                    && !matchedRequest.get().getStateId().equals(RequestState.INSERTED.getId())) {
+                MessageHelper.addGlobalMessage(FacesMessage.SEVERITY_WARN,
+                        ResourcesHelper.getValidation("warning"),
+                        ResourcesHelper.getValidation("cannotRemoveRequest"));
+            } else if(matchedRequest.isPresent()){
+                if(!ValidationHelper.isNullOrEmpty(matchedRequest.get().getId())){
+                    Request request = DaoManager.get(Request.class, matchedRequest.get().getId());
+                    prepareRequestToSave(request);
+                    request.setIsDeleted(Boolean.TRUE);
+                    DaoManager.save(request, true);
+                }
+                getRegSubjectList().removeIf(s -> s.getTempId().equalsIgnoreCase(getSelectedIdForDelete()));
+                if(!ValidationHelper.isNullOrEmpty(getNewRequestList())){
+                    getNewRequestList().removeIf(s -> !ValidationHelper.isNullOrEmpty(s.getTempId()) &&
+                            s.getTempId().equalsIgnoreCase(getSelectedIdForDelete()));
+
+                    getRegSubjectList().removeIf(s -> !ValidationHelper.isNullOrEmpty(s.getTempId()) &&
+                            s.getTempId().equalsIgnoreCase(getSelectedIdForDelete()));
+                }
+
+                if(!ValidationHelper.isNullOrEmpty(getUpdatedNewRequestList()))
+                    getUpdatedNewRequestList().removeIf(s -> !ValidationHelper.isNullOrEmpty(s.getTempId()) &&
+                            s.getTempId().equalsIgnoreCase(getSelectedIdForDelete()));
+            }
+        }
+    }
+
+    public List<Request> getUpdatedNewRequestList() {
+        return updatedNewRequestList;
+    }
+
+    public void setUpdatedNewRequestList(List<Request> updatedNewRequestList) {
+        this.updatedNewRequestList = updatedNewRequestList;
+    }
+
+    public boolean isShowServiceTable() {
+        return showServiceTable;
+    }
+
+    public void setShowServiceTable(boolean showServiceTable) {
+        this.showServiceTable = showServiceTable;
+    }
+
+    public Request getOriginalRequest() {
+        return originalRequest;
+    }
+
+    public void setOriginalRequest(Request originalRequest) {
+        this.originalRequest = originalRequest;
+    }
+
+    public List<Request> getAssociatedRequests() {
+        return associatedRequests;
+    }
+
+    public void setAssociatedRequests(List<Request> associatedRequests) {
+        this.associatedRequests = associatedRequests;
+    }
+
+    public List<String> getUpdatedPropertyNames() {
+        return updatedPropertyNames;
+    }
+
+    public void setUpdatedPropertyNames(List<String> updatedPropertyNames) {
+        this.updatedPropertyNames = updatedPropertyNames;
+    }
+
+    public Boolean getSaveAssociatedRequests() {
+        return saveAssociatedRequests;
+    }
+
+    public void setSaveAssociatedRequests(Boolean saveAssociatedRequests) {
+        this.saveAssociatedRequests = saveAssociatedRequests;
     }
 }

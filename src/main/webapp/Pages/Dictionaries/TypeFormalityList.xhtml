@@ -1,0 +1,245 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ff="http://readytech.com/functions">
+<ui:composition template="/resources/tpl/Admin/LazyListBase.xhtml">
+    <ui:param name="list_title" value="#{msg.typeFormality}"/>
+    <ui:param name="bean" value="#{typeFormalityBean}"/>
+    <ui:param name="entity_name" value="#{msg.typeFormality}"/>
+    <ui:param name="additionalEditAction" value="window.scrollTo(0,0);"/>
+
+    <ui:define name="search_body">
+        <div class="settingsBlock">
+            <p:commandButton id="settingButton" onclick="togglePanel();" type="button" style="margin-left: 110px;position: absolute;"
+                             icon="ui-icon ui-icon-search pi pi-sliders-h" styleClass="searchPanelButton"/>
+            <script type="text/javascript">
+                // <![CDATA[
+                $("body").click(function(e){
+                    var target = $(e.target);
+                    if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('.ui-selectcheckboxmenu-panel').length
+                        && !target.parents('#ui-datepicker-div').length && !target.parents('#filterType_items').length) {
+                        PF('panelSetting').getJQ().hide();
+                    }
+                    if(target.closest('.ui-selectcheckboxmenu-item').length) {
+                        console.log("hello");
+                        $("#states").addClass("border_class");
+                    } else {
+                        $("#states").removeClass("border_class");
+                    }
+                });
+                function togglePanel() {
+                    PF('panelSetting').getJQ().toggle();
+                    if($('#statoAllLabel').length==0) {
+                        $('.ui-selectcheckboxmenu-header .ui-chkbox.ui-widget').after('<label id="statoAllLabel">Stato</label>');
+                    }
+                }
+                jQuery(document).ready(function() {
+                    PF('panelSetting').getJQ().hide();
+                });
+                // ]]>
+            </script>
+            <style>
+                #settingPanel {
+                    position: absolute;
+                    z-index: 1;
+                    margin-top: 40px;
+                    max-width: 560px;
+                    left: 200px;
+                    border: 1px solid #547ac4;
+                }
+                #settingPanel .ui-selectonemenu {
+                    background-color: #F0F3F5 !important;
+                    border-radius: 7px !important;
+                    min-height: 38px;
+                }
+                #settingPanel .ui-selectonemenu .ui-selectonemenu-label {
+                    margin-top: 3px;
+                }
+                #settingPanel .ui-selectonemenu:not(.green-border) {
+                    border: none !important;
+                }
+                .green-border {
+                    border: 1px solid #009900 !important;
+                }
+                #buttonCreate .ui-button-text {
+                    margin-left: -15px;
+                }
+                body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
+                    background-color: #f0f3f5 !important;
+                }
+                body .ui-datatable:not(.borderless) thead th {
+                    padding: 10px 10px !important;
+                }
+                .layout-menu.clearfix {
+                    margin-left: 15px !important;
+                }
+            </style>
+            <p:remoteCommand name="updateFilterInput"
+                             update=":filterCode :filterDescription :filterTextInVisura :filterInitText :filterFinalText :filterCertificationText"/>
+            <p:remoteCommand name="filterTableFromPanel"
+                             action="#{bean.filterTableFromPanel}" update=":form:table"/>
+
+            <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" styleClass="panelSetting" style="display: none;">
+                <div class="p-grid">
+                    <div class="p-col-12" style="text-align: center;">
+                        <h2>Filtra per</h2>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value="#{ff:upper(msg.typeFormalityCode)}:"/>
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value="#{ff:upper(msg.typeFormalityDescription)}:"/>
+                        </div>
+                    </div>
+
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:inputText id="filterCode" onblur="updateFilterInput()" value="#{bean.code}" style="width: 99%;min-height: 38px;"
+                                         styleClass="#{bean.code ne null and bean.code ne '' ? 'green-border' : ''}" />
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:inputText id="filterDescription" onblur="updateFilterInput()" value="#{bean.description}" style="width: 99%;min-height: 38px;" styleClass="#{bean.description ne null and bean.description ne '' ? 'green-border' : ''}" />
+                        </div>
+                    </div>
+
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value="#{ff:upper(msg.typeFormalityTextInVisura)}:"/>
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value="#{ff:upper(msg.typeFormalityType)}:"/>
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:inputText id="filterTextInVisura" onblur="updateFilterInput()" value="#{bean.textInVisura}" style="width: 99%;min-height: 38px;" styleClass="#{bean.textInVisura ne null and bean.textInVisura ne '' ? 'green-border' : ''}" />
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <p:selectOneMenu id="filterType" value="#{bean.actType}"
+                                         style="width: calc( 100% - 5px);" styleClass="#{bean.actType ne null and bean.actType ne '' ? 'green-border' : ''}">
+                            <f:selectItems value="#{bean.typeActEnumList}"/>
+                            <p:ajax event="itemSelect" update="@this"/>
+                        </p:selectOneMenu>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value="#{ff:upper(msg.typeFormalityTextInitial)}:"/>
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value="#{ff:upper(msg.typeFormalityTextFinal)}:"/>
+                        </div>
+                    </div>
+
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:inputText id="filterInitText" onblur="updateFilterInput()" value="#{bean.initText}" style="width: 99%;min-height: 38px;"
+                                         styleClass="#{bean.initText ne null and bean.initText ne '' ? 'green-border' : ''}" />
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:inputText id="filterFinalText" onblur="updateFilterInput()" value="#{bean.finalText}" style="width: 99%;min-height: 38px;" styleClass="#{bean.finalText ne null and bean.finalText ne '' ? 'green-border' : ''}" />
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value="#{ff:upper(msg.typeFormalityCertificationText)}:"/>
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value=""/>
+                        </div>
+                    </div>
+
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:inputText id="filterCertificationText" onblur="updateFilterInput()" value="#{bean.certificationText}" style="width: 99%;min-height: 38px;"
+                                         styleClass="#{bean.certificationText ne null and bean.certificationText ne '' ? 'green-border' : ''}" />
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                    </div>
+                    <div class="p-col-12" style="text-align: center;">
+                        <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #00CC52;margin-right: 20px;" id="searchButton"
+                                         onclick="filterTableFromPanel();" onsuccess="PF('panelSetting').getJQ().hide()"/>
+                        <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFilterPanel}" update="settingPanel" oncomplete="filterTableFromPanel();PF('panelSetting').getJQ().hide()"/>
+                    </div>
+                </div>
+            </p:panel>
+        </div>
+    </ui:define>
+    <ui:define name="edit_fields">
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" style="width: 40%">
+
+
+            <span>#{msg.typeFormalityCertificationText}</span>
+            <p:inputText value="#{bean.entity.certificationText}" styleClass="input-width"/>
+            <span>#{msg.typeFormalitySalesDevelopment} </span>
+            <p:selectBooleanCheckbox value="#{bean.entity.salesDevelopment}" style="margin-right:100%"/>
+            <span>#{msg.typeFormalitySalesDevelopmentOMI} </span>
+            <p:selectBooleanCheckbox value="#{bean.entity.salesDevelopmentOMI}" style="margin-right:100%"/>
+            <span>#{msg.typeFormalityRenewal} </span>
+            <p:selectBooleanCheckbox value="#{bean.entity.renewal}" style="margin-right:100%"/>
+        </p:panelGrid>
+    </ui:define>
+
+    <ui:define name="columns">
+        <p:column headerText="#{msg.typeFormalityCode}">
+            <h:outputText value="#{item.code}"/>
+        </p:column>
+        <p:column headerText="#{msg.typeFormalityDescription}">
+            <h:outputText value="#{item.description}"/>
+        </p:column>
+        <p:column headerText="#{msg.typeFormalityTextInVisura}">
+            <h:outputText value="#{item.textInVisura}"/>
+        </p:column>
+        <p:column headerText="#{msg.typeFormalityType}">
+            <h:outputText value="#{item.type}" converter="enumConverter"/>
+        </p:column>
+        <p:column headerText="#{msg.typeFormalityTextInitial}">
+            <h:outputText value="#{item.initText}"/>
+        </p:column>
+        <p:column headerText="#{msg.typeFormalityTextFinal}">
+            <h:outputText value="#{item.finalText}"/>
+        </p:column>
+        <p:column headerText="#{msg.typeFormalityPrejudicial}">
+            <p:selectBooleanCheckbox value="#{item.prejudicial}" disabled="true"/>
+        </p:column>
+        <p:column headerText="#{msg.typeFormalityCertificationText}">
+            <h:outputText value="#{item.certificationText}"/>
+        </p:column>
+        <p:column headerText="#{msg.typeFormalitySalesDevelopment}">
+            <p:selectBooleanCheckbox value="#{item.salesDevelopment}" disabled="true"/>
+        </p:column>
+        <p:column headerText="#{msg.typeFormalitySalesDevelopmentOMI}">
+            <p:selectBooleanCheckbox value="#{item.salesDevelopmentOMI}" disabled="true"/>
+        </p:column>
+        <p:column headerText="#{msg.typeFormalityRenewal}">
+            <p:selectBooleanCheckbox value="#{item.renewal}" disabled="true"/>
+        </p:column>
+    </ui:define>
+
+</ui:composition>
+</html>

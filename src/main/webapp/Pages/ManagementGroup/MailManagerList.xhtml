@@ -3,14 +3,26 @@
 <html xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
-<ui:composition template="/resources/tpl/Admin/LazyListTabBaseSimple.xhtml">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ff="http://readytech.com/functions"
+      xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+<ui:composition template="/resources/tpl/Admin/LazyListTabBaseSimplev2.xhtml">
     <ui:param name="bean" value="#{mailManagerListBean}"/>
+    <ui:define name="viewname">
+        <li>
+            <p:link outcome="/Pages/ManagementGroup/MailManagerList.jsf">#{msg.headerMailManager}</p:link>
+        </li>
+    </ui:define>
     <ui:define name="list_body">
         <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/mail.css"
               media="all" rel="stylesheet" type="text/css"/>
-        <script>
+        <link href="#{facesContext.externalContext.requestContextPath}/resources/chart/css/demo.css"
+              media="all" rel="stylesheet" type="text/css"/>
+        <script type="text/javascript"
+                src="#{facesContext.externalContext.requestContextPath}/resources/javascript/field-formatters.js"/>
 
+        <script>
             function checkDates() {
                 var dateFrom = $('#filterDateFrom_input').val();
                 var dateTo = $('#filterDateTo_input').val();
@@ -49,12 +61,36 @@
 
             function selectAllRowTopTableWV() {
                 if (PF('selectTopAllWV').input.is(':checked')) {
-                    PF('selectBottomAllWV').check();
-                    PF('tableWV').selectAllRows();
-                } else {
-                    PF('selectBottomAllWV').uncheck();
-                    PF('tableWV').unselectAllRows()
+                    console.log(">>>> checked ");
+                    PF('selectRowWV').check();
+                }else {
+                    console.log(">>>> unchecked ");
+                    PF('selectRowWV').uncheck();
                 }
+            }
+
+            function selectAllRowTopTableWV_old() {
+                var selectedIds = '';
+                if (PF('selectTopAllWV').input.is(':checked')) {
+                        $('.rowcheckboxes').each(function () {
+                            if(selectedIds == ''){
+                                selectedIds = $(this).attr("id");
+                            }else {
+                                selectedIds = selectedIds + ","+ $(this).attr("id");
+                            }
+
+                        $(this).find('div.ui-chkbox-box').addClass('ui-state-active');
+                        $(this).find('span.ui-chkbox-icon').addClass('ui-icon-check');
+                    });
+
+                } else {
+                    $('.rowcheckboxes').each(function () {
+                        $(this).find('div.ui-chkbox-box').removeClass('ui-state-active');
+                        $(this).find('span.ui-chkbox-icon').removeClass('ui-icon-check');
+                    });
+                }
+                $('input[name="selectedIds"]').val(selectedIds)
+                onSelectAllInbox();
             }
 
             function selectAllRowBottomTableWV() {
@@ -65,111 +101,443 @@
                     PF('selectTopAllWV').uncheck();
                     PF('tableWV').unselectAllRows()
                 }
-            }
+            };
+
         </script>
+
         <style>
+            body .ui-panel .ui-panel-content {
+                border: none !important;
+            }
+
+            body .ui-datatable .ui-paginator.ui-paginator-top {
+                background-color: #788FA7 !important;
+                color: #ffffff !important;
+            }
+            .mail-button {
+                background: #00CC52 !important;
+            }
+
+            .searchPanelButton {
+                background: #fb6e51 !important;
+            }
+            .cartelle-btn {
+                background:  #ff8b00 !important;
+            }
             .ui-chkbox.ui-chkbox-all.ui-widget {
                 display: none;
             }
+
+            .table-demo {
+                margin-right: 0rem;
+                margin-left: 0rem;
+                margin-top: 0rem;
+            }
+
+            body .ui-widget-header {
+                background: #f8f9fa !important;
+                color: #495057 !important;
+            }
+
+            body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
+                background-color: #f0f3f5 !important;
+            }
+
+            .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+                border: 1px solid #c9cdd2 !important;
+            }
+
+            .ui-datatable tbody td, .ui-datatable tfoot td {
+                border-width: 0 1px 1px 0 !important;
+            }
+
+            body .ui-datatable thead th {
+                background-color: #f8f9fa !important;
+                color: #495057 !important;
+                padding: 1rem 1rem !important;
+            }
+
+            body .ui-datatable .ui-datatable-data tr td {
+                padding: 6px 6px !important;
+            }
+
+            body .ui-datatable thead th.ui-state-active {
+                color: #2196F3 !important;
+            }
+
+            body .ui-datatable .ui-datatable-data > tr:hover {
+                background: #e9ecef !important;
+            }
+
+            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page, body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev, body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last {
+                color: #6c757d !important;
+            }
+
+            body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+                background: #2196F3 !important;
+                color: #ffffff !important;
+            }
+            .table-demo .p-col-12, .table-demo .card {
+                padding: 0;
+                border: none;
+            }
+            .ui-datatable-gridlines.td {
+                border-width: 1px !important;
+            }
+
+            body .ui-datatable .ui-datatable-header {
+                border-top: 2px solid #c9cdd2 !important;
+            }
+
+            .card {
+                border: none !important;
+                padding-bottom: 0px !important;
+                margin-bottom: 0px !important;
+                padding-top: 0px !important;
+            }
+
+            #table_div_content{
+                padding-top: 0px !important;
+            }
+            .ui-datatable-header {
+                padding-top: 5px !important;
+                padding-bottom: 5px !important;
+            }
+
+
+            body {
+                font-family: "cabin", sans-serif !important;
+                font-size: 1rem !important;
+                text-decoration: none;
+            }
+
+
+            body .ui-datatable .ui-datatable-data tr.ui-datatable-even.ui-state-highlight {
+                background-color: #2f8ee5 !important;
+                color: #ffffff;
+                border-color: #1c82df;
+            }
+
+            body .ui-state-highlight {
+                background-color: #2d353c !important;
+                color: #D0D7DE !important;
+            }
+
+            /*body .ui-datatable .ui-paginator.ui-paginator-top {*/
+            /*    background-color: #2f8ee5 !important;*/
+            /*    color: #ffffff !important;*/
+            /*}*/
+
+            /*body .ui-datatable .ui-paginator.ui-paginator-bottom {*/
+            /*    background-color: #2f8ee5 !important;*/
+            /*    color: #ffffff !important;*/
+            /*}*/
+
+            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page,
+            body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev,
+            body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last {
+                color: #FFFFFF !important;
+            }
+
+            body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+                background: #FFF !important;
+                color: #000000 !important;
+            }
+
+
+            .layout-wrapper .route-bar {
+                border-bottom: 1px solid #c9cdd2;
+            }
+
+            .layout-footer {
+                border-top: 1px solid #c9cdd2;
+            }
+
+            .ui-datatable tbody.ui-datatable-data {
+                border-left: 1px solid #c9cdd2;
+            }
+
+            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-rpp-options {
+                margin: 0;
+            }
+            body .ui-widget, body .ui-widget .ui-widget {
+                font-family: "Open Sans","Helvetica Neue",sans-serif !important;
+                text-decoration: none !important;
+                font-size: 14px !important;
+                /*font-weight: normal !important;*/
+            }
+
+            #states_panel {
+                background: #ffffff;
+                color: #495057;
+                padding: 0;
+                border: 0 none;
+                box-shadow: 0px 11px 15px -7px rgb(0 0 0 / 20%), 0px 24px 38px 3px rgb(0 0 0 / 14%), 0px 9px 46px 8px rgb(0 0 0 / 12%);
+                border-radius: 4px;
+            }
+
+            #states_panel .ui-selectcheckboxmenu-items-wrapper {
+                padding: 0px 1rem 1rem 1rem;
+            }
+
+            #states_panel .ui-selectcheckboxmenu-header {
+                margin: 1rem 1rem 0px 1rem;
+                border: 1px solid #808080 ;
+                background-color: #D9E0E7 !important;
+                color: #000000 !important;
+            }
+
+            #states_panel .ui-selectcheckboxmenu-list-item {
+                border: 1px solid #c9cdd2;
+                border-top: none;
+            }
+
+            #states_panel .ui-selectcheckboxmenu-close {
+                display: none;
+            }
+
+            .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item label {
+                color: #295887;
+                font-weight: 600;
+            }
+
+            .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item {
+                border: 1px solid;
+            }
+
+            .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-list-item .ui-chkbox .ui-chkbox-box.ui-state-hover {
+                border: 2px solid #4D759D;
+            }
+
+            body .ui-selectcheckboxmenu-panel .ui-selectcheckboxmenu-items {
+                padding: 0 0;
+            }
+
+            body .ui-chkbox .ui-chkbox-box.ui-state-active {
+                border-color: #4D759D;
+                color: #5f666c !important;
+                background-color: transparent !important;
+            }
+
+            #filterDateFrom_input {
+                width: 160px;
+            }
+
+            #filterDateTo_input {
+                width: 160px;
+            }
+            body .ui-datatable thead th {
+                border-color: #c9cdd2 !important;
+            }
+
+            body .ui-inputfield {
+                border: 1px solid #a8acb1;
+            }
+
+            body .ui-chkbox .ui-chkbox-box .ui-chkbox-icon.ui-icon-check {
+                font-weight: bolder;
+            }
+            .calender-filled input, .select-checkbox {
+                border: 0.2em  solid #57c279 !important;
+            }
+            body .ui-inputfield.ui-state-focus {
+                box-shadow: 0 0 0 0.2em #57c279 !important;
+            }
+
+            body .ui-selectcheckboxmenu.ui-state-focus:not(.ui-state-error) {
+                box-shadow: 0 0 0 0.2em #57c279 !important;
+            }
+
+            .border_class{
+                border: 0.2em solid #57c279 !important; border-radius: 7px !important;
+            }
+
+            #filterEmailsender.ui-state-focus {
+                box-shadow: 0 0 0 0.2em #a6d5fa !important;
+            }
+
+            #filterEmailSubject.ui-state-focus {
+                box-shadow: 0 0 0 0.2em #a6d5fa !important;
+            }
+
+            #filterEmailBody.ui-state-focus {
+                box-shadow: 0 0 0 0.2em #a6d5fa !important;
+            }
+
+            #settingPanel .ui-state-active {
+                background-color: #A9A9A9 !important;
+                color: #ffffff !important;
+            }
+
         </style>
 
         <p:remoteCommand name="updateSearchPanel" update=":form:searchPanel"/>
+        <p:remoteCommand name="updateCalendarFrom" update=":form:filterDateFrom"/>
         <p:remoteCommand name="updateCalendarTo" update=":form:filterDateTo"/>
         <p:remoteCommand name="updatePoll" update=":form:table, :form:searchPanel"/>
-        <h:inputHidden id="currentPageNumber" value="#{bean.currentPageNumber}"/>
-        <p:poll interval="30" listener="#{bean.executePoll}"/>
+        <p:remoteCommand name="globalSearch"
+                         action="#{bean.globalSearch}"  update=":form:table"/>
+        <p:remoteCommand name="handleParentCheck"
+                         action="#{bean.handleParentCheck}"  update=":form:table"/>
+        <p:remoteCommand name="refreshButtons"
+                         action="#{bean.refreshButtons}"  update=":form"/>
+        <p:poll interval="60" listener="#{bean.executePoll}"/>
         <div id="list_panel">
-            <p:panelGrid columns="6" id="filterSearchPanel" styleClass="ui-panelgrid-blank ui-fluid" layout="grid"
-                          columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2,ui-grid-col-2,ui-grid-col-2">
-                <p:column>
-                     <p:calendar id="filterDateFrom" readonlyInput="false" showOn="button"
-                            onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
-                            pattern="dd/MM/yyyy" mask="true"
-                            locale="it" navigator="true" popupIconOnly="true"
-                            onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
-                            value="#{bean.dateFrom}" placeholder="#{msg.mailManagerDateFrom}" />
-                </p:column>
-               
-                <p:column>
-                  <p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
-                            onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
-                            pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateTo}"
-                            onblur="check_date(this)" value="#{bean.dateTo}" />
-                </p:column>
-                <p:column>
-                    <p:selectCheckboxMenu value="#{bean.selectedSearchStateIds}" 
-			                						label="#{msg.mailManagerStates}"
-			                						style="margin-right: 15px!important;">
-			                    <f:selectItems value="#{bean.searchStates}"/>
-                    </p:selectCheckboxMenu>
-                </p:column>
-                <p:column>
-                    <p:inputText id="filterEmailFrom" value="#{bean.filterEmailFrom}" placeholder="#{msg.mailManagerEmailFrom}" />
-                </p:column>
-                <p:column>
-                    <p:inputText id="filterEmailTo" value="#{bean.filterEmailTo}" placeholder="#{msg.mailManagerEmailTo}"/>
-                </p:column>
-                <p:column>
-                     <p:inputText id="filterEmailSubject" value="#{bean.filterEmailSubject}" placeholder="#{msg.mailManagerEmailSubject}"/>
-                </p:column>
-                <p:column>
-                      <p:inputText id="filterEmailBody" value="#{bean.filterEmailBody}" placeholder="#{msg.mailManagerEmailBody}"/>
-                </p:column>
-                <p:column>
-                    <p:inputText id="filterEmailFile" value="#{bean.filterEmailFile}" placeholder="#{msg.mailManagerEmailFile}"/>
-                </p:column>
-                <p:column>
-                    <p:inputText value="#{bean.filterAll}"
-                             placeholder="#{msg.mailManagerEmailFrom}/#{msg.mailManagerEmailTo}/#{msg.mailManagerEmailSubject}/#{msg.mailManagerEmailBody}/#{msg.mailManagerEmailFile}"/>
-                </p:column>
-                <p:column>
-                    <p:commandButton value="#{msg.search}" id="searchButton" onclick="checkDates(); filterTableFromPanel();"
-                                     update="searchPanel" styleClass="grey-btn" style="width:50%"/>
-                </p:column>
-                    
-                    
-            </p:panelGrid>
-           
+            <div class="p-grid" style="margin-right: -28px !important; margin-left: -28px !important; margin-top : 1em !important; ">
+                <div class="p-col-12 p-md-12">
+                    <div class="card">
+                        <div class="p-grid">
+                            <div class="p-col-2" style="padding-top: 0px;padding-bottom: 0px;">
+                                <div class="p-formgroup-inline">
+                                    <div class="p-field" style="margin-bottom: 0px;">
+                                        <p:commandButton value="&nbsp;#{msg.mailManagerNewMail}"
+                                                         actionListener="#{bean.createNewMail}" update="@form" styleClass="ui-button-success p-mr-2 p-mb-2 mail-button"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-col-10" style="padding-top: 0px;padding-bottom: 0px;">
+                                <div class="p-formgroup-inline alignEnd">
+                                    <div class="p-field">
+                                        <p:inputText value="#{bean.filterEmail}" id="filterEmailsender"
+                                                     placeholder="#{msg.mailManagerEmailFrom}/#{msg.mailManagerEmailTo}" style=" width: 300px !important;"/>
+                                    </div>
+                                    <div class="p-field">
+                                        <p:inputText id="filterEmailSubject" value="#{bean.filterEmailSubject}" placeholder="#{msg.mailManagerEmailSubject}"
+                                                     style=" width: 300px !important;"/>
+                                    </div>
+                                    <div class="p-field">
+                                        <p:inputText id="filterEmailBody" value="#{bean.filterEmailBody}" placeholder="#{msg.mailManagerEmailBody}"
+                                                     style=" width: 300px !important;"/>
+                                    </div>
+                                    <div class="p-field">
+                                        <p:commandButton id="cercaButton" onclick="checkDates(); filterTableFromPanel();"
+                                                         update="searchPanel" icon="ui-icon ui-icon-search pi pi-search" styleClass="searchPanelButton"/>
+                                    </div>
 
-            <p:panel id="table_div">
+                                    <div class="settingsBlock">
+                                        <p:commandButton id="settingButton" onclick="togglePanel();" type="button"
+                                                         icon="ui-icon ui-icon-search pi pi-sliders-h" styleClass="searchPanelButton"/>
+                                        <script type="text/javascript">
+                                            // <![CDATA[
+                                            $("body").click(function(e){
+                                                var target = $(e.target);
+                                                if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('.ui-selectcheckboxmenu-panel').length
+                                                    && !target.parents('#ui-datepicker-div').length && !target.parents('.ui-datepicker-header').length) {
+                                                    PF('panelSetting').getJQ().hide();
+                                                }
+                                                if(target.closest('.ui-selectcheckboxmenu-item').length) {
+                                                    console.log("hello");
+                                                    $("#states").addClass("border_class");
+                                                } else {
+                                                    $("#states").removeClass("border_class");
+                                                }
+                                            });
+                                            function togglePanel() {
+                                                PF('panelSetting').getJQ().toggle();
+                                                if($('#statoAllLabel').length==0) {
+                                                    $('.ui-selectcheckboxmenu-header .ui-chkbox.ui-widget').after('<label id="statoAllLabel">Stato</label>');
+                                                }
+                                            }
+                                            jQuery(document).ready(function() {
+                                                PF('panelSetting').getJQ().hide();
+                                            });
+                                            // ]]>
+                                        </script>
+                                        <p:remoteCommand name="onPageChange"
+                                                         action="#{bean.onPageChange()}" oncomplete="setPageNumber()"/>
+                                        <p:remoteCommand name="onRowClick" action="#{bean.rowDblSelectListener}" update="table"/>
+                                        <p:remoteCommand name="onSortHeader" action="#{bean.sortData}" update="table"
+                                                         oncomplete="setHeaderSort()"/>
+
+                                        <p:remoteCommand name="handleRowsChange"
+                                                         action="#{bean.handleRowsChange()}" oncomplete="setPageNumber()"/>
+                                        <p:remoteCommand name="onBottomPageChange"
+                                                         action="#{bean.onBottomPageChange()}" oncomplete="setPageNumber()"/>
+                                        <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" styleClass="panelSetting" style="display: none;">
+                                            <div class="p-grid">
+                                                <div class="p-col-12" style="text-align: center;">
+                                                    <h2>Filtra per</h2>
+                                                </div>
+                                                <div class="p-col-12">
+                                                    Data:
+                                                    <p:calendar id="filterDateFrom" readonlyInput="false" showOn="button"
+                                                                onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+                                                                pattern="dd/MM/yyyy" mask="true" style="margin-right: 10px;"
+                                                                locale="it" navigator="true" popupIconOnly="true"
+                                                                onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+                                                                value="#{bean.dateFrom}" placeholder="#{msg.mailManagerDateFrom}" styleClass="#{bean.dateFrom ne null ? 'calender-filled' : ''}">
+                                                        <p:ajax event="dateSelect" update="@this" />
+                                                    </p:calendar>
+                                                    <div id="hyphen"></div>
+                                                    <p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
+                                                                onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                                                                pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateTo}"
+                                                                onblur="check_date(this)" value="#{bean.dateTo}" styleClass="#{bean.dateTo ne null ? 'calender-filled' : ''}">
+                                                        <p:ajax event="dateSelect" update="@this" />
+                                                    </p:calendar>
+                                                </div>
+                                                <div class="p-col-12">
+                                                    <span style="margin-bottom: 5px">#{msg.status}:</span>
+                                                    <p:selectCheckboxMenu value="#{bean.selectedSearchStateIds}" id="states"
+                                                                          label="#{msg.mailManagerStates}"  multiple="true"
+                                                                          style="margin-right: 15px!important;width: 40%;" styleClass="statesmenu#{bean.selectedSearchStateIds ne null and fn:length(bean.selectedSearchStateIds) gt 0 ? ' select-checkbox' : ''}">
+                                                        <f:selectItems value="#{bean.searchStates}"/>
+                                                        <p:ajax event="change" update="@this"/>
+                                                    </p:selectCheckboxMenu>
+                                                </div>
+                                                <div class="p-col-12" style="text-align: center;">
+                                                    <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #00CC52;margin-right: 20px;" id="searchButton"
+                                                                     onclick="checkDates(); filterTableFromPanel();PF('panelSetting').getJQ().hide()" update="searchPanel"/>
+                                                    <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFiltraPanel}" update="settingPanel" onclick="PF('panelSetting').getJQ().hide()"/>
+                                                </div>
+                                            </div>
+                                        </p:panel>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <p:panel id="table_div" style="margin-left: -20px; margin-right: -20px;">
                 <ui:fragment id="searchPanel">
                     <div class="button_group">
                         <p:remoteCommand name="filterTableFromPanel" action="#{bean.filterTableFromPanel}"
                                          update=":form:table"/>
-                        <p:commandButton value="&nbsp;#{msg.mailManagerNewMail}" icon="fa fa-plus" style="float: left"
-                                         actionListener="#{bean.createNewMail}" update="@form" styleClass="btn-green"/>
+
                         <p:commandButton value="&nbsp;#{msg.mailManagerFolder}" style="float: left"
                                          rendered="#{bean.canGotoFolders}"
-                                         actionListener="#{bean.gotoFolders}" update="@form" styleClass="grey-btn"/>
-                        <p:commandButton value="&nbsp;#{msg.mailManagerUpdate}" styleClass="grey-btn"
+                                         actionListener="#{bean.gotoFolders}" update="@form" styleClass="cartelle-btn p-mr-2 p-mb-2"/>
+                        <p:commandButton value="&nbsp;#{msg.mailManagerUpdate}" styleClass="cartelle-btn p-mr-2 p-mb-2"
                                          style="float: left"
-                                         update="menuform, header_form_panel, :form:table_panel"/>
+                                         update=":form:table_panel"/>
                         <p:commandButton icon="fa fa-arrow-right" title="#{msg.mailManagerForward}"
-                                         value="#{msg.mailManagerForward}" styleClass="grey-btn"
+                                         value="#{msg.mailManagerForward}" styleClass="cyan-blue-btn p-mr-2 p-mb-2"
                                          action="#{bean.forwardMail}" update=":form" style="float: left;"
                                          rendered="#{(bean.selectedInboxes.size() == 1) and not bean.selectedInboxes[0].isNew and bean.canCreate}"/>
                         <p:commandButton value="&nbsp;#{msg.mailManagerReply}" icon="fa fa-reply"
                                          rendered="#{(bean.selectedInboxes.size() == 1) and not bean.selectedInboxes[0].isNew and bean.canCreate}"
-                                         update=":form" styleClass="grey-btn" style="float: left"
+                                         update=":form" styleClass="cyan-blue-btn p-mr-2 p-mb-2" style="float: left"
                                          action="#{bean.replyMail}"/>
                         <p:commandButton value="&nbsp;#{msg.mailManagerReplyToAll}" icon="fa fa-reply-all"
                                          rendered="#{(bean.selectedInboxes.size() == 1) and not bean.selectedInboxes[0].isNew and bean.canCreate}"
-                                         update=":form" styleClass="grey-btn" style="float: left"
+                                         update=":form" styleClass="cyan-blue-btn p-mr-2 p-mb-2" style="float: left"
                                          action="#{bean.replyToAllMail}"/>
                         <p:commandButton value="&nbsp;#{msg.mailManagerMove}" oncomplete="PF('moveDlgWV').show();"
-                                         icon="fa fa-chevron-down" iconPos="right" styleClass="grey-btn"
+                                         icon="fa fa-chevron-down" iconPos="right" styleClass="cyan-blue-btn p-mr-2 p-mb-2"
                                          style="float: left"
                                          rendered="#{not empty mailManagerListBean.selectedInboxes and bean.canDeleteMail and bean.actual}"
                                          update=":form"/>
-                        <p:commandButton value="&nbsp;#{msg.mailManagerCancelMail}" styleClass="grey-btn" update=":form"
+                        <p:commandButton value="&nbsp;#{msg.mailManagerCancelMail}" styleClass="cyan-blue-btn p-mr-2 p-mb-2" update=":form"
                                          style="float: left"
                                          rendered="#{(not empty mailManagerListBean.selectedInboxes) and bean.canDeleteMail and bean.actual}"
                                          action="#{mailManagerListBean.cancelMail}" icon="fa fa-trash"/>
-                        <p:commandButton value="&nbsp;#{msg.mailManagerEditStateAction}" styleClass="grey-btn"
+                        <p:commandButton value="&nbsp;#{msg.mailManagerEditStateAction}" styleClass="cyan-blue-btn p-mr-2 p-mb-2"
                                          style="float: left"
                                          rendered="#{bean.mailManagerButtonSelectedId!=3 and not empty mailManagerListBean.selectedInboxes}"
                                          icon="fa fa-exchange" oncomplete="PF('editStateDlgWV').show();"/>
-                        <p:commandButton value="&nbsp;#{msg.mailManageReestablish}" styleClass="grey-btn"
+                        <p:commandButton value="&nbsp;#{msg.mailManageReestablish}" styleClass="cyan-blue-btn p-mr-2 p-mb-2"
                                          style="float: left"
                                          update=":form:table, :form:mail_item_1, :form:mail_item_2, :form:mail_item_3, :form:mail_item_0"
                                          rendered="#{bean.mailManagerButtonSelectedId==3 and not empty mailManagerListBean.selectedInboxes}"
@@ -177,37 +545,37 @@
                         <p:commandButton value="&nbsp;#{msg.mailManagerAssignMail}" icon="fa fa-lock"
                                          style="float: left"
                                          rendered="#{(not empty mailManagerListBean.selectedInboxes) and bean.canAssignPractice}"
-                                         oncomplete="PF('assignUserDlgWV').show();" styleClass="grey-btn"/>
+                                         oncomplete="PF('assignUserDlgWV').show();" styleClass="cyan-blue-btn p-mr-2 p-mb-2"/>
                         <p:commandButton value="&nbsp;#{msg.mailManageArchive}" icon="fa fa-hdd-o" style="float: left"
-                                         disabled="#{not bean.selectedCanActivateProcedure}" styleClass="grey-btn"
+                                         disabled="#{not bean.selectedCanActivateProcedure}" styleClass="cyan-blue-btn p-mr-2 p-mb-2"
                                          rendered="#{bean.mailManagerButtonSelectedId==3 and not empty mailManagerListBean.selectedInboxes and bean.havePermissionArchive}"
                                          action="#{bean.archiveMail}" update=":form:table, :form:mail_item_3"/>
 
 
                         <p:commandButton ajax="true" icon="fa fa-trash-o" oncomplete="editFormat(false);"
                                          action="#{bean.filterLetterByOwner}"
-                                         styleClass="#{bean.mailManagerButtonSelectedId==3?'':'grey-btn'}"
+                                         styleClass="#{bean.mailManagerButtonSelectedId==3?'selected-button p-mb-2':'cyan-blue-btn p-mb-2'}"
                                          update="form" id="mail_item_3" style="float: right"
                                          value="#{bean.getMailManagerSTORAGE()}">
                             <f:setPropertyActionListener value="3" target="#{bean.mailManagerButtonSelectedId}"/>
                         </p:commandButton>
                         <p:commandButton ajax="true" icon="fa fa-spinner" oncomplete="editFormat(false);"
                                          action="#{bean.filterLetterByOwner}"
-                                         styleClass="#{bean.mailManagerButtonSelectedId==0?'':'grey-btn'}"
+                                         styleClass="#{bean.mailManagerButtonSelectedId==0?'selected-button p-mr-2 p-mb-2':'cyan-blue-btn p-mr-2 p-mb-2'}"
                                          update="form" id="mail_item_0" style="float: right"
                                          value="#{bean.getMailManagerDRAFT()}">
                             <f:setPropertyActionListener value="0" target="#{bean.mailManagerButtonSelectedId}"/>
                         </p:commandButton>
                         <p:commandButton ajax="true" icon="fa fa-arrow-right" oncomplete="editFormat(false);"
                                          action="#{bean.filterLetterByOwner}"
-                                         styleClass="#{bean.mailManagerButtonSelectedId==1?'':'grey-btn'}"
+                                         styleClass="#{bean.mailManagerButtonSelectedId==1?'selected-button p-mr-2 p-mb-2':'cyan-blue-btn p-mr-2 p-mb-2'}"
                                          update="form" id="mail_item_1" style="float: right"
                                          value="#{bean.getMailManagerSENT()}">
                             <f:setPropertyActionListener value="1" target="#{bean.mailManagerButtonSelectedId}"/>
                         </p:commandButton>
                         <p:commandButton ajax="true" icon="fa fa-arrow-left" oncomplete="editFormat(false);"
                                          action="#{bean.filterLetterByOwner}"
-                                         styleClass="#{bean.mailManagerButtonSelectedId==2?'':'grey-btn'}"
+                                         styleClass="#{bean.mailManagerButtonSelectedId==2?'selected-button p-mr-2 p-mb-2':'cyan-blue-btn p-mr-2 p-mb-2' }"
                                          update="@form" id="mail_item_2" style="float: right"
                                          value="#{bean.getMailManagerRECEIVED()}" escape="false">
                             <f:setPropertyActionListener value="2" target="#{bean.mailManagerButtonSelectedId}"/>
@@ -217,107 +585,386 @@
                 </ui:fragment>
 
                 <ui:fragment id="table_panel">
+                    <div class="p-grid table-demo">
+                        <div class="p-col-12">
+                            <div class="card">
+                                <input type="hidden" name="pageNumber" value="#{bean.currentPageNumber}" />
+                                <p:panel id="table" styleClass="ui-datatable ui-widget" widgetVar="tableWV">
+                                    <c:set value="${bean.rowsPerPage}" var="rowsPerPage"></c:set>
+                                    <h:inputHidden id="numTotalPages" value="#{bean.totalPages}"/>
+                                    <h:inputHidden id="entityEditId" value="#{bean.entityEditId}"/>
+                                    <h:inputHidden id="tableHeader" name="tableHeader" value="data_header"/>
+                                    <h:inputHidden id="selectedIds" name="selectedIds" value="#{bean.selectedIds}"/>
+                                    <h:inputHidden id="rowsPerPageSelected" value="#{bean.rowsPerPage}"/>
+                                    <script>
+                                        // <![CDATA[
 
-                    <p:dataTable var="item" id="table" first="#{bean.defaultPage}" dynamic="true"
-                                 filteredValue="#{mailManagerListBean.filteredList}"
-                                 emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyModel}"
-                                 rowKey="#{item.id}" rows="#{bean.rowsPerPage}" lazy="true" paginator="true"
-                                 paginatorAlwaysVisible="true" disabledTextSelection="true"
-                                 rowStyleClass="#{bean.mailManagerButtonSelectedId==2 ? (item.read? 'mail_style':'receive_new_mail_style'):'mail_style'} #{bean.isSendOrStorage() ? 'mail-tab-DELETE-SEND' :''}"
-                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                 widgetVar="tableWV" selection="#{mailManagerListBean.selectedInboxes}"
-                                 rowExpandMode="single" rowsPerPageTemplate="15, 30, 45, 60"
-                                 sortOrder="#{bean.tableSortOrder}" sortField="#{bean.tableSortColumn}"
-                                 sortBy="#{false}">
-                        <p:ajax event="page" listener="#{bean.onPageChange}" update="currentPageNumber"></p:ajax>
-                        <!--<p:ajax event="rowSelect" listener="#{mailManagerListBean.rowSelectListener}"
-                                update=":form:searchPanel, :header_form_panel, :form:table_div"/> -->
+                                        $(document ).ready(function() {
+                                            var value = $("[name='pageNumber']").val();
+                                            $("div[class^='page_']").each(function(i, obj) {
+                                                obj.removeClass("ui-state-active");
+                                            });
 
-                        <p:ajax event="rowSelectCheckbox" async="true" update=":form"/>
-                        <p:ajax event="rowUnselectCheckbox" async="true" update=":form"/>
-                        <p:ajax event="rowSelect" update=":form"
-                                listener="#{mailManagerListBean.rowDblSelectListener}"/>
+                                            $('.page_' + value).addClass("ui-state-active");
+                                            $('#page_bottom_' + + value).addClass("ui-state-active");
+                                            // if(value == 1) {
+                                            //     $('.page_1').addClass("ui-state-active");
+                                            //     $('#page_bottom_1').addClass("ui-state-active");
+                                            // }else{
+                                            //     $('.page_1').removeClass("ui-state-active");
+                                            //     $('#page_bottom_1').removeClass("ui-state-active");
+                                            // }
+                                        });
 
-                        <p:column style="width: 17px !important;" selectionMode="multiple">
-                            <f:facet name="header">
-                                <p:selectBooleanCheckbox id="checkTop" async="true" widgetVar="selectTopAllWV"
-                                                         onchange="selectAllRowTopTableWV()"/>
-                            </f:facet>
-                            <f:facet name="footer">
-                                <p:selectBooleanCheckbox id="checkBottom" async="true" widgetVar="selectBottomAllWV"
-                                                         onchange="selectAllRowBottomTableWV()"/>
-                            </f:facet>
-                        </p:column>
+                                        function setPageNumber(){
+                                            var value = $("[name='pageNumber']").val();
+                                            for (let i = 0; i < 10; i++) {
+                                              $('.page_' + i).removeClass("ui-state-active");
+                                              $('.page_bottom_' + i).removeClass("ui-state-active");
+                                            }
+                                            $('.page_' + value).addClass("ui-state-active");
+                                            $('.page_bottom_' + value).addClass("ui-state-active");
+                                        }
 
-                        <p:column styleClass="min_padding_margin icon_column" exportable="false"
-                                  style="width: 40px !important;">
-                            <f:facet name="header">
-                                <span class="fa fa-paperclip"/>
-                            </f:facet>
-                            <p:outputPanel rendered="#{item.files}">
-                                <span class="fa fa-paperclip"/>
-                            </p:outputPanel>
-                        </p:column>
-                        <p:column exportable="false" styleClass="min_padding_margin" style="width: 30px">
-                            <p:outputPanel rendered="#{item.realForward}">
-                                <span class="fa fa-share"/>
-                            </p:outputPanel>
-                            <p:outputPanel rendered="#{item.realResponse}">
-                                <span class="fa fa-reply"/>
-                            </p:outputPanel>
-                        </p:column>
-                        <p:column exportable="false" styleClass="min_padding_margin" style="width: 30px">
-                            <f:facet name="header">
-                                <i class="fa fa-exclamation" aria-hidden="true"/>
-                            </f:facet>
-                            <p:outputPanel rendered="#{bean.defaultType.showPriority and not empty item.priorityWrapper
-                                           and not empty item.priorityWrapper.icon}">
-                                <span class="fa #{item.priorityWrapper.icon}"/>
-                            </p:outputPanel>
-                        </p:column>
-                        <p:column headerText="#{msg.mailManagerEmailReceiveDate}" field="sendDate" filterable="false"
-                                  sortBy="#{item.sendDate}" style="width: 112px;" id="sendDate">
-                            <h:outputText value="#{item.sendDateStr}"/>
-                        </p:column>
+                                        function setHeaderSort(){
+                                            var columnheader = $("[name='tableHeader']").val();
+                                            var cls = $('#' + columnheader).attr("class");
+                                            if(cls == 'ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s ui-icon-triangle-1-n'){
+                                                $('#' + columnheader).removeAttr("class");
+                                                $('#' + columnheader).addClass("ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s ui-icon-triangle-1-s");
+                                            }else {
+                                                if(cls == 'ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s ui-icon-triangle-1-s'){
+                                                    $('#' + columnheader).removeAttr("class");
+                                                    $('#' + columnheader).addClass("ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s ui-icon-triangle-1-n");
+                                                }
+                                            }
+                                        }
 
-                        <p:column headerText="#{msg.mailManagerEmailFrom}" id="emailFrom" field="emailFrom" filterable="false"
-                                  sortBy="#{item.emailFrom}" style="display : #{bean.needShowEmailFrom ? '' : 'none'};">
-                            <h:outputText value="#{item.emailFromStr[0]}" id="email_from"/>
-                            <p:tooltip for="email_from" value="#{item.emailFromStr[1]}"/>
-                        </p:column>
+                                        function refreshPerPage(id) {
+                                            $('input[id*="rowsPerPageSelected"]').val(document.getElementById(id).value);
+                                            handleRowsChange();
+                                        }
 
-                        <p:column headerText="#{msg.mailManagerEmailTo}" id="emailTo" field="emailTo" filterable="false"
-                                  sortBy="#{item.emailTo}" style="display : #{bean.needShowEmailTo ? '' : 'none'}">
-                            <h:outputText value="#{item.emailToStr[0]}" id="email_to"/>
-                            <p:tooltip for="email_to" value="#{item.emailToStr[1]}"/>
-                        </p:column>
+                                        function loadPerPage() {
+                                            handleRowsChange();
+                                        }
 
-                        <p:column headerText="#{msg.mailManagerEmailSubject}">
-                            <h:outputText value="#{item.emailSubject}"/>
-                        </p:column>
+                                        function changePage(pageNumber) {
+                                            $('input[name="pageNumber"]').val(pageNumber);
+                                            onPageChange();
+                                            getCurrentPageNumber();
+                                        }
+                                        function setAtFirstPage(){
+                                            changePage(1);
+                                        }
+                                        function setAtLastPage(){
+                                            var totalPages = getTotalPagesCount();
+                                            changePage(totalPages);
+                                        }
 
-                        <p:column headerText="#{msg.mailManagerEmailUser}"
-                                  style="width: 100px;display: #{bean.needShowEmailUser?'':'none'}">
-                            <h:outputText value="#{item.createUser}"/>
-                        </p:column>
+                                        function getTotalPagesCount() {
+                                            var totalPages = $('input[id="numTotalPages"]').val();
+                                            return totalPages;
+                                        }
 
-                        <p:column headerText="#{msg.mailManagerEmailState}" sortBy="#{item.state}"
-                                  styleClass="min_padding_margin" id="state" field="state" filterable="false"
-                                  rendered="#{bean.mailManagerButtonSelectedId != 1}"
-                                  style="width: 70px;">
-                            <h:outputText value="#{item.stateStr}"/>
-                        </p:column>
+                                        function getCurrentPageNumber() {
+                                            var pageNumber = $('input[name="pageNumber"]').val();
+                                            return parseInt(pageNumber);
+                                        }
 
-                        <p:column headerText="#{msg.mailManagerEmailUser}"
-                                  style="width: 100px;display: #{bean.needShowChangeStateUser?'':'none'}">
-                            <h:outputText value="#{item.changeStateUser}"/>
-                        </p:column>
-                    </p:dataTable>
+                                        function previousPage() {
+                                            var pageNumber = getCurrentPageNumber();
+                                            if(pageNumber>1) {
+                                                pageNumber = pageNumber-1;
+                                                changePage(pageNumber);
+                                            }
+                                        }
+
+                                        function firstPage() {
+                                            changePage(1);
+                                        }
+
+                                        function lastPage() {
+                                            var totalPages = getTotalPagesCount();
+                                            changePage(totalPages);
+                                        }
+
+                                        function nextPage() {
+                                            var pageNumber = getCurrentPageNumber();
+                                            var totalPages = getTotalPagesCount();
+                                            if(pageNumber < totalPages) {
+                                                pageNumber++;
+                                                changePage(pageNumber);
+                                            }
+                                        }
+
+                                        function selectRow(id){
+                                            $('input[id="entityEditId"]').val(id);
+                                            onRowClick();
+                                        }
+
+                                        function sortRow(columnheader){
+                                            $('input[id="tableHeader"]').val(columnheader);
+                                            onSortHeader();
+                                        }
+
+                                        function manageSelectInbox(){
+                                            //onSelectInbox();
+                                            updatedCheckBoxes();
+                                        }
+
+                                        function updatedCheckBoxes(){
+                                            var selectedIds = '';
+                                            if (PF('selectTopAllWV').input.is(':checked')) {
+
+                                                $('.rowcheckboxes').each(function () {
+                                                    if(selectedIds == ''){
+                                                        selectedIds = $(this).attr("id");
+                                                    }else {
+                                                        selectedIds = selectedIds + ","+ $(this).attr("id");
+                                                    }
+
+                                                    $(this).find('div.ui-chkbox-box').addClass('ui-state-active');
+                                                    $(this).find('span.ui-chkbox-icon').addClass('ui-icon-check');
+                                                });
+                                                $('input[name="selectedIds"]').val(selectedIds)
+                                            } else {
+                                                $('.rowcheckboxes').each(function () {
+                                                    $(this).find('div.ui-chkbox-box').removeClass('ui-state-active');
+                                                    $(this).find('span.ui-chkbox-icon').removeClass('ui-icon-check');
+                                                });
+                                            }
+                                        }
+
+                                        function disableAll(id){
+
+                                            $('[id^=mail_item_]').each(function() {
+
+                                                if(($(this).attr("id")) != id){
+                                                    console.log(id, 'kkkk', $(this).attr("id"));
+                                                    $(this).attr("disabled", "true");
+                                                }
+                                            });
+                                        }
+
+                                        function enableAll(){
+
+                                            $('[id^=mail_item_]').each(function() {
+                                                $(this).removeAttr('disabled');
+                                            });
+                                        }
+
+                                        // ]]>
+                                    </script>
+                                    <div id="table_paginator_top" class="ui-paginator ui-paginator-top ui-widget-header">
+                                        <h:outputText id="totalPages" value="(1 of #{bean.totalPages})"
+                                                      styleClass="ui-paginator-current"/>
+                                        <h:outputText value="#{bean.pageNavigationStart}" escape="false"/>
+                                        <h:outputText styleClass="ui-paginator-pages" value="#{bean.paginatorString}" escape="false"/>
+                                        <h:outputText value="#{bean.pageNavigationEnd}" escape="false"/>
+                                        <label id="table_rppLabel" class="ui-paginator-rpp-label ui-helper-hidden">Rows Per Page</label>
+                                        <h:selectOneMenu value = "#{bean.rowsPerPage}" onchange="refreshPerPage('table_rppDD')" name="table_rppDD" id="table_rppDD">
+                                            <f:selectItem itemValue = "18" itemLabel = "18" />
+                                            <f:selectItem itemValue = "50" itemLabel = "50" />
+                                            <f:selectItem itemValue = "100" itemLabel = "100" />
+                                        </h:selectOneMenu>
+                                    </div>
+                                    <div class="ui-datatable-tablewrapper">
+                                        <table>
+                                            <thead id="table_head">
+                                            <tr role="row">
+                                                <th id="table:j_idt93"
+                                                    class="ui-state-default ui-selection-column min_padding_margin icon_column"
+                                                    role="columnheader" scope="col" style="width: 20px !important;">
+                                                    <p:selectBooleanCheckbox id="checkTop" async="true" widgetVar="selectTopAllWV"
+                                                                             onchange="handleParentCheck();" value="#{bean.parentCheck}"/>
+<!--                                                    <span class="ui-column-title">-->
+<!--                                                        <div id="table:checkTop" class="ui-chkbox ui-widget">-->
+<!--                                                            <div class="ui-helper-hidden-accessible">-->
+<!--                                                                <input id="table:checkTop_input" name="checkTop_input"-->
+<!--                                                                       type="checkbox" autocomplete="off"-->
+<!--                                                                       aria-checked="false"-->
+<!--                                                                       onchange="selectAllRowTopTableWV()"/>-->
+<!--                                                            </div>-->
+<!--                                                            <div class="ui-chkbox-box ui-widget ui-corner-all ui-state-default">-->
+<!--                                                                <span class="ui-chkbox-icon ui-icon ui-icon-blank ui-c">-->
+
+<!--                                                                </span>-->
+<!--                                                            </div>-->
+<!--                                                        </div>-->
+<!--                                                    </span>-->
+                                                </th>
+                                                <th id="table:j_idt94"
+                                                    class="ui-state-default min_padding_margin icon_column"
+                                                    role="columnheader" scope="col" style="width: 20px !important;"><span
+                                                        class="ui-column-title">
+                                            <span class="fa fa-paperclip"></span></span></th><th id="table:j_idt98" class="ui-state-default min_padding_margin" role="columnheader" scope="col" style="width: 20px"><span class="ui-column-title"></span></th><th id="table:j_idt103" class="ui-state-default min_padding_margin" role="columnheader" scope="col" style="width: 20px"><span class="ui-column-title">
+                                            <i class="fa fa-exclamation"></i></span></th>
+                                                <th id="table:sendDate" class="ui-state-default ui-sortable-column"
+                                                    scope="col"
+                                                    style="width: 120px;"><span
+                                                        class="ui-column-title">Data</span><span
+                                                        class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s"></span>
+                                                </th>
+                                                <th id="table:emailFrom" class="ui-state-default ui-sortable-column"
+                                                    scope="col" style="display : #{bean.needShowEmailFrom ? '' : 'none'};"><span
+                                                        class="ui-column-title">Mittente</span><span
+                                                        class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s"></span>
+                                                </th>
+
+                                                <th id="table:emailTo" class="ui-state-default ui-sortable-column"
+                                                    scope="col" style="display : #{bean.needShowEmailTo ? '' : 'none'}"><span
+                                                        class="ui-column-title">Destinatario</span><span
+                                                        class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s"></span>
+                                                </th>
+                                                <th id="table:j_idt110" class="ui-state-default" scope="col"><span
+                                                        class="ui-column-title">Oggetto</span>
+                                                </th>
+
+                                                <c:if test="${bean.mailManagerButtonSelectedId != 1}">
+                                                    <th id="table:state"
+                                                        class="ui-state-default ui-sortable-column min_padding_margin"
+                                                        scope="col" style="width: 100px;"><span
+                                                            class="ui-column-title">Stato</span><span
+                                                            class="ui-sortable-column-icon ui-icon ui-icon-carat-2-n-s"></span>
+                                                    </th>
+                                                </c:if>
+
+                                                <c:if test="${bean.needShowChangeStateUser or bean.needShowEmailUser}">
+                                                    <th id="table:j_idt115" class="ui-state-default" scope="col"
+                                                        style="width: 150px;"><span
+                                                            class="ui-column-title">Operatore</span></th>
+                                                </c:if>
+
+                                            </tr>
+                                            </thead>
+                                            <tbody id="table_data" class="ui-datatable-data ui-widget-content">
+                                            <c:forEach var="item" items="#{bean.lazyModel.wrappedData}" varStatus="loop">
+
+                                                <c:if test="${loop.index % 2 == 0}">
+                                                    <c:set value="ui-datatable-even" var="evenclass"></c:set>
+                                                </c:if>
+
+                                                <c:if test="${loop.index % 2 != 0}">
+                                                    <c:set value="ui-datatable-odd" var="evenclass"></c:set>
+                                                </c:if>
+
+<!--                                                <c:if test="${bean.mailManagerButtonSelectedId==2 and item.read and bean.isSendOrStorage()}">-->
+<!--                                                    <c:set value="mail_style mail-tab-DELETE-SEND ui-datatable-gridlines" var="cssClass"></c:set>-->
+<!--                                                </c:if>-->
+<!--                                                <c:if test="${bean.mailManagerButtonSelectedId==2 and item.read and !bean.isSendOrStorage()}">-->
+<!--                                                    <c:set value="mail_style ui-datatable-gridlines" var="cssClass"></c:set>-->
+<!--                                                </c:if>-->
+<!--                                                <c:if test="${bean.mailManagerButtonSelectedId==2 and !item.read and bean.isSendOrStorage()}">-->
+<!--                                                    <c:set value="receive_new_mail_style mail-tab-DELETE-SEND ui-datatable-gridlines" var="cssClass"></c:set>-->
+<!--                                                </c:if>-->
+<!--                                                <c:if test="${bean.mailManagerButtonSelectedId==2 and !item.read and !bean.isSendOrStorage()}">-->
+<!--                                                    <c:set value="receive_new_mail_style ui-datatable-gridlines" var="cssClass"></c:set>-->
+<!--                                                </c:if>-->
+
+
+<!--                                                <c:if test="${bean.mailManagerButtonSelectedId != 2 and bean.isSendOrStorage()}">-->
+<!--                                                    <c:set value="mail_style mail-tab-DELETE-SEND ui-datatable-gridlines" var="cssClass"></c:set>-->
+<!--                                                </c:if>-->
+<!--                                                <c:if test="${bean.mailManagerButtonSelectedId != 2 and !bean.isSendOrStorage()}">-->
+<!--                                                    <c:set value="mail_style ui-datatable-gridlines" var="cssClass"></c:set>-->
+<!--                                                </c:if>-->
+
+
+<!--                                                <tr class="ui-widget-content ui-datatable-selectable ${evenclass}-->
+<!--                                                    #{bean.mailManagerButtonSelectedId==2 ? (item.read? 'mail_style':'receive_new_mail_style'):'mail_style'}-->
+<!--                                                        #{bean.isSendOrStorage() ? 'mail-tab-DELETE-SEND' :''}">-->
+                                                <tr class="ui-widget-content ui-datatable-selectable ${evenclass} ${item.rowCheck ? 'ui-state-highlight' : ''} #{bean.mailManagerButtonSelectedId==2 ? (item.read? 'mail_style':'receive_new_mail_style'):'mail_style'} #{bean.isSendOrStorage() ? 'mail-tab-DELETE-SEND' :''}">
+                                                    <td style="width: 20px !important;"
+                                                        class="ui-selection-column min_padding_margin icon_column">
+                                                        <p:selectBooleanCheckbox id="checkRow" value="#{item.rowCheck}" styleClass="checkRow">
+                                                            <p:ajax event="change" async="true" delay="1000" listener="#{bean.handleRowCheck}" update=":form"/>
+                                                            <f:attribute name="selectedInbox" value="#{item}" />
+                                                        </p:selectBooleanCheckbox>
+<!--                                                        <div class="ui-chkbox ui-widget">-->
+<!--                                                            <div class="ui-helper-hidden-accessible"><input type="checkbox"-->
+<!--                                                                                                            name="table_checkbox"/>-->
+<!--                                                            </div>-->
+<!--                                                            <div class="ui-chkbox-box ui-widget ui-corner-all ui-state-default">-->
+<!--                                                                <span class="ui-chkbox-icon ui-icon ui-icon-blank ui-c"></span>-->
+<!--                                                            </div>-->
+<!--                                                        </div>-->
+                                                    </td>
+                                                    <td style="width: 20px !important;"
+                                                        class="min_padding_margin icon_column" onclick="selectRow(#{item.id})">
+                                                        <div id="table:51:j_idt96" class="ui-outputpanel ui-widget"
+                                                             onclick="selectRow(#{item.id})">
+                                                            <p:outputPanel rendered="#{item.files}">
+                                                                <h:outputText class="fa fa-paperclip"/>
+                                                            </p:outputPanel>
+                                                        </div>
+                                                    </td>
+
+                                                    <td style="width: 20px" class="min_padding_margin" onclick="selectRow(#{item.id})">
+                                                        <p:outputPanel rendered="#{item.realForward}">
+                                                            <span class="fa fa-share"/>
+                                                        </p:outputPanel>
+                                                        <p:outputPanel rendered="#{item.realResponse}">
+                                                            <span class="fa fa-reply"/>
+                                                        </p:outputPanel>
+                                                    </td>
+
+                                                    <td style="width: 20px" class="min_padding_margin" onclick="selectRow(#{item.id})">
+                                                        <p:outputPanel rendered="#{bean.defaultType.showPriority and not empty item.priorityWrapper
+                                                       and not empty item.priorityWrapper.icon}">
+                                                            <span class="fa #{item.priorityWrapper.icon}"/>
+                                                        </p:outputPanel>
+                                                    </td>
+
+                                                    <td style="width: 120px;" onclick="selectRow(#{item.id})">
+                                                        <h:outputText value="#{item.sendDateStr}"/></td>
+                                                    <c:if test="${bean.needShowEmailFrom}">
+                                                        <td style="width: 100px;"  onclick="selectRow(#{item.id})">  <h:outputText value="#{item.emailFromStr[0]}" id="email_from"/></td>
+                                                    </c:if>
+                                                    <c:if test="${bean.needShowEmailTo}">
+                                                        <td style="width: 100px;" onclick="selectRow(#{item.id})">  <h:outputText value="#{item.emailToStr[0]}" id="email_to"/></td>
+                                                    </c:if>
+                                                    <td onclick="selectRow(#{item.id})">  <h:outputText value="#{item.emailSubject}"/></td>
+                                                    <c:if test="${bean.needShowEmailUser}">
+                                                        <td onclick="selectRow(#{item.id})">  <h:outputText value="#{item.createUser}"/></td>
+                                                    </c:if>
+                                                    <c:if test="${bean.mailManagerButtonSelectedId != 1}">
+                                                        <td onclick="selectRow(#{item.id})"><h:outputText styleClass="min_padding_margin" style="width: 70px;" value="#{item.stateStr}"/></td>
+                                                    </c:if>
+                                                    <c:if test="${bean.needShowChangeStateUser}">
+                                                        <td onclick="selectRow(#{item.id})"><h:outputText value="#{item.changeStateUser}"/></td>
+                                                    </c:if>
+
+                                                </tr>
+
+                                            </c:forEach>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div id="table_paginator_bottom" class="ui-paginator ui-paginator-top ui-widget-header">
+                                        <h:outputText id="totalPagesBottom" value="(1 of #{bean.totalPages})" styleClass="ui-paginator-current"/>
+                                        <h:outputText value="#{bean.pageNavigationStart}" escape="false"/>
+                                        <h:outputText styleClass="ui-paginator-pages" value="#{bean.paginatorString}" escape="false"/>
+                                        <h:outputText value="#{bean.pageNavigationEnd}" escape="false"/>
+                                        <label id="table_rppLabel_bottom"
+                                               class="ui-paginator-rpp-label ui-helper-hidden">Rows Per Page</label>
+                                        <h:selectOneMenu value = "#{bean.rowsPerPage}" onchange="refreshPerPage('table_rppDD_bottom')" name="table_rppDD"
+                                                         id="table_rppDD_bottom">
+                                            <f:selectItem itemValue = "18" itemLabel = "18" />
+                                            <f:selectItem itemValue = "50" itemLabel = "50" />
+                                            <f:selectItem itemValue = "100" itemLabel = "100" />
+                                        </h:selectOneMenu>
+                                    </div>
+                                </p:panel>
+                            </div>
+                        </div>
+                    </div>
                 </ui:fragment>
             </p:panel>
         </div>
 
-        <p:dialog id="assignUserDlg" widgetVar="assignUserDlgWV"
+        <p:dialog id="assignUserDlg" widgetVar="assignUserDlgWV" styleClass="dialog-green"
                   draggable="false" modal="true" resizable="false"
                   header="#{msg.mailManagerAssignUserHeader}">
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">

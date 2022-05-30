@@ -3,6 +3,7 @@ package it.nexera.ris.common.helpers;
 import it.nexera.ris.common.enums.ApplicationSettingsKeys;
 import it.nexera.ris.common.enums.MailManagerStatuses;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
+import it.nexera.ris.persistence.UserHolder;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.User;
 import it.nexera.ris.persistence.beans.entities.domain.WLGFolder;
@@ -126,10 +127,14 @@ public class MailManagerHelper extends BaseHelper {
                     case DRAFT:
                         mail.setServerId(null);
                         mail.setState(MailManagerStatuses.NEW.getId());
+                        log.info("setting mail :: "+mail.getId() + " state to :: "+MailManagerStatuses.findById(mail.getState())
+                                + " by user:: "+ UserHolder.getInstance().getCurrentUser().getId());
                         break;
 
                     case STORAGE:
                         mail.setState(MailManagerStatuses.DELETED.getId());
+                        log.info("setting mail :: "+mail.getId() + " state to :: "+MailManagerStatuses.findById(mail.getState())
+                                + " by user:: "+UserHolder.getInstance().getCurrentUser().getId());
                         break;
                 }
             }

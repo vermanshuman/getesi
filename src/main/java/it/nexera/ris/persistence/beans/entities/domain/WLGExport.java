@@ -21,7 +21,7 @@ import java.io.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "wlg_export",indexes = {@Index(columnList = "destination_path")})
+@Table(name = "wlg_export")
 public class WLGExport extends IndexedEntity {
     public transient final Log log = LogFactory.getLog(WLGExport.class);
 

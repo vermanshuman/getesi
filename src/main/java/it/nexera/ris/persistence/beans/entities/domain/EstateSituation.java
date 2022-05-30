@@ -9,9 +9,7 @@ import it.nexera.ris.persistence.interfaces.BeforeSave;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
@@ -35,7 +33,7 @@ public class EstateSituation extends IndexedEntity implements BeforeSave, AfterS
     private List<Property> propertyList;
 
     @OneToMany(mappedBy = "situation", cascade = CascadeType.ALL)
-    private Set<SituationProperty> situationProperties;
+    private List<SituationProperty> situationProperties;
 
     @ManyToMany
     @JoinTable(name = "situation_real_formality", joinColumns = {
@@ -95,7 +93,7 @@ public class EstateSituation extends IndexedEntity implements BeforeSave, AfterS
             return;
         }
         if (getSituationProperties() == null) {
-            setSituationProperties(new HashSet<>());
+            setSituationProperties(new ArrayList<>());
         }
         List<SituationProperty> listToAdd = new ArrayList<>();
 
@@ -154,11 +152,11 @@ public class EstateSituation extends IndexedEntity implements BeforeSave, AfterS
         this.propertyList = propertyList;
     }
 
-    public Set<SituationProperty> getSituationProperties() {
+    public List<SituationProperty> getSituationProperties() {
         return situationProperties;
     }
 
-    public void setSituationProperties(Set<SituationProperty> situationProperties) {
+    public void setSituationProperties(List<SituationProperty> situationProperties) {
         this.situationProperties = situationProperties;
     }
 

@@ -87,6 +87,8 @@ public class Document extends DocumentTagEntity implements Cloneable {
     @Column(name = "report_numer")
     private Long reportNumber;
 
+    private Boolean complete;
+
     @Transient
     private byte[] uploadedDocumentContent;
 
@@ -400,5 +402,13 @@ public class Document extends DocumentTagEntity implements Cloneable {
             fileExtension = FileHelper.getFileExtension(getTitle());
         }
         return fileExtension;
+    }
+
+    public Boolean getComplete() {
+        return complete;
+    }
+
+    public void setComplete(Boolean complete) {
+        this.complete = complete;
     }
 }

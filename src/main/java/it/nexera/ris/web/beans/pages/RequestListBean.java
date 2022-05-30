@@ -7,9 +7,15 @@ import it.nexera.ris.common.helpers.create.xls.CreateExcelRequestsReportHelper;
 import it.nexera.ris.persistence.UserHolder;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
-import it.nexera.ris.persistence.beans.entities.domain.*;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
-import it.nexera.ris.persistence.beans.entities.domain.readonly.RequestShort;
+import it.nexera.ris.persistence.beans.entities.domain.Client;
+import it.nexera.ris.persistence.beans.entities.domain.Document;
+import it.nexera.ris.persistence.beans.entities.domain.Request;
+import it.nexera.ris.persistence.beans.entities.domain.User;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
+import it.nexera.ris.persistence.beans.entities.domain.readonly.WLGInboxShort;
 import it.nexera.ris.persistence.view.ClientView;
 import it.nexera.ris.persistence.view.RequestView;
 import it.nexera.ris.web.beans.EntityLazyListPageBean;
@@ -17,6 +23,8 @@ import it.nexera.ris.web.beans.wrappers.logic.RequestStateWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.RequestTypeFilterWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.ServiceFilterWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.UserFilterWrapper;
+import it.nexera.ris.web.common.EntityLazyListModel;
+import it.nexera.ris.web.common.ListPaginator;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.logging.Log;
@@ -27,7 +35,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
-import org.primefaces.event.data.PageEvent;
+import org.primefaces.model.SortOrder;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
@@ -148,15 +156,23 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     private Integer expirationDays;
 
-    private Integer tablePage;
+    private List<RequestState> selectedStates;
+
+    private List<RequestType> selectedRequestTypes;
+
+    private List<Service> selectedServices;
 
     private Integer rowsPerPage;
 
-    private Integer currentPageNumber;
+    private Integer pageNumber;
+
+    private Integer requestType;
 
     @Getter
     @Setter
-    private Integer defaultPage;
+    private ListPaginator paginator;
+
+    private boolean resetSettingPanel = true;
 
     private static final String KEY_CLIENT_ID = "KEY_CLIENT_ID_SESSION_KEY_NOT_COPY";
     private static final String KEY_STATES = "KEY_STATES_SESSION_KEY_NOT_COPY";
@@ -170,49 +186,22 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     private static final String KEY_DATE_TO_REQ = "KEY_DATE_TO_REQ_SESSION_KEY_NOT_COPY";
     private static final String KEY_DATE_FROM_EVASION = "KEY_DATE_FROM_EVASION_SESSION_KEY_NOT_COPY";
     private static final String KEY_DATE_TO_EVASION = "KEY_DATE_TO_EVASION_SESSION_KEY_NOT_COPY";
-    private static final String KEY_PAGE_NUMBER = "KEY_REQUEST_PAGE_NUMBER_SESSION_KEY_NOT_COPY";
-    private static final String KEY_ROWS_PER_PAGE = "KEY_REQUEST_ROWS_PER_PAGE_SESSION_KEY_NOT_COPY";
-
-
-    @Override
-    protected void preLoad() throws PersistenceBeanException {
-        if (ValidationHelper.isNullOrEmpty(SessionHelper.get("loadRequestFilters"))) {
-            setDefaultPage(0);
-            setCurrentPageNumber(0);
-            clearFilterValueFromSession();
-        }else {
-            if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_ROWS_PER_PAGE))) {
-                setRowsPerPage(Integer.parseInt(SessionHelper.get(KEY_ROWS_PER_PAGE).toString()));
-            } else
-                setRowsPerPage(10);
-            if (getRowsPerPage() == 0)
-                setRowsPerPage(10);
-
-            if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_PAGE_NUMBER))) {
-                setTablePage(Integer.parseInt(SessionHelper.get(KEY_PAGE_NUMBER).toString()));
-                setCurrentPageNumber(getTablePage());
-                setDefaultPage(getTablePage() * getRowsPerPage());
-            } else{
-                setTablePage(0);
-                setDefaultPage(0);
-                setCurrentPageNumber(getTablePage());
-            }
-        }
-        super.preLoad();
-    }
-
-//    @Override
-//    protected void onConstruct() {
-//        super.onConstruct();
-//        if (ValidationHelper.isNullOrEmpty(SessionHelper.get("loadRequestFilters"))) {
-//            clearFilterValueFromSession();
-//        }
-//    }
+    private static final String KEY_NOMINATIVO = "KEY_NOMINATIVO_SESSION_KEY_NOT_COPY";
+    private static final String KEY_CF = "KEY_CF_SESSION_KEY_NOT_COPY";
+    private static final String KEY_ROWS_PER_PAGE = "KEY_ROWS_PER_PAGE_SESSION_KEY_NOT_COPY";
+    private static final String KEY_PAGE_NUMBER = "KEY_PAGE_NUMBER_SESSION_KEY_NOT_COPY";
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
             IllegalAccessException, IOException {
+
+        if (ValidationHelper.isNullOrEmpty(SessionHelper.get("loadRequestFilters"))) {
+            clearFilterValueFromSession();
+        }
+        setPaginator(new ListPaginator(10, 1, 1, 1,
+                "DESC", "createDate"));
+
         setSearchLastName((String) SessionHelper.get("searchLastName"));
         setSearchFiscalCode((String) SessionHelper.get("searchFiscalCode"));
         setSearchCreateUser((String) SessionHelper.get("searchCreateUser"));
@@ -270,7 +259,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         List<User> notExternalCategoryUsers = DaoManager.load(User.class
                 , new Criterion[]{Restrictions.or(
                         Restrictions.eq("category", UserCategories.INTERNO),
-                        Restrictions.isNull("category"))});
+                        Restrictions.isNull("category")), Restrictions.eq("status", UserStatuses.ACTIVE)});
 
         notExternalCategoryUsers.forEach(u -> getUserWrappers().add(new UserFilterWrapper(u)));
 
@@ -307,9 +296,9 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                     getRequestTypeWrappers().add(new RequestTypeFilterWrapper(r.getId().equals(dueRequestTypeId), r));
                 });
             }
-//            for (RequestState rs : RequestState.values()) {
-//                getStateWrappers().add(new RequestStateWrapper(!RequestState.EVADED.equals(rs), rs));
-//            }
+            for (RequestState rs : RequestState.values()) {
+                getStateWrappers().add(new RequestStateWrapper(!RequestState.EVADED.equals(rs), rs));
+            }
             Integer expirationDays = (Integer) SessionHelper.get("expirationDays");
             if (!ValidationHelper.isNullOrEmpty(expirationDays)) {
                 SessionHelper.removeObject("expirationDays");
@@ -317,45 +306,28 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             }
         } else {
             setExpirationDays(null);
-//            Arrays.asList(RequestState.values()).forEach(st -> getStateWrappers()
-//                    .add(new RequestStateWrapper(PageTypes.REPORT_LIST.equals(getCurrentPage())
-//                            ? RequestState.EVADED.equals(st) : st.isNeedShow(), st)));
+            Arrays.asList(RequestState.values()).forEach(st -> getStateWrappers()
+                    .add(new RequestStateWrapper(false, st)));
 
             List<RequestType> requestTypes = DaoManager.load(RequestType.class, new Criterion[]{Restrictions.isNotNull("name")});
             if (!ValidationHelper.isNullOrEmpty(requestTypes)) {
-                Collections.sort(requestTypes, new Comparator<RequestType>() {
-                    @Override
-                    public int compare(final RequestType object1, final RequestType object2) {
-                        return object1.toString().toUpperCase().compareTo(object2.toString().toUpperCase());
-                    }
-                });
+                Collections.sort(requestTypes, Comparator.comparing(object -> object.toString().toUpperCase()));
                 requestTypes.forEach(r -> getRequestTypeWrappers().add(new RequestTypeFilterWrapper(r)));
             }
-        }
-        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get("loadRequestFilters"))) {
-            loadFilterValueFromSession();
-        }else {
-            setTablePage(0);
-            setRowsPerPage(10);
-        }
-        if(ValidationHelper.isNullOrEmpty(getStateWrappers())){
-            if (!ValidationHelper.isNullOrEmpty(dueRequestTypeId)) {
-                for (RequestState rs : RequestState.values()) {
-                    getStateWrappers().add(new RequestStateWrapper(!RequestState.EVADED.equals(rs), rs));
-                }
-            }else {
-                Arrays.asList(RequestState.values()).forEach(st -> getStateWrappers()
-                        .add(new RequestStateWrapper(PageTypes.REPORT_LIST.equals(getCurrentPage())
-                                ? RequestState.EVADED.equals(st) : st.isNeedShow(), st)));
-            }
-        }
 
-        if (!ValidationHelper.isNullOrEmpty(getStateWrappers())) {
-            SessionHelper.put(KEY_STATES, getStateWrappers()
-                                .stream()
-                    .map(st -> new RequestStateWrapper(st.getSelected(), st.getState()))
-                    .collect(Collectors.toList()));
         }
+        String filterStateBy = (String) SessionHelper.get("REQUEST_LIST_FILTER_BY");
+        if (!ValidationHelper.isNullOrEmpty(filterStateBy)) {
+            getStateWrappers().forEach(r -> {
+                if (r.getState().equals(RequestState.valueOf(filterStateBy))) {
+                    r.setSelected(Boolean.TRUE);
+                } else {
+                    r.setSelected(Boolean.FALSE);
+                }
+            });
+            SessionHelper.removeObject("REQUEST_LIST_FILTER_BY");
+        }
+        loadFilterValueFromSession();
         filterTableFromPanel();
     }
 
@@ -421,8 +393,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
             Request request = DaoManager.get(Request.class, downloadRequestId);
 
-            String body = getPdfRequestBody(request);
-
+            String body = RequestHelper.getPdfRequestBody(request);
             updateFilterValueInSession();
 
             FileHelper.sendFile("richiesta-" + request.getStrId() + ".pdf",
@@ -433,384 +404,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         }
     }
 
-    public static String getPdfRequestBody(Request request) {
-        return getFirstPart(request) + getSecondPart(request) +
-                getThirdPart(request);
-    }
-
-    public static String getPdfRequestBody(Request request, Subject subject) {
-        return getFirstPart(request, subject) + getSecondPart(request, subject) +
-                getThirdPart(request, subject);
-    }
-
-    public static String getThirdPart(Request request) {
-        return ((request == null) || (request.getSubject() == null)) ? "" :
-                getThirdPart(request, request.getSubject());
-    }
-
-    public static String getThirdPart(Request request, Subject subject) {
-        String thirdPart = "";
-
-        try {
-
-            if (!ValidationHelper.isNullOrEmpty(subject)) {
-
-                thirdPart += "<hr/>";
-                thirdPart += "<b>Richieste</b>:<br/>";
-
-                List<RequestShort> requestList;
-                List<Criterion> criteria = new ArrayList<Criterion>();
-
-                List<Long> subjectsIds = EstateSituationHelper.getIdSubjects(request);
-                subjectsIds.add(subject.getId());
-
-                criteria.add(Restrictions.in("subject.id", subjectsIds));
-
-                if (request != null)
-                    criteria.add(Restrictions.ne("id", request.getId()));
-
-                criteria.add(Restrictions.or(Restrictions.eq("isDeleted", false),
-                        Restrictions.isNull("isDeleted")));
-
-                requestList = DaoManager.load(RequestShort.class, criteria.toArray(new Criterion[0]),
-                        Order.desc("createDate"));
-
-
-                for (RequestShort r : requestList) {
-                    thirdPart +=
-                            (request.getSubject().getId().equals(r.getSubject().getId()) ? "" : "PRES - ") +
-                                    r.getCreateDateStr() +
-                                    " - " +
-                                    r.getClientName() +
-                                    " - " +
-                                    r.getServiceName() +
-                                    " - " +
-                                    r.getAggregationLandChargesRegistryName() +
-                                    "<br/>";
-
-                    if (!ValidationHelper.isNullOrEmpty(r.getMultipleServices())) {
-                        thirdPart += "<ul>";
-                        for (Service service : r.getMultipleServices()) {
-                            thirdPart += "<li>";
-                            thirdPart += service.getName();
-                            thirdPart += "</li>";
-                        }
-                        thirdPart += "</ul>";
-                    }
-                }
-
-                List<RequestOLD> requestOLDS = DaoManager.load(RequestOLD.class, new Criterion[]{
-                        subject.getTypeIsPhysicalPerson() ?
-                                Restrictions.eq("fiscalCodeVat", subject.getFiscalCode()) :
-                                Restrictions.eq("fiscalCodeVat", subject.getNumberVAT())});
-
-                for (RequestOLD old : requestOLDS) {
-                    thirdPart +=
-                            old.getRequestDateString() + " - " +
-                                    old.getClient() + " - " +
-                                    old.getType() + " - " +
-                                    old.getLandChargesRegistry() +
-                                    "<br/>";
-                }
-//                
-//                if(!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
-//                    thirdPart += "<ul>";
-//                    for(Service service : request.getMultipleServices()) {
-//                        thirdPart += "<li>";
-//                        thirdPart += service.getName();
-//                        thirdPart += "</li>";
-//                    }
-//                    thirdPart += "</ul>";
-//                }
-
-                thirdPart += "<br/>";
-
-                thirdPart += "<hr/>";
-
-                thirdPart += "<b>Visure a testo:</b><br/>";
-
-                List<VisureRTF> visureRTFS = DaoManager.load(VisureRTF.class, new Criterion[]{
-                        subject.getTypeIsPhysicalPerson() ?
-                                Restrictions.eq("fiscalCodeVat", subject.getFiscalCode()) :
-                                Restrictions.eq("fiscalCodeVat", subject.getNumberVAT())});
-
-                for (VisureRTF rtf : visureRTFS) {
-                    thirdPart +=
-                            DateTimeHelper.toString(rtf.getUpdateDate()) + " - " +
-                                    rtf.getNumFormality() + " - " +
-                                    rtf.getLandChargesRegistry() +
-                                    "<br/>";
-                }
-
-                thirdPart += "<br/>";
-
-                thirdPart += "<hr/>";
-
-                thirdPart += "<b>Visure DH:</b><br/>";
-
-                List<VisureDH> visureDHS = DaoManager.load(VisureDH.class, new Criterion[]{
-                        subject.getTypeIsPhysicalPerson() ?
-                                Restrictions.eq("fiscalCodeVat", subject.getFiscalCode()) :
-                                Restrictions.eq("fiscalCodeVat", subject.getNumberVAT())});
-
-                for (VisureDH dh : visureDHS) {
-                    thirdPart +=
-                            dh.getType() + " - " +
-                                    DateTimeHelper.toString(dh.getUpdateDate()) + " - " +
-                                    dh.getNumFormality() + " - " +
-                                    dh.getNumberPractice() + " - " +
-                                    dh.getLandChargesRegistry() +
-                                    "<br/>";
-                }
-
-                thirdPart += "<br/>";
-
-                thirdPart += "<hr/>";
-
-                thirdPart += "<b>Formalit&agrave;:</b><br/>";
-
-                int countOfRequests = 0;
-
-                if (request != null) {
-                    countOfRequests = 1;
-                } else {
-                    countOfRequests = requestList.size();
-                }
-
-                List<Formality> formalityList = new ArrayList<>();
-
-                for (int i = 0; i < countOfRequests; ++i) {
-
-                    List<Long> listIds = EstateSituationHelper.getIdSubjects(subject);
-                    listIds.add(subject.getId());
-                    criteria = new ArrayList<>();
-
-                    criteria.add(Restrictions.in("sub.id", listIds));
-                    List<Formality> list =
-                            DaoManager.load(Formality.class, new CriteriaAlias[]{new CriteriaAlias
-                                    ("sectionC", "sectionC", JoinType.INNER_JOIN),
-                                    new CriteriaAlias("sectionC.subject", "sub", JoinType.INNER_JOIN)
-                            }, criteria.toArray(new Criterion[0]));
-
-                    formalityList.addAll(list);
-                }
-
-                for (Formality f : formalityList) {
-                    boolean isPresumptive = f.getSectionC().stream().map(SectionC::getSubject).flatMap(List::stream)
-                            .noneMatch(x -> x.getId().equals(request.getSubject().getId()));
-
-                    thirdPart +=
-                            (isPresumptive ? "PRES - " : "") +
-                                    f.getConservatoryStr() + " - " +
-                                    DateTimeHelper.toString(f.getPresentationDate()) + " - " +
-                                    (f.getType() == null || "null".equalsIgnoreCase(f.getType()) ? "" : f.getType().toUpperCase() + " - ") +
-                                    (f.getParticularRegister() == null ? "" : f.getParticularRegister() + " - ") +
-                                    (f.getGeneralRegister() == null ? "" : f.getGeneralRegister() + " - ") +
-                                    f.getActType();
-
-                    thirdPart += "<br/>";
-                }
-
-                thirdPart += "<br/>";
-
-                thirdPart += "<hr/>";
-
-                thirdPart += "<b>Segnalazioni:</b><br/>";
-
-                List<ReportFormalitySubject> rfsList =
-                        DaoManager.load(ReportFormalitySubject.class,
-                                new Criterion[]{
-                                        subject.getTypeIsPhysicalPerson() ?
-                                                Restrictions.eq("fiscalCode", subject.getFiscalCode()) :
-                                                Restrictions.eq("numberVAT", subject.getNumberVAT())
-                                }, Order.desc("createDate"));
-
-                for (ReportFormalitySubject rfs : rfsList) {
-                    if (rfs.getTypeFormalityId().equals(1L)) {
-                        thirdPart += "Trascrizione - ";
-                    } else if (rfs.getTypeFormalityId().equals(2L)) {
-                        thirdPart += "Iscrizione - ";
-                    } else {
-                        thirdPart += "Annotamento - ";
-                    }
-                    thirdPart +=
-                            DateTimeHelper.toString(rfs.getDate()) + " - " +
-                                    (rfs.getNumber() == null ? "" : rfs.getNumber() + " - ") +
-                                    ((rfs.getLandChargesRegistry() == null) ? "" : rfs.getLandChargesRegistry().getName()) +
-                                    "<br/>";
-                }
-
-
-                if (subject.getTypeIsPhysicalPerson()) {
-                    thirdPart += "<hr/>";
-                    thirdPart += "<b>Presumibili:</b><br/>";
-
-
-                    List<Subject> subjects = SubjectHelper.getPresumablesForSubject(
-                            subject);
-
-                    subjects.removeIf(s -> s.equals(subject));
-                    for (Subject s : subjects) {
-
-                        thirdPart += s.getFullName() + " - " + s.getSexType().getShortValue() + " - " +
-                                DateTimeHelper.toString(s.getBirthDate()) + " - " +
-                                ((s.getForeignCountry() != null && s.getForeignCountry())
-                                        ? (s.getCountry().getDescription() + " (EE) ")
-                                        : (s.getBirthCityDescription()
-                                        + (s.getBirthProvince() != null ? s.getBirthProvince().getCode() : " ")))
-                                + "nato il " + DateTimeHelper.toString(s.getBirthDate()) + " - " +
-                                s.getFiscalCode() +
-                                "<br/>";
-                    }
-                }
-            }
-        } catch (Exception e) {
-            LogHelper.log(log, e);
-            return "ERROR IN THIRD PART";
-        }
-
-        return thirdPart;
-    }
-
-    private static String getSecondPart(Request request) {
-        return ((request == null) || (request.getSubject() == null)) ? "" :
-                getSecondPart(request, request.getSubject());
-    }
-
-    private static String getSecondPart(Request request, Subject subject) {
-        String secondPart = "";
-
-        if (!ValidationHelper.isNullOrEmpty(request)) {
-
-            if (!ValidationHelper.isNullOrEmpty(request.getNdg())) {
-                secondPart += "NDG: " + request.getNdg() + "<br/>";
-            }
-            if (!ValidationHelper.isNullOrEmpty(request.getPosition())) {
-                secondPart += "Posizione: " + request.getPosition() + "<br/>";
-            }
-            if (!ValidationHelper.isNullOrEmpty(request.getCreateUserId())) {
-                secondPart += "Utente: " + request.getCreateUserName() + "<br/>";
-            }
-            if (!ValidationHelper.isNullOrEmpty(request.getUserOfficeId())) {
-                Office office = new Office();
-                try {
-                    office = DaoManager.get(Office.class, request.getUserOfficeId());
-                } catch (PersistenceBeanException | InstantiationException | IllegalAccessException e) {
-                    //  LogHelper.log(log, e);
-                }
-                if (!ValidationHelper.isNullOrEmpty(office)) {
-                    secondPart += "Filiale: " + office.getCode() + " " + office.getDescription() + "<br/>";
-                }
-            }
-            if (!ValidationHelper.isNullOrEmpty(request.getNote())) {
-                secondPart += "Note: " + request.getNote() + "<br/>";
-            } else if (!ValidationHelper.isNullOrEmpty(request.getUltimaResidenza())) {
-                secondPart += "Note: " + request.getUltimaResidenza() + "<br/>";
-            }
-
-        }
-
-        return secondPart;
-    }
-
-    public static String getFirstPart(Request request) {
-        return ((request == null) || (request.getSubject() == null)) ? "" :
-                getFirstPart(request, request.getSubject());
-    }
-
-    private static String getFirstPart(Request request, Subject subject) {
-        String result = "";
-
-        if (!ValidationHelper.isNullOrEmpty(request)) {
-
-            if (!ValidationHelper.isNullOrEmpty(request.getClientName())) {
-                result += "Cliente: " + request.getClientName() + "<br/>";
-            }
-            if (!ValidationHelper.isNullOrEmpty(request.getCreateDate())) {
-                result += "Data richiesta: " + request.getCreateDateStr() + "<br/>";
-            }
-            if (!ValidationHelper.isNullOrEmpty(request.getRequestType())) {
-                result += "Servizio: " + request.getRequestTypeName() + "<br/>";
-            }
-            if (!ValidationHelper.isNullOrEmpty(request.getService())) {
-                result += "Tipo Richiesta: " + request.getServiceName() + "<br/>";
-                result += "Ufficio: " + request.getService().getEmailTextCamelCase() + " ";
-            }else if (!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
-                result += "Tipo Richiesta: " +  request.getMultipleServices()
-                        .stream()
-                        .filter(s -> !ValidationHelper.isNullOrEmpty(s.getName()))
-                        .map(s -> s.toString())
-                        .collect(Collectors.joining(","));
-                result += "<br/>";
-
-                result += "Ufficio: " + request.getMultipleServices()
-                        .stream()
-                        .filter(s -> !ValidationHelper.isNullOrEmpty(s.getEmailTextCamelCase()))
-                        .map(s -> s.getEmailTextCamelCase())
-                        .collect(Collectors.joining(","));
-                result += " ";
-            }
-            if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())) {
-                result += request.getAggregationLandChargesRegistryName() + "<br/>";
-            } else if (!ValidationHelper.isNullOrEmpty(request.getCity())) {
-                result += request.getCityDescription() + "<br/>";
-            }
-
-            if (!ValidationHelper.isNullOrEmpty(request.getUrgent()) && request.getUrgent()) {
-                result += "Urgente: <b>S</b> <br/>";
-            } else {
-                result += "Urgente: <b>N</b> <br/>";
-            }
-        }
-
-        if (!ValidationHelper.isNullOrEmpty(subject)) {
-            if (subject.getTypeIsPhysicalPerson()) {
-                result += "Soggetto: " + subject.getSurnameUpper() + " "
-                        + subject.getNameUpper() + "<br/>";
-                result += "Tipo: " + subject.getSexType().getShortValue() + "<br/>";
-            } else if (!ValidationHelper.isNullOrEmpty(subject.getBusinessName())) {
-                result += "Soggetto: " + subject.getBusinessName() + "<br/>";
-
-            }
-            if (!ValidationHelper.isNullOrEmpty(subject.getBirthCity()) &&
-                    !ValidationHelper.isNullOrEmpty(subject.getBirthProvince())) {
-
-                result += "Dati Anagrafici: " + (subject.getTypeIsPhysicalPerson() ? "nato a " : "con sede in ")
-                        +
-                        ((subject.getForeignCountry() != null &&
-                                subject.getForeignCountry()) ?
-                                (subject.getCountry().getDescription() + " (EE) ") :
-
-                                (subject.getBirthCityDescription() + " ( "
-                                        + subject.getBirthProvince().getCode() + " ) "));
-
-                if (!ValidationHelper.isNullOrEmpty(subject.getBirthDate())) {
-                    result += "il " + DateTimeHelper.toString(subject.getBirthDate());
-                }
-            } else if (!ValidationHelper.isNullOrEmpty(subject.getCountry())) {
-                result += "Dati Anagrafici: " + (subject.getTypeIsPhysicalPerson() ? "nato in " : "con sede in ")
-                        + (subject.getCountry().getDescription() + " (EE) ");
-            }
-
-            result += "<br/>";
-            if (!ValidationHelper.isNullOrEmpty(subject.getFiscalCode())) {
-                result += "C.F. " + subject.getFiscalCode() + "<br/>";
-            } else if (!ValidationHelper.isNullOrEmpty(subject.getNumberVAT())) {
-                result += " P.IVA: " + subject.getNumberVAT() + "<br/>";
-            }
-        }
-
-        return result;
-    }
-
     public void prepareToModify() {
-
-        if (!ValidationHelper.isNullOrEmpty(getStateWrappers())) {
-            SessionHelper.put(KEY_STATES, getStateWrappers()
-                    .stream()
-                    .map(st -> new RequestStateWrapper(st.getSelected(), st.getState()))
-                    .collect(Collectors.toList()));
-        }
         setShowPrintButton(true);
         getStatesForSelect().add(SelectItemHelper.getNotSelected());
         getUsersForSelect().add(SelectItemHelper.getNotSelected());
@@ -926,7 +520,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                     }
                 }
 
-                String body = getPdfRequestBody(request);
+                String body = RequestHelper.getPdfRequestBody(request);
                 files.put(fileCounter++ + "_richiesta-" + request.getStrId() + ".pdf",
                         PrintPDFHelper.convertToPDF(null, body, null,
                                 DocumentType.ESTATE_FORMALITY));
@@ -992,21 +586,25 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public void manageRequest() {
+
         SessionHelper.put("searchLastName", getSearchLastName());
         SessionHelper.put("searchFiscalCode", getSearchFiscalCode());
         SessionHelper.put("searchCreateUser", getSearchCreateUser());
-
         updateFilterValueInSession();
-
         RedirectHelper.goTo(PageTypes.REQUEST_EDIT, getEntityEditId());
     }
 
     public void filterTableFromPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-
         updateFilterValueInSession();
+        String filterState = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("searchClicked");
+
         List<Criterion> restrictions = RequestHelper.filterTableFromPanel(getDateFrom(), getDateTo(), getDateFromEvasion(),
                 getDateToEvasion(), getSelectedClientId(), getRequestTypeWrappers(), getStateWrappers(), getUserWrappers(),
-                getServiceWrappers(), getSelectedUserType(), getAggregationFilterId(), getSelectedServiceType());
+                getServiceWrappers(), getSelectedUserType(), getAggregationFilterId(), getSelectedServiceType(), Boolean.FALSE);
+
+        if((ValidationHelper.isNullOrEmpty(filterState) || !Boolean.parseBoolean(filterState)) && ValidationHelper.isNullOrEmpty(getSelectedStates()))
+            restrictions.add(Restrictions.or(Restrictions.eq("stateId", RequestState.INSERTED.getId()),
+                    Restrictions.eq("stateId", RequestState.IN_WORK.getId()), Restrictions.eq("stateId", RequestState.TO_BE_SENT.getId())));
 
         if (!ValidationHelper.isNullOrEmpty(getSearchLastName())) {
             restrictions.add(
@@ -1061,23 +659,48 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         }
 
         if (!ValidationHelper.isNullOrEmpty(getFiduciaryClientFilterId())) {
-            restrictions.add(Restrictions.eq("fiduciaryId",
-                    getFiduciaryClientFilterId()));
+//            restrictions.add(Restrictions.eq("fiduciaryId",
+//                    getFiduciaryClientFilterId()));
         }
 
 
         if (!ValidationHelper.isNullOrEmpty(getManagerClientFilterid())) {
-            restrictions.add(Restrictions.eq("managerId",
-                    getManagerClientFilterid()));
+//            restrictions.add(Restrictions.eq("managerId",
+//                    getManagerClientFilterid()));
         }
 
         setFilterRestrictions(restrictions);
-        loadList(RequestView.class, restrictions.toArray(new Criterion[0]),
-                new Order[]{Order.desc("createDate")});
+//        loadList(RequestView.class, restrictions.toArray(new Criterion[0]),
+//                new Order[]{Order.desc("createDate")});
+        this.setLazyModel(new EntityLazyListModel<>(RequestView.class, restrictions.toArray(new Criterion[0]),
+                new Order[]{
+                        Order.desc("createDate")
+                }));
 
+        getLazyModel().load((getPaginator().getTablePage() - 1) * getPaginator().getRowsPerPage(), getPaginator().getRowsPerPage(),
+                getPaginator().getTableSortColumn(),
+                (getPaginator().getTableSortOrder() == null || getPaginator().getTableSortOrder().equalsIgnoreCase("DESC")
+                        || getPaginator().getTableSortOrder().equalsIgnoreCase("UNSORTED")) ? SortOrder.DESCENDING : SortOrder.ASCENDING, new HashMap<>());
+
+        Integer totalPages = (int) Math.ceil((getLazyModel().getRowCount() * 1.0) / getPaginator().getRowsPerPage());
+        if (totalPages == 0)
+            totalPages = 1;
+
+        getPaginator().setRowCount(getLazyModel().getRowCount());
+        getPaginator().setTotalPages(totalPages);
+        getPaginator().setPage(getPaginator().getCurrentPageNumber());
+    }
+
+    public void loadFilterData() throws PersistenceBeanException, IllegalAccessException {
+        if (ValidationHelper.isNullOrEmpty(getCities()))
+            populateCities(getFilterRestrictions());
+    }
+
+    private void populateCities(List<Criterion> restrictions)
+            throws PersistenceBeanException, IllegalAccessException {
         List<RequestView> requestList = DaoManager.load(RequestView.class, restrictions.toArray(new Criterion[0]));
 
-        List<Long> cityIds = new ArrayList<Long>();
+        List<Long> cityIds = new ArrayList<>();
 
 
         for (RequestView request : requestList) {
@@ -1091,7 +714,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                     new Criterion[]{Restrictions.isNotNull("province.id")
                             , Restrictions.eq("external", Boolean.TRUE), Restrictions.in("id", cityIds)}, Boolean.FALSE));
         }
-
     }
 
     public void verifyRequests() throws PersistenceBeanException, InstantiationException, IllegalAccessException, IOException {
@@ -1166,12 +788,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                     break;
                 }
             }
-        }
-        if (!ValidationHelper.isNullOrEmpty(getStateWrappers())) {
-            SessionHelper.put(KEY_STATES, getStateWrappers()
-                    .stream()
-                    .map(st -> new RequestStateWrapper(st.getSelected(), st.getState()))
-                    .collect(Collectors.toList()));
         }
     }
 
@@ -1358,10 +974,150 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         RedirectHelper.goTo(PageTypes.MAIL_MANAGER_VIEW, getEntityEditId());
     }
 
-    public void openRequestSubject() {
+    public void openRequestMailNew() {
+        RedirectHelper.goTo(PageTypes.MAIL_MANAGER_VIEW, getEntityEditId(), true);
+    }
 
+    public void openRequestSubject() {
         updateFilterValueInSession();
         RedirectHelper.goToOnlyView(PageTypes.SUBJECT, getEntityEditId());
+    }
+
+    private void updateFilterValueInSession() {
+        if (!ValidationHelper.isNullOrEmpty(getSelectedClientId())) {
+            SessionHelper.put(KEY_CLIENT_ID, getSelectedClientId());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getStateWrappers())) {
+            SessionHelper.put(KEY_STATES, getStateWrappers());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getRequestTypeWrappers())) {
+            SessionHelper.put(KEY_REQUEST_TYPE, getRequestTypeWrappers());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getServiceWrappers())) {
+            SessionHelper.put(KEY_SERVICES, getServiceWrappers());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getManagerClientFilterid())) {
+            SessionHelper.put(KEY_CLIENT_MANAGER_ID, getManagerClientFilterid());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getFiduciaryClientFilterId())) {
+            SessionHelper.put(KEY_CLIENT_FIDUCIARY_ID, getFiduciaryClientFilterId());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getAggregationFilterId())) {
+            SessionHelper.put(KEY_AGGREAGATION, getAggregationFilterId());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getDateExpiration())) {
+            SessionHelper.put(KEY_DATE_EXPIRATION, getDateExpiration());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getDateFrom())) {
+            SessionHelper.put(KEY_DATE_FROM_REQ, getDateFrom());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getDateTo())) {
+            SessionHelper.put(KEY_DATE_TO_REQ, getDateTo());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getDateFromEvasion())) {
+            SessionHelper.put(KEY_DATE_FROM_EVASION, getDateFromEvasion());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getDateToEvasion())) {
+            SessionHelper.put(KEY_DATE_TO_EVASION, getDateToEvasion());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getSearchLastName())) {
+            SessionHelper.put(KEY_NOMINATIVO, getSearchLastName());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getSearchFiscalCode())) {
+            SessionHelper.put(KEY_CF, getSearchFiscalCode());
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(getRowsPerPage())) {
+            SessionHelper.put(KEY_ROWS_PER_PAGE, getRowsPerPage());
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(getPageNumber())) {
+            SessionHelper.put(KEY_PAGE_NUMBER, getPageNumber());
+        }
+    }
+
+    private void loadFilterValueFromSession() {
+
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_ID))) {
+            setSelectedClientId((Long) SessionHelper.get(KEY_CLIENT_ID));
+        } else {
+            setSelectedClientId(null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_STATES))) {
+            setStateWrappers((List<RequestStateWrapper>) SessionHelper.get(KEY_STATES));
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_REQUEST_TYPE))) {
+            setRequestTypeWrappers((List<RequestTypeFilterWrapper>) SessionHelper.get(KEY_REQUEST_TYPE));
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_SERVICES))) {
+            setServiceWrappers((List<ServiceFilterWrapper>) SessionHelper.get(KEY_SERVICES));
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_MANAGER_ID))) {
+            setManagerClientFilterid((Long) SessionHelper.get(KEY_CLIENT_MANAGER_ID));
+        } else {
+            setManagerClientFilterid(null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_FIDUCIARY_ID))) {
+            setFiduciaryClientFilterId((Long) SessionHelper.get(KEY_CLIENT_FIDUCIARY_ID));
+        } else {
+            setFiduciaryClientFilterId(null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_AGGREAGATION))) {
+            setAggregationFilterId((Long) SessionHelper.get(KEY_AGGREAGATION));
+        } else {
+            setAggregationFilterId(null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_EXPIRATION))) {
+            setDateExpiration((Date) SessionHelper.get(KEY_DATE_EXPIRATION));
+        } else {
+            setDateExpiration(null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_FROM_REQ))) {
+            setDateFrom((Date) SessionHelper.get(KEY_DATE_FROM_REQ));
+        } else {
+            setDateFrom(null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_TO_REQ))) {
+            setDateTo((Date) SessionHelper.get(KEY_DATE_TO_REQ));
+        } else {
+            setDateTo(null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_FROM_EVASION))) {
+            setDateFromEvasion((Date) SessionHelper.get(KEY_DATE_FROM_EVASION));
+        } else {
+            setDateFromEvasion(null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_TO_EVASION))) {
+            setDateToEvasion((Date) SessionHelper.get(KEY_DATE_TO_EVASION));
+        } else {
+            setDateToEvasion(null);
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_NOMINATIVO))) {
+            setSearchLastName((String) SessionHelper.get(KEY_NOMINATIVO));
+        } else {
+            setSearchLastName(null);
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CF))) {
+            setSearchFiscalCode((String) SessionHelper.get(KEY_CF));
+        } else {
+            setSearchFiscalCode(null);
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_ROWS_PER_PAGE))) {
+            setRowsPerPage((Integer) SessionHelper.get(KEY_ROWS_PER_PAGE));
+        } else {
+            setRowsPerPage(10);
+        }
+        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_PAGE_NUMBER))) {
+            setPageNumber((Integer) SessionHelper.get(KEY_PAGE_NUMBER));
+        } else {
+            setPageNumber(0);
+        }
+//        executeJS("if (PF('tableWV').getPaginator() != null ) " +
+//                "PF('tableWV').getPaginator().setPage(" + getPageNumber() + ");");
     }
 
     public Date getDateFrom() {
@@ -1759,13 +1515,223 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         this.expirationDays = expirationDays;
     }
 
-
-    public Integer getTablePage() {
-        return tablePage;
+    public Integer getRequestTypeSelected() {
+        int selected = 0;
+        for (RequestTypeFilterWrapper requestTypeFilterWrapper : requestTypeWrappers) {
+            if (requestTypeFilterWrapper.getSelected()) {
+                selected++;
+            }
+        }
+        return selected;
     }
 
-    public void setTablePage(Integer tablePage) {
-        this.tablePage = tablePage;
+    public Integer getStateSelected() {
+        int selected = 0;
+        for (RequestStateWrapper requestStateWrapper : stateWrappers) {
+            if (requestStateWrapper.getSelected()) {
+                selected++;
+            }
+        }
+        return selected;
+    }
+
+    public Integer getServiceSelected() {
+        int selected = 0;
+        for (ServiceFilterWrapper serviceFilterWrapper : serviceWrappers) {
+            if (serviceFilterWrapper.getSelected()) {
+                selected++;
+            }
+        }
+        return selected;
+    }
+
+    public void reset() throws PersistenceBeanException, IOException, InstantiationException, IllegalAccessException {
+        clearFilterValueFromSession();
+        setSelectedClientId(null);
+        setManagerClientFilterid(null);
+        setFiduciaryClientFilterId(null);
+        setAggregationFilterId(null);
+        setStateWrappers(new ArrayList<>());
+        setUserWrappers(new ArrayList<>());
+        setServiceWrappers(new ArrayList<>());
+        setRequestTypeWrappers(new ArrayList<>());
+        setShowPrintButton(null);
+        this.onLoad();
+    }
+
+    public void setSelectedStates(List<RequestState> selectedStates) {
+        this.selectedStates = selectedStates;
+    }
+
+    public List<RequestState> getSelectedStates() {
+        List<RequestState> selected = new ArrayList<>();
+        for (RequestStateWrapper requestStateWrapper : stateWrappers) {
+            if (requestStateWrapper.getSelected()) {
+                selected.add(requestStateWrapper.getState());
+            }
+        }
+        return selected;
+    }
+
+    public List<RequestType> getSelectedRequestTypes() {
+        List<RequestType> selected = new ArrayList<>();
+        for (RequestTypeFilterWrapper requestTypeFilterWrapper : requestTypeWrappers) {
+            if (requestTypeFilterWrapper.getSelected()) {
+                selected.add(requestTypeFilterWrapper.getRequestType());
+            }
+        }
+        return selected;
+    }
+
+    public String getItemIconStyleClass(Long requestTypeId) {
+        String iconStyleClass = "";
+        if (!ValidationHelper.isNullOrEmpty(requestTypeId)) {
+            try {
+                RequestType requestTypeDTO = DaoManager.get(RequestType.class, requestTypeId);
+                iconStyleClass = requestTypeDTO.getIcon();
+                if (iconStyleClass.startsWith("fa")) {
+                    iconStyleClass = "fa " + iconStyleClass;
+                }
+            } catch (HibernateException | InstantiationException | IllegalAccessException | PersistenceBeanException e) {
+                LogHelper.log(log, e);
+            }
+        }
+        return iconStyleClass;
+    }
+
+    public void handleRowsChange() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        String rowsPerPage = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("rowsPerPageSelected");
+        String pageNumber = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("pageNumber");
+        if (!ValidationHelper.isNullOrEmpty(rowsPerPage))
+            getPaginator().setRowsPerPage(Integer.parseInt(rowsPerPage));
+
+        Integer totalPages = getPaginator().getRowCount() / getPaginator().getRowsPerPage();
+        Integer pageEnd = 10;
+        if (pageEnd < totalPages)
+            pageEnd = totalPages;
+        StringBuilder builder = new StringBuilder();
+        for (int i = 1; i <= pageEnd; i++) {
+            builder.append("<a class=\"ui-paginator-page ui-state-default ui-corner-all page_" + i + "\"");
+            builder.append("tabindex=\"0\" href=\"#\" onclick=\"changePage(" + i + ",event)\">" + i + "</a>");
+        }
+        getPaginator().setPaginatorString(builder.toString());
+        filterTableFromPanel();
+    }
+
+    public void onPageChange() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        String rowsPerPage = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("rowsPerPageSelected");
+        String pageNumber = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("pageNumber");
+        if (!ValidationHelper.isNullOrEmpty(rowsPerPage))
+            getPaginator().setRowsPerPage(Integer.parseInt(rowsPerPage));
+        if (!ValidationHelper.isNullOrEmpty(pageNumber)) {
+            Integer currentPage = Integer.parseInt(pageNumber);
+            getPaginator().setCurrentPageNumber(currentPage);
+            StringBuilder builder = new StringBuilder();
+            String cls = "ui-paginator-first ui-state-default ui-corner-all";
+            if (currentPage == 1) {
+                cls += " ui-state-disabled";
+            }
+            builder.append("<a href=\"#\" class=\"" + cls + "\"");
+            builder.append(" tabindex=\"-1\" onclick=\"firstPage(event)\">\n");
+            builder.append("<span class=\"ui-icon ui-icon-seek-first\">F</span>\n</a>\n");
+            builder.append("<a href=\"#\" onclick=\"previousPage(event)\"");
+            cls = "ui-paginator-prev ui-corner-all";
+            if (currentPage == 1) {
+                cls += " ui-state-disabled";
+            }
+            builder.append(" class=\"" + cls + "\"");
+            builder.append(" tabindex=\"-1\">\n");
+            builder.append("<span class=\"ui-icon ui-icon-seek-prev\">P</span>\n</a>\n");
+
+            getPaginator().setPageNavigationStart(builder.toString());
+            if (currentPage == getPaginator().getTotalPages()) {
+                builder.setLength(0);
+                builder.append("<a href=\"#\" class=\"ui-paginator-next ui-state-default ui-corner-all ui-state-disabled\"");
+                builder.append(" tabindex=\"0\">\n");
+                builder.append("<span class=\"ui-icon ui-icon-seek-next\">N</span>\n</a>\n");
+                builder.append("<a href=\"#\"");
+                builder.append(" class=\"ui-paginator-last ui-state-default ui-corner-all ui-state-disabled\" tabindex=\"-1\">\n");
+                builder.append("<span class=\"ui-icon ui-icon-seek-end\">E</span>\n</a>\n");
+                getPaginator().setPageNavigationEnd(builder.toString());
+            } else {
+                builder.setLength(0);
+                builder.append("<a href=\"#\" class=\"ui-paginator-next ui-state-default ui-corner-all\"  onclick=\"nextPage(event)\"");
+                builder.append(" tabindex=\"0\">\n");
+                builder.append("<span class=\"ui-icon ui-icon-seek-next\">N</span>\n</a>\n");
+                builder.append("<a href=\"#\"");
+                builder.append(" class=\"ui-paginator-last ui-state-default ui-corner-all\" tabindex=\"-1\" onclick=\"lastPage(event)\">\n");
+                builder.append("<span class=\"ui-icon ui-icon-seek-end\">E</span>\n</a>\n");
+                getPaginator().setPageNavigationEnd(builder.toString());
+            }
+            getPaginator().setTablePage(currentPage);
+            filterTableFromPanel();
+        }
+    }
+
+    public void clearFiltraPanel() throws PersistenceBeanException, IllegalAccessException {
+        loadFilterData();
+        setSelectedClientId(null);
+        setDateFrom(null);
+        setDateTo(null);
+        setDateFromEvasion(null);
+        setDateToEvasion(null);
+        setDateExpiration(null);
+        setRequestTypes(null);
+        setManagerClientFilterid(null);
+        setFiduciaryClientFilterId(null);
+        setAggregationFilterId(null);
+        setSelectedServices(null);
+        clearFilterValueFromSession();
+        resetSettingPanel = false;
+    }
+
+    private void clearFilterValueFromSession() {
+        SessionHelper.removeObject(KEY_CLIENT_ID);
+        SessionHelper.removeObject(KEY_DATE_FROM_REQ);
+        SessionHelper.removeObject(KEY_DATE_TO_REQ);
+        SessionHelper.removeObject(KEY_DATE_FROM_EVASION);
+        SessionHelper.removeObject(KEY_DATE_TO_EVASION);
+        SessionHelper.removeObject(KEY_DATE_EXPIRATION);
+        SessionHelper.removeObject(KEY_REQUEST_TYPE);
+        SessionHelper.removeObject(KEY_CLIENT_MANAGER_ID);
+        SessionHelper.removeObject(KEY_CLIENT_FIDUCIARY_ID);
+        SessionHelper.removeObject(KEY_AGGREAGATION);
+        SessionHelper.removeObject(KEY_SERVICES);
+        SessionHelper.removeObject(KEY_CF);
+        SessionHelper.removeObject(KEY_NOMINATIVO);
+        SessionHelper.removeObject(KEY_STATES);
+        SessionHelper.removeObject("searchLastName");
+        SessionHelper.removeObject("searchFiscalCode");
+        SessionHelper.removeObject("searchCreateUser");
+    }
+
+    public void setSelectedRequestTypes(List<RequestType> selectedRequestTypes) {
+        this.selectedRequestTypes = selectedRequestTypes;
+    }
+
+    public List<Service> getSelectedServices() {
+        List<Service> selected = new ArrayList<>();
+        for (ServiceFilterWrapper serviceFilterWrapper : serviceWrappers) {
+            if (serviceFilterWrapper.getSelected()) {
+                selected.add(serviceFilterWrapper.getService());
+            }
+        }
+        return selected;
+    }
+
+    public void setSelectedServices(List<Service> selectedServices) {
+        this.selectedServices = selectedServices;
+    }
+
+    public void createNewMultipleRequests() {
+        // executeJS("PF('chooseSingleOrMultipleRequestCreateWV').show();");
+        String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE";
+        RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT, queryParam);
+    }
+
+    public void redirectToNewMultipleRequests() {
+        String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE&" + RedirectHelper.REQUEST_TYPE_PARAM + "=" + getRequestType();
+        RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT, queryParam);
     }
 
     public Integer getRowsPerPage() {
@@ -1776,176 +1742,27 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         this.rowsPerPage = rowsPerPage;
     }
 
-    private void updateFilterValueInSession() {
-        if (!ValidationHelper.isNullOrEmpty(getSelectedClientId())) {
-            SessionHelper.put(KEY_CLIENT_ID, getSelectedClientId());
-        }
-//        if (!ValidationHelper.isNullOrEmpty(getStateWrappers())) {
-//            SessionHelper.put(KEY_STATES, getStateWrappers());
-//        }
-
-        if (!ValidationHelper.isNullOrEmpty(getRequestTypeWrappers())) {
-            SessionHelper.put(KEY_REQUEST_TYPE, getRequestTypeWrappers());
-        }
-        if (!ValidationHelper.isNullOrEmpty(getServiceWrappers())) {
-            SessionHelper.put(KEY_SERVICES, getServiceWrappers());
-        }
-        if (!ValidationHelper.isNullOrEmpty(getManagerClientFilterid())) {
-            SessionHelper.put(KEY_CLIENT_MANAGER_ID, getManagerClientFilterid());
-        }
-        if (!ValidationHelper.isNullOrEmpty(getFiduciaryClientFilterId())) {
-            SessionHelper.put(KEY_CLIENT_FIDUCIARY_ID, getFiduciaryClientFilterId());
-        }
-        if (!ValidationHelper.isNullOrEmpty(getAggregationFilterId())) {
-            SessionHelper.put(KEY_AGGREAGATION, getAggregationFilterId());
-        }
-        if (!ValidationHelper.isNullOrEmpty(getDateExpiration())) {
-            SessionHelper.put(KEY_DATE_EXPIRATION, getDateExpiration());
-        }
-        if (!ValidationHelper.isNullOrEmpty(getDateFrom())) {
-            SessionHelper.put(KEY_DATE_FROM_REQ, getDateFrom());
-        }
-        if (!ValidationHelper.isNullOrEmpty(getDateTo())) {
-            SessionHelper.put(KEY_DATE_TO_REQ, getDateTo());
-        }
-        if (!ValidationHelper.isNullOrEmpty(getDateFromEvasion())) {
-            SessionHelper.put(KEY_DATE_FROM_EVASION, getDateFromEvasion());
-        }
-        if (!ValidationHelper.isNullOrEmpty(getDateToEvasion())) {
-            SessionHelper.put(KEY_DATE_TO_EVASION, getDateToEvasion());
-        }
-        Map<String, String> params = FacesContext.getCurrentInstance().
-                getExternalContext().getRequestParameterMap();
-        if (!params.isEmpty()) {
-            String value = params.get("currentPageNumber");
-            if (!ValidationHelper.isNullOrEmpty(value)) {
-                SessionHelper.put(KEY_PAGE_NUMBER, value);
-            } else {
-                SessionHelper.put(KEY_PAGE_NUMBER, null);
-            }
-        }
-//        if (!ValidationHelper.isNullOrEmpty(getTablePage())) {
-//            SessionHelper.put(KEY_PAGE_NUMBER, Long.toString(getTablePage()));
-//        }else {
-//            SessionHelper.put(KEY_PAGE_NUMBER, null);
-//        }
-
-        if (!ValidationHelper.isNullOrEmpty(getRowsPerPage())) {
-            SessionHelper.put(KEY_ROWS_PER_PAGE, Long.toString(getRowsPerPage()));
-        } else {
-            SessionHelper.put(KEY_ROWS_PER_PAGE, null);
-        }
+    public Integer getPageNumber() {
+        return pageNumber;
     }
 
-    private void loadFilterValueFromSession() {
-
-        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_ID))) {
-            setSelectedClientId((Long) SessionHelper.get(KEY_CLIENT_ID));
-        }
-
-        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_STATES))) {
-            setStateWrappers((List<RequestStateWrapper>) SessionHelper.get(KEY_STATES));
-        }
-
-        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_REQUEST_TYPE))) {
-            setRequestTypeWrappers((List<RequestTypeFilterWrapper>) SessionHelper.get(KEY_REQUEST_TYPE));
-        }
-        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_SERVICES))) {
-            setServiceWrappers((List<ServiceFilterWrapper>) SessionHelper.get(KEY_SERVICES));
-        }
-        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_MANAGER_ID))) {
-            setManagerClientFilterid((Long) SessionHelper.get(KEY_CLIENT_MANAGER_ID));
-        }
-        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_FIDUCIARY_ID))) {
-            setFiduciaryClientFilterId((Long) SessionHelper.get(KEY_CLIENT_FIDUCIARY_ID));
-        }
-        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_AGGREAGATION))) {
-            setAggregationFilterId((Long) SessionHelper.get(KEY_AGGREAGATION));
-        }
-        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_EXPIRATION))) {
-            setDateExpiration((Date) SessionHelper.get(KEY_DATE_EXPIRATION));
-        }
-        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_FROM_REQ))) {
-            setDateFrom((Date) SessionHelper.get(KEY_DATE_FROM_REQ));
-        }
-        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_TO_REQ))) {
-            setDateTo((Date) SessionHelper.get(KEY_DATE_TO_REQ));
-        }
-        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_FROM_EVASION))) {
-            setDateFromEvasion((Date) SessionHelper.get(KEY_DATE_FROM_EVASION));
-        }
-        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_DATE_TO_EVASION))) {
-            setDateToEvasion((Date) SessionHelper.get(KEY_DATE_TO_EVASION));
-        }
-
-        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_PAGE_NUMBER))) {
-            setTablePage(Integer.parseInt(SessionHelper.get(KEY_PAGE_NUMBER).toString()));
-        } else
-            setTablePage(0);
-        executeJS("if (PF('tableWV').getPaginator() != null ) " +
-                "PF('tableWV').getPaginator().setPage(" + getTablePage() + ");");
-
-        if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_ROWS_PER_PAGE))) {
-            setRowsPerPage(Integer.parseInt(SessionHelper.get(KEY_ROWS_PER_PAGE).toString()));
-        } else
-            setRowsPerPage(10);
-        if (getRowsPerPage() == 0)
-            setRowsPerPage(10);
+    public void setPageNumber(Integer pageNumber) {
+        this.pageNumber = pageNumber;
     }
 
-    private void clearFilterValueFromSession() {
-
-        SessionHelper.removeObject(KEY_CLIENT_ID);
-        SessionHelper.removeObject(KEY_STATES);
-        SessionHelper.removeObject(KEY_REQUEST_TYPE);
-        SessionHelper.removeObject(KEY_SERVICES);
-        SessionHelper.removeObject(KEY_CLIENT_MANAGER_ID);
-        SessionHelper.removeObject(KEY_CLIENT_FIDUCIARY_ID);
-        SessionHelper.removeObject(KEY_AGGREAGATION);
-        SessionHelper.removeObject(KEY_DATE_EXPIRATION);
-        SessionHelper.removeObject(KEY_DATE_FROM_REQ);
-        SessionHelper.removeObject(KEY_DATE_TO_REQ);
-        SessionHelper.removeObject(KEY_DATE_FROM_EVASION);
-        SessionHelper.removeObject(KEY_DATE_TO_EVASION);
-        SessionHelper.removeObject(KEY_DATE_TO_REQ);
-        SessionHelper.removeObject(KEY_DATE_TO_REQ);
-        SessionHelper.removeObject(KEY_PAGE_NUMBER);
-        SessionHelper.removeObject(KEY_ROWS_PER_PAGE);
+    public Integer getRequestType() {
+        return requestType;
     }
 
-    public void onPageChange(PageEvent event) {
-        if (event != null)
-            setTablePage(event.getPage());
-        setCurrentPageNumber(getTablePage());
-        SessionHelper.put(KEY_PAGE_NUMBER, Long.toString(getTablePage()));
-        Map<String, String> params = FacesContext.getCurrentInstance().
-                getExternalContext().getRequestParameterMap();
-
-        if (!params.isEmpty()) {
-            String rows = params.get("table_rows");
-            if (!ValidationHelper.isNullOrEmpty(rows)) {
-                try {
-                    Integer rpp = Integer.parseInt(rows);
-                    if(!getRowsPerPage().equals(rpp)){
-                        String first = params.get("table_first");
-                        if(!ValidationHelper.isNullOrEmpty(first)){
-                            setTablePage(Integer.parseInt(first)/rpp);
-                            setCurrentPageNumber(getTablePage());
-                        }
-                    }
-                    setRowsPerPage(rpp);
-                    SessionHelper.put(KEY_ROWS_PER_PAGE, Long.toString(getRowsPerPage()));
-                } catch (NumberFormatException e) {
-                }
-            }
-        }
+    public void setRequestType(Integer requestType) {
+        this.requestType = requestType;
     }
 
-    public Integer getCurrentPageNumber() {
-        return currentPageNumber;
+    public boolean isResetSettingPanel() {
+        return resetSettingPanel;
     }
 
-    public void setCurrentPageNumber(Integer currentPageNumber) {
-        this.currentPageNumber = currentPageNumber;
+    public void setResetSettingPanel(boolean resetSettingPanel) {
+        this.resetSettingPanel = resetSettingPanel;
     }
 }

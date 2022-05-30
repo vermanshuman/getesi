@@ -27,8 +27,7 @@ public class SaveRequestDocumentsHelper {
             public void execute() throws Exception {
                 manageFormalitiesForExternal(request, documents);
                 for (Document document : documents) {
-                    if (!ValidationHelper.isNullOrEmpty(document.getSelectedForDialogList())
-                            && document.getSelectedForDialogList()) {
+                    if (!ValidationHelper.isNullOrEmpty(document.getSelectedForDialogList()) && document.getSelectedForDialogList()) {
                         document.setSelectedForEmail(true);
                         document.setRequest(request);
                         DaoManager.save(document);

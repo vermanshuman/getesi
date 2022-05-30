@@ -1,0 +1,1050 @@
+/* Dashboard Start */
+
+body {
+    background-color: #ffffff !important;
+}
+
+fieldset {
+    border: 2px solid lightgray;
+    border-radius: 5px;
+    min-height: 105px;
+    /*max-height: 105px;*/
+    color: #778087;
+}
+
+legend {
+    font-size: 20px;
+}
+
+fieldset div {
+    font-size: 20px;
+    text-align: center;
+}
+
+.carico-heading {
+    background-color: #71B7FB;
+    padding: 10px;
+    color: #fff;
+}
+
+.carico-icon {
+    font-size: 40px !important;
+    width: 40px;
+    margin-left: -5px;
+}
+
+.carico-heading i {
+    color: white;
+    margin-right: 14px;
+    font-size: 24px;
+}
+
+.ui-progressbar .ui-widget-header {
+    background: #1e90ff !important;
+}
+
+.forecast-big-icon {
+    background-color: #2f8ee5;
+    border-radius: 5px;
+    margin-right: 1%;
+    margin-left: 1%;
+    width: 60px;
+    height: 60px;
+}
+.layout-dashboard .tasks ul li {
+    border-bottom: 2px solid #c1c1c1;
+}
+
+.layout-dashboard .ui-progressbar {
+    background-color: #cecece;
+}
+/* Dashboard End */
+
+/* MailManagerList Start */
+.receive_new_mail_style {
+    color: black !important;
+    font-weight: bold !important;
+}
+.selected-button {
+    background-color: #000066 !important;
+}
+body .cyan-blue-btn {
+    background-color: #547ac4 !important;
+}
+
+body .ui-button:not(#editButton) {
+    background: #547ac4;
+    color: #ffffff;
+    border: none !important;
+    /*margin: 0;*/
+    outline: 0 none;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+body .editButton {
+    background: #788FA7 !important;
+    color: #ffffff;
+    border: none !important;
+    margin: 0;
+    outline: 0 none;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+body .editButton.ui-button:not(.stampaButton){
+    background: #788FA7 !important;
+}
+
+body .editButton.ui-button.ui-state-focus {
+    outline: 0 none;
+    outline-offset: 0;
+    box-shadow: 0 0 0 0.2em #788FA7;
+}
+
+body .editButton.ui-button.ui-state-active, body .ui-button.ui-state-down {
+    background: #788FA7;
+    border-color: #788FA7;
+    color: #ffffff;
+}
+.mail_style {
+    color: #4c5156 !important;
+}
+
+/* MailManagerList End */
+
+/* Menu Start */
+.notarialCertificationListIcon {
+    display: inline-block;
+    background-size: 23px !important;
+    width: 20px !important;
+    height: 23px;
+    margin-left: 2px;
+    background: url("../images/notarial-cerification-list-logo.png") top left no-repeat;
+    filter: invert(100%) sepia(100%) saturate(100%) hue-rotate(197deg) brightness(0%) contrast(101%) !important;
+}
+/* Menu End */
+
+/* Footer Start */
+.footer-text-right {
+    color: #778087;
+}
+/* Footer End */
+
+/* Topbar Start */
+
+.profileImg {
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+}
+
+.only-date-icon .ui-inputfield{
+    display: none;
+}
+
+body #currentDay .ui-button:hover, body #currentDay .ui-button.ui-state-focus {
+    background-color: #64b5f6 !important;
+}
+
+body #currentDay .ui-button {
+    background-color: transparent !important;
+    border: none !important;
+    margin-right: 10px;
+    box-shadow: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+}
+
+body #currentDay .ui-button .ui-icon {
+    font-size: 24px;
+    margin-left: -12px;
+    margin-top: -12px;
+}
+
+body .top-bar-cal .ui-widget-header {
+    background-color: transparent !important;
+    color: #000 !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+    padding-bottom: 0px !important;
+    border: none !important;
+}
+
+.top-bar-cal td.ui-datepicker-week-end:first-child a {
+    border-radius: 0 !important;
+    color: #4ead99 !important;
+}
+
+.top-bar-cal td.ui-datepicker-week-end:first-child {
+    background-color: #e7f3f1;
+}
+
+body .top-bar-cal .ui-datepicker-next, body .top-bar-cal .ui-datepicker-prev {
+    display: none;
+}
+
+.ui-datepicker-calendar {
+    border: 2px solid lightgray;
+}
+
+body .top-bar-cal .ui-datepicker-calendar th {
+    background-color: #e6e6e6;
+    border-right: 2px solid lightgray;
+}
+
+body .top-bar-cal .ui-datepicker-calendar td {
+    border: 2px solid lightgray;
+}
+
+.top-bar-cal .ui-datepicker-month {
+    float: left;
+    font-size: 22px;
+    color: #4ead99;
+    text-transform: uppercase;
+}
+
+.top-bar-cal .ui-datepicker-year {
+    float: right;
+    font-size: 22px;
+}
+body .top-bar-cal .ui-widget-header {
+    background-color: #fff !important;
+}
+.top-bar-cal .ui-datepicker-month {
+    float: left;
+    font-size: 22px;
+    color: #4ead99;
+    text-transform: uppercase;
+}
+
+/* Topbar End */
+
+
+/*RequestTypeList Start*/
+.anagrafico-icon {
+    background-image: url("../images/servizio_anagrafico.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 20px;
+    height: 20px;
+    margin: 0 auto;
+    display: inline-block;
+}
+
+
+.anagrafico-icon-alt {
+    background-image: url("../images/serv_anagrafico.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
+    margin: 0 auto;
+    display: inline-block;
+}
+
+
+.anagrafico-icon-alt-3x {
+    background-image: url("../images/serv_anagrafico.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 36px;
+    height: 40px;
+    margin: 0 auto;
+    display: block;
+    background-size: cover;
+}
+
+.camerale-icon {
+    background-image: url("../images/servizi-comunali.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
+    margin: 0 auto;
+    display: inline-block;
+}
+
+.immobiliare-icon {
+    background-image: url("../images/servizi-immobiliari.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
+    margin: 0 auto;
+    display: inline-block;
+}
+
+.investigativo-icon {
+    background-image: url("../images/servizi-investigativi.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
+    margin: 0 auto;
+    display: inline-block;
+}
+
+.anagrafico-icon-3x {
+    background-image: url("../images/servizio_anagrafico.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 36px;
+    height: 40px;
+    margin: 0 auto;
+    display: block;
+    background-size: cover;
+}
+
+.camerale-icon-3x {
+    background-image: url("../images/servizi-comunali.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 36px;
+    height: 40px;
+    margin: 0 auto;
+    display: block;
+    background-size: cover;
+}
+
+.immobiliare-icon-3x {
+    background-image: url("../images/servizi-immobiliari.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 36px;
+    height: 40px;
+    margin: 0 auto;
+    display: block;
+    background-size: cover;
+}
+
+.investigativo-icon-3x {
+    background-image: url("../images/servizi-investigativi.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 36px;
+    height: 40px;
+    margin: 0 auto;
+    display: block;
+    background-size: cover;
+}
+
+.fa.fa-diamond.fa-3x {
+    background-image: url("../images/servizi-catastali.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 36px;
+    height: 40px;
+    margin: 0 auto;
+    display: block;
+    background-size: cover;
+}
+
+.fa.fa-diamond {
+    background-image: url("../images/servizi-catastali.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
+    margin: 0 auto;
+    display: inline-block;
+}
+
+.fa-diamond:before {
+    display: none;
+}
+
+.fa.fa-gavel.fa-3x {
+    background-image: url("../images/servizi-legali.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 36px;
+    height: 40px;
+    margin: 0 auto;
+    display: block;
+    background-size: cover;
+}
+
+.fa.fa-gavel {
+    background-image: url("../images/servizi-legali.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
+    margin: 0 auto;
+    display: inline-block;
+}
+
+.fa-gavel:before {
+    display: none;
+}
+
+.mail-icon {
+    background-image: url("../images/mail.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 28px;
+    height: 28px;
+    margin: 0 auto;
+    display: block;
+}
+
+.home-icon {
+    background-image: url("../images/home.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 24px;
+    height: 20px;
+    display: block;
+}
+
+.contact-icon {
+    background-image: url("../images/contacts.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 28px;
+    height: 20px;
+    display: block;
+}
+
+.go-back-icon {
+    background-image: url("../images/previous.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 30px;
+    height: 21px;
+    width: 20px;
+    display: block;
+    margin-top: -6px;
+}
+
+.go-forward-icon {
+    background-image: url("../images/previous.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 30px;
+    height: 21px;
+    width: 20px;
+    display: block;
+    margin-top: -6px;
+    margin-left: 55px;
+    -webkit-transform:rotate(180deg);
+    -moz-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
+
+.email-icon {
+    background-image: url("../images/email.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 24px;
+    height: 20px;
+    display: block;
+}
+
+.richieste-icon {
+    background-image: url("../images/richieste.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 20px;
+    height: 20px;
+    display: block;
+}
+
+.banca-bati-icon {
+    background-image: url("../images/banca-bati.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 22px;
+    height: 20px;
+    display: block;
+}
+
+.reportistica-icon {
+    background-image: url("../images/reportistica.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 22px;
+    height: 20px;
+    display: block;
+}
+
+.fatturazione-icon {
+    background-image: url("../images/fatturazione.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 24px;
+    height: 24px;
+    display: block;
+}
+
+.configurazione-icon {
+    background-image: url("../images/configurazione.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 26px;
+    height: 42px;
+    display: block;
+}
+
+.esecuzione-immobiliare-icon {
+    background-image: url("../images/esecuzione-immobiliare.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 22px;
+    height: 22px;
+    display: block;
+}
+
+.richiesta-da-mail-icon {
+    background-image: url("../images/richiesta-da-mail.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 28px;
+    height: 28px;
+    background-size: 25px;
+    display: block;
+}
+
+.richiesta-da-clienti-icon {
+    background-image: url("../images/richiesta-da-clienti.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 28px;
+    height: 28px;
+    background-size: 25px;
+    display: block;
+}
+
+
+.user-icon {
+    background-image: url("../images/user.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 28px;
+    height: 28px;
+    margin: 0 auto;
+    display: block;
+}
+
+.attachment-icon {
+    background-image: url("../images/attachment.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 23px;
+    height: 23px;
+    margin: 0 auto;
+    display: block;
+}
+
+.move-icon {
+    background-image: url("../images/moveto.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 23px;
+    height: 23px;
+    margin: 0 auto;
+    display: block;
+}
+/*RequestTypeList End*/
+
+/*Structure List Start*/
+.button_panel {
+    background-color: #788fa7;
+    padding: 12px 0px 12px 12px;
+    width: 99%;
+    text-align: -webkit-left;
+    margin-bottom: 10px;
+    color: white;
+}
+.tree_panel {
+    width: 30%;
+}
+
+.tree_info {
+    width: 69%;
+    position: absolute;
+}
+
+.ui-treetable-selectable-node .treeIcon {
+    float: left;
+}
+
+.treeIcon {
+    margin-right: 3px;
+    vertical-align: middle;
+}
+/*Structure List End*/
+
+/* Event List Start */
+body .ui-button.ui-state-active {
+    background-color: #003871 !important;
+}
+
+.fc .fc-button-group > * {
+    background-color: #788FA7 !important;
+}
+
+.fc td.fc-today {
+    background-color: #788FA7 !important;
+    opacity: 0.1;
+}
+
+.fc-ltr .fc-basic-view .fc-day-number {
+    opacity: 1;
+}
+
+.fc td.fc-today {
+    background-color: #788FA7 !important;
+    opacity: 0.1;
+}
+/* Event List End */
+
+/* Database List Start*/
+.no_break_header thead th span {
+    overflow-wrap: break-word !important;
+}
+/* Database List End */
+
+/* Eventi List Start */
+.fc .fc-button-group {
+    position: relative !important;
+    display: inline-flex !important;;
+    vertical-align: middle !important;
+}
+
+/* Eventi List End */
+
+body .ui-paginator .ui-paginator-current {
+    color: #ffffff !important;
+}
+
+body .ui-fieldset .ui-fieldset-legend {
+    background-color: #000066 !important;
+}
+
+body .ui-state-active {
+    background-color: #2d353c !important;
+    color: #ffffff !important;
+}
+
+body .ui-datepicker-today .ui-state-highlight:not(.ui-state-active) {
+    background-color: transparent !important;
+    color: #495057 !important;
+    font-weight: normal !important;
+}
+
+body .ui-paginator .ui-paginator-pages .ui-paginator-page {
+    color: #ffffff !important;
+}
+
+body .top-bar-cal.ui-widget-content {
+    background-color: #ffffff;
+    border: 1px solid #c9cdd2 !important;
+    top: 50px !important;
+    width: 600px;
+    right: 0;
+    left: auto !important;
+}
+
+body .ui-datatable thead th.ui-state-hover {
+    background-color: #f0f3f5 !important;
+    color: #5f666c !important;
+}
+
+body .ui-datatable:not(.borderless) thead th {
+    background-color: #ffffff !important;
+    padding: 8px 2px;
+    border-color: #808080 !important;
+    color: #5f666c !important;
+}
+
+.ui-datatable:not(.borderless) thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+    padding: 4px 10px!important;
+    overflow: hidden!important;
+    border-width: 1px!important;
+    border-style: solid!important;
+}
+
+body .ui-datatable .ui-datatable-data tr td {
+    padding: 6px 12px;
+}
+.ui-datatable tbody td {
+    border-color: inherit;
+}
+.ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+    padding: 4px 10px;
+    overflow: hidden;
+    border-width: 1px;
+    border-style: solid;
+}
+.min_padding_margin {
+    text-align: center;
+    table-layout: auto;
+    margin-left: 2px !important;
+    padding-left: 2px !important;
+    padding-right: 4px !important;
+}
+
+.ui-paginator {
+    padding-bottom: 5px !important;
+    padding-top: 5px !important;
+}
+
+body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev, body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last {
+    color: #ffffff !important;
+}
+
+body .ui-paginator .ui-paginator-first.ui-state-hover, body .ui-paginator .ui-paginator-prev.ui-state-hover, body .ui-paginator .ui-paginator-next.ui-state-hover, body .ui-paginator .ui-paginator-last.ui-state-hover {
+    color: #2d353c !important;
+}
+
+.action_column {
+    width: 32px;
+    text-align: center;
+}
+
+.button-top-margin {
+    margin-top: 1rem;
+}
+
+body .ui-widget-header {
+    background-color: #788FA7 !important;
+    color: #ffffff !important;
+}
+
+.btn_line {
+    margin-top: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+.input-width {
+    width: 98% !important;
+}
+
+body .ui-tabs.ui-tabs-top .ui-tabs-nav li.ui-state-active, body .ui-tabs.ui-tabs-bottom .ui-tabs-nav li.ui-state-active, body .ui-tabs.ui-tabs-left .ui-tabs-nav li.ui-state-active, body .ui-tabs.ui-tabs-right .ui-tabs-nav li.ui-state-active {
+    background-color: #003871 !important;
+}
+
+body .ui-tabs.ui-tabs-top .ui-tabs-nav li a, body .ui-tabs.ui-tabs-bottom .ui-tabs-nav li a, body .ui-tabs.ui-tabs-left .ui-tabs-nav li a, body .ui-tabs.ui-tabs-right .ui-tabs-nav li a {
+    color: #ffffff !important;
+}
+
+.card h1:first-child {
+    margin-top: 16px !important;
+}
+.card h1 {
+    font-size: 24px !important;
+    font-weight: 400 !important;
+    margin: 24px 0 !important;
+}
+
+.card h2 {
+    font-size: 22px;
+    font-weight: 400;
+}
+
+.full-width {
+    width: 100%;
+}
+
+select-width {
+    width: 94%;
+}
+
+.ui-selectcheckboxmenu-token {
+    margin: 2px !important;
+}
+
+.ui-datatable thead th, .ui-datatable tfoot td {
+    text-align: center !important;
+}
+
+.layout-wrapper .layout-menu-container .layout-menu-logo {
+    text-align: center;
+    height: 60px;
+}
+
+.layout-wrapper .layout-menu-container .layout-menu-logo img {
+    width: 50px;
+    margin-top: 15px;
+}
+
+
+.mtb-10 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.layout-dashboard .user-card .user-card-content .fa-user-circle {
+    font-size: 4.2em;
+    margin: -30px 0 0 24px;
+    color: #fff;
+    background-color: #000;
+    border-radius: 50%;
+    width: auto;
+}
+
+body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-button {
+    background: #00CC52 !important;
+}
+
+
+#requestDocumentDlgId{
+    border: 2px solid #57c279;
+}
+/*@media screen and (max-width: 991px) {
+    .layout-wrapper .layout-menu-container {
+        width: 300px;
+        left: -300px;
+    }
+    .layout-wrapper .layout-main {
+        margin-left: 0;
+    }
+}
+
+@media screen and (min-width: 992px) {
+    .layout-wrapper.layout-static .layout-menu-container {
+        width: 300px;
+    }
+    .layout-wrapper.layout-static .layout-main {
+        margin-left: 300px;
+    }
+    .layout-wrapper.layout-static.layout-static-inactive .layout-menu-container {
+        left: -300px;
+    }
+    .layout-wrapper .layout-topbar {
+        left: 300px;
+    }
+}*/
+.layout-wrapper .layout-topbar, .layout-menu-logo {
+    background-color: #ffffff !important;
+}
+
+.layout-wrapper .layout-topbar .topbar-menu > li > a .topbar-icon{
+    color: #063971 !important;
+}
+
+.configurazione-icon-new {
+    background-image: url("../images/impostazioni-system.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 30px;
+    height: 30px;
+    margin-top: 3px;
+    display: block;
+}
+
+.red-file{
+
+    background-image: url("../images/pdf_icon2.jpg");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 26px;
+    height: 42px;
+    display: block;
+
+}
+
+.action_column .ui-button .red-file{
+
+    background-image: url("../images/pdf_icon2.jpg") !important;
+    background-repeat: no-repeat !important;
+    background-position: 50% !important;
+    background-size: 26px !important;
+    height: 42px !important;
+    display: block !important;
+    top : 0% !important;
+}
+
+
+.red-file::before{
+    content: none !important;
+}
+
+.red-btn {
+    background: red !important;
+    background-color: red !important;
+    color: #FFFFFF !important;
+}
+
+.save-btn {
+    background-color: #00CC52 !important;
+    margin-right: 15px;
+    width: 100px;
+}
+
+
+.annula-btn {
+    background-color: #F3362B !important;
+    width: 100px;
+}
+
+.button-top-margin {
+    margin-top: 10px
+}
+
+.layout-wrapper{
+    overflow: auto !important;
+    height: 90% !important
+}
+
+.additional_button{
+    margin-top: 5px;
+}
+
+
+.alignEnd {
+    place-content: flex-end;
+}
+
+.searchPanelButton {
+    background: #fb6e51 !important;
+}
+
+@media screen and (max-width: 1200px) {
+    #settingPanel {
+        margin-top: 90px;
+    }
+    .alignEnd {
+        place-content: flex-start;
+    }
+}
+.ui-datatable.borderless thead th, .ui-datatable.borderless tbody,
+.ui-datatable.borderless tbody tr, .ui-datatable.borderless tbody td {
+    border-style: none;
+    background: #ffffff;
+}
+
+.email-icon-new {
+    background-image: url("../images/email_new.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 26px;
+    height: 42px;
+    display: block;
+}
+
+.correct-email-icon {
+    background-image: url("../images/icons8-segno-di-spunta-48.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 26px;
+    height: 42px;
+    display: block;
+}
+
+.email-check-icon {
+    background-image: url("../images/email-check.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 38px;
+    height: 42px;
+    display: block;
+    background-position-y: calc(50% - 2px);
+}
+
+.menu-dots-icon {
+    background-image: url("../images/menu-dots.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 30px;
+    height: 42px;
+    display: block;
+}
+
+.icon-block {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+
+.icon-block i {
+    width: 50px;
+}
+
+.confirmationDialog {
+    border: 7px solid #57c279 !important;
+}
+
+.confirmationDialog .ui-dialog-titlebar {
+    border-bottom: none !important;
+}
+
+body .confirmationDialog .ui-widget-header {
+    background: #f8f9fa !important;
+    color: #495057 !important;
+}
+
+.confirm-button {
+    background-color: #00CC52 !important;
+}
+
+#subjectRestoreDlg, #chooseSingleOrMultipleRequestCreate {
+    border: 2px solid #57c279;
+}
+
+.dialog-gray {
+    border: 7px solid #d9e0e7 !important;
+}
+
+.dialog-gray-width {
+    width: 370px !important;
+}
+
+.dialog-gray .ui-dialog-titlebar {
+    background: #f8f9fa !important;
+    color: #495057 !important;
+}
+
+.dialog-orange {
+    border: 7px solid #ffa500 !important;
+}
+
+.dialog-orange .ui-dialog-titlebar {
+    background: #f8f9fa !important;
+    color: #495057 !important;
+}
+
+.dialog-green {
+    border: 7px solid #57c279 !important;
+}
+
+.dialog-green-width {
+    width: 370px !important;
+}
+
+.dialog-green .ui-dialog-titlebar {
+    background: #f8f9fa !important;
+    color: #495057 !important;
+}
+
+.dialog-red {
+    border: 7px solid #F3362B !important;
+}
+
+.pdf-icon {
+    background-image: url("../images/pdf.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 25px;
+    height: 25px;
+    background-size: 21px;
+    display: block;
+    margin-top: -14% !important;
+}
+
+.newEntityDialog.ui-dialog .ui-widget-header {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+}

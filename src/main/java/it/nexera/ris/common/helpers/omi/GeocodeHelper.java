@@ -47,10 +47,7 @@ public class GeocodeHelper extends BaseHelper {
     }
 
     public static List<Pair<Double, Double>> getCoordinates(String address) throws Exception {
-
         StringBuffer query;
-        if(address.contains("`"))
-            address = address.replaceAll("`", "'");
         String[] split = address.split(" ");
         String queryResult = null;
 

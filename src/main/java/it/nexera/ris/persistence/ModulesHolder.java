@@ -49,7 +49,8 @@ public class ModulesHolder {
                 if (ids == null) {
                     ids = new ArrayList<Long>();
                 }
-                if(!ValidationHelper.isNullOrEmpty(mp.getModule())){
+                if(!ValidationHelper.isNullOrEmpty(mp)
+                        && !ValidationHelper.isNullOrEmpty(mp.getModule())){
                     ids.add(mp.getModule().getId());
                     modules.put(mp.getPage_type(), ids);
                 }

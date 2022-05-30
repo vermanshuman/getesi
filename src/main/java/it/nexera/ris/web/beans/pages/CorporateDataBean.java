@@ -9,17 +9,13 @@ import java.util.stream.Stream;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
-import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 
-import it.nexera.ris.common.annotations.View;
 import it.nexera.ris.common.helpers.ComboboxHelper;
 import it.nexera.ris.common.helpers.SelectItemWrapperConverter;
 import it.nexera.ris.common.helpers.ValidationHelper;
-import it.nexera.ris.common.xml.wrappers.CitySelectItem;
 import it.nexera.ris.common.xml.wrappers.SelectItemWrapper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
-import it.nexera.ris.persistence.beans.entities.domain.Client;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
 import org.hibernate.HibernateException;
@@ -41,19 +37,19 @@ import org.hibernate.criterion.Restrictions;
 @Setter
 @Getter
 @ManagedBean
-@ViewScoped
+@RequestScoped
 public class CorporateDataBean extends EntityEditPageBean<ApplicationSettingsValue> implements Serializable {
 
 	/**
-	 *
+	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	 private String companyName;
 
-	private String companyName;
+	 private String fiscalCode;
 
-	private String fiscalCode;
-
-	private String address;
+	 private String address;
 
 	private List<SelectItem> provinces;
 
@@ -111,6 +107,8 @@ public class CorporateDataBean extends EntityEditPageBean<ApplicationSettingsVal
 
 	@Override
 	public void onValidate() throws PersistenceBeanException, HibernateException, IllegalAccessException {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
@@ -148,7 +146,7 @@ public class CorporateDataBean extends EntityEditPageBean<ApplicationSettingsVal
 		}
 		OMIHelper.initCategoryCodes();
 	}
-
+	
 	@Override
 	public void goBack() {
 		RedirectHelper.goTo(PageTypes.HOME);

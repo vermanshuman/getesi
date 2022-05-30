@@ -12,7 +12,6 @@ import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.Subject;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Country;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.LandChargesRegistry;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
@@ -87,9 +86,7 @@ public class SubjectXMLWrapper extends BaseXMLWrapper<Subject> {
 
         if (!ValidationHelper.isNullOrEmpty(getCityCode())) {
             List<City> cities  = ConnectionManager.load(City.class, new Criterion[]{
-                    Restrictions.eq("cfis", getCityCode()),
-                    Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                            Restrictions.isNull("isDeleted"))
+                    Restrictions.eq("cfis", getCityCode())
             }, session);
 
             if (cities != null && cities.size() > 0) {
@@ -101,9 +98,7 @@ public class SubjectXMLWrapper extends BaseXMLWrapper<Subject> {
         if (ValidationHelper.isNullOrEmpty(subject.getBirthCity())
                 && !ValidationHelper.isNullOrEmpty(getCityDescription())) {
             List<City> cityList = ConnectionManager.load(City.class, new Criterion[]{
-                    Restrictions.eq("description", getCityDescription()),
-                    Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                            Restrictions.isNull("isDeleted"))
+                    Restrictions.eq("description", getCityDescription())
             }, session);
 
             if (!ValidationHelper.isNullOrEmpty(cityList)) {
