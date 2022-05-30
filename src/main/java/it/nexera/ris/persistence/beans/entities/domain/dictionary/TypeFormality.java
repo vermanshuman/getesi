@@ -57,6 +57,9 @@ public class TypeFormality extends Dictionary {
 
     private Boolean renewal;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     @Override
     public String toString() {
         return getCode();

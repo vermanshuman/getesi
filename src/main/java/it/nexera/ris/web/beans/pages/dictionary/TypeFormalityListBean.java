@@ -3,14 +3,22 @@ package it.nexera.ris.web.beans.pages.dictionary;
 import it.nexera.ris.common.enums.TypeActEnum;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.ComboboxHelper;
+import it.nexera.ris.common.helpers.LogHelper;
 import it.nexera.ris.common.helpers.ValidationHelper;
+import it.nexera.ris.persistence.PersistenceSessionManager;
+import it.nexera.ris.persistence.beans.dao.DaoManager;
+import it.nexera.ris.persistence.beans.entities.domain.Iban;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.TypeFormality;
 import it.nexera.ris.web.beans.EntityLazyListPageBean;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.HibernateException;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.primefaces.context.RequestContext;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -22,6 +30,8 @@ import java.util.List;
 
 @ManagedBean(name = "typeFormalityBean")
 @ViewScoped
+@Getter
+@Setter
 public class TypeFormalityListBean extends EntityLazyListPageBean<TypeFormality> implements Serializable {
 
     private static final long serialVersionUID = 4576200330090741930L;
@@ -42,10 +52,13 @@ public class TypeFormalityListBean extends EntityLazyListPageBean<TypeFormality>
 
     private List<SelectItem> typeActEnumList;
 
+    private TypeFormality entity;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
             InstantiationException, IllegalAccessException, IOException {
         filterTableFromPanel();
+        setEntity(new TypeFormality());
         setTypeActEnumList(ComboboxHelper.fillList(TypeActEnum.class, true, false));
     }
 
@@ -72,6 +85,8 @@ public class TypeFormalityListBean extends EntityLazyListPageBean<TypeFormality>
         if (!ValidationHelper.isNullOrEmpty(getCertificationText())) {
             restrictions.add(Restrictions.ilike("certificationText", getCertificationText(), MatchMode.ANYWHERE));
         }
+        restrictions.add(Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                Restrictions.isNull("isDeleted")));
 
         this.loadList(TypeFormality.class, restrictions.toArray(new Criterion[0]), new Order[]
                 {Order.asc("code")});
@@ -88,67 +103,96 @@ public class TypeFormalityListBean extends EntityLazyListPageBean<TypeFormality>
         filterTableFromPanel();
     }
 
-    public String getCode() {
-        return code;
+    @Override
+    public void editEntity() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        if (this.getCanEdit()) {
+            this.cleanValidation();
+            if (!ValidationHelper.isNullOrEmpty(this.getEntityEditId())) {
+                try {
+                    this.setEntity(DaoManager.get(getType(), this.getEntityEditId()));
+                    DaoManager.getSession().evict(this.getEntity());
+                } catch (Exception e) {
+                    LogHelper.log(log, e);
+                }
+            }
+            RequestContext.getCurrentInstance().update("addTypeFormalityDialog");
+            executeJS("PF('addTypeFormalityDialogWV').show();");
+        }
     }
 
-    public void setCode(String code) {
-        this.code = code;
+    @Override
+    public void addEntity() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        if (this.getCanCreate()) {
+            setEntity(new TypeFormality());
+            this.cleanValidation();
+            RequestContext.getCurrentInstance().update("addTypeFormalityDialog");
+            executeJS("PF('addTypeFormalityDialogWV').show();");
+        }
     }
 
-    public String getDescription() {
-        return description;
+    public void save() throws HibernateException, PersistenceBeanException, NumberFormatException, IOException,
+            InstantiationException, IllegalAccessException {
+        this.cleanValidation();
+        this.setValidationFailed(false);
+
+        try {
+            this.validate();
+        } catch (PersistenceBeanException e) {
+            LogHelper.log(log, e);
+        }
+        if (this.getValidationFailed()) {
+            return;
+        }
+        saveEntity();
+        this.resetFields();
+        executeJS("PF('addTypeFormalityDialogWV').hide()");
+        executeJS("refreshTable()");
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    protected void validate() throws PersistenceBeanException {
+        try {
+            if (DaoManager.getCount(TypeFormality.class, "id", new Criterion[]{
+                    Restrictions.eq("code", getEntity().getCode()),
+                    Restrictions.eq("type", getEntity().getType()),
+                    Restrictions.ne("id", getEntity().isNew() ? 0L : getEntity().getId())
+            }) > 0) {
+                addException("typeFormalityInUse");
+            }
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
     }
 
-    public String getTextInVisura() {
-        return textInVisura;
+    public void resetFields() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        setEntity(new TypeFormality());
+        this.cleanValidation();
+        this.filterTableFromPanel();
     }
 
-    public void setTextInVisura(String textInVisura) {
-        this.textInVisura = textInVisura;
+    @Override
+    public void deleteEntity() throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException, NumberFormatException, IOException {
+        this.setEntity(DaoManager.get(getType(), this.getEntityDeleteId()));
+        getEntity().setIsDeleted(Boolean.TRUE);
+        saveEntity();
+        filterTableFromPanel();
     }
 
-    public TypeActEnum getActType() {
-        return actType;
-    }
-
-    public void setActType(TypeActEnum actType) {
-        this.actType = actType;
-    }
-
-    public String getInitText() {
-        return initText;
-    }
-
-    public void setInitText(String initText) {
-        this.initText = initText;
-    }
-
-    public String getFinalText() {
-        return finalText;
-    }
-
-    public void setFinalText(String finalText) {
-        this.finalText = finalText;
-    }
-
-    public String getCertificationText() {
-        return certificationText;
-    }
-
-    public void setCertificationText(String certificationText) {
-        this.certificationText = certificationText;
-    }
-
-    public List<SelectItem> getTypeActEnumList() {
-        return typeActEnumList;
-    }
-
-    public void setTypeActEnumList(List<SelectItem> typeActEnumList) {
-        this.typeActEnumList = typeActEnumList;
+    private void saveEntity() {
+        Transaction tr = null;
+        try {
+            tr = PersistenceSessionManager.getBean().getSession()
+                    .beginTransaction();
+            DaoManager.save(this.getEntity());
+        } catch (Exception e) {
+            if (tr != null) {
+                tr.rollback();
+            }
+            LogHelper.log(log, e);
+        } finally {
+            if (tr != null && !tr.wasRolledBack()
+                    && tr.isActive()) {
+                tr.commit();
+            }
+        }
     }
 }

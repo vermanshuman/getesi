@@ -2,6 +2,8 @@ package it.nexera.ris.persistence.beans.entities.domain.dictionary;
 
 import it.nexera.ris.common.enums.TypeActEnum;
 import it.nexera.ris.persistence.beans.entities.Dictionary;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -14,6 +16,8 @@ import java.util.Objects;
 @Table(name = "dic_type_act")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "data_entry")
+@Getter
+@Setter
 public class TypeAct extends Dictionary {
 
     private static final long serialVersionUID = 7341809886279567072L;
@@ -32,6 +36,9 @@ public class TypeAct extends Dictionary {
     @XmlElement(name = "typeStr")
     private String typeStr;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     @Override
     public String toString() {
         return getCode()+ " - " + getDescription();
@@ -49,37 +56,5 @@ public class TypeAct extends Dictionary {
     public int hashCode() {
 
         return Objects.hash(getId());
-    }
-
-    public TypeActEnum getType() {
-        return type;
-    }
-
-    public void setType(TypeActEnum type) {
-        this.type = type;
-    }
-
-    public String getTextInVisura() {
-        return textInVisura;
-    }
-
-    public void setTextInVisura(String textInVisura) {
-        this.textInVisura = textInVisura;
-    }
-
-    public String getCodeInVisura() {
-        return codeInVisura;
-    }
-
-    public void setCodeInVisura(String codeInVisura) {
-        this.codeInVisura = codeInVisura;
-    }
-
-    public String getTypeStr() {
-        return typeStr;
-    }
-
-    public void setTypeStr(String typeStr) {
-        this.typeStr = typeStr;
     }
 }
