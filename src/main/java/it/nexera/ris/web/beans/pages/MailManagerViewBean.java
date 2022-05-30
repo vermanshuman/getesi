@@ -1715,11 +1715,20 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         getSelectedInvoice().setStatus(invoiceStatus);
 
         getSelectedInvoice().setTotalGrossAmount(getTotalGrossAmount());
+        if (!ValidationHelper.isNullOrEmpty(getEntity().getNdg()))
+        	getSelectedInvoice().setNdg(getEntity().getNdg());
+        if (!ValidationHelper.isNullOrEmpty(getEntity().getOffice()))
+        	getSelectedInvoice().setOffice(getEntity().getOffice());
+        if (!ValidationHelper.isNullOrEmpty(getEntity().getReferenceRequest()))
+        	getSelectedInvoice().setPractice(getEntity().getReferenceRequest());
         DaoManager.save(getSelectedInvoice(), true);
         setMaxInvoiceNumber(getSelectedInvoice().getId());
         if (saveInvoiceNumber) {
             getSelectedInvoice().setNumber(getNumber());
             getSelectedInvoice().setInvoiceNumber(getInvoiceNumber());
+        }
+        if (!ValidationHelper.isNullOrEmpty(getEntity().getManagers())) {
+        	getSelectedInvoice().setManagers(new ArrayList<>(getEntity().getManagers()));
         }
         DaoManager.save(getSelectedInvoice(), true);
         for (GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
