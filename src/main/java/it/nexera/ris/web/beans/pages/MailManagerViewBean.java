@@ -1499,7 +1499,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             }
             wrapper.setInvoiceTotalCost(invoiceItem.getInvoiceTotalCost());
             wrapper.setSelectedTaxRateId(invoiceItem.getTaxRate().getId());
-            wrapper.setInvoiceItemAmount(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount()) ? 0.0 : invoiceItem.getAmount());
+            if(!ValidationHelper.isNullOrEmpty(invoiceItem.getAmount()))
+            	wrapper.setInvoiceItemAmount(invoiceItem.getAmount());
             double totalcost = !(ValidationHelper.isNullOrEmpty(invoiceItem.getInvoiceTotalCost())) ? invoiceItem.getInvoiceTotalCost().doubleValue() : 0.0;
             double amount = !(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount())) ? invoiceItem.getAmount().doubleValue() : 0.0;
             double totalLine;
@@ -1642,6 +1643,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         ums = new ArrayList<>();
         ums.add(new SelectItem("pz", "pz"));
         wrapper.setUms(ums);
+        wrapper.setInvoiceItemAmount(1.0d);
         wrapper.setVatAmounts(ComboboxHelper.fillList(TaxRate.class, Order.asc("description"), new CriteriaAlias[]{}, new Criterion[]{
                 Restrictions.eq("use", Boolean.TRUE)
         }, true, false));
