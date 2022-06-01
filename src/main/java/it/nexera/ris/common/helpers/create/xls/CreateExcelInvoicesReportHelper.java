@@ -110,21 +110,24 @@ public class CreateExcelInvoicesReportHelper extends CreateExcelReportHelper {
         for (Invoice invoice : invoices) {
             row = createRowAfterDefinedEmptyRows(1);
             row.createCell(0).setCellValue((invoice.getCreateDate() != null) ?
-                    DateTimeHelper.toStringDateWithDots(invoice.getCreateDate()) : "");
-            row.createCell(1).setCellValue(invoice.getInvoiceNumber());
+                    DateTimeHelper.toFormatedString(invoice.getCreateDate(),
+                            DateTimeHelper.getDatePattern()) : "");
+            row.createCell(1).setCellValue(invoice.getNumber());
             if(!ValidationHelper.isNullOrEmpty(invoice.getClient())
                     && !ValidationHelper.isNullOrEmpty(invoice.getClient().getClientName())){
                 row.createCell(2).setCellValue(invoice.getClient().getClientName());
             }
 
             List<GoodsServicesFieldWrapper>  wrapperList = goodsServicesFields(invoice, invoiceHelper);
-            row.createCell(3).setCellValue(String.valueOf(invoiceHelper.getAllTotalLine(wrapperList)));
-            row.createCell(5).setCellValue(invoiceHelper.getTotalVat(wrapperList));
+            row.createCell(3).setCellValue(
+                    String.valueOf(invoiceHelper.getAllTotalLine(wrapperList)).replace(".",","));
+            row.createCell(5).setCellValue(
+                    String.valueOf(invoiceHelper.getTotalVat(wrapperList)).replace(".",","));
             Double grossAmount = invoiceHelper.getTotalGrossAmount(wrapperList);
-            row.createCell(6).setCellValue(String.valueOf(grossAmount));
+            row.createCell(6).setCellValue(String.valueOf(grossAmount).replace(".",","));
             Double totalPayments = invoiceHelper.getTotalPayment(invoice);
-            row.createCell(8).setCellValue(String.valueOf(totalPayments));
-            row.createCell(10).setCellValue(String.valueOf(grossAmount - totalPayments));
+            row.createCell(8).setCellValue(String.valueOf(totalPayments).replace(".",","));
+            row.createCell(10).setCellValue(String.valueOf(grossAmount - totalPayments).replace(".",","));
         }
         autoSizeColumnsAndSetSizeToAnotherByDefault(getColumns().length);
 

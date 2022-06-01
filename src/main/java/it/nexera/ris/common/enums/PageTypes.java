@@ -54,7 +54,6 @@ public enum PageTypes {
     STRUCTURE_LIST("/Pages/Dictionaries/StructureList.jsf", true),
 
     COST_CONFIGURATION_LIST("/Pages/Dictionaries/CostConfigurationList.jsf", true),
-    COST_CONFIGURATION_EDIT("/Pages/Dictionaries/CostConfigurationEdit.jsf", true),
 
     SERVICE_LIST("/Pages/Dictionaries/ServiceList.jsf", true),
     SERVICE_EDIT("/Pages/Dictionaries/ServiceEdit.jsf", true),
@@ -71,7 +70,6 @@ public enum PageTypes {
     DATA_GROUP_EDIT("/Pages/Dictionaries/DataGroupEdit.jsf"),
 
     REFERENT_LIST("/Pages/Dictionaries/ReferentList.jsf", true),
-    REFERENT_EDIT("/Pages/Dictionaries/ReferentEdit.jsf", true),
 
     DAY_PHRASE_LIST("/Pages/Dictionaries/DayPhraseList.jsf", true),
     TYPE_ACT_LIST("/Pages/Dictionaries/TypeActList.jsf", true),
@@ -129,8 +127,7 @@ public enum PageTypes {
     OMI_KML_LIST("/Pages/Dictionaries/OMIKmlList.jsf"),
 
     NOTARY_LIST("/Pages/Dictionaries/NotaryList.jsf", true),
-    NOTARY_EDIT("/Pages/Dictionaries/NotaryEdit.jsf", true),
-    
+
     COURT_LIST("/Pages/Dictionaries/CourtList.jsf", true),
 
     RELATIONSHIP_TYPES_LIST("/Pages/Dictionaries/RelationshipTypeList.jsf", true),
@@ -145,7 +142,6 @@ public enum PageTypes {
     LAND_OMI_EDIT("/Pages/ConfigurationArea/LandOmiEdit.jsf", true),
 
     LAND_CULTURE_LIST("/Pages/ConfigurationArea/LandCultureList.jsf", true),
-    LAND_CULTURE_EDIT("/Pages/ConfigurationArea/LandCultureEdit.jsf", true),
 
     CALENDAR("/Pages/Configuration/Calendar.jsf"),
     FOREIGN_STATES("/Pages/Configuration/ForeignStates.jsf"),

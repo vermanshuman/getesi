@@ -170,19 +170,19 @@
             .servicesTable table {
                 margin-top: 60px;
             }
-            
+
             div[id*='wizard:billingPanel_content'] {
-          		border: none !important;
-          	}
-          	
-          	.ui-dialog .ui-widget-header {
+                border: none !important;
+            }
+
+            .ui-dialog .ui-widget-header {
                 background: #f8f9fa !important;
                 color: #495057 !important;
             }
-            
+
             #confirmCopyPriceListDialog .ui-panelgrid .ui-panelgrid-cell {
-		    	border: none !important;
-		    }
+                border: none !important;
+            }
         </style>
         <script type="text/javascript">
             // <![CDATA[
@@ -858,22 +858,22 @@
                                 </p:column>
                             </p:row>
                         </p:panelGrid>
-                	</p:panelGrid>
-                	<p:panel styleClass="ui-panelgrid-blank form-group" id="billingPanel" style="border:none !important;">
+                    </p:panelGrid>
+                    <p:panel styleClass="ui-panelgrid-blank form-group" id="billingPanel" style="border:none !important;">
                         <h:outputText value="#{msg.headerBilling}"
                                       style="font-weight: bold; margin-left: 15px; font-size: large;"/>
-						
-						<p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group">
-	                        <h:outputText value="#{msg.clientEditCopyCostList}"/>
-	                        <p:selectOneMenu id="client" value="#{bean.selectedClientIdToCopy}" style="width: 300px; "
-	                                         styleClass="#{bean.selectedClientIdToCopy ne null ? 'select-one-menu' : ''}">
-	                            <f:selectItem itemLabel="#{ff:upper(msg.client_list)}" itemValue="#{null}"
-	                                          noSelectionOption="true"/>
-	                            <f:selectItems value="#{bean.clientsToCopy}" />
-	                            <p:ajax event="itemSelect" update="@this"/>
-	                        </p:selectOneMenu>
-	                        <p:commandButton value="#{msg.clientEditCopy}" action="#{bean.checkCopyPriceListClient}" />
-                		</p:panelGrid>
+
+                        <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group">
+                            <h:outputText value="#{msg.clientEditCopyCostList}"/>
+                            <p:selectOneMenu id="client" value="#{bean.selectedClientIdToCopy}" style="width: 300px; "
+                                             styleClass="#{bean.selectedClientIdToCopy ne null ? 'select-one-menu' : ''}">
+                                <f:selectItem itemLabel="#{ff:upper(msg.client_list)}" itemValue="#{null}"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{bean.clientsToCopy}" />
+                                <p:ajax event="itemSelect" update="@this"/>
+                            </p:selectOneMenu>
+                            <p:commandButton value="#{msg.clientEditCopy}" action="#{bean.checkCopyPriceListClient}" />
+                        </p:panelGrid>
                         <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group"
                                      style="margin-bottom: 10px;">
                             <span>#{msg.clientEditAutomaticInvoice}: </span>
@@ -886,9 +886,9 @@
                             <span>#{msg.clientEditMonthlyInvoice}: </span>
                             <p:selectBooleanCheckbox value="#{bean.entity.monthlyInvoice}" disabled="#{bean.onlyView}"/>
                         </p:panelGrid>
-                   	</p:panel>
-                	<p:dataTable var="item" value="#{bean.services}" editable="true" editMode="cell" id="servicesTable"
-                             emptyMessage="#{msg.noRecordsFound}" styleClass="servicesTable">
+                    </p:panel>
+                    <p:dataTable var="item" value="#{bean.services}" editable="true" editMode="cell" id="servicesTable"
+                                 emptyMessage="#{msg.noRecordsFound}" styleClass="servicesTable">
                         <f:facet name="header">
                             <h:outputText value="#{msg.clientServiceTable}"/>
                         </f:facet>
@@ -1335,17 +1335,17 @@
                                  oncomplete="PF('deleteEmailDlgWV').hide();"/>
             </div>
         </p:dialog>
-        
+
         <p:dialog widgetVar="confirmCopyPriceListDialogWV" resizable="false" id="confirmCopyPriceListDialog" styleClass="dialog-green"
                   draggable="false" modal="true" width="500" style="overflow: unset !important; height: 150px !important;">
             <p:panelGrid columns="1" style="border: none;">
-            	<h:outputText value="#{bean.emptyPriceListMessage}" rendered="#{not empty bean.emptyPriceListMessage}"/>
-            	<h:outputText value="#{msg.clientEditConfirmCopyPriceList}"/>
+                <h:outputText value="#{bean.emptyPriceListMessage}" rendered="#{not empty bean.emptyPriceListMessage}"/>
+                <h:outputText value="#{msg.clientEditConfirmCopyPriceList}"/>
             </p:panelGrid>
-            
+
             <div class="btn_line">
                 <p:commandButton value="#{msg.yes}" update=":form:wizard:servicesTable" styleClass="yes-button"
-                                 oncomplete="PF('confirmCopyPriceListDialogWV').hide();" style="margin-right: 15px;" 
+                                 oncomplete="PF('confirmCopyPriceListDialogWV').hide();" style="margin-right: 15px;"
                                  action="#{bean.copyPriceListClient}"/>
                 <p:commandButton value="#{msg.no}" styleClass="no-button"
                                  onclick="PF('confirmCopyPriceListDialogWV').hide();"/>

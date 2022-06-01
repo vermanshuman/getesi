@@ -1,20 +1,18 @@
 package it.nexera.ris.persistence.beans.entities.domain;
 
-import it.nexera.ris.common.enums.ClientTitleType;
-import it.nexera.ris.common.enums.ClientType;
 import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Table;
 import java.io.Serializable;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @javax.persistence.Entity
 @Table(name = "notary")
+@Getter
+@Setter
 public class Notary extends IndexedEntity implements Serializable {
 
 	private static final long serialVersionUID = 7229760713684989000L;
@@ -31,6 +29,9 @@ public class Notary extends IndexedEntity implements Serializable {
     @Column(name = "inscriptions")
     private String inscriptions;
 
+	@Column(name = "is_deleted")
+	private Boolean isDeleted;
+
     public String toString() {
     	String r = name;
     	
@@ -39,37 +40,4 @@ public class Notary extends IndexedEntity implements Serializable {
     	
     	return r;
     }
-    
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getCity() {
-		return city;
-	}
-
-	public void setCity(String city) {
-		this.city = city;
-	}
-
-	public String getOfficeAddress() {
-		return officeAddress;
-	}
-
-	public void setOfficeAddress(String officeAddress) {
-		this.officeAddress = officeAddress;
-	}
-
-	public String getInscriptions() {
-		return inscriptions;
-	}
-
-	public void setInscriptions(String inscriptions) {
-		this.inscriptions = inscriptions;
-	}
-
 }

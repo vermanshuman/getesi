@@ -22,6 +22,7 @@ import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -903,10 +904,13 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         if(ValidationHelper.isNullOrEmpty(fiscalCodeAppliant))
             fiscalCodeAppliant = "";
 
-        result.append("P.IVA: ");
+        if(StringUtils.isNotBlank(fiscalCodeAppliant)){
+            result.append("P.IVA: ");
+        }
         result.append(fiscalCodeAppliant);
         result.append("<br/>");
-        result.append("Cod. Fiscale: ");
+        if(StringUtils.isNotBlank(fiscalCodeAppliant))
+            result.append("Cod. Fiscale: ");
         result.append(fiscalCodeAppliant);
         result.append("<br/>");
         String emailFrom = "";
@@ -923,7 +927,8 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
 
         result.append("<td style=\"border: 2px solid lightgray;width: 50%;padding: 10px;line-height: 22px;\">");
         String clientName = "";
-        String clientAddress= "";
+        String clientAddressStreet = "";
+        String clientAddressHouseNumber = "";
         String clientPostal= "";
         String clientNumberVAT= "";
         String clientFiscalCode= "";
@@ -935,10 +940,10 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
                     clientName = invoice.getClient().getClientName();
                 }
                 if(!ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressStreet())){
-                    clientAddress = invoice.getClient().getAddressStreet();
+                    clientAddressStreet = invoice.getClient().getAddressStreet();
                 }
                 if(!ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressHouseNumber())){
-                    clientAddress = invoice.getClient().getAddressHouseNumber();
+                    clientAddressHouseNumber = invoice.getClient().getAddressHouseNumber();
                 }
                 if(!ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressPostalCode())){
                     clientPostal = invoice.getClient().getAddressPostalCode();
@@ -969,20 +974,26 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         result.append("<b>");
         result.append(clientName.toUpperCase());
         result.append("</b><br/>");
-        result.append(clientAddress);
+        result.append(clientAddressStreet);
+        result.append("<br/>");
+        result.append(clientAddressHouseNumber);
         result.append("<br/>");
         result.append(clientPostal);
         result.append("<br/>");
-        result.append("P.IVA: ");
+        if(StringUtils.isNotBlank(clientNumberVAT))
+            result.append("P.IVA: ");
         result.append(clientNumberVAT);
         result.append("<br/>");
-        result.append("Cod. Fiscale: ");
+        if(StringUtils.isNotBlank(clientFiscalCode))
+            result.append("Cod. Fiscale: ");
         result.append(clientFiscalCode);
         result.append("<br/>");
-        result.append("Codice Ufficio: ");
+        if(StringUtils.isNotBlank(clientOffice))
+            result.append("Codice Ufficio: ");
         result.append(clientOffice);
         result.append("<br/>");
-        result.append("PEC: ");
+        if(StringUtils.isNotBlank(clientPEC))
+            result.append("PEC: ");
         result.append(clientPEC);
         result.append("<br/>");
         result.append("</td>");
@@ -1043,11 +1054,13 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
                 refrenceRequest = invoice.getEmailFrom().getReferenceRequest();
             }
         }
-        result.append("NDG: ");
+        if(StringUtils.isNotBlank(ndg))
+            result.append("NDG: ");
         result.append(ndg);
         result.append("</td>");
         result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\">");
-        result.append("Rif.: ");
+        if(StringUtils.isNotBlank(refrenceRequest))
+            result.append("Rif.: ");
         result.append(refrenceRequest);
         result.append("</td>");
         result.append("</tr>");
@@ -1077,14 +1090,17 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
                 mailOffice = invoice.getEmailFrom().getOffice().toString();
             }
         }
-        result.append("Gestore: ");
+        if(StringUtils.isNotBlank(mailClient))
+            result.append("Gestore: ");
         result.append(mailClient);
         result.append("<br/>");
-        result.append("Fiduciario: ");
+        if(StringUtils.isNotBlank(mailTrust))
+            result.append("Fiduciario: ");
         result.append(mailTrust);
         result.append("</td>");
         result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\">");
-        result.append("Ufficio: ");
+        if(StringUtils.isNotBlank(mailOffice))
+            result.append("Ufficio: ");
         result.append(mailOffice);
         result.append("</td>");
         result.append("</tr>");

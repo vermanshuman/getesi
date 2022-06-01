@@ -1821,7 +1821,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             if (fileContent != null) {
                 InputStream stream = new ByteArrayInputStream(fileContent);
                 invoicePDFFile = new DefaultStreamedContent(stream, FileHelper.getFileExtension(filePathStr),
-                        fileName + ".pdf");
+                        fileName.toUpperCase() + ".pdf");
             }
         } catch (Exception e) {
             LogHelper.log(log, e);
@@ -1984,7 +1984,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 if (fileContent != null) {
                     InputStream stream = new ByteArrayInputStream(fileContent);
                     invoicePDFFile = new DefaultStreamedContent(stream, FileHelper.getFileExtension(filePathStr),
-                            fileName + ".pdf");
+                            fileName.toUpperCase() + ".pdf");
                 }
             }
         }catch(Exception e){

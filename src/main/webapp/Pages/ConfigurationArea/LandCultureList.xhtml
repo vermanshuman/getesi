@@ -73,6 +73,10 @@
                 .layout-menu.clearfix {
                     margin-left: 15px !important;
                 }
+                #filterCultureDescription {
+                    width: 100%;
+                    height: 38px;
+                }
             </style>
             <p:remoteCommand name="updateFilterInput"
                              update=":filterName"/>
@@ -99,15 +103,18 @@
                                          styleClass="#{bean.landCultureName ne null and bean.landCultureName ne '' ? 'green-border' : ''}" />
                         </div>
                     </div>
-
-                    <p:selectCheckboxMenu id="filterCultureDescription" value="#{bean.selectedFilterQuality}"
-                                          filter="true" filterMatchMode="startsWith"
-                                          label="#{msg.landCadastralCultureDescription}"
-                                          multiple="true"
-                                          styleClass="#{bean.selectedFilterQuality ne null ? 'green-border' : ''}">
-                        <f:selectItems value="#{bean.qualities}"/>
-                        <p:ajax event="change" update="@this"/>
-                    </p:selectCheckboxMenu>
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:selectCheckboxMenu id="filterCultureDescription" value="#{bean.selectedFilterQuality}"
+                                                  filter="true" filterMatchMode="startsWith"
+                                                  label="#{msg.landCadastralCultureDescription}"
+                                                  multiple="true"
+                                                  styleClass="#{bean.selectedFilterQuality ne null ? 'green-border' : ''}">
+                                <f:selectItems value="#{bean.qualities}"/>
+                                <p:ajax event="change" update="@this"/>
+                            </p:selectCheckboxMenu>
+                        </div>
+                    </div>
 
                     <div class="p-col-12" style="text-align: center;">
                         <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #00CC52;margin-right: 20px;" id="searchButton"
