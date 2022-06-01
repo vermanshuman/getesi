@@ -5,7 +5,6 @@
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui"
-                xmlns:pe="http://primefaces.org/ui/extensions"
                 template="/resources/tpl/Admin/FormBase.xhtml">
     <ui:param name="bean" value="#{mailManagerViewBean}"/>
     <ui:define name="form_body">
@@ -148,8 +147,8 @@
                 width: 210px !important;
             }
             input {
-                background-color: #F0F3F5 !important;
-                border: none !important;
+                /*background-color: #F0F3F5 !important;*/
+                /*border: none !important;*/
                 border-radius: 7px !important;
                 min-height: 28px;
             }
@@ -359,5 +358,6 @@
         <ui:include src="../Dialogs/MailManagerViewRequestsDialog.xhtml"/>
         <ui:include src="../Dialogs/InvoiceDialogBilling.xhtml"/>
         <ui:include src="../Dialogs/MailManagerViewRequestsForInvoiceDialog.xhtml"></ui:include>
+        <ui:include src="../Dialogs/InvoiceMissingBillingClientDialog.xhtml"></ui:include>
     </ui:define>
 </ui:composition>

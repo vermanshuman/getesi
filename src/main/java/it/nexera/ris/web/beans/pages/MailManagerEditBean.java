@@ -923,7 +923,7 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
             setAttachedFiles(new ArrayList<>());
         }
         if (new File(export.getDestinationPath()).exists()) {
-            getAttachedFiles().add(new FileWrapper(export.getId(), export.getFileName(), export.getDestinationPath()));
+            getAttachedFiles().add(new FileWrapper(export.getId(), export.getFileName(), export.getDestinationPath(), Boolean.TRUE));
         } else {
             LogHelper.log(log, "WARNING failed to attach file | no file on server: " + export.getDestinationPath());
         }

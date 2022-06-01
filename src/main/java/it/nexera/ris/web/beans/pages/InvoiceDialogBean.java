@@ -1035,12 +1035,12 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         String ndg = "";
         String refrenceRequest = "";
 
-        if(!ValidationHelper.isNullOrEmpty(invoice) && !ValidationHelper.isNullOrEmpty(invoice.getEmail())){
-            if(!ValidationHelper.isNullOrEmpty(invoice.getEmail().getNdg())){
-                ndg = invoice.getEmail().getNdg();
+        if(!ValidationHelper.isNullOrEmpty(invoice) && !ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())){
+            if(!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getNdg())){
+                ndg = invoice.getEmailFrom().getNdg();
             }
-            if(!ValidationHelper.isNullOrEmpty(invoice.getEmail().getReferenceRequest())){
-                refrenceRequest = invoice.getEmail().getReferenceRequest();
+            if(!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getReferenceRequest())){
+                refrenceRequest = invoice.getEmailFrom().getReferenceRequest();
             }
         }
         result.append("NDG: ");
@@ -1677,5 +1677,29 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         }
         return "";
     }
+
+    public void saveFiles(WLGInbox inbox, List<FileWrapper> invoiceEmailAttachedFiles, boolean transaction) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        if (!ValidationHelper.isNullOrEmpty(invoiceEmailAttachedFiles)) {
+            for (FileWrapper wrapper : invoiceEmailAttachedFiles) {
+                if(!ValidationHelper.isNullOrEmpty(wrapper.getAddAttachment()) && wrapper.getAddAttachment()){
+                    WLGExport export = DaoManager.get(WLGExport.class, new Criterion[]{
+                            Restrictions.eq("id", wrapper.getId())
+                    });
+                    export.setExportDate(new Date());
+                    export.setSourcePath(String.format("\\%s", inbox.getId()));
+                    export.setInbox(inbox);
+                    DaoManager.save(export, transaction);
+                }else {
+                    WLGExport export = DaoManager.get(WLGExport.class, new Criterion[]{
+                            Restrictions.eq("id", wrapper.getId())
+                    });
+                    if(!ValidationHelper.isNullOrEmpty(export)){
+                        DaoManager.refresh(export);
+                    }
+                }
+            }
+        }
+    }
+
 }
 

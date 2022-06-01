@@ -274,7 +274,8 @@ public class MailHelper extends BaseHelper {
 
         if (files != null) {
             for (FileWrapper file : files) {
-                addAttachment(multipart, file.getFilePath(), file.getFileName());
+                if(!ValidationHelper.isNullOrEmpty(file.getAddAttachment()) && file.getAddAttachment())
+                    addAttachment(multipart, file.getFilePath(), file.getFileName());
             }
         }
 

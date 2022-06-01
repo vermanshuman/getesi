@@ -43,7 +43,7 @@ public class PaymentTypeListBean extends EntityLazyListPageBean<PaymentType>
     private String istitutionName;
 
     private String iban;
-    
+
     private PaymentType entity;
 
     @Override
@@ -70,6 +70,8 @@ public class PaymentTypeListBean extends EntityLazyListPageBean<PaymentType>
         if (!ValidationHelper.isNullOrEmpty(getIban())) {
             restrictions.add(Restrictions.ilike("iban", getIban(), MatchMode.ANYWHERE));
         }
+        restrictions.add(Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                Restrictions.isNull("isDeleted")));
         this.loadList(PaymentType.class, restrictions.toArray(new Criterion[0]),
                 new Order[]
                         {Order.asc("description")});
@@ -83,7 +85,7 @@ public class PaymentTypeListBean extends EntityLazyListPageBean<PaymentType>
         setIstitutionName(null);
         filterTableFromPanel();
     }
-    
+
     @Override
     public void editEntity() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         if (this.getCanEdit()) {
@@ -100,7 +102,7 @@ public class PaymentTypeListBean extends EntityLazyListPageBean<PaymentType>
             executeJS("PF('addPaymentTypeDialogWV').show();");
         }
     }
-    
+
     @Override
     public void addEntity() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         if (this.getCanCreate()) {
@@ -110,39 +112,50 @@ public class PaymentTypeListBean extends EntityLazyListPageBean<PaymentType>
             executeJS("PF('addPaymentTypeDialogWV').show();");
         }
     }
-    
-	public void save() throws HibernateException, PersistenceBeanException, NumberFormatException, IOException,
-			InstantiationException, IllegalAccessException {
-		this.cleanValidation();
-		this.setValidationFailed(false);
 
-		this.validate();
-		
-		if (this.getValidationFailed()) {
-			return;
-		}
-		saveEntity();
-		this.resetFields();
-		executeJS("PF('addPaymentTypeDialogWV').hide()");
-		executeJS("refreshTable()");
-	}
-	
-	protected void validate() {
-		if (ValidationHelper.isNullOrEmpty(this.getEntity().getDescription())) {
+    public void save() throws HibernateException, PersistenceBeanException, NumberFormatException, IOException,
+            InstantiationException, IllegalAccessException {
+        this.cleanValidation();
+        this.setValidationFailed(false);
+
+        try {
+            this.validate();
+        } catch (PersistenceBeanException e) {
+            LogHelper.log(log, e);
+        }
+        if (this.getValidationFailed()) {
+            return;
+        }
+        saveEntity();
+        this.resetFields();
+        executeJS("PF('addPaymentTypeDialogWV').hide()");
+        executeJS("refreshTable()");
+    }
+
+    protected void validate() throws PersistenceBeanException {
+        if (ValidationHelper.isNullOrEmpty(this.getEntity().getDescription())) {
             addRequiredFieldException("form:description");
         } else if (!ValidationHelper.isUnique(PaymentType.class, "description",
                 getEntity().getDescription(), this.getEntity().getId())) {
             addFieldException("form:description", "nameAlreadyInUse");
         }
-	}
-	
-	public void resetFields() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+    }
+
+    public void resetFields() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         setEntity(new PaymentType());
         this.cleanValidation();
         this.filterTableFromPanel();
     }
-	
-	private void saveEntity() {
+
+    @Override
+    public void deleteEntity() throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException, NumberFormatException, IOException {
+        this.setEntity(DaoManager.get(getType(), this.getEntityDeleteId()));
+        getEntity().setIsDeleted(Boolean.TRUE);
+        saveEntity();
+        filterTableFromPanel();
+    }
+
+    private void saveEntity() {
         Transaction tr = null;
         try {
             tr = PersistenceSessionManager.getBean().getSession()

@@ -29,6 +29,9 @@ public class Country extends Dictionary {
     @Column(name = "external")
     private Boolean external;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     @Transient
     private String fiscalCode;
 
@@ -57,5 +60,13 @@ public class Country extends Dictionary {
 
     public void setFiscalCode(String fiscalCode) {
         this.fiscalCode = fiscalCode;
+    }
+
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
     }
 }

@@ -907,7 +907,7 @@
                                                      rendered="#{not empty bean.invoiceEmailAttachedFiles}" emptyMessage="#{msg.noRecordsFound}"
                                                      scrollHeight="150" style="border: 1px solid #a8acb1;">
                                             <p:column styleClass="action_column">
-                                                <p:selectBooleanCheckbox value="#{bean.addAttachment}"/>
+                                                <p:selectBooleanCheckbox value="#{file.addAttachment}"/>
                                             </p:column>
                                             <p:column headerText="#{msg.mailManagerEmailFile}" style="width: 280px !important;">
                                                 <h:outputText value="#{file.fileName}"/>
@@ -961,23 +961,6 @@
                             onsuccess="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"/>
                         </div>
                     </div>
-                    <!-- <p:column>
-                        <p:commandButton value="#{msg.mailManagerEditMailAttachedFiles}"
-                                         oncomplete="PF('attachFielDlgWV').show();" icon="fa fa-paperclip"
-                                         styleClass="grey-button" style="margin-bottom: 10px"/>
-                    </p:column>
-                    <p:column>
-                        <p:outputPanel id="listFile">
-                            <ui:repeat value="#{bean.attachedFiles}" var="file">
-                                <p:commandButton icon="fa fa-paperclip" title="#{msg.download}" update=":form, messages"
-                                                 ajax="false"
-                                                 action="#{bean.downloadFile}" value="&nbsp;#{file.fileName}"
-                                                 style="background-color: transparent!important;color: #5f666c!important; padding-right: 5px;">
-                                    <f:setPropertyActionListener value="#{file.id}" target="#{bean.downloadFileIndex}"/>
-                                </p:commandButton>
-                            </ui:repeat>
-                        </p:outputPanel>
-                    </p:column> -->
 
                     <script>
                         function onInitCkEditor() {

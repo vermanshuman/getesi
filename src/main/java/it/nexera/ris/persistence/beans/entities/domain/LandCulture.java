@@ -26,6 +26,9 @@ public class LandCulture extends IndexedEntity implements Serializable {
 
     private Boolean unavailable;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     @Override
     public String toString() {
         return name;

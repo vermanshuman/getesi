@@ -128,10 +128,9 @@
 					<h:panelGroup layout="block" style="display: none" id="createInvoiceDiv">
 							<p:commandButton style="margin-left: 2px;"
 											 value="#{msg.requestTextEditCreateInvoice}"
-											 action="#{bean.prepareInvoiceData}"
+											 action="#{bean.preCheckInvoice}"
 											 styleClass="ui-button-success" id="createInvoice"
-											 update="@widgetVar(mailManagerViewRequestsForInvoiceDlg)"
-											 oncomplete="PF('mailManagerViewRequestsForInvoiceDlg').show();"/>
+											 update="@widgetVar(mailManagerViewRequestsForInvoiceDlg)"/>
 						</h:panelGroup>
 					<!--			<p:commandButton style="margin-left: 2px;"-->
 					<!--							 value="#{msg.requestTextEditCreateInvoice}"-->
@@ -192,6 +191,7 @@
 			<ui:include src="../Dialogs/RequestExtraCostDialog.xhtml"/>
 			<ui:include src="../Dialogs/InvoiceDialogExcel.xhtml"/>
 			<ui:include src="../Dialogs/MailManagerViewRequestsForInvoiceDialog.xhtml"></ui:include>
+			<ui:include src="../Dialogs/InvoiceMissingBillingClientDialog.xhtml"></ui:include>
 		</ui:define>
 	</ui:composition>
 	</html>

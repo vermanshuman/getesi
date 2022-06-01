@@ -1111,12 +1111,15 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             }
             log.info("Leaving generateXlsRequestCost");
 
-            Optional evadedRequest = getSelectedRequests()
-                    .stream().filter(r -> !ValidationHelper.isNullOrEmpty(r.getStateId()) && !r.getStateId().equals(RequestState.EVADED.getId()))
+            Optional<Request> evadedRequest = getSelectedRequests()
+                    .stream().filter(r ->
+                            r.isDeletedRequest() && !ValidationHelper.isNullOrEmpty(r.getStateId())
+                                    && !r.getStateId().equals(RequestState.EVADED.getId()))
                     .findFirst();
-            if(!evadedRequest.isPresent()){
+
+            if(evadedRequest == null || !evadedRequest.isPresent()){
                 if(!ValidationHelper.isNullOrEmpty(getDocument())
-                        && !ValidationHelper.isNullOrEmpty(getDocument().getComplete())) {
+                        && (ValidationHelper.isNullOrEmpty(getDocument().getComplete()) || !getDocument().getComplete()) ) {
                     getDocument().setComplete(true);
                     DaoManager.save(getDocument(), true);
                 }
@@ -1553,9 +1556,10 @@ public class ExcelDataEdit extends BaseEntityPageBean {
     }
 
     public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        System.out.println(">>>>>>>>>>> " + getRequestId());
         setCostNote(null);
         setCostManipulationHelper(new CostManipulationHelper());
-        Request request =DaoManager.get(Request.class, getRequestId());
+        Request request =  DaoManager.get(Request.class, getRequestId());
         request.setSelectedTemplateId(null);
         if(!Hibernate.isInitialized(request.getRequestFormalities())){
             request.reloadRequestFormalities();
@@ -1714,6 +1718,15 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         getCostManipulationHelper().addExtraCost(extraCostValue, getRequestId());
     }
 
+    public void preCheckInvoice() throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
+
+        if (!ValidationHelper.isNullOrEmpty(getMail()) && ValidationHelper.isNullOrEmpty(getMail().getClientInvoice())) {
+            executeJS("PF('invoiceMissingBillingClientDialogWV').show();");
+            return;
+        }
+        prepareInvoiceData();
+        executeJS("PF('mailManagerViewRequestsForInvoiceDlg').show();");
+    }
     public void prepareInvoiceData() {
         setRequestsConsideredForInvoice(new ArrayList<>());
         List<Request> requestListForInvoice =

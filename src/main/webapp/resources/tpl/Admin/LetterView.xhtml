@@ -65,7 +65,8 @@
             </p:selectOneMenu>
 
             <h:outputText value="#{msg.mailBilling}:"/>
-            <p:selectOneMenu id="client_invoice_id" value="#{bean.selectedClientInvoiceId}" styleClass="input-width-mmv w-100">
+            <p:selectOneMenu id="client_invoice_id" value="#{bean.selectedClientInvoiceId}"
+                             styleClass="input-width-mmv w-100">
                 <f:selectItems value="#{bean.invoiceClients}"/>
             </p:selectOneMenu>
 

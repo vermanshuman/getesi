@@ -301,8 +301,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
     private Boolean documentTypeInvoice;
 
-    private boolean addAttachment = false;
-
     private Boolean showButtons;
 
     private String invoiceAlreadyCreated;
@@ -1500,7 +1498,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             wrapper.setInvoiceTotalCost(invoiceItem.getInvoiceTotalCost());
             wrapper.setSelectedTaxRateId(invoiceItem.getTaxRate().getId());
             if(!ValidationHelper.isNullOrEmpty(invoiceItem.getAmount()))
-            	wrapper.setInvoiceItemAmount(invoiceItem.getAmount());
+                wrapper.setInvoiceItemAmount(invoiceItem.getAmount());
             double totalcost = !(ValidationHelper.isNullOrEmpty(invoiceItem.getInvoiceTotalCost())) ? invoiceItem.getInvoiceTotalCost().doubleValue() : 0.0;
             double amount = !(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount())) ? invoiceItem.getAmount().doubleValue() : 0.0;
             double totalLine;
@@ -1718,11 +1716,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
         getSelectedInvoice().setTotalGrossAmount(getTotalGrossAmount());
         if (!ValidationHelper.isNullOrEmpty(getEntity().getNdg()))
-        	getSelectedInvoice().setNdg(getEntity().getNdg());
+            getSelectedInvoice().setNdg(getEntity().getNdg());
         if (!ValidationHelper.isNullOrEmpty(getEntity().getOffice()))
-        	getSelectedInvoice().setOffice(getEntity().getOffice());
+            getSelectedInvoice().setOffice(getEntity().getOffice());
         if (!ValidationHelper.isNullOrEmpty(getEntity().getReferenceRequest()))
-        	getSelectedInvoice().setPractice(getEntity().getReferenceRequest());
+            getSelectedInvoice().setPractice(getEntity().getReferenceRequest());
+
         DaoManager.save(getSelectedInvoice(), true);
         setMaxInvoiceNumber(getSelectedInvoice().getId());
         if (saveInvoiceNumber) {
@@ -1730,7 +1729,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             getSelectedInvoice().setInvoiceNumber(getInvoiceNumber());
         }
         if (!ValidationHelper.isNullOrEmpty(getEntity().getManagers())) {
-        	getSelectedInvoice().setManagers(new ArrayList<>(getEntity().getManagers()));
+            getSelectedInvoice().setManagers(new ArrayList<>(getEntity().getManagers()));
         }
         DaoManager.save(getSelectedInvoice(), true);
         for (GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
@@ -1995,7 +1994,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         DaoManager.save(inbox, true);
         invoice.setEmail(inbox);
         DaoManager.save(invoice, true);
-        saveFiles(inbox, true);
+        invoiceDialogBean.saveFiles(inbox, getInvoiceEmailAttachedFiles(), true);
 //        loadDraftEmail();
         loadInvoiceDialogData(invoice);
         return inbox;
@@ -2078,7 +2077,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         WLGInbox wlgInbox = saveMail(MailManagerStatuses.NEW.getId());
 
         try {
-            MailHelper.sendMail(wlgInbox,(addAttachment ? getInvoiceEmailAttachedFiles() : null), null);
+            MailHelper.sendMail(wlgInbox,getInvoiceEmailAttachedFiles(), null);
             log.info("Mail is sent");
             if (!ValidationHelper.isNullOrEmpty(getBaseMailId())) {
                 wlgInbox.setRecievedInbox(DaoManager.get(WLGInbox.class, getBaseMailId()));
@@ -2128,7 +2127,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private void attachInvoiceData() throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
         setInvoiceEmailAttachedFiles(new ArrayList<>());
         String refrequest = "";
-        String ndg = "";
         WLGInbox baseMail = DaoManager.get(WLGInbox.class, getBaseMailId());
         if (!ValidationHelper.isNullOrEmpty(baseMail)) {
             if (!ValidationHelper.isNullOrEmpty(baseMail)
@@ -2140,13 +2138,16 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                         .collect(Collectors.toList()));
             }
             refrequest = baseMail.getReferenceRequest();
-            ndg = baseMail.getNdg();
         }
         if (ValidationHelper.isNullOrEmpty(getInvoicedRequests()))
             return;
         Request invoiceRequest = getInvoicedRequests().get(0);
-        byte[] baos = getXlsBytes(refrequest, invoiceRequest);
+        byte[] baos = null;
+        if(!ValidationHelper.isNullOrEmpty(invoiceRequest)){
+            baos = getXlsBytes(refrequest, invoiceRequest);
+        }
         Invoice invoice = DaoManager.get(Invoice.class, getNumber());
+
         if (!ValidationHelper.isNullOrEmpty(baos)) {
             excelInvoice = new WLGExport();
             Date currentDate = new Date();
@@ -2155,80 +2156,67 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             String fileName = "Richieste_Invoice_" + DateTimeHelper.toFileDateWithMinutes(currentDate) + ".xls";
             String sb = excelInvoice.generateDestinationPath(fileName);
             File filePath = new File(sb);
+            String excelFile = "";
             try {
-                String str = FileHelper.writeFileToFolder(fileName,
+                excelFile = FileHelper.writeFileToFolder(fileName,
                         filePath, baos);
-                if (!new File(str).exists()) {
+                if (!new File(excelFile).exists()) {
                     return;
                 }
-                LogHelper.log(log, excelInvoice.getId() + " " + str);
+                LogHelper.log(log, excelInvoice.getId() + " " + excelFile);
             } catch (Exception e) {
                 LogHelper.log(log, e);
             }
             DaoManager.save(excelInvoice, true);
             addAttachedFile(excelInvoice);
             //attachInvoicePdf(baos);
-            attachInvoicePdf(invoice);
+//            attachInvoicePdf(invoice);
+            attachInvoicePdf(invoice, excelFile);
         }
-        //invoiceDialogBean.attachCourtesyInvoicePdf(invoice);
+        invoiceDialogBean.attachCourtesyInvoicePdf(invoice);
     }
 
-    private void attachInvoicePdf(byte[] excelFile) {
+    private void attachInvoicePdf(Invoice invoice,String excelFile) {
         try {
-            if(!ValidationHelper.isNullOrEmpty(excelFile)) {
-                Date currentDate = new Date();
-                String fileName = "Richieste_Invoice_" + DateTimeHelper.toFileDateWithMinutes(currentDate);
-                String sofficeCommand =
-                        ApplicationSettingsHolder.getInstance().getByKey(
-                                ApplicationSettingsKeys.SOFFICE_COMMAND).getValue().trim();
-
-                pdfInvoice = new WLGExport();
-                pdfInvoice.setExportDate(currentDate);
-                DaoManager.save(pdfInvoice, true);
-                String sb = pdfInvoice.generateDestinationPath(fileName);
-                File filePath = new File(sb);
-                String str = "";
-                try {
-                    str = FileHelper.writeFileToFolder(fileName + ".xls",
-                            filePath, excelFile);
-                    if (!new File(str).exists()) {
-                        return;
-                    }
-                    LogHelper.log(log, pdfInvoice.getId() + " " + str);
-                } catch (Exception e) {
-                    LogHelper.log(log, e);
-                }
-
-                Process p = Runtime.getRuntime().exec(new String[] { sofficeCommand, "--headless",
-                        "--convert-to", "pdf","--outdir", sb, str });
-                p.waitFor();
-
-                String newPath = str.replaceFirst(".xls", ".pdf");
-                FileHelper.delete(str);
-                File convertedFile = new File(newPath);
-                String pdfFileName = convertedFile.getName();
-                pdfInvoice.generateDestinationPath(pdfFileName);
-                DaoManager.save(pdfInvoice, true);
-                LogHelper.log(log, pdfInvoice.getId() + " " + newPath);
-                addAttachedFile(pdfInvoice);
-            }
-        }catch (Exception e) {
-            LogHelper.log(log, e);
-        }
-    }
-
-    private void attachInvoicePdf(Invoice invoice) {
-        try {
+            String excelPdf = "";
             Date currentDate = new Date();
             String fileName = "Richieste_Invoice_" + DateTimeHelper.toFileDateWithMinutes(currentDate);
+            String tempDir = FileHelper.getLocalTempDir();
+            tempDir  += File.separator + UUID.randomUUID();
+            FileUtils.forceMkdir(new File(tempDir));
+            String sofficeCommand =
+                    ApplicationSettingsHolder.getInstance().getByKey(
+                            ApplicationSettingsKeys.SOFFICE_COMMAND).getValue().trim();
+            Process p = Runtime.getRuntime().exec(new String[] { sofficeCommand, "--headless",
+                    "--convert-to", "pdf","--outdir", tempDir, excelFile });
+            p.waitFor();
+            excelPdf = tempDir + File.separator + fileName + ".pdf";
+            String tempPdf = invoiceDialogBean.prepareInvoicePdf(DocumentType.COURTESY_INVOICE, invoice);
+
             pdfInvoice = new WLGExport();
             pdfInvoice.setExportDate(currentDate);
             DaoManager.save(pdfInvoice, true);
             String sb = pdfInvoice.generateDestinationPath(fileName);
             Files.createDirectories(Paths.get(sb));
-            String pdfFilePath = sb + File.separator + fileName + ".pdf";
-            invoiceDialogBean.attachInvoicePdf(invoice, pdfFilePath);
-            pdfInvoice.setDestinationPath(pdfFilePath);
+            fileName =  "FE-" + getNumber() + " " + invoice.getClient().getClientName();
+            String filePathStr = sb + File.separator + fileName + ".pdf";
+
+            Path pdfFilePath = Paths.get(filePathStr);
+            if(Files.notExists(pdfFilePath.getParent()))
+                Files.createDirectories(pdfFilePath.getParent());
+            PDFMergerUtility obj = new PDFMergerUtility();
+            obj.setDestinationFileName(filePathStr);
+            File file1 = new File(tempPdf);
+            obj.addSource(file1);
+            if(!ValidationHelper.isNullOrEmpty(excelPdf)){
+                File file2 = new File(excelPdf);
+                obj.addSource(file2);
+            }
+            obj.mergeDocuments(MemoryUsageSetting.setupTempFileOnly());
+            FileHelper.delete(tempPdf);
+            FileHelper.delete(excelPdf);
+
+            pdfInvoice.setDestinationPath(filePathStr);
             DaoManager.save(pdfInvoice, true);
             LogHelper.log(log, pdfInvoice.getId() + " " + pdfFilePath);
             addAttachedFile(pdfInvoice);
@@ -2236,6 +2224,69 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             LogHelper.log(log, e);
         }
     }
+//    private void attachInvoicePdf(byte[] excelFile) {
+//        try {
+//            if(!ValidationHelper.isNullOrEmpty(excelFile)) {
+//                Date currentDate = new Date();
+//                String fileName = "Richieste_Invoice_" + DateTimeHelper.toFileDateWithMinutes(currentDate);
+//                String sofficeCommand =
+//                        ApplicationSettingsHolder.getInstance().getByKey(
+//                                ApplicationSettingsKeys.SOFFICE_COMMAND).getValue().trim();
+//
+//                pdfInvoice = new WLGExport();
+//                pdfInvoice.setExportDate(currentDate);
+//                DaoManager.save(pdfInvoice, true);
+//                String sb = pdfInvoice.generateDestinationPath(fileName);
+//                File filePath = new File(sb);
+//                String str = "";
+//                try {
+//                    str = FileHelper.writeFileToFolder(fileName + ".xls",
+//                            filePath, excelFile);
+//                    if (!new File(str).exists()) {
+//                        return;
+//                    }
+//                    LogHelper.log(log, pdfInvoice.getId() + " " + str);
+//                } catch (Exception e) {
+//                    LogHelper.log(log, e);
+//                }
+//
+//                Process p = Runtime.getRuntime().exec(new String[] { sofficeCommand, "--headless",
+//                        "--convert-to", "pdf","--outdir", sb, str });
+//                p.waitFor();
+//
+//                String newPath = str.replaceFirst(".xls", ".pdf");
+//                FileHelper.delete(str);
+//                File convertedFile = new File(newPath);
+//                String pdfFileName = convertedFile.getName();
+//                pdfInvoice.generateDestinationPath(pdfFileName);
+//                DaoManager.save(pdfInvoice, true);
+//                LogHelper.log(log, pdfInvoice.getId() + " " + newPath);
+//                addAttachedFile(pdfInvoice);
+//            }
+//        }catch (Exception e) {
+//            LogHelper.log(log, e);
+//        }
+//    }
+//
+//    private void attachInvoicePdf(Invoice invoice) {
+//        try {
+//            Date currentDate = new Date();
+//            String fileName = "Richieste_Invoice_" + DateTimeHelper.toFileDateWithMinutes(currentDate);
+//            pdfInvoice = new WLGExport();
+//            pdfInvoice.setExportDate(currentDate);
+//            DaoManager.save(pdfInvoice, true);
+//            String sb = pdfInvoice.generateDestinationPath(fileName);
+//            Files.createDirectories(Paths.get(sb));
+//            String pdfFilePath = sb + File.separator + fileName + ".pdf";
+//            invoiceDialogBean.attachInvoicePdf(invoice, pdfFilePath);
+//            pdfInvoice.setDestinationPath(pdfFilePath);
+//            DaoManager.save(pdfInvoice, true);
+//            LogHelper.log(log, pdfInvoice.getId() + " " + pdfFilePath);
+//            addAttachedFile(pdfInvoice);
+//        }catch (Exception e) {
+//            LogHelper.log(log, e);
+//        }
+//    }
 
     private byte[] getXlsBytes(String refrequest, Request invoiceRequest) {
         byte[] excelFile = null;
@@ -2390,6 +2441,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             String sb = MailHelper.getDestinationPath() +
                     DateTimeHelper.ToFilePathString(new Date());
 
+            fileName =  "FE-" + getNumber() + " " + invoice.getClient().getClientName();
             String filePathStr = sb + File.separator + fileName + ".pdf";
             Path pdfFilePath = Paths.get(filePathStr);
             if(Files.notExists(pdfFilePath.getParent()))
@@ -2528,13 +2580,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                                     Double total = imponibile + totalIva;
                                     text = text.replace("totale",total.toString());
                                     r.setText(text, 0);
-                                }/*else if (text != null && text.contains("refrequest")) {
-	                                text = text.replace("refrequest",refrequest);
-	                                r.setText(text, 0);
-	                            }else if (text != null && text.contains("inboxndg")) {
-	                                text = text.replace("inboxndg",ndg);
-	                                r.setText(text, 0);
-	                            }*/
+                                }
                             }
                         }
                     }
@@ -2576,20 +2622,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             }
         }catch(Exception e){
             LogHelper.log(log,e);
-        }
-    }
-
-    private void saveFiles(WLGInbox inbox, boolean transaction) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        if (!ValidationHelper.isNullOrEmpty(getInvoiceEmailAttachedFiles())) {
-            for (FileWrapper wrapper : getInvoiceEmailAttachedFiles()) {
-                WLGExport export = DaoManager.get(WLGExport.class, new Criterion[]{
-                        Restrictions.eq("id", wrapper.getId())
-                });
-                export.setExportDate(new Date());
-                export.setSourcePath(String.format("\\%s", inbox.getId()));
-                export.setInbox(inbox);
-                DaoManager.save(export, transaction);
-            }
         }
     }
 
@@ -2903,15 +2935,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
     }
 
-
-    public boolean isAddAttachment() {
-        return addAttachment;
-    }
-
-    public void setAddAttachment(boolean addAttachment) {
-        this.addAttachment = addAttachment;
-    }
-
     public String createInvoiceEmailDefaultBody(Invoice invoice) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         String emailBody = "";
         if(!invoice.isNew()) {
@@ -2950,7 +2973,10 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     }
 
     public void preCheckDocument() throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
-        if (!ValidationHelper.isNullOrEmpty(getEntity().getNdg())) {
+        if (ValidationHelper.isNullOrEmpty(getEntity().getClientInvoice())) {
+            executeJS("PF('invoiceMissingBillingClientDialogWV').show();");
+            return;
+        }else if (!ValidationHelper.isNullOrEmpty(getEntity().getNdg())) {
             List<Invoice> invoices = DaoManager.load(Invoice.class, new Criterion[]{Restrictions.eq("ndg", getEntity().getNdg())});
             if (!ValidationHelper.isNullOrEmpty(invoices)) {
                 String message = ResourcesHelper.getString("invoiceAlreadyCreated");

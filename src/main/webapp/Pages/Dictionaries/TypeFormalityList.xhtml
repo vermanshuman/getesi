@@ -190,21 +190,6 @@
             </p:panel>
         </div>
     </ui:define>
-    <ui:define name="edit_fields">
-        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" style="width: 40%">
-
-
-            <span>#{msg.typeFormalityCertificationText}</span>
-            <p:inputText value="#{bean.entity.certificationText}" styleClass="input-width"/>
-            <span>#{msg.typeFormalitySalesDevelopment} </span>
-            <p:selectBooleanCheckbox value="#{bean.entity.salesDevelopment}" style="margin-right:100%"/>
-            <span>#{msg.typeFormalitySalesDevelopmentOMI} </span>
-            <p:selectBooleanCheckbox value="#{bean.entity.salesDevelopmentOMI}" style="margin-right:100%"/>
-            <span>#{msg.typeFormalityRenewal} </span>
-            <p:selectBooleanCheckbox value="#{bean.entity.renewal}" style="margin-right:100%"/>
-        </p:panelGrid>
-    </ui:define>
-
     <ui:define name="columns">
         <p:column headerText="#{msg.typeFormalityCode}">
             <h:outputText value="#{item.code}"/>

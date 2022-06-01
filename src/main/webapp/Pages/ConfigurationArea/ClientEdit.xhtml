@@ -548,6 +548,7 @@
                 </p:outputPanel>
 
                 <p:outputPanel widgetVar="secondPanel" id="secondPanel" style="margin: 15px 0 25px 0; position: relative">
+
                     <p:selectBooleanCheckbox widgetVar="showAgency" value="#{bean.hasAgency}"
                                              disabled="#{bean.onlyView}">
                         <p:ajax event="change" update="secondPanel" listener="#{bean.setOfficesByArea}"/>

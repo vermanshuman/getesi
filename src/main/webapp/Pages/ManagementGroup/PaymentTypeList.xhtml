@@ -4,7 +4,7 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:ff="http://readytech.com/functions"
-      xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:p="http://primefaces.org/ui">
 <ui:composition template="/resources/tpl/Admin/LazyListBase.xhtml">
     <ui:param name="list_title" value="#{msg.regimeConiugi}"/>
     <ui:param name="bean" value="#{paymentTypeListBean}"/>
@@ -182,7 +182,7 @@
             <h:outputText value="#{item.iban}"/>
         </p:column>
     </ui:define>
-    
+
     <ui:define name="dialogs_body">
         <p:remoteCommand name="refreshTable" update="@form"/>
         <p:dialog widgetVar="addPaymentTypeDialogWV"  id="addPaymentTypeDialog" modal="true" draggable="false"
@@ -196,18 +196,28 @@
                         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
                                      columnClasses="ui-grid-col-3,ui-grid-col-9">
                             <span><span class="red">*</span> #{msg.description}:</span>
-				            <p:inputText id="description" value="#{bean.entity.description}" label="#{msg.description}" styleClass="input-width"/>
-				
-				            <span>#{msg.code}:</span>
-				            <p:inputText id="code" value="#{bean.entity.code}" label="#{msg.code}" styleClass="input-width"/>
-				            <span>#{msg.beneficiary}:</span>
-				            <p:inputText id="beneficiary" value="#{bean.entity.beneficiary}" label="#{msg.beneficiary}" styleClass="input-width"/>
-				
-				            <span>#{msg.istitutionName}:</span>
-				            <p:inputText id="istitutionName" value="#{bean.entity.istitutionName}" label="#{msg.istitutionName}" styleClass="input-width"/>
-				
-				            <span>#{msg.iban}:</span>
-				            <p:inputText id="iban" value="#{bean.entity.iban}" label="#{msg.iban}" styleClass="input-width"/>
+                            <p:inputText id="description"
+                                         value="#{bean.entity.description}"
+                                         label="#{msg.description}"/>
+
+                            <span>#{msg.code}:</span>
+                            <p:inputText id="code"
+                                         value="#{bean.entity.code}"
+                                         label="#{msg.code}"/>
+                            <span>#{msg.beneficiary}:</span>
+                            <p:inputText id="beneficiary"
+                                         value="#{bean.entity.beneficiary}"
+                                         label="#{msg.beneficiary}"/>
+
+                            <span>#{msg.istitutionName}:</span>
+                            <p:inputText id="istitutionName"
+                                         value="#{bean.entity.istitutionName}"
+                                         label="#{msg.istitutionName}"/>
+
+                            <span>#{msg.iban}:</span>
+                            <p:inputText id="iban"
+                                         value="#{bean.entity.iban}"
+                                         label="#{msg.iban}"/>
                         </p:panelGrid>
                         <div class="p-col-12" style="text-align:center;">
                             <p:commandButton value="#{msg.save.toUpperCase()}" style="margin-left:15px;"

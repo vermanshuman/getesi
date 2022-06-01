@@ -62,17 +62,13 @@ public class Invoice extends IndexedEntity implements Serializable {
 	@Column(name = "status")
 	private InvoiceStatus status;
 
-	/*@ManyToOne
-	@JoinColumn(name = "manager_id")
-	private Client manager;*/
-	
 	@ManyToMany
-    @JoinTable(name = "invoice_manager", joinColumns = {
-            @JoinColumn(name = "invoice_id", table = "invoice")
-    }, inverseJoinColumns = {
-            @JoinColumn(name = "manager_id", table = "client")
-    })
-    private List<Client> managers;
+	@JoinTable(name = "invoice_manager", joinColumns = {
+			@JoinColumn(name = "invoice_id", table = "invoice")
+	}, inverseJoinColumns = {
+			@JoinColumn(name = "manager_id", table = "client")
+	})
+	private List<Client> managers;
 
 	@ManyToOne
 	@JoinColumn(name = "office_id")
@@ -214,22 +210,6 @@ public class Invoice extends IndexedEntity implements Serializable {
 		this.status = status;
 	}
 
-	/*public Client getManager() {
-		return manager;
-	}
-
-	public void setManager(Client manager) {
-		this.manager = manager;
-	}*/
-	
-	public List<Client> getManagers() {
-		return managers;
-	}
-
-	public void setManagers(List<Client> managers) {
-		this.managers = managers;
-	}
-
 	public Office getOffice() {
 		return office;
 	}
@@ -326,4 +306,13 @@ public class Invoice extends IndexedEntity implements Serializable {
 	public void setEmailFrom(WLGInbox emailFrom) {
 		this.emailFrom = emailFrom;
 	}
+
+	public List<Client> getManagers() {
+		return managers;
+	}
+
+	public void setManagers(List<Client> managers) {
+		this.managers = managers;
+	}
+
 }
