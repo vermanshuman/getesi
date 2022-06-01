@@ -227,9 +227,10 @@ public class ClientEditBean extends EntityEditPageBean<Client>
     private Long selectedClientIdToCopy;
 
     private List<SelectItem> clientsToCopy;
-
-    private Boolean showClientCopy;
-
+    
+    private String emptyPriceListMessage;
+    
+    private List<PriceList> priceListToCopy;
 
     /*
      * (non-Javadoc)
@@ -409,7 +410,6 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                                             (ValidationHelper.isNullOrEmpty(c.getFiduciary()) || !c.getFiduciary())
                             )
                     ).sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList()), Boolean.TRUE));
-            setShowClientCopy(true);
         }
     }
 
@@ -1664,29 +1664,41 @@ public class ClientEditBean extends EntityEditPageBean<Client>
     }
 
     public void copyPriceListClient() throws HibernateException, IllegalAccessException, PersistenceBeanException {
-        List<PriceList> priceLists = new ArrayList<>();
+    	List<PriceList> priceListEntity = DaoManager.load(PriceList.class, new Criterion[]{
+                Restrictions.eq("client.id", getEntityId())});
+    	for(PriceList price: priceListEntity) {
+    		DaoManager.remove(price, true);
+    	}
+        
+        for(PriceList priceList: getPriceListToCopy()) {
+            DaoManager.getSession().evict(priceList);
+            priceList.setId(null);
+            PriceList newPrice = new PriceList();
+            newPrice = priceList;
+            newPrice.setClient(getEntity());
+            newPrice.setCreateDate(new Date());
+            newPrice.setUpdateDate(null);
+            newPrice.setUpdateUserId(null);
+            newPrice.setConfigureDate(null);
+            DaoManager.save(newPrice, true);
+        }
+    }
+    
+    public void checkCopyPriceListClient() throws HibernateException, IllegalAccessException, PersistenceBeanException {
+    	List<PriceList> priceLists = new ArrayList<>();
+    	setPriceListToCopy(priceLists);
         if(!ValidationHelper.isNullOrEmpty(getSelectedClientIdToCopy())) {
             priceLists = DaoManager.load(PriceList.class, new Criterion[]{
                     Restrictions.eq("client.id", getSelectedClientIdToCopy())});
-            if(!ValidationHelper.isNullOrEmpty(priceLists)) {
-                for(PriceList priceList: priceLists) {
-                    DaoManager.getSession().evict(priceList);
-                    priceList.setId(null);
-                    PriceList newPrice = new PriceList();
-                    newPrice = priceList;
-                    newPrice.setClient(getEntity());
-                    newPrice.setCreateDate(new Date());
-                    newPrice.setUpdateDate(null);
-                    newPrice.setUpdateUserId(null);
-                    newPrice.setConfigureDate(null);
-                    DaoManager.save(newPrice, true);
-                }
+            if(ValidationHelper.isNullOrEmpty(priceLists)) {
+            	System.out.println("pricelist empty");
+            	setEmptyPriceListMessage(ResourcesHelper.getString("clientEditEmptyPriceList"));
+            } else {
+            	System.out.println("pricelist size :: "+priceLists.size());
+            	getPriceListToCopy().addAll(priceLists);
             }
-        }
-        priceLists = DaoManager.load(PriceList.class, new Criterion[]{
-                Restrictions.eq("client", getEntity())});
-        if(!ValidationHelper.isNullOrEmpty(priceLists)) {
-            setShowClientCopy(false);
+            RequestContext.getCurrentInstance().update("confirmCopyPriceListDialog");
+            executeJS("PF('confirmCopyPriceListDialogWV').show();");
         }
     }
 
@@ -2308,11 +2320,22 @@ public class ClientEditBean extends EntityEditPageBean<Client>
         this.clientsToCopy = clientsToCopy;
     }
 
-    public Boolean getShowClientCopy() {
-        return showClientCopy;
-    }
+	public String getEmptyPriceListMessage() {
+		return emptyPriceListMessage;
+	}
 
-    public void setShowClientCopy(Boolean showClientCopy) {
-        this.showClientCopy = showClientCopy;
-    }
+	public void setEmptyPriceListMessage(String emptyPriceListMessage) {
+		this.emptyPriceListMessage = emptyPriceListMessage;
+	}
+
+	public List<PriceList> getPriceListToCopy() {
+		return priceListToCopy;
+	}
+
+	public void setPriceListToCopy(List<PriceList> priceListToCopy) {
+		this.priceListToCopy = priceListToCopy;
+	}
+	
+	
+    
 }

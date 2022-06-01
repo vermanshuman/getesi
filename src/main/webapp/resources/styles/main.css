@@ -1048,3 +1048,13 @@ body .confirmationDialog .ui-widget-header {
     background-color: #FFFFFF !important;
     color: #000000 !important;
 }
+
+.ui-button.yes-button {
+    background-color: #00cc52 !important;
+    width: 50px !important;
+}
+
+.ui-button.no-button {
+    background-color: #F3362B !important;
+    width: 50px !important;
+}
