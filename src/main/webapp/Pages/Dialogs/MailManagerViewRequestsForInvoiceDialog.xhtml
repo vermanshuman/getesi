@@ -46,8 +46,17 @@
             width: 170px !important;
 
         }
+    
+	    #mailManagerViewRequestsForInvoiceDialog .ui-datatable .ui-datatable-data > tr > td {
+		    padding: 1rem 1rem;
+		    border: 1px solid #5f666c !important;
+		    text-align: center;
+		}
+		#mailManagerViewRequestsForInvoiceDialog .ui-datatable-scrollable table, .ui-datatable-sticky table {
+		    table-layout: fixed !important;
+		}
     </style>
-    <p:dialog widgetVar="mailManagerViewRequestsForInvoiceDlg" modal="true" width="1300"
+    <p:dialog widgetVar="mailManagerViewRequestsForInvoiceDlg" modal="true" width="1300" minWidth="1300"
               header="#{msg.mailManagerViewRequestsDialogHeader}" id="mailManagerViewRequestsForInvoiceDialog">
         <!-- <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group" id="validRequests"> -->
         <div class="p-grid">
