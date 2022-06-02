@@ -2,6 +2,7 @@ package it.nexera.ris.web.beans.pages;
 
 import it.nexera.ris.common.annotations.ReattachIgnore;
 import it.nexera.ris.common.enums.DocumentType;
+import it.nexera.ris.common.enums.ExtraCostType;
 import it.nexera.ris.common.enums.PageTypes;
 import it.nexera.ris.common.enums.RealEstateType;
 import it.nexera.ris.common.enums.RequestState;
@@ -1266,6 +1267,7 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 				request.getAggregationLandChargesRegistry().getNational()) {
 
 			getCostManipulationHelper().setIncludeNationalCost(false);
+			executeJS("PF('includeNationalCost2DialogWV').show();");
 			return;
 		}
 		if(!ValidationHelper.isNullOrEmpty(getCostManipulationHelper().getIncludeNationalCost())
@@ -1298,6 +1300,33 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 			}
 		}
 	}
+	
+	public void deleteNationalCost() throws Exception {
+		Request request = DaoManager.get(Request.class, new Criterion[]{
+				Restrictions.eq("id", getRequestId())});
+
+		setCostManipulationHelper(new CostManipulationHelper());
+		getCostManipulationHelper().setIncludeNationalCost(false);
+		getCostManipulationHelper().setRequestExtraCosts(new ArrayList<>());
+		List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
+				Restrictions.eq("requestId", request.getId())});
+		if(!ValidationHelper.isNullOrEmpty(extraCosts)) {
+			getCostManipulationHelper().setRequestExtraCosts(extraCosts);
+			Optional<ExtraCost> nationalExtraCost =  getCostManipulationHelper().getRequestExtraCosts()
+                    .stream()
+                    .filter(ec -> ec.getType().equals(ExtraCostType.NAZIONALEPOSITIVA))
+                    .findFirst();
+            if(nationalExtraCost.isPresent()) {
+            	getCostManipulationHelper().getRequestExtraCosts().remove(nationalExtraCost.get());
+                getCostManipulationHelper().setIncludeNationalCost(null);
+                Request requestDb  = DaoManager.get(Request.class, getRequestId());
+				getCostManipulationHelper().saveRequestExtraCost(requestDb);
+				CostCalculationHelper calculation = new CostCalculationHelper(requestDb);
+				calculation.calculateAllCosts(true);
+                setShowAddNationalCostButton(true);
+            }
+		}
+    }
 
 	public boolean isViewRelatedEstate() {
 		return viewRelatedEstate;
