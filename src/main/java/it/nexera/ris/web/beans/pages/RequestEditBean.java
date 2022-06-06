@@ -1956,7 +1956,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
     }
 
     private void saveData() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        if(!getEntity().isNew()){
+        if(!getEntity().isNew() && getNewRequestList().size() == 1){
 
             pageSave();
             if(!ValidationHelper.isNullOrEmpty(getAssociatedRequests())

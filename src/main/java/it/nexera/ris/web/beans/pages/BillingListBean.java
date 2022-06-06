@@ -29,6 +29,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
@@ -362,7 +365,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private List<SelectItem> clientAddressCities;
 
     private List<SelectItem> cities;
-    
+
     private static final String MAIL_FOOTER = ResourcesHelper.getString("emailFooter");
 
     @ManagedProperty(value="#{invoiceDialogBean}")
@@ -1315,6 +1318,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
 
         try {
+            saveInvoiceInDraft();
             Invoice invoice = DaoManager.get(Invoice.class, getNumber());
             List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
             FatturaAPI fatturaAPI = new FatturaAPI();
@@ -1777,15 +1781,13 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                     refrequest = invoice.getEmailFrom().getReferenceRequest();
                 }
             }
-
-            String excelPdf = "";
+            String landscapePDF = "";
+            String tempDir  = FileHelper.getLocalTempDir() + File.separator + UUID.randomUUID();
             Date currentDate = new Date();
             String fileName = "Richieste_Invoice_" + DateTimeHelper.toFileDateWithMinutes(currentDate);
             if (!ValidationHelper.isNullOrEmpty(getInvoicedRequests()) && !ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
                 byte[] baos = getXlsBytes(refrequest, getInvoicedRequests().get(0), invoice.getEmailFrom());
                 if (!ValidationHelper.isNullOrEmpty(baos)) {
-                    String tempDir = FileHelper.getLocalTempDir();
-                    tempDir  += File.separator + UUID.randomUUID();
                     FileUtils.forceMkdir(new File(tempDir));
                     File filePath = new File(tempDir);
                     String excelFile = FileHelper.writeFileToFolder(fileName + ".xls", filePath, baos);
@@ -1795,12 +1797,22 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                     Process p = Runtime.getRuntime().exec(new String[] { sofficeCommand, "--headless",
                             "--convert-to", "pdf","--outdir", tempDir, excelFile });
                     p.waitFor();
-                    excelPdf = tempDir + File.separator + fileName + ".pdf";
+
+                    String excelPdf = tempDir + File.separator + fileName + ".pdf";
+                    PDDocument srcDoc = PDDocument.load(new File(excelPdf));
+                    for (PDPage pdPage : srcDoc.getDocumentCatalog().getPages()) {
+                        float width = pdPage.getMediaBox().getWidth();
+                        pdPage.setRotation(270);
+                    }
+                    landscapePDF = tempDir + File.separator + fileName + "_landscape.pdf";
+                    srcDoc.save(landscapePDF);
+                    srcDoc.close();
                     FileHelper.delete(excelFile);
+                    FileHelper.delete(excelPdf);
                 }
             }
 
-            String tempPdf = invoiceDialogBean.prepareInvoicePdf(DocumentType.COURTESY_INVOICE, invoice);
+            String tempPdf = invoiceDialogBean.prepareInvoicePdf(DocumentType.COURTESY_INVOICE, invoice, tempDir);
             String sb = MailHelper.getDestinationPath() +
                     DateTimeHelper.ToFilePathString(new Date());
             fileName =  "FE-" + getNumber() + " " + invoice.getClient().getClientName();
@@ -1812,13 +1824,15 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             obj.setDestinationFileName(filePathStr);
             File file1 = new File(tempPdf);
             obj.addSource(file1);
-            if(!ValidationHelper.isNullOrEmpty(excelPdf)){
-                File file2 = new File(excelPdf);
+            if(!ValidationHelper.isNullOrEmpty(landscapePDF)){
+                File file2 = new File(landscapePDF);
                 obj.addSource(file2);
             }
             obj.mergeDocuments(MemoryUsageSetting.setupTempFileOnly());
-            FileHelper.delete(tempPdf);
-            FileHelper.delete(excelPdf);
+            //FileHelper.delete(tempPdf);
+            //FileHelper.delete(landscapePDF);
+            FileHelper.delete(tempDir);
+
             byte[] fileContent = FileHelper.loadContentByPath(filePathStr);
             if (fileContent != null) {
                 InputStream stream = new ByteArrayInputStream(fileContent);
@@ -1970,7 +1984,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 p.waitFor();
                 FileHelper.delete(tempDoc);
 
-                String tempPdf = invoiceDialogBean.prepareInvoicePdf(null, null);
+                String tempPdf = invoiceDialogBean.prepareInvoicePdf(null, null, tempDir);
                 String tempFilePathStr = sb + File.separator + fileName + "_temp.pdf";
                 String filePathStr = sb + File.separator + fileName + ".pdf";
                 PDFMergerUtility obj = new PDFMergerUtility();
@@ -1980,8 +1994,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 obj.addSource(file1);
                 obj.addSource(file2);
                 obj.mergeDocuments(MemoryUsageSetting.setupTempFileOnly());
-                FileHelper.delete(tempPdf);
-                FileHelper.delete(tempFilePathStr);
+//                FileHelper.delete(tempPdf);
+//                FileHelper.delete(tempFilePathStr);
+                FileHelper.delete(tempDir);
                 byte[] fileContent = FileHelper.loadContentByPath(filePathStr);
                 if (fileContent != null) {
                     InputStream stream = new ByteArrayInputStream(fileContent);
@@ -2311,11 +2326,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     private void attachInvoicePdf(Invoice invoice,String excelFile) {
         try {
-            String excelPdf = "";
             Date currentDate = new Date();
             String fileName = "Richieste_Invoice_" + DateTimeHelper.toFileDateWithMinutes(currentDate);
-            String tempDir = FileHelper.getLocalTempDir();
-            tempDir  += File.separator + UUID.randomUUID();
+            String tempDir = FileHelper.getLocalTempDir() + File.separator + UUID.randomUUID();
             FileUtils.forceMkdir(new File(tempDir));
             String sofficeCommand =
                     ApplicationSettingsHolder.getInstance().getByKey(
@@ -2323,8 +2336,17 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             Process p = Runtime.getRuntime().exec(new String[] { sofficeCommand, "--headless",
                     "--convert-to", "pdf","--outdir", tempDir, excelFile });
             p.waitFor();
-            excelPdf = tempDir + File.separator + fileName + ".pdf";
-            String tempPdf = invoiceDialogBean.prepareInvoicePdf(DocumentType.COURTESY_INVOICE, invoice);
+            String excelPdf = tempDir + File.separator + fileName + ".pdf";
+
+            PDDocument srcDoc = PDDocument.load(new File(excelPdf));
+            for (PDPage pdPage : srcDoc.getDocumentCatalog().getPages()) {
+                pdPage.setRotation(270);
+            }
+            String landscapePDF = tempDir + File.separator + fileName + "_landscape.pdf";
+            srcDoc.save(landscapePDF);
+            srcDoc.close();
+
+            String tempPdf = invoiceDialogBean.prepareInvoicePdf(DocumentType.COURTESY_INVOICE, invoice, tempDir);
 
             pdfInvoice = new WLGExport();
             pdfInvoice.setExportDate(currentDate);
@@ -2340,14 +2362,14 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             obj.setDestinationFileName(filePathStr);
             File file1 = new File(tempPdf);
             obj.addSource(file1);
-            if(!ValidationHelper.isNullOrEmpty(excelPdf)){
-                File file2 = new File(excelPdf);
+            if(!ValidationHelper.isNullOrEmpty(landscapePDF)){
+                File file2 = new File(landscapePDF);
                 obj.addSource(file2);
             }
             obj.mergeDocuments(MemoryUsageSetting.setupTempFileOnly());
-            FileHelper.delete(tempPdf);
-            FileHelper.delete(excelPdf);
-
+//            FileHelper.delete(tempPdf);
+//            FileHelper.delete(excelPdf);
+            FileHelper.delete(tempDir);
             pdfInvoice.setDestinationPath(filePathStr);
             DaoManager.save(pdfInvoice, true);
             LogHelper.log(log, pdfInvoice.getId() + " " + pdfFilePath);
@@ -2524,10 +2546,10 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 Restrictions.eq("inbox", inbox)
         });
         for (WLGExport export : exportList) {
-        	if(!ValidationHelper.isNullOrEmpty(export.getFileName()) && export.getFileName().startsWith("FE-") && export.getFileName().contains(".xls"))
-        		addAttachedFile(export, true);
-        	else
-        		addAttachedFile(export, false);
+            if(!ValidationHelper.isNullOrEmpty(export.getFileName()) && export.getFileName().startsWith("FE-") && export.getFileName().contains(".xls"))
+                addAttachedFile(export, true);
+            else
+                addAttachedFile(export, false);
         }
     }
 
@@ -2672,8 +2694,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                     requestTypeSet.add(request.getRequestType().getName());
                 });
                 for(String request: requestTypeSet){
-                	if(!requestType.isEmpty())
-                		requestType = requestType + " + ";
+                    if(!requestType.isEmpty())
+                        requestType = requestType + " + ";
                     requestType = requestType + request;
                 }
                 requestType = "REQUEST: "+requestType;
@@ -2685,7 +2707,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                         + (requestType.isEmpty() ? "" : requestType + "</br></br>")
                         + thanksMessage
                         + MAIL_FOOTER;
-
                 return emailBody;
             } else if(ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
                 String dearCustomer = ResourcesHelper.getString("dearCustomer");

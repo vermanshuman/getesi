@@ -157,6 +157,12 @@
                 border:none !important;
                 padding:0 !important;
             }
+            .card.card-w-title .ui-widget-header, #fileTable_head tr {
+                display: none;
+            }
+            .card.card-w-title .ui-widget-header, #formTable_head tr {
+                display: none;
+            }
         </style>
         <p:remoteCommand name="removeFileCommand" update="form"/>
         <!-- <div align="center">
@@ -280,12 +286,12 @@
                     <p:column styleClass="filename_column">
                         <h:outputText value="#{fileEntry.getTitle()}"/>
                     </p:column>
-                    <p:column styleClass="action_column">
+                    <p:column styleClass="action_column"  style="width: 60px">
                         <p:commandButton styleClass="white-button" icon="fa fa-fw fa-file-pdf-o red-file icon-align" action="#{bean.showPDF}" ajax="false">
                             <f:setPropertyActionListener value="#{fileEntry.id}" target="#{bean.downloadFileId}"/>
                         </p:commandButton>
                     </p:column>
-                    <p:column styleClass="action_column">
+                    <p:column styleClass="action_column"  style="width: 60px">
                         <p:commandButton icon="fa fa-fw fa-file-code-o icon-align" action="#{bean.showXML}" ajax="false">
                             <f:setPropertyActionListener value="#{fileEntry.id}" target="#{bean.downloadFileId}"/>
                         </p:commandButton>
@@ -563,14 +569,14 @@
                     <p:column styleClass="filename_column">
                         <h:outputText value="#{fileEntry.getTitle()}"/>
                     </p:column>
-                    <p:column styleClass="action_column">
+                    <p:column styleClass="action_column"  style="width: 60px">
                         <p:commandButton styleClass="white-button" icon="fa fa-fw fa-file-pdf-o red-file icon-align" action="#{bean.downloadEstateFormalityPDF}"
                                          ajax="false">
                             <f:setPropertyActionListener value="#{fileEntry.id}"
                                                          target="#{bean.downloadFileId}"/>
                         </p:commandButton>
                     </p:column>
-                    <p:column styleClass="action_column">
+                    <p:column styleClass="action_column"  style="width: 60px">
                         <p:commandButton icon="fa fa-fw fa-file-code-o icon-align" action="#{bean.showXML}" ajax="false">
                             <f:setPropertyActionListener value="#{fileEntry.id}" target="#{bean.downloadFileId}"/>
                         </p:commandButton>
@@ -850,10 +856,10 @@
                         value="#{msg.ok}" oncomplete="PF('includeNationalCostDialogWV').hide()"/>
             </div>
         </p:dialog>
-        
+
         <p:dialog widgetVar="confirmAddNationalCostDialogWV" resizable="false" id="confirmAddNationalCostDialog" styleClass="dialog-green"
                   draggable="false" modal="true" width="500" style="overflow: unset !important; height: 150px !important;">
-            <h:outputText value="#{msg.estateSituationViewAddNationalCostConfirmMessage}"/>
+        <h:outputText value="#{msg.estateSituationViewAddNationalCostConfirmMessage}"/>
 
             <div class="btn_line">
                 <p:commandButton value="#{msg.yes}" update=":form:nationalCostPanel" styleClass="yes-button"
@@ -863,7 +869,7 @@
                                  onclick="PF('confirmAddNationalCostDialogWV').hide();"/>
             </div>
         </p:dialog>
-        
+
         <p:dialog widgetVar="confirmRemoveNationalCostDialogWV" resizable="false" id="confirmRemoveNationalCostDialog" styleClass="dialog-green"
                   draggable="false" modal="true" width="500" style="overflow: unset !important; height: 150px !important;">
             <h:outputText value="#{msg.estateSituationViewRemoveNationalCostConfirmMessage}"/>
@@ -877,14 +883,14 @@
             </div>
         </p:dialog>
 
-		<p:dialog id="includeNationalCost2Dialog" header="Note!" widgetVar="includeNationalCost2DialogWV" height="100px" styleClass="dialog-red">
+        <p:dialog id="includeNationalCost2Dialog" header="Note!" widgetVar="includeNationalCost2DialogWV" height="100px" styleClass="dialog-red">
             #{msg.requestAlreadyIncludeNationalCostMessage} <br />
-			<div class="btn_line">
-				<p:commandButton value="#{msg.ok}" oncomplete="PF('includeNationalCost2DialogWV').hide()" />
-			</div>
-		</p:dialog>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.ok}" oncomplete="PF('includeNationalCost2DialogWV').hide()" />
+            </div>
+        </p:dialog>
 
-		<p:remoteCommand name="associateFormalities" action="#{bean.associateFormalitiesToRequest()}"
+        <p:remoteCommand name="associateFormalities" action="#{bean.associateFormalitiesToRequest()}"
                          oncomplete="updatePdfTable()"/>
         <ui:include src="../Dialogs/SearchFormalityDialog.xhtml">
             <ui:param name="onCompleteSaveAction" value="associateFormalities()"/>

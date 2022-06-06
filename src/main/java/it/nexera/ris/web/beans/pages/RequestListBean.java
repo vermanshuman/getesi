@@ -438,7 +438,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     public void loadRequestsExcel() throws PersistenceBeanException,
             IllegalAccessException, IOException, InstantiationException {
-        filterTableFromPanel();
+        //filterTableFromPanel();
         setAllRequestViewsToModify(DaoManager.load(RequestView.class, getFilterRestrictions().toArray(new Criterion[0])));
         List<Long> requestIdList = getAllRequestViewsToModify().stream().map(RequestView::getId).collect(Collectors.toList());
         if (!ValidationHelper.isNullOrEmpty(requestIdList)) {

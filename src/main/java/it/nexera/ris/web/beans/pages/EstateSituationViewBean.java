@@ -1,11 +1,7 @@
 package it.nexera.ris.web.beans.pages;
 
 import it.nexera.ris.common.annotations.ReattachIgnore;
-import it.nexera.ris.common.enums.DocumentType;
-import it.nexera.ris.common.enums.ExtraCostType;
-import it.nexera.ris.common.enums.PageTypes;
-import it.nexera.ris.common.enums.RealEstateType;
-import it.nexera.ris.common.enums.RequestState;
+import it.nexera.ris.common.enums.*;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.exceptions.TypeActNotConfigureException;
 import it.nexera.ris.common.helpers.*;
@@ -1297,9 +1293,9 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 				calculation.calculateAllCosts(true);
 				setShowAddNationalCostButton(false);
 			}
-		} 
+		}
 	}
-	
+
 	public void deleteNationalCost() throws Exception {
 		Request request = DaoManager.get(Request.class, new Criterion[]{
 				Restrictions.eq("id", getRequestId())});
@@ -1312,20 +1308,20 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 		if(!ValidationHelper.isNullOrEmpty(extraCosts)) {
 			getCostManipulationHelper().setRequestExtraCosts(extraCosts);
 			Optional<ExtraCost> nationalExtraCost =  getCostManipulationHelper().getRequestExtraCosts()
-                    .stream()
-                    .filter(ec -> ec.getType().equals(ExtraCostType.NAZIONALEPOSITIVA))
-                    .findFirst();
-            if(nationalExtraCost.isPresent()) {
-            	getCostManipulationHelper().getRequestExtraCosts().remove(nationalExtraCost.get());
-                getCostManipulationHelper().setIncludeNationalCost(null);
-                Request requestDb  = DaoManager.get(Request.class, getRequestId());
+					.stream()
+					.filter(ec -> ec.getType().equals(ExtraCostType.NAZIONALEPOSITIVA))
+					.findFirst();
+			if(nationalExtraCost.isPresent()) {
+				getCostManipulationHelper().getRequestExtraCosts().remove(nationalExtraCost.get());
+				getCostManipulationHelper().setIncludeNationalCost(null);
+				Request requestDb  = DaoManager.get(Request.class, getRequestId());
 				getCostManipulationHelper().saveRequestExtraCost(requestDb);
 				CostCalculationHelper calculation = new CostCalculationHelper(requestDb);
 				calculation.calculateAllCosts(true);
-                setShowAddNationalCostButton(true);
-            }
+				setShowAddNationalCostButton(true);
+			}
 		}
-    }
+	}
 
 	public boolean isViewRelatedEstate() {
 		return viewRelatedEstate;

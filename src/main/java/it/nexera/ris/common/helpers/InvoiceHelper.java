@@ -35,8 +35,8 @@ public class InvoiceHelper {
         Map<Long, List<PriceList>> priceListMap = new HashMap<>();
         Set<String> requestTypeNames = new HashSet<>();
         for(Request request: selectedRequestList) {
-        	requestTypeNames.add(request.getRequestType().getName());
-        	CostCalculationHelper costCalculationHelper = new CostCalculationHelper(request);
+            requestTypeNames.add(request.getRequestType().getName());
+            CostCalculationHelper costCalculationHelper = new CostCalculationHelper(request);
             List<PriceList> requestPriceList = new ArrayList<>();
             if(!ValidationHelper.isNullOrEmpty(request.getService())) {
                 List<PriceList>  priceList = costCalculationHelper.loadPriceList(costCalculationHelper.isBillingClient(), costCalculationHelper.restrictionForPriceList(),request.getService());
@@ -356,17 +356,15 @@ public class InvoiceHelper {
         List<InvoiceItem> invoiceItems = new ArrayList<>();
         String requestName = "";
         for(String requestTypeName : requestTypeNames) {
-        	if(!requestName.isEmpty())
-        		requestName = requestName + " + ";
-        	requestName = requestName + requestTypeName;
+            if(!requestName.isEmpty())
+                requestName = requestName + " + ";
+            requestName = requestName + requestTypeName;
         }
         for(Map.Entry<TaxRate, List<RequestPriceListModel>> taxRateEntry : taxRateMap.entrySet()) {
             TaxRate taxRate = taxRateEntry.getKey();
             List<RequestPriceListModel> list = taxRateEntry.getValue();
             double sumTotalCost = 0d;
-            //String requestName = "";
             for(RequestPriceListModel requestPriceListModel : list) {
-               // requestName = requestPriceListModel.getRequest().getRequestType().getName();
                 sumTotalCost = sumTotalCost + requestPriceListModel.getTotalCost();
             }
             InvoiceItem invoiceItem = new InvoiceItem();

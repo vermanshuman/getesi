@@ -330,10 +330,10 @@
             background-color: #2d353c !important;
             color: #ffffff !important;
         }
-        
-		body .ui-autocomplete .ui-autocomplete-multiple-container .ui-autocomplete-token .ui-autocomplete-token-icon {
-			font: normal normal normal 14px/1 FontAwesome !important;
-		}
+
+        body .ui-autocomplete .ui-autocomplete-multiple-container .ui-autocomplete-token .ui-autocomplete-token-icon {
+            font: normal normal normal 14px/1 FontAwesome !important;
+        }
     </style>
 
     <p:dialog widgetVar="invoiceDialogBillingWV" modal="true" width="1350" draggable="false" id="invoiceDialogBilling"
@@ -599,8 +599,6 @@
                                         <p:inputText id="total_line" value="#{key.totalLine}" styleClass="total_line_#{key.counter}" >
                                             <p:keyFilter mask="num" />
                                         </p:inputText>
-                                        <!-- <p:selectBooleanCheckbox style="margin-top: 5px;"></p:selectBooleanCheckbox>
-                                        <h:outputText style="margin-top: 5px;" value="#{msg.notImpIncome}"></h:outputText> -->
                                     </div>
 
 
@@ -627,8 +625,8 @@
                                     </div>  -->
 
                                     <div class="p-col-9">
-                                        <p:inputTextarea value="#{key.description}" placeholder="#{msg.performanceOrProducts}" 
-                                        		disabled="#{bean.invoiceSentStatus}" converter="uppercaseConverter"></p:inputTextarea>
+                                        <p:inputTextarea value="#{key.description}" placeholder="#{msg.performanceOrProducts}"
+                                                         disabled="#{bean.invoiceSentStatus}" converter="uppercaseConverter"></p:inputTextarea>
                                     </div>
                                     <div class="p-col-3">
                                         <h:outputText value=""></h:outputText>

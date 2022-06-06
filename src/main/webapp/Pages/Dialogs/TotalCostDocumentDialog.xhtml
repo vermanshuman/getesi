@@ -8,7 +8,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core">
 <p:dialog widgetVar="createTotalCosthDocumentDialogWV" id="createTotalCosthDocumentDialog" modal="true"
           resizable="false"
-          draggable="false" onHide="tableUpdateAfterDialogClose()">
+          draggable="false" onHide="document.getElementById('filterTable').click();">
     <h:outputText value="#{msg.requestTotalDocument}"/>
     <div class="btn_line">
         <p:commandButton value="#{msg.submit}" styleClass="btn-green"
@@ -21,6 +21,8 @@
         </p:commandButton>
         <p:commandButton id="fakeButtonExcelDownload" process="searchPanel"
                          styleClass="non_displayed_button" ajax="false" action="#{bean.loadRequestsExcel}"/>
+        <p:commandButton id="filterTable"
+                         styleClass="non_displayed_button" ajax="true" onclick="filterTableFromPanel([{name:'searchClicked',value:'true'}]);"/>
     </div>
 </p:dialog>
 <p:remoteCommand name="tableUpdateAfterDialogClose" oncomplete="filterTableFromPanel()"/>

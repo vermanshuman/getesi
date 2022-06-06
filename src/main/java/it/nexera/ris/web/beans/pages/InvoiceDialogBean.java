@@ -835,7 +835,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         StringBuilder result = new StringBuilder();
         result.append("<div style=\"padding: 20px;\">");
         result.append("<h3>FATTURA ELETTRONICA</h3>");
-        result.append("<table style=\"width: 920px;border-collapse: collapse;border: 1px solid lightgray;\">");
+        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;\">");
         result.append("<thead style=\"background-color: #E7E7E7;\">");
         result.append("<td style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;font-weight: bold;background-color: #E7E7E7;\">Mittente</td>");
         result.append("<td style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;font-weight: bold;background-color: #E7E7E7;\">Destinatario</td>");
@@ -1001,7 +1001,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         result.append("</tbody>");
         result.append("</table>");
 
-        result.append("<table style=\"width: 920px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
+        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
         result.append("<tbody>");
         result.append("<tr style=\"background-color: #E7E7E7;\">");
         result.append("<td colspan=\"4\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;background-color: #E7E7E7;font-weight: bold\">Dati Fattura</td>");
@@ -1036,7 +1036,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         result.append("</tr>");
         result.append("</table>");
 
-        result.append("<table style=\"width: 920px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
+        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
         result.append("<tbody>");
         result.append("<tr>");
         result.append("<td colspan=\"2\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Dati</td>");
@@ -1066,7 +1066,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         result.append("</tr>");
         result.append("</table>");
 
-        result.append("<table style=\"width: 920px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
+        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
         result.append("<tbody>");
         result.append("<tr>");
         result.append("<td colspan=\"2\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Dati cliente</td>");
@@ -1106,7 +1106,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         result.append("</tr>");
         result.append("</table>");
 
-        result.append("<table style=\"width: 920px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
+        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
         result.append("<tbody>");
         result.append("<tr style=\"background-color: #E7E7E7;\">");
         result.append("<td colspan=\"6\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;background-color: #E7E7E7;font-weight: bold\">Dettaglio linee Fattura</td>");
@@ -1159,7 +1159,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         }
         result.append("</table>");
 
-        result.append("<table style=\"width: 920px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
+        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
         result.append("<tbody>");
         result.append("<tr style=\"background-color: #E7E7E7;\">");
         result.append("<td colspan=\"6\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;background-color: #E7E7E7;font-weight: bold\">Dati Riepilogo</td>");
@@ -1202,7 +1202,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         result.append("</table>");
 
         // page-break-before: always;
-        result.append("<table style=\"width: 920px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
+        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
         result.append("<tbody>");
         result.append("<tr style=\"background-color: #E7E7E7;\">");
         result.append("<td colspan=\"6\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;background-color: #E7E7E7;font-weight: bold\">Dati pagamento</td>");
@@ -1666,7 +1666,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         return "";
     }
 
-    public String prepareInvoicePdf(DocumentType documentType, Invoice invoice) throws
+    public String prepareInvoicePdf(DocumentType documentType, Invoice invoice, String tempDir) throws
             IOException, PersistenceBeanException, IllegalAccessException {
         String body = getPdfRequestBody(invoice);
         log.info("Invoice PDF body" + body);
@@ -1675,9 +1675,9 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         if (fileContent != null) {
             String fileName = "FE-" + getNumber() + " "
                     + invoice.getClient().getClientName();
-            String tempDir = FileHelper.getLocalTempDir();
-            tempDir  += File.separator + UUID.randomUUID();
-            FileUtils.forceMkdir(new File(tempDir));
+//            String tempDir = FileHelper.getLocalTempDir();
+//            tempDir  += File.separator + UUID.randomUUID();
+         //   FileUtils.forceMkdir(new File(tempDir));
             String tempPdf = tempDir +  File.separator +  fileName +".pdf";
             InputStream stream = new ByteArrayInputStream(fileContent);
             File targetFile = new File(tempPdf);
