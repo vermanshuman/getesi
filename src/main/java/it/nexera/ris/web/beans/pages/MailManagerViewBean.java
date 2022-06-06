@@ -2966,9 +2966,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             String reference = "";
             String ndg = "";
             if (!ValidationHelper.isNullOrEmpty(getEntity().getNdg()))
-                ndg = "NDG: " + getEntity().getNdg();
+                ndg = getEntity().getNdg();
             if (!ValidationHelper.isNullOrEmpty(getEntity().getReferenceRequest()))
-                reference = "RIF: " + getEntity().getReferenceRequest() + " ";
+                reference = getEntity().getReferenceRequest();
             String requestType = "";
             List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
             Set<String> requestTypeSet = new HashSet<>();
@@ -2976,18 +2976,19 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 requestTypeSet.add(request.getRequestType().getName());
             });
             for(String request: requestTypeSet){
-                if(!requestType.isEmpty())
-                    requestType = requestType + " + ";
+            	if(!requestType.isEmpty())
+            		requestType = requestType + " + ";
                 requestType = requestType + request;
             }
-            requestType = "REQUEST: "+requestType;
-
+                        
             emailBody = dearCustomer + ",</br></br>"
                     + attachedCopyMessage + "</br></br>"
-                    + (ndg.isEmpty() ? "" : ndg + "</br>")
-                    + (reference.isEmpty() ? "" : reference + "</br>")
-                    + (requestType.isEmpty() ? "" : requestType + "</br></br>")
-                    + thanksMessage
+                    + "<table style='border:none;'>"
+                    + (!ndg.isEmpty() ? "<tr><td style='border:none;'>NDG: " +"</td><td style='padding-left: 50px; border:none;'>" + ndg + "</td></tr>" : "")
+                    + (!reference.isEmpty() ? "<tr><td style='border:none;'>RIF: " +"</td><td style='padding-left: 50px; border:none;'>" + reference + "</td></tr>" : "")
+                    + (!requestType.isEmpty() ? "<tr><td style='border:none;'>REQUEST: " +"</td><td style='padding-left: 50px; border:none;'>" + requestType + "</td></tr>" : "")
+                    + "</table></br>"
+                    + thanksMessage 
                     + MAIL_FOOTER;
         }
         return emailBody;

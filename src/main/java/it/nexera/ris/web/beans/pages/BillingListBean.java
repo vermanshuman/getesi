@@ -2680,9 +2680,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 String reference = "";
                 String ndg = "";
                 if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getNdg()))
-                    ndg = "NDG: " + invoice.getEmailFrom().getNdg();
+                    ndg = invoice.getEmailFrom().getNdg();
                 if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getReferenceRequest()))
-                    reference = "RIF: " +invoice.getEmailFrom().getReferenceRequest() + " ";
+                    reference = invoice.getEmailFrom().getReferenceRequest();
                 String requestType = "";
                 List<Request> requests = DaoManager.load(Request.class, new Criterion[]{
                         Restrictions.eq("invoice", invoice),
@@ -2694,19 +2694,21 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                     requestTypeSet.add(request.getRequestType().getName());
                 });
                 for(String request: requestTypeSet){
-                    if(!requestType.isEmpty())
-                        requestType = requestType + " + ";
+                	if(!requestType.isEmpty())
+                		requestType = requestType + " + ";
                     requestType = requestType + request;
                 }
-                requestType = "REQUEST: "+requestType;
 
                 String emailBody = dearCustomer + ",</br></br>"
                         + attachedCopyMessage + "</br></br>"
-                        + (ndg.isEmpty() ? "" : ndg + "</br>")
-                        + (reference.isEmpty() ? "" : reference + "</br>")
-                        + (requestType.isEmpty() ? "" : requestType + "</br></br>")
-                        + thanksMessage
+                        + "<table style='border:none;'>"
+                        + (!ndg.isEmpty() ? "<tr><td style='border:none;'>NDG: " +"</td><td style='padding-left: 50px; border:none;'>" + ndg + "</td></tr>" : "")
+                        + (!reference.isEmpty() ? "<tr><td style='border:none;'>RIF: " +"</td><td style='padding-left: 50px; border:none;'>" + reference + "</td></tr>" : "")
+                        + (!requestType.isEmpty() ? "<tr><td style='border:none;'>REQUEST: " +"</td><td style='padding-left: 50px; border:none;'>" + requestType + "</td></tr>" : "")
+                        + "</table></br>"
+                        + thanksMessage 
                         + MAIL_FOOTER;
+
                 return emailBody;
             } else if(ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
                 String dearCustomer = ResourcesHelper.getString("dearCustomer");
