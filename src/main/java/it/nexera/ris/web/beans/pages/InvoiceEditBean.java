@@ -85,7 +85,7 @@ public class InvoiceEditBean extends EntityEditPageBean<Invoice> implements Seri
 			paymentTypes = ComboboxHelper.fillList(new PaymentType[] { });
 			setVatAmounts(ComboboxHelper.fillList(TaxRate.class, Order.asc("description"), new CriteriaAlias[]{}, new Criterion[]{
 					Restrictions.eq("use", Boolean.TRUE)
-			}, true, false));
+			}, true, false, true));
 			selectedClientId = null;
 			selectedPaymentTypeId = null;
 

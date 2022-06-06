@@ -362,6 +362,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private List<SelectItem> clientAddressCities;
 
     private List<SelectItem> cities;
+    
+    private static final String MAIL_FOOTER = ResourcesHelper.getString("emailFooter");
 
     @ManagedProperty(value="#{invoiceDialogBean}")
     private InvoiceDialogBean invoiceDialogBean;
@@ -1137,11 +1139,11 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private GoodsServicesFieldWrapper createGoodsServicesFieldWrapper() throws IllegalAccessException, PersistenceBeanException {
         GoodsServicesFieldWrapper wrapper = new GoodsServicesFieldWrapper();
         ums = new ArrayList<>();
-        ums.add(new SelectItem("pz", "pz"));
+        ums.add(new SelectItem("pz", "PZ"));
         wrapper.setUms(ums);
         wrapper.setVatAmounts(ComboboxHelper.fillList(TaxRate.class, Order.asc("description"), new CriteriaAlias[]{}, new Criterion[]{
                 Restrictions.eq("use", Boolean.TRUE)
-        }, true, false));
+        }, true, false, true));
         wrapper.setTotalLine(0D);
         return wrapper;
     }
@@ -2300,7 +2302,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 LogHelper.log(log, e);
             }
             DaoManager.save(excelInvoice, true);
-            addAttachedFile(excelInvoice);
+            addAttachedFile(excelInvoice, false);
             //attachInvoicePdf(baos);
             attachInvoicePdf(invoice, excelFile);
         }
@@ -2349,7 +2351,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             pdfInvoice.setDestinationPath(filePathStr);
             DaoManager.save(pdfInvoice, true);
             LogHelper.log(log, pdfInvoice.getId() + " " + pdfFilePath);
-            addAttachedFile(pdfInvoice);
+            addAttachedFile(pdfInvoice, true);
         }catch (Exception e) {
             LogHelper.log(log, e);
         }
@@ -2500,7 +2502,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         return excelFile;
     }
 
-    private void addAttachedFile(WLGExport export) {
+    private void addAttachedFile(WLGExport export, Boolean addAttachment) {
         if (export == null) {
             return;
         }
@@ -2508,7 +2510,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             setInvoiceEmailAttachedFiles(new ArrayList<>());
         }
         if (new File(export.getDestinationPath()).exists()) {
-            getInvoiceEmailAttachedFiles().add(new FileWrapper(export.getId(), export.getFileName(), export.getDestinationPath()));
+            getInvoiceEmailAttachedFiles().add(new FileWrapper(export.getId(), export.getFileName(), export.getDestinationPath(), addAttachment));
         } else {
             LogHelper.log(log, "WARNING failed to attach file | no file on server: " + export.getDestinationPath());
         }
@@ -2522,7 +2524,10 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 Restrictions.eq("inbox", inbox)
         });
         for (WLGExport export : exportList) {
-            addAttachedFile(export);
+        	if(!ValidationHelper.isNullOrEmpty(export.getFileName()) && export.getFileName().startsWith("FE-") && export.getFileName().contains(".xls"))
+        		addAttachedFile(export, true);
+        	else
+        		addAttachedFile(export, false);
         }
     }
 
@@ -2667,7 +2672,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                     requestTypeSet.add(request.getRequestType().getName());
                 });
                 for(String request: requestTypeSet){
-                    requestType = requestType + request + " ";
+                	if(!requestType.isEmpty())
+                		requestType = requestType + " + ";
+                    requestType = requestType + request;
                 }
                 requestType = "REQUEST: "+requestType;
 
@@ -2676,7 +2683,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                         + (ndg.isEmpty() ? "" : ndg + "</br>")
                         + (reference.isEmpty() ? "" : reference + "</br>")
                         + (requestType.isEmpty() ? "" : requestType + "</br></br>")
-                        + thanksMessage;
+                        + thanksMessage
+                        + MAIL_FOOTER;
 
                 return emailBody;
             } else if(ValidationHelper.isNullOrEmpty(invoice.getEmail())) {

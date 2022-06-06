@@ -358,7 +358,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             setInvoiceTotalCost(Double.parseDouble(getExamRequest().getTotalCostDouble()));
         setVatAmounts(ComboboxHelper.fillList(TaxRate.class, Order.asc("description"), new CriteriaAlias[]{}, new Criterion[]{
                 Restrictions.eq("use", Boolean.TRUE)
-        }, true, false));
+        }, true, false, true));
 
         docTypes = new ArrayList<>();
         docTypes.add(new SelectItem("FE", "FATTURA"));
@@ -366,7 +366,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         competence = new Date();
 
         ums = new ArrayList<SelectItem>();
-        ums.add(new SelectItem("pz", "pz"));
+        ums.add(new SelectItem("pz", "PZ"));
         setVatCollectabilityList(ComboboxHelper.fillList(VatCollectability.class,
                 false, false));
         paymentTypes = ComboboxHelper.fillList(PaymentType.class);

@@ -33,8 +33,10 @@ public class InvoiceHelper {
     public static List<InvoiceItem> groupingItemsByTaxRate(List<Request> selectedRequestList, String causal)
             throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
         Map<Long, List<PriceList>> priceListMap = new HashMap<>();
+        Set<String> requestTypeNames = new HashSet<>();
         for(Request request: selectedRequestList) {
-            CostCalculationHelper costCalculationHelper = new CostCalculationHelper(request);
+        	requestTypeNames.add(request.getRequestType().getName());
+        	CostCalculationHelper costCalculationHelper = new CostCalculationHelper(request);
             List<PriceList> requestPriceList = new ArrayList<>();
             if(!ValidationHelper.isNullOrEmpty(request.getService())) {
                 List<PriceList>  priceList = costCalculationHelper.loadPriceList(costCalculationHelper.isBillingClient(), costCalculationHelper.restrictionForPriceList(),request.getService());
@@ -352,13 +354,19 @@ public class InvoiceHelper {
                 .collect(
                         Collectors.groupingBy(RequestPriceListModel::getTaxRate, Collectors.toList()));
         List<InvoiceItem> invoiceItems = new ArrayList<>();
+        String requestName = "";
+        for(String requestTypeName : requestTypeNames) {
+        	if(!requestName.isEmpty())
+        		requestName = requestName + " + ";
+        	requestName = requestName + requestTypeName;
+        }
         for(Map.Entry<TaxRate, List<RequestPriceListModel>> taxRateEntry : taxRateMap.entrySet()) {
             TaxRate taxRate = taxRateEntry.getKey();
             List<RequestPriceListModel> list = taxRateEntry.getValue();
             double sumTotalCost = 0d;
-            String requestName = "";
+            //String requestName = "";
             for(RequestPriceListModel requestPriceListModel : list) {
-                requestName = requestPriceListModel.getRequest().getRequestType().getName();
+               // requestName = requestPriceListModel.getRequest().getRequestType().getName();
                 sumTotalCost = sumTotalCost + requestPriceListModel.getTotalCost();
             }
             InvoiceItem invoiceItem = new InvoiceItem();
@@ -375,11 +383,11 @@ public class InvoiceHelper {
     public GoodsServicesFieldWrapper createGoodsServicesFieldWrapper() throws IllegalAccessException, PersistenceBeanException {
         GoodsServicesFieldWrapper wrapper = new GoodsServicesFieldWrapper();
         List<SelectItem> ums = new ArrayList<>();
-        ums.add(new SelectItem("pz", "pz"));
+        ums.add(new SelectItem("pz", "PZ"));
         wrapper.setUms(ums);
         wrapper.setVatAmounts(ComboboxHelper.fillList(TaxRate.class, Order.asc("description"), new CriteriaAlias[]{}, new Criterion[]{
                 Restrictions.eq("use", Boolean.TRUE)
-        }, true, false));
+        }, true, false, true));
         wrapper.setTotalLine(0D);
         return wrapper;
     }

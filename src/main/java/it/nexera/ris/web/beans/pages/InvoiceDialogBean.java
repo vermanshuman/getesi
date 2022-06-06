@@ -610,7 +610,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         competence = new Date();
         setVatCollectabilityList(ComboboxHelper.fillList(VatCollectability.class,
                 false, false));
-        paymentTypes = ComboboxHelper.fillList(invoiceDb.getClient().getPaymentTypeList(), Boolean.TRUE);
+        paymentTypes = ComboboxHelper.fillList(invoiceDb.getClient().getPaymentTypeList(), Boolean.FALSE);
         setGoodsServicesFields(new ArrayList<>());
         setInvoiceDate(invoiceDb.getDate());
         setSelectedInvoice(invoiceDb);
@@ -804,11 +804,11 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
     private GoodsServicesFieldWrapper createGoodsServicesFieldWrapper() throws IllegalAccessException, PersistenceBeanException {
         GoodsServicesFieldWrapper wrapper = new GoodsServicesFieldWrapper();
         ums = new ArrayList<>();
-        ums.add(new SelectItem("pz", "pz"));
+        ums.add(new SelectItem("pz", "PZ"));
         wrapper.setUms(ums);
         wrapper.setVatAmounts(ComboboxHelper.fillList(TaxRate.class, Order.asc("description"), new CriteriaAlias[]{}, new Criterion[]{
                 Restrictions.eq("use", Boolean.TRUE)
-        }, true, false));
+        }, true, false, true));
         wrapper.setTotalLine(0D);
         return wrapper;
     }

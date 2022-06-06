@@ -851,14 +851,14 @@ public class WLGInbox extends IndexedEntity {
     }
 
     public String getReferenceRequest() {
-        return referenceRequest;
-    }
+		return referenceRequest;
+	}
 
-    public void setReferenceRequest(String referenceRequest) {
-        this.referenceRequest = referenceRequest;
-    }
+	public void setReferenceRequest(String referenceRequest) {
+		this.referenceRequest = referenceRequest;
+	}
 
-    public String getNdg() { return ndg; }
+	public String getNdg() { return ndg; }
 
     public void setNdg(String ndg) { this.ndg = ndg; }
 

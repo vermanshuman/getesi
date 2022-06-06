@@ -308,6 +308,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private String otherRequestsExistsForInvoice;
 
     private List<Request> otherRequestsConsideredForInvoice;
+    
+    private static final String MAIL_FOOTER = ResourcesHelper.getString("emailFooter");
 
     @ManagedProperty(value="#{invoiceDialogBean}")
     private InvoiceDialogBean invoiceDialogBean;
@@ -1457,7 +1459,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         setVatCollectabilityList(ComboboxHelper.fillList(VatCollectability.class,
                 false, false));
         if(!ValidationHelper.isNullOrEmpty(invoiceDb.getClient()))
-            paymentTypes = ComboboxHelper.fillList(invoiceDb.getClient().getPaymentTypeList(), Boolean.TRUE);
+            paymentTypes = ComboboxHelper.fillList(invoiceDb.getClient().getPaymentTypeList(), Boolean.FALSE);
         setGoodsServicesFields(new ArrayList<>());
         setInvoiceDate(invoiceDb.getDate());
         setSelectedInvoice(invoiceDb);
@@ -1639,12 +1641,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private GoodsServicesFieldWrapper createGoodsServicesFieldWrapper() throws IllegalAccessException, PersistenceBeanException {
         GoodsServicesFieldWrapper wrapper = new GoodsServicesFieldWrapper();
         ums = new ArrayList<>();
-        ums.add(new SelectItem("pz", "pz"));
+        ums.add(new SelectItem("pz", "PZ"));
         wrapper.setUms(ums);
         wrapper.setInvoiceItemAmount(1.0d);
         wrapper.setVatAmounts(ComboboxHelper.fillList(TaxRate.class, Order.asc("description"), new CriteriaAlias[]{}, new Criterion[]{
                 Restrictions.eq("use", Boolean.TRUE)
-        }, true, false));
+        }, true, false, true));
         wrapper.setTotalLine(0D);
         return wrapper;
     }
@@ -2168,7 +2170,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 LogHelper.log(log, e);
             }
             DaoManager.save(excelInvoice, true);
-            addAttachedFile(excelInvoice);
+            addAttachedFile(excelInvoice, false);
             //attachInvoicePdf(baos);
 //            attachInvoicePdf(invoice);
             attachInvoicePdf(invoice, excelFile);
@@ -2219,7 +2221,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             pdfInvoice.setDestinationPath(filePathStr);
             DaoManager.save(pdfInvoice, true);
             LogHelper.log(log, pdfInvoice.getId() + " " + pdfFilePath);
-            addAttachedFile(pdfInvoice);
+            addAttachedFile(pdfInvoice, true);
         }catch (Exception e) {
             LogHelper.log(log, e);
         }
@@ -2336,7 +2338,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         return excelFile;
     }
 
-    private void addAttachedFile(WLGExport export) {
+    private void addAttachedFile(WLGExport export, Boolean addAttachment) {
         if (export == null) {
             return;
         }
@@ -2344,7 +2346,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             setInvoiceEmailAttachedFiles(new ArrayList<>());
         }
         if (new File(export.getDestinationPath()).exists()) {
-            getInvoiceEmailAttachedFiles().add(new FileWrapper(export.getId(), export.getFileName(), export.getDestinationPath()));
+            getInvoiceEmailAttachedFiles().add(new FileWrapper(export.getId(), export.getFileName(), export.getDestinationPath(), addAttachment));
         } else {
             LogHelper.log(log, "WARNING failed to attach file | no file on server: " + export.getDestinationPath());
         }
@@ -2631,7 +2633,10 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 Restrictions.eq("inbox", inbox)
         });
         for (WLGExport export : exportList) {
-            addAttachedFile(export);
+        	if(!ValidationHelper.isNullOrEmpty(export.getFileName()) && export.getFileName().startsWith("FE-") && export.getFileName().contains(".xls"))
+        		addAttachedFile(export, true);
+        	else
+        		addAttachedFile(export, false);
         }
     }
 
@@ -2834,7 +2839,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 FileHelper.delete(tempDoc);
                 DaoManager.save(courtesyInvoicePdf, true);
                 LogHelper.log(log, courtesyInvoicePdf.getId() + " " + filePath);
-                addAttachedFile(courtesyInvoicePdf);
+                addAttachedFile(courtesyInvoicePdf, false);
             }
         } catch (Exception e) {
             LogHelper.log(log, e);
@@ -2954,7 +2959,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 requestTypeSet.add(request.getRequestType().getName());
             });
             for(String request: requestTypeSet){
-                requestType = requestType + request + " ";
+            	if(!requestType.isEmpty())
+            		requestType = requestType + " + ";
+                requestType = requestType + request;
             }
             requestType = "REQUEST: "+requestType;
 
@@ -2963,7 +2970,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     + (ndg.isEmpty() ? "" : ndg + "</br>")
                     + (reference.isEmpty() ? "" : reference + "</br>")
                     + (requestType.isEmpty() ? "" : requestType + "</br></br>")
-                    + thanksMessage;
+                    + thanksMessage 
+                    + MAIL_FOOTER;
         }
         return emailBody;
     }
