@@ -2032,66 +2032,68 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         Invoice invoice =  DaoManager.get(Invoice.class, new Criterion[]{
                 Restrictions.eq("number", getNumber())
         });
-        if (!ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
-            WLGInbox inbox = DaoManager.get(WLGInbox.class, invoice.getEmail().getId());
-
-            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailFrom()))
-                setEmailFrom(inbox.getEmailFrom());
-            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailTo()))
-                setEmailTo(inbox.getEmailTo());
-            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailCC()))
-                setEmailCC(inbox.getEmailCC());
-
-            if (!ValidationHelper.isNullOrEmpty(getEmailFrom()))
-                setSendFrom(Arrays.asList(getEmailFrom().split(",")));
-
-            if (!ValidationHelper.isNullOrEmpty(getEmailTo()))
-                setSendTo(Arrays.asList(getEmailTo().split(",")));
-
-            if (!ValidationHelper.isNullOrEmpty(getEmailCC()))
-                setSendCC(Arrays.asList(getEmailCC().split(",")));
-
-            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailBodyToEditor()))
-                setEmailBodyToEditor(inbox.getEmailBodyToEditor());
-
-            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailSubject()))
-                setEmailSubject(inbox.getEmailSubject());
-        } else {
-            if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
-//                appendReplyFooter();
-//                String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
+        if(!ValidationHelper.isNullOrEmpty(invoice)) {
+	        if (!ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
+	            WLGInbox inbox = DaoManager.get(WLGInbox.class, invoice.getEmail().getId());
+	
+	            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailFrom()))
+	                setEmailFrom(inbox.getEmailFrom());
+	            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailTo()))
+	                setEmailTo(inbox.getEmailTo());
+	            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailCC()))
+	                setEmailCC(inbox.getEmailCC());
+	
+	            if (!ValidationHelper.isNullOrEmpty(getEmailFrom()))
+	                setSendFrom(Arrays.asList(getEmailFrom().split(",")));
+	
+	            if (!ValidationHelper.isNullOrEmpty(getEmailTo()))
+	                setSendTo(Arrays.asList(getEmailTo().split(",")));
+	
+	            if (!ValidationHelper.isNullOrEmpty(getEmailCC()))
+	                setSendCC(Arrays.asList(getEmailCC().split(",")));
+	
+	            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailBodyToEditor()))
+	                setEmailBodyToEditor(inbox.getEmailBodyToEditor());
+	
+	            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailSubject()))
+	                setEmailSubject(inbox.getEmailSubject());
+	        } else {
+	            if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
+//                	appendReplyFooter();
+//                	String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
 //                        String.class, new Criterion[]{Restrictions.eq("id", Long.parseLong(
 //                                ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.SENT_SERVER_ID)
 //                                        .getValue()))}).get(0);
-//                if (invoice.getEmailFrom().getEmailCC().contains(emailsFrom)) {
-//                    sendTo = new LinkedList<>();
-//                    sendTo.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailFrom()));
-//                    sendTo.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailTo()));
-//                    sendCC = new LinkedList<>();
-//                    sendCC = MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailCC()).stream()
+//                	if (invoice.getEmailFrom().getEmailCC().contains(emailsFrom)) {
+//                    	sendTo = new LinkedList<>();
+//                    	sendTo.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailFrom()));
+//                    	sendTo.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailTo()));
+//                    	sendCC = new LinkedList<>();
+//                    	sendCC = MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailCC()).stream()
 //                            .filter(m -> !m.contains(emailsFrom)).collect(Collectors.toList());
-//                } else {
-//                    sendTo = MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailFrom());
-//                    sendCC = new LinkedList<>();
-//                    sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailTo()).stream()
+//                	} else {
+//                    	sendTo = MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailFrom());
+//                    	sendCC = new LinkedList<>();
+//                    	sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailTo()).stream()
 //                            .filter(m -> !m.contains(emailsFrom)).collect(Collectors.toList()));
-//                    sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailCC()));
-//                }
-                WLGInbox inbox = DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId());
-                List<Client> managers = inbox.getManagers();
-                List<ClientEmail> allEmailList = new ArrayList<>();
-                CollectionUtils.emptyIfNull(managers).stream().forEach(manager -> {
-                    if (!ValidationHelper.isNullOrEmpty(manager.getEmails()))
-                        allEmailList.addAll(manager.getEmails());
-                });
-                sendTo = new LinkedList<>();
-                CollectionUtils.emptyIfNull(allEmailList).stream().forEach(email -> {
-                    if (!ValidationHelper.isNullOrEmpty(email.getEmail()))
-                        sendTo.addAll(MailHelper.parseMailAddress(email.getEmail()));
-                });
-            }
-//            setEmailBodyToEditor(getEntity().getEmailBodyToEditor());
-            setEmailBodyToEditor(createInvoiceEmailDefaultBody(invoice));
+//                    	sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailCC()));
+//                	}
+	                WLGInbox inbox = DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId());
+	                List<Client> managers = inbox.getManagers();
+	                List<ClientEmail> allEmailList = new ArrayList<>();
+	                CollectionUtils.emptyIfNull(managers).stream().forEach(manager -> {
+	                    if (!ValidationHelper.isNullOrEmpty(manager.getEmails()))
+	                        allEmailList.addAll(manager.getEmails());
+	                });
+	                sendTo = new LinkedList<>();
+	                CollectionUtils.emptyIfNull(allEmailList).stream().forEach(email -> {
+	                    if (!ValidationHelper.isNullOrEmpty(email.getEmail()))
+	                        sendTo.addAll(MailHelper.parseMailAddress(email.getEmail()));
+	                });
+	            }
+	//            setEmailBodyToEditor(getEntity().getEmailBodyToEditor());
+	            setEmailBodyToEditor(createInvoiceEmailDefaultBody(invoice));
+	        }
         }
     }
 
