@@ -246,10 +246,10 @@ public class PrintPDFHelper extends BaseHelper {
 
                 case INVOICE:
                 case COURTESY_INVOICE:
-                    marginTop = 20l;
+                    marginTop = 1l;
                     marginLeft = 10l;
                     marginRight = 10l;
-                    marginBottom = 20l;
+                    marginBottom = 2l;
                     break;
 
                 default:

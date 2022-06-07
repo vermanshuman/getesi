@@ -374,7 +374,11 @@
                                     <p:outputLabel value="#{msg.number}"/>
                                 </div>
                                 <div class="p-col-2">
-                                    <p:inputText value="#{bean.number}" id="number" readonly="true"/>
+                                    <p:inputText value="#{bean.number}" id="number"
+                                                 disabled="#{bean.selectedInvoice eq null or bean.selectedInvoice.id eq null
+                                                 or bean.selectedInvoice.status eq null or bean.selectedInvoice.status.id eq null or bean.selectedInvoice.status.id ne 1}">
+                                        <p:ajax listener="#{bean.numberChanged()}" update="mainPanel"/>
+                                    </p:inputText>
                                 </div>
                                 <div class="p-col-1 vertical-center" >
                                     <p:outputLabel value="#{msg.data}"/>
@@ -396,7 +400,7 @@
                                     <p:outputLabel value="#{msg.codifica}"/>
                                 </div>
                                 <div class="p-col-2">
-                                    <p:inputText value="#{bean.invoiceNumber}" readonly="true"/>
+                                    <p:inputText value="#{bean.invoiceNumber}" disabled="true"/>
                                 </div>
                                 <div class="p-col-1 vertical-center">
                                     <h:outputText value="#{msg.client}"/>
@@ -724,7 +728,7 @@
                                     <p:commandButton value="#{msg.cancel.toUpperCase()}" oncomplete="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"
                                                      rendered="#{!bean.invoiceSentStatus}"/>
                                     <p:commandButton value="#{msg.saveInDraft}" styleClass="ui-button-success p-mr-2 p-mb-2" style="margin-left:5px;"
-                                                     action="#{bean.saveInvoiceInDraft}" update="mainPanel goodsServicesPanel countsSummaryPanel @widgetVar(buttonsPanelWV) :form"
+                                                     action="#{bean.saveInvoiceInDraft}" update="mainPanel goodsServicesPanel countsSummaryPanel @widgetVar(buttonsPanelWV)"
                                                      rendered="#{!bean.invoiceSentStatus}"/>
                                     <p:commandButton value="#{msg.delivery}" styleClass="ui-button-success p-mr-2 p-mb-2"
                                                      action="#{bean.sendInvoice}" rendered="#{!bean.invoiceSentStatus}"
@@ -1091,10 +1095,10 @@
         </script>
     </p:dialog>
 
-    <p:dialog widgetVar="invoiceErrorDialogWV"  modal="true" draggable="false"
+    <p:dialog widgetVar="invoiceErrorDialogWV"  id="invoiceErrorDialog" modal="true" draggable="false"
               position="center center">
         <div class="ui-messages-error ui-corner-all">
-            <span class="ui-messages-error-summary">#{msg.invalidDataMsg}</span><br/>
+            <span class="ui-messages-error-summary">#{bean.invoiceErrorMessage}</span><br/>
         </div>
         <p:commandButton oncomplete="PF('invoiceErrorDialogWV').hide();"
                          value="#{msg.close}" />

@@ -833,7 +833,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
 
     public static String getPdfRequestBody(Invoice invoice) throws PersistenceBeanException, IllegalAccessException {
         StringBuilder result = new StringBuilder();
-        result.append("<div style=\"padding: 20px;\">");
+        result.append("<div style=\"padding: 20px;font-size: 12px;\">");
         result.append("<h3>FATTURA ELETTRONICA</h3>");
         result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;\">");
         result.append("<thead style=\"background-color: #E7E7E7;\">");
@@ -842,7 +842,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         result.append("</thead>");
         result.append("<tbody>");
         result.append("<tr>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 50%;padding: 10px;line-height: 22px;\">");
+        result.append("<td style=\"border: 2px solid lightgray;width: 50%;padding: 10px;line-height: 18px;\">");
 
         String comapnyName = ApplicationSettingsHolder.getInstance()
                 .getByKey(ApplicationSettingsKeys.COMPANY_NAME).getValue();
@@ -925,7 +925,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         result.append("<br/>");
         result.append("</td>");
 
-        result.append("<td style=\"border: 2px solid lightgray;width: 50%;padding: 10px;line-height: 22px;\">");
+        result.append("<td style=\"border: 2px solid lightgray;width: 50%;padding: 10px;line-height: 18px;\">");
         String clientName = "";
         String clientAddressStreet = "";
         String clientAddressHouseNumber = "";
@@ -1001,7 +1001,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         result.append("</tbody>");
         result.append("</table>");
 
-        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
+        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 12px;\">");
         result.append("<tbody>");
         result.append("<tr style=\"background-color: #E7E7E7;\">");
         result.append("<td colspan=\"4\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;background-color: #E7E7E7;font-weight: bold\">Dati Fattura</td>");
@@ -1013,14 +1013,14 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 25%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Importo Totale</td>");
         result.append("</tr>");
         result.append("<tr>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\"><b>Fattura</b></td>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\"><b>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\"><b>Fattura</b></td>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\"><b>");
         result.append(invoice.getInvoiceNumber() != null ? invoice.getInvoiceNumber() : "");
         result.append("</b></td>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\"><b>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\"><b>");
         result.append(invoice.getDate() != null ? DateTimeHelper.toFormatedString(invoice.getDate(), DateTimeHelper.getMySQLDatePattern()) : "");
         result.append("</b></td>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\"><b>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\"><b>");
         result.append("EUR ");
         result.append(invoice.getTotalGrossAmount() != null ? invoice.getTotalGrossAmount().toString().replace(".", ",") : "");
         result.append("</b></td>");
@@ -1030,19 +1030,19 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         result.append("<td colspan=\"4\" style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 25%;color: #478FCA;;background-color: #f3f3f3;\"><b>Causale</b></td>");
         result.append("</tr>");
         result.append("<tr>");
-        result.append("<td colspan=\"4\" style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\">");
+        result.append("<td colspan=\"4\" style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\">");
         result.append(invoice.getNotes() != null ? invoice.getNotes() : "");
         result.append("</td>");
         result.append("</tr>");
         result.append("</table>");
 
-        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
+        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 12px;\">");
         result.append("<tbody>");
         result.append("<tr>");
         result.append("<td colspan=\"2\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Dati</td>");
         result.append("</tr>");
         result.append("<tr>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\">");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\">");
         String ndg = "";
         String refrenceRequest = "";
 
@@ -1058,7 +1058,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
             result.append("NDG: ");
         result.append(ndg);
         result.append("</td>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\">");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\">");
         if(StringUtils.isNotBlank(refrenceRequest))
             result.append("Rif.: ");
         result.append(refrenceRequest);
@@ -1066,13 +1066,13 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         result.append("</tr>");
         result.append("</table>");
 
-        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
+        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 12px;\">");
         result.append("<tbody>");
         result.append("<tr>");
         result.append("<td colspan=\"2\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Dati cliente</td>");
         result.append("</tr>");
         result.append("<tr>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\">");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\">");
         String mailClient = "";
         String mailTrust = "";
         String mailOffice = "";
@@ -1091,22 +1091,22 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
             }
         }
         if(StringUtils.isNotBlank(mailClient))
-            result.append("Gestore: ");
+            result.append("GESTORE: ");
         result.append(mailClient);
         result.append("<br/>");
-        if(StringUtils.isNotBlank(mailTrust))
-            result.append("Fiduciario: ");
-        result.append(mailTrust);
+        if(StringUtils.isNotBlank(mailTrust.toUpperCase()))
+            result.append("FIDUCIARIO: ");
+        result.append(mailTrust.toUpperCase());
         result.append("</td>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\">");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\">");
         if(StringUtils.isNotBlank(mailOffice))
-            result.append("Ufficio: ");
-        result.append(mailOffice);
+            result.append("UFFICIO: ");
+        result.append(mailOffice.toUpperCase());
         result.append("</td>");
         result.append("</tr>");
         result.append("</table>");
 
-        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
+        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 12px;\">");
         result.append("<tbody>");
         result.append("<tr style=\"background-color: #E7E7E7;\">");
         result.append("<td colspan=\"6\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;background-color: #E7E7E7;font-weight: bold\">Dettaglio linee Fattura</td>");
@@ -1125,29 +1125,29 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
             if(!ValidationHelper.isNullOrEmpty(items)){
                 for(InvoiceItem item : items){
                     result.append("<tr>");
-                    result.append("<td style=\"border: 2px solid lightgray;width: 35%;padding: 10px;line-height: 22px;\">");
+                    result.append("<td style=\"border: 2px solid lightgray;width: 35%;padding: 10px;line-height: 18px;\">");
                     if(!ValidationHelper.isNullOrEmpty(item.getDescription())){
                         result.append(item.getDescription());
                     }
                     result.append("</td>");
-                    result.append("<td style=\"border: 2px solid lightgray;width: 10%;padding: 10px;line-height: 22px;\">");
+                    result.append("<td style=\"border: 2px solid lightgray;width: 10%;padding: 10px;line-height: 18px;\">");
                     result.append("pz");
                     result.append("</td>");
-                    result.append("<td style=\"border: 2px solid lightgray;width: 10%;padding: 10px;line-height: 22px;\">");
+                    result.append("<td style=\"border: 2px solid lightgray;width: 10%;padding: 10px;line-height: 18px;\">");
                     if(!ValidationHelper.isNullOrEmpty(item.getAmount()))
                         result.append(item.getAmount());
                     result.append("</td>");
-                    result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 22px;\">");
+                    result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\">");
                     if(!ValidationHelper.isNullOrEmpty(item.getInvoiceTotalCost()))
                         result.append(item.getInvoiceTotalCost());
                     result.append("</td>");
-                    result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 22px;\">");
+                    result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\">");
                     if(!ValidationHelper.isNullOrEmpty(item.getAmount())
                             && !ValidationHelper.isNullOrEmpty(item.getInvoiceTotalCost())){
                         result.append(item.getInvoiceTotalCost() * item.getAmount());
                     }
                     result.append("</td>");
-                    result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 22px;\">");
+                    result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\">");
                     if(!ValidationHelper.isNullOrEmpty(item.getTaxRate())
                             && !ValidationHelper.isNullOrEmpty(item.getTaxRate().getDescription())){
                         result.append(item.getTaxRate().getDescription());
@@ -1159,7 +1159,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         }
         result.append("</table>");
 
-        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
+        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 12px;\">");
         result.append("<tbody>");
         result.append("<tr style=\"background-color: #E7E7E7;\">");
         result.append("<td colspan=\"6\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;background-color: #E7E7E7;font-weight: bold\">Dati Riepilogo</td>");
@@ -1178,20 +1178,20 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
                     BigDecimal percentage = !ValidationHelper.isNullOrEmpty(item.getTaxRate()) && !ValidationHelper.isNullOrEmpty(item.getTaxRate().getPercentage()) ? item.getTaxRate().getPercentage() : BigDecimal.ZERO;
                     Double totalAmount = !ValidationHelper.isNullOrEmpty(item.getInvoiceTotalCost()) && !ValidationHelper.isNullOrEmpty(item.getAmount()) ? (item.getInvoiceTotalCost()*item.getAmount()) : 0;
                     result.append("<tr>");
-                    result.append("<td style=\"border: 2px solid lightgray;width: 35%;padding: 10px;line-height: 22px;\">");
+                    result.append("<td style=\"border: 2px solid lightgray;width: 35%;padding: 10px;line-height: 18px;\">");
                     if(!ValidationHelper.isNullOrEmpty(item.getTaxRate()) && !ValidationHelper.isNullOrEmpty(item.getTaxRate().getDescription())){
                         result.append(item.getTaxRate().getDescription());
                     }
                     result.append("</td>");
-                    result.append("<td style=\"border: 2px solid lightgray;width: 20%;padding: 10px;line-height: 22px;\">");
+                    result.append("<td style=\"border: 2px solid lightgray;width: 20%;padding: 10px;line-height: 18px;\">");
                     if(!percentage.equals(0))
                         result.append(percentage + " %");
                     result.append("</td>");
-                    result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\">");
+                    result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\">");
                     if(!totalAmount.equals(0))
                         result.append(totalAmount);
                     result.append("</td>");
-                    result.append("<td style=\"border: 2px solid lightgray;width: 20%;padding: 10px;line-height: 22px;\">");
+                    result.append("<td style=\"border: 2px solid lightgray;width: 20%;padding: 10px;line-height: 18px;\">");
                     if(!percentage.equals(0) &&!totalAmount.equals(0))
                         result.append(percentage.multiply(BigDecimal.valueOf(totalAmount)).divide(BigDecimal.valueOf(100)));
                     result.append("</td>");
@@ -1202,7 +1202,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         result.append("</table>");
 
         // page-break-before: always;
-        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 20px;\">");
+        result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 12px;\">");
         result.append("<tbody>");
         result.append("<tr style=\"background-color: #E7E7E7;\">");
         result.append("<td colspan=\"6\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;background-color: #E7E7E7;font-weight: bold\">Dati pagamento</td>");
@@ -1216,28 +1216,28 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 30%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">IBAN</td>");
         result.append("</tr>");
         result.append("<tr>");
-        result.append("<td colspan=\"6\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;font-weight: bold\">Pagamento completo</td>");
+        result.append("<td colspan=\"6\" style=\"padding: 10px;text-align: left;font-weight: bold\">Pagamento completo</td>");
         result.append("</tr>");
         result.append("<tr>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 22px;\"></td>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 22px;\">");
+        result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\"></td>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\">");
         if(!ValidationHelper.isNullOrEmpty(invoice.getPaymentType()) && !ValidationHelper.isNullOrEmpty(invoice.getPaymentType().getDescription())) {
             result.append(invoice.getPaymentType().getDescription());
         }
         result.append("</td>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 22px;\"></td>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 22px;\">");
+        result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\"></td>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\">");
         if(!ValidationHelper.isNullOrEmpty(invoice.getTotalGrossAmount())) {
             result.append("EUR ");
             result.append(invoice.getTotalGrossAmount() != null ? invoice.getTotalGrossAmount().toString().replace(".", ",") : "");
         }
         result.append("</td>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 22px;\">");
+        result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\">");
         if(!ValidationHelper.isNullOrEmpty(invoice.getPaymentType()) && !ValidationHelper.isNullOrEmpty(invoice.getPaymentType().getIstitutionName())) {
             result.append(invoice.getPaymentType().getIstitutionName());
         }
         result.append("</td>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 22px;\">");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\">");
         if(!ValidationHelper.isNullOrEmpty(invoice.getPaymentType()) && !ValidationHelper.isNullOrEmpty(invoice.getPaymentType().getIban())) {
             result.append(invoice.getPaymentType().getIban());
         }
@@ -1533,9 +1533,6 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
                 totIva = totIva.setScale(2, RoundingMode.HALF_UP);
                 totalIva = totIva.doubleValue();
                 String fileName = "FE-" + invoice.getNumber() + " " + invoice.getClient().getClientName();
-//                Date currentDate = new Date();
-//                String fileName = "Richieste_Invoice_"+DateTimeHelper.toFileDateWithMinutes(currentDate);
-                //String fileName = "FE-" + getNumber() + " " + getSelectedInvoice().getClient().getClientName();
                 String tempDir = FileHelper.getLocalTempDir();
                 tempDir  += File.separator + UUID.randomUUID();
                 FileUtils.forceMkdir(new File(tempDir));
@@ -1673,7 +1670,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         byte [] fileContent  = PrintPDFHelper.convertToPDF(null, body, null, documentType);
 
         if (fileContent != null) {
-            String fileName = "FE-" + getNumber() + " "
+            String fileName = "FE-" + invoice.getNumber() + " "
                     + invoice.getClient().getClientName();
 //            String tempDir = FileHelper.getLocalTempDir();
 //            tempDir  += File.separator + UUID.randomUUID();

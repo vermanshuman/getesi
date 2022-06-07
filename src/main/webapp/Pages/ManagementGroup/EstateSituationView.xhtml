@@ -132,8 +132,30 @@
                 font-size: 14px;
             }
 
-            body .ui-panel .ui-panel-titlebar, body .ui-panel .ui-panel-content, #immobiliFieldset, #formalityDettaglio, #sinteticheFieldSet{
+
+            #immobiliFieldset, #formalityDettaglio, #sinteticheFieldSet{
                 border: 1px solid #6c757d !important;
+            }
+
+
+            body .ui-panel .ui-panel-titlebar {
+                border-top: 1px solid #6c757d !important;
+                border-right: 1px solid #6c757d !important;
+                border-left: 1px solid #6c757d !important;
+            }
+
+            body .ui-panel .ui-panel-content{
+                border-right: 1px solid #6c757d !important;
+                border-left: 1px solid #6c757d !important;
+                border-bottom: 1px solid #6c757d !important;
+            }
+
+            .card .ui-panel-titlebar {
+                border-bottom:none !important
+            }
+
+            .card .ui-panel-content {
+                border-top:none !important
             }
 
             .ui-fileupload-buttonbar .ui-button .ui-icon-plusthick{
@@ -157,15 +179,14 @@
                 border:none !important;
                 padding:0 !important;
             }
-            .card.card-w-title .ui-widget-header, #fileTable_head tr {
+            #fileTable_head tr {
                 display: none;
             }
-            .card.card-w-title .ui-widget-header, #formTable_head tr {
+            #formTable_head tr {
                 display: none;
             }
-            
             #confirmAddNationalCostDialog .ui-widget-header {
-            	display: block !important;
+                display: block !important;
             }
         </style>
         <p:remoteCommand name="removeFileCommand" update="form"/>
@@ -244,14 +265,13 @@
                 <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group estate-situation" layout="grid" style="text-align: right;">
                     <p:column>
                         <p:panel id="nationalCostPanel" style="border:none ; padding:0 !important; width: 265px;">
-                            <p:commandButton value="#{msg.estateSituationViewAddNationalCost}" style="width: 210px !important;"
-                                             styleClass="grey-button" rendered="#{bean.showAddNationalCostButton}"
-                                             oncomplete="PF('confirmAddNationalCostDialogWV').show();"></p:commandButton>
+                            <p:commandButton value="#{msg.estateSituationViewAddNationalCost}" action="#{bean.updateNationalCost}" style="width: 210px !important;margin-top: 88px;margin-left: -210px;position: absolute;"
+                                             styleClass="grey-button" rendered="#{bean.showAddNationalCostButton}" update="nationalCostPanel"></p:commandButton>
                             <ui:fragment rendered="#{not bean.showAddNationalCostButton}">
 				  				<span style="border: 2px solid #57c279 !important;padding: 5px 8px 8px 4px; border-radius: 2px;display: inline-block;">
 				      				<i class="fa fa-check-circle-o" style="color: green; margin-right: 5px; margin-left: 5px;"/>
-				      				<p:commandLink value="#{msg.estateSituationViewAddNationalCost}" style="width: 265px !important;"
-                                                   oncomplete="PF('confirmRemoveNationalCostDialogWV').show();" />
+				      				<p:commandLink value="#{msg.estateSituationViewAddNationalCost}" disabled="true" style="width: 265px !important;"
+                                                   oncomplete="PF('associateToClientDlgWV').show();" />
 				  				</span>
                             </ui:fragment>
                         </p:panel>
@@ -858,39 +878,6 @@
             <div class="btn_line">
                 <p:commandButton
                         value="#{msg.ok}" oncomplete="PF('includeNationalCostDialogWV').hide()"/>
-            </div>
-        </p:dialog>
-
-        <p:dialog widgetVar="confirmAddNationalCostDialogWV" resizable="false" id="confirmAddNationalCostDialog" styleClass="dialog-green"
-                  draggable="false" modal="true" width="500" style="overflow: unset !important; height: 150px !important;">
-        <h:outputText value="#{msg.estateSituationViewAddNationalCostConfirmMessage}"/>
-
-            <div class="btn_line">
-                <p:commandButton value="#{msg.yes}" update=":form:nationalCostPanel" styleClass="yes-button"
-                                 oncomplete="PF('confirmAddNationalCostDialogWV').hide();" style="margin-right: 15px;"
-                                 action="#{bean.updateNationalCost}"/>
-                <p:commandButton value="#{msg.no}" styleClass="no-button"
-                                 onclick="PF('confirmAddNationalCostDialogWV').hide();"/>
-            </div>
-        </p:dialog>
-
-        <p:dialog widgetVar="confirmRemoveNationalCostDialogWV" resizable="false" id="confirmRemoveNationalCostDialog" styleClass="dialog-green"
-                  draggable="false" modal="true" width="500" style="overflow: unset !important; height: 150px !important;">
-            <h:outputText value="#{msg.estateSituationViewRemoveNationalCostConfirmMessage}"/>
-
-            <div class="btn_line">
-                <p:commandButton value="#{msg.yes}" update=":form:nationalCostPanel" styleClass="yes-button"
-                                 oncomplete="PF('confirmRemoveNationalCostDialogWV').hide();" style="margin-right: 15px;"
-                                 action="#{bean.deleteNationalCost}"/>
-                <p:commandButton value="#{msg.no}" styleClass="no-button"
-                                 onclick="PF('confirmRemoveNationalCostDialogWV').hide();"/>
-            </div>
-        </p:dialog>
-
-        <p:dialog id="includeNationalCost2Dialog" header="Note!" widgetVar="includeNationalCost2DialogWV" height="100px" styleClass="dialog-red">
-            #{msg.requestAlreadyIncludeNationalCostMessage} <br />
-            <div class="btn_line">
-                <p:commandButton value="#{msg.ok}" oncomplete="PF('includeNationalCost2DialogWV').hide()" />
             </div>
         </p:dialog>
 
