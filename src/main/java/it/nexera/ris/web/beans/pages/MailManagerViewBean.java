@@ -2122,19 +2122,20 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             wlgInbox.setServerId(Long.parseLong(ApplicationSettingsHolder.getInstance()
                     .getByKey(ApplicationSettingsKeys.SENT_SERVER_ID).getValue()));
             DaoManager.save(wlgInbox, true);
-            List<Request> selectedRequestList = new ArrayList<>();
-            if (!ValidationHelper.isNullOrEmpty(getEntity().getValidRequests())) {
-                selectedRequestList = getEntity().getValidRequests().stream().filter(r -> r.isSelectedForInvoice())
-                        .collect(Collectors.toList());
+            //List<Request> selectedRequestList = new ArrayList<>();
+            if (!ValidationHelper.isNullOrEmpty(getInvoicedRequests())) {
+                //selectedRequestList = getInvoicedRequests().stream().filter(r -> r.isSelectedForInvoice())
+                        //.collect(Collectors.toList());
+            
+	            CollectionUtils.emptyIfNull(getInvoicedRequests()).stream().forEach(r -> {
+	                try {
+	                    r.setStateId(RequestState.INVOICED.getId());
+	                    DaoManager.save(r, true);
+	                } catch (PersistenceBeanException e) {
+	                    log.error("error in saving request after sending mail ", e);
+	                }
+	            });
             }
-            CollectionUtils.emptyIfNull(selectedRequestList).stream().forEach(r -> {
-                try {
-                    r.setStateId(RequestState.INVOICED.getId());
-                    DaoManager.save(r, true);
-                } catch (PersistenceBeanException e) {
-                    log.error("error in saving request after sending mail ", e);
-                }
-            });
         } catch (Exception e) {
             log.info("Mail is not sent");
             LogHelper.log(log, e);
