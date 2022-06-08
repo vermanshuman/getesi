@@ -1675,7 +1675,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             addRequiredFieldException("form:paymentType");
             setValidationFailed(true);
         }
-
+        
         for (GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
             if (ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceTotalCost())) {
                 setValidationFailed(true);
@@ -1687,6 +1687,13 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
 
         setInvoiceErrorMessage(ResourcesHelper.getString("invalidDataMsg"));
+        
+        if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT())) {
+        	if(getClientNumberVAT().trim().length() != 11) {
+        		setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
+        		setValidationFailed(true);
+        	}
+        }
 
         if(!ValidationHelper.isNullOrEmpty(getSelectedInvoice())
                 && !ValidationHelper.isNullOrEmpty(getSelectedInvoice().getId())){
@@ -1830,9 +1837,19 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 setValidationFailed(true);
             }
         }
+        
+        setInvoiceErrorMessage(ResourcesHelper.getString("invalidDataMsg"));
+        
+        if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT())) {
+        	if(getClientNumberVAT().trim().length() != 11) {
+        		setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
+        		setValidationFailed(true);
+        	}
+        }
 
-        if (getValidationFailed()) {
+        if (getValidationFailed()){
             executeJS("PF('invoiceErrorDialogWV').show();");
+            RequestContext.getCurrentInstance().update("invoiceErrorDialog");
             return;
         }
 

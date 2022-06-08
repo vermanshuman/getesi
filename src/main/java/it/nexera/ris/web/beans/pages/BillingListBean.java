@@ -1183,6 +1183,13 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
 
         setInvoiceErrorMessage(ResourcesHelper.getString("invalidDataMsg"));
+        
+        if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT())) {
+        	if(getClientNumberVAT().trim().length() != 11) {
+        		setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
+        		setValidationFailed(true);
+        	}
+        }
 
         if(!ValidationHelper.isNullOrEmpty(getSelectedInvoice())
                 && !ValidationHelper.isNullOrEmpty(getSelectedInvoice().getId())){
@@ -1332,8 +1339,18 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             }
         }
 
+        setInvoiceErrorMessage(ResourcesHelper.getString("invalidDataMsg"));
+        
+        if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT())) {
+        	if(getClientNumberVAT().trim().length() != 11) {
+        		setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
+        		setValidationFailed(true);
+        	}
+        }
+
         if (getValidationFailed()){
             executeJS("PF('invoiceErrorDialogWV').show();");
+            RequestContext.getCurrentInstance().update("invoiceErrorDialog");
             return;
         }
 
