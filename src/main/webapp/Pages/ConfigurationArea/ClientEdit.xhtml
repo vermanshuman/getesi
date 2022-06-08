@@ -167,9 +167,6 @@
             .card.card-w-title {
                 border: none !important;
             }
-            .servicesTable table {
-                margin-top: 60px;
-            }
 
             div[id*='wizard:billingPanel_content'] {
                 border: none !important;
@@ -863,17 +860,6 @@
                         <h:outputText value="#{msg.headerBilling}"
                                       style="font-weight: bold; margin-left: 15px; font-size: large;"/>
 
-                        <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group">
-                            <h:outputText value="#{msg.clientEditCopyCostList}"/>
-                            <p:selectOneMenu id="client" value="#{bean.selectedClientIdToCopy}" style="width: 300px; "
-                                             styleClass="#{bean.selectedClientIdToCopy ne null ? 'select-one-menu' : ''}">
-                                <f:selectItem itemLabel="#{ff:upper(msg.client_list)}" itemValue="#{null}"
-                                              noSelectionOption="true"/>
-                                <f:selectItems value="#{bean.clientsToCopy}" />
-                                <p:ajax event="itemSelect" update="@this"/>
-                            </p:selectOneMenu>
-                            <p:commandButton value="#{msg.clientEditCopy}" action="#{bean.checkCopyPriceListClient}" />
-                        </p:panelGrid>
                         <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group"
                                      style="margin-bottom: 10px;">
                             <span>#{msg.clientEditAutomaticInvoice}: </span>
@@ -886,9 +872,21 @@
                             <span>#{msg.clientEditMonthlyInvoice}: </span>
                             <p:selectBooleanCheckbox value="#{bean.entity.monthlyInvoice}" disabled="#{bean.onlyView}"/>
                         </p:panelGrid>
+                        
+                        <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group">
+                            <h:outputText value="#{msg.clientEditCopyCostList}"/>
+                            <p:selectOneMenu id="client" value="#{bean.selectedClientIdToCopy}" style="width: 300px; "
+                                             styleClass="#{bean.selectedClientIdToCopy ne null ? 'select-one-menu' : ''}">
+                                <f:selectItem itemLabel="#{ff:upper(msg.client_list)}" itemValue="#{null}"
+                                              noSelectionOption="true"/>
+                                <f:selectItems value="#{bean.clientsToCopy}" />
+                                <p:ajax event="itemSelect" update="@this"/>
+                            </p:selectOneMenu>
+                            <p:commandButton value="#{msg.clientEditCopy}" action="#{bean.checkCopyPriceListClient}" />
+                        </p:panelGrid>
                     </p:panel>
                     <p:dataTable var="item" value="#{bean.services}" editable="true" editMode="cell" id="servicesTable"
-                                 emptyMessage="#{msg.noRecordsFound}" styleClass="servicesTable">
+                                 emptyMessage="#{msg.noRecordsFound}">
                         <f:facet name="header">
                             <h:outputText value="#{msg.clientServiceTable}"/>
                         </f:facet>

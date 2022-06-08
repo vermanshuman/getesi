@@ -398,19 +398,15 @@ public class ClientEditBean extends EntityEditPageBean<Client>
             getTaxRates().add(new SelectItem(tr.getId(), tr.getPercentage() +  "% - " + tr.getDescription()));
         });
 
-        List<PriceList> priceLists = DaoManager.load(PriceList.class, new Criterion[]{
-                Restrictions.eq("client.id", getEntityId())});
-        if(ValidationHelper.isNullOrEmpty(priceLists)) {
-            List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
-                    Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
-                            Restrictions.isNull("deleted"))});
-            setClientsToCopy(ComboboxHelper.fillList(clients.stream()
-                    .filter(c -> (
-                                    (ValidationHelper.isNullOrEmpty(c.getManager()) || !c.getManager()) &&
-                                            (ValidationHelper.isNullOrEmpty(c.getFiduciary()) || !c.getFiduciary())
-                            )
-                    ).sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList()), Boolean.TRUE));
-        }
+        List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
+                Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
+                        Restrictions.isNull("deleted"))});
+        setClientsToCopy(ComboboxHelper.fillList(clients.stream()
+                .filter(c -> (
+                                (ValidationHelper.isNullOrEmpty(c.getManager()) || !c.getManager()) &&
+                                        (ValidationHelper.isNullOrEmpty(c.getFiduciary()) || !c.getFiduciary())
+                        )
+                ).sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList()), Boolean.TRUE));
     }
 
     public void initAreasAndOffices() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
