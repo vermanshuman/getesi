@@ -1708,10 +1708,17 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         setInvoiceErrorMessage(ResourcesHelper.getString("invalidDataMsg"));
 
         if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT())) {
-            if(getClientNumberVAT().trim().length() != 11) {
+            String vatNumber = getClientNumberVAT().trim();
+        	if(getClientNumberVAT().startsWith("IT")) {
+        		vatNumber = getClientNumberVAT().trim().substring(2);
+            }
+        	if(vatNumber.length() != 11) {
                 setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
                 setValidationFailed(true);
             }
+        } else {
+        	setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
+            setValidationFailed(true);
         }
 
         if(!ValidationHelper.isNullOrEmpty(getSelectedInvoice())
@@ -1860,10 +1867,17 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         setInvoiceErrorMessage(ResourcesHelper.getString("invalidDataMsg"));
 
         if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT())) {
-            if(getClientNumberVAT().trim().length() != 11) {
+            String vatNumber = getClientNumberVAT().trim();
+        	if(getClientNumberVAT().startsWith("IT")) {
+        		vatNumber = getClientNumberVAT().trim().substring(2);
+            }
+        	if(vatNumber.length() != 11) {
                 setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
                 setValidationFailed(true);
             }
+        } else {
+        	setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
+            setValidationFailed(true);
         }
 
         if (getValidationFailed()) {
