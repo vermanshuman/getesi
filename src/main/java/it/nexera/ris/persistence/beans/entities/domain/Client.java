@@ -277,6 +277,9 @@ public class Client extends IndexedEntity implements Serializable {
     @Column(name = "unauthorized_cost_formality")
     private Double unauthorizedCostFormality;
 
+    @Column(name = "invoice_expiration_days")
+    private Double invoiceExpirationDays;
+
     @Override
     public String toString() {
         if (ClientType.PROFESSIONAL.getId().equals(getTypeId())) {
@@ -894,5 +897,13 @@ public class Client extends IndexedEntity implements Serializable {
 
     public void setUnauthorizedCostFormality(Double unauthorizedCostFormality) {
         this.unauthorizedCostFormality = unauthorizedCostFormality;
+    }
+
+    public Double getInvoiceExpirationDays() {
+        return invoiceExpirationDays;
+    }
+
+    public void setInvoiceExpirationDays(Double invoiceExpirationDays) {
+        this.invoiceExpirationDays = invoiceExpirationDays;
     }
 }

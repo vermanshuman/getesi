@@ -71,18 +71,18 @@
 					style="width: 100%" />
 			</p:panelGrid>
 
-			<ui:repeat value="#{bean.excelDataTable}" var="key">
+			<ui:repeat value="#{bean.excelDataTable}" var="excelData">
 				<p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
-					<h:outputText value="#{key.requestName}" style="font-weight:bold;font-size: 20px;"/>
-					 <p:dataTable value="#{key.requests}" var="req" rowIndexVar="row" emptyMessage="#{msg.noRecordsFound}">
-						<p:columns value="#{key.columnNames}" var="column">
+					<h:outputText value="#{excelData.requestName}" style="font-weight:bold;font-size: 20px;"/>
+					 <p:dataTable value="#{excelData.requests}" var="req" rowIndexVar="row" emptyMessage="#{msg.noRecordsFound}">
+						<p:columns value="#{excelData.columnNames}" var="column">
 							<f:facet name="header">
 								<h:outputText value="#{column}" />
 							</f:facet>
-							<h:outputText value="#{key.columnValues[column.concat('_').concat(req.tempId)]}" rendered="#{column eq msg.excelNote}" escape="false"/>
-							<h:outputText value="#{key.columnValues[column.concat('_').concat(req.tempId)]}" rendered="#{column ne msg.excelNote}"/>
+							<h:outputText value="#{excelData.columnValues[column.concat('_').concat(req.tempId)]}" rendered="#{column eq msg.excelNote}" escape="false"/>
+							<h:outputText value="#{excelData.columnValues[column.concat('_').concat(req.tempId)]}" rendered="#{column ne msg.excelNote}"/>
 							<f:facet name="footer">
-								<h:outputText value="#{key.footerValues[column]}" style="font-weight:bold;font-size: 15px;"/>
+								<h:outputText value="#{excelData.footerValues[column]}" style="font-weight:bold;font-size: 15px;"/>
 							</f:facet>
 						</p:columns>
 						 <p:column exportable="false" styleClass="action_midle_column">

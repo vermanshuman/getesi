@@ -383,9 +383,10 @@ public class InvoiceHelper {
         List<SelectItem> ums = new ArrayList<>();
         ums.add(new SelectItem("pz", "PZ"));
         wrapper.setUms(ums);
+        wrapper.setInvoiceItemAmount(1.0d);
         wrapper.setVatAmounts(ComboboxHelper.fillList(TaxRate.class, Order.asc("description"), new CriteriaAlias[]{}, new Criterion[]{
                 Restrictions.eq("use", Boolean.TRUE)
-        }, true, false, true));
+        }, true, false));
         wrapper.setTotalLine(0D);
         return wrapper;
     }

@@ -56,6 +56,7 @@ public enum ApplicationSettingsKeys {
     COMPANY_NAME,
     FISCAL_CODE,
     ADDRESS,
+    COMPANY_POSTAL_CODE,
     COMPANY_PROVINCE,
     COMPANY_CITY,
     

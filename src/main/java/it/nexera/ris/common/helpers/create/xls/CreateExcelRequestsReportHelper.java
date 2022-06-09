@@ -38,6 +38,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
 import org.apache.poi.ss.util.RegionUtil;
+import org.hibernate.Hibernate;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -1722,7 +1723,9 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
         List<DocumentSubject> documentSubjects = null;
         Optional<Long> maxNumberOfDistinctLandCharesRegistry = Optional.empty();
 
-//        List<Document> documents = request.getDocumentsRequest().stream().filter(x -> x.getTypeId().equals(5L)).collect(Collectors.toList());
+        if(!Hibernate.isInitialized(request.getRequestFormalities())){
+            request.reloadRequestFormalities();
+        }
         List<Long> documentIds = CollectionUtils.emptyIfNull(request.getRequestFormalities())
                 .stream()
                 .filter(rf -> !ValidationHelper.isNullOrEmpty(rf.getDocumentId()))

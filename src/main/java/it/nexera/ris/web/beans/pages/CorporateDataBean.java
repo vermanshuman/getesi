@@ -51,6 +51,8 @@ public class CorporateDataBean extends EntityEditPageBean<ApplicationSettingsVal
 
 	 private String address;
 
+	 private String postalCode;
+
 	private List<SelectItem> provinces;
 
 	private Long selectedProvinceId;
@@ -70,6 +72,7 @@ public class CorporateDataBean extends EntityEditPageBean<ApplicationSettingsVal
 		setCompanyName(ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.COMPANY_NAME).getValue());
 		setFiscalCode(ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.FISCAL_CODE).getValue());
 		setAddress(ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.ADDRESS).getValue());
+		setPostalCode(ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.COMPANY_POSTAL_CODE).getValue());
 		setProvinces(ComboboxHelper.fillList(Province.class, Order.asc("description")));
 		getProvinces().add(new SelectItem(Province.FOREIGN_COUNTRY_ID, Province.FOREIGN_COUNTRY));
 		String provinceDescription = ApplicationSettingsHolder.getInstance().getByKey(
@@ -107,8 +110,6 @@ public class CorporateDataBean extends EntityEditPageBean<ApplicationSettingsVal
 
 	@Override
 	public void onValidate() throws PersistenceBeanException, HibernateException, IllegalAccessException {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -117,6 +118,7 @@ public class CorporateDataBean extends EntityEditPageBean<ApplicationSettingsVal
 		ApplicationSettingsHolder.getInstance().applyNewValue(ApplicationSettingsKeys.COMPANY_NAME, getCompanyName());
 		ApplicationSettingsHolder.getInstance().applyNewValue(ApplicationSettingsKeys.FISCAL_CODE, getFiscalCode());
 		ApplicationSettingsHolder.getInstance().applyNewValue(ApplicationSettingsKeys.ADDRESS, getAddress());
+		ApplicationSettingsHolder.getInstance().applyNewValue(ApplicationSettingsKeys.COMPANY_POSTAL_CODE, getPostalCode());
 		if (!ValidationHelper.isNullOrEmpty(getSelectedProvinceId())) {
 			Province selectedProvince = DaoManager.get(Province.class, getSelectedProvinceId());
 			if (!ValidationHelper.isNullOrEmpty(selectedProvince)) {

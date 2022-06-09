@@ -102,7 +102,17 @@ public class CitiesListBean extends EntityLazyListPageBean<City> implements Seri
             this.cleanValidation();
             if (!ValidationHelper.isNullOrEmpty(this.getEntityEditId())) {
                 try {
-                    this.setEntity(DaoManager.get(getType(), this.getEntityEditId()));
+                    try {
+                        this.setEntity(DaoManager.get(getType(), this.getEntityEditId()));
+                        setCfis(getEntity().getCfis());
+                        DaoManager.getSession().evict(this.getEntity());
+                        if (!ValidationHelper.isNullOrEmpty(getEntity().getProvince())) {
+                            setSelectedProvinceId(getEntity().getProvince().getId());
+                        }else
+                            setSelectedProvinceId(null);
+                    } catch (Exception e) {
+                        LogHelper.log(log, e);
+                    }
                     DaoManager.getSession().evict(this.getEntity());
                 } catch (Exception e) {
                     LogHelper.log(log, e);
@@ -167,6 +177,8 @@ public class CitiesListBean extends EntityLazyListPageBean<City> implements Seri
 
     public void resetFields() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         setEntity(new City());
+        setSelectedProvinceId(null);
+        setCfis(null);
         this.cleanValidation();
         this.filterTableFromPanel();
     }

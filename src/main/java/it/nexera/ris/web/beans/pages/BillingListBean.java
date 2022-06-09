@@ -1183,12 +1183,12 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
 
         setInvoiceErrorMessage(ResourcesHelper.getString("invalidDataMsg"));
-        
+
         if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT())) {
-        	if(getClientNumberVAT().trim().length() != 11) {
-        		setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
-        		setValidationFailed(true);
-        	}
+            if(getClientNumberVAT().trim().length() != 11) {
+                setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
+                setValidationFailed(true);
+            }
         }
 
         if(!ValidationHelper.isNullOrEmpty(getSelectedInvoice())
@@ -1340,12 +1340,12 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
 
         setInvoiceErrorMessage(ResourcesHelper.getString("invalidDataMsg"));
-        
+
         if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT())) {
-        	if(getClientNumberVAT().trim().length() != 11) {
-        		setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
-        		setValidationFailed(true);
-        	}
+            if(getClientNumberVAT().trim().length() != 11) {
+                setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
+                setValidationFailed(true);
+            }
         }
 
         if (getValidationFailed()){
@@ -1807,8 +1807,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     public void downloadInvoicePdf() {
         try {
-            System.out.println(">>>>>>>>>>>>>. " + getNumber());
-
             Invoice invoice =  DaoManager.get(Invoice.class, new Criterion[]{
                     Restrictions.eq("number", getNumber())
             });
@@ -2776,5 +2774,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         executeJS("$('.tab').removeClass('selected'); $('#content_tab4').addClass('selected'); $('.hide').hide(); $('#content_tab4').show();");
     }
 
-
+    public void numberChanged() {
+        LocalDate currentdate = LocalDate.now();
+        int currentYear = currentdate.getYear();
+        setInvoiceNumber(getNumber() + "-" + currentYear + "-FE");
+    }
 }

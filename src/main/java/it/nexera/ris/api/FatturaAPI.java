@@ -10,8 +10,6 @@ import it.nexera.ris.persistence.beans.entities.domain.Invoice;
 import it.nexera.ris.persistence.beans.entities.domain.InvoiceItem;
 import it.nexera.ris.persistence.beans.entities.domain.TaxRate;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
-import it.nexera.ris.web.beans.wrappers.GoodsServicesFieldWrapper;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -65,8 +63,15 @@ public class FatturaAPI {
         if(!(customerName != null && !customerName.equals("")))
             customerName = invoice.getClient().getNameProfessional();
         context.put("customerName", customerName);
-        String customerAddress = invoice.getClient().getAddressHouseNumber() != null ? invoice.getClient().getAddressHouseNumber() : ""
-                + invoice.getClient().getAddressStreet() != null ? invoice.getClient().getAddressStreet() : "";
+        String customerAddress = "";
+        if(!ValidationHelper.isNullOrEmpty(invoice.getClient())){
+            if(!ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressStreet())){
+                customerAddress = invoice.getClient().getAddressStreet();
+            }
+            if(!ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressHouseNumber())){
+                customerAddress += invoice.getClient().getAddressHouseNumber();
+            }
+        }
         context.put("customerAddress", customerAddress);
         context.put("customerPostcode", invoice.getClient().getAddressPostalCode());
         context.put("customerCity", invoice.getClient().getAddressCityId() != null ? invoice.getClient().getAddressCityId().getDescription() : "");
@@ -152,7 +157,7 @@ public class FatturaAPI {
                 if (!ValidationHelper.isNullOrEmpty(item.getTaxRate())) {
                     TaxRate taxrate = DaoManager.get(TaxRate.class, item.getTaxRate().getId());
                     if (!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())) {
-                    	totalVat += item.getInvoiceTotalCost().doubleValue() * (taxrate.getPercentage().doubleValue() / 100);
+                        totalVat += item.getInvoiceTotalCost().doubleValue() * (taxrate.getPercentage().doubleValue() / 100);
                     }
                 }
             }

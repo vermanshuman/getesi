@@ -179,10 +179,10 @@
                 border:none !important;
                 padding:0 !important;
             }
-            .card.card-w-title .ui-widget-header, #fileTable_head tr {
+            #fileTable_head tr {
                 display: none;
             }
-            .card.card-w-title .ui-widget-header, #formTable_head tr {
+            #formTable_head tr {
                 display: none;
             }
             #confirmAddNationalCostDialog .ui-widget-header {
@@ -230,58 +230,58 @@
         </div>  -->
 
         <div style="width: 100%; display: flex;">
-	        <div align="center"  style="width:50%;">
-	             <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group estate-situation" layout="grid"
-	                         style="text-align: left;width: fit-content;">
-	                <p:column>
+            <div align="center"  style="width:50%;">
+                <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group estate-situation" layout="grid"
+                             style="text-align: left;width: fit-content;">
+                    <p:column>
 	                	<span style="font-size:20px;">
 	                    	#{ff:upper(msg.estateSituationEditSubjectName)}
-	                    	<b>#{ff:upper(bean.requestEntity.nameStr)}</b>
+                            <b>#{ff:upper(bean.requestEntity.nameStr)}</b>
 	                	</span>
-	                </p:column>
-	                
-	                <p:column>
+                    </p:column>
+
+                    <p:column>
 	                	<span style="font-size:20px;">
 	                    	#{ff:upper(msg.estateSituationEditRequestType)} #{ff:upper(bean.requestEntity.service.name)}
 	                	</span>
-	                </p:column>
-	            </p:panelGrid>
-	         </div>
-	         <div align="center"  style="width:50%;">
-	            <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group estate-situation" layout="grid"
-	                         style="text-align: left;width: fit-content;">
-	                <p:column>
+                    </p:column>
+                </p:panelGrid>
+            </div>
+            <div align="center"  style="width:50%;">
+                <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group estate-situation" layout="grid"
+                             style="text-align: left;width: fit-content;">
+                    <p:column>
 	                	<span style="font-size:20px; text-align: left;">
 	                    	#{ff:upper(msg.estateSituationEditConservatory)}
-	                    	<b>#{ff:upper(bean.requestEntity.aggregationLandChargesRegistryName)}</b>
+                            <b>#{ff:upper(bean.requestEntity.aggregationLandChargesRegistryName)}</b>
 	                	</span>
-	                </p:column>
-	                
-	                <p:column>
+                    </p:column>
+
+                    <p:column>
 	                	<span style="font-size:20px;">
 	                    	#{ff:upper(msg.estateSituationEditClientName)} #{ff:upper(bean.requestEntity.clientName)}
 	                	</span>
-	                </p:column>
-	            </p:panelGrid> 
-	        </div>
-	        <div align="right" style="width:fit-content;">
-	        	 <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group estate-situation" layout="grid">
-	            	<p:column> 
-	                    <p:panel id="nationalCostPanel" style="border:none ; padding:0 !important; width: 265px;">
-	                        <p:commandButton value="#{msg.estateSituationViewAddNationalCost}" style="width: 210px !important;"
+                    </p:column>
+                </p:panelGrid>
+            </div>
+            <div align="right" style="width:fit-content;">
+                <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group estate-situation" layout="grid">
+                    <p:column>
+                        <p:panel id="nationalCostPanel" style="border:none ; padding:0 !important; width: 265px;">
+                            <p:commandButton value="#{msg.estateSituationViewAddNationalCost}" style="width: 210px !important;margin-top: 80px;margin-left: -210px;position: absolute;"
                                              styleClass="grey-button" rendered="#{bean.showAddNationalCostButton}"
                                              oncomplete="PF('confirmAddNationalCostDialogWV').show();"></p:commandButton>
-	                        <ui:fragment rendered="#{not bean.showAddNationalCostButton}">
-			            		<span style="border: 2px solid #57c279 !important;padding: 5px 8px 8px 4px; border-radius: 2px;display: inline-block;">
+                            <ui:fragment rendered="#{not bean.showAddNationalCostButton}">
+			            		<span style="border: 2px solid #57c279 !important;padding: 5px 8px 8px 4px; border-radius: 2px;margin-top: 80px;margin-left: -210px;position: absolute;">
 			                		<i class="fa fa-check-circle-o" style="color: green; margin-right: 5px; margin-left: 5px;"/>
 			                		<p:commandLink value="#{msg.estateSituationViewAddNationalCost}" style="width: 265px !important;"
                                                    oncomplete="PF('confirmRemoveNationalCostDialogWV').show();" />
 			            		</span>
-	                        </ui:fragment>
-	                    </p:panel>
-	                </p:column>
-	            </p:panelGrid> 
-	        </div>
+                            </ui:fragment>
+                        </p:panel>
+                    </p:column>
+                </p:panelGrid>
+            </div>
         </div>
 
         <p:fieldset id="immobiliFieldset" legend="#{msg.databaseListSubjectProperties}" toggleable="true" toggleSpeed="500" collapsed="false" styleClass="sub-list-legend" style="margin-top: 10px;">
@@ -884,10 +884,10 @@
                         value="#{msg.ok}" oncomplete="PF('includeNationalCostDialogWV').hide()"/>
             </div>
         </p:dialog>
-        
+
         <p:dialog widgetVar="confirmAddNationalCostDialogWV" resizable="false" id="confirmAddNationalCostDialog" styleClass="dialog-green"
                   draggable="false" modal="true" width="500" style="overflow: unset !important; height: 150px !important;">
-        <h:outputText value="#{msg.estateSituationViewAddNationalCostConfirmMessage}"/>
+            <h:outputText value="#{msg.estateSituationViewAddNationalCostConfirmMessage}"/>
 
             <div class="btn_line">
                 <p:commandButton value="#{msg.yes}" update=":form:nationalCostPanel" styleClass="yes-button"

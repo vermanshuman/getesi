@@ -1663,31 +1663,34 @@ public class ExcelDataEdit extends BaseEntityPageBean {
     }
 
     public void createInvoice() throws Exception {
-        List<Request> selectedRequestList = new ArrayList<>();
+        setMaxInvoiceNumber();
+        List<Request> selectedRequestList;
         if (!ValidationHelper.isNullOrEmpty(getRequestsConsideredForInvoice())) {
             selectedRequestList = getRequestsConsideredForInvoice().stream()
                     .filter(r -> r.isSelectedForInvoice())
                     .collect(Collectors.toList());
-        }
 
-        Invoice invoice = new Invoice();
-        if(selectedRequestList.size() > 0) {
-            if(!ValidationHelper.isNullOrEmpty(getMail())
-                    && !ValidationHelper.isNullOrEmpty(getMail().getClientInvoice()))
-                invoice.setClient(getMail().getClientInvoice());
-            else
-                throw new Exception("Client invoice is null, Can't create invoice");
+            Invoice invoice = new Invoice();
+            if(selectedRequestList.size() > 0) {
+                if(!ValidationHelper.isNullOrEmpty(getMail())
+                        && !ValidationHelper.isNullOrEmpty(getMail().getClientInvoice()))
+                    invoice.setClient(getMail().getClientInvoice());
+                else
+                    throw new Exception("Client invoice is null, Can't create invoice");
+            }
+            getInvoiceDialogBean().setSelectedInvoiceClient(invoice.getClient());
+            invoice.setDate(new Date());
+            invoice.setStatus(InvoiceStatus.DRAFT);
+            invoice.setEmailFrom(getMail());
+            getInvoiceDialogBean().setEntity(getMail());
+            getInvoiceDialogBean().setSelectedInvoiceItems(InvoiceHelper.groupingItemsByTaxRate(selectedRequestList,
+                    getInvoiceDialogBean().getCausal()));
+            getInvoiceDialogBean().setInvoicedRequests(selectedRequestList);
+            invoice.setTotalGrossAmount(getInvoiceDialogBean().getTotalGrossAmount());
+
+            getInvoiceDialogBean().loadInvoiceDialogData(invoice);
+            executeJS("PF('invoiceDialogExcelWV').show();");
         }
-        getInvoiceDialogBean().setSelectedInvoiceClient(invoice.getClient());
-        invoice.setDate(new Date());
-        invoice.setStatus(InvoiceStatus.DRAFT);
-        invoice.setEmailFrom(getMail());
-        getInvoiceDialogBean().setSelectedInvoiceItems(InvoiceHelper.groupingItemsByTaxRate(selectedRequestList, ""));
-        getInvoiceDialogBean().setInvoicedRequests(selectedRequestList);
-        invoice.setTotalGrossAmount(getInvoiceDialogBean().getTotalGrossAmount());
-        getInvoiceDialogBean().setEntity(getMail());
-        getInvoiceDialogBean().loadInvoiceDialogData(invoice);
-        executeJS("PF('invoiceDialogExcelWV').show();");
     }
 
     public void setMaxInvoiceNumber() throws HibernateException {
