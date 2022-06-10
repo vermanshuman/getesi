@@ -1151,14 +1151,18 @@
 
         <ui:fragment>
             <div class="ui-g">
-                <div class="ui-g-10" style="margin-top:2%"></div>
-                <div class="ui-g-2" id="request-btns-1" style="margin-top:2%;text-align:right;">
+                <div class="ui-g-9" style="margin-top:2%"></div>
+                <div class="ui-g-3" id="request-btns-1" style="margin-top:2%;text-align:right;display: flex;">
                     <p:commandButton action="#{bean.validateMultipleRequest(true)}" value="#{bean.multipleRequestCreate ? msg.saveAndClose.toUpperCase() : msg.save.toUpperCase() }"
                                      icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left"
                                      rendered="#{!bean.regSubjectList.isEmpty() and (bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2)
                                      or ((bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)
                 or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1))}"/>
-
+                    <p:commandButton action="#{bean.editRequest()}" value="#{msg.saveChanges.toUpperCase()}"
+                                     icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left"
+                                     rendered="#{!bean.regSubjectList.isEmpty() and (bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2)
+                                     or ((bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)
+                or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1))}"/>
                     <div style="clear: both"></div>
                 </div>
             </div>

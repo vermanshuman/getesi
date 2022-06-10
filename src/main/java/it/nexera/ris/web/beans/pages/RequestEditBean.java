@@ -1861,6 +1861,10 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }
     }
 
+    public void editRequest() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+
+    }
+
     private boolean equals(Object obj1, Object obj2){
         if(obj1 == null && obj2 == null)
             return true;
