@@ -1071,7 +1071,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
         Long lastInvoiceNumber = 0l;
         try {
-            lastInvoiceNumber = (Long) DaoManager.getMax(Invoice.class, "id",
+            lastInvoiceNumber = (Long) DaoManager.getMax(Invoice.class, "number",
                     new Criterion[]{});
         } catch (PersistenceBeanException | IllegalAccessException e) {
             LogHelper.log(log, e);
@@ -1113,37 +1113,10 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     public Double getTotalGrossAmount() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         return invoiceHelper.getTotalGrossAmount(getGoodsServicesFields());
-//        Double totalGrossAmount = 0D;
-//        if(!ValidationHelper.isNullOrEmpty(getGoodsServicesFields())) {
-//            for(GoodsServicesFieldWrapper wrapper: getGoodsServicesFields()) {
-//                if(!ValidationHelper.isNullOrEmpty(wrapper.getTotalLine())){
-//                    totalGrossAmount += wrapper.getTotalLine();
-//                    if(!ValidationHelper.isNullOrEmpty(wrapper.getSelectedTaxRateId())){
-//                        TaxRate taxrate = DaoManager.get(TaxRate.class, wrapper.getSelectedTaxRateId());
-//                        if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())){
-//                            totalGrossAmount += (wrapper.getTotalLine() * (taxrate.getPercentage().doubleValue()/100));
-//                        }
-//                    }
-//                }
-//            }
-//            BigDecimal tot = BigDecimal.valueOf(totalGrossAmount);
-//            tot = tot.setScale(2, RoundingMode.HALF_UP);
-//            totalGrossAmount = tot.doubleValue();
-//        }
-//        return totalGrossAmount;
     }
 
     public Double getAllTotalLine() {
         return invoiceHelper.getAllTotalLine(getGoodsServicesFields());
-//        Double total = 0D;
-//        if(!ValidationHelper.isNullOrEmpty(getGoodsServicesFields())) {
-//            total = getGoodsServicesFields().stream().collect(
-//                    Collectors.summingDouble(GoodsServicesFieldWrapper::getTotalLine));
-//            BigDecimal tot = BigDecimal.valueOf(total);
-//            tot = tot.setScale(2, RoundingMode.HALF_UP);
-//            total = tot.doubleValue();
-//        }
-//        return total;
     }
 
     private GoodsServicesFieldWrapper createGoodsServicesFieldWrapper() throws IllegalAccessException, PersistenceBeanException {
@@ -1186,15 +1159,15 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
         if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT())) {
             String vatNumber = getClientNumberVAT().trim();
-        	if(getClientNumberVAT().startsWith("IT")) {
-        		vatNumber = getClientNumberVAT().trim().substring(2);
+            if(getClientNumberVAT().startsWith("IT")) {
+                vatNumber = getClientNumberVAT().trim().substring(2);
             }
-        	if(vatNumber.length() != 11) {
+            if(vatNumber.length() != 11) {
                 setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
                 setValidationFailed(true);
             }
         } else {
-        	setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
+            setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
             setValidationFailed(true);
         }
 
@@ -1350,15 +1323,15 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
         if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT())) {
             String vatNumber = getClientNumberVAT().trim();
-        	if(getClientNumberVAT().startsWith("IT")) {
-        		vatNumber = getClientNumberVAT().trim().substring(2);
+            if(getClientNumberVAT().startsWith("IT")) {
+                vatNumber = getClientNumberVAT().trim().substring(2);
             }
-        	if(vatNumber.length() != 11) {
+            if(vatNumber.length() != 11) {
                 setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
                 setValidationFailed(true);
             }
         } else {
-        	setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
+            setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
             setValidationFailed(true);
         }
 
@@ -1376,7 +1349,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
             FatturaAPI fatturaAPI = new FatturaAPI();
             String xmlData = fatturaAPI.getDataForXML(invoice, invoiceItems);
-            log.info("Mailmanager XMLDATA: " + xmlData);
             FatturaAPIResponse fatturaAPIResponse = fatturaAPI.callFatturaAPI(xmlData, log);
 
             if (fatturaAPIResponse != null && fatturaAPIResponse.getReturnCode() != -1) {
@@ -1413,7 +1385,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
             FatturaAPI fatturaAPI = new FatturaAPI();
             String xmlData = fatturaAPI.getDataForXML(invoice, invoiceItems);
-            log.info("Mailmanager XMLDATA: " + xmlData);
             FatturaAPIResponse fatturaAPIResponse = fatturaAPI.callFatturaAPI(xmlData, log);
 
             if (fatturaAPIResponse != null && fatturaAPIResponse.getReturnCode() != -1) {

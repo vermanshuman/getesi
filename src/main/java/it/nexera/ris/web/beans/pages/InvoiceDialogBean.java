@@ -786,7 +786,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
 
         Long lastInvoiceNumber = 0l;
         try {
-            lastInvoiceNumber = (Long) DaoManager.getMax(Invoice.class, "id",
+            lastInvoiceNumber = (Long) DaoManager.getMax(Invoice.class, "number",
                     new Criterion[]{});
         } catch (PersistenceBeanException | IllegalAccessException e) {
             LogHelper.log(log, e);
@@ -1313,32 +1313,40 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 12px;\">");
         result.append("<tbody>");
         result.append("<tr style=\"background-color: #E7E7E7;\">");
-        result.append("<td colspan=\"6\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;background-color: #E7E7E7;font-weight: bold\">Dati pagamento</td>");
+        result.append("<td colspan=\"5\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;background-color: #E7E7E7;font-weight: bold\">Dati pagamento</td>");
         result.append("</tr>");
         result.append("<tr style=\"background-color: #E7E7E7;\">");
-        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 20%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Condizioni Pagamento</td>");
-        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 10%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Modalità</td>");
-        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 15%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Data Scadenza</td>");
-        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 10%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Importo</td>");
-        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 15%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Istituto</td>");
+        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 7%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Modalità</td>");
+        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 10%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Scadenza</td>");
+        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 30%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Istituto</td>");
         result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 30%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">IBAN</td>");
+        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 10%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Importo</td>");
         result.append("</tr>");
 //        result.append("<tr>");
 //        result.append("<td colspan=\"6\" style=\"padding: 10px;text-align: left;font-weight: bold\">Pagamento completo</td>");
 //        result.append("</tr>");
         result.append("<tr>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\"></td>");
+        String mode = "";
         result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\">");
-        if (!ValidationHelper.isNullOrEmpty(invoice.getPaymentType()) && !ValidationHelper.isNullOrEmpty(invoice.getPaymentType().getDescription())) {
-            result.append(invoice.getPaymentType().getDescription());
+        if (!ValidationHelper.isNullOrEmpty(invoice.getPaymentType())){
+            if(!ValidationHelper.isNullOrEmpty(invoice.getPaymentType().getCode())
+                    && invoice.getPaymentType().getCode().equalsIgnoreCase("MP05"))
+                mode = "Bonifico";
+            if(StringUtils.isBlank(mode) && !ValidationHelper.isNullOrEmpty(invoice.getPaymentType().getDescription()))
+                mode = invoice.getPaymentType().getDescription();
         }
+        result.append(mode);
         result.append("</td>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\"></td>");
+        Integer expirationDays = 0;
+        String expirationDate = "";
+        if(!ValidationHelper.isNullOrEmpty(invoice.getClient())
+                && !ValidationHelper.isNullOrEmpty(invoice.getClient().getInvoiceExpirationDays()))
+            expirationDays += invoice.getClient().getInvoiceExpirationDays().intValue();
+        if(!ValidationHelper.isNullOrEmpty(invoice.getDate()))
+            expirationDate = DateTimeHelper.toFormatedString(DateTimeHelper.addDays(invoice.getDate(), expirationDays),
+                    DateTimeHelper.getDatePattern());
         result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\">");
-        if (!ValidationHelper.isNullOrEmpty(invoice.getTotalGrossAmount())) {
-            result.append("EUR ");
-            result.append(invoice.getTotalGrossAmount() != null ? invoice.getTotalGrossAmount().toString().replace(".", ",") : "");
-        }
+        result.append(expirationDate);
         result.append("</td>");
         result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\">");
         if (!ValidationHelper.isNullOrEmpty(invoice.getPaymentType()) && !ValidationHelper.isNullOrEmpty(invoice.getPaymentType().getIstitutionName())) {
@@ -1350,11 +1358,17 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
             result.append(invoice.getPaymentType().getIban());
         }
         result.append("</td>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\">");
+        if (!ValidationHelper.isNullOrEmpty(invoice.getTotalGrossAmount())) {
+            result.append("EUR ");
+            result.append(invoice.getTotalGrossAmount() != null ? invoice.getTotalGrossAmount().toString().replace(".", ",") : "");
+        }
+        result.append("</td>");
         result.append("</tr>");
         result.append("</tbody>");
         result.append("</table>");
         result.append("</div>");
-        result.append("<pd4ml:footnote noref=\"true\">Copia della fattura elettronica disponibile nella Sua area riservata dell'Agenzia delle Entrate</pd4ml:footnote>");
+        result.append("<pd4ml:footnote noref=\"true\"><span style=\"font-size: 10px;\">Copia della fattura elettronica disponibile nella Sua area riservata dell'Agenzia delle Entrate</span></pd4ml:footnote>");
         return result.toString();
     }
 
@@ -1902,13 +1916,36 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
 
         setInvoiceErrorMessage(ResourcesHelper.getString("invalidDataMsg"));
 
-        if (!ValidationHelper.isNullOrEmpty(getSelectedInvoice())
-                && !ValidationHelper.isNullOrEmpty(getSelectedInvoice().getId())) {
+        if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT())) {
+            String vatNumber = getClientNumberVAT().trim();
+            if(getClientNumberVAT().startsWith("IT")) {
+                vatNumber = getClientNumberVAT().trim().substring(2);
+            }
+            if(vatNumber.length() != 11) {
+                setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
+                setValidationFailed(true);
+            }
+        } else {
+            setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
+            setValidationFailed(true);
+        }
+
+        if(!ValidationHelper.isNullOrEmpty(getSelectedInvoice())
+                && !ValidationHelper.isNullOrEmpty(getSelectedInvoice().getId())){
             if (DaoManager.getCount(Invoice.class, "id", new Criterion[]{
                     Restrictions.eq("number", getNumber()),
                     Restrictions.ne("id", getSelectedInvoice().isNew() ? 0L : getSelectedInvoice().getId())
             }) > 0) {
                 setInvoiceErrorMessage(ResourcesHelper.getValidation("invoiceWarning"));
+                setValidationFailed(true);
+            }
+        }
+        for(GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
+            if(ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceTotalCost())){
+                setValidationFailed(true);
+            }
+
+            if(ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getSelectedTaxRateId())){
                 setValidationFailed(true);
             }
         }
@@ -1995,7 +2032,8 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         if (!ValidationHelper.isNullOrEmpty(getClientAddressCityId()))
             getSelectedInvoiceClient().setAddressCityId(DaoManager.get(City.class, getClientAddressCityId()));
         if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT()))
-            getSelectedInvoiceClient().setNumberVAT(getClientNumberVAT());
+            if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT()))
+                getSelectedInvoiceClient().setNumberVAT(getClientNumberVAT());
         if (!ValidationHelper.isNullOrEmpty(getClientFiscalCode()))
             getSelectedInvoiceClient().setFiscalCode(getClientFiscalCode());
         if (!ValidationHelper.isNullOrEmpty(getClientMailPEC()))
@@ -2123,4 +2161,3 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         }
     }
 }
-

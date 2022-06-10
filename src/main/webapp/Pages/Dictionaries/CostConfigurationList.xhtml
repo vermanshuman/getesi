@@ -76,9 +76,8 @@
                 .layout-menu.clearfix {
                     margin-left: 15px !important;
                 }
-                
                 .ui-selectoneradio label {
-                	display:initial !important; 
+                    display:initial !important;
                 }
             </style>
             <p:remoteCommand name="updateFilterInput"
@@ -174,7 +173,7 @@
                             <p:commandButton value="#{msg.save.toUpperCase()}" style="margin-left:15px;"
                                              action="#{bean.save}" update="validationMessages"
                                              styleClass="ui-button-success p-mr-2 p-mb-2"/>
-                            <p:commandButton oncomplete="PF('addTypeFormalityDialogWV').hide();"
+                            <p:commandButton oncomplete="PF('addCostConfigurationDialogWV').hide();"
                                              value="#{msg.undo.toUpperCase()}" style="background-color: #F3362B !important;"
                                              action="#{bean.resetFields}"/>
 

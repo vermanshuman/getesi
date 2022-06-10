@@ -1151,14 +1151,14 @@
 
         <ui:fragment>
             <div class="ui-g">
-                <div class="ui-g-9" style="margin-top:2%"></div>
-                <div class="ui-g-3" id="request-btns-1" style="margin-top:2%;text-align:right;display: flex;">
-                    <p:commandButton action="#{bean.validateMultipleRequest(true)}" value="#{bean.multipleRequestCreate ? msg.saveAndClose.toUpperCase() : msg.save.toUpperCase() }"
+                <div class="#{bean.entity.isNew ? 'ui-g-10' : 'ui-g-9'}" style="margin-top:2%"></div>
+                <div class="#{bean.entity.isNew ? 'ui-g-2' : 'ui-g-3'}" id="request-btns-1" style="#{bean.entity.isNew ? 'margin-top:2%;text-align:right;' : 'margin-top:2%;text-align:right;'}">
+                    <p:commandButton action="#{bean.modifyEditedRequest()}" value="#{msg.saveChanges.toUpperCase()}"
                                      icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left"
-                                     rendered="#{!bean.regSubjectList.isEmpty() and (bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2)
+                                     rendered="#{!bean.entity.isNew and (bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2)
                                      or ((bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)
                 or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1))}"/>
-                    <p:commandButton action="#{bean.editRequest()}" value="#{msg.saveChanges.toUpperCase()}"
+                    <p:commandButton action="#{bean.validateMultipleRequest(true)}" value="#{bean.multipleRequestCreate ? msg.saveAndClose.toUpperCase() : msg.save.toUpperCase() }"
                                      icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left"
                                      rendered="#{!bean.regSubjectList.isEmpty() and (bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2)
                                      or ((bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)

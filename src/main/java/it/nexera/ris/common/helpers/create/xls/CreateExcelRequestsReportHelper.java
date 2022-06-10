@@ -810,7 +810,14 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                 result += "<br/>";
             result += altroCost;
         }
-        if(!ValidationHelper.isNullOrEmpty(request.getService()) && !ValidationHelper.isNullOrEmpty(request.getService().getIsUpdate()) &&
+        String titleCost = getTitleCostsNote(request);
+        if(StringUtils.isNotBlank(titleCost)){
+            if(StringUtils.isNotBlank(result))
+                result += "<br/>";
+            result += titleCost;
+        }
+        if(!ValidationHelper.isNullOrEmpty(request.getService())
+                && !ValidationHelper.isNullOrEmpty(request.getService().getIsUpdate()) &&
             request.getService().getIsUpdate()){
             CostCalculationHelper costCalculationHelper = new CostCalculationHelper(request);
             Boolean billingClient = isBillingClient(request);
@@ -1872,6 +1879,19 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
 
         if(val > 0d){
             result += "Costo aggiuntivo: €" + val;
+        }
+        return result;
+    }
+    private String getTitleCostsNote(Request request) throws PersistenceBeanException, IllegalAccessException {
+        String result = "";
+        List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
+                Restrictions.eq("requestId", request.getId()),
+                Restrictions.eq("type", ExtraCostType.IPOTECARIO),
+                Restrictions.and(Restrictions.isNotNull("note")
+                        , Restrictions.eq("note", MortgageType.Titolo.toString()).ignoreCase())});
+
+        if(!ValidationHelper.isNullOrEmpty(extraCosts)){
+            result = "Titolo consultato";
         }
         return result;
     }

@@ -1025,8 +1025,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         if (isOnlyView())
             RedirectHelper.goTo(PageTypes.MAIL_MANAGER_FOLDER);
         else
-            //RedirectHelper.goToSavePage(PageTypes.MAIL_MANAGER_LIST, null, getTablePage());
-        	RedirectHelper.goTo(PageTypes.MAIL_MANAGER_LIST);
+            RedirectHelper.goTo(PageTypes.MAIL_MANAGER_LIST);
     }
 
     public void processManagedState(boolean redirectToCreateRequest) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -1263,7 +1262,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
         Long lastInvoiceNumber = 0l;
         try {
-            lastInvoiceNumber = (Long) DaoManager.getMax(Invoice.class, "id",
+            lastInvoiceNumber = (Long) DaoManager.getMax(Invoice.class, "number",
                     new Criterion[]{});
         } catch (PersistenceBeanException | IllegalAccessException e) {
             LogHelper.log(log, e);
@@ -1710,15 +1709,15 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
         if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT())) {
             String vatNumber = getClientNumberVAT().trim();
-        	if(getClientNumberVAT().startsWith("IT")) {
-        		vatNumber = getClientNumberVAT().trim().substring(2);
+            if(getClientNumberVAT().startsWith("IT")) {
+                vatNumber = getClientNumberVAT().trim().substring(2);
             }
-        	if(vatNumber.length() != 11) {
+            if(vatNumber.length() != 11) {
                 setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
                 setValidationFailed(true);
             }
         } else {
-        	setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
+            setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
             setValidationFailed(true);
         }
 
@@ -1869,15 +1868,15 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
         if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT())) {
             String vatNumber = getClientNumberVAT().trim();
-        	if(getClientNumberVAT().startsWith("IT")) {
-        		vatNumber = getClientNumberVAT().trim().substring(2);
+            if(getClientNumberVAT().startsWith("IT")) {
+                vatNumber = getClientNumberVAT().trim().substring(2);
             }
-        	if(vatNumber.length() != 11) {
+            if(vatNumber.length() != 11) {
                 setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
                 setValidationFailed(true);
             }
         } else {
-        	setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
+            setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
             setValidationFailed(true);
         }
 
@@ -1896,7 +1895,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
             FatturaAPI fatturaAPI = new FatturaAPI();
             String xmlData = fatturaAPI.getDataForXML(invoice, invoiceItems);
-            log.info("Mailmanager XMLDATA: " + xmlData);
+
             FatturaAPIResponse fatturaAPIResponse = fatturaAPI.callFatturaAPI(xmlData, log);
 
             if (fatturaAPIResponse != null && fatturaAPIResponse.getReturnCode() != -1) {

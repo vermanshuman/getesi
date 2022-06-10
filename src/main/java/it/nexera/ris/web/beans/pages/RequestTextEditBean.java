@@ -2653,7 +2653,6 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             invoiceItems.add(invoiceItem);
             FatturaAPI fatturaAPI = new FatturaAPI();
             String xmlData = fatturaAPI.getDataForXML(invoice, invoiceItems);
-            log.info("XMLDATA: " + xmlData);
             FatturaAPIResponse fatturaAPIResponse = fatturaAPI.callFatturaAPI(xmlData, log);
             log.info("API Call Done : " + fatturaAPIResponse.getDescription() + " " + "Response Code: " + fatturaAPIResponse.getReturnCode());
             if (fatturaAPIResponse != null && fatturaAPIResponse.getReturnCode() != -1) {

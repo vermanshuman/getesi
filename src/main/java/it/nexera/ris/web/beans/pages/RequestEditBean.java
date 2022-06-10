@@ -1667,177 +1667,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             }
             boolean requestUpdated = false;
             if (redirect && !getEntity().isNew()) {
-                if (!getOriginalRequest().getSubject().getTypeId().equals(getWrapper().getSelectedPersonId())) {
-                    requestUpdated = true;
-                    getUpdatedPropertyNames().add("typeId");
-                }
-                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getClient())
-                        && ValidationHelper.isNullOrEmpty(getSelectedClientId()))
-                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getClient())
-                        && !ValidationHelper.isNullOrEmpty(getSelectedClientId()))
-                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getClient()) &&
-                        !ValidationHelper.isNullOrEmpty(getSelectedClientId()) &&
-                        !getOriginalRequest().getClient().getId().equals(getSelectedClientId()))) {
-                    requestUpdated = true;
-                    getUpdatedPropertyNames().add("client");
-                }
-
-                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getBillingClient())
-                        && ValidationHelper.isNullOrEmpty(getSelectedBillingClientId()))
-                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getBillingClient())
-                        && !ValidationHelper.isNullOrEmpty(getSelectedBillingClientId()))
-                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getBillingClient()) &&
-                        !ValidationHelper.isNullOrEmpty(getSelectedBillingClientId()) &&
-                        !getOriginalRequest().getBillingClient().getId().equals(getSelectedBillingClientId()))) {
-                    requestUpdated = true;
-                    getUpdatedPropertyNames().add("billingClient");
-                }
-
-                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNotary())
-                        && ValidationHelper.isNullOrEmpty(getSelectedNotaryId()))
-                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getNotary())
-                        && !ValidationHelper.isNullOrEmpty(getSelectedNotaryId()))
-                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNotary()) &&
-                        !ValidationHelper.isNullOrEmpty(getSelectedNotaryId()) &&
-                        !getOriginalRequest().getNotary().getId().equals(getSelectedNotaryId()))) {
-                    requestUpdated = true;
-                    getUpdatedPropertyNames().add("notary");
-                }
-
-                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getOffice())
-                        && ValidationHelper.isNullOrEmpty(getSelectedOfficeId()))
-                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getOffice())
-                        && !ValidationHelper.isNullOrEmpty(getSelectedOfficeId()))
-                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getOffice()) &&
-                        !ValidationHelper.isNullOrEmpty(getSelectedOfficeId()) &&
-                        !getOriginalRequest().getOffice().getId().equals(getSelectedOfficeId()))) {
-                    requestUpdated = true;
-                    getUpdatedPropertyNames().add("office");
-                }
-
-                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getRequestMangerList())
-                        && ValidationHelper.isNullOrEmpty(getFiduciaryClientsSelected()))
-                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getRequestMangerList())
-                        && !ValidationHelper.isNullOrEmpty(getFiduciaryClientsSelected()))
-                ) {
-                    requestUpdated = true;
-                    getUpdatedPropertyNames().add("managerList");
-                }
-
-                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getClientFiduciary())
-                        && ValidationHelper.isNullOrEmpty(getSelectedFiduciaryId()))
-                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getClientFiduciary())
-                        && !ValidationHelper.isNullOrEmpty(getSelectedFiduciaryId()))
-                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getClientFiduciary()) &&
-                        !ValidationHelper.isNullOrEmpty(getSelectedFiduciaryId()) &&
-                        !getOriginalRequest().getClientFiduciary().getId().equals(getSelectedFiduciaryId()))) {
-                    requestUpdated = true;
-                    getUpdatedPropertyNames().add("fiduciaryClient");
-                }
-
-                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getPosition())
-                        && ValidationHelper.isNullOrEmpty(getPosition()))
-                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getPosition())
-                        && !ValidationHelper.isNullOrEmpty(getPosition()))
-                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getPosition()) &&
-                        !ValidationHelper.isNullOrEmpty(getPosition()) &&
-                        !getOriginalRequest().getPosition().equals(getPosition()))) {
-                    requestUpdated = true;
-                    getUpdatedPropertyNames().add("position");
-                }
-
-                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNdg())
-                        && ValidationHelper.isNullOrEmpty(getNdg()))
-                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getNdg())
-                        && !ValidationHelper.isNullOrEmpty(getNdg()))
-                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNdg()) &&
-                        !ValidationHelper.isNullOrEmpty(getNdg()) &&
-                        !getOriginalRequest().getNdg().equals(getNdg()))) {
-                    requestUpdated = true;
-                    getUpdatedPropertyNames().add("ndg");
-                }
-
-                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getCdr())
-                        && ValidationHelper.isNullOrEmpty(getCdr()))
-                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getCdr())
-                        && !ValidationHelper.isNullOrEmpty(getCdr()))
-                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getCdr()) &&
-                        !ValidationHelper.isNullOrEmpty(getCdr()) &&
-                        !getOriginalRequest().getCdr().equals(getCdr()))) {
-                    requestUpdated = true;
-                    getUpdatedPropertyNames().add("cdr");
-                }
-
-                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNote())
-                        && ValidationHelper.isNullOrEmpty(getEntity().getNote()))
-                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getNote())
-                        && !ValidationHelper.isNullOrEmpty(getEntity().getNote()))
-                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNote()) &&
-                        !ValidationHelper.isNullOrEmpty(getEntity().getNote()) &&
-                        !getOriginalRequest().getNote().equals(getEntity().getNote()))) {
-                    requestUpdated = true;
-                    getUpdatedPropertyNames().add("note");
-                }
-
-                if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getUrgent())
-                        && ValidationHelper.isNullOrEmpty(getUrgent()))
-                        || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getUrgent())
-                        && !ValidationHelper.isNullOrEmpty(getUrgent()))
-                        || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getUrgent()) &&
-                        !ValidationHelper.isNullOrEmpty(getUrgent()) &&
-                        !getOriginalRequest().getUrgent().equals(getUrgent()))) {
-                    requestUpdated = true;
-                    getUpdatedPropertyNames().add("urgent");
-                }
-
-                if (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getRequestMangerList())
-                        && !ValidationHelper.isNullOrEmpty(getFiduciaryClientsSelected())) {
-                    if (!getOriginalRequest().getRequestMangerList().stream()
-                            .map(Client::getId)
-                            .collect(Collectors.toList()).equals(getFiduciaryClientsSelected().stream()
-                                    .map(SelectItemWrapper::getId)
-                                    .collect(Collectors.toList()))) {
-                        requestUpdated = true;
-                        getUpdatedPropertyNames().add("managerList");
-
-                    }
-                }
-
-                if (!getUpdatedPropertyNames().contains("typeId") && getWrapper().getSelectedPersonId().equals(SubjectType.PHYSICAL_PERSON.getId())) {
-
-                    if (!equals(getOriginalRequest().getSubject().getSurname(),getSubject().getSurname())
-                            || !equals(getOriginalRequest().getSubject().getName(),getSubject().getName())
-                            || getOriginalRequest().getSubject().getBirthDate().compareTo(getSubject().getBirthDate()) != 0
-                            || !equals(getOriginalRequest().getSubject().getBirthProvince(),getSubject().getBirthProvince())
-                            || !equals(getOriginalRequest().getSubject().getBirthCity(),getSubject().getBirthCity())
-                            || !equals(getOriginalRequest().getSubject().getFiscalCode(),getSubject().getFiscalCode())
-                            || !equals(getOriginalRequest().getSubject().getSex(),getWrapper().getSelectedSexTypeId())){
-//                    if (!getOriginalRequest().getSubject().getSurname().equals(getSubject().getSurname())
-//                            || !getOriginalRequest().getSubject().getName().equals(getSubject().getName())
-//                            || getOriginalRequest().getSubject().getBirthDate().compareTo(getSubject().getBirthDate()) != 0
-//                            || !getOriginalRequest().getSubject().getBirthProvince().equals(getSubject().getBirthProvince())
-//                            || !getOriginalRequest().getSubject().getBirthCity().equals(getSubject().getBirthCity())
-//                            || !getOriginalRequest().getSubject().getFiscalCode().equals(getSubject().getFiscalCode())
-//                        || !getOriginalRequest().getSubject().getSex().equals(getWrapper().getSelectedSexTypeId())) {
-                        requestUpdated = true;
-                        getUpdatedPropertyNames().add("subject");
-                    }
-                } else if (!getUpdatedPropertyNames().contains("typeId") && getWrapper().getSelectedPersonId().equals(SubjectType.LEGAL_PERSON.getId())) {
-                    if (!equals(getOriginalRequest().getSubject().getBusinessName(),getSubject().getBusinessName())
-                            || !equals(getOriginalRequest().getSubject().getBirthProvince(),getSubject().getBirthProvince())
-                            || !equals(getOriginalRequest().getSubject().getBirthCity(),getSubject().getBirthCity())
-                            || !equals(getOriginalRequest().getSubject().getNumberVAT(),getSubject().getNumberVAT())
-                            || !equals(getOriginalRequest().getSubject().getOldNumberVAT(),getSubject().getOldNumberVAT())
-                            || !equals(getOriginalRequest().getSubject().getFiscalCode(),getSubject().getFiscalCode())){
-                            //|| !getOriginalRequest().getSubject().getBirthProvince().equals(getSubject().getBirthProvince())
-//                            || !getOriginalRequest().getSubject().getBirthCity().equals(getSubject().getBirthCity())
-//                            || !getOriginalRequest().getSubject().getNumberVAT().equals(getSubject().getNumberVAT())
-//                            || !getOriginalRequest().getSubject().getOldNumberVAT().equals(getSubject().getOldNumberVAT())
-//                            || !getOriginalRequest().getSubject().getFiscalCode().equals(getSubject().getFiscalCode()))
-                        requestUpdated = true;
-                        getUpdatedPropertyNames().add("subject");
-                    }
-                }
+                requestUpdated = manageAssociatedRequest();
             }
             if (requestUpdated && !ValidationHelper.isNullOrEmpty(getEntity().getStateId())
                     && getEntity().getStateId().equals(RequestState.IN_WORK.getId())
@@ -1859,10 +1689,6 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             }
             saveServiceRequest(redirect);
         }
-    }
-
-    public void editRequest() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
-
     }
 
     private boolean equals(Object obj1, Object obj2){
@@ -1961,114 +1787,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private void saveData() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         if(!getEntity().isNew() && getNewRequestList().size() == 1){
-
-            pageSave();
-            if(!ValidationHelper.isNullOrEmpty(getAssociatedRequests())
-                    && !ValidationHelper.isNullOrEmpty(getSaveAssociatedRequests()) && getSaveAssociatedRequests()){
-                try {
-                    this.tr = DaoManager.getSession().beginTransaction();
-                    this.setSaveFlag(1);
-
-                    Request entity = DaoManager.get(Request.class,
-                            new CriteriaAlias[]{
-                                    new CriteriaAlias("subject", "s", JoinType.INNER_JOIN)
-                            },
-                            new Criterion[]{
-                            Restrictions.eq("id", getEntity().getId())
-                    });
-
-                    for(Request ar : getAssociatedRequests()) {
-
-                        Request associatedRequest = DaoManager.get(Request.class,
-                                new CriteriaAlias[]{
-                                        new CriteriaAlias("subject", "s", JoinType.INNER_JOIN)
-                                },
-                                new Criterion[]{
-                                        Restrictions.eq("id", ar.getId())
-                                });
-
-                        if(getUpdatedPropertyNames().contains("typeId") || getUpdatedPropertyNames().contains("subject") &&
-                            !ValidationHelper.isNullOrEmpty(associatedRequest.getSubject())
-                                    && associatedRequest.getSubject().getId().equals(getOriginalRequest().getSubject().getId())){
-                            associatedRequest.setSubject(entity.getSubject());
-                        }
-                        if(getUpdatedPropertyNames().contains("client")){
-                            associatedRequest.setClient(DaoManager.get(Client.class, getSelectedClientId()));
-                        }
-                        if(getUpdatedPropertyNames().contains("billingClient")){
-                            associatedRequest.setBillingClient(getEntity().getBillingClient());
-                        }
-
-                        if(getUpdatedPropertyNames().contains("notary")){
-                            associatedRequest.setNotary(getEntity().getNotary());
-                        }
-
-                        if(getUpdatedPropertyNames().contains("office")){
-                            associatedRequest.setOffice(getEntity().getOffice());
-                        }
-
-                        if(getUpdatedPropertyNames().contains("managerList")){
-                            associatedRequest.setRequestMangerList(getEntity().getRequestMangerList());
-                        }
-
-                        if(getUpdatedPropertyNames().contains("fiduciaryClient")){
-                            associatedRequest.setClientFiduciary(getEntity().getClientFiduciary());
-                        }
-
-                        if(getUpdatedPropertyNames().contains("position")){
-                            associatedRequest.setPosition(getEntity().getPosition());
-                        }
-
-                        if(getUpdatedPropertyNames().contains("ndg")){
-                            associatedRequest.setNdg(getEntity().getNdg());
-                        }
-
-                        if(getUpdatedPropertyNames().contains("cdr")){
-                            associatedRequest.setCdr(getEntity().getCdr());
-                        }
-
-                        if(getUpdatedPropertyNames().contains("ndg")){
-                            associatedRequest.setNdg(getEntity().getNdg());
-                        }
-
-                        if(getUpdatedPropertyNames().contains("note")){
-                            associatedRequest.setNote(getEntity().getNote());
-                        }
-
-                        if(getUpdatedPropertyNames().contains("urgent")){
-                            associatedRequest.setUrgent(getEntity().getUrgent());
-                        }
-                        prepareRequestToSave(associatedRequest);
-                        DaoManager.save(associatedRequest);
-                    }
-                } catch (Exception e) {
-                    if (this.tr != null) {
-                        this.tr.rollback();
-                    }
-                    LogHelper.log(log, e);
-                    MessageHelper.addGlobalMessage(FacesMessage.SEVERITY_ERROR, "",
-                            ResourcesHelper.getValidation("objectEditedException"));
-                } finally {
-                    if (this.tr != null && !this.tr.wasRolledBack()
-                            && this.tr.isActive()) {
-                        try {
-                            this.tr.commit();
-                        } catch (StaleObjectStateException e) {
-                            MessageHelper
-                                    .addGlobalMessage(
-                                            FacesMessage.SEVERITY_ERROR,
-                                            "",
-                                            ResourcesHelper
-                                                    .getValidation("exceptionOccuredWhileSaving"));
-                            LogHelper.log(log, e);
-                        } catch (Exception e) {
-                            LogHelper.log(log, e);
-                            e.printStackTrace();
-                        }
-                    }
-                    this.setSaveFlag(0);
-                }
-            }
+         saveEditedRequestData();
         }else {
             Subject subject = null;
             if (this.getSaveFlag() == 0) {
@@ -4926,5 +4645,382 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     public void setSaveAssociatedRequests(Boolean saveAssociatedRequests) {
         this.saveAssociatedRequests = saveAssociatedRequests;
+    }
+
+    public void modifyEditedRequest()
+            throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+        this.cleanValidation();
+        this.onValidate();
+        if (this.getValidationFailed()) {
+            return;
+        }
+        setAssociatedRequests(new ArrayList<>());
+        setUpdatedPropertyNames(new ArrayList<>());
+        setSaveAssociatedRequests(false);
+        boolean requestUpdated = manageAssociatedRequest();
+        if (requestUpdated && !ValidationHelper.isNullOrEmpty(getEntity().getStateId())
+                && getEntity().getStateId().equals(RequestState.IN_WORK.getId())
+                && !ValidationHelper.isNullOrEmpty(getEntity().getMail())){
+
+            List<Request> associatedRequests =
+                    DaoManager.load(Request.class, new CriteriaAlias[]{
+                            new CriteriaAlias("mail", "m", JoinType.INNER_JOIN),
+                            new CriteriaAlias("subject", "s", JoinType.INNER_JOIN)
+                    }, new Criterion[]{
+                            Restrictions.and(Restrictions.eq("m.id", getEntity().getMail().getId()),
+                                    Restrictions.ne("id", getEntity().getId()))
+                    });
+            if(!ValidationHelper.isNullOrEmpty(associatedRequests)){
+                setAssociatedRequests(associatedRequests);
+                executeJS("PF('requestDataChangedWarningWV').show();");
+                return;
+            }
+        }
+        Request editedRequest = emptyIfNull(getNewRequestList())
+                    .stream()
+                .filter(r -> r.getId().equals(getEntity().getId()))
+                .findFirst().get();
+        System.out.println(">>>>>>>>>>>>>>>>>>. " + editedRequest);
+        setRequestData(editedRequest);
+        List<Request> newRequests = new ArrayList<>();
+        boolean saved = false;
+        if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())
+                && !ValidationHelper.isNullOrEmpty(editedRequest.getAggregationLandChargesRegistry())
+                && getWrapper().getSelectedConservatoryItemId().stream().anyMatch(c -> c.getId().equals(editedRequest.getAggregationLandChargesRegistry().getId()))
+                || ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+
+            if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+                getWrapper().getSelectedConservatoryItemId().remove(getWrapper().getSelectedConservatoryItemId()
+                        .stream().filter(c -> c.getId().equals(getEntity().getAggregationLandChargesRegistry().getId()))
+                        .findAny().orElse(null));
+            }
+            saved = true;
+        }
+        if (!ValidationHelper.isNullOrEmpty(getWrapper().getSelectedConservatoryItemId())) {
+            List<ConservatoriaSelectItem> selectedConservatoryItemId = getWrapper().getSelectedConservatoryItemId();
+            int size = selectedConservatoryItemId.size();
+
+            for (int i = 0; i < size; i++) {
+                ConservatoriaSelectItem item = selectedConservatoryItemId.get(i);
+                Request request = null;
+                boolean isNew = false;
+                try {
+                    if (!saved) {
+                        request = getEntity();
+                        saved = true;
+                    } else {
+                        isNew = true;
+                        request = getEntity().copy();
+                    }
+                } catch (CloneNotSupportedException e) {
+                    LogHelper.log(log, e);
+                }
+
+                if(isNew){
+                    request.setAggregationLandChargesRegistry(DaoManager.get(AggregationLandChargesRegistry.class, item.getId()));
+                    setAllDataRelatedToRequestOrNotify(request);
+                    request.setTempId(UUID.randomUUID().toString());
+                    insertNewRequest(request);
+                    newRequests.add(request);
+                }
+            }
+        }
+        if(newRequests.size() > 0){
+            if(getUpdatedNewRequestList() == null)
+                setUpdatedNewRequestList(new ArrayList<>());
+            getUpdatedNewRequestList().addAll(newRequests);
+        }
+        saveEditedRequestData();
+        saveRequestLoading();
+        resetRequestData();
+    }
+
+    private void saveEditedRequestData() {
+        pageSave();
+        if(!ValidationHelper.isNullOrEmpty(getAssociatedRequests())
+                && !ValidationHelper.isNullOrEmpty(getSaveAssociatedRequests()) && getSaveAssociatedRequests()){
+            try {
+                this.tr = DaoManager.getSession().beginTransaction();
+                this.setSaveFlag(1);
+
+                Request entity = DaoManager.get(Request.class,
+                        new CriteriaAlias[]{
+                                new CriteriaAlias("subject", "s", JoinType.INNER_JOIN)
+                        },
+                        new Criterion[]{
+                                Restrictions.eq("id", getEntity().getId())
+                        });
+
+                for(Request ar : getAssociatedRequests()) {
+
+                    Request associatedRequest = DaoManager.get(Request.class,
+                            new CriteriaAlias[]{
+                                    new CriteriaAlias("subject", "s", JoinType.INNER_JOIN)
+                            },
+                            new Criterion[]{
+                                    Restrictions.eq("id", ar.getId())
+                            });
+
+                    if(getUpdatedPropertyNames().contains("typeId") || getUpdatedPropertyNames().contains("subject") &&
+                            !ValidationHelper.isNullOrEmpty(associatedRequest.getSubject())
+                            && associatedRequest.getSubject().getId().equals(getOriginalRequest().getSubject().getId())){
+                        associatedRequest.setSubject(entity.getSubject());
+                    }
+                    if(getUpdatedPropertyNames().contains("client")){
+                        associatedRequest.setClient(DaoManager.get(Client.class, getSelectedClientId()));
+                    }
+                    if(getUpdatedPropertyNames().contains("billingClient")){
+                        associatedRequest.setBillingClient(getEntity().getBillingClient());
+                    }
+
+                    if(getUpdatedPropertyNames().contains("notary")){
+                        associatedRequest.setNotary(getEntity().getNotary());
+                    }
+
+                    if(getUpdatedPropertyNames().contains("office")){
+                        associatedRequest.setOffice(getEntity().getOffice());
+                    }
+
+                    if(getUpdatedPropertyNames().contains("managerList")){
+                        associatedRequest.setRequestMangerList(getEntity().getRequestMangerList());
+                    }
+
+                    if(getUpdatedPropertyNames().contains("fiduciaryClient")){
+                        associatedRequest.setClientFiduciary(getEntity().getClientFiduciary());
+                    }
+
+                    if(getUpdatedPropertyNames().contains("position")){
+                        associatedRequest.setPosition(getEntity().getPosition());
+                    }
+
+                    if(getUpdatedPropertyNames().contains("ndg")){
+                        associatedRequest.setNdg(getEntity().getNdg());
+                    }
+
+                    if(getUpdatedPropertyNames().contains("cdr")){
+                        associatedRequest.setCdr(getEntity().getCdr());
+                    }
+
+                    if(getUpdatedPropertyNames().contains("ndg")){
+                        associatedRequest.setNdg(getEntity().getNdg());
+                    }
+
+                    if(getUpdatedPropertyNames().contains("note")){
+                        associatedRequest.setNote(getEntity().getNote());
+                    }
+
+                    if(getUpdatedPropertyNames().contains("urgent")){
+                        associatedRequest.setUrgent(getEntity().getUrgent());
+                    }
+                    prepareRequestToSave(associatedRequest);
+                    DaoManager.save(associatedRequest);
+                }
+            } catch (Exception e) {
+                if (this.tr != null) {
+                    this.tr.rollback();
+                }
+                LogHelper.log(log, e);
+                MessageHelper.addGlobalMessage(FacesMessage.SEVERITY_ERROR, "",
+                        ResourcesHelper.getValidation("objectEditedException"));
+            } finally {
+                if (this.tr != null && !this.tr.wasRolledBack()
+                        && this.tr.isActive()) {
+                    try {
+                        this.tr.commit();
+                    } catch (StaleObjectStateException e) {
+                        MessageHelper
+                                .addGlobalMessage(
+                                        FacesMessage.SEVERITY_ERROR,
+                                        "",
+                                        ResourcesHelper
+                                                .getValidation("exceptionOccuredWhileSaving"));
+                        LogHelper.log(log, e);
+                    } catch (Exception e) {
+                        LogHelper.log(log, e);
+                        e.printStackTrace();
+                    }
+                }
+                this.setSaveFlag(0);
+            }
+        }
+    }
+    private void saveRequestLoading(){
+        executeJS("PF('requestSaved').show();");
+        executeJS("setTimeout(function(){PF('requestSaved').hide();}, 500);");
+    }
+    @SneakyThrows
+    private void resetRequestData() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        setShownFields(null);
+        setHiddenFields(null);
+        setSelectedRequestTypesIdMultiple(null);
+        onRequestTypeChangeBlock();
+        setSelectedServiceIds(new Long[]{});
+        setSelectedServiceId(null);
+        setInputCardList(null);
+        setHiddenInputCardList(null);
+        setWrapper(new RequestWrapper(getEntity(), isMultipleCreate(), false, true));
+    }
+    private boolean manageAssociatedRequest(){
+        boolean requestUpdated = false;
+        if (!getOriginalRequest().getSubject().getTypeId().equals(getWrapper().getSelectedPersonId())) {
+            requestUpdated = true;
+            getUpdatedPropertyNames().add("typeId");
+        }
+        if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getClient())
+                && ValidationHelper.isNullOrEmpty(getSelectedClientId()))
+                || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getClient())
+                && !ValidationHelper.isNullOrEmpty(getSelectedClientId()))
+                || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getClient()) &&
+                !ValidationHelper.isNullOrEmpty(getSelectedClientId()) &&
+                !getOriginalRequest().getClient().getId().equals(getSelectedClientId()))) {
+            requestUpdated = true;
+            getUpdatedPropertyNames().add("client");
+        }
+
+        if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getBillingClient())
+                && ValidationHelper.isNullOrEmpty(getSelectedBillingClientId()))
+                || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getBillingClient())
+                && !ValidationHelper.isNullOrEmpty(getSelectedBillingClientId()))
+                || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getBillingClient()) &&
+                !ValidationHelper.isNullOrEmpty(getSelectedBillingClientId()) &&
+                !getOriginalRequest().getBillingClient().getId().equals(getSelectedBillingClientId()))) {
+            requestUpdated = true;
+            getUpdatedPropertyNames().add("billingClient");
+        }
+
+        if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNotary())
+                && ValidationHelper.isNullOrEmpty(getSelectedNotaryId()))
+                || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getNotary())
+                && !ValidationHelper.isNullOrEmpty(getSelectedNotaryId()))
+                || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNotary()) &&
+                !ValidationHelper.isNullOrEmpty(getSelectedNotaryId()) &&
+                !getOriginalRequest().getNotary().getId().equals(getSelectedNotaryId()))) {
+            requestUpdated = true;
+            getUpdatedPropertyNames().add("notary");
+        }
+
+        if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getOffice())
+                && ValidationHelper.isNullOrEmpty(getSelectedOfficeId()))
+                || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getOffice())
+                && !ValidationHelper.isNullOrEmpty(getSelectedOfficeId()))
+                || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getOffice()) &&
+                !ValidationHelper.isNullOrEmpty(getSelectedOfficeId()) &&
+                !getOriginalRequest().getOffice().getId().equals(getSelectedOfficeId()))) {
+            requestUpdated = true;
+            getUpdatedPropertyNames().add("office");
+        }
+
+        if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getRequestMangerList())
+                && ValidationHelper.isNullOrEmpty(getFiduciaryClientsSelected()))
+                || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getRequestMangerList())
+                && !ValidationHelper.isNullOrEmpty(getFiduciaryClientsSelected()))
+        ) {
+            requestUpdated = true;
+            getUpdatedPropertyNames().add("managerList");
+        }
+
+        if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getClientFiduciary())
+                && ValidationHelper.isNullOrEmpty(getSelectedFiduciaryId()))
+                || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getClientFiduciary())
+                && !ValidationHelper.isNullOrEmpty(getSelectedFiduciaryId()))
+                || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getClientFiduciary()) &&
+                !ValidationHelper.isNullOrEmpty(getSelectedFiduciaryId()) &&
+                !getOriginalRequest().getClientFiduciary().getId().equals(getSelectedFiduciaryId()))) {
+            requestUpdated = true;
+            getUpdatedPropertyNames().add("fiduciaryClient");
+        }
+
+        if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getPosition())
+                && ValidationHelper.isNullOrEmpty(getPosition()))
+                || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getPosition())
+                && !ValidationHelper.isNullOrEmpty(getPosition()))
+                || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getPosition()) &&
+                !ValidationHelper.isNullOrEmpty(getPosition()) &&
+                !getOriginalRequest().getPosition().equals(getPosition()))) {
+            requestUpdated = true;
+            getUpdatedPropertyNames().add("position");
+        }
+
+        if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNdg())
+                && ValidationHelper.isNullOrEmpty(getNdg()))
+                || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getNdg())
+                && !ValidationHelper.isNullOrEmpty(getNdg()))
+                || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNdg()) &&
+                !ValidationHelper.isNullOrEmpty(getNdg()) &&
+                !getOriginalRequest().getNdg().equals(getNdg()))) {
+            requestUpdated = true;
+            getUpdatedPropertyNames().add("ndg");
+        }
+
+        if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getCdr())
+                && ValidationHelper.isNullOrEmpty(getCdr()))
+                || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getCdr())
+                && !ValidationHelper.isNullOrEmpty(getCdr()))
+                || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getCdr()) &&
+                !ValidationHelper.isNullOrEmpty(getCdr()) &&
+                !getOriginalRequest().getCdr().equals(getCdr()))) {
+            requestUpdated = true;
+            getUpdatedPropertyNames().add("cdr");
+        }
+
+        if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNote())
+                && ValidationHelper.isNullOrEmpty(getEntity().getNote()))
+                || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getNote())
+                && !ValidationHelper.isNullOrEmpty(getEntity().getNote()))
+                || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getNote()) &&
+                !ValidationHelper.isNullOrEmpty(getEntity().getNote()) &&
+                !getOriginalRequest().getNote().equals(getEntity().getNote()))) {
+            requestUpdated = true;
+            getUpdatedPropertyNames().add("note");
+        }
+
+        if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getUrgent())
+                && ValidationHelper.isNullOrEmpty(getUrgent()))
+                || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getUrgent())
+                && !ValidationHelper.isNullOrEmpty(getUrgent()))
+                || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getUrgent()) &&
+                !ValidationHelper.isNullOrEmpty(getUrgent()) &&
+                !getOriginalRequest().getUrgent().equals(getUrgent()))) {
+            requestUpdated = true;
+            getUpdatedPropertyNames().add("urgent");
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getRequestMangerList())
+                && !ValidationHelper.isNullOrEmpty(getFiduciaryClientsSelected())) {
+            if (!getOriginalRequest().getRequestMangerList().stream()
+                    .map(Client::getId)
+                    .collect(Collectors.toList()).equals(getFiduciaryClientsSelected().stream()
+                            .map(SelectItemWrapper::getId)
+                            .collect(Collectors.toList()))) {
+                requestUpdated = true;
+                getUpdatedPropertyNames().add("managerList");
+
+            }
+        }
+
+        if (!getUpdatedPropertyNames().contains("typeId") && getWrapper().getSelectedPersonId().equals(SubjectType.PHYSICAL_PERSON.getId())) {
+
+            if (!equals(getOriginalRequest().getSubject().getSurname(),getSubject().getSurname())
+                    || !equals(getOriginalRequest().getSubject().getName(),getSubject().getName())
+                    || getOriginalRequest().getSubject().getBirthDate().compareTo(getSubject().getBirthDate()) != 0
+                    || !equals(getOriginalRequest().getSubject().getBirthProvince(),getSubject().getBirthProvince())
+                    || !equals(getOriginalRequest().getSubject().getBirthCity(),getSubject().getBirthCity())
+                    || !equals(getOriginalRequest().getSubject().getFiscalCode(),getSubject().getFiscalCode())
+                    || !equals(getOriginalRequest().getSubject().getSex(),getWrapper().getSelectedSexTypeId())){
+                requestUpdated = true;
+                getUpdatedPropertyNames().add("subject");
+            }
+        } else if (!getUpdatedPropertyNames().contains("typeId") && getWrapper().getSelectedPersonId().equals(SubjectType.LEGAL_PERSON.getId())) {
+            if (!equals(getOriginalRequest().getSubject().getBusinessName(),getSubject().getBusinessName())
+                    || !equals(getOriginalRequest().getSubject().getBirthProvince(),getSubject().getBirthProvince())
+                    || !equals(getOriginalRequest().getSubject().getBirthCity(),getSubject().getBirthCity())
+                    || !equals(getOriginalRequest().getSubject().getNumberVAT(),getSubject().getNumberVAT())
+                    || !equals(getOriginalRequest().getSubject().getOldNumberVAT(),getSubject().getOldNumberVAT())
+                    || !equals(getOriginalRequest().getSubject().getFiscalCode(),getSubject().getFiscalCode())){
+                requestUpdated = true;
+                getUpdatedPropertyNames().add("subject");
+            }
+        }
+        return requestUpdated;
     }
 }

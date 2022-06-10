@@ -861,9 +861,11 @@
                                       style="font-weight: bold; margin-left: 15px; font-size: large;"/>
 
                         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
-                        style="margin-top: 82px;">
+                                     style="margin-top: 82px;">
                             <h:outputText value="#{msg.clientDaysToDeadline}"/>
-                            <p:inputText disabled="#{bean.onlyView}"/>
+                            <p:inputText value="#{bean.entity.invoiceExpirationDays}" disabled="#{bean.onlyView}">
+                                <p:keyFilter mask="num" />
+                            </p:inputText>
                         </p:panelGrid>
 
                         <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group"

@@ -76,7 +76,7 @@ public class FatturaAPI {
         context.put("customerPostcode", invoice.getClient().getAddressPostalCode());
         context.put("customerCity", invoice.getClient().getAddressCityId() != null ? invoice.getClient().getAddressCityId().getDescription() : "");
         context.put("customerProvince", invoice.getClient().getAddressProvinceId() != null ? invoice.getClient().getAddressProvinceId().getCode() : "");
-        context.put("customerCountry", invoice.getClient().getCountry() != null ? invoice.getClient().getCountry().getDescription() : "");
+        context.put("customerCountry", "IT");
         context.put("customerFiscalCode", invoice.getClient().getFiscalCode());
         context.put("customerVatCode", invoice.getClient().getNumberVAT());
         context.put("customerCellPhone", invoice.getClient().getPhone());
@@ -112,6 +112,7 @@ public class FatturaAPI {
     }
 
     public FatturaAPIResponse callFatturaAPI(String xmlSource, Log log) {
+        log.info("Invoice XMLData : " + xmlSource);
         String apiURL =
                 ApplicationSettingsHolder.getInstance().getByKey(
                         ApplicationSettingsKeys.CLOUD_API_URL).getValue().trim();

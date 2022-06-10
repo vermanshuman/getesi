@@ -127,14 +127,15 @@
     <ui:define name="dialogs_body">
         <p:remoteCommand name="refreshTable" update="@form"/>
         <p:dialog widgetVar="addDayPhraseDialogWV"  id="addDayPhraseDialog" modal="true" draggable="false"
-                  width="600" styleClass="dialog-white-bg addPaymentDialog newEntityDialog"
+                  width="700" styleClass="dialog-white-bg addPaymentDialog newEntityDialog"
                   position="center center" header="#{msg.phrase}">
             <div class="p-grid">
                 <div class="p-col-12 p-md-12">
                     <div class="card"
                          style="border: none !important; padding-top:0px; padding-bottom:0px; margin-top:10px;">
                         <ui:include src="/resources/tpl/common/ValidationMessages.xhtml"/>
-                        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" style="width: 40%">
+                        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                                     columnClasses="ui-grid-col-4,ui-grid-col-8">
                             <span><span class="red">*</span>#{msg.phraseArea}:</span>
                             <p:inputText id="phrase" style="min-width: 351px;"
                                          value="#{bean.entity.phrase}"
