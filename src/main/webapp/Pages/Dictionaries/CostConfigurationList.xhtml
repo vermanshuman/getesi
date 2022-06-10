@@ -76,6 +76,10 @@
                 .layout-menu.clearfix {
                     margin-left: 15px !important;
                 }
+                
+                .ui-selectoneradio label {
+                	display:initial !important; 
+                }
             </style>
             <p:remoteCommand name="updateFilterInput"
                              update=":filterName :filterDescription"/>
@@ -140,7 +144,7 @@
     <ui:define name="dialogs_body">
         <p:remoteCommand name="refreshTable" update="@form"/>
         <p:dialog widgetVar="addCostConfigurationDialogWV"  id="addCostConfigurationDialog" modal="true" draggable="false"
-                  width="600" styleClass="dialog-white-bg addPaymentDialog newEntityDialog"
+                  width="770" styleClass="dialog-white-bg addPaymentDialog newEntityDialog"
                   position="center center" header="#{msg.costConfiguration}">
             <div class="p-grid">
                 <div class="p-col-12 p-md-12">
@@ -148,7 +152,7 @@
                          style="border: none !important; padding-top:0px; padding-bottom:0px; margin-top:10px;">
                         <ui:include src="/resources/tpl/common/ValidationMessages.xhtml"/>
                         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
-                                     columnClasses="ui-grid-col-3,ui-grid-col-9">
+                                     columnClasses="ui-grid-col-3,ui-grid-col-9" style="width: 100%;">
                             <span><span class="red">*</span>#{msg.name}:</span>
                             <p:inputText value="#{bean.entity.name}" id="name" maxlength="50" label="#{msg.name}"
                                          onkeypress="numbers_letters_only('#name');" styleClass="input-width"/>
