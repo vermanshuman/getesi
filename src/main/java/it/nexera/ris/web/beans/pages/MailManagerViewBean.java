@@ -1025,7 +1025,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         if (isOnlyView())
             RedirectHelper.goTo(PageTypes.MAIL_MANAGER_FOLDER);
         else
-            RedirectHelper.goToSavePage(PageTypes.MAIL_MANAGER_LIST, null, getTablePage());
+            //RedirectHelper.goToSavePage(PageTypes.MAIL_MANAGER_LIST, null, getTablePage());
+        	RedirectHelper.goTo(PageTypes.MAIL_MANAGER_LIST);
     }
 
     public void processManagedState(boolean redirectToCreateRequest) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
