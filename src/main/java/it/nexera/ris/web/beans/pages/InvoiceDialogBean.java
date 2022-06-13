@@ -394,7 +394,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         setInvoiceEmailAttachedFiles(new ArrayList<>());
         String refrequest = "";
         if(ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
-            attachCourtesyInvoicePdf(invoice);
+            //attachCourtesyInvoicePdf(invoice);
             return;
         }
 
@@ -442,7 +442,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
             //attachInvoicePdf(baos);
             attachInvoicePdf(invoice, excelFile);
         }
-        attachCourtesyInvoicePdf(invoice);
+        //attachCourtesyInvoicePdf(invoice);
     }
 
 
@@ -452,7 +452,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         String ndg = "";
         // WLGInbox baseMail = DaoManager.get(WLGInbox.class, getBaseMailId());
         if (ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
-            attachCourtesyInvoicePdf(invoice);
+            //attachCourtesyInvoicePdf(invoice);
             return;
         }
         WLGInbox baseMail = DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId());
@@ -494,7 +494,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
             addAttachedFile(excelInvoice);
             attachInvoicePdf(baos);
         }
-        attachCourtesyInvoicePdf(invoice);
+        //attachCourtesyInvoicePdf(invoice);
     }
 
 
@@ -1372,7 +1372,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         return result.toString();
     }
 
-    public void attachCourtesyInvoicePdf(Invoice invoice) {
+   /* public void attachCourtesyInvoicePdf(Invoice invoice) {
         try {
             String templatePath = (new File(FileHelper.getRealPath(),
                     "resources" + File.separator + "layouts" + File.separator
@@ -1514,7 +1514,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         } catch (Exception e) {
             LogHelper.log(log, e);
         }
-    }
+    }*/
 
     private void attachInvoiceData(Long mailId) throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
         setInvoiceEmailAttachedFiles(new ArrayList<>());
@@ -1562,7 +1562,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         Invoice invoice = DaoManager.get(Invoice.class, new Criterion[]{
                 Restrictions.eq("number", getNumber())
         });
-        attachCourtesyInvoicePdf(invoice);
+        //attachCourtesyInvoicePdf(invoice);
     }
 
     private byte[] getXlsBytes(String refrequest, Request invoiceRequest) {

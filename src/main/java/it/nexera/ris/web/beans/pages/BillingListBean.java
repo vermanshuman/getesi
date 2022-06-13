@@ -2307,7 +2307,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setInvoiceEmailAttachedFiles(new ArrayList<>());
         String refrequest = "";
         if(ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
-            attachCourtesyInvoicePdf(invoice);
+            //attachCourtesyInvoicePdf(invoice);
             return;
         }
 
@@ -2355,7 +2355,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             //attachInvoicePdf(baos);
             attachInvoicePdf(invoice, excelFile);
         }
-        attachCourtesyInvoicePdf(invoice);
+        //attachCourtesyInvoicePdf(invoice);
     }
 
     private void attachInvoicePdf(Invoice invoice,String excelFile) {
@@ -2765,7 +2765,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setInvoiceNumber(getNumber() + "-" + currentYear + "-FE");
     }
     
-    public void attachCourtesyInvoicePdf(Invoice invoice) {
+    /*public void attachCourtesyInvoicePdf(Invoice invoice) {
         try {
             //String refrequest = "";
             //String ndg = "";
@@ -2878,13 +2878,13 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                                     Double total = imponibile + totalIva;
                                     text = text.replace("totale", total.toString());
                                     r.setText(text, 0);
-                                }/*else if (text != null && text.contains("refrequest")) {
+                                }else if (text != null && text.contains("refrequest")) {
 	                                text = text.replace("refrequest",refrequest);
 	                                r.setText(text, 0);
 	                            }else if (text != null && text.contains("inboxndg")) {
 	                                text = text.replace("inboxndg",ndg);
 	                                r.setText(text, 0);
-	                            }*/
+	                            }
                             }
                         }
                     }
@@ -2913,5 +2913,5 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         } catch (Exception e) {
             LogHelper.log(log, e);
         }
-    }
+    }*/
 }
