@@ -1693,13 +1693,31 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         }
     }
 
-    public void setMaxInvoiceNumber() throws HibernateException {
+    /*public void setMaxInvoiceNumber() throws HibernateException {
         LocalDate currentdate = LocalDate.now();
         int currentYear = currentdate.getYear();
 
         Long lastInvoiceNumber = 0l;
         try {
             lastInvoiceNumber = (Long) DaoManager.getMax(Invoice.class, "id",
+                    new Criterion[]{});
+        } catch (PersistenceBeanException | IllegalAccessException e) {
+            LogHelper.log(log, e);
+        }
+        if(lastInvoiceNumber == null)
+            lastInvoiceNumber = 0l;
+        String invoiceNumber = (lastInvoiceNumber + 1) + "-" + currentYear + "-FE";
+        getInvoiceDialogBean().setInvoiceNumber(invoiceNumber);
+        getInvoiceDialogBean().setNumber(lastInvoiceNumber + 1);
+    }*/
+    
+    public void setMaxInvoiceNumber() throws HibernateException {
+        LocalDate currentdate = LocalDate.now();
+        int currentYear = currentdate.getYear();
+
+        Long lastInvoiceNumber = 0l;
+        try {
+            lastInvoiceNumber = (Long) DaoManager.getMax(Invoice.class, "number",
                     new Criterion[]{});
         } catch (PersistenceBeanException | IllegalAccessException e) {
             LogHelper.log(log, e);
