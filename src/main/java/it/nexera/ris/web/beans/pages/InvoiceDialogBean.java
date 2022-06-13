@@ -1422,7 +1422,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
                 imponi = imponi.setScale(2, RoundingMode.HALF_UP);
                 imponibile = imponi.doubleValue();
                 Date currentDate = new Date();
-                String fileName = "Fattura_cortesia_" + getInvoiceNumber();
+                String fileName = "Fattura_cortesia_" + invoice.getInvoiceNumber();
 
                 String tempDir = FileHelper.getLocalTempDir();
                 tempDir += File.separator + UUID.randomUUID();

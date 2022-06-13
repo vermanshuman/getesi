@@ -2253,7 +2253,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             addAttachedFile(excelInvoice, false);
             attachInvoicePdf(invoice, excelFile);
         }
-        invoiceDialogBean.attachCourtesyInvoicePdf(invoice);
+        attachCourtesyInvoicePdf(invoice);
     }
 
     private void attachInvoicePdf(Invoice invoice,String excelFile) {
@@ -2792,7 +2792,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         setPaymentInvoices(paymentInvoicesList);
     }
 
-    public void attachCourtesyInvoicePdf() {
+    public void attachCourtesyInvoicePdf(Invoice invoice) {
         try {
             //String refrequest = "";
             //String ndg = "";
@@ -2804,9 +2804,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             Double imponibile = 0.0;
             Double totalIva = 0.0;
             Double ivaPercentage = 0.0;
-            Invoice invoice =  DaoManager.get(Invoice.class, new Criterion[]{
-                    Restrictions.eq("number", getNumber())
-            });
             if (!ValidationHelper.isNullOrEmpty(invoice)) {
                 List<InvoiceItem> items = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
                 for (InvoiceItem item : items) {
@@ -2845,7 +2842,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 imponibile = imponi.doubleValue();
 
                 Date currentDate = new Date();
-                String fileName = "Fattura_cortesia_" + getInvoiceNumber();
+                String fileName = "Fattura_cortesia_" + invoice.getInvoiceNumber();
 
                 String tempDir = FileHelper.getLocalTempDir();
                 tempDir += File.separator + UUID.randomUUID();
