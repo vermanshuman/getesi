@@ -36,6 +36,15 @@ public class InvoiceHelper {
         Set<String> requestTypeNames = new HashSet<>();
         for(Request request: selectedRequestList) {
             requestTypeNames.add(request.getRequestType().getName());
+            request.setSelectedTemplateId(null);
+            RequestPrint requestPrint = DaoManager.get(RequestPrint.class,
+                    new CriteriaAlias[]{new CriteriaAlias("request", "rq", JoinType.INNER_JOIN)},
+                    new Criterion[]{Restrictions.eq("rq.id", request.getId())});
+            if (requestPrint != null) {
+                if (requestPrint.getTemplate() != null) {
+                	request.setSelectedTemplateId(requestPrint.getTemplate().getId());
+                }
+            }
             CostCalculationHelper costCalculationHelper = new CostCalculationHelper(request);
             List<PriceList> requestPriceList = new ArrayList<>();
             if(!ValidationHelper.isNullOrEmpty(request.getService())) {
@@ -86,6 +95,20 @@ public class InvoiceHelper {
                 if (!ValidationHelper.isNullOrEmpty(priceList)) {
                     requestPriceList.addAll(priceList);
                 }
+                
+                //if negativo template is applied
+                if(!ValidationHelper.isNullOrEmpty(request.getSelectedTemplateId()) && request.getSelectedTemplateId().equals(8L)) {
+                	 priceList = DaoManager.load(PriceList.class,
+                             new Criterion[]{
+                                      Restrictions.eq("client", request.getClient() != null ? request.getClient() : request.getBillingClient()),
+                                      Restrictions.eq("isNegative", true),
+                                      Restrictions.eq("service", request.getService())});
+                	 requestPriceList = new ArrayList<>();
+                	 if (!ValidationHelper.isNullOrEmpty(priceList)) {
+                		 requestPriceList.addAll(priceList);
+                     }
+                }
+                
 
 //                priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
 //                        new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
@@ -136,6 +159,21 @@ public class InvoiceHelper {
                 if (!ValidationHelper.isNullOrEmpty(priceList)) {
                     requestPriceList.addAll(priceList);
                 }
+                
+                //if negativo template is applied
+                if(!ValidationHelper.isNullOrEmpty(request.getSelectedTemplateId()) && request.getSelectedTemplateId().equals(8L)) {
+                	requestPriceList = new ArrayList<>();
+                	for (Service service : request.getMultipleServices()) {
+	                	priceList = DaoManager.load(PriceList.class,
+	                            new Criterion[]{
+	                                    Restrictions.eq("client", request.getClient() != null ? request.getClient() : request.getBillingClient()),
+	                                    Restrictions.eq("isNegative", true),
+	                                    Restrictions.eq("service", service)});
+	                	if (!ValidationHelper.isNullOrEmpty(priceList)) {
+	                		requestPriceList.addAll(priceList);
+	                    }
+                	}
+                }
             }
 //
 //            if(!ValidationHelper.isNullOrEmpty(request.getService())) {
@@ -152,6 +190,21 @@ public class InvoiceHelper {
 //                                Restrictions.eq("isNegative", true),
 //                                Restrictions.in("service", request.getMultipleServices())});
 //            }
+            
+            /*if(!ValidationHelper.isNullOrEmpty(request.getService())) {
+              priceList = DaoManager.load(PriceList.class,
+                     new Criterion[]{
+                              Restrictions.eq("client", request.getClient() != null ? request.getClient() : request.getBillingClient()),
+                              Restrictions.eq("isNegative", true),
+                              Restrictions.eq("service", request.getService())});
+
+          }else if(!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
+              priceList = DaoManager.load(PriceList.class,
+                      new Criterion[]{
+                              Restrictions.eq("client", request.getClient() != null ? request.getClient() : request.getBillingClient()),
+                              Restrictions.eq("isNegative", true),
+                              Restrictions.in("service", request.getMultipleServices())});
+         }*/
             priceListMap.put(request.getId(), requestPriceList);
         }
 
@@ -159,6 +212,15 @@ public class InvoiceHelper {
         for(Map.Entry<Long, List<PriceList>> entry : priceListMap.entrySet()) {
             Long requestId = entry.getKey();
             Request request = DaoManager.get(Request.class, requestId);
+            request.setSelectedTemplateId(null);
+            RequestPrint requestPrint = DaoManager.get(RequestPrint.class,
+                    new CriteriaAlias[]{new CriteriaAlias("request", "rq", JoinType.INNER_JOIN)},
+                    new Criterion[]{Restrictions.eq("rq.id", request.getId())});
+            if (requestPrint != null) {
+                if (requestPrint.getTemplate() != null) {
+                	request.setSelectedTemplateId(requestPrint.getTemplate().getId());
+                }
+            }
 //            String totalCostStr = request.getTotalCost() != null ? request.getTotalCost() : "0.0";
 //            if(totalCostStr.contains(",")) {
 //                totalCostStr = totalCostStr.replace(",", ".");
@@ -272,7 +334,26 @@ public class InvoiceHelper {
                             }
                         }
                     }
-                }else if(!ValidationHelper.isNullOrEmpty(priceList.getIsNegative()) && priceList.getIsNegative()){
+                }
+                //if negativo template is applied
+                else if(!ValidationHelper.isNullOrEmpty(priceList.getIsNegative()) && priceList.getIsNegative() 
+                		&& !ValidationHelper.isNullOrEmpty(request.getSelectedTemplateId()) && request.getSelectedTemplateId().equals(8L)){
+                    requestPriceListModel.setTaxRate(priceList.getTaxRate());
+                    totalCost = 0d;
+                    double firstPrice = 0d;
+                    double price = 0d;
+                    Double conservationCosts = Double.parseDouble(priceList.getFirstPrice().replaceAll(",", "."));
+                    if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())
+                            && !ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getLandChargesRegistries())) {
+                    	firstPrice = conservationCosts * request.getAggregationLandChargesRegistry()
+                                .getNumberOfVisualizedLandChargesRegistries();
+                    }
+                    if (!ValidationHelper.isNullOrEmpty(priceList.getPrice())) {
+                    	price = Double.parseDouble(priceList.getPrice().replaceAll(",", "."));
+                    }
+                    totalCost = firstPrice + price;
+                }
+                else if(!ValidationHelper.isNullOrEmpty(priceList.getIsNegative()) && priceList.getIsNegative()){
                     requestPriceListModel.setTaxRate(priceList.getTaxRate());
                     Double conservationCosts = Double.parseDouble(priceList.getPrice().replaceAll(",", "."));
                     if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())
@@ -280,7 +361,8 @@ public class InvoiceHelper {
                         totalCost += conservationCosts * request.getAggregationLandChargesRegistry()
                                 .getNumberOfVisualizedLandChargesRegistries();
                     }
-                }
+                } 
+                
                 requestPriceListModel.setRequestId(requestId);
                 requestPriceListModel.setRequest(request);
                 requestPriceListModel.setTotalCost(totalCost);
