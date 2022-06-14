@@ -945,10 +945,12 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 Invoice invoice =  DaoManager.get(Invoice.class, new Criterion[]{
                         Restrictions.eq("number", getNumber())
                 });
-                if (ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
-                    attachInvoiceData(invoice);
-                } else {
-                    fillAttachedFiles(invoice.getEmail());
+                if(!ValidationHelper.isNullOrEmpty(invoice)) {
+	                if (ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
+	                    attachInvoiceData(invoice);
+	                } else {
+	                    fillAttachedFiles(invoice.getEmail());
+	                }
                 }
             }
         }
@@ -1039,7 +1041,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 setGoodsServicesFields(wrapperList);
                 if(ValidationHelper.isNullOrEmpty(getSelectedInvoice().getStatus()) ||
                         !getSelectedInvoice().getStatus().equals(InvoiceStatus.DRAFT))
-                    setSameInvoiceNumber(invoice.getId());
+                    setSameInvoiceNumber(invoice.getNumber());
 
                 if(!ValidationHelper.isNullOrEmpty(invoice.getStatus()) && invoice.getStatus().equals(InvoiceStatus.DELIVERED)) {
                     setInvoiceSentStatus(true);
@@ -1059,7 +1061,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     }
 
     public void loadInvoiceDialogDataEdit(Invoice invoice) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        setNumber(invoice.getId());
+        setNumber(invoice.getNumber());
         setSelectedInvoiceItems(DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)}));
         loadInvoiceDialogData(invoice);
         //executeJS("PF('invoiceDialogBillingWV').show();");
@@ -2274,7 +2276,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         if(requests != null && !requests.isEmpty()) {
             setActiveTabIndex(2);
         }
-        setNumber(invoice.getId());
+        setNumber(invoice.getNumber());
         loadInvoiceDialogData(invoice);
 
     }
