@@ -366,6 +366,12 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private List<SelectItem> clientAddressCities;
 
     private List<SelectItem> cities;
+    
+    private String invoiceAlreadyCreated;
+
+    private String otherRequestsExistsForInvoice;
+
+    private List<Request> otherRequestsConsideredForInvoice;
 
     private static final String MAIL_FOOTER = ResourcesHelper.getString("emailFooter");
 

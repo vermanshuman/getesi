@@ -22,6 +22,7 @@ import it.nexera.ris.web.beans.base.AccessBean;
 import it.nexera.ris.web.beans.wrappers.GoodsServicesFieldWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.ExcelDataWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.FileWrapper;
+import it.nexera.ris.web.handlers.NullTaxRateExcpetion;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.codec.binary.Base64;
@@ -1641,8 +1642,14 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         invoice.setStatus(InvoiceStatus.DRAFT);
         invoice.setEmailFrom(getEntity());
         // DaoManager.save(invoice, true);
-
-        setSelectedInvoiceItems(InvoiceHelper.groupingItemsByTaxRate(selectedRequestList, getCausal()));
+        try {
+        	setSelectedInvoiceItems(InvoiceHelper.groupingItemsByTaxRate(selectedRequestList, getCausal()));
+        } catch (NullTaxRateExcpetion e) {
+        	setInvoiceErrorMessage(ResourcesHelper.getString("nullTaxRateMessage"));
+        	executeJS("PF('invoiceErrorDialogWV').show();");
+            RequestContext.getCurrentInstance().update("invoiceErrorDialog");
+            return;
+        }
       /*  for (InvoiceItem invoiceItem : invoiceItems) {
             invoiceItem.setInvoice(invoice);
             DaoManager.save(invoiceItem, true);
@@ -1661,6 +1668,19 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         // DaoManager.save(invoice, true);
         loadInvoiceDialogData(invoice);
         executeJS("PF('invoiceDialogBillingWV').show();");
+        double totalCost = 0d;
+        for(Request request: selectedRequestList) {
+        	if(ValidationHelper.isNullOrEmpty(request.getTotalCost()))
+        		totalCost += 0d;
+        	else
+        		totalCost += Double.parseDouble(request.getTotalCost().replaceAll(",", "."));
+        }
+        log.info("request total cost :: "+totalCost + ", total invoice :: "+getAllTotalLine().doubleValue());
+        if(totalCost != getAllTotalLine().doubleValue()) {
+        	setInvoiceErrorMessage(ResourcesHelper.getString("invoiceTotalNotMatchMessage"));
+        	executeJS("PF('invoiceErrorDialogWV').show();");
+            RequestContext.getCurrentInstance().update("invoiceErrorDialog");
+        }
     }
 
     private GoodsServicesFieldWrapper createGoodsServicesFieldWrapper() throws IllegalAccessException, PersistenceBeanException {
@@ -1706,6 +1726,11 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
 
         setInvoiceErrorMessage(ResourcesHelper.getString("invalidDataMsg"));
+        
+        if (ValidationHelper.isNullOrEmpty(getClientAddressSDI())) {
+        	setInvoiceErrorMessage(ResourcesHelper.getString("noSDIAddressMessage"));
+            setValidationFailed(true);
+        }
 
         if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT())) {
             String vatNumber = getClientNumberVAT().trim();
@@ -1865,6 +1890,11 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
 
         setInvoiceErrorMessage(ResourcesHelper.getString("invalidDataMsg"));
+        
+        if (ValidationHelper.isNullOrEmpty(getClientAddressSDI())) {
+        	setInvoiceErrorMessage(ResourcesHelper.getString("noSDIAddressMessage"));
+            setValidationFailed(true);
+        }
 
         if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT())) {
             String vatNumber = getClientNumberVAT().trim();
