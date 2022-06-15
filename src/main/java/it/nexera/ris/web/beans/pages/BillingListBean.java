@@ -1052,6 +1052,26 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 if(!ValidationHelper.isNullOrEmpty(invoice.getStatus()) && invoice.getStatus().equals(InvoiceStatus.DELIVERED)) {
                     setInvoiceSentStatus(true);
                 }
+                if (!ValidationHelper.isNullOrEmpty(invoice.getInvoiceNumber())) {
+                    String invoiceNo = "Fattura: " + invoice.getInvoiceNumber();
+                    String invoiceDate = "";
+                    if (!ValidationHelper.isNullOrEmpty(invoice.getDateString()))
+                        invoiceDate = invoice.getDateString();
+                    String reference = "";
+                    if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom()) && !ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getReferenceRequest()))
+                        reference = "- Rif. " + invoice.getEmailFrom().getReferenceRequest() + " ";
+                    String ndg = "";
+                    if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom()) && !ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getNdg()))
+                        ndg = "NDG: " + invoice.getEmailFrom().getNdg();
+                    String emailSubject = invoiceNo + " " +
+                            invoiceDate + " " +
+                            reference +
+                            (!reference.isEmpty() && !ndg.isEmpty() ? " - " : "") +
+                            ndg;
+                    setEmailSubject(emailSubject);
+                    if (!ValidationHelper.isNullOrEmpty(invoice.getEmail()) && !ValidationHelper.isNullOrEmpty(invoice.getEmail().getEmailSubject()))
+                        setEmailSubject(invoice.getEmail().getEmailSubject());
+                }
             }
         } else {
             setGoodsServicesFields(new ArrayList<>());
