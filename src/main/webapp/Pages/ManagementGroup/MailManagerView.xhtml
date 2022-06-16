@@ -309,7 +309,7 @@
             </div>
         </p:dialog>
 
-        <!-- <p:dialog id="invoiceOpenErrorDialog" widgetVar="invoiceOpenErrorDialogWV" modal="true" styleClass="dialog-red"
+        <p:dialog id="invoiceOpenErrorDialog" widgetVar="invoiceOpenErrorDialogWV" modal="true" styleClass="dialog-red"
                   resizable="false" draggable="false" effect="SLIDE"
                   header="">
             <span>
@@ -333,9 +333,9 @@
                                  oncomplete="PF('invoiceAlreadyCreatedDialogWV').hide();"/>
                 <p:commandButton value="#{msg.cancel}" oncomplete="PF('invoiceAlreadyCreatedDialogWV').hide();"
                                  style="background-color: #F3362B !important; width: 100px;" update="@form" />
-                <p:commandButton value="#{msg.close}" styleClass="confirm-button"
+                <!-- <p:commandButton value="#{msg.close}" styleClass="confirm-button"
                                  style="background-color: #F3362B !important;margin-right: 15px;"
-                                 oncomplete="PF('invoiceAlreadyCreatedDialogWV').hide();"/>
+                                 oncomplete="PF('invoiceAlreadyCreatedDialogWV').hide();"/> -->
             </div>
         </p:dialog>
 
@@ -352,7 +352,7 @@
                                  style="background-color: #F3362B !important;"
                                  update="@widgetVar(mailManagerViewRequestsForInvoiceDlg) @widgetVar(requestsTableConsideredForInvoiceWV)" />
             </div>
-        </p:dialog> -->
+        </p:dialog>
 
         <ui:include src="../ConfigurationArea/ClientCreate.xhtml"/>
         <ui:include src="../Dialogs/MailManagerViewRequestsDialog.xhtml"/>

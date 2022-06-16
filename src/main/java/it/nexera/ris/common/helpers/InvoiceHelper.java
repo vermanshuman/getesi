@@ -12,8 +12,6 @@ import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import it.nexera.ris.web.beans.pages.BillingListBean;
 import it.nexera.ris.web.beans.wrappers.GoodsServicesFieldWrapper;
 import it.nexera.ris.web.common.RequestPriceListModel;
-import it.nexera.ris.web.handlers.NullTaxRateExcpetion;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Hibernate;
@@ -33,7 +31,7 @@ public class InvoiceHelper {
     private static transient final Log log = LogFactory.getLog(InvoiceHelper.class);
 
     public static List<InvoiceItem> groupingItemsByTaxRate(List<Request> selectedRequestList, String causal)
-            throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException, NullTaxRateExcpetion {
+            throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
         Map<Long, List<PriceList>> priceListMap = new HashMap<>();
         Set<String> requestTypeNames = new HashSet<>();
         for(Request request: selectedRequestList) {
@@ -429,9 +427,6 @@ public class InvoiceHelper {
         requestPriceListModels.stream()
                 .forEach(rp -> {
                     log.info(rp.getTaxRate() + "   " + rp.getTotalCost());
-                    if(ValidationHelper.isNullOrEmpty(rp.getTaxRate())) {
-                    	throw new NullTaxRateExcpetion("null tax rate");
-                    }
                 });
         Map<TaxRate, List<RequestPriceListModel>> taxRateMap = requestPriceListModels
                 .stream()

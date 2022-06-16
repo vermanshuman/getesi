@@ -17,7 +17,6 @@ import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.beans.BaseEntityPageBean;
 import it.nexera.ris.web.beans.wrappers.logic.ExcelDataWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.ExcelTableWrapper;
-import it.nexera.ris.web.handlers.NullTaxRateExcpetion;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.FileUtils;
@@ -27,7 +26,6 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
-import org.primefaces.context.RequestContext;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
@@ -114,14 +112,6 @@ public class ExcelDataEdit extends BaseEntityPageBean {
     private InvoiceDialogBean invoiceDialogBean;
 
     private List<Request> requestsConsideredForInvoice;
-    
-    private String invoiceAlreadyCreated;
-
-    private String otherRequestsExistsForInvoice;
-
-    private List<Request> otherRequestsConsideredForInvoice;
-    
-    private Boolean showCreateFatturaButton;
 
     @Override
     protected void onConstruct() {
@@ -1048,7 +1038,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                     if (!ValidationHelper.isNullOrEmpty(getExcelClientInvoiceId())) {
                         getMail().setClientInvoice(DaoManager.get(Client.class, getExcelClientInvoiceId()));
                     } else {
-                        //getMail().setClientInvoice(null);
+                        getMail().setClientInvoice(null);
                     }
                 }
 
@@ -1693,32 +1683,13 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             invoice.setStatus(InvoiceStatus.DRAFT);
             invoice.setEmailFrom(getMail());
             getInvoiceDialogBean().setEntity(getMail());
-            try {
-            	getInvoiceDialogBean().setSelectedInvoiceItems(InvoiceHelper.groupingItemsByTaxRate(selectedRequestList, getInvoiceDialogBean().getCausal()));
-            } catch (NullTaxRateExcpetion e) {
-            	getInvoiceDialogBean().setInvoiceErrorMessage(ResourcesHelper.getString("nullTaxRateMessage"));
-            	executeJS("PF('invoiceErrorDialogWV').show();");
-                RequestContext.getCurrentInstance().update("invoiceErrorDialog");
-                return;
-            }
+            getInvoiceDialogBean().setSelectedInvoiceItems(InvoiceHelper.groupingItemsByTaxRate(selectedRequestList,
+                    getInvoiceDialogBean().getCausal()));
             getInvoiceDialogBean().setInvoicedRequests(selectedRequestList);
             invoice.setTotalGrossAmount(getInvoiceDialogBean().getTotalGrossAmount());
 
             getInvoiceDialogBean().loadInvoiceDialogData(invoice);
             executeJS("PF('invoiceDialogExcelWV').show();");
-            double totalCost = 0d;
-            for(Request request: selectedRequestList) {
-            	if(ValidationHelper.isNullOrEmpty(request.getTotalCost()))
-            		totalCost += 0d;
-            	else
-            		totalCost += Double.parseDouble(request.getTotalCost().replaceAll(",", "."));
-            }
-            log.info("request total cost :: "+totalCost + ", total invoice :: "+getInvoiceDialogBean().getAllTotalLine().doubleValue());
-            if(totalCost != getInvoiceDialogBean().getAllTotalLine().doubleValue()) {
-            	getInvoiceDialogBean().setInvoiceErrorMessage(ResourcesHelper.getString("invoiceTotalNotMatchMessage"));
-            	executeJS("PF('invoiceErrorDialogWV').show();");
-                RequestContext.getCurrentInstance().update("invoiceErrorDialog");
-            }
         }
     }
 
@@ -1792,91 +1763,6 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                 r.setSelectedForInvoice(true);
             });
             setRequestsConsideredForInvoice(requestListForInvoice);
-        }
-    }
-    
-    public void preCheckDocument() throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
-        if (!ValidationHelper.isNullOrEmpty(getMail()) && ValidationHelper.isNullOrEmpty(getMail().getClientInvoice())) {
-            executeJS("PF('invoiceMissingBillingClientDialogWV').show();");
-            return;
-        }else if (!ValidationHelper.isNullOrEmpty(getMail().getNdg())) {
-            List<Invoice> invoices = DaoManager.load(Invoice.class, new Criterion[]{Restrictions.eq("ndg", getMail().getNdg())});
-            if (!ValidationHelper.isNullOrEmpty(invoices)) {
-                String message = ResourcesHelper.getString("invoiceAlreadyCreated");
-                message = message + " "+getMail().getNdg() + " in data "+invoices.get(0).getDateString();
-                setInvoiceAlreadyCreated(message);
-                RequestContext.getCurrentInstance().update("@widgetVar(invoiceAlreadyCreatedDialogWV)");
-                executeJS("PF('invoiceAlreadyCreatedDialogWV').show();");
-                return;
-            }
-        }
-        preCheckDocumentOtherRequests();
-    }
-
-    public void preCheckDocumentOtherRequests() throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
-        if (!ValidationHelper.isNullOrEmpty(getMail().getNdg())) {
-            List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.and(Restrictions.eq("ndg", getMail().getNdg()),
-                    Restrictions.eq("stateId", RequestState.EVADED.getId()),
-                    Restrictions.isNotNull("mail"),
-                    Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                            Restrictions.isNull("isDeleted")),
-                    Restrictions.ne("mail", getMail()) )});
-            List<Request> requestListForInvoice = new ArrayList<>();
-            if (!ValidationHelper.isNullOrEmpty(requests)) {
-                requestListForInvoice.addAll(requests);
-                List<Request> requestListEntity = getMail().getRequests().stream()
-                        .filter(x -> x.isDeletedRequest() && ValidationHelper.isNullOrEmpty(x.getInvoice())
-                                && !ValidationHelper.isNullOrEmpty(x.getStateId())
-                                && (RequestState.EVADED.getId().equals(x.getStateId())))
-                        .collect(Collectors.toList());
-                if (!ValidationHelper.isNullOrEmpty(requestListEntity)) {
-                    requestListForInvoice.addAll(requestListEntity);
-                }
-                if (!ValidationHelper.isNullOrEmpty(requestListForInvoice)) {
-                    setOtherRequestsConsideredForInvoice(new ArrayList<>());
-                    getOtherRequestsConsideredForInvoice().addAll(requestListForInvoice);
-                }
-                String message = ResourcesHelper.getString("otherRequestsExistsForInvoice");
-                setOtherRequestsExistsForInvoice(message);
-                RequestContext.getCurrentInstance().update("@widgetVar(otherRequestsExistsForInvoiceDialogWV)");
-                executeJS("PF('otherRequestsExistsForInvoiceDialogWV').show();");
-                return;
-            }
-        }
-        checkDocument(false);
-    }
-    
-    public void checkDocument(boolean otherRequests) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
-        setRequestsConsideredForInvoice(null);
-        Document document = DaoManager.get(Document.class, new Criterion[] { Restrictions.eq("mail.id", getMail().getId())});
-        if (!ValidationHelper.isNullOrEmpty(document) && !ValidationHelper.isNullOrEmpty(document.getTypeId())
-                && document.getTypeId().equals(DocumentType.INVOICE_REPORT.getId())) {
-            if (otherRequests) {
-                setRequestsConsideredForInvoice(new ArrayList<>());
-                List<Request> otherRequestListForInvoice = getOtherRequestsConsideredForInvoice();
-                if (!ValidationHelper.isNullOrEmpty(otherRequestListForInvoice)) {
-                    otherRequestListForInvoice.stream().forEach(r -> {
-                        r.setSelectedForInvoice(true);
-                    });
-                    getRequestsConsideredForInvoice().addAll(otherRequestListForInvoice);
-                }
-            } else {
-                setRequestsConsideredForInvoice(new ArrayList<>());
-                List<Request> requestListForInvoice = getMail().getRequests().stream()
-                        .filter(x ->  x.isDeletedRequest() && ValidationHelper.isNullOrEmpty(x.getInvoice())
-                                && !ValidationHelper.isNullOrEmpty(x.getStateId())
-                                && (RequestState.EVADED.getId().equals(x.getStateId())))
-                        .collect(Collectors.toList());
-                if (!ValidationHelper.isNullOrEmpty(requestListForInvoice)) {
-                    requestListForInvoice.stream().forEach(r -> {
-                        r.setSelectedForInvoice(true);
-                    });
-                    getRequestsConsideredForInvoice().addAll(requestListForInvoice);
-                }
-            }
-            executeJS("PF('mailManagerViewRequestsForInvoiceDlg').show();");
-        } else {
-            executeJS("PF('invoiceOpenErrorDialogWV').show();");
         }
     }
 

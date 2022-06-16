@@ -126,17 +126,11 @@
 									 ajax="false" update="@form"/>
 
 					<h:panelGroup layout="block" style="display: none" id="createInvoiceDiv">
-							<!-- <p:commandButton style="margin-left: 2px;"
+							<p:commandButton style="margin-left: 2px;"
 											 value="#{msg.requestTextEditCreateInvoice}"
 											 action="#{bean.preCheckInvoice}"
 											 styleClass="ui-button-success" id="createInvoice"
-											 update="@widgetVar(mailManagerViewRequestsForInvoiceDlg)"/> -->
-							<p:commandButton style="margin-left: 2px;"
-											 value="#{msg.requestTextEditCreateInvoice}"
-                                 			 action="#{bean.preCheckDocument}" 
-                                 			 update="invoiceAlreadyCreatedDialog otherRequestsExistsForInvoiceDialog"
-                                 			 id="createInvoice"
-											 styleClass="ui-button-success" />
+											 update="@widgetVar(mailManagerViewRequestsForInvoiceDlg)"/>
 						</h:panelGroup>
 					<!--			<p:commandButton style="margin-left: 2px;"-->
 					<!--							 value="#{msg.requestTextEditCreateInvoice}"-->
