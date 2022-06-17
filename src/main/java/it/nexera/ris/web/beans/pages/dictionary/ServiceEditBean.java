@@ -5,6 +5,7 @@ import it.nexera.ris.common.enums.ServiceReferenceTypes;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.*;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
+import it.nexera.ris.persistence.beans.entities.domain.TaxRate;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.CostConfiguration;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.DataGroup;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
@@ -68,6 +69,10 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
     private Boolean salesDevelopment;
 
     private Boolean landOmi;
+    
+    private List<SelectItem> taxRates;
+    
+    private Long selectedNationalTaxRateId;
     
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -161,6 +166,22 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
 
         setSalesDevelopment(this.getEntity().getSalesDevelopment());
         setLandOmi(this.getEntity().getLandOmi());
+        
+        setTaxRates(new ArrayList<>());
+        getTaxRates().add(SelectItemHelper.getNotSelected());
+        List<TaxRate> activeTaxRates = DaoManager.load(TaxRate.class, new Criterion[]{
+                Restrictions.and(
+                        Restrictions.isNotNull("use"),
+                        Restrictions.eq("use", Boolean.TRUE)
+                )
+        });
+        activeTaxRates.forEach(tr -> {
+            getTaxRates().add(new SelectItem(tr.getId(), tr.getPercentage() +  "% - " + tr.getDescription()));
+        });
+        
+        if(!ValidationHelper.isNullOrEmpty(getEntity().getNationalTaxRate())) {
+        	setSelectedNationalTaxRateId(getEntity().getNationalTaxRate().getId());
+        }
     }
 
     public void editService() {
@@ -264,6 +285,10 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
             this.getEntity().setLandOmi(this.getLandOmi());
         }else {
             this.getEntity().setLandOmi(null);
+        }
+        
+        if(!ValidationHelper.isNullOrEmpty(getSelectedNationalTaxRateId())) {
+        	this.getEntity().setNationalTaxRate(DaoManager.get(TaxRate.class, getSelectedNationalTaxRateId()));
         }
 
         DaoManager.save(this.getEntity());
@@ -476,4 +501,22 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
     public void setLandOmi(Boolean landOmi) {
         this.landOmi = landOmi;
     }
+
+	public List<SelectItem> getTaxRates() {
+		return taxRates;
+	}
+
+	public void setTaxRates(List<SelectItem> taxRates) {
+		this.taxRates = taxRates;
+	}
+
+	public Long getSelectedNationalTaxRateId() {
+		return selectedNationalTaxRateId;
+	}
+
+	public void setSelectedNationalTaxRateId(Long selectedNationalTaxRateId) {
+		this.selectedNationalTaxRateId = selectedNationalTaxRateId;
+	}
+    
+    
 }

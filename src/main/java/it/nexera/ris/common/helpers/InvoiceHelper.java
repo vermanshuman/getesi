@@ -367,6 +367,9 @@ public class InvoiceHelper {
                     	if (!ValidationHelper.isNullOrEmpty(request.getService())
                     			&& !ValidationHelper.isNullOrEmpty(request.getService().getNationalPrice())) {
                     		nationalPrice = request.getService().getNationalPrice();
+                    		if(!ValidationHelper.isNullOrEmpty(request.getService().getNationalTaxRate())) {
+                    			requestPriceListModel.setTaxRate(request.getService().getNationalTaxRate());
+                    		}
                     	}
                     	totalCost = result + nationalPrice;
                     }

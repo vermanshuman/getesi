@@ -4,6 +4,7 @@ import it.nexera.ris.common.enums.RequestOutputTypes;
 import it.nexera.ris.common.enums.ServiceReferenceTypes;
 import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
+import it.nexera.ris.persistence.beans.entities.domain.TaxRate;
 
 import javax.persistence.*;
 import java.util.List;
@@ -111,6 +112,10 @@ public class Service extends IndexedEntity {
 
     @Column(name = "land_omi")
     private Boolean landOmi;
+    
+    @ManyToOne
+    @JoinColumn(name = "national_tax_rate")
+    private TaxRate nationalTaxRate;
 
     @Override
     public String toString() {
@@ -330,4 +335,14 @@ public class Service extends IndexedEntity {
     public void setLandOmi(Boolean landOmi) {
         this.landOmi = landOmi;
     }
+
+	public TaxRate getNationalTaxRate() {
+		return nationalTaxRate;
+	}
+
+	public void setNationalTaxRate(TaxRate nationalTaxRate) {
+		this.nationalTaxRate = nationalTaxRate;
+	}
+    
+    
 }

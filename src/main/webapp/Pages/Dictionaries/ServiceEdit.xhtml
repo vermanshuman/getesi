@@ -152,11 +152,15 @@
                                          id="national" onchange="toggleIsNationalServ()"
                                          disabled="#{bean.onlyView}" widgetVar="isNationalServ"/>
                 <p:panel id="nationalService" style="margin: auto; display: #{bean.entity.isNational ? '' : 'none'}">
-                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid">
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" style="width:400px;">
                         <span>#{msg.serviceCost}: </span>
                         <p:inputText value="#{bean.entity.nationalPrice}" id="serviceNationalPrice"
                                      rendered="#{!bean.onlyView}" styleClass="input-width"/>
-
+                        <span>#{msg.serviceTaxRate}</span>
+                        <p:selectOneMenu value="#{bean.selectedNationalTaxRateId}" styleClass="input-width"
+                            		label="#{msg.taxRate}">
+                        	<f:selectItems value="#{bean.taxRates}"/>
+                        </p:selectOneMenu>
                     </p:panelGrid>
                 </p:panel>
             </p:panelGrid>
