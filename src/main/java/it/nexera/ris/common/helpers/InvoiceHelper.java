@@ -414,6 +414,17 @@ public class InvoiceHelper {
                         requestPriceListModel.setTaxRate(taxRateExtraCosts.get(0).getTaxRate());
                         requestPriceListModels.add(requestPriceListModel);
                     }
+                } else {
+                	if(!ValidationHelper.isNullOrEmpty(request.getService().getNationalTaxRate())) {
+	                	RequestPriceListModel requestPriceListModel = new RequestPriceListModel();
+	                    requestPriceListModel.setRequestId(requestId);
+	                    requestPriceListModel.setRequest(request);
+	                    requestPriceListModel.setTotalCost(cost.getPrice());
+	                    requestPriceListModel.setClient(request.getClient());
+	                    requestPriceListModel.setService(request.getService());
+            			requestPriceListModel.setTaxRate(request.getService().getNationalTaxRate());
+            			requestPriceListModels.add(requestPriceListModel);
+            		}
                 }
             }
 
