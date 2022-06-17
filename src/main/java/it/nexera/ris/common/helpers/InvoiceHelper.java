@@ -342,6 +342,8 @@ public class InvoiceHelper {
                     totalCost = 0d;
                     double firstPrice = 0d;
                     double price = 0d;
+                    double result = 0d;
+                    double nationalPrice = 0d;
                     Double conservationCosts = Double.parseDouble(priceList.getFirstPrice().replaceAll(",", "."));
                     if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())
                             && !ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getLandChargesRegistries())) {
@@ -352,6 +354,22 @@ public class InvoiceHelper {
                     	price = Double.parseDouble(priceList.getPrice().replaceAll(",", "."));
                     }
                     totalCost = firstPrice + price;
+                    if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())
+                            && !ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getNational())
+                            && request.getAggregationLandChargesRegistry().getNational()) {
+                    	conservationCosts = Double.parseDouble(priceList.getPrice().replaceAll(",", "."));
+                        if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())
+                                && !ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getLandChargesRegistries())) {
+                            result = conservationCosts * request.getAggregationLandChargesRegistry()
+                                    .getNumberOfVisualizedLandChargesRegistries();
+                        }
+                        
+                    	if (!ValidationHelper.isNullOrEmpty(request.getService())
+                    			&& !ValidationHelper.isNullOrEmpty(request.getService().getNationalPrice())) {
+                    		nationalPrice = request.getService().getNationalPrice();
+                    	}
+                    	totalCost = result + nationalPrice;
+                    }
                 }
                 else if(!ValidationHelper.isNullOrEmpty(priceList.getIsNegative()) && priceList.getIsNegative()){
                     requestPriceListModel.setTaxRate(priceList.getTaxRate());
