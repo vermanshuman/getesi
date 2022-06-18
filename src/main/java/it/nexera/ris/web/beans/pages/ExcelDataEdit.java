@@ -1038,7 +1038,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                     if (!ValidationHelper.isNullOrEmpty(getExcelClientInvoiceId())) {
                         getMail().setClientInvoice(DaoManager.get(Client.class, getExcelClientInvoiceId()));
                     } else {
-                        getMail().setClientInvoice(null);
+                        //getMail().setClientInvoice(null);
                     }
                 }
 

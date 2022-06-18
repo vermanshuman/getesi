@@ -334,6 +334,26 @@
         body .ui-autocomplete .ui-autocomplete-multiple-container .ui-autocomplete-token .ui-autocomplete-token-icon {
             font: normal normal normal 14px/1 FontAwesome !important;
         }
+        
+        .ui-fileupload-responsive {
+       		display: inline-flex;
+       	}
+       	
+       	.ui-fileupload-content {
+       		display: none;
+       	}
+       	
+       	body .ui-fileupload .ui-fileupload-buttonbar {
+       		border: none !important;
+       	} 
+       	
+       	#invoiceDialogBilling .ui-fileupload-buttonbar.ui-widget-header {
+       		background-color: #f0f2f5 !important;
+       	}
+       	
+       	.ui-icon-plusthick {
+       		margin-left: 17px !important;
+       	}
     </style>
 
     <p:dialog widgetVar="invoiceDialogExcelWV" modal="true" width="1350" draggable="false" id="invoiceDialogBilling"
@@ -906,11 +926,18 @@
                         <div class="p-col-6">
                             <div class="p-grid">
                                 <div class="p-col-12">
-                                    <h:outputText value="#{msg.mailManagerEmailAttachmentMessage}"/>
+                                    <div  style="display:inline;">
+                                    	<h:outputText value="#{msg.mailManagerEmailAttachmentMessage}"/>
+                                    </div>
+                                    <div  style="display:inline;">
+	                                    <p:fileUpload fileUploadListener="#{invoiceDialogBean.handleFileUpload}" label=""
+	                                  			mode="advanced" auto="true" multiple="true"
+	                                  		 	update="listFile attachedFilesTable"/>
+                                  	</div>
                                 </div>
                                 <div class="p-col-12">
                                     <p:outputPanel id="listFile">
-                                        <p:dataTable value="#{invoiceDialogBean.invoiceEmailAttachedFiles}" styleClass="simple-table" var="file"
+                                        <p:dataTable value="#{invoiceDialogBean.invoiceEmailAttachedFiles}" styleClass="simple-table" var="file" id="attachedFilesTable"
                                                      rendered="#{not empty invoiceDialogBean.invoiceEmailAttachedFiles}" emptyMessage="#{msg.noRecordsFound}"
                                                      scrollHeight="150" style="border: 1px solid #a8acb1;">
                                             <p:column styleClass="action_column">

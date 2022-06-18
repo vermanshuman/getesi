@@ -44,6 +44,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.primefaces.component.tabview.TabView;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.LazyDataModel;
@@ -2936,4 +2937,24 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             LogHelper.log(log, e);
         }
     }*/
+    
+    public void handleFileUpload(FileUploadEvent event) throws PersistenceBeanException {
+    	WLGExport newFile = new WLGExport();
+        newFile.setExportDate(new Date());
+        DaoManager.save(newFile, true);
+
+        File filePath = new File(newFile.generateDestinationPath(event.getFile().getFileName()));
+        try {
+            String str = FileHelper.writeFileToFolder(event.getFile().getFileName(),
+                    filePath, event.getFile().getContents());
+            if (!new File(str).exists()) {
+                return;
+            }
+            LogHelper.log(log, newFile.getId() + " " + str);
+        } catch (IOException e) {
+            LogHelper.log(log, e);
+        }
+        DaoManager.save(newFile, true);
+        addAttachedFile(newFile, true);
+    }
 }
