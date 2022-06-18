@@ -20,9 +20,9 @@ public class ExcelTableWrapper implements Serializable {
     
     private List<String> columnNames;
     
-    List<Request> requests;
+    private List<Request> requests;
     
-    Map<String, String> columnValues;
+    private Map<String, String> columnValues;
     
     private Map<String, String> footerValues;
     

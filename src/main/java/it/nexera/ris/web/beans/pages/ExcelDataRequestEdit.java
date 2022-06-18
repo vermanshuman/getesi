@@ -304,6 +304,7 @@ public class ExcelDataRequestEdit extends BaseEntityPageBean {
         if(!ValidationHelper.isNullOrEmpty(getRequests()))
             requestClient = getRequests().get(0).getClient();
         List<String> columns = new ArrayList<>();
+        setDataTable(new ArrayList<>());
         for (Map.Entry<RequestType, List<Request>> entry : sortedRequests.entrySet()) {
             columns.clear();
             List<ClientInvoiceManageColumn> clientInvoiceManageColumns = DaoManager.load(ClientInvoiceManageColumn.class,
@@ -313,7 +314,7 @@ public class ExcelDataRequestEdit extends BaseEntityPageBean {
                             Restrictions.and(Restrictions.eq("client.id", requestClient.getId())
                                     ,Restrictions.eq("requestType.id",entry.getKey().getId()))
                     });
-            if (!ValidationHelper.isNullOrEmpty(columns)) {
+            if (!ValidationHelper.isNullOrEmpty(clientInvoiceManageColumns)) {
                 for (ClientInvoiceManageColumn column : clientInvoiceManageColumns) {
                     columns.add(getColumnNameByField(column.getField()));
                 }

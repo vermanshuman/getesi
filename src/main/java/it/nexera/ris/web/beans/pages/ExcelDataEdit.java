@@ -293,10 +293,12 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         Map<RequestType, List<Request>> sortedRequests = new HashMap<>();
         setRequests(requests.stream().filter(Request::isDeletedRequest).collect(Collectors.toList()));
         sortRequestsByType(getRequests(), sortedRequests);
-        Client requestClient = getRequests().get(0).getClient();
-
+        //Client requestClient = getRequests().get(0).getClient();
+        setExcelDataTable(new ArrayList<>());
+        
         for (Map.Entry<RequestType, List<Request>> entry : sortedRequests.entrySet()) {
             List<String> columns = new ArrayList<>();
+            Client requestClient = entry.getValue().get(0).getClient();
             List<ClientInvoiceManageColumn> clientInvoiceManageColumns = DaoManager.load(ClientInvoiceManageColumn.class,
                     new CriteriaAlias[]{new CriteriaAlias("client", "client", JoinType.INNER_JOIN),
                             new CriteriaAlias("requestType", "requestType", JoinType.INNER_JOIN)},
