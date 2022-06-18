@@ -290,6 +290,7 @@ public class InvoiceHelper {
                         requestPriceListModel.setTaxRate(priceList.getTaxRate());
                     }else  if(priceList.getCostConfiguration().getTypeId().equals(CostType.EXTRA_COST.getId())){
                         totalCost += Double.parseDouble(priceList.getPrice().replaceAll("\\,", "."));
+                        requestPriceListModel.setTaxRate(priceList.getTaxRate());
                     } else  if(priceList.getCostConfiguration().getTypeId().equals(
                             CostType.DEPENDING_ON_NUMBER_OF_FORMALITIES.getId())){
                         requestPriceListModel.setTaxRate(priceList.getTaxRate());
