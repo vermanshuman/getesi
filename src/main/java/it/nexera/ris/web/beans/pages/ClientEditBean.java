@@ -1259,7 +1259,7 @@ public class ClientEditBean extends EntityEditPageBean<Client>
             }
         }
     }
-
+    
     public void setOfficesByArea() {
         final List<Long> areaIds;
         if (isHasAgency()) {
@@ -1696,6 +1696,11 @@ public class ClientEditBean extends EntityEditPageBean<Client>
             RequestContext.getCurrentInstance().update("confirmCopyPriceListDialog");
             executeJS("PF('confirmCopyPriceListDialogWV').show();");
         }
+    }
+    
+    public void saveConfigurePriceListData() {
+    	setRunAfterSave(false);
+    	pageSave();
     }
 
     public void lastStepListener(boolean isLast) {

@@ -24,9 +24,9 @@
                 border: 0px !important;
                 border-radius: 0px;
             }
-            #configurePriceList{
+            /* #configurePriceList{
                 overflow: hidden !important;
-            }
+            } */
             #configurePriceList .ui-dialog-titlebar{
                 padding: 5px !important;
             }
@@ -893,7 +893,7 @@
                             <p:commandButton value="#{msg.clientEditCopy}" action="#{bean.checkCopyPriceListClient}" />
                         </p:panelGrid>
                     </p:panel>
-                    <p:dataTable var="item" value="#{bean.services}" editable="true" editMode="cell" id="servicesTable"
+                    <p:dataTable var="item" value="#{bean.services}" editable="true" editMode="cell" id="servicesTable" widgetVar="servicesTableWV"
                                  emptyMessage="#{msg.noRecordsFound}">
                         <f:facet name="header">
                             <h:outputText value="#{msg.clientServiceTable}"/>
@@ -1124,9 +1124,10 @@
 
         </p:dialog>
 
-        <p:dialog id="configurePriceList" width="90%" widgetVar="configurePriceListWV" styleClass="table-center"
-                  resizable="false" closable="true" fitViewport="true"  draggable="false" modal="true" style="max-height: 85%;" >
-            <p:outputPanel widgetVar="configurePriceListPanel" id="configurePriceListPanel" style="min-height: 100px; height: 700px; overflow: auto;">
+        <p:dialog id="configurePriceList" width="90%" widgetVar="configurePriceListWV" styleClass="table-center" 
+                  resizable="false" closable="true" fitViewport="true"  draggable="false" modal="true" 
+                  style="max-height: 700px;min-height: 100px; height: 700px; overflow: auto;" >
+            <p:outputPanel widgetVar="configurePriceListPanel" id="configurePriceListPanel" >
                 <p:dataTable var="itemR" value="#{bean.selectedService.priceLists}" styleClass="without-header borderless"
                              emptyMessage="#{msg.noRecordsFound}" id="configurePriceListTable">
                     <p:column>
@@ -1273,7 +1274,9 @@
                 </p:panel>
 
                 <div class="btn_line">
-                    <p:commandButton value="#{msg.confirm}" process="@(.myclass)" class="ui-button-success "
+                    <p:commandButton value="#{msg.confirm}" class="ui-button-success " 
+                    				 action="#{bean.saveConfigurePriceListData}" 
+                    				 update="@widgetVar(servicesTableWV)"
                                      oncomplete="PF('configurePriceListWV').hide()" style="margin-right: 5px;"/>
                     <p:commandButton value="#{msg.cancel}" process="@(.myclass)" class="ui-button-danger"
                                      oncomplete="PF('configurePriceListWV').hide()"
