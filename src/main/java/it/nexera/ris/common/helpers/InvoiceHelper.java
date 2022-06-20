@@ -367,9 +367,22 @@ public class InvoiceHelper {
                         
                     	if (!ValidationHelper.isNullOrEmpty(request.getService())
                     			&& !ValidationHelper.isNullOrEmpty(request.getService().getNationalPrice())) {
-                    		nationalPrice = request.getService().getNationalPrice();
                     		if(!ValidationHelper.isNullOrEmpty(request.getService().getNationalTaxRate())) {
-                    			requestPriceListModel.setTaxRate(request.getService().getNationalTaxRate());
+                    			if(request.getService().getNationalTaxRate().equals(priceList.getTaxRate())) {
+                    				nationalPrice = request.getService().getNationalPrice();
+                    			} else {
+                    				nationalPrice = 0d;
+                    				RequestPriceListModel requestPriceListModelNational = new RequestPriceListModel();
+                    				requestPriceListModelNational.setRequestId(requestId);
+                    				requestPriceListModelNational.setRequest(request);
+                    				requestPriceListModelNational.setTotalCost(request.getService().getNationalPrice());
+                    				requestPriceListModelNational.setClient(priceList.getClient());
+                    				requestPriceListModelNational.setService(priceList.getService());
+                    				requestPriceListModelNational.setTaxRate(request.getService().getNationalTaxRate());
+                                    requestPriceListModels.add(requestPriceListModelNational);
+                    			}
+                    		} else {
+                    			nationalPrice = request.getService().getNationalPrice();
                     		}
                     	}
                     	totalCost = result + nationalPrice;
