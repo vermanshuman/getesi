@@ -20,6 +20,7 @@ import it.nexera.ris.web.beans.wrappers.GoodsServicesFieldWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.*;
 import it.nexera.ris.web.common.EntityLazyListModel;
 import it.nexera.ris.web.common.ListPaginator;
+import it.nexera.ris.web.common.RequestPriceListModel;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
@@ -1179,6 +1180,11 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
 
         setInvoiceErrorMessage(ResourcesHelper.getString("invalidDataMsg"));
+        
+        if (ValidationHelper.isNullOrEmpty(getClientAddressSDI())) {
+        	setInvoiceErrorMessage(ResourcesHelper.getString("noSDIAddressMessage"));
+            setValidationFailed(true);
+        }
 
         if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT())) {
             String vatNumber = getClientNumberVAT().trim();
@@ -1343,6 +1349,11 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
 
         setInvoiceErrorMessage(ResourcesHelper.getString("invalidDataMsg"));
+        
+        if (ValidationHelper.isNullOrEmpty(getClientAddressSDI())) {
+        	setInvoiceErrorMessage(ResourcesHelper.getString("noSDIAddressMessage"));
+            setValidationFailed(true);
+        }
 
         if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT())) {
             String vatNumber = getClientNumberVAT().trim();
@@ -1660,7 +1671,16 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             invoice.setDate(getInvoiceDate());
             invoice.setDate(new Date());
             invoice.setStatus(InvoiceStatus.DRAFT);
-            setSelectedInvoiceItems(InvoiceHelper.groupingItemsByTaxRate(filteredRequests, ""));
+            List<RequestPriceListModel> requestPriceListModels = InvoiceHelper.groupingItemsByTaxRate(filteredRequests);
+    		requestPriceListModels.stream().forEach(rp -> {
+    			log.info(rp.getTaxRate() + "   " + rp.getTotalCost());
+    			if (ValidationHelper.isNullOrEmpty(rp.getTaxRate())) {
+    				setInvoiceErrorMessage(ResourcesHelper.getString("nullTaxRateMessage"));
+    				executeJS("PF('invoiceErrorDialogWV').show();");
+    				RequestContext.getCurrentInstance().update("invoiceErrorDialog");
+    			}
+    		});
+            setSelectedInvoiceItems(InvoiceHelper.getInvoiceItems(requestPriceListModels, ""));
             loadInvoiceDialogData(invoice);
             executeJS("PF('invoiceDialogBillingWV').show();");
         }

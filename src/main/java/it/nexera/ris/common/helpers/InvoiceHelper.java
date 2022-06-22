@@ -29,11 +29,13 @@ import java.util.stream.Collectors;
 
 public class InvoiceHelper {
     private static transient final Log log = LogFactory.getLog(InvoiceHelper.class);
+    
+    static Set<String> requestTypeNames = new HashSet<>();
 
-    public static List<InvoiceItem> groupingItemsByTaxRate(List<Request> selectedRequestList, String causal)
+    public static List<RequestPriceListModel> groupingItemsByTaxRate(List<Request> selectedRequestList)
             throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
         Map<Long, List<PriceList>> priceListMap = new HashMap<>();
-        Set<String> requestTypeNames = new HashSet<>();
+        
         for(Request request: selectedRequestList) {
             requestTypeNames.add(request.getRequestType().getName());
             request.setSelectedTemplateId(null);
@@ -470,10 +472,10 @@ public class InvoiceHelper {
                 }
             }
         }
-        requestPriceListModels.stream()
-                .forEach(rp -> {
-                    log.info(rp.getTaxRate() + "   " + rp.getTotalCost());
-                });
+        return requestPriceListModels;
+    }
+    
+    public static List<InvoiceItem> getInvoiceItems(List<RequestPriceListModel> requestPriceListModels, String causal) {
         Map<TaxRate, List<RequestPriceListModel>> taxRateMap = requestPriceListModels
                 .stream()
                 .filter(rp -> !ValidationHelper.isNullOrEmpty(rp.getTaxRate())
