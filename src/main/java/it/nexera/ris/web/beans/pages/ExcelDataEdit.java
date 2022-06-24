@@ -1708,12 +1708,12 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             getInvoiceDialogBean().loadInvoiceDialogData(invoice);
             executeJS("PF('invoiceDialogExcelWV').show();");
             
-            setErrorDialogCounter(0);
             requestPriceListModels.stream().forEach(rp -> {
     			log.info(rp.getTaxRate() + "   " + rp.getTotalCost());
     			if (ValidationHelper.isNullOrEmpty(rp.getTaxRate())) {
+    				getInvoiceDialogBean().setInvoiceErrorMessage(ResourcesHelper.getString("nullTaxRateMessage"));
     				executeJS("PF('nullTaxRateErrorDialogWV').show();");
-    				setErrorDialogCounter(1);
+    	            RequestContext.getCurrentInstance().update("nullTaxRateErrorDialog");
     			}
     		});
             
@@ -1726,8 +1726,13 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             }
             log.info("request total cost :: "+totalCost + ", total invoice :: "+getInvoiceDialogBean().getAllTotalLine().doubleValue());
             if(totalCost != getInvoiceDialogBean().getAllTotalLine().doubleValue()) {
-            	executeJS("PF('invoiceTotalNotMatchErrorDialogWV').show();");
-            	setErrorDialogCounter(getErrorDialogCounter() + 1);
+            	if(!ValidationHelper.isNullOrEmpty(getInvoiceDialogBean().getInvoiceErrorMessage())) {
+            		getInvoiceDialogBean().setInvoiceErrorMessage(getInvoiceDialogBean().getInvoiceErrorMessage() + "<br /><br />" + ResourcesHelper.getString("invoiceTotalNotMatchMessage"));
+            	} else {
+            		getInvoiceDialogBean().setInvoiceErrorMessage(ResourcesHelper.getString("invoiceTotalNotMatchMessage"));
+            	}
+    			executeJS("PF('nullTaxRateErrorDialogWV').show();");
+                RequestContext.getCurrentInstance().update("nullTaxRateErrorDialog");
             }
         }
     }
@@ -1890,16 +1895,14 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         }
     }
     
-    public void loadInvoiceDataAfterError(Integer dialogCounter) throws IllegalAccessException, HibernateException, InstantiationException, PersistenceBeanException {
-    	if(dialogCounter.intValue() == 1) {
-	    	Invoice invoice = getTempInvoice();
-	    	getInvoiceDialogBean().setSelectedInvoiceClient(invoice.getClient());
-	        if(!ValidationHelper.isNullOrEmpty(getInvoiceDialogBean().getSelectedInvoiceClient()))
-	        	getInvoiceDialogBean().setSelectedInvoiceClientId(getInvoiceDialogBean().getSelectedInvoiceClient().getId());
-	        getInvoiceDialogBean().loadInvoiceDialogData(invoice);
-	        executeJS("PF('invoiceDialogExcelWV').show();");
-	        RequestContext.getCurrentInstance().update("invoiceDialogBilling");
-    	}
+    public void loadInvoiceDataAfterError() throws IllegalAccessException, HibernateException, InstantiationException, PersistenceBeanException {
+    	Invoice invoice = getTempInvoice();
+    	getInvoiceDialogBean().setSelectedInvoiceClient(invoice.getClient());
+        if(!ValidationHelper.isNullOrEmpty(getInvoiceDialogBean().getSelectedInvoiceClient()))
+        	getInvoiceDialogBean().setSelectedInvoiceClientId(getInvoiceDialogBean().getSelectedInvoiceClient().getId());
+        getInvoiceDialogBean().loadInvoiceDialogData(invoice);
+        executeJS("PF('invoiceDialogExcelWV').show();");
+        RequestContext.getCurrentInstance().update("invoiceDialogBilling");
     }
 
     public Request getExamRequest() {

@@ -333,10 +333,7 @@
                                  oncomplete="PF('invoiceAlreadyCreatedDialogWV').hide();"/>
                 <p:commandButton value="#{msg.cancel}" oncomplete="PF('invoiceAlreadyCreatedDialogWV').hide();"
                                  style="background-color: #F3362B !important; width: 100px;" update="@form" />
-                <!-- <p:commandButton value="#{msg.close}" styleClass="confirm-button"
-                                 style="background-color: #F3362B !important;margin-right: 15px;"
-                                 oncomplete="PF('invoiceAlreadyCreatedDialogWV').hide();"/> -->
-            </div>
+           </div>
         </p:dialog>
 
         <p:dialog id="otherRequestsExistsForInvoiceDialog" widgetVar="otherRequestsExistsForInvoiceDialogWV" modal="true" styleClass="dialog-green"
@@ -354,19 +351,20 @@
             </div>
         </p:dialog>
         
-        <p:dialog id="nullTaxRateErrorDialog" widgetVar="nullTaxRateErrorDialogWV" modal="true" styleClass="dialog-red"
+        <p:dialog id="nullTaxRateErrorDialog" widgetVar="nullTaxRateErrorDialogWV" modal="true" position="center center"
 	                  resizable="false" draggable="false" effect="SLIDE">
-		    <span>
-		        <h:outputText value="#{msg.nullTaxRateMessage}"/>
-		    </span>
-		    <div class="btn_line">
-		        <p:commandButton value="#{msg.close}" styleClass="confirm-button" action="#{bean.loadInvoiceDataAfterError(1)}"
-		                         style="background-color: #F3362B !important;margin-right: 15px;"
-		                         oncomplete="PF('nullTaxRateErrorDialogWV').hide();"/>
-		    </div>
+			<div class="ui-messages-error ui-corner-all">
+	            <span class="ui-messages-error-summary" style="margin-left:0px !important;">
+	            	<h:outputText value="#{bean.invoiceErrorMessage}" escape="false"/>
+	            </span><br/>
+	        </div>
+	        <div class="btn_line">
+	        	<p:commandButton action="#{bean.loadInvoiceDataAfterError}" oncomplete="PF('nullTaxRateErrorDialogWV').hide();"
+	                         value="#{msg.close}" style="background-color: #F3362B !important;" />
+	        </div>
 		</p:dialog>
 		
-		<p:dialog id="invoiceTotalNotMatchErrorDialog" widgetVar="invoiceTotalNotMatchErrorDialogWV" modal="true" styleClass="dialog-red"
+		<!-- <p:dialog id="invoiceTotalNotMatchErrorDialog" widgetVar="invoiceTotalNotMatchErrorDialogWV" modal="true" styleClass="dialog-red"
 	                  resizable="false" draggable="false" effect="SLIDE">
 		    <span>
 		        <h:outputText value="#{msg.invoiceTotalNotMatchMessage}"/>
@@ -376,7 +374,7 @@
 		                         style="background-color: #F3362B !important;margin-right: 15px;"
 		                         oncomplete="PF('invoiceTotalNotMatchErrorDialogWV').hide();"/>
 		    </div>
-		</p:dialog>
+		</p:dialog> --> 
 
         <ui:include src="../ConfigurationArea/ClientCreate.xhtml"/>
         <ui:include src="../Dialogs/MailManagerViewRequestsDialog.xhtml"/>

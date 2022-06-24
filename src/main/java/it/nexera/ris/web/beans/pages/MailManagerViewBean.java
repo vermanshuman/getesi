@@ -322,8 +322,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     
     private Invoice tempInvoice;
     
-    private Integer errorDialogCounter;
-
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
         if (!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.BILLING_LIST))) {
@@ -1669,12 +1667,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         loadInvoiceDialogData(invoice);
         executeJS("PF('invoiceDialogBillingWV').show();");
         
-        setErrorDialogCounter(0);
         requestPriceListModels.stream().forEach(rp -> {
 			log.info(rp.getTaxRate() + "   " + rp.getTotalCost());
 			if (ValidationHelper.isNullOrEmpty(rp.getTaxRate())) {
+				setInvoiceErrorMessage(ResourcesHelper.getString("nullTaxRateMessage"));
 				executeJS("PF('nullTaxRateErrorDialogWV').show();");
-				setErrorDialogCounter(1);
+	            RequestContext.getCurrentInstance().update("nullTaxRateErrorDialog");
 			}
 		});
         
@@ -1687,8 +1685,13 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
         log.info("request total cost :: "+totalCost + ", total invoice :: "+getAllTotalLine().doubleValue());
         if(totalCost != getAllTotalLine().doubleValue()) {
-        	executeJS("PF('invoiceTotalNotMatchErrorDialogWV').show();");
-        	setErrorDialogCounter(getErrorDialogCounter() + 1);
+        	if(!ValidationHelper.isNullOrEmpty(getInvoiceErrorMessage())) {
+        		setInvoiceErrorMessage(getInvoiceErrorMessage() + "<br /><br />" + ResourcesHelper.getString("invoiceTotalNotMatchMessage"));
+        	} else {
+        		setInvoiceErrorMessage(ResourcesHelper.getString("invoiceTotalNotMatchMessage"));
+        	}
+			executeJS("PF('nullTaxRateErrorDialogWV').show();");
+            RequestContext.getCurrentInstance().update("nullTaxRateErrorDialog");
         }
     }
 
@@ -3193,15 +3196,13 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         addAttachedFile(newFile, true);
     }
     
-    public void loadInvoiceDataAfterError(Integer dialogCounter) throws IllegalAccessException, HibernateException, InstantiationException, PersistenceBeanException {
-    	if(dialogCounter.intValue() == 1) {
-	    	Invoice invoice = getTempInvoice();
-	    	setSelectedInvoiceClient(invoice.getClient());
-	        if(!ValidationHelper.isNullOrEmpty(getSelectedInvoiceClient()))
-	            setSelectedInvoiceClientId(getSelectedInvoiceClient().getId());
-	        loadInvoiceDialogData(invoice);
-	        executeJS("PF('invoiceDialogBillingWV').show();");
-	        RequestContext.getCurrentInstance().update("invoiceDialogBilling");
-    	}
+    public void loadInvoiceDataAfterError() throws IllegalAccessException, HibernateException, InstantiationException, PersistenceBeanException {
+    	Invoice invoice = getTempInvoice();
+    	setSelectedInvoiceClient(invoice.getClient());
+        if(!ValidationHelper.isNullOrEmpty(getSelectedInvoiceClient()))
+            setSelectedInvoiceClientId(getSelectedInvoiceClient().getId());
+        loadInvoiceDialogData(invoice);
+        executeJS("PF('invoiceDialogBillingWV').show();");
+        RequestContext.getCurrentInstance().update("invoiceDialogBilling");
     }
 }
