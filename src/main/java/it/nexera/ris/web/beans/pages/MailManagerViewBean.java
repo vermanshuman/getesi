@@ -322,6 +322,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     
     private Invoice tempInvoice;
     
+    private Boolean invoiceSaveAsDraft;
+    
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
         if (!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.BILLING_LIST))) {
@@ -1574,6 +1576,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         getClientProvinces().add(new SelectItem(Province.FOREIGN_COUNTRY_ID, Province.FOREIGN_COUNTRY));
         setClientAddressCities(ComboboxHelper.fillList(new ArrayList<City>(), true));
         getInvoiceClientData(getSelectedInvoiceClient());
+        if (!ValidationHelper.isNullOrEmpty(invoiceDb) && !ValidationHelper.isNullOrEmpty(invoiceDb.getStatus()) && invoiceDb.getStatus().equals(InvoiceStatus.DRAFT))
+        	setInvoiceSaveAsDraft(Boolean.TRUE);
     }
 
     private String getCausal() {
@@ -1779,13 +1783,14 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             saveInvoice(InvoiceStatus.DRAFT, true);
             loadInvoiceDialogData(getSelectedInvoice());
             setShowCreateFatturaButton(Boolean.FALSE);
+            setInvoiceSaveAsDraft(Boolean.TRUE);
         } catch (Exception e) {
             e.printStackTrace();
             LogHelper.log(log, e);
         }
-        executeJS("PF('invoiceDialogBillingWV').hide();");
-        RequestContext.getCurrentInstance().update("form");
-        closeInvoiceDialog();
+        //executeJS("PF('invoiceDialogBillingWV').hide();");
+        //RequestContext.getCurrentInstance().update("form");
+        //closeInvoiceDialog();
     }
 
     public Invoice saveInvoice(InvoiceStatus invoiceStatus, Boolean saveInvoiceNumber) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
@@ -1981,8 +1986,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             executeJS("PF('sendInvoiceErrorDialogWV').show();");
             return;
         }
-        executeJS("PF('invoiceDialogBillingWV').hide();");
-        closeInvoiceDialog();
+        //executeJS("PF('invoiceDialogBillingWV').hide();");
+        //closeInvoiceDialog();
     }
 
 //    public List<String> completeMailFrom(String query) {

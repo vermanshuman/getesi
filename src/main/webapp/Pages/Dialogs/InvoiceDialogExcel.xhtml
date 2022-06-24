@@ -747,14 +747,16 @@
                                 <div class="p-col-4" style="text-align:right;">
                                     <p:commandButton value="#{msg.cancel.toUpperCase()}" oncomplete="PF('invoiceDialogExcelWV').hide(); closeInvoiceDialog();"
                                                      rendered="#{!invoiceDialogBean.invoiceSentStatus}"/>
-                                    <p:commandButton value="#{msg.saveInDraft}" styleClass="ui-button-success p-mr-2 p-mb-2" style="margin-left:5px;"
+                                    <p:commandButton value="#{msg.saveInDraft}" styleClass="#{invoiceDialogBean.invoiceSaveAsDraft ? '' : 'ui-button-success'}" style="margin-left:5px;"
                                                      action="#{invoiceDialogBean.saveInvoiceInDraft}" update="mainPanel goodsServicesPanel countsSummaryPanel @widgetVar(buttonsPanelWV)"
                                                      rendered="#{!invoiceDialogBean.invoiceSentStatus}"/>
-                                    <p:commandButton value="#{msg.delivery}" styleClass="ui-button-success p-mr-2 p-mb-2"
+                                    <p:commandButton value="#{msg.delivery}" styleClass="ui-button-success" style="margin-left:5px;"
                                                      action="#{invoiceDialogBean.sendInvoice}" rendered="#{!invoiceDialogBean.invoiceSentStatus}"
                                                      update="@widgetVar(buttonsPanelWV) @widgetVar(countsSummaryPanelVW)
-                             						 		 @widgetVar(goodsServicesPanelVW) @widgetVar(mainPanelVW) @widgetVar(sendInvoiceErrorDialogWV) :form"/>                                    <p:commandButton value="#{msg.close}" oncomplete="PF('invoiceDialogExcelWV').hide(); closeInvoiceDialog();"
-                                                                                                                                                                                                                          rendered="#{invoiceDialogBean.invoiceSentStatus}"/>
+                             						 		 @widgetVar(goodsServicesPanelVW) @widgetVar(mainPanelVW) @widgetVar(sendInvoiceErrorDialogWV)"/>                                    
+                             		<p:commandButton value="#{msg.close}" 
+                             						 oncomplete="PF('invoiceDialogExcelWV').hide(); closeInvoiceDialog();" 
+                             						 rendered="#{invoiceDialogBean.invoiceSentStatus}"/>
                                 </div>
                             </div>
                         </p:panel>

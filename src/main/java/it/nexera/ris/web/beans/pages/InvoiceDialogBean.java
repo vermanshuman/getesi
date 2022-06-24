@@ -1,5 +1,7 @@
 package it.nexera.ris.web.beans.pages;
 
+import it.nexera.ris.api.FatturaAPI;
+import it.nexera.ris.api.FatturaAPIResponse;
 import it.nexera.ris.common.enums.*;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.*;
@@ -289,8 +291,6 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
 
     private String apiError;
 
-    private boolean sendInvoice;
-
     private Boolean billinRequest;
 
 
@@ -354,6 +354,8 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
     private Date paymentDate;
 
     private WLGInbox entity;
+    
+    private Boolean invoiceSaveAsDraft;
 
     @Override
     protected void onConstruct() {
@@ -1965,13 +1967,14 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         try {
             saveInvoice(InvoiceStatus.DRAFT, true);
             loadInvoiceDialogData(getSelectedInvoice());
+            setInvoiceSaveAsDraft(Boolean.TRUE);
         } catch (Exception e) {
             e.printStackTrace();
             LogHelper.log(log, e);
         }
-        executeJS("PF('invoiceDialogExcelWV').hide();");
-        RequestContext.getCurrentInstance().update("form");
-        closeInvoiceDialog();
+        //executeJS("PF('invoiceDialogExcelWV').hide();");
+        //RequestContext.getCurrentInstance().update("form");
+        //closeInvoiceDialog();
     }
 
     public Invoice saveInvoice(InvoiceStatus invoiceStatus, Boolean saveInvoiceNumber) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
@@ -2185,5 +2188,111 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         }
         DaoManager.save(newFile, true);
         addAttachedFile(newFile, true);
+    }
+    
+    public void sendInvoice() {
+        cleanValidation();
+        if (ValidationHelper.isNullOrEmpty(getInvoiceDate())) {
+            addRequiredFieldException("form:date");
+            setValidationFailed(true);
+        }
+
+        if (ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeId())) {
+            addRequiredFieldException("form:paymentType");
+            setValidationFailed(true);
+        }
+
+        for (GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
+            if (ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceTotalCost())) {
+                setValidationFailed(true);
+            }
+
+            if (ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getSelectedTaxRateId())) {
+                setValidationFailed(true);
+            }
+        }
+
+        setInvoiceErrorMessage(ResourcesHelper.getString("invalidDataMsg"));
+        
+        if (ValidationHelper.isNullOrEmpty(getClientAddressSDI())) {
+        	setInvoiceErrorMessage(ResourcesHelper.getString("noSDIAddressMessage"));
+            setValidationFailed(true);
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(getClientNumberVAT())) {
+            String vatNumber = getClientNumberVAT().trim();
+            if(getClientNumberVAT().startsWith("IT")) {
+                vatNumber = getClientNumberVAT().trim().substring(2);
+            }
+            if(vatNumber.length() != 11) {
+                setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
+                setValidationFailed(true);
+            }
+        } else {
+            setInvoiceErrorMessage(ResourcesHelper.getString("invalidClientNumberVAT"));
+            setValidationFailed(true);
+        }
+
+        if (getValidationFailed()) {
+            executeJS("PF('invoiceErrorDialogWV').show();");
+            RequestContext.getCurrentInstance().update("invoiceErrorDialog");
+            return;
+        }
+
+        try {
+
+            saveInvoiceInDraft();
+            Invoice invoice =  DaoManager.get(Invoice.class, new Criterion[]{
+                    Restrictions.eq("number", getNumber())
+            });
+            List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
+            FatturaAPI fatturaAPI = new FatturaAPI();
+            String xmlData = fatturaAPI.getDataForXML(invoice, invoiceItems);
+
+            FatturaAPIResponse fatturaAPIResponse = fatturaAPI.callFatturaAPI(xmlData, log);
+
+            if (fatturaAPIResponse != null && fatturaAPIResponse.getReturnCode() != -1) {
+                invoice.setStatus(InvoiceStatus.DELIVERED);
+                DaoManager.save(invoice, true);
+
+                List<Request> selectedRequestList = new ArrayList<>();
+                if (!ValidationHelper.isNullOrEmpty(getInvoicedRequests())) {
+                    selectedRequestList = getInvoicedRequests().stream().filter(r -> !ValidationHelper.isNullOrEmpty(r.getInvoice()))
+                            .collect(Collectors.toList());
+                }
+                CollectionUtils.emptyIfNull(selectedRequestList).stream().forEach(r -> {
+                    try {
+                        r.setStateId(RequestState.SENT_TO_SDI.getId());
+                        DaoManager.save(r, true);
+                    } catch (PersistenceBeanException e) {
+                        log.error("error in saving request after sending invoice ", e);
+                    }
+                });
+
+                setInvoiceSentStatus(true);
+                /*executeJS("PF('invoiceDialogWV').hide();");*/
+            } else {
+                setApiError(ResourcesHelper.getString("sendInvoiceErrorMsg"));
+                if (fatturaAPIResponse != null
+                        && !ValidationHelper.isNullOrEmpty(fatturaAPIResponse.getDescription())) {
+
+                    if (fatturaAPIResponse.getDescription().contains("already exists")) {
+                        setApiError(ResourcesHelper.getString("sendInvoiceDuplicateMsg"));
+                    } else
+                        setApiError(fatturaAPIResponse.getDescription());
+                }
+                executeJS("PF('sendInvoiceErrorDialogWV').show();");
+                return;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            LogHelper.log(log, e);
+            setApiError(ResourcesHelper.getString("sendInvoiceErrorMsg"));
+            executeJS("PF('sendInvoiceErrorDialogWV').show();");
+            return;
+        }
+        //executeJS("PF('invoiceDialogBillingWV').hide();");
+        //closeInvoiceDialog();
     }
 }

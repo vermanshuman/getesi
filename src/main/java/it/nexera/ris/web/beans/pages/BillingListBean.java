@@ -373,6 +373,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     @ManagedProperty(value="#{invoiceDialogBean}")
     private InvoiceDialogBean invoiceDialogBean;
+    
+    private Boolean invoiceSaveAsDraft;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -1068,12 +1070,15 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                     if (!ValidationHelper.isNullOrEmpty(invoice.getEmail()) && !ValidationHelper.isNullOrEmpty(invoice.getEmail().getEmailSubject()))
                         setEmailSubject(invoice.getEmail().getEmailSubject());
                 }
+                if (!ValidationHelper.isNullOrEmpty(invoice.getStatus()) && invoice.getStatus().equals(InvoiceStatus.DRAFT))
+                	setInvoiceSaveAsDraft(Boolean.TRUE);
             }
         } else {
             setGoodsServicesFields(new ArrayList<>());
             createNewGoodsServicesFields();
             setMaxInvoiceNumber();
             setInvoiceDate(new Date());
+            setInvoiceSaveAsDraft(Boolean.FALSE);
         }
         setClientProvinces(ComboboxHelper.fillList(Province.class, Order.asc("description")));
         getClientProvinces().add(new SelectItem(Province.FOREIGN_COUNTRY_ID, Province.FOREIGN_COUNTRY));
@@ -1228,14 +1233,15 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
         try {
             Invoice invoice = saveInvoice(InvoiceStatus.DRAFT, true);
+            setInvoiceSaveAsDraft(Boolean.TRUE);
             loadInvoiceDialogData(invoice);
         }catch(Exception e) {
             e.printStackTrace();
             LogHelper.log(log, e);
         }
-        executeJS("PF('invoiceDialogBillingWV').hide();");
-        RequestContext.getCurrentInstance().update("form");
-        closeInvoiceDialog();
+        //executeJS("PF('invoiceDialogBillingWV').hide();");
+        //RequestContext.getCurrentInstance().update("form");
+        //closeInvoiceDialog();
 
     }
 
@@ -1409,8 +1415,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             executeJS("PF('sendInvoiceErrorDialogWV').show();");
             return;
         }
-        executeJS("PF('invoiceDialogBillingWV').hide();");
-        closeInvoiceDialog();
+        //executeJS("PF('invoiceDialogBillingWV').hide();");
+        //closeInvoiceDialog();
     }
 
     public void sendInvoice(Invoice invoiceDb) {
