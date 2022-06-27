@@ -43,6 +43,11 @@ public class FatturaAPI {
         velocityEngine.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
         velocityEngine.init();
         //add data to a VelocityContext
+//        invoiceItems
+//                .stream()
+//                .filter(iv -> !ValidationHelper.isNullOrEmpty(iv.getDescription())
+//                        && iv.getDescription().contains("&"))
+//                .forEach(iv -> iv.setXmlDescription(iv.getDescription().replaceAll("&", "E")));
         VelocityContext context = addDataToVelocityContext(invoice, invoiceItems);
         //get the Template
         Template template = velocityEngine.getTemplate(FileHelper.getFatturaAPITemplatePath());
@@ -58,7 +63,10 @@ public class FatturaAPI {
 
     public VelocityContext addDataToVelocityContext(Invoice invoice, List<InvoiceItem> invoiceItems) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         VelocityContext context = new VelocityContext();
-        context.put("documentType", invoice.getDocumentType());
+        if(!ValidationHelper.isNullOrEmpty(invoice.getDocumentType()))
+            context.put("documentType", invoice.getDocumentType());
+        else
+            context.put("documentType", "FE");
         String customerName = invoice.getClient().getNameOfTheCompany();
         if(!(customerName != null && !customerName.equals("")))
             customerName = invoice.getClient().getNameProfessional();
@@ -74,8 +82,10 @@ public class FatturaAPI {
         }
         context.put("customerAddress", customerAddress);
         context.put("customerPostcode", invoice.getClient().getAddressPostalCode());
-        context.put("customerCity", invoice.getClient().getAddressCityId() != null ? invoice.getClient().getAddressCityId().getDescription() : "");
-        context.put("customerProvince", invoice.getClient().getAddressProvinceId() != null ? invoice.getClient().getAddressProvinceId().getCode() : "");
+        context.put("customerCity", invoice.getClient().getAddressCityId() != null
+                ? invoice.getClient().getAddressCityId().getDescription() : "");
+        context.put("customerProvince", invoice.getClient().getAddressProvinceId() != null
+                ? invoice.getClient().getAddressProvinceId().getCode() : "");
         context.put("customerCountry", "IT");
         context.put("customerFiscalCode", invoice.getClient().getFiscalCode());
         context.put("customerVatCode", invoice.getClient().getNumberVAT());
@@ -99,8 +109,10 @@ public class FatturaAPI {
         context.put("sendEmail", false);
         context.put("invoiceItems", invoiceItems);
         context.put("numero", invoice.getInvoiceNumber());
-        if(!ValidationHelper.isNullOrEmpty(invoice.getNotes()))
+        if(!ValidationHelper.isNullOrEmpty(invoice.getNotes())){
             context.put("invoiceNote", invoice.getNotes());
+        }
+
         else
             context.put("invoiceNote", "");
         if(!ValidationHelper.isNullOrEmpty(invoice.getDate())){

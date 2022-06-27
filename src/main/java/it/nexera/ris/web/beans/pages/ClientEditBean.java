@@ -1259,7 +1259,7 @@ public class ClientEditBean extends EntityEditPageBean<Client>
             }
         }
     }
-    
+
     public void setOfficesByArea() {
         final List<Long> areaIds;
         if (isHasAgency()) {

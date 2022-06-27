@@ -8,7 +8,8 @@ public enum InvoiceStatus {
     DRAFT(1l, true),
     TOSEND(2l, true),
     DELIVERED(3l, true),
-    CREDITNOTE(4l, true);
+    CREDITNOTE(4l, true),
+    UNLOCKED(5l, true);;
 
     private Long id;
 

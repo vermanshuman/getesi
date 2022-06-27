@@ -4680,7 +4680,6 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
                     .stream()
                 .filter(r -> r.getId().equals(getEntity().getId()))
                 .findFirst().get();
-        System.out.println(">>>>>>>>>>>>>>>>>>. " + editedRequest);
         setRequestData(editedRequest);
         List<Request> newRequests = new ArrayList<>();
         boolean saved = false;

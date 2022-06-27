@@ -335,14 +335,14 @@ public class Service extends IndexedEntity {
     public void setLandOmi(Boolean landOmi) {
         this.landOmi = landOmi;
     }
-
-	public TaxRate getNationalTaxRate() {
+    
+    public TaxRate getNationalTaxRate() {
 		return nationalTaxRate;
 	}
 
 	public void setNationalTaxRate(TaxRate nationalTaxRate) {
 		this.nationalTaxRate = nationalTaxRate;
 	}
-    
-    
+	
+	
 }

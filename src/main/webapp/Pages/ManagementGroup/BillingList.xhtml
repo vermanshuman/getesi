@@ -663,20 +663,31 @@
             #subjectSettingPanel .ui-state-disabled {
                 opacity: 0.8;
             }
+            #showNoRecipientError .ui-widget-header {
+                background: #f8f9fa !important;
+                color: #495057 !important;
+            }
         </style>
         <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
         <link rel="stylesheet"
               href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
         <div style="margin-left: 20px;">
+            <script type="text/javascript">
+                jQuery(document).ready(function() {
+                    loadInvoiceTab();
+                    loadSubjectTab();
+                });
+            </script>
             <nav class="left" style="margin-left:20px;">
                 <a href="#" id="tab1" class="tab selected">#{ff:upper(msg.billingListDashboard)}</a>
                 <a href="#" id="tab2" class="tab">#{ff:upper(msg.billingListInvoices)}</a>
                 <a href="#" id="tab3" class="tab">#{ff:upper(msg.billingListCreditNotes)}</a>
                 <a href="#" id="tab4" class="tab">#{ff:upper(msg.billingListSubjectsToBeInvoiced)}</a>
+                <a href="#" id="tab5" class="tab">#{ff:upper(msg.menuConfiguration)}</a>
             </nav>
-
             <main>
                 <div id="content_tab1" class="hide">
+
                     <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" cellpadding="3" cellspacing="0"
                                  columnClasses="ui-grid-col-4,ui-grid-col-4,ui-grid-col-3,ui-grid-col-1" layout="grid">
                         <p:commandButton value="#{ff:upper(msg.billingListUpdate)}"/>
@@ -1060,6 +1071,8 @@
                 </div>
                 <!-- FATTURE TAB -->
                 <div id="content_tab2" class="hide" style="display: none;">
+                    <p:remoteCommand name="loadInvoiceTab" action="#{bean.loadInvoiceTab}"
+                                     update=":invoiceTable :filterClient :manager :office"/>
                     <div class="p-grid">
                         <div class="p-col-12 p-md-12">
                             <div class="card"
@@ -1259,6 +1272,12 @@
                                 </p:commandButton>
                                 <p:commandButton id="sendinvoice-btn" value="#{ff:upper(msg.delivery)}" class="action-btn" style="display: none;"
                                                  action="#{bean.sendInvoice(invoice)}" update="invoiceTable"/>
+                                <p:commandButton id="sendmail-btn" value="#{ff:upper(msg.sendEmail)}" class="action-btn" style="display: none;"
+                                                 action="#{bean.checkRecipient(invoice, true)}"/>
+                                <p:commandButton id="downloadattachment-btn" value="#{ff:upper(msg.downloadAttachment)}" class="action-btn" style="display: none;"
+                                                 action="#{bean.downloadAttachment(invoice)}"/>
+                                <p:commandButton id="unlock-btn" value="#{ff:upper(msg.unLock)}" class="action-btn" style="display: none;"
+                                                 action="#{bean.unlockInvoice(invoice)}" update="invoiceTable"/>
                                 <div class="icon-block" style="justify-content: left;">
                                     <i class="email-icon-new"></i>
                                     <p:commandLink id="actionPnl" global="false" style="outline: none;" immediate="true"
@@ -1269,13 +1288,27 @@
                                     <p:tooltip for="actionPnl" hideEvent="blur" showEvent="focus" styleClass="actionPnl-tooltip">
                                         <p:outputPanel id="actionGrid" styleClass="actionPnl-panel">
                                             <p:commandButton value="#{ff:upper(msg.dataVerification)}" styleClass="action-btn"
+                                                             rendered="#{invoice.client ne null and invoice.client.id ne null and  invoice.client.id gt 0}"
                                                              onclick="document.getElementById('invoiceTable:#{rowId}:openinvoice-btn').click()"
                                                              oncomplete="PF('invoiceDialogBillingWV').show();"
+                                                             style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;">
+                                            </p:commandButton>
+                                            <p:commandButton value="#{ff:upper(msg.downloadAttachment)}" styleClass="action-btn"
+                                                             onclick="document.getElementById('invoiceTable:#{rowId}:downloadattachment-btn').click()"
                                                              style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;">
                                             </p:commandButton>
                                             <p:commandButton value="#{ff:upper(msg.delivery)}" styleClass="action-btn"
                                                              onclick="document.getElementById('invoiceTable:#{rowId}:sendinvoice-btn').click()"
                                                              rendered="#{invoice.status.toString() == 'BOZZA'}"
+                                                             style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;"/>
+
+                                            <p:commandButton value="#{ff:upper(msg.sendEmail)}" styleClass="action-btn"
+                                                             onclick="document.getElementById('invoiceTable:#{rowId}:sendmail-btn').click()"
+                                                             rendered="#{invoice.status.toString() == 'BOZZA'}"
+                                                             style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;"/>
+                                            <p:commandButton value="#{ff:upper(msg.unLock)}" styleClass="action-btn"
+                                                             onclick="document.getElementById('invoiceTable:#{rowId}:unlock-btn').click()"
+                                                             rendered="#{invoice.status.toString() != 'SBLOCCATA'}"
                                                              style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;"/>
                                         </p:outputPanel>
                                     </p:tooltip>
@@ -1285,6 +1318,8 @@
                                 <p:commandButton id="openinvoice-btn-server" value="#{ff:upper(msg.requestListManage)}" class="action-btn" style="display: none;"
                                                  action="#{bean.loadInvoiceDialogDataEdit(invoice)}" oncomplete="PF('invoiceDialogBillingWV').show();" update="invoiceDialogBilling">
                                 </p:commandButton>
+                                <p:commandButton id="unlock-btn-server" value="#{ff:upper(msg.unLock)}" class="action-btn" style="display: none;"
+                                                 action="#{bean.unlockInvoice(invoice)}" update="invoiceTable"/>
                                 <div class="icon-block" style="justify-content: left;">
                                     <i class="email-check-icon"></i>
                                     <p:commandLink id="actionPnl1" global="false" style="outline: none;" immediate="true" readonly="true">
@@ -1294,8 +1329,16 @@
                                     <p:tooltip for="actionPnl1" hideEvent="blur" showEvent="focus" styleClass="actionPnl-tooltip">
                                         <p:outputPanel id="actionGrid1" styleClass="actionPnl-panel">
                                             <p:commandButton value="#{ff:upper(msg.dataVerification)}" styleClass="action-btn"
+                                                             rendered="#{invoice.client ne null and invoice.client.id ne null and  invoice.client.id gt 0}"
                                                              onclick="document.getElementById('invoiceTable:#{rowId}:openinvoice-btn-server').click()"
                                                              oncomplete="PF('invoiceDialogBillingWV').show();"
+                                                             style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;"/>
+                                            <p:commandButton value="#{ff:upper(msg.downloadAttachment)}" styleClass="action-btn"
+                                                             onclick="document.getElementById('invoiceTable:#{rowId}:downloadattachment-btn-server').click()"
+                                                             style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;"/>
+                                            <p:commandButton value="#{ff:upper(msg.unLock)}" styleClass="action-btn"
+                                                             onclick="document.getElementById('invoiceTable:#{rowId}:unlock-btn-server').click()"
+                                                             rendered="#{invoice.status.toString() != 'SBLOCCATA'}"
                                                              style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;"/>
                                         </p:outputPanel>
                                     </p:tooltip>
@@ -1310,7 +1353,9 @@
 
                 </div>
                 <div id="content_tab4" class="hide" style="display: none;">
-
+                    <p:remoteCommand name="loadSubjectTab" action="#{bean.loadSubjectTab}"
+                                     update=":subjectTable :statuses :services :requestTypes :subjectManager :fiduciario
+                        :subjectOffice :requestTypeSelectCheckboxPanel :serviceSelectCheckboxPanel :stateSelectCheckboxPanel :userSelectCheckboxPanel"/>
                     <div class="p-grid">
                         <div class="p-col-12 p-md-12">
                             <div class="card"
@@ -1367,7 +1412,7 @@
                                                 $("body").click(function(e){
                                                     var target = $(e.target);
                                                     if (!target.parents('#subjectSettingButton').length && !target.parents('#subjectSettingPanel').length && !target.parents('#client_panel').length
-                                                        && !target.parents('#requestTypeSelectCheckboxPanel').length && !target.parents('#manager_panel').length && !target.parents('#office_panel').length
+                                                        && !target.parents('#requestTypeSelectCheckboxPanel').length && !target.parents('#subjectManager_panel').length && !target.parents('#subjectOffice_panel').length
                                                         && !target.parents('#stateSelectCheckboxPanel').length && !target.parents('#serviceSelectCheckboxPanel').length
                                                         && !target.parents('#fiduciario_panel').length
                                                         && !target.parents('#ui-datepicker-div').length && !target.parents('.ui-datepicker-header').length) {
@@ -1405,6 +1450,11 @@
                                                 jQuery(document).ready(function() {
                                                     PF('subjectPanelSetting').getJQ().hide();
                                                 });
+                                                function resetSettingPanelData() {
+                                                    $('#requestTypes .ui-selectcheckboxmenu-multiple-container li').remove();
+                                                    $('#services .ui-selectcheckboxmenu-multiple-container li').remove();
+                                                    return true;
+                                                }
                                                 // ]]>
                                             </script>
                                             <p:panel id="subjectSettingPanel" widgetVar="subjectPanelSetting"
@@ -1431,9 +1481,8 @@
                                                                               style="width: 100%;min-height: 38px;"
                                                                               multiple="true" label=""
                                                                               value="#{bean.selectedStates}"
-                                                                              onclick="applyBorder('statuses');"
-                                                                              styleClass="#{bean.getStateSelected() gt 0 ? ' select-checkbox' : ''}"
-                                                                              disabled="true">
+                                                                              onclick="PF('stateSelectCheckboxWV').show();applyBorder('statuses');"
+                                                                              styleClass="#{(bean.getStateSelected() ne null and bean.getStateSelected() gt 0) ? ' select-checkbox' : ''}">
                                                             <f:selectItems value="#{bean.stateWrappers}" var="state"
                                                                            itemValue="#{state}"
                                                                            itemLabel="#{state.value}"/>
@@ -1606,9 +1655,11 @@
                                                         <p:commandButton style="width: auto;"
                                                                          value="#{ff:upper(msg.mailManageReestablish)}"
                                                                          actionListener="#{bean.clearFiltraPanel}"
-                                                                         update="subjectSettingPanel subjectSearchPanel"
-                                                                         oncomplete="resetData();checkDates();filterTableFromPanel();PF('subjectPanelSetting').getJQ().hide();"/>
+                                                                         update="requestTypeSelectCheckboxPanel serviceSelectCheckboxPanel stateSelectCheckboxPanel requestTypeSelectCheckboxPanelDataTable"
+                                                                         oncomplete="resetData();checkDates();filterRequestTableFromPanel();PF('subjectPanelSetting').getJQ().hide();"/>
                                                     </div>
+
+<!--                                                     update="subjectSettingPanel subjectSearchPanel"-->
 
                                                 </div>
                                             </p:panel>
@@ -1641,6 +1692,8 @@
                                              action="#{bean.handleRowsChange()}" update="subjectTable" oncomplete="setPageNumber()"/>
                             <p:remoteCommand name="onPageChange"
                                              action="#{bean.onPageChange()}" update="subjectTable" oncomplete="setPageNumber()"/>
+                            <p:remoteCommand name="showNoRecipient"
+                                             onstart="PF('showNoRecipientErrorDialog').show();" />
                         </div>
                     </ui:fragment>
 
@@ -1693,6 +1746,33 @@
                             </p:column>
                             <p:column headerText="#{msg.requestService}">
                                 <h:outputText value="#{service.value}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:overlayPanel>
+
+                    <p:overlayPanel id="stateSelectCheckboxPanel" my="left top" at="right bottom"
+                                    widgetVar="stateSelectCheckboxWV" for="statuses" style="width:200px;left: 1650px !important;" styleClass="settingsBlock">
+
+                        <p:dataTable id="stateSelectCheckboxPanelDataTable" var="state" emptyMessage="#{msg.noRecordsFound}"
+                                     value="#{bean.stateWrappers}" selectionMode="single"
+                                     selection="#{bean.selectedStateForFilter}" rowKey="#{state.value}">
+                            <p:ajax event="rowSelect"
+                                    listener="#{bean.selectStateForFilter}"
+                                    update="stateSelectCheckboxPanelDataTable"/>
+                            <p:column style="width:18px">
+                                <f:facet name="header">
+                                    <p:selectBooleanCheckbox value="#{bean.selectedAllStatesOnPanel}">
+                                        <p:ajax update="stateSelectCheckboxPanelDataTable" event="change"/>
+                                        <p:ajax event="change" update="statuses" oncomplete="applyClickListener('statuses', 'stateSelectCheckboxWV');"/>
+                                    </p:selectBooleanCheckbox>
+                                </f:facet>
+                                <p:selectBooleanCheckbox value="#{state.selected}">
+                                    <p:ajax update="stateSelectCheckboxPanelDataTable" event="change"/>
+                                    <p:ajax event="change" update="statuses" oncomplete="applyClickListener('statuses', 'stateSelectCheckboxWV');"/>
+                                </p:selectBooleanCheckbox>
+                            </p:column>
+                            <p:column headerText="#{msg.status}">
+                                <h:outputText value="#{state.value}"/>
                             </p:column>
                         </p:dataTable>
                     </p:overlayPanel>
@@ -2042,6 +2122,10 @@
                     </p:panel>
 
                 </div>
+
+                <div id="content_tab5" class="hide" style="display: none;">
+
+                </div>
             </main>
             <ui:include src="../Dialogs/InvoiceDialogBilling.xhtml"/>
         </div>
@@ -2073,13 +2157,15 @@
             }
 
             function resetData() {
-                $("#filterDateFrom_input").val("");
-                $("#filterDateTo_input").val("");
-                $("#manager_label").text("#{ff:upper(msg.clientManager)}");
-                $("#office_label").text("#{msg.subjectViewFormalityConservatoryCap}");
-                $("#filterNotes").val("");
-                $("#filterNdg").val("");
-                $("#filterPractice").val("");
+                // $("#filterDateFrom_input").val("");
+                // $("#filterDateTo_input").val("");
+                // $("#manager_label").text("#{ff:upper(msg.clientManager)}");
+                // $("#office_label").text("#{msg.subjectViewFormalityConservatoryCap}");
+                // $("#filterNotes").val("");
+                // $("#filterNdg").val("");
+                // $("#filterPractice").val("");
+                $('#requestTypes .ui-selectcheckboxmenu-multiple-container li').remove();
+                $('#services .ui-selectcheckboxmenu-multiple-container li').remove();
                 return true;
             }
 
@@ -2135,6 +2221,12 @@
                                  action="#{bean.modifyRequests}"
                                  oncomplete="PF('editAndPrintDialogWV').hide(); filterTableFromPanel();"/>
             </div>
+        </p:dialog>
+
+        <p:dialog id="showNoRecipientError" widgetVar="showNoRecipientErrorDialog" modal="true" resizable="false"
+                  draggable="false" styleClass="dialog-red">
+            <p:ajax event="close" oncomplete="PF('showNoRecipientErrorDialog').hide();"/>
+            <h:outputText value="#{val.noRecipientError}"/>
         </p:dialog>
 
         <ui:include src="../Dialogs/TotalCostDocumentDialog.xhtml"/>

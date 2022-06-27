@@ -893,7 +893,7 @@
                             <p:commandButton value="#{msg.clientEditCopy}" action="#{bean.checkCopyPriceListClient}" />
                         </p:panelGrid>
                     </p:panel>
-                    <p:dataTable var="item" value="#{bean.services}" editable="true" editMode="cell" id="servicesTable" widgetVar="servicesTableWV"
+                    <p:dataTable var="item" value="#{bean.services}" editable="true" editMode="cell" id="servicesTable"  widgetVar="servicesTableWV"
                                  emptyMessage="#{msg.noRecordsFound}">
                         <f:facet name="header">
                             <h:outputText value="#{msg.clientServiceTable}"/>
@@ -1274,7 +1274,7 @@
                 </p:panel>
 
                 <div class="btn_line">
-                    <p:commandButton value="#{msg.confirm}" class="ui-button-success " 
+                    <p:commandButton value="#{msg.confirm}" class="ui-button-success "  
                     				 action="#{bean.saveConfigurePriceListData}" 
                     				 update="@widgetVar(servicesTableWV)"
                                      oncomplete="PF('configurePriceListWV').hide()" style="margin-right: 5px;"/>

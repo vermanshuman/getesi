@@ -300,6 +300,14 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                 }
             }
         }
+        try {
+            if (!ValidationHelper.isNullOrEmpty(SessionHelper.get("templateIdForExcelData"))) {
+                this.setSelectedTemplateId((Long) SessionHelper.get("templateIdForExcelData"));
+                SessionHelper.removeObject("templateIdForExcelData");
+            }
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
         if ((ValidationHelper.isNullOrEmpty(getEntity().getNeedValidateCadastral())
                 || getEntity().getNeedValidateCadastral()) && !ValidationHelper.isNullOrEmpty(getExamRequest()) &&
                 !EstateSituationHelper.isValidFormalityCadastral(getExamRequest().getId())) {
@@ -1583,6 +1591,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 //        }
         //  getCostManipulationHelper().saveRequestExtraCost(getExamRequest());
         // updateTemplate();
+        SessionHelper.put("templateIdForExcelData", getSelectedTemplateId());
         editExcelDataRequest();
     }
 

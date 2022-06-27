@@ -59,7 +59,6 @@ public enum PageTypes {
     SERVICE_EDIT("/Pages/Dictionaries/ServiceEdit.jsf", true),
 
     LAND_CHARGES_REGISTRY_LIST("/Pages/Dictionaries/LandChargesRegistryList.jsf", true),
-    LAND_CHARGES_REGISTRY_EDIT("/Pages/Dictionaries/LandChargesRegistryEdit.jsf", true),
 
     AGGREGATION_LAND_CHARGES_REGISTRY_LIST("/Pages/Dictionaries/AggregationLandChargesRegistryList.jsf", true),
     AGGREGATION_LAND_CHARGES_REGISTRY_EDIT("/Pages/Dictionaries/AggregationLandChargesRegistryEdit.jsf", true),

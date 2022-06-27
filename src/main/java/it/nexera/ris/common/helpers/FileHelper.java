@@ -565,6 +565,7 @@ public class FileHelper extends BaseHelper {
         zos.putNextEntry(new ZipEntry(zipName + "/"));
 
         for (String fileName : files.keySet()) {
+            System.out.println("FFFFFFFFFFFFFFFFFF " + fileName);
             ZipEntry entry = new ZipEntry(zipName + "/" + fileName);
             entry.setSize(files.get(fileName).length);
             zos.putNextEntry(entry);

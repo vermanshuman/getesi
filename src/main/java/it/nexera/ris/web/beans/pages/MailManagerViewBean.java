@@ -29,6 +29,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.io.MemoryUsageSetting;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -1520,6 +1521,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
         int counter = 1;
         List<GoodsServicesFieldWrapper> wrapperList = new ArrayList<>();
+
         for (InvoiceItem invoiceItem : getSelectedInvoiceItems()) {
 
             GoodsServicesFieldWrapper wrapper = createGoodsServicesFieldWrapper();
@@ -1648,25 +1650,10 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         invoice.setDate(new Date());
         invoice.setStatus(InvoiceStatus.DRAFT);
         invoice.setEmailFrom(getEntity());
-        // DaoManager.save(invoice, true);
         List<RequestPriceListModel> requestPriceListModels = InvoiceHelper.groupingItemsByTaxRate(selectedRequestList);
-        setSelectedInvoiceItems(InvoiceHelper.getInvoiceItems(requestPriceListModels, getCausal()));
-      /*  for (InvoiceItem invoiceItem : invoiceItems) {
-            invoiceItem.setInvoice(invoice);
-            DaoManager.save(invoiceItem, true);
-        }
-        CollectionUtils.emptyIfNull(selectedRequestList).stream().forEach(r -> {
-            try {
-                r.setInvoice(invoice);
-                DaoManager.save(r, true);
-            } catch (PersistenceBeanException e) {
-                log.error("error in saving invoice in request after creating invoice ", e);
-            }
-        });*/
-        //   setShowCreateFatturaButton(Boolean.FALSE);
+        setSelectedInvoiceItems(InvoiceHelper.getInvoiceItems(requestPriceListModels, getCausal(), selectedRequestList));
         setInvoicedRequests(selectedRequestList);
         invoice.setTotalGrossAmount(getTotalGrossAmount());
-        // DaoManager.save(invoice, true);
         setTempInvoice(invoice);
         loadInvoiceDialogData(invoice);
         executeJS("PF('invoiceDialogBillingWV').show();");
@@ -1730,7 +1717,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             addRequiredFieldException("form:paymentType");
             setValidationFailed(true);
         }
-
+        boolean isSpecialCharacters = false;
         for (GoodsServicesFieldWrapper goodsServicesFieldWrapper : getGoodsServicesFields()) {
             if (ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getInvoiceTotalCost())) {
                 setValidationFailed(true);
@@ -1739,9 +1726,18 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             if (ValidationHelper.isNullOrEmpty(goodsServicesFieldWrapper.getSelectedTaxRateId())) {
                 setValidationFailed(true);
             }
+            if(!getValidationFailed() && !isSpecialCharacters
+                    && StringUtils.isNotBlank(goodsServicesFieldWrapper.getDescription())
+                    && checkSpecialCharacters(goodsServicesFieldWrapper.getDescription())){
+                isSpecialCharacters = true;
+                String description = goodsServicesFieldWrapper.getDescription();
+                System.out.println(getInvoiceErrorMessage() + ">>>>>>>> " + description);
+                goodsServicesFieldWrapper.setDescription(description.replaceAll(InvoiceHelper.specialCharacters, ""));
+            }
         }
 
-        setInvoiceErrorMessage(ResourcesHelper.getString("invalidDataMsg"));
+        if(!isSpecialCharacters)
+            setInvoiceErrorMessage(ResourcesHelper.getString("invalidDataMsg"));
         
         if (ValidationHelper.isNullOrEmpty(getClientAddressSDI())) {
         	setInvoiceErrorMessage(ResourcesHelper.getString("noSDIAddressMessage"));
@@ -1779,6 +1775,43 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             return;
         }
 
+        if(!isSpecialCharacters
+                && StringUtils.isNotBlank(getInvoiceNote()) && checkSpecialCharacters(getInvoiceNote())){
+            isSpecialCharacters = true;
+            String invoiceNote = getInvoiceNote();
+            setInvoiceNote(invoiceNote.replaceAll(InvoiceHelper.specialCharacters, ""));
+        }
+
+        if(isSpecialCharacters){
+            executeJS("PF('invoiceDialogBillingWV').hide();");
+            executeJS("PF('invoiceSpecialCharactersDialogWV').show();");
+            RequestContext.getCurrentInstance().update("invoiceSpecialCharactersDialog");
+        }else
+            saveInvoiceDialog();
+    }
+
+    private boolean checkSpecialCharacters(String inputString){
+        String foundCharacters = "";
+        Matcher hasSpecial = InvoiceHelper.specialCharactersPattern.matcher(inputString);
+        for (int i = 0; i < inputString.length(); i++) {
+            if (hasSpecial.find()) {
+                if(StringUtils.isBlank(foundCharacters))
+                    foundCharacters = hasSpecial.group(0);
+                else
+                    foundCharacters += ", " + hasSpecial.group(0);
+            }
+        }
+        if(StringUtils.isNotBlank(foundCharacters)){
+            setInvoiceErrorMessage(String.format(
+                    ResourcesHelper.getString("invoiceSpecialCharacters"),
+                    foundCharacters));
+            return true;
+        }
+        setInvoiceErrorMessage(null);
+        return false;
+    }
+
+    public void saveInvoiceDialog(){
         try {
             saveInvoice(InvoiceStatus.DRAFT, true);
             loadInvoiceDialogData(getSelectedInvoice());
@@ -1792,7 +1825,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         //RequestContext.getCurrentInstance().update("form");
         //closeInvoiceDialog();
     }
-
     public Invoice saveInvoice(InvoiceStatus invoiceStatus, Boolean saveInvoiceNumber) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         //- Invoice invoice = DaoManager.get(Invoice.class, getNumber());
         if (getSelectedInvoice() == null) {
@@ -1810,7 +1842,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
         if (!ValidationHelper.isNullOrEmpty(getVatCollectabilityId()))
             getSelectedInvoice().setVatCollectability(VatCollectability.getById(getVatCollectabilityId()));
-        getSelectedInvoice().setNotes(getInvoiceNote());
+        getSelectedInvoice().setNotes(getInvoiceNote().replaceAll("&", "E"));
         getSelectedInvoice().setStatus(invoiceStatus);
 
         getSelectedInvoice().setTotalGrossAmount(getTotalGrossAmount());
@@ -1841,7 +1873,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 // InvoiceItem invoiceItem = DaoManager.get(InvoiceItem.class, goodsServicesFieldWrapper.getInvoiceItemId());
                 invoiceItem.setAmount(goodsServicesFieldWrapper.getInvoiceItemAmount());
                 invoiceItem.setTaxRate(DaoManager.get(TaxRate.class, goodsServicesFieldWrapper.getSelectedTaxRateId()));
-                invoiceItem.setDescription(goodsServicesFieldWrapper.getDescription());
+                invoiceItem.setDescription(goodsServicesFieldWrapper.getDescription().replaceAll("&","E"));
                 invoiceItem.setInvoiceTotalCost(goodsServicesFieldWrapper.getInvoiceTotalCost());
                 invoiceItem.setInvoice(getSelectedInvoice());
                 DaoManager.save(invoiceItem, true);
@@ -1945,7 +1977,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
             FatturaAPIResponse fatturaAPIResponse = fatturaAPI.callFatturaAPI(xmlData, log);
 
-            if (fatturaAPIResponse != null && fatturaAPIResponse.getReturnCode() != -1) {
+            if (fatturaAPIResponse != null && fatturaAPIResponse.getReturnCode() == 0) {
                 invoice.setStatus(InvoiceStatus.DELIVERED);
                 DaoManager.save(invoice, true);
 
@@ -1972,9 +2004,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
                     if (fatturaAPIResponse.getDescription().contains("already exists")) {
                         setApiError(ResourcesHelper.getString("sendInvoiceDuplicateMsg"));
-                    } else
-                        setApiError(fatturaAPIResponse.getDescription());
+                    }
                 }
+                RequestContext.getCurrentInstance().update("sendInvoiceErrorDialog");
                 executeJS("PF('sendInvoiceErrorDialogWV').show();");
                 return;
             }
@@ -2459,8 +2491,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             if (!ValidationHelper.isNullOrEmpty(getEntity().getOffice())) {
                 excelDataWrapper.setOffice(getEntity().getOffice().getDescription());
             }
-
-            List<Request> filteredRequests = emptyIfNull(getInvoicedRequests()).stream().filter(r -> r.isDeletedRequest()).collect(Collectors.toList());
+            List<Request> filteredRequests = DaoManager.load(Request.class,
+                    new Criterion[]{
+                            Restrictions.eq("invoice", invoiceRequest.getInvoice()),
+                            Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                                    Restrictions.isNull("isDeleted"))
+                    });
             excelFile = new CreateExcelRequestsReportHelper(true).convertMailUserDataToExcel(filteredRequests, document, excelDataWrapper);
         } catch (Exception e) {
             LogHelper.log(log, e);
@@ -2538,14 +2574,24 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             String refrequest = "";
             WLGInbox baseMail = DaoManager.get(WLGInbox.class, getBaseMailId());
             if (!ValidationHelper.isNullOrEmpty(baseMail)) {
-                if (!ValidationHelper.isNullOrEmpty(baseMail)
-                        && !ValidationHelper.isNullOrEmpty(baseMail.getRequests())) {
-                    setInvoicedRequests(baseMail.getRequests()
-                            .stream()
-                            .filter(r -> !ValidationHelper.isNullOrEmpty(r.getStateId()) &&
-                                    (r.getStateId().equals(RequestState.EVADED.getId()) || r.getStateId().equals(RequestState.SENT_TO_SDI.getId())))
-                            .collect(Collectors.toList()));
+                List<Request> filteredRequests = DaoManager.load(Request.class,
+                        new Criterion[]{
+                                Restrictions.eq("invoice", getSelectedInvoice()),
+                                Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                                        Restrictions.isNull("isDeleted"))
+                        });
+
+                if (!ValidationHelper.isNullOrEmpty(filteredRequests)) {
+                    setInvoicedRequests(filteredRequests);
                 }
+//                if (!ValidationHelper.isNullOrEmpty(baseMail)
+//                        && !ValidationHelper.isNullOrEmpty(baseMail.getRequests())) {
+//                    setInvoicedRequests(baseMail.getRequests()
+//                            .stream()
+//                            .filter(r -> !ValidationHelper.isNullOrEmpty(r.getStateId()) &&
+//                                    (r.getStateId().equals(RequestState.EVADED.getId()) || r.getStateId().equals(RequestState.SENT_TO_SDI.getId())))
+//                            .collect(Collectors.toList()));
+//                }
                 refrequest = baseMail.getReferenceRequest();
             }
             String landscapePDF = "";
@@ -2567,7 +2613,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     String excelPdf = tempDir + File.separator + fileName + ".pdf";
                     PDDocument srcDoc = PDDocument.load(new File(excelPdf));
                     for (PDPage pdPage : srcDoc.getDocumentCatalog().getPages()) {
-                        float width = pdPage.getMediaBox().getWidth();
                         pdPage.setRotation(270);
                     }
                     landscapePDF = tempDir + File.separator + fileName + "_landscape.pdf";

@@ -163,6 +163,11 @@ public class RequestHelper {
 
 
             stateWrappers.stream().filter(RequestStateWrapper::getSelected).forEach(state -> stateIds.add(state.getId()));
+            if(isBilling && ValidationHelper.isNullOrEmpty(stateIds)){
+                stateIds.add(RequestState.EVADED.getId());
+                stateIds.add(RequestState.SENT_TO_SDI.getId());
+            }
+
             if (!ValidationHelper.isNullOrEmpty(stateIds)) {
                 restrictions.add(Restrictions.in("stateId", stateIds));
             }

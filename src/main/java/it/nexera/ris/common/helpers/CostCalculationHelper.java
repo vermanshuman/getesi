@@ -539,6 +539,10 @@ public class CostCalculationHelper {
 
         List<Double> numberOfGroupedEstateFormality = getRequest().getSumOfGroupedEstateFormalities();
         Integer numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
+
+        System.out.println("numberOfGroupedEstateFormality " + numberOfGroupedEstateFormality);
+        System.out.println("numberOfGroupsByDocumentOfEstateFormality " + numberOfGroupsByDocumentOfEstateFormality);
+        System.out.println("getNumberOfGroupsByDocumentOfEstateFormality " + getRequest().getNumberOfGroupsByDocumentOfEstateFormality());
 //        if (!ValidationHelper.isNullOrEmpty(getRequest().getNumberActUpdate())) {
 //            numberOfGroupedEstateFormality = Collections.singletonList(getRequest().getNumberActUpdate());
 //            numberOfGroupsByDocumentOfEstateFormality = getRequest().getNumberOfGroupsByDocumentOfEstateFormality();
@@ -856,6 +860,9 @@ public class CostCalculationHelper {
         }
         if (!Hibernate.isInitialized(getRequest().getRequestSubjects())) {
             getRequest().reloadRequestSubjects();
+        }
+        if (!Hibernate.isInitialized(getRequest().getRequestFormalities())) {
+            getRequest().reloadRequestFormalities();
         }
         DaoManager.save(getRequest(), true);
     }

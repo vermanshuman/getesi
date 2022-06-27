@@ -286,11 +286,11 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
         }else {
             this.getEntity().setLandOmi(null);
         }
-        
+
         if(!ValidationHelper.isNullOrEmpty(getSelectedNationalTaxRateId())) {
         	this.getEntity().setNationalTaxRate(DaoManager.get(TaxRate.class, getSelectedNationalTaxRateId()));
         }
-
+        
         DaoManager.save(this.getEntity());
     }
 
@@ -501,8 +501,8 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
     public void setLandOmi(Boolean landOmi) {
         this.landOmi = landOmi;
     }
-
-	public List<SelectItem> getTaxRates() {
+    
+    public List<SelectItem> getTaxRates() {
 		return taxRates;
 	}
 
@@ -517,6 +517,6 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
 	public void setSelectedNationalTaxRateId(Long selectedNationalTaxRateId) {
 		this.selectedNationalTaxRateId = selectedNationalTaxRateId;
 	}
-    
-    
+	
+	
 }

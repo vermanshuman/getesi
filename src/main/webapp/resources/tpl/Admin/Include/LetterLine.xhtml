@@ -154,11 +154,6 @@
                                  action="#{bean.preCheckDocument}" update="invoiceAlreadyCreatedDialog otherRequestsExistsForInvoiceDialog"
                                  id="createInvoice" styleClass="grey-button"/>
 
-
-                <!--  <p:commandButton icon="ui-icon fa fa-pencil" update=":form" styleClass="right-side"
-                                  action="#{bean.editEntity}"
-                                  disabled="#{!bean.entity.canEdit}"/> -->
-
                 <ui:fragment rendered="#{bean.entity.received and bean.relatedToClient}">
 	            <span style="border: 2px solid #788fa7 !important;padding: 5px 8px 8px 4px; border-radius: 2px;display: inline-block;">
 	                <i class="fa fa-check-circle-o" style="color: green; margin-right: 5px; margin-left: 5px;"/>

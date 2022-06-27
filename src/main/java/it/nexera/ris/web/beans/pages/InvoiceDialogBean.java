@@ -31,6 +31,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
@@ -1063,6 +1064,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
                         !ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressCityId().getDescription())) {
                     clientPostal += " - " + invoice.getClient().getAddressCityId().getDescription();
                 }
+
                 if (!ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressProvinceId()) &&
                         !ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressProvinceId().getCode())) {
                     clientPostal += " - " + invoice.getClient().getAddressProvinceId().getCode();
@@ -1115,7 +1117,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         result.append("<table style=\"width: 720px;border-collapse: collapse;border: 1px solid lightgray;margin-top: 12px;\">");
         result.append("<tbody>");
         result.append("<tr style=\"background-color: #E7E7E7;\">");
-        result.append("<td colspan=\"4\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;background-color: #E7E7E7;font-weight: bold\">Dati Fattura</td>");
+        result.append("<td colspan=\"4\" style=\"border: 1px solid lightgray;padding: 10px;text-align: left;width: 50%;color: #888888;background-color: #E7E7E7;\">Dati Fattura</td>");
         result.append("</tr>");
         result.append("<tr style=\"background-color: #E7E7E7;\">");
         result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 25%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Natura Documento</td>");
@@ -1124,17 +1126,17 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 25%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Importo Totale</td>");
         result.append("</tr>");
         result.append("<tr>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\"><b>Fattura</b></td>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\"><b>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\"><h3 style=\"font-size:0.8em\">Fattura</h3></td>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\"><h3 style=\"font-size: 0.8em\">");
         result.append(invoice.getInvoiceNumber() != null ? invoice.getInvoiceNumber() : "");
-        result.append("</b></td>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\"><b>");
+        result.append("</h3></td>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\"><h3 style=\"font-size: 0.8em\">");
         result.append(invoice.getDate() != null ? DateTimeHelper.toFormatedString(invoice.getDate(), DateTimeHelper.getDatePattern()) : "");
-        result.append("</b></td>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\"><b>");
-        result.append("EUR ");
-        result.append(invoice.getTotalGrossAmount() != null ? invoice.getTotalGrossAmount().toString().replace(".", ",") : "");
-        result.append("</b></td>");
+        result.append("</h3></td>");
+        result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\"><h3 style=\"font-size: 0.8em\">");
+        result.append("&euro; ");
+        result.append(invoice.getTotalGrossAmount() != null ? InvoiceHelper.format(invoice.getTotalGrossAmount()).replace(".", ",") : "");
+        result.append("</h3></td>");
         result.append("</tr>");
         result.append("</tbody>");
         result.append("<tr style=\"background-color: #E7E7E7;\">");
@@ -1165,13 +1167,11 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
                 refrenceRequest = invoice.getEmailFrom().getReferenceRequest();
             }
         }
-        if (StringUtils.isNotBlank(ndg))
-            result.append("NDG: ");
+        result.append("NDG: ");
         result.append(ndg);
         result.append("</td>");
         result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\">");
-        if (StringUtils.isNotBlank(refrenceRequest))
-            result.append("Rif.: ");
+        result.append("Rif.: ");
         result.append(refrenceRequest);
         result.append("</td>");
         result.append("</tr>");
@@ -1201,17 +1201,14 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
                 mailOffice = invoice.getEmailFrom().getOffice().toString();
             }
         }
-        if (StringUtils.isNotBlank(mailClient))
-            result.append("GESTORE: ");
+        result.append("GESTORE: ");
         result.append(mailClient);
         result.append("<br/>");
-        if (StringUtils.isNotBlank(mailTrust.toUpperCase()))
-            result.append("FIDUCIARIO: ");
+        result.append("FIDUCIARIO: ");
         result.append(mailTrust.toUpperCase());
         result.append("</td>");
         result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\">");
-        if (StringUtils.isNotBlank(mailOffice))
-            result.append("UFFICIO: ");
+        result.append("UFFICIO: ");
         result.append(mailOffice.toUpperCase());
         result.append("</td>");
         result.append("</tr>");
@@ -1246,16 +1243,19 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
                     result.append("</td>");
                     result.append("<td style=\"border: 2px solid lightgray;width: 10%;padding: 10px;line-height: 18px;\">");
                     if (!ValidationHelper.isNullOrEmpty(item.getAmount()))
-                        result.append(item.getAmount());
+                        result.append(item.getAmount().intValue());
                     result.append("</td>");
                     result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\">");
+
+
                     if (!ValidationHelper.isNullOrEmpty(item.getInvoiceTotalCost()))
-                        result.append(item.getInvoiceTotalCost());
+                        result.append(InvoiceHelper.format(item.getInvoiceTotalCost()));
+
                     result.append("</td>");
                     result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\">");
                     if (!ValidationHelper.isNullOrEmpty(item.getAmount())
                             && !ValidationHelper.isNullOrEmpty(item.getInvoiceTotalCost())) {
-                        result.append(item.getInvoiceTotalCost() * item.getAmount());
+                        result.append(InvoiceHelper.format(item.getInvoiceTotalCost() * item.getAmount()));
                     }
                     result.append("</td>");
                     result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\">");
@@ -1300,11 +1300,13 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
                     result.append("</td>");
                     result.append("<td style=\"border: 2px solid lightgray;width: 25%;padding: 10px;line-height: 18px;\">");
                     if (!totalAmount.equals(0))
-                        result.append(totalAmount);
+                        result.append(InvoiceHelper.format(totalAmount));
                     result.append("</td>");
                     result.append("<td style=\"border: 2px solid lightgray;width: 20%;padding: 10px;line-height: 18px;\">");
-                    if (!percentage.equals(0) && !totalAmount.equals(0))
-                        result.append(percentage.multiply(BigDecimal.valueOf(totalAmount)).divide(BigDecimal.valueOf(100)));
+                    if (!percentage.equals(0) && !totalAmount.equals(0)){
+                        Double value = percentage.multiply(BigDecimal.valueOf(totalAmount)).divide(BigDecimal.valueOf(100)).doubleValue();
+                        result.append(InvoiceHelper.format(value));
+                    }
                     result.append("</td>");
                     result.append("</tr>");
                 }
@@ -1322,8 +1324,8 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 7%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Modalità</td>");
         result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 10%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Scadenza</td>");
         result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 30%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Istituto</td>");
-        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 30%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">IBAN</td>");
-        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 10%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Importo</td>");
+        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 25%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">IBAN</td>");
+        result.append("<td style=\"border: 2px solid lightgray;padding: 10px;text-align: left;width: 15%;color: #478FCA;background-color: #f3f3f3;font-weight: bold\">Importo</td>");
         result.append("</tr>");
 //        result.append("<tr>");
 //        result.append("<td colspan=\"6\" style=\"padding: 10px;text-align: left;font-weight: bold\">Pagamento completo</td>");
@@ -1361,12 +1363,12 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
             result.append(invoice.getPaymentType().getIban());
         }
         result.append("</td>");
-        result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\">");
+        result.append("<td style=\"border: 2px solid lightgray;width: 15%;padding: 10px;line-height: 18px;\"><h3 style=\"font-size: 0.8em\">");
         if (!ValidationHelper.isNullOrEmpty(invoice.getTotalGrossAmount())) {
-            result.append("EUR ");
-            result.append(invoice.getTotalGrossAmount() != null ? invoice.getTotalGrossAmount().toString().replace(".", ",") : "");
+            result.append("&euro; ");
+            result.append(invoice.getTotalGrossAmount() != null ? InvoiceHelper.format(invoice.getTotalGrossAmount()).replace(".", ",") : "");
         }
-        result.append("</td>");
+        result.append("</h3></td>");
         result.append("</tr>");
         result.append("</tbody>");
         result.append("</table>");
@@ -1375,7 +1377,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         return result.toString();
     }
 
-   /* public void attachCourtesyInvoicePdf(Invoice invoice) {
+    /*public void attachCourtesyInvoicePdf(Invoice invoice) {
         try {
             String templatePath = (new File(FileHelper.getRealPath(),
                     "resources" + File.separator + "layouts" + File.separator

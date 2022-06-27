@@ -11,6 +11,7 @@ import it.nexera.ris.web.beans.wrappers.Pair;
 import it.nexera.ris.web.beans.wrappers.logic.RelationshipGroupingWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.TemplateEntity;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.criterion.Criterion;
@@ -169,7 +170,9 @@ public class TemplatePdfTableHelper {
     }
 
     private static Integer extractInt(String s) {
-        String num = s.replaceAll("\\D", "");
+        String num = "";
+        if(StringUtils.isNotBlank(s))
+            num = s.replaceAll("\\D", "");
         // return 0 if no digits found
         return num.isEmpty() ? 0 : Integer.parseInt(num);
     }

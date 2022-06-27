@@ -354,6 +354,10 @@
        	.ui-icon-plusthick {
        		margin-left: 17px !important;
        	}
+        #sendInvoiceErrorDialog .ui-widget-header {
+            background: #f8f9fa !important;
+            color: #495057 !important;
+        }
     </style>
 
     <p:dialog widgetVar="invoiceDialogBillingWV" modal="true" width="1350" draggable="false" id="invoiceDialogBilling"
@@ -1184,12 +1188,33 @@
         </div>
     </p:dialog>
 
-    <p:dialog widgetVar="sendInvoiceErrorDialogWV"  modal="true" draggable="false" position="center center">
+    <p:dialog widgetVar="sendInvoiceErrorDialogWV"  id="sendInvoiceErrorDialog" modal="true"
+              styleClass="dialog-red" resizable="false" draggable="false" effect="SLIDE" header="">
         <div class="ui-messages-error ui-corner-all">
             <span class="ui-messages-error-summary">#{bean.apiError}</span><br/>
         </div>
-        <p:commandButton oncomplete="PF('sendInvoiceErrorDialogWV').hide();"
-                         value="#{msg.close}" />
+
+        <div class="btn_line">
+            <p:commandButton value="#{msg.close}" styleClass="confirm-button"
+                             style="margin-right: 15px;"
+                             oncomplete="PF('invoiceMissingBillingClientDialogWV').hide();"/>
+        </div>
     </p:dialog>
 
+
+    <p:dialog widgetVar="invoiceSpecialCharactersDialogWV"
+              styleClass="dialog-gray dialog-gray-width" id="invoiceSpecialCharactersDialog"
+              draggable="false" modal="true" resizable="false"
+              header="">
+        <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group" layout="grid">
+            <h:outputText value="#{bean.invoiceErrorMessage}"/>
+        </p:panelGrid>
+        <div class="btn_line">
+            <p:commandButton value="#{msg.confirm}" style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"
+                             action="#{bean.saveInvoiceDialog}"
+                             oncomplete="PF('invoiceSpecialCharactersDialogWV').hide();"/>
+            <p:commandButton value="#{msg.cancel}" style="background-color: #F3362B !important; width: 100px;"
+                             oncomplete="PF('invoiceSpecialCharactersDialogWV').hide();"/>
+        </div>
+    </p:dialog>
 </ui:composition>

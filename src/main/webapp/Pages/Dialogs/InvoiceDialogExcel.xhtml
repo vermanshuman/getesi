@@ -335,6 +335,7 @@
             font: normal normal normal 14px/1 FontAwesome !important;
         }
         
+                
         .ui-fileupload-responsive {
        		display: inline-flex;
        	}
@@ -353,7 +354,7 @@
        	
        	.ui-icon-plusthick {
        		margin-left: 17px !important;
-       	}
+       	}        
     </style>
 
     <p:dialog widgetVar="invoiceDialogExcelWV" modal="true" width="1350" draggable="false" id="invoiceDialogBilling"
@@ -1192,6 +1193,7 @@
                          value="#{msg.close}" />
     </p:dialog>
     
+        
     <p:dialog id="invoiceOpenErrorDialog" widgetVar="invoiceOpenErrorDialogWV" modal="true" styleClass="dialog-red"
                   resizable="false" draggable="false" effect="SLIDE"
                   header="">
@@ -1246,17 +1248,17 @@
                          value="#{msg.close}" style="background-color: #F3362B !important;" />
         </div>
 	</p:dialog>
-		
-		<!-- <p:dialog id="invoiceTotalNotMatchErrorDialog" widgetVar="invoiceTotalNotMatchErrorDialogWV" modal="true" styleClass="dialog-red"
-	                  resizable="false" draggable="false" effect="SLIDE">
-		    <span>
-		        <h:outputText value="#{msg.invoiceTotalNotMatchMessage}"/>
-		    </span>
-		    <div class="btn_line">
-		        <p:commandButton value="#{msg.close}" styleClass="confirm-button" action="#{bean.loadInvoiceDataAfterError(bean.errorDialogCounter)}"
-		                         style="background-color: #F3362B !important;margin-right: 15px;"
-		                         oncomplete="PF('invoiceTotalNotMatchErrorDialogWV').hide();"/>
-		    </div>
-		</p:dialog> --> 
+	
+	<!-- <p:dialog id="invoiceTotalNotMatchErrorDialog" widgetVar="invoiceTotalNotMatchErrorDialogWV" modal="true" styleClass="dialog-red"
+                  resizable="false" draggable="false" effect="SLIDE">
+	    <span>
+	        <h:outputText value="#{msg.invoiceTotalNotMatchMessage}"/>
+	    </span>
+	    <div class="btn_line">
+	        <p:commandButton value="#{msg.close}" styleClass="confirm-button" action="#{bean.loadInvoiceDataAfterError(bean.errorDialogCounter)}"
+	                         style="background-color: #F3362B !important;margin-right: 15px;"
+	                         oncomplete="PF('invoiceTotalNotMatchErrorDialogWV').hide();"/>
+	    </div>
+	</p:dialog> -->
 
 </ui:composition>

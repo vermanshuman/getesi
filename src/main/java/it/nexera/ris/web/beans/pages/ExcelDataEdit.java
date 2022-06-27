@@ -125,8 +125,6 @@ public class ExcelDataEdit extends BaseEntityPageBean {
     
     private Invoice tempInvoice;
     
-    private Integer errorDialogCounter;
-
     @Override
     protected void onConstruct() {
         setMailId(null);
@@ -1572,7 +1570,6 @@ public class ExcelDataEdit extends BaseEntityPageBean {
     }
 
     public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        System.out.println(">>>>>>>>>>> " + getRequestId());
         setCostNote(null);
         setCostManipulationHelper(new CostManipulationHelper());
         Request request =  DaoManager.get(Request.class, getRequestId());
@@ -1700,7 +1697,8 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             invoice.setEmailFrom(getMail());
             getInvoiceDialogBean().setEntity(getMail());
             List<RequestPriceListModel> requestPriceListModels = InvoiceHelper.groupingItemsByTaxRate(selectedRequestList);
-    		getInvoiceDialogBean().setSelectedInvoiceItems(InvoiceHelper.getInvoiceItems(requestPriceListModels, getInvoiceDialogBean().getCausal()));
+    		getInvoiceDialogBean().setSelectedInvoiceItems(
+    		        InvoiceHelper.getInvoiceItems(requestPriceListModels, getInvoiceDialogBean().getCausal(), selectedRequestList));
             getInvoiceDialogBean().setInvoicedRequests(selectedRequestList);
             invoice.setTotalGrossAmount(getInvoiceDialogBean().getTotalGrossAmount());
 

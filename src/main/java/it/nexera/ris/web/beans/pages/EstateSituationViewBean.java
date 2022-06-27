@@ -935,9 +935,11 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 	}
 
 	public void goCancel() throws PersistenceBeanException, IllegalAccessException {
-		List<EstateFormality> formalityList = (List<EstateFormality>) getLazyFormalityList().getWrappedData();
-		for (EstateFormality formality : formalityList) {
-			DaoManager.save(formality, true);
+		if(!ValidationHelper.isNullOrEmpty(getLazyFormalityList())){
+			List<EstateFormality> formalityList = (List<EstateFormality>) getLazyFormalityList().getWrappedData();
+			for (EstateFormality formality : formalityList) {
+				DaoManager.save(formality, true);
+			}
 		}
 		RedirectHelper.goTo(PageTypes.REQUEST_ESTATE_SITUATION_LIST, getRequestEntity().getId());
 	}

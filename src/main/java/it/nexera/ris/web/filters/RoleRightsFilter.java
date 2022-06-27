@@ -57,6 +57,11 @@ public class RoleRightsFilter extends BaseFilter implements Filter {
         SessionHelper.removeObject("loadRequestFilters");
         if(!ValidationHelper.isNullOrEmpty(SessionHelper.get("currentPageURL"))) {
             String previousURL = SessionHelper.get("currentPageURL").toString();
+            if(previousURL.endsWith(PageTypes.EXCEL_DATA_REQUEST.getPage()) &&
+                    !httpRequest.getRequestURI().endsWith(PageTypes.REQUEST_TEXT_EDIT.getPage()) &&
+                    !ValidationHelper.isNullOrEmpty(SessionHelper.get("templateIdForExcelData"))){
+                SessionHelper.removeObject("templateIdForExcelData");
+            }
             if(previousURL.endsWith(PageTypes.REQUEST_EDIT.getPage()) ||
                     previousURL.endsWith(PageTypes.REQUEST_ESTATE_SITUATION_LIST.getPage()) ||
                     previousURL.endsWith(PageTypes.REQUEST_ESTATE_SITUATION_VIEW.getPage()) ||
