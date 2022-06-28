@@ -1110,104 +1110,127 @@
                                                                  update="searchPanel"
                                                                  icon="ui-icon ui-icon-search pi pi-search"/>
                                             </div>
-                                            <p:commandButton id="settingButton" onclick="PF('panelSetting').toggle();"
-                                                             type="button"
-                                                             styleClass="ui-button-warning-icon searchPanelButton"
-                                                             icon="ui-icon ui-icon-search pi pi-sliders-h"/>
-                                            <p:panel id="settingPanel" widgetVar="panelSetting" closable="true"
-                                                     toggleable="true" collapsed="true">
-                                                <div class="p-grid">
-                                                    <div class="p-col-12" style="text-align: center;">
-                                                        <h2>Filtra per</h2>
-                                                    </div>
-                                                    <div class="p-col-12">
-                                                        <div style="">
-                                                            <h:outputText style="color: #003871;"
-                                                                          value="#{ff:upper(msg.billingListDate)}:"/>
+                                            <div class="settingsBlock">
+                                                <script type="text/javascript">
+                                                    // <![CDATA[
+                                                    $("body").click(function(e){
+                                                        var target = $(e.target);
+                                                        if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('.ui-selectonemenu-panel').length) {
+                                                            PF('panelSetting').getJQ().hide();
+                                                        }
+                                                        if(target.closest('.ui-selectcheckboxmenu-item').length) {
+                                                            $("#states").addClass("border_class");
+                                                        } else {
+                                                            $("#states").removeClass("border_class");
+                                                        }
+                                                    });
+                                                    function togglePanel() {
+                                                        PF('panelSetting').getJQ().toggle();
+                                                    }
+                                                    jQuery(document).ready(function() {
+                                                        PF('panelSetting').getJQ().hide();
+                                                    });
+                                                    // ]]>
+                                                </script>
+                                                <p:commandButton id="settingButton" onclick="PF('panelSetting').getJQ().toggle();"
+                                                                 type="button"
+                                                                 styleClass="ui-button-warning-icon searchPanelButton"
+                                                                 icon="ui-icon ui-icon-search pi pi-sliders-h"/>
+                                                <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true"
+                                                         styleClass="panelSetting" style="display: none;">
+                                                    <div class="p-grid">
+                                                        <div class="p-col-12" style="text-align: center;">
+                                                            <h2>Filtra per</h2>
+                                                        </div>
+                                                        <div class="p-col-12">
+                                                            <div style="">
+                                                                <h:outputText style="color: #003871;"
+                                                                              value="#{ff:upper(msg.billingListDate)}:"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="p-col-6">
+                                                            <p:calendar id="filterDateFrom" readonlyInput="false"
+                                                                        showOn="button"
+                                                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+                                                                        pattern="dd/MM/yyyy" mask="true" locale="it"
+                                                                        navigator="true"
+                                                                        popupIconOnly="true"
+                                                                        onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+                                                                        value="#{bean.dateFrom}"
+                                                                        placeholder="#{msg.billingListDateFrom}"
+                                                                        styleClass="#{bean.dateFrom ne null ? 'calender-filled' : ''}">
+                                                                <p:ajax event="dateSelect" update="@this"/>
+                                                            </p:calendar>
+                                                            <div id="hyphen"></div>
+                                                        </div>
+                                                        <div class="p-col-6">
+                                                            <p:calendar id="filterDateTo" readonlyInput="false"
+                                                                        showOn="button"
+                                                                        onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                                                                        pattern="dd/MM/yyyy" mask="true"
+                                                                        locale="it" navigator="true" popupIconOnly="true"
+                                                                        placeholder="#{msg.billingListDateTo}"
+                                                                        onblur="check_date(this)" value="#{bean.dateTo}"
+                                                                        styleClass="#{bean.dateTo ne null ? 'calender-filled' : ''}">
+                                                                <p:ajax event="dateSelect" update="@this"/>
+                                                            </p:calendar>
+                                                        </div>
+                                                        <div class="p-col-6">
+                                                            <p:selectOneMenu id="manager"
+                                                                             value="#{bean.managerClientFilterid}"
+                                                                             style="width: 100%;"
+                                                                             styleClass="#{bean.managerClientFilterid ne null ? 'select-one-menu' : ''}">
+                                                                <f:selectItem itemLabel="#{ff:upper(msg.clientManager)}"
+                                                                              itemValue="#{null}"
+                                                                              noSelectionOption="true"/>
+                                                                <f:selectItems value="#{bean.managerClients}"/>
+                                                                <p:ajax event="itemSelect" update="@this"/>
+                                                            </p:selectOneMenu>
+                                                        </div>
+                                                        <div class="p-col-6">
+                                                            <p:selectOneMenu id="office" value="#{bean.selectedOfficeId}"
+                                                                             style="width: 100%;"
+                                                                             styleClass="#{bean.selectedOfficeId ne null ? 'select-one-menu' : ''}">
+                                                                <f:selectItem
+                                                                        itemLabel="#{msg.subjectViewFormalityConservatoryCap}"
+                                                                        itemValue="#{null}"
+                                                                        noSelectionOption="true"/>
+                                                                <f:selectItems value="#{bean.offices}"/>
+                                                                <p:ajax event="itemSelect" update="@this"/>
+                                                            </p:selectOneMenu>
+                                                        </div>
+                                                        <div class="p-col-6">
+                                                            <p:inputText id="filterNotes" value="#{bean.filterNotes}"
+                                                                         placeholder="#{msg.billingListNotes}"
+                                                                         styleClass="input-width-100"/>
+                                                        </div>
+                                                        <div class="p-col-6">
+                                                            <p:inputText id="filterNdg" value="#{bean.filterNdg}"
+                                                                         placeholder="#{msg.billingListNdg}"
+                                                                         styleClass="input-width-100"/>
+                                                        </div>
+                                                        <div class="p-col-6">
+                                                            <p:inputText id="filterPractice" value="#{bean.filterPractice}"
+                                                                         placeholder="#{msg.billingListPractice}"
+                                                                         styleClass="input-width-100"/>
+                                                        </div>
+
+                                                        <div class="p-col-12 search-panel-btns" style="text-align: center;">
+                                                            <p:commandButton
+                                                                    value="#{ff:upper(msg.requestPrintSelectTemplate)}"
+                                                                    style="background: #00CC52;" id="searchButton"
+                                                                    onclick="checkDates(); filterTableFromPanel();"
+                                                                    update="searchPanel"
+                                                                    oncomplete="PF('panelSetting').getJQ().toggle();"/>
+                                                            <p:commandButton id="manageReestablishBtn"
+                                                                             value="#{ff:upper(msg.mailManageReestablish)}"
+                                                                             actionListener="#{bean.clearFilterPanel}"
+                                                                             update="searchPanel invoiceTable"
+                                                                             oncomplete="PF('panelSetting').getJQ().toggle();"/>
                                                         </div>
                                                     </div>
-                                                    <div class="p-col-6">
-                                                        <p:calendar id="filterDateFrom" readonlyInput="false"
-                                                                    showOn="button"
-                                                                    onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
-                                                                    pattern="dd/MM/yyyy" mask="true" locale="it"
-                                                                    navigator="true"
-                                                                    popupIconOnly="true"
-                                                                    onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
-                                                                    value="#{bean.dateFrom}"
-                                                                    placeholder="#{msg.billingListDateFrom}"
-                                                                    styleClass="#{bean.dateFrom ne null ? 'calender-filled' : ''}">
-                                                            <p:ajax event="dateSelect" update="@this"/>
-                                                        </p:calendar>
-                                                        <div id="hyphen"></div>
-                                                    </div>
-                                                    <div class="p-col-6">
-                                                        <p:calendar id="filterDateTo" readonlyInput="false"
-                                                                    showOn="button"
-                                                                    onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
-                                                                    pattern="dd/MM/yyyy" mask="true"
-                                                                    locale="it" navigator="true" popupIconOnly="true"
-                                                                    placeholder="#{msg.billingListDateTo}"
-                                                                    onblur="check_date(this)" value="#{bean.dateTo}"
-                                                                    styleClass="#{bean.dateTo ne null ? 'calender-filled' : ''}">
-                                                            <p:ajax event="dateSelect" update="@this"/>
-                                                        </p:calendar>
-                                                    </div>
-                                                    <div class="p-col-6">
-                                                        <p:selectOneMenu id="manager"
-                                                                         value="#{bean.managerClientFilterid}"
-                                                                         style="width: 100%;"
-                                                                         styleClass="#{bean.managerClientFilterid ne null ? 'select-one-menu' : ''}">
-                                                            <f:selectItem itemLabel="#{ff:upper(msg.clientManager)}"
-                                                                          itemValue="#{null}"
-                                                                          noSelectionOption="true"/>
-                                                            <f:selectItems value="#{bean.managerClients}"/>
-                                                            <p:ajax event="itemSelect" update="@this"/>
-                                                        </p:selectOneMenu>
-                                                    </div>
-                                                    <div class="p-col-6">
-                                                        <p:selectOneMenu id="office" value="#{bean.selectedOfficeId}"
-                                                                         style="width: 100%;"
-                                                                         styleClass="#{bean.selectedOfficeId ne null ? 'select-one-menu' : ''}">
-                                                            <f:selectItem
-                                                                    itemLabel="#{msg.subjectViewFormalityConservatoryCap}"
-                                                                    itemValue="#{null}"
-                                                                    noSelectionOption="true"/>
-                                                            <f:selectItems value="#{bean.offices}"/>
-                                                            <p:ajax event="itemSelect" update="@this"/>
-                                                        </p:selectOneMenu>
-                                                    </div>
-                                                    <div class="p-col-6">
-                                                        <p:inputText id="filterNotes" value="#{bean.filterNotes}"
-                                                                     placeholder="#{msg.billingListNotes}"
-                                                                     styleClass="input-width-100"/>
-                                                    </div>
-                                                    <div class="p-col-6">
-                                                        <p:inputText id="filterNdg" value="#{bean.filterNdg}"
-                                                                     placeholder="#{msg.billingListNdg}"
-                                                                     styleClass="input-width-100"/>
-                                                    </div>
-                                                    <div class="p-col-6">
-                                                        <p:inputText id="filterPractice" value="#{bean.filterPractice}"
-                                                                     placeholder="#{msg.billingListPractice}"
-                                                                     styleClass="input-width-100"/>
-                                                    </div>
-
-                                                    <div class="p-col-12 search-panel-btns" style="text-align: center;">
-                                                        <p:commandButton
-                                                                value="#{ff:upper(msg.requestPrintSelectTemplate)}"
-                                                                style="background: #00CC52;" id="searchButton"
-                                                                onclick="checkDates(); filterTableFromPanel();"
-                                                                update="searchPanel"
-                                                                oncomplete="PF('panelSetting').toggle()"/>
-                                                        <p:commandButton id="manageReestablishBtn"
-                                                                         value="#{ff:upper(msg.mailManageReestablish)}"
-                                                                         actionListener="#{bean.clearFilterPanel}"
-                                                                         update="settingPanel invoiceTable"
-                                                                         oncomplete="PF('panelSetting').toggle()"/>
-                                                    </div>
-                                                </div>
-                                            </p:panel>
+                                                </p:panel>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="p-col-12" style="margin-top: -15px; margin-bottom: -15px;">
