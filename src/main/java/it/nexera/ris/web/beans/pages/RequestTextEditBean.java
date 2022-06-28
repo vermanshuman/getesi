@@ -1313,6 +1313,10 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                 CollectionUtils.emptyIfNull(getSalesOtherEstateSituations())) {
             situation.save();
         }
+        for (SalesEstateSituationEditTableWrapper situation :
+            CollectionUtils.emptyIfNull(getGravamiEstateSituations())) {
+	        situation.save();
+	    }
         for (RequestConservatory rc : getRequestConservatoryList()) {
             if (!ValidationHelper.isNullOrEmpty(rc.getConservatoryDate())
                     && !ValidationHelper.isNullOrEmpty(rc.getRegistry())) {
