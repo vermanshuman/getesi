@@ -364,6 +364,11 @@
         div[id="dialogTab:mailCC"] .ui-autocomplete-input-token, input[id="dialogTab:mailCC_input"] {
             width: 100% !important;
         }
+        
+        .download_column {
+    		width: 59px !important;
+    		margin-right: 20px !important;
+		}
     </style>
 
     <p:dialog widgetVar="invoiceDialogBillingWV" modal="true" width="1350" draggable="false" id="invoiceDialogBilling"
@@ -932,11 +937,6 @@
                                         </p:column>
                                     </p:autoComplete>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="p-col-6">
-                            <div class="p-grid">
                                 <div class="p-col-12">
                                     <div  style="display:inline;">
                                     	<h:outputText value="#{msg.mailManagerEmailAttachmentMessage}"/>
@@ -947,6 +947,21 @@
 	                                  		 	update="listFile attachedFilesTable"/>
                                   	</div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="p-col-6">
+                            <div class="p-grid">
+                                <!-- <div class="p-col-12">
+                                    <div  style="display:inline;">
+                                    	<h:outputText value="#{msg.mailManagerEmailAttachmentMessage}"/>
+                                    </div>
+                                    <div  style="display:inline;">
+	                                    <p:fileUpload fileUploadListener="#{bean.handleFileUpload}" label=""
+	                                  			mode="advanced" auto="true" multiple="true"
+	                                  		 	update="listFile attachedFilesTable"/>
+                                  	</div>
+                                </div> -->
                                 <div class="p-col-12">
                                     <p:outputPanel id="listFile">
                                         <p:dataTable value="#{bean.invoiceEmailAttachedFiles}" styleClass="simple-table" var="file" id="attachedFilesTable"
@@ -955,10 +970,10 @@
                                             <p:column styleClass="action_column">
                                                 <p:selectBooleanCheckbox value="#{file.addAttachment}"/>
                                             </p:column>
-                                            <p:column headerText="#{msg.mailManagerEmailFile}" style="width: 280px !important;">
+                                            <p:column headerText="#{msg.mailManagerEmailFile}">
                                                 <h:outputText value="#{file.fileName}"/>
                                             </p:column>
-                                            <p:column>
+                                            <p:column styleClass="download_column">
                                                 <p:commandButton icon="fa fa-cloud-download" title="#{msg.download}" update=":form, messages"
                                                                  ajax="false"
                                                                  action="#{bean.downloadInvoiceFile}"
