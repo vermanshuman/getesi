@@ -126,7 +126,7 @@ public class LandChargesRegistryListBean extends
         List<Criterion> restrictions = new ArrayList<>();
 
         if (!ValidationHelper.isNullOrEmpty(getName())) {
-            restrictions.add(Restrictions.eq("name", getName()));
+            restrictions.add(Restrictions.ilike("name", getName(), MatchMode.ANYWHERE));
         }
         if (!ValidationHelper.isNullOrEmpty(getDescription())) {
             restrictions.add(Restrictions.eq("description", getDescription()));

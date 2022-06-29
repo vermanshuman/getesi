@@ -536,6 +536,8 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 			throws PersistenceBeanException, IllegalAccessException, InstantiationException {
 		Subject differentSubject = GeneralFunctionsHelper.checkSubjectPropertyUpload(event.getFile().getFileName(),
 				event.getFile().getContents(), getRequestEntity(), DaoManager.getSession());
+
+
 		getViewState().put("estateSituationViewBean", this);
 		if (differentSubject == null) {
 			GeneralFunctionsHelper.handleFileUpload(event.getFile().getFileName(),

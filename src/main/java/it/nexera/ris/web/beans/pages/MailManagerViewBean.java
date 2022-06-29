@@ -656,27 +656,10 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     .filter(c -> emptyIfNull(c.getReferenceClients()).stream()
                             .anyMatch(rc -> rc.getId().equals(getSelectedNotManagerOrFiduciaryClientId())))
                     .collect(Collectors.toList())));
-
-//            setClientManagers(ComboboxHelper.fillWrapperList(clientList.stream()
-//                    .filter(c -> (c.getManager() != null && c.getManager()) || (c.getId().equals(getSelectedNotManagerOrFiduciaryClientId())))
-//                    .collect(Collectors.toList())));
         } else {
             setClientManagers(ComboboxHelper.fillWrapperList(clientList.stream()
                     .filter(c -> c.getManager() != null && c.getManager()).collect(Collectors.toList())));
         }
-
-
-//        if (!ValidationHelper.isNullOrEmpty(getSelectedClientId())) {
-//           setClientManagers(ComboboxHelper.fillWrapperList(clientList.stream()
-//                      .filter(c -> c.getManager() != null && c.getManager() && c.getId().equals(getSelectedClientId()) )
-//                      .collect(Collectors.toList())));
-//         }else {
-//           setClientManagers(ComboboxHelper.fillWrapperList(clientList.stream()
-//                      .filter(c -> c.getManager() != null && c.getManager()  )
-//                      .collect(Collectors.toList())));
-//         }
-
-
         getClientSelectItemWrapperConverter().setWrapperList(new ArrayList<>(getClientManagers()));
 
         if (!ValidationHelper.isNullOrEmpty(getSelectedClientManagers())) {
@@ -1276,9 +1259,19 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         }
         if(lastInvoiceNumber == null)
             lastInvoiceNumber = 0l;
-        String invoiceNumber = (lastInvoiceNumber + 1) + "-" + currentYear + "-FE";
+        String nextNumber = ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.NEXT_INVOICE_NUMBER).getValue();
+        Long nextInvoiceNumber = 0l;
+        if(StringUtils.isNotBlank(nextNumber)) {
+            nextInvoiceNumber = Long.parseLong(nextNumber.trim());
+        }
+        if(nextInvoiceNumber > lastInvoiceNumber)
+            lastInvoiceNumber = nextInvoiceNumber;
+        else {
+            lastInvoiceNumber += 1;
+        }
+        String invoiceNumber = lastInvoiceNumber + "-" + currentYear + "-FE";
         setInvoiceNumber(invoiceNumber);
-        setNumber(lastInvoiceNumber + 1);
+        setNumber(lastInvoiceNumber);
     }
 
 //    public void setMaxInvoiceNumber(Long invoiceId) throws HibernateException {

@@ -472,9 +472,6 @@
                 width: 100%;
             }
 
-            .calender-filled input, .select-checkbox, .select-one-menu {
-                border: 1px solid #009900 !important;
-            }
 
             body .ui-inputfield.ui-state-focus {
                 box-shadow: 0 0 0 0.2em #57c279 !important;
@@ -500,9 +497,14 @@
                 margin-left: -37px;
             }
 
-            #settingPanel .ui-selectonemenu, #subjectSettingPanel .ui-selectonemenu {
+            #settingPanel #subjectSettingPanel {
                 background-color: #F0F3F5 !important;
                 border: none !important;
+                border-radius: 7px !important;
+            }
+
+            .ui-selectonemenu {
+                background-color: #F0F3F5 !important;
                 border-radius: 7px !important;
             }
 
@@ -667,6 +669,9 @@
                 background: #f8f9fa !important;
                 color: #495057 !important;
             }
+            .calender-filled input, .select-checkbox, .select-one-menu {
+                border: 1px solid #009900 !important;
+            }
         </style>
         <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
         <link rel="stylesheet"
@@ -683,7 +688,10 @@
                 <a href="#" id="tab2" class="tab">#{ff:upper(msg.billingListInvoices)}</a>
                 <a href="#" id="tab3" class="tab">#{ff:upper(msg.billingListCreditNotes)}</a>
                 <a href="#" id="tab4" class="tab">#{ff:upper(msg.billingListSubjectsToBeInvoiced)}</a>
-                <a href="#" id="tab5" class="tab">#{ff:upper(msg.menuConfiguration)}</a>
+                <h:panelGroup rendered="#{bean.currentUser.isAdmin()}">
+                    <a href="#" id="tab5" class="tab">#{ff:upper(msg.menuConfiguration)}</a>
+                </h:panelGroup>
+
             </nav>
             <main>
                 <div id="content_tab1" class="hide">
@@ -1072,7 +1080,7 @@
                 <!-- FATTURE TAB -->
                 <div id="content_tab2" class="hide" style="display: none;">
                     <p:remoteCommand name="loadInvoiceTab" action="#{bean.loadInvoiceTab}"
-                                     update=":invoiceTable :filterClient :manager :office"/>
+                                     update=":invoiceTable :filterClient :manager :office :invoicestatuses"/>
                     <div class="p-grid">
                         <div class="p-col-12 p-md-12">
                             <div class="card"
@@ -1115,7 +1123,9 @@
                                                     // <![CDATA[
                                                     $("body").click(function(e){
                                                         var target = $(e.target);
-                                                        if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('.ui-selectonemenu-panel').length) {
+                                                        if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('.ui-selectonemen-panel').length
+                                                            && !target.parents('#manager_items').length && !target.parents('#office_items').length
+                                                            && !target.parents('#invoicestatuses_items').length) {
                                                             PF('panelSetting').getJQ().hide();
                                                         }
                                                         if(target.closest('.ui-selectcheckboxmenu-item').length) {
@@ -1213,6 +1223,19 @@
                                                             <p:inputText id="filterPractice" value="#{bean.filterPractice}"
                                                                          placeholder="#{msg.billingListPractice}"
                                                                          styleClass="input-width-100"/>
+                                                        </div>
+
+                                                        <div class="p-col-6">
+                                                            <p:selectOneMenu id="invoicestatuses"
+                                                                             value="#{bean.filterStatusId}"
+                                                                             style="width: 100%;"
+                                                                             styleClass="#{bean.filterStatusId ne null ? 'select-one-menu' : ''}">
+                                                                <f:selectItem itemLabel="#{ff:upper(msg.status)}"
+                                                                              itemValue="#{null}"
+                                                                              noSelectionOption="true"/>
+                                                                <f:selectItems value="#{bean.invoiceStatuses}"/>
+                                                                <p:ajax event="itemSelect" update="@this"/>
+                                                            </p:selectOneMenu>
                                                         </div>
 
                                                         <div class="p-col-12 search-panel-btns" style="text-align: center;">
@@ -1682,7 +1705,7 @@
                                                                          oncomplete="resetData();checkDates();filterRequestTableFromPanel();PF('subjectPanelSetting').getJQ().hide();"/>
                                                     </div>
 
-<!--                                                     update="subjectSettingPanel subjectSearchPanel"-->
+                                                    <!--                                                     update="subjectSettingPanel subjectSearchPanel"-->
 
                                                 </div>
                                             </p:panel>
@@ -2147,6 +2170,37 @@
                 </div>
 
                 <div id="content_tab5" class="hide" style="display: none;">
+                    <ui:include src="/resources/tpl/common/ValidationMessages.xhtml"/>
+                    <div class="p-grid">
+                        <div class="p-col-12 p-md-12">
+                            <div class="card"
+                                 style="border: none !important; padding-top:0px; padding-bottom:0px; margin-top:10px;">
+                                <div class="p-grid">
+                                    <div class="p-col-2" style="padding-bottom: 0px !important;">
+                                        <div>
+                                            <div class="p-field">
+                                                <span><span class="red">*</span>#{msg.billingNextNumber}:</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="p-col-3" style="padding-bottom: 0px !important;">
+                                        <div>
+                                            <div class="p-field">
+                                                <p:inputText id="inumber" value="#{bean.nextInvoiceNumber}"
+                                                             label="#{msg.billingNextNumber}" styleClass="input-width">
+                                                    <p:keyFilter mask="num" />
+                                                </p:inputText>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-col-12" style="margin-top: -15px; margin-bottom: -15px;">
+                            <p:commandButton value="#{msg.save}" style="float: right" styleClass="ui-button-success" iconPos="left"
+                                             action="#{bean.saveNextInvoiceNumber}" update="inumber"/>
+                        </div>
+                    </div>
 
                 </div>
             </main>

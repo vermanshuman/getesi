@@ -65,7 +65,9 @@ public enum ApplicationSettingsKeys {
     DTD,
 
     CLOUD_API_URL,
-    CLOUD_API_KEY
+    CLOUD_API_KEY,
+
+    NEXT_INVOICE_NUMBER,
     ;
 
     boolean needToRefresh;

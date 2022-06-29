@@ -5,10 +5,11 @@
       xmlns:p="http://primefaces.org/ui">
 <ui:composition template="/resources/tpl/Admin/EmptyBase.xhtml">
     <ui:param name="view_title" value="#{msg.systemMonitoring}"/>
-    <ui:param name="bean" value="#{monitoringBean}"/>
+
     <ui:param name="showAjax" value="#{false}"/>
 
     <ui:define name="view_body">
+        <ui:param name="bean" value="#{monitoringBean}"/>
         <script type="text/javascript">
             window.onload = function () {
                 PF('socketWV').connect('/notify');

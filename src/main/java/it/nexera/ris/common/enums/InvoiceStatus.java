@@ -9,7 +9,9 @@ public enum InvoiceStatus {
     TOSEND(2l, true),
     DELIVERED(3l, true),
     CREDITNOTE(4l, true),
-    UNLOCKED(5l, true);;
+    UNLOCKED(5l, true),
+    EMAILSENT(6l, true),
+    EMAILNOTSENT(7l, true);
 
     private Long id;
 

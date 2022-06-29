@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 import javax.persistence.Column;
 
 import it.nexera.ris.persistence.beans.entities.domain.*;
-import it.nexera.ris.persistence.view.RequestViewDesc;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
@@ -117,8 +116,6 @@ public class EntityLazyListModel<T extends IEntity> extends LazyDataModel<T> {
                 log.info("Execution time for laod list " + formatter.format((end - start) / 1000d) + " seconds");    
             }else if (RequestView.class.getName().equals(clazz.getName())) {
                 log.info("Execution time for Request list " + formatter.format((end - start) / 1000d) + " seconds");    
-            }else if (RequestViewDesc.class.getName().equals(clazz.getName())) {
-                log.info("Execution time for Request list " + formatter.format((end - start) / 1000d) + " seconds");
             }
             
             
@@ -178,8 +175,6 @@ public class EntityLazyListModel<T extends IEntity> extends LazyDataModel<T> {
             if (WLGInboxShort.class.getName().equals(clazz.getName())) {
                 log.info("Execution time for rowCount is " + formatter.format((end - start) / 1000d) + " seconds");
             }else  if (RequestView.class.getName().equals(clazz.getName())) {
-                log.info("Execution time for rowCount(Request list) is " + formatter.format((end - start) / 1000d) + " seconds");
-            }else  if (RequestViewDesc.class.getName().equals(clazz.getName())) {
                 log.info("Execution time for rowCount(Request list) is " + formatter.format((end - start) / 1000d) + " seconds");
             }
             

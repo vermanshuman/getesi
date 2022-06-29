@@ -17,8 +17,10 @@ import org.hibernate.sql.JoinType;
 
 import javax.faces.context.FacesContext;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -540,13 +542,22 @@ public class CostCalculationHelper {
         List<Double> numberOfGroupedEstateFormality = getRequest().getSumOfGroupedEstateFormalities();
         Integer numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
 
-        System.out.println("numberOfGroupedEstateFormality " + numberOfGroupedEstateFormality);
-        System.out.println("numberOfGroupsByDocumentOfEstateFormality " + numberOfGroupsByDocumentOfEstateFormality);
-        System.out.println("getNumberOfGroupsByDocumentOfEstateFormality " + getRequest().getNumberOfGroupsByDocumentOfEstateFormality());
+        boolean isServiceUpdate = false;
+        if (!ValidationHelper.isNullOrEmpty(getRequest().getService())
+                && !ValidationHelper.isNullOrEmpty(getRequest().getService().getIsUpdate())
+                && getRequest().getService().getIsUpdate()) {
+            isServiceUpdate = true;
+        }
+
 //        if (!ValidationHelper.isNullOrEmpty(getRequest().getNumberActUpdate())) {
 //            numberOfGroupedEstateFormality = Collections.singletonList(getRequest().getNumberActUpdate());
 //            numberOfGroupsByDocumentOfEstateFormality = getRequest().getNumberOfGroupsByDocumentOfEstateFormality();
 //        }
+
+        if(isServiceUpdate){
+            numberOfGroupedEstateFormality = Collections.singletonList(getNumActs(getRequest().getId()).doubleValue());
+            numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
+        }
         boolean isPriceList = Boolean.FALSE;
         if (!ValidationHelper.isNullOrEmpty(getRequest().getService())) {
             List<PriceList> priceList = loadPriceList(billingClient, restrictionForPriceList, getRequest().getService());
@@ -603,6 +614,21 @@ public class CostCalculationHelper {
             result = numberOfGroupedEstateFormality.stream().mapToDouble(Double::doubleValue).sum();
         }
         return result;
+    }
+
+
+    private BigInteger getNumActs(Long requestId) throws PersistenceBeanException, IllegalAccessException {
+        BigInteger countFormality = DaoManager.countQuery("select count(*) " +
+                "from request_formality where request_id=" + requestId);
+        BigInteger countSuccessFormality = DaoManager.countQuery("select count(*)" +
+                "from (estate_formality_success inner join request_formality on " +
+                "estate_formality_success.estate_formality_id=request_formality.formality_id) " +
+                "where estate_formality_success.note_type=\"NOTE_TYPE_A\" and request_formality.request_id=" + requestId);
+        BigInteger countCommunication = DaoManager.countQuery("select count(*) " +
+                "from (communication inner join request_formality on " +
+                "communication.estate_formality_id=request_formality.formality_id) " +
+                "where request_formality.request_id=" + requestId);
+        return countFormality.add(countSuccessFormality).add(countCommunication);
     }
 
     public List<PriceList> loadPriceList(Boolean billingClient, boolean restrictionForPriceList)

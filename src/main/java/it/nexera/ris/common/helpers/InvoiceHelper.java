@@ -588,9 +588,13 @@ public class InvoiceHelper {
         return paymentImportTotal;
     }
 
-    public static String format(Double value) {
-        if(value != null){
-            return String.format("%.2f",value).replaceAll(",", ".");
+    public static String format(Double amount) {
+        if(amount != null){
+            StringBuilder sb = new StringBuilder();
+            Formatter formatter = new Formatter(sb, Locale.GERMAN);
+            formatter.format("%(,.2f", amount);
+            return sb.toString();
+            //return String.format("%.2f",value).replaceAll(",", ".");
         }
         return "";
     }

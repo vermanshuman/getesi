@@ -75,8 +75,9 @@ public class RoleRightsFilter extends BaseFilter implements Filter {
                     previousURL.endsWith(PageTypes.MAIL_MANAGER_EDIT.getPage()) ||
                     previousURL.endsWith(PageTypes.MAIL_MANAGER_FOLDER.getPage()) ||
                     previousURL.endsWith(PageTypes.MAIL_MANAGER_VIEW.getPage())){
-                if( httpRequest.getParameter("page") != null
-                        && httpRequest.getRequestURI().endsWith(PageTypes.MAIL_MANAGER_LIST.getPage())){
+//                if( httpRequest.getParameter("page") != null
+//                        && httpRequest.getRequestURI().endsWith(PageTypes.MAIL_MANAGER_LIST.getPage())){
+                    if(httpRequest.getRequestURI().endsWith(PageTypes.MAIL_MANAGER_LIST.getPage())){
                     SessionHelper.put("loadMailFilters", "true");
                 }
             }
