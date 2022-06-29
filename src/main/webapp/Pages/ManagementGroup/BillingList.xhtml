@@ -1400,8 +1400,8 @@
                 </div>
                 <div id="content_tab4" class="hide" style="display: none;">
                     <p:remoteCommand name="loadSubjectTab" action="#{bean.loadSubjectTab}"
-                                     update=":subjectTable :statuses :services :requestTypes :subjectManager :fiduciario
-                        :subjectOffice :requestTypeSelectCheckboxPanel :serviceSelectCheckboxPanel :stateSelectCheckboxPanel :userSelectCheckboxPanel"/>
+                                     update=":subjectTable :form:statuses :form:services :form:requestTypes :subjectManager :fiduciario
+                        :subjectOffice :form:requestTypeSelectCheckboxPanel :form:serviceSelectCheckboxPanel :form:stateSelectCheckboxPanel"/>
                     <div class="p-grid">
                         <div class="p-col-12 p-md-12">
                             <div class="card"
@@ -1701,8 +1701,8 @@
                                                         <p:commandButton style="width: auto;"
                                                                          value="#{ff:upper(msg.mailManageReestablish)}"
                                                                          actionListener="#{bean.clearFiltraPanel}"
-                                                                         update="requestTypeSelectCheckboxPanel serviceSelectCheckboxPanel stateSelectCheckboxPanel requestTypeSelectCheckboxPanelDataTable"
-                                                                         oncomplete="resetData();checkDates();filterRequestTableFromPanel();PF('subjectPanelSetting').getJQ().hide();"/>
+                                                                         update=":form:subjectSearchPanel :form:subjectSettingPanel"
+                                                                         oncomplete="loadSubjectTab();PF('subjectPanelSetting').getJQ().hide();"/>
                                                     </div>
 
                                                     <!--                                                     update="subjectSettingPanel subjectSearchPanel"-->
@@ -1732,7 +1732,7 @@
                         <div class="button_group">
                             <p:remoteCommand name="filterRequestTableFromPanel"
                                              action="#{bean.filterRequestTableFromPanel}"
-                                             update=":subjectTable"/>
+                                             update=":form:subjectTable"/>
                             <p:remoteCommand name="updateCalendarTo" update=":form:filterSubjectDateTo"/>
                             <p:remoteCommand name="handleRowsChange"
                                              action="#{bean.handleRowsChange()}" update="subjectTable" oncomplete="setPageNumber()"/>
@@ -1744,7 +1744,7 @@
                     </ui:fragment>
 
                     <p:overlayPanel id="requestTypeSelectCheckboxPanel" my="left top" at="left bottom"
-                                    widgetVar="requestTypeSelectCheckboxWV" for="requestTypes" dynamic="true" style="width:300px;">
+                                    widgetVar="requestTypeSelectCheckboxWV" for="requestTypes" style="width:300px;">
                         <p:dataTable id="requestTypeSelectCheckboxPanelDataTable" var="requestType" emptyMessage="#{msg.noRecordsFound}"
                                      value="#{bean.requestTypeWrappers}" selectionMode="single"
                                      selection="#{bean.selectedRequestTypeForFilter}" rowKey="#{requestType.value}">
@@ -1771,7 +1771,7 @@
 
 
                     <p:overlayPanel id="serviceSelectCheckboxPanel" my="left top" at="right bottom"
-                                    widgetVar="serviceSelectCheckboxWV" for="services" dynamic="true" style="width:400px;">
+                                    widgetVar="serviceSelectCheckboxWV" for="services" style="width:400px;">
                         <p:dataTable id="serviceSelectCheckboxPanelDataTable" var="service" emptyMessage="#{msg.noRecordsFound}"
                                      value="#{bean.serviceWrappers}" selectionMode="single"
                                      selection="#{bean.selectedServiceForFilter}" rowKey="#{service.value}">

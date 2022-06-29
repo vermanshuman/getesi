@@ -1837,10 +1837,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     }
 
     public void clearFiltraPanel() throws PersistenceBeanException, IOException, InstantiationException, IllegalAccessException {
-        setSelectedStates(null);
-        //setSelectedRequestTypes(null);
-//        setRequestTypeWrappers(new ArrayList<>());
-        // setSelectedServices(null);
+        setSelectedStates(new ArrayList<>());
+        setSelectedRequestTypes(new ArrayList<>());
+        setSelectedServices(new ArrayList<>());
         setSubjectManagerClientFilterId(null);
         setFiduciaryClientFilterId(null);
         setAggregationFilterId(null);
@@ -1849,7 +1848,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setSubjectDateTo(null);
         setDateFromEvasion(null);
         setDateToEvasion(null);
-        //      this.onLoad();
+        setStateWrappers(new ArrayList<>());
+        setServiceWrappers(new ArrayList<>());
+        setRequestTypeWrappers(new ArrayList<>());
         setActiveTabIndex(3);
     }
 
