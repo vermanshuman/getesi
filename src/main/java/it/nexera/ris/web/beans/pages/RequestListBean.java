@@ -195,7 +195,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
             IllegalAccessException, IOException {
-
         if (ValidationHelper.isNullOrEmpty(SessionHelper.get("loadRequestFilters"))) {
             clearFilterValueFromSession();
         }
@@ -1031,8 +1030,8 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             SessionHelper.put(KEY_ROWS_PER_PAGE, getRowsPerPage());
         }
 
-        if (!ValidationHelper.isNullOrEmpty(getPageNumber())) {
-            SessionHelper.put(KEY_PAGE_NUMBER, getPageNumber());
+        if (!ValidationHelper.isNullOrEmpty(getPaginator().getCurrentPageNumber())) {
+            SessionHelper.put(KEY_PAGE_NUMBER, getPaginator().getCurrentPageNumber());
         }
     }
 
@@ -1112,10 +1111,11 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             setRowsPerPage(10);
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_PAGE_NUMBER))) {
-            setPageNumber((Integer) SessionHelper.get(KEY_PAGE_NUMBER));
+            getPaginator().setCurrentPageNumber((Integer) SessionHelper.get(KEY_PAGE_NUMBER));
         } else {
-            setPageNumber(0);
+            getPaginator().setCurrentPageNumber(0);
         }
+        getPaginator().setTablePage(getPaginator().getCurrentPageNumber());
 //        executeJS("if (PF('tableWV').getPaginator() != null ) " +
 //                "PF('tableWV').getPaginator().setPage(" + getPageNumber() + ");");
     }
@@ -1700,6 +1700,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         SessionHelper.removeObject(KEY_CF);
         SessionHelper.removeObject(KEY_NOMINATIVO);
         SessionHelper.removeObject(KEY_STATES);
+        SessionHelper.removeObject(KEY_PAGE_NUMBER);
         SessionHelper.removeObject("searchLastName");
         SessionHelper.removeObject("searchFiscalCode");
         SessionHelper.removeObject("searchCreateUser");

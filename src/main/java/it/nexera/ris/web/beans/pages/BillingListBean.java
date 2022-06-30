@@ -613,13 +613,13 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         if (!ValidationHelper.isNullOrEmpty(getFilterStatusId())) {
             InvoiceStatus invoiceStatus = InvoiceStatus.getById(getFilterStatusId());
             if(!ValidationHelper.isNullOrEmpty(invoiceStatus)){
-               if(invoiceStatus.equals(InvoiceStatus.EMAILSENT)){
-                   restrictions.add(Restrictions.isNotNull("email"));
-               }else if(invoiceStatus.equals(InvoiceStatus.EMAILNOTSENT)){
-                   restrictions.add(Restrictions.isNull("email"));
+                if(invoiceStatus.equals(InvoiceStatus.EMAILSENT)){
+                    restrictions.add(Restrictions.isNotNull("email"));
+                }else if(invoiceStatus.equals(InvoiceStatus.EMAILNOTSENT)){
+                    restrictions.add(Restrictions.isNull("email"));
                 }else {
-                   restrictions.add(Restrictions.eq("status", invoiceStatus));
-               }
+                    restrictions.add(Restrictions.eq("status", invoiceStatus));
+                }
             }
         }
         if (restrictionsLike.size() > 0) {
@@ -983,6 +983,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 Restrictions.eq("manager", Boolean.TRUE),
         }, Boolean.FALSE));
         setInvoiceStatuses(ComboboxHelper.fillList(InvoiceStatus.class, false));
+        getInvoiceStatuses()
+                .removeIf(is -> is.getLabel().equals(InvoiceStatus.CREDITNOTE.toString()));
         setOffices(ComboboxHelper.fillList(Office.class, Boolean.TRUE));
         loadCompanies(getClientList());
     }
@@ -1154,10 +1156,10 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         loadInvoiceDialogData(invoice);
         //executeJS("PF('invoiceDialogBillingWV').show();");
     }
-    
+
     public void loadPaymentData(){
         if(!ValidationHelper.isNullOrEmpty(getSelectedInvoice()))
-        setPaymentAmount(getSelectedInvoice().getTotalGrossAmount());
+            setPaymentAmount(getSelectedInvoice().getTotalGrossAmount());
     }
 
     public void setMaxInvoiceNumber() throws HibernateException {
@@ -1355,12 +1357,23 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             Invoice invoice = saveInvoice(InvoiceStatus.DRAFT, true);
             setInvoiceSaveAsDraft(Boolean.TRUE);
             loadInvoiceDialogData(invoice);
+            setMaxInvoiceNumber();
+            String nextNumber = ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.NEXT_INVOICE_NUMBER).getValue();
+            if(StringUtils.isNotBlank(nextNumber)){
+                Long invoiceNumber= Long.parseLong(nextNumber.trim());
+                if(invoiceNumber < getNumber())
+                    invoiceNumber = getNumber();
+                setNextInvoiceNumber(invoiceNumber);
+            }else {
+                setNextInvoiceNumber(getNumber());
+            }
+            RequestContext.getCurrentInstance().update("inumber");
         } catch (Exception e) {
             e.printStackTrace();
             LogHelper.log(log, e);
         }
         //executeJS("PF('invoiceDialogBillingWV').hide();");
-        //RequestContext.getCurrentInstance().update("form");
+
         //closeInvoiceDialog();
     }
 

@@ -320,7 +320,7 @@ body a {
 	justify-content: center;
 }
 
-.search-panel-btns button {
+.search-panel-btns button:not(#manageReestablishBtn) {
 	width: 98px;
 }
 

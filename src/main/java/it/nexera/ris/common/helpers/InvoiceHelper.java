@@ -485,14 +485,13 @@ public class InvoiceHelper {
                 .collect(
                         Collectors.groupingBy(RequestPriceListModel::getTaxRate, Collectors.toList()));
         List<InvoiceItem> invoiceItems = new ArrayList<>();
-        String requestName = "";
-        for(Request request: selectedRequestList) {
-            if(!ValidationHelper.isNullOrEmpty(request.getRequestType())){
-                if(!requestName.isEmpty())
-                    requestName = requestName + " + ";
-                requestName = requestName + request.getRequestTypeName();
-            }
-        }
+
+        String requestName = selectedRequestList
+                .stream()
+                .map(r-> r.getRequestTypeName())
+                .distinct()
+                .collect(Collectors.joining(" + "));
+
         for(Map.Entry<TaxRate, List<RequestPriceListModel>> taxRateEntry : taxRateMap.entrySet()) {
             TaxRate taxRate = taxRateEntry.getKey();
             List<RequestPriceListModel> list = taxRateEntry.getValue();

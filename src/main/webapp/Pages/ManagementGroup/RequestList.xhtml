@@ -224,7 +224,7 @@
             .al-cen-fx div {
                 justify-content: center;
             }
-            /* body .ui-widget, body .ui-widget .ui-widget {
+            /*  body .ui-widget, body .ui-widget .ui-widget {
                 font-family: "Open Sans","Helvetica Neue",sans-serif;
                 text-decoration: none;
             } */
@@ -933,6 +933,20 @@
             <h:inputHidden id="pageNumber" value="#{bean.paginator.currentPageNumber}" />
 
             <div class="ui-datatable ui-widget request-table ">
+                <script>
+                    // <![CDATA[
+                    $(document ).ready(function() {
+                        var value = $("[name='pageNumber']").val();
+                        $("div[class^='page_']").each(function(i, obj) {
+                            obj.removeClass("ui-state-active");
+                        });
+                        if(value == 0)
+                            value = 1;
+                        $('.page_' + value).addClass("ui-state-active");
+                        $('#page_bottom_' + + value).addClass("ui-state-active");
+                    });
+                    // ]]>
+                </script>
                 <div id="table_paginator_top" class=" ui-paginator ui-paginator-top ui-widget-header ui-corner-top">
                     <h:outputText style="float: left;" value="Elementi visibili nella pagina"/>
                     <label for="table_rppDD" class="ui-paginator-rpp-label ui-helper-hidden">Rows Per Page</label>

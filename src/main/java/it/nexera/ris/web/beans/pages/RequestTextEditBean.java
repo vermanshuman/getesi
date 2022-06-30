@@ -195,7 +195,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     private Double invoiceItemAmount;
 
-   // private Double invoiceItemVat;
+    // private Double invoiceItemVat;
 
     private Double invoiceTotalCost;
 
@@ -300,14 +300,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                 }
             }
         }
-        try {
-            if (!ValidationHelper.isNullOrEmpty(SessionHelper.get("templateIdForExcelData"))) {
-                this.setSelectedTemplateId((Long) SessionHelper.get("templateIdForExcelData"));
-                SessionHelper.removeObject("templateIdForExcelData");
-            }
-        } catch (Exception e) {
-            LogHelper.log(log, e);
-        }
+
         if ((ValidationHelper.isNullOrEmpty(getEntity().getNeedValidateCadastral())
                 || getEntity().getNeedValidateCadastral()) && !ValidationHelper.isNullOrEmpty(getExamRequest()) &&
                 !EstateSituationHelper.isValidFormalityCadastral(getExamRequest().getId())) {
@@ -360,7 +353,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
         updateConservatoryList();
 
-      //  generateMenuModel();
+        //  generateMenuModel();
         setMaxInvoiceNumber();
         if(!ValidationHelper.isNullOrEmpty(getExamRequest().getTotalCostDouble()))
             setInvoiceTotalCost(Double.parseDouble(getExamRequest().getTotalCostDouble()));
@@ -396,7 +389,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
                 setInvoiceItemAmount(invoiceItem.getAmount());
                 if(!ValidationHelper.isNullOrEmpty(invoiceItem.getTaxRate()))
                     setSelectedTaxRateId(invoiceItem.getTaxRate().getId());
-              //  setInvoiceItemVat(invoiceItem.getVat());
+                //  setInvoiceItemVat(invoiceItem.getVat());
             }
         }
         if(getExamRequest().getStateId().equals(RequestState.SENT_TO_SDI.getId()))
@@ -404,6 +397,15 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
         setBillinRequest(AccessBean.canViewPage(PageTypes.BILLING_LIST));
 
+        try {
+            if (!ValidationHelper.isNullOrEmpty(SessionHelper.get("templateIdForExcelData"))) {
+                this.setSelectedTemplateId((Long) SessionHelper.get("templateIdForExcelData"));
+                updateTemplate();
+                SessionHelper.removeObject("templateIdForExcelData");
+            }
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
     }
 
     public void onErrorClose() throws PersistenceBeanException {
@@ -1314,9 +1316,9 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             situation.save();
         }
         for (SalesEstateSituationEditTableWrapper situation :
-            CollectionUtils.emptyIfNull(getGravamiEstateSituations())) {
-	        situation.save();
-	    }
+                CollectionUtils.emptyIfNull(getGravamiEstateSituations())) {
+            situation.save();
+        }
         for (RequestConservatory rc : getRequestConservatoryList()) {
             if (!ValidationHelper.isNullOrEmpty(rc.getConservatoryDate())
                     && !ValidationHelper.isNullOrEmpty(rc.getRegistry())) {
@@ -1600,7 +1602,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     }
 
     public void editExcelDataRequest() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
-            RedirectHelper.goToExcelDataRequest(getRequestId(), null, false);
+        RedirectHelper.goToExcelDataRequest(getRequestId(), null, false);
     }
 
     public void reloadPage() throws IllegalAccessException, InstantiationException, PersistenceBeanException {
@@ -2748,9 +2750,9 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 //        return invoiceItemVat;
 //    }
 
-   // public void setInvoiceItemVat(Double invoiceItemVat) {
-      //  this.invoiceItemVat = invoiceItemVat;
-   // }
+    // public void setInvoiceItemVat(Double invoiceItemVat) {
+    //  this.invoiceItemVat = invoiceItemVat;
+    // }
 
     public Double getInvoiceTotalCost() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         if(!ValidationHelper.isNullOrEmpty(getExamRequest())){
