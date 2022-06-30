@@ -444,6 +444,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }else {
             setNextInvoiceNumber(getNumber());
         }
+        setPaymentAmount(null);
     }
 
     private void loadRequestPanel() throws PersistenceBeanException, IllegalAccessException {
@@ -1152,6 +1153,11 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setSelectedInvoiceItems(DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)}));
         loadInvoiceDialogData(invoice);
         //executeJS("PF('invoiceDialogBillingWV').show();");
+    }
+    
+    public void loadPaymentData(){
+        if(!ValidationHelper.isNullOrEmpty(getSelectedInvoice()))
+        setPaymentAmount(getSelectedInvoice().getTotalGrossAmount());
     }
 
     public void setMaxInvoiceNumber() throws HibernateException {

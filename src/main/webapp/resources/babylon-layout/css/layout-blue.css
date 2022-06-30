@@ -106,7 +106,7 @@ html {
 }
 
 body {
-  font-family: "cabin", sans-serif;
+  font-family: Verdana, sans-serif;
   font-size: 14px;
   font-weight: 400;
   color: #212121;
@@ -2075,7 +2075,7 @@ a {
   background-color: transparent;
   outline: 0 none;
   color: #727272;
-  font-family: "cabin", sans-serif;
+  font-family: Verdana, sans-serif;
 }
 .layout-dashboard .live-support .new-message .p-col-fixed {
   width: 100px;
@@ -3771,7 +3771,7 @@ html {
   background-color: transparent;
   outline: 0 none;
   color: #727272;
-  font-family: "cabin", sans-serif;
+  font-family: Verdana, sans-serif;
 }
 .widget-live-support .new-message .p-col-fixed {
   width: 100px;
@@ -4733,4 +4733,10 @@ html {
 
 .layout-dashboard .user-card .user-card-content .user-detail ul li .project-progressbar {
   width: calc(70% - 100px);
+}
+
+.ui-widget, .ui-widget .ui-widget {
+    font-family: Verdana, sans-serif !important;
+    text-decoration: none !important;
+    font-size: 14px !important;
 }

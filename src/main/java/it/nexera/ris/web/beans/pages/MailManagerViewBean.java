@@ -496,6 +496,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             });
             setRequestsConsideredForInvoice(requestListForInvoice);
         }
+        setPaymentAmount(null);
     }
 
     public void handleClientSelect() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -1573,6 +1574,11 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         getInvoiceClientData(getSelectedInvoiceClient());
         if (!ValidationHelper.isNullOrEmpty(invoiceDb) && !ValidationHelper.isNullOrEmpty(invoiceDb.getStatus()) && invoiceDb.getStatus().equals(InvoiceStatus.DRAFT))
         	setInvoiceSaveAsDraft(Boolean.TRUE);
+    }
+    
+    public void loadPaymentData(){
+        if(!ValidationHelper.isNullOrEmpty(getSelectedInvoice()))
+        	setPaymentAmount(getSelectedInvoice().getTotalGrossAmount());
     }
 
     private String getCausal() {
