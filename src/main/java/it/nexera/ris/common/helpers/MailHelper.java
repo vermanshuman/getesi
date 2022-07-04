@@ -199,6 +199,10 @@ public class MailHelper extends BaseHelper {
         Session mailSession = Session.getInstance(props, auth);
 
         MimeMessage simpleMessage = new MimeMessage(mailSession);
+        log.info("sending mail with subject :: "+mail.getEmailSubject());
+        log.info("sending mail marked To :: "+mail.getEmailTo());
+        log.info("sending mail marked CC :: "+ (!ValidationHelper.isNullOrEmpty(mail.getEmailCC()) ? mail.getEmailCC() : ""));
+        log.info("sending mail marked BCC :: "+ (!ValidationHelper.isNullOrEmpty(mail.getEmailBCC()) ? mail.getEmailBCC() : ""));
 
         List<String> mailsTo = parseMailAddress(mail.getEmailTo());
 
@@ -272,8 +276,11 @@ public class MailHelper extends BaseHelper {
 //        multipart.addBodyPart(messageBodyText);
 //        multipart.addBodyPart(messageBodyHtml);
 
+        log.info("Email Entity: " + mail.getId());
         if (files != null) {
+            log.info("Email Attachments: " + files.size());
             for (FileWrapper file : files) {
+                log.info("Send attachment: " + file.getAddAttachment());
                 if(!ValidationHelper.isNullOrEmpty(file.getAddAttachment()) && file.getAddAttachment())
                     addAttachment(multipart, file.getFilePath(), file.getFileName());
             }

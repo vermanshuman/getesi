@@ -467,11 +467,12 @@
                         <f:selectItems value="#{bean.notaryList}"/>
                     </p:selectOneMenu>
                     <span> #{msg.clientTypeTrust}</span><br/>
-                    <p:selectOneMenu id="clientTypeTrust" styleClass="select-width h38"
-                                     value="#{bean.selectedFiduciaryId}"
-                                     label="#{msg.clientTypeTrust}">
-                        <f:selectItems value="#{bean.fiduciaryList}"/>
-                    </p:selectOneMenu>
+                    <p:inputText id="clientTypeTrust" value="#{bean.fiduciary}" styleClass="input-width"  style="width: 100% !important;margin-bottom: 20px;"/>
+<!--                    <p:selectOneMenu id="clientTypeTrust" styleClass="select-width h38"-->
+<!--                                     value="#{bean.selectedFiduciaryId}"-->
+<!--                                     label="#{msg.clientTypeTrust}">-->
+<!--                        <f:selectItems value="#{bean.fiduciaryList}"/>-->
+<!--                    </p:selectOneMenu>-->
                     <c:forEach items="#{bean.mutipleRequestObjTabPath}" var="objItem">
                         <div class="ui-g-12 ih_36" style="padding: 0">
                             <ui:include src="#{objItem}"/>

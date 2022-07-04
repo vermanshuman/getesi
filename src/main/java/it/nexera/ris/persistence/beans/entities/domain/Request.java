@@ -396,6 +396,8 @@ public class Request extends DocumentTagEntity implements BeforeSave {
     @Column(name = "unauthorized_quote")
     private Boolean unauthorizedQuote;
 
+    private String fiduciary;
+
     @Transient
     private Boolean haveRequestReport;
 
@@ -2391,5 +2393,13 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     public void setUnauthorizedQuote(Boolean unauthorizedQuote) {
         this.unauthorizedQuote = unauthorizedQuote;
+    }
+
+    public String getFiduciary() {
+        return fiduciary;
+    }
+
+    public void setFiduciary(String fiduciary) {
+        this.fiduciary = fiduciary;
     }
 }

@@ -797,4 +797,10 @@ public class DateTimeHelper extends BaseHelper {
         GregorianCalendar gc = new GregorianCalendar();
         return gc.get(field);
     }
+
+    public static int getMonth(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return (cal.get(Calendar.MONTH) + 1);
+    }
 }

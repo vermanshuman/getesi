@@ -1590,7 +1590,7 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
 
             String templatePath  = (new File(FileHelper.getRealPath(),
                     "resources" + File.separator + "layouts" + File.separator
-                            + "Invoice" + File.separator + "InvoiceDocumentTemplate.docx")
+                            + "invoice" + File.separator + "InvoiceDocumentTemplate.docx")
                     .getAbsolutePath());
 
             Double imponibile = 0.0;

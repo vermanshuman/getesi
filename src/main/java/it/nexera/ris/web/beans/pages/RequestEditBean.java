@@ -257,7 +257,9 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
 
     private List<SelectItem> officeList;
 
-    private Long selectedFiduciaryId;
+    //private Long selectedFiduciaryId;
+
+    private String fiduciary;
 
     private List<SelectItem> fiduciaryList;
 
@@ -378,9 +380,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         if(!ValidationHelper.isNullOrEmpty(mail.getOffice())){
             setSelectedOfficeId(mail.getOffice().getId());
         }
-        if(!ValidationHelper.isNullOrEmpty(mail.getClientFiduciary())){
-            setSelectedFiduciaryId(mail.getClientFiduciary().getId());
-        }
+        setFiduciary(mail.getFiduciary());
         if (!ValidationHelper.isNullOrEmpty(mail.getManagers())) {
             prepareFiduciaryClientsList(mail.getManagers());
         }
@@ -544,7 +544,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         }
 
         if(!getEntity().isNew())
-            setSelectedFiduciaryId(getEntity().getClientFiduciary() != null ? getEntity().getClientFiduciary().getId() : null);
+            setFiduciary(getEntity().getFiduciary());
 
         if (!dataFromEmail) {
             setSelectedBillingClientId(getEntity().getBillingClient() != null ? getEntity().getBillingClient().getId() : null);
@@ -2160,11 +2160,7 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             request.setOffice(null);
         }
 
-        if (!ValidationHelper.isNullOrEmpty(getSelectedFiduciaryId())) {
-            request.setClientFiduciary(DaoManager.get(Client.class, getSelectedFiduciaryId()));
-        } else {
-            request.setClientFiduciary(null);
-        }
+        request.setFiduciary(getFiduciary());
         request.setNote(getEntity().getNote());
         if (getSubject() != null) {
             Subject tempSubject  = getSubject();
@@ -4530,14 +4526,6 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
         this.mutipleRequestNDGPath = mutipleRequestNDGPath;
     }
 
-    public Long getSelectedFiduciaryId() {
-        return selectedFiduciaryId;
-    }
-
-    public void setSelectedFiduciaryId(Long selectedFiduciaryId) {
-        this.selectedFiduciaryId = selectedFiduciaryId;
-    }
-
     public List<SelectItem> getFiduciaryList() {
         return fiduciaryList;
     }
@@ -4918,13 +4906,13 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             getUpdatedPropertyNames().add("managerList");
         }
 
-        if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getClientFiduciary())
-                && ValidationHelper.isNullOrEmpty(getSelectedFiduciaryId()))
-                || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getClientFiduciary())
-                && !ValidationHelper.isNullOrEmpty(getSelectedFiduciaryId()))
-                || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getClientFiduciary()) &&
-                !ValidationHelper.isNullOrEmpty(getSelectedFiduciaryId()) &&
-                !getOriginalRequest().getClientFiduciary().getId().equals(getSelectedFiduciaryId()))) {
+        if ((!ValidationHelper.isNullOrEmpty(getOriginalRequest().getFiduciary())
+                && ValidationHelper.isNullOrEmpty(getFiduciary()))
+                || (ValidationHelper.isNullOrEmpty(getOriginalRequest().getFiduciary())
+                && !ValidationHelper.isNullOrEmpty(getFiduciary()))
+                || (!ValidationHelper.isNullOrEmpty(getOriginalRequest().getFiduciary()) &&
+                !ValidationHelper.isNullOrEmpty(getFiduciary()) &&
+                !getOriginalRequest().getFiduciary().equalsIgnoreCase(getFiduciary()))) {
             requestUpdated = true;
             getUpdatedPropertyNames().add("fiduciaryClient");
         }
@@ -5021,5 +5009,13 @@ public class RequestEditBean extends EntityEditPageBean<Request> implements Seri
             }
         }
         return requestUpdated;
+    }
+
+    public String getFiduciary() {
+        return fiduciary;
+    }
+
+    public void setFiduciary(String fiduciary) {
+        this.fiduciary = fiduciary;
     }
 }

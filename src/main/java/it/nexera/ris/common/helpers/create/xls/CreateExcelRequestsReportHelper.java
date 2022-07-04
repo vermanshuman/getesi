@@ -1587,15 +1587,37 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                     row.getCell(colIndex).setCellStyle(cellStyle);
                 }
             }else  if(index != -2) {
+                String note = "";
                 if (!ValidationHelper.isNullOrEmpty(request.getCostNote())) {
                     row.createCell(colIndex, CellType.STRING).setCellValue(request.getCostNote());
                     row.getCell(colIndex).setCellStyle(cellStyle);
                 } else {
+                    boolean isAdded = Boolean.FALSE;
+                    List<Document> requestDocuments = DaoManager.load(Document.class,
+                            new CriteriaAlias[]{new CriteriaAlias("request", "request", JoinType.INNER_JOIN)},
+                            new Criterion[]{Restrictions.and(Restrictions.eq("request.id", request.getId()),
+                                    Restrictions.eq("typeId", 2L))});
+
+                    if (!ValidationHelper.isNullOrEmpty(requestDocuments)) {
+                        if(request.getService() !=null
+                                && request.getService().getUnauthorizedQuote()!=null && request.getService().getUnauthorizedQuote()){
+                            note = "Preventivo non autorizzato";
+                            isAdded = Boolean.TRUE;
+                        }
+                    }
+                    if(!isAdded && request.getAuthorizedQuote()!=null &&  request.getAuthorizedQuote()){
+                        note = "Preventivo autorizzato";
+                    }
+                    if(!isAdded && request.getUnauthorizedQuote()!=null
+                            && request.getUnauthorizedQuote()){
+                        note = "Preventivo non autorizzato";
+                    }
                     String requestNote = generateCorrectNote(request);
                     requestNote = requestNote.replaceAll("(?i)<br\\p{javaSpaceChar}*(?:/>|>)", "\n");
-                    row.createCell(colIndex, CellType.STRING).setCellValue(requestNote);
-                    row.getCell(colIndex).setCellStyle(cellStyle);
+                    note = note.trim().isEmpty() ? requestNote : note.concat(" ").concat(requestNote);
                 }
+                row.createCell(colIndex, CellType.STRING).setCellValue(note);
+                row.getCell(colIndex).setCellStyle(cellStyle);
             }else {
                 row.createCell(colIndex, CellType.STRING).setCellValue("nazionale positiva");
                 row.getCell(colIndex).setCellStyle(cellStyle);

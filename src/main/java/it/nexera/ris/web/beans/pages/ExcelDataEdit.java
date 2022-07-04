@@ -34,6 +34,8 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 import java.io.File;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -80,7 +82,8 @@ public class ExcelDataEdit extends BaseEntityPageBean {
 
     private SelectItemWrapperConverter<Client> clientSelectItemWrapperConverter;
 
-    private Long selectedClientFiduciaryId;
+    //private Long selectedClientFiduciaryId;
+    private String fiduciary;
 
     private List<SelectItem> fiduciaryClientsList;
 
@@ -254,9 +257,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                     setSelectedOfficeId(getMail().getOffice().getId());
                 }
 
-                if (!ValidationHelper.isNullOrEmpty(getMail().getClientFiduciary())) {
-                    setSelectedClientFiduciaryId(getMail().getClientFiduciary().getId());
-                }
+                setFiduciary(getMail().getFiduciary());
                 fillSelectedClientManagers();
                 setReferenceRequest(getMail().getReferenceRequest());
             }else if(!ValidationHelper.isNullOrEmpty(getSelectedRequestClient())){
@@ -1009,10 +1010,10 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                     excelDataWrapper.setManagers(clients);
                 }
             }
-            if (!ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
-                excelDataWrapper.setClientFiduciary(DaoManager.get(Client.class, getSelectedClientFiduciaryId()));
+            if (!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getClientFiduciary())) {
+                excelDataWrapper.setClientFiduciary(DaoManager.get(Client.class, getMail().getClientFiduciary().getId()));
             }
-
+            excelDataWrapper.setFiduciary(getFiduciary());
             List<Request> recievedInboxRequests = null;
             if(!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
                     !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox().getRequests())) {
@@ -1078,13 +1079,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                     }else {
                         getMail().setManagers(null);
                     }
-
-                    if (!ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
-                        getMail().setClientFiduciary(DaoManager.get(Client.class, getSelectedClientFiduciaryId()));
-                    } else {
-                        getMail().setClientFiduciary(null);
-                    }
-
+                    getMail().setFiduciary(getFiduciary());
                     DaoManager.save(getMail(), true);
 
                     Document document = DaoManager.get(Document.class, new Criterion[]{
@@ -1279,9 +1274,6 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         if (!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getExcelClientInvoiceId())) {
             SelectItemHelper.addItemToListIfItIsNotInIt(getInvoiceClients(), getMail().getClientInvoice());
         }
-        if (!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
-            SelectItemHelper.addItemToListIfItIsNotInIt(getInvoiceClients(), getMail().getClientFiduciary());
-        }
         if (getSelectedNotManagerOrFiduciaryClientId() != null) {
             setClientManagers(ComboboxHelper.fillWrapperList( emptyIfNull(clientList)
                     .stream()
@@ -1368,6 +1360,11 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         if(getExamRequest().getCostButtonConfirmClicked() != null && getExamRequest().getCostButtonConfirmClicked()){
             reCalculate = false;
         }
+        getCostManipulationHelper().viewExtraCost(getExamRequest(), reCalculate);
+    }
+    
+    public void updateCosts(boolean reCalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        getCostManipulationHelper().updateExamRequestParametersFromHelper(getExamRequest());
         getCostManipulationHelper().viewExtraCost(getExamRequest(), reCalculate);
     }
 
@@ -1515,14 +1512,6 @@ public class ExcelDataEdit extends BaseEntityPageBean {
 
     public void setClientSelectItemWrapperConverter(SelectItemWrapperConverter<Client> clientSelectItemWrapperConverter) {
         this.clientSelectItemWrapperConverter = clientSelectItemWrapperConverter;
-    }
-
-    public Long getSelectedClientFiduciaryId() {
-        return selectedClientFiduciaryId;
-    }
-
-    public void setSelectedClientFiduciaryId(Long selectedClientFiduciaryId) {
-        this.selectedClientFiduciaryId = selectedClientFiduciaryId;
     }
 
     public List<SelectItem> getFiduciaryClientsList() {
@@ -1722,6 +1711,9 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             	else
             		totalCost += Double.parseDouble(request.getTotalCost().replaceAll(",", "."));
             }
+            BigDecimal tot = BigDecimal.valueOf(totalCost);
+            tot = tot.setScale(2, RoundingMode.HALF_UP);
+            totalCost = tot.doubleValue();
             log.info("request total cost :: "+totalCost + ", total invoice :: "+getInvoiceDialogBean().getAllTotalLine().doubleValue());
             if(totalCost != getInvoiceDialogBean().getAllTotalLine().doubleValue()) {
             	if(!ValidationHelper.isNullOrEmpty(getInvoiceDialogBean().getInvoiceErrorMessage())) {
@@ -1864,6 +1856,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         Document document = DaoManager.get(Document.class, new Criterion[] { Restrictions.eq("mail.id", getMail().getId())});
         if (!ValidationHelper.isNullOrEmpty(document) && !ValidationHelper.isNullOrEmpty(document.getTypeId())
                 && document.getTypeId().equals(DocumentType.INVOICE_REPORT.getId())) {
+
             if (otherRequests) {
                 setRequestsConsideredForInvoice(new ArrayList<>());
                 List<Request> otherRequestListForInvoice = getOtherRequestsConsideredForInvoice();

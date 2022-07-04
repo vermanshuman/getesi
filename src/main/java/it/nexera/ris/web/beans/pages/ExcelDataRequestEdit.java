@@ -1305,6 +1305,10 @@ public class ExcelDataRequestEdit extends BaseEntityPageBean {
         getCostManipulationHelper().viewExtraCost(getExamRequest(), reCalculate);
     }
 
+    public void updateCosts(boolean reCalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        getCostManipulationHelper().updateExamRequestParametersFromHelper(getExamRequest());
+        getCostManipulationHelper().viewExtraCost(getExamRequest(), reCalculate);
+    }
 
     protected Double getExtraCostRelated(Long requestId, ExtraCostType extraCostType) throws PersistenceBeanException, IllegalAccessException {
         Double result = 0d;

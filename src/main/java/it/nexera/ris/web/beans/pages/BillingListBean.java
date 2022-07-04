@@ -50,6 +50,7 @@ import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.LazyDataModel;
+import org.primefaces.model.SortOrder;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.chart.Axis;
 import org.primefaces.model.chart.AxisType;
@@ -402,6 +403,32 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     
     private Long selectedPaymentOutcome;
     
+    private List<Invoice> unlockedInvoices;
+    
+    private Long filterInvoiceNumberAdmin;
+    
+    private List<SelectItem> companiesAdmin;
+
+    private Long selectedCompanyIdAdmin;
+    
+    private Date dateFromAdmin;
+
+    private Date dateToAdmin;
+    
+    private Long managerClientFilteridAdmin;
+    
+    private List<SelectItem> managerClientsAdmin;
+
+    private Long selectedOfficeIdAdmin;
+    
+    private List<SelectItem> officesAdmin;
+
+    private String filterNotesAdmin;
+
+    private String filterNdgAdmin;
+
+    private String filterPracticeAdmin;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
@@ -599,8 +626,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
 
         if (!ValidationHelper.isNullOrEmpty(getManagerClientFilterid())) {
-            restrictions.add(Restrictions.eq("managerId", getManagerClientFilterid()));
-            restrictions.add(Restrictions.eq("manager.id", getManagerClientFilterid()));
+            restrictions.add(Restrictions.eq("managers.id", getManagerClientFilterid()));
         }
 
         if (!ValidationHelper.isNullOrEmpty(getSelectedOfficeId())) {
@@ -687,6 +713,10 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setCompanies(companies.stream()
                 .sorted(Comparator.comparing(SelectItem::getLabel))
                 .collect(Collectors.toList()));
+        
+        setCompaniesAdmin(companies.stream()
+                .sorted(Comparator.comparing(SelectItem::getLabel))
+                .collect(Collectors.toList()));
     }
 
     public void filterRequestTableFromPanel() {
@@ -698,6 +728,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         if (!ValidationHelper.isNullOrEmpty(getNameFilter())) {
             restrictions.add(Restrictions.or(
                     Restrictions.ilike("name", getNameFilter(), MatchMode.ANYWHERE),
+                    Restrictions.ilike("reverseName", getNameFilter(), MatchMode.ANYWHERE),
                     Restrictions.ilike("code", getNameFilter().trim(), MatchMode.ANYWHERE)));
         }
 //
@@ -725,10 +756,13 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setRequestFilterRestrictions(restrictions);
 
         this.setLazySubjectModel(new EntityLazyListModel<>(RequestView.class, restrictions.toArray(new Criterion[0]),
-                null));
+                new Order[]{
+                        Order.desc("createDate")
+                }));
         getLazySubjectModel().load((getPaginator().getTablePage() - 1) * getPaginator().getRowsPerPage(), getPaginator().getRowsPerPage(),
-                null,
-                null, new HashMap<>());
+                getPaginator().getTableSortColumn(),
+                (getPaginator().getTableSortOrder() == null || getPaginator().getTableSortOrder().equalsIgnoreCase("DESC")
+                        || getPaginator().getTableSortOrder().equalsIgnoreCase("UNSORTED")) ? SortOrder.DESCENDING : SortOrder.ASCENDING, new HashMap<>());
 
         Integer totalPages = (int) Math.ceil((getLazySubjectModel().getRowCount() * 1.0) / getPaginator().getRowsPerPage());
         if (totalPages == 0)
@@ -1558,16 +1592,17 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
         try {
             saveInvoiceInDraft();
-            Invoice invoice = DaoManager.get(Invoice.class, new Criterion[]{
-                    Restrictions.eq("number", getNumber())
-            });
-            List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", invoice)});
+
+//            Invoice invoice = DaoManager.get(Invoice.class, new Criterion[]{
+//                    Restrictions.eq("number", getNumber())
+//            });
+            List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[]{Restrictions.eq("invoice", getSelectedInvoice())});
             FatturaAPI fatturaAPI = new FatturaAPI();
-            String xmlData = fatturaAPI.getDataForXML(invoice, invoiceItems);
+            String xmlData = fatturaAPI.getDataForXML(getSelectedInvoice(), invoiceItems);
             FatturaAPIResponse fatturaAPIResponse = fatturaAPI.callFatturaAPI(xmlData, log);
             if (fatturaAPIResponse != null && fatturaAPIResponse.getReturnCode() == 0) {
-                invoice.setStatus(InvoiceStatus.DELIVERED);
-                DaoManager.save(invoice, true);
+                getSelectedInvoice().setStatus(InvoiceStatus.DELIVERED);
+                DaoManager.save(getSelectedInvoice(), true);
                 setInvoiceSentStatus(true);
             } else {
                 setApiError(ResourcesHelper.getString("sendInvoiceErrorMsg"));
@@ -1590,7 +1625,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             executeJS("PF('sendInvoiceErrorDialogWV').show();");
             return;
         }
-        //executeJS("PF('invoiceDialogBillingWV').hide();");
+        executeJS("PF('invoiceDialogBillingWV').hide();");
         //closeInvoiceDialog();
     }
 
@@ -1849,7 +1884,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
             Invoice invoice = new Invoice();
             invoice.setClient(DaoManager.get(Client.class, getSelectedSubjectClientId()));
-            invoice.setDate(getInvoiceDate());
             invoice.setDate(new Date());
             invoice.setStatus(InvoiceStatus.DRAFT);
             List<RequestPriceListModel> requestPriceListModels = InvoiceHelper.groupingItemsByTaxRate(filteredRequests);
@@ -2106,7 +2140,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             //String ndg = "";
             String templatePath = (new File(FileHelper.getRealPath(),
                     "resources" + File.separator + "layouts" + File.separator
-                            + "Invoice" + File.separator + "InvoiceDocumentTemplate.docx")
+                            + "invoice" + File.separator + "InvoiceDocumentTemplate.docx")
                     .getAbsolutePath());
 
             Double imponibile = 0.0;
@@ -3302,4 +3336,84 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             setValidationFailed(true);
         }
     }
+    
+    public void loadAdministrationTab() throws HibernateException, IllegalAccessException, PersistenceBeanException {
+    	setUnlockedInvoices(DaoManager.load(Invoice.class,
+                new Criterion[]{Restrictions.eq("status", InvoiceStatus.UNLOCKED)}, new Order[]{
+                        Order.desc("number")}));
+        setManagerClientsAdmin(ComboboxHelper.fillList(ClientView.class, Order.asc("name"), new Criterion[]{
+                Restrictions.eq("manager", Boolean.TRUE),
+        }, Boolean.FALSE));
+        setOfficesAdmin(ComboboxHelper.fillList(Office.class, Boolean.TRUE));
+        loadCompanies(getClientList());
+    }
+    
+    
+    public void filterTableFromPanelAdmin() throws IllegalAccessException, PersistenceBeanException {
+        List<Criterion> restrictions = new ArrayList<>();
+        List<Criterion> restrictionsLike = new ArrayList<>();
+
+        if (!ValidationHelper.isNullOrEmpty(getFilterInvoiceNumberAdmin())) {
+            Criterion r = Restrictions.eq("number", getFilterInvoiceNumberAdmin());
+            restrictionsLike.add(r);
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(getSelectedCompanyIdAdmin())) {
+            restrictions.add(Restrictions.eq("client.id", getSelectedCompanyIdAdmin()));
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(getDateFromAdmin())) {
+            restrictions.add(Restrictions.ge("date", DateTimeHelper.getDayStart(getDateFromAdmin())));
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(getDateToAdmin())) {
+            restrictions.add(Restrictions.le("date", DateTimeHelper.getDayEnd(getDateToAdmin())));
+        }
+
+       /* if (!ValidationHelper.isNullOrEmpty(getManagerClientFilteridAdmin())) {
+            restrictions.add(Restrictions.eq("managerId", getManagerClientFilteridAdmin()));
+            restrictions.add(Restrictions.eq("manager.id", getManagerClientFilteridAdmin()));
+        }*/
+
+        if (!ValidationHelper.isNullOrEmpty(getSelectedOfficeIdAdmin())) {
+            restrictions.add(Restrictions.eq("office.id", getSelectedOfficeIdAdmin()));
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(getFilterNotesAdmin())) {
+            restrictions.add(Restrictions.eq("notes", getFilterNotesAdmin()));
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(getFilterNdgAdmin())) {
+            restrictions.add(Restrictions.eq("ndg", getFilterNdgAdmin()));
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(getFilterPracticeAdmin())) {
+            restrictions.add(Restrictions.eq("practice", getFilterPracticeAdmin()));
+        }
+
+        if (restrictionsLike.size() > 0) {
+            if (restrictionsLike.size() > 1) {
+                restrictions.add(Restrictions.or(restrictionsLike.toArray(new Criterion[restrictionsLike.size()])));
+            } else {
+                restrictions.add(restrictionsLike.get(0));
+            }
+        }
+    	restrictions.add(Restrictions.eq("status", InvoiceStatus.UNLOCKED));
+    	setInvoiceTabCriteria(restrictions);
+    	setUnlockedInvoices(DaoManager.load(Invoice.class, restrictions.toArray(new Criterion[0]), new Order[]{
+    			Order.desc("number")}));
+    }
+
+    public void clearFilterPanelAdmin() throws PersistenceBeanException, IllegalAccessException {
+        setDateFromAdmin(null);
+        setDateToAdmin(null);
+        setSelectedClientId(null);
+        setManagerClientFilteridAdmin(null);
+        setSelectedOfficeIdAdmin(null);
+        setFilterNotesAdmin(null);
+        setFilterNdg(null);
+        setFilterPracticeAdmin(null);
+        filterTableFromPanelAdmin();
+    }
+
 }

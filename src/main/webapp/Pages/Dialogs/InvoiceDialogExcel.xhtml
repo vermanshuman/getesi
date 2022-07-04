@@ -368,14 +368,14 @@
         div[id="dialogTab:mailTo"] .ui-autocomplete-input-token, input[id="dialogTab:mailTo_input"] {
             width: 100% !important;
         }
-        
+
         .download_column {
     		width: 59px !important;
     		margin-right: 20px !important;
 		}
     </style>
 
-    <p:dialog widgetVar="invoiceDialogBillingWV" modal="true" width="1350" draggable="false" id="invoiceDialogBilling"
+    <p:dialog widgetVar="invoiceDialogExcelWV" modal="true" width="1350" draggable="false" id="invoiceDialogExcel"
               header="#{msg.requestTextEditElectronicSalesInvoice} (n. #{invoiceDialogBean.invoiceNumber})">
         <div style="margin-top:20px; overflow-x:hidden; overflow-y:auto; height: 700px;" class="invoiceDialog">
             <p:tabView dynamic="true" cache="true" id="dialogTab" activeIndex="#{invoiceDialogBean.activeTabIndex}">
@@ -764,7 +764,7 @@
                                     </p:commandButton>
                                 </div>
                                 <div class="p-col-4" style="text-align:right;">
-                                    <p:commandButton value="#{msg.cancel.toUpperCase()}" oncomplete="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"
+                                    <p:commandButton value="#{msg.cancel.toUpperCase()}" oncomplete="PF('invoiceDialogExcelWV').hide(); closeInvoiceDialog();"
                                                      rendered="#{!invoiceDialogBean.invoiceSentStatus}"/>
                                     <p:commandButton value="#{msg.saveInDraft}" styleClass="#{invoiceDialogBean.invoiceSaveAsDraft ? '' : 'ui-button-success'}" style="margin-left:5px;"
                                                      action="#{invoiceDialogBean.saveInvoiceInDraft}" update="mainPanel goodsServicesPanel countsSummaryPanel @widgetVar(buttonsPanelWV)"
@@ -774,7 +774,7 @@
                                                      update="@widgetVar(buttonsPanelWV) @widgetVar(countsSummaryPanelVW)
                              						 		 @widgetVar(goodsServicesPanelVW) @widgetVar(mainPanelVW) @widgetVar(sendInvoiceErrorDialogWV)"/>
                                     <p:commandButton value="#{msg.close}"
-                                                     oncomplete="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"
+                                                     oncomplete="PF('invoiceDialogExcelWV').hide(); closeInvoiceDialog();"
                                                      rendered="#{invoiceDialogBean.invoiceSentStatus}"/>
                                 </div>
                             </div>
@@ -1018,12 +1018,12 @@
                     <div class="p-grid">
                         <div class="p-col-8"></div>
                         <div class="p-col-4">
-                            <p:commandButton value="#{msg.cancel}" oncomplete="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"/>
+                            <p:commandButton value="#{msg.cancel}" oncomplete="PF('invoiceDialogExcelWV').hide(); closeInvoiceDialog();"/>
                             <p:commandButton value="#{msg.saveInDraft}" styleClass="ui-button-success p-mr-2 p-mb-2"
                                              style="margin-left:5px;" action="#{invoiceDialogBean.saveMailInDraft}"/>
                             <p:commandButton value="#{msg.sendEmail}" action="#{invoiceDialogBean.sendMail}"
                                              styleClass="ui-button-success p-mr-2 p-mb-2"
-                                             onsuccess="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"/>
+                                             onsuccess="PF('invoiceDialogExcelWV').hide(); closeInvoiceDialog();"/>
                         </div>
                     </div>
 

@@ -122,7 +122,7 @@
                 background: #fb6e51 !important;
             }
             .cartelle-btn {
-                background:  #ff8b00 !important;
+                background:  #788FA7 !important;
             }
             .ui-chkbox.ui-chkbox-all.ui-widget {
                 display: none;
@@ -553,28 +553,28 @@
 
                         <p:commandButton ajax="true" icon="fa fa-trash-o" oncomplete="editFormat(false);"
                                          action="#{bean.filterLetterByOwner}"
-                                         styleClass="#{bean.mailManagerButtonSelectedId==3?'selected-button p-mb-2':'cyan-blue-btn p-mb-2'}"
+                                         styleClass="#{bean.mailManagerButtonSelectedId==3?'selected-button p-mb-2':'cartelle-btn p-mb-2'}"
                                          update="form" id="mail_item_3" style="float: right"
                                          value="#{bean.getMailManagerSTORAGE()}">
                             <f:setPropertyActionListener value="3" target="#{bean.mailManagerButtonSelectedId}"/>
                         </p:commandButton>
                         <p:commandButton ajax="true" icon="fa fa-spinner" oncomplete="editFormat(false);"
                                          action="#{bean.filterLetterByOwner}"
-                                         styleClass="#{bean.mailManagerButtonSelectedId==0?'selected-button p-mr-2 p-mb-2':'cyan-blue-btn p-mr-2 p-mb-2'}"
+                                         styleClass="#{bean.mailManagerButtonSelectedId==0?'selected-button p-mr-2 p-mb-2':'cartelle-btn p-mr-2 p-mb-2'}"
                                          update="form" id="mail_item_0" style="float: right"
                                          value="#{bean.getMailManagerDRAFT()}">
                             <f:setPropertyActionListener value="0" target="#{bean.mailManagerButtonSelectedId}"/>
                         </p:commandButton>
                         <p:commandButton ajax="true" icon="fa fa-arrow-right" oncomplete="editFormat(false);"
                                          action="#{bean.filterLetterByOwner}"
-                                         styleClass="#{bean.mailManagerButtonSelectedId==1?'selected-button p-mr-2 p-mb-2':'cyan-blue-btn p-mr-2 p-mb-2'}"
+                                         styleClass="#{bean.mailManagerButtonSelectedId==1?'selected-button p-mr-2 p-mb-2':'cartelle-btn p-mr-2 p-mb-2'}"
                                          update="form" id="mail_item_1" style="float: right"
                                          value="#{bean.getMailManagerSENT()}">
                             <f:setPropertyActionListener value="1" target="#{bean.mailManagerButtonSelectedId}"/>
                         </p:commandButton>
                         <p:commandButton ajax="true" icon="fa fa-arrow-left" oncomplete="editFormat(false);"
                                          action="#{bean.filterLetterByOwner}"
-                                         styleClass="#{bean.mailManagerButtonSelectedId==2?'selected-button p-mr-2 p-mb-2':'cyan-blue-btn p-mr-2 p-mb-2' }"
+                                         styleClass="#{bean.mailManagerButtonSelectedId==2?'selected-button p-mr-2 p-mb-2':'cartelle-btn p-mr-2 p-mb-2' }"
                                          update="@form" id="mail_item_2" style="float: right"
                                          value="#{bean.getMailManagerRECEIVED()}" escape="false">
                             <f:setPropertyActionListener value="2" target="#{bean.mailManagerButtonSelectedId}"/>

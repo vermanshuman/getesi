@@ -95,52 +95,50 @@ public class ApplicationListener implements ServletContextListener, IConnectionL
         initializeProps();
 
         FileHelper.setRealPath(servletContextEvent.getServletContext().getRealPath("/"));
-
-
-        String templatePath = (new File(FileHelper.getRealPath(),
-                "resources" + File.separator + "layouts" + File.separator
-                        + "Invoice" + File.separator + "InvoiceDocumentTemplate.docx")
-                .getAbsolutePath());
-        try {
-            try (XWPFDocument doc = new XWPFDocument(
-                    Files.newInputStream(Paths.get(templatePath)))) {
-                for (XWPFParagraph p : doc.getParagraphs()) {
-                    List<XWPFRun> runs = p.getRuns();
-                    if (runs != null) {
-                        for (XWPFRun r : runs) {
-                            String text = r.getText(0);
-                            if (text != null && text.contains("inum")) {
-                                FileHelper.getTemplateMapping().put("inum", r);
-                            } else if (text != null && text.contains("clientname")) {
-                                FileHelper.getTemplateMapping().put("clientname", r);
-                            } else if (text != null && text.contains("clientaddress")) {
-                                FileHelper.getTemplateMapping().put("clientaddress", r);
-                            } else if (text != null && text.contains("clientaddress2")) {
-                                FileHelper.getTemplateMapping().put("clientaddress2", r);
-                            } else if (text != null && text.contains("clientpiva")) {
-                                FileHelper.getTemplateMapping().put("clientpiva", r);
-                            } else if (text != null && text.contains("impon")) {
-                                FileHelper.getTemplateMapping().put("impon", r);
-                            } else if (text != null && text.contains("ivap")) {
-                                FileHelper.getTemplateMapping().put("ivap", r);
-                            } else if (text != null && text.contains("ivaa")) {
-                                FileHelper.getTemplateMapping().put("ivaa", r);
-                            } else if (text != null && text.contains("totale")) {
-                                FileHelper.getTemplateMapping().put("totale", r);
-                            } else if (text != null && text.contains("refrequest")) {
-                                FileHelper.getTemplateMapping().put("refrequest", r);
-                            } else if (text != null && text.contains("inboxndg")) {
-                                FileHelper.getTemplateMapping().put("inboxndg", r);
-                            }
-                        }
-                    }
-                }
-            }
-
-        } catch (Exception e) {
-            log.error("Exception while parsing template");
-            LogHelper.log(log, e);
-        }
+//        try {
+//            String templatePath = (new File(FileHelper.getRealPath(),
+//                    "resources" + File.separator + "layouts" + File.separator
+//                            + "Invoice" + File.separator + "InvoiceDocumentTemplate.docx")
+//                    .getAbsolutePath());
+//            try (XWPFDocument doc = new XWPFDocument(
+//                    Files.newInputStream(Paths.get(templatePath)))) {
+//                for (XWPFParagraph p : doc.getParagraphs()) {
+//                    List<XWPFRun> runs = p.getRuns();
+//                    if (runs != null) {
+//                        for (XWPFRun r : runs) {
+//                            String text = r.getText(0);
+//                            if (text != null && text.contains("inum")) {
+//                                FileHelper.getTemplateMapping().put("inum", r);
+//                            } else if (text != null && text.contains("clientname")) {
+//                                FileHelper.getTemplateMapping().put("clientname", r);
+//                            } else if (text != null && text.contains("clientaddress")) {
+//                                FileHelper.getTemplateMapping().put("clientaddress", r);
+//                            } else if (text != null && text.contains("clientaddress2")) {
+//                                FileHelper.getTemplateMapping().put("clientaddress2", r);
+//                            } else if (text != null && text.contains("clientpiva")) {
+//                                FileHelper.getTemplateMapping().put("clientpiva", r);
+//                            } else if (text != null && text.contains("impon")) {
+//                                FileHelper.getTemplateMapping().put("impon", r);
+//                            } else if (text != null && text.contains("ivap")) {
+//                                FileHelper.getTemplateMapping().put("ivap", r);
+//                            } else if (text != null && text.contains("ivaa")) {
+//                                FileHelper.getTemplateMapping().put("ivaa", r);
+//                            } else if (text != null && text.contains("totale")) {
+//                                FileHelper.getTemplateMapping().put("totale", r);
+//                            } else if (text != null && text.contains("refrequest")) {
+//                                FileHelper.getTemplateMapping().put("refrequest", r);
+//                            } else if (text != null && text.contains("inboxndg")) {
+//                                FileHelper.getTemplateMapping().put("inboxndg", r);
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//
+//        } catch (Exception e) {
+//            log.error("Exception while parsing template");
+//            LogHelper.log(log, e);
+//        }
 
         HibernateUtil.addConnectionListener(this);
         HibernateUtil.getSessionFactory(false);

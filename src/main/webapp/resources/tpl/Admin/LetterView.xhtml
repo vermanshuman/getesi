@@ -54,14 +54,14 @@
             <p:selectOneMenu id="clientType" value="#{bean.clientTypeId}"
                              styleClass="select-width w-100" label="#{msg.clientType}">
                 <f:selectItems value="#{bean.clientTypes}" />
-                <p:ajax event="change" listener="#{bean.initOfficesList(true)}" update="client_not_manger_or_fiduciary_id client_fiduciary_id mail_ofice_id managers client_invoice_id"/>
+                <p:ajax event="change" listener="#{bean.initOfficesList(true)}" update="client_not_manger_or_fiduciary_id mail_ofice_id managers client_invoice_id"/>
             </p:selectOneMenu>
             <h:outputText value="#{msg.client}:"/>
             <p:selectOneMenu id="client_not_manger_or_fiduciary_id"
                              value="#{bean.selectedNotManagerOrFiduciaryClientId}"
                              styleClass="input-width-mmv w-100">
                 <f:selectItems value="#{bean.notManagerOrFiduciaryClients}"/>
-                <p:ajax event="change" listener="#{bean.initOfficesList(true)}" update="client_fiduciary_id mail_ofice_id managers client_invoice_id"/>
+                <p:ajax event="change" listener="#{bean.initOfficesList(true)}" update="mail_ofice_id managers client_invoice_id"/>
             </p:selectOneMenu>
 
             <h:outputText value="#{msg.mailBilling}:"/>
@@ -71,9 +71,11 @@
             </p:selectOneMenu>
 
             <h:outputText value="#{msg.mailTrust}:"/>
-            <p:selectOneMenu id="client_fiduciary_id" value="#{bean.selectedClientFiduciaryId}" styleClass="input-width-mmv w-100">
-                <f:selectItems value="#{bean.fiduciaryClientsList}"/>
-            </p:selectOneMenu>
+            <p:inputText id="fiduciary_text" value="#{bean.fiduciary}"  styleClass="w-100"/>
+<!--            <p:selectOneMenu id="client_fiduciary_id" value="#{bean.selectedClientFiduciaryId}" styleClass="input-width-mmv w-100">-->
+<!--                <f:selectItems value="#{bean.fiduciaryClientsList}"/>-->
+<!--            </p:selectOneMenu>-->
+
 
             <span>#{msg.clientManager}</span>
             <p:selectCheckboxMenu id="managers" value="#{bean.selectedClientManagers}" styleClass="w-100"

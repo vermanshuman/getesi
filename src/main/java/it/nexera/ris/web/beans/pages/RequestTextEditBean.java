@@ -1600,6 +1600,11 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         SessionHelper.put("templateIdForExcelData", getSelectedTemplateId());
         editExcelDataRequest();
     }
+    
+    public void updateCosts(boolean reCalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        getCostManipulationHelper().updateExamRequestParametersFromHelper(getExamRequest());
+        getCostManipulationHelper().viewExtraCost(getExamRequest(), reCalculate);
+    }
 
     public void editExcelDataRequest() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
         RedirectHelper.goToExcelDataRequest(getRequestId(), null, false);

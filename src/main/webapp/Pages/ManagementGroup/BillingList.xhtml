@@ -459,7 +459,7 @@
                 font-size: 14px !important;
             } */
 
-            #settingPanel, #subjectSettingPanel {
+            #settingPanel, #subjectSettingPanel, #settingPanelAdmin {
                 position: absolute;
                 z-index: 1;
                 margin-top: 46px;
@@ -481,7 +481,7 @@
                 box-shadow: 0 0 0 0.2em #57c279 !important;
             }
 
-            #settingPanel input, #subjectSettingPanel input {
+            #settingPanel input, #subjectSettingPanel input, #settingPanelAdmin input {
                 background-color: #F0F3F5 !important;
                 border: none !important;;
                 border-radius: 7px !important;
@@ -497,7 +497,7 @@
                 margin-left: -37px;
             }
 
-            #settingPanel #subjectSettingPanel {
+            #settingPanel #subjectSettingPanel #settingPanelAdmin{
                 background-color: #F0F3F5 !important;
                 border: none !important;
                 border-radius: 7px !important;
@@ -508,7 +508,7 @@
                 border-radius: 7px !important;
             }
 
-            #settingPanel .ui-selectonemenu-label, #subjectSettingPanel .ui-selectonemenu-label {
+            #settingPanel .ui-selectonemenu-label, #subjectSettingPanel .ui-selectonemenu-label, #settingPanelAdmin .ui-selectonemenu-label{
                 background-color: #F0F3F5 !important;
                 border-radius: 7px !important;
                 color: #003871;
@@ -672,11 +672,19 @@
             .calender-filled input, .select-checkbox, .select-one-menu {
                 border: 1px solid #009900 !important;
             }
-            #invoiceTable_data tr td:first-child {
-                text-align: center;
+            
+            #table_div_administration_content {
+            	border: none !important;
+                padding-top: 0px !important;
+                padding-bottom: 0px !important;
             }
-            #invoiceTable tr td, #invoiceTable tr th {
-                border: 1px solid #000 !important;
+            
+            #filterDateFromAdmin_input {
+                width: 100% !important;
+            }
+
+            #filterDateToAdmin_input {
+                width: 100% !important;
             }
         </style>
         <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
@@ -687,6 +695,7 @@
                 jQuery(document).ready(function() {
                     loadInvoiceTab();
                     loadSubjectTab();
+                    loadAdministrationTab();
                 });
             </script>
             <nav class="left" style="margin-left:20px;">
@@ -2177,19 +2186,21 @@
 
                 <div id="content_tab5" class="hide" style="display: none;">
                     <ui:include src="/resources/tpl/common/ValidationMessages.xhtml"/>
+                    <p:remoteCommand name="loadAdministrationTab" action="#{bean.loadAdministrationTab}"
+                                     update=":unlockedInvoiceTable :filterClientAdmin :managerAdmin :officeAdmin"/>
                     <div class="p-grid">
                         <div class="p-col-12 p-md-12">
                             <div class="card"
                                  style="border: none !important; padding-top:0px; padding-bottom:0px; margin-top:10px;">
                                 <div class="p-grid">
-                                    <div class="p-col-2" style="padding-bottom: 0px !important;">
+                                    <div class="p-col-2">
                                         <div>
                                             <div class="p-field">
                                                 <span><span class="red">*</span>#{msg.billingNextNumber}:</span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="p-col-3" style="padding-bottom: 0px !important;">
+                                    <div class="p-col-2">
                                         <div>
                                             <div class="p-field">
                                                 <p:inputText id="inumber" value="#{bean.nextInvoiceNumber}"
@@ -2199,15 +2210,199 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="p-col-2" >
+			                            <p:commandButton value="#{msg.save}" styleClass="ui-button-success" iconPos="left"
+			                                             action="#{bean.saveNextInvoiceNumber}" update="inumber"/>
+			                        </div>
+			                        
+			                        <div class="p-col-6" style="padding-bottom: 0px !important;">
+                                        <div class="p-formgroup-inline alignEnd">
+                                            <div class="p-field">
+                                                <p:inputText id="filterInvoiceNumberAdmin"
+                                                             value="#{bean.filterInvoiceNumberAdmin}"
+                                                             placeholder="#{msg.billingListNumber}"
+                                                             style="width: 300px !important;height: 36px;border: 1px solid #a8acb1 !important;background: #ffffff !important;"/>
+                                            </div>
+                                            <p:selectOneMenu id="filterClientAdmin" value="#{bean.selectedCompanyIdAdmin}" style="width: 300px; margin-right: 20px;"
+                                                             styleClass="#{bean.selectedCompanyIdAdmin ne null ? 'select-one-menu' : ''}">
+                                                <f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}"
+                                                              itemValue="#{null}" noSelectionOption="true"/>
+                                                <f:selectItems value="#{bean.companiesAdmin}"/>
+                                                <p:ajax event="itemSelect" update="@this"/>
+                                            </p:selectOneMenu>
+
+                                            <div class="p-field">
+                                                <p:commandButton id="cercaButtonAdmin" onclick="filterTableFromPanelAdmin();"
+                                                                 styleClass="ui-button-warning-icon searchPanelButton"
+                                                                 update="searchPanelAdmin"
+                                                                 icon="ui-icon ui-icon-search pi pi-search"/>
+                                            </div>
+                                            <div class="settingsBlock">
+                                                <script type="text/javascript">
+                                                    // <![CDATA[
+                                                    $("body").click(function(e){
+                                                        var target = $(e.target);
+                                                        if (!target.parents('#settingButtonAdmin').length && !target.parents('#settingPanelAdmin').length 
+                                                        	&& !target.parents('.ui-selectonemen-panel').length
+                                                            && !target.parents('#managerAdmin_items').length && !target.parents('#officeAdmin_items').length) {
+                                                            PF('panelSettingAdmin').getJQ().hide();
+                                                        }
+                                                    });
+                                                    function togglePanel() {
+                                                        PF('panelSettingAdmin').getJQ().toggle();
+                                                    }
+                                                    jQuery(document).ready(function() {
+                                                        PF('panelSettingAdmin').getJQ().hide();
+                                                    });
+                                                    // ]]>
+                                                </script>
+                                                <p:commandButton id="settingButtonAdmin" onclick="PF('panelSettingAdmin').getJQ().toggle();"
+                                                                 type="button"
+                                                                 styleClass="ui-button-warning-icon searchPanelButton"
+                                                                 icon="ui-icon ui-icon-search pi pi-sliders-h"/>
+                                                <p:panel id="settingPanelAdmin" widgetVar="panelSettingAdmin" closable="true" toggleable="true"
+                                                         styleClass="panelSetting" style="display: none;">
+                                                    <div class="p-grid">
+                                                        <div class="p-col-12" style="text-align: center;">
+                                                            <h2>Filtra per</h2>
+                                                        </div>
+                                                        <div class="p-col-12">
+                                                            <div style="">
+                                                                <h:outputText style="color: #003871;"
+                                                                              value="#{ff:upper(msg.billingListDate)}:"/>
+                                                            </div>
+                                                        </div>
+                                                        <div class="p-col-6">
+                                                            <p:calendar id="filterDateFromAdmin" readonlyInput="false"
+                                                                        showOn="button"
+                                                                        onkeypress="if(!searchOnEnter(event, 'searchButtonAdmin')) return true;"
+                                                                        pattern="dd/MM/yyyy" mask="true" locale="it"
+                                                                        navigator="true"
+                                                                        popupIconOnly="true"
+                                                                        onblur="setTimeout(function(){checkDatesAdmin();}, 500);check_date(this);"
+                                                                        value="#{bean.dateFromAdmin}"
+                                                                        placeholder="#{msg.billingListDateFrom}"
+                                                                        styleClass="#{bean.dateFrom ne null ? 'calender-filled' : ''}">
+                                                                <p:ajax event="dateSelect" update="@this"/>
+                                                            </p:calendar>
+                                                            <div id="hyphen"></div>
+                                                        </div>
+                                                        <div class="p-col-6">
+                                                            <p:calendar id="filterDateToAdmin" readonlyInput="false"
+                                                                        showOn="button"
+                                                                        onkeypress="if(!searchOnEnter(event, 'searchButtonAdmin')) return false;"
+                                                                        pattern="dd/MM/yyyy" mask="true"
+                                                                        locale="it" navigator="true" popupIconOnly="true"
+                                                                        placeholder="#{msg.billingListDateTo}"
+                                                                        onblur="check_date(this)" value="#{bean.dateToAdmin}"
+                                                                        styleClass="#{bean.dateTo ne null ? 'calender-filled' : ''}">
+                                                                <p:ajax event="dateSelect" update="@this"/>
+                                                            </p:calendar>
+                                                        </div>
+                                                        <div class="p-col-6">
+                                                            <p:selectOneMenu id="managerAdmin"
+                                                                             value="#{bean.managerClientFilteridAdmin}"
+                                                                             style="width: 100%;"
+                                                                             styleClass="#{bean.managerClientFilteridAdmin ne null ? 'select-one-menu' : ''}">
+                                                                <f:selectItem itemLabel="#{ff:upper(msg.clientManager)}"
+                                                                              itemValue="#{null}"
+                                                                              noSelectionOption="true"/>
+                                                                <f:selectItems value="#{bean.managerClientsAdmin}"/>
+                                                                <p:ajax event="itemSelect" update="@this"/>
+                                                            </p:selectOneMenu>
+                                                        </div>
+                                                        <div class="p-col-6">
+                                                            <p:selectOneMenu id="officeAdmin" value="#{bean.selectedOfficeIdAdmin}"
+                                                                             style="width: 100%;"
+                                                                             styleClass="#{bean.selectedOfficeIdAdmin ne null ? 'select-one-menu' : ''}">
+                                                                <f:selectItem
+                                                                        itemLabel="#{msg.subjectViewFormalityConservatoryCap}"
+                                                                        itemValue="#{null}"
+                                                                        noSelectionOption="true"/>
+                                                                <f:selectItems value="#{bean.officesAdmin}"/>
+                                                                <p:ajax event="itemSelect" update="@this"/>
+                                                            </p:selectOneMenu>
+                                                        </div>
+                                                        <div class="p-col-6">
+                                                            <p:inputText id="filterNotesAdmin" value="#{bean.filterNotesAdmin}"
+                                                                         placeholder="#{msg.billingListNotes}"
+                                                                         styleClass="input-width-100"/>
+                                                        </div>
+                                                        <div class="p-col-6">
+                                                            <p:inputText id="filterNdgAdmin" value="#{bean.filterNdgAdmin}"
+                                                                         placeholder="#{msg.billingListNdg}"
+                                                                         styleClass="input-width-100"/>
+                                                        </div>
+                                                        <div class="p-col-6">
+                                                            <p:inputText id="filterPracticeAdmin" value="#{bean.filterPracticeAdmin}"
+                                                                         placeholder="#{msg.billingListPractice}"
+                                                                         styleClass="input-width-100"/>
+                                                        </div>
+
+                                                        <div class="p-col-12 search-panel-btns" style="text-align: center;">
+                                                            <p:commandButton
+                                                                    value="#{ff:upper(msg.requestPrintSelectTemplate)}"
+                                                                    style="background: #00CC52;" id="searchButtonAdmin"
+                                                                    onclick="checkDatesAdmin(); filterTableFromPanelAdmin();"
+                                                                    update="searchPanelAdmin"
+                                                                    oncomplete="PF('panelSettingAdmin').getJQ().toggle();"/>
+                                                            <p:commandButton id="manageReestablishBtnAdmin"
+                                                                             value="#{ff:upper(msg.mailManageReestablish)}"
+                                                                             actionListener="#{bean.clearFilterPanelAdmin}"
+                                                                             update="searchPanelAdmin unlockedInvoiceTable settingPanelAdmin"
+                                                                             oncomplete="PF('panelSettingAdmin').getJQ().hide();"/>
+                                                        </div>
+                                                    </div>
+                                                </p:panel>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="p-col-12" style="margin-top: -15px; margin-bottom: -15px;">
-                            <p:commandButton value="#{msg.save}" style="float: right" styleClass="ui-button-success" iconPos="left"
-                                             action="#{bean.saveNextInvoiceNumber}" update="inumber"/>
-                        </div>
                     </div>
+					
+					<p:panel id="table_div_administration">
+                        <ui:fragment id="searchPanelAdmin">
+                            <div class="button_group">
+                                <p:remoteCommand name="filterTableFromPanelAdmin" action="#{bean.filterTableFromPanelAdmin}"
+                                                 update=":unlockedInvoiceTable"/>
+                                <p:remoteCommand name="updateCalendarToAdmin" update=":form:filterDateToAdmin"/>
+                            </div>
+                        </ui:fragment>
 
+                        <p:dataTable id="unlockedInvoiceTable" value="#{bean.unlockedInvoices}" emptyMessage="#{msg.noRecordsFound}"
+                                     var="invoice" rows="15" lazy="true"
+                                     paginator="true" paginatorAlwaysVisible="true" rowIndexVar="rowId"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="15, 30, 45, 60">
+                            <p:column headerText="#{msg.billingListNumber}" sortBy="#{invoice.number}" style="width: 11%">
+                                <h:outputText value="#{invoice.number}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.billingListDate}" sortBy="#{invoice.dateString}" style="width: 11%">
+                                <h:outputText value="#{invoice.dateString}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.billingListClient}" sortBy="#{invoice.client}" style="width: 20%">
+                                <h:outputText value="#{invoice.client}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.billingListNotes}" sortBy="#{invoice.notes}" style="width: 30%">
+                                <h:outputText value="#{invoice.notes}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.billingListStatus}" style="text-align:center;width: 11%;">
+                                <p:commandButton
+                                        value="#{invoice.status != null ? invoice.status.toString() : ff:upper(msg.billingListDraft)}"
+                                        style="width: 150px;"
+                                        styleClass="#{invoice.status == null ? 'orange-button' : (invoice.status.getId() == 1 ? 'orange-button' : (invoice.status.getId() == 3 ? 'green-button' : (invoice.status.getId() == 4 ? 'red-button' : 'button')))  }">
+                                </p:commandButton>
+                            </p:column>
+                            <p:column headerText="#{msg.billingListAmount}" sortBy="#{invoice.totalGrossAmount}" style="width: 11%">
+                                <h:outputText value="#{invoice.totalGrossAmount}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.billingListOnBalance}" sortBy="#{invoice.onBalance}" style="width: 11%">
+                                <h:outputText value="#{invoice.onBalance}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
                 </div>
             </main>
             <ui:include src="../Dialogs/InvoiceDialogBilling.xhtml"/>
@@ -2256,6 +2451,23 @@
                 this.cfg.grid = {
                     background: '#ffffff',
                     borderColor: '#D4D4D4',
+                }
+            }
+            
+            function checkDatesAdmin() {
+                var dateFrom = $('#filterDateFromAdmin_input').val();
+                var dateTo = $('#filterDateToAdmin_input').val();
+
+                var dFrom = new Date(dateFrom.substring(6) + '-'
+                    + dateFrom.substring(3, 5) + '-'
+                    + dateFrom.substring(0, 2));
+                var dTo = new Date(dateTo.substring(6) + '-'
+                    + dateTo.substring(3, 5) + '-' + dateTo.substring(0, 2));
+
+                if (dFrom > dTo) {
+                    $('#filterDateToAdmin_input').val(
+                        $('#filterDateFromAdmin_input').val());
+                    updateCalendarToAdmin();
                 }
             }
         </script>

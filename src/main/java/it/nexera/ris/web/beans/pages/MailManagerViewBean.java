@@ -120,7 +120,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
     private Long selectedClientInvoiceId;
 
-    private Long selectedClientFiduciaryId;
+    //private Long selectedClientFiduciaryId;
+
+    private String fiduciary;
 
     private String emailBody;
 
@@ -420,11 +422,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         if (!ValidationHelper.isNullOrEmpty(getEntity().getClientInvoice())) {
             setSelectedClientInvoiceId(getEntity().getClientInvoice().getId());
         }
-
         //&& Boolean.TRUE.equals(getEntity().getClientFiduciary().getFiduciary())
-        if (!ValidationHelper.isNullOrEmpty(getEntity().getClientFiduciary())) {
-            setSelectedClientFiduciaryId(getEntity().getClientFiduciary().getId());
-        }
+        setFiduciary(getEntity().getFiduciary());
         fillSelectedClientManagers();
         if (AccessBean.canCreateInPage(PageTypes.CLIENT_LIST)) {
             setCreateClient(true);
@@ -655,9 +654,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         if (!ValidationHelper.isNullOrEmpty(getSelectedClientInvoiceId())) {
             SelectItemHelper.addItemToListIfItIsNotInIt(getInvoiceClients(), getEntity().getClientInvoice());
         }
-        if (!ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
-            SelectItemHelper.addItemToListIfItIsNotInIt(getInvoiceClients(), getEntity().getClientFiduciary());
-        }
+//        if (!ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
+//            SelectItemHelper.addItemToListIfItIsNotInIt(getInvoiceClients(), getEntity().getClientFiduciary());
+//        }
 
         if (getSelectedNotManagerOrFiduciaryClientId() != null) {
 
@@ -1120,11 +1119,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             } else {
                 getEntity().setClientInvoice(null);
             }
-            if (!ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
-                getEntity().setClientFiduciary(DaoManager.get(Client.class, getSelectedClientFiduciaryId()));
-            } else {
-                getEntity().setClientFiduciary(null);
-            }
+//            if (!ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
+//                getEntity().setClientFiduciary(DaoManager.get(Client.class, getSelectedClientFiduciaryId()));
+//            } else {
+//                getEntity().setClientFiduciary(null);
+//            }
+            getEntity().setFiduciary(getFiduciary());
             if (!ValidationHelper.isNullOrEmpty(getSelectedOfficeId())) {
                 getEntity().setOffice(DaoManager.get(Office.class, getSelectedOfficeId()));
             } else {
@@ -1716,6 +1716,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         	else
         		totalCost += Double.parseDouble(request.getTotalCost().replaceAll(",", "."));
         }
+        BigDecimal tot = BigDecimal.valueOf(totalCost);
+        tot = tot.setScale(2, RoundingMode.HALF_UP);
+        totalCost = tot.doubleValue();
         log.info("request total cost :: "+totalCost + ", total invoice :: "+getAllTotalLine().doubleValue());
         if(totalCost != getAllTotalLine().doubleValue()) {
         	if(!ValidationHelper.isNullOrEmpty(getInvoiceErrorMessage())) {
@@ -2060,7 +2063,8 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             executeJS("PF('sendInvoiceErrorDialogWV').show();");
             return;
         }
-        //executeJS("PF('invoiceDialogBillingWV').hide();");
+        executeJS("PF('invoiceDialogBillingWV').hide();");
+        redierctToBilling();
         //closeInvoiceDialog();
     }
 
@@ -2706,7 +2710,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             //String ndg = "";
             String templatePath  = (new File(FileHelper.getRealPath(),
                     "resources" + File.separator + "layouts" + File.separator
-                            + "Invoice" + File.separator + "InvoiceDocumentTemplate.docx")
+                            + "invoice" + File.separator + "InvoiceDocumentTemplate.docx")
                     .getAbsolutePath());
 
             Double imponibile = 0.0;
@@ -3301,4 +3305,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         executeJS("PF('invoiceDialogBillingWV').show();");
         RequestContext.getCurrentInstance().update("invoiceDialogBilling");
     }
+
+    public void redierctToBilling() {
+        RedirectHelper.goTo(PageTypes.BILLING_LIST);
+    }
+
 }

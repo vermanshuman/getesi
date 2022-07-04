@@ -27,7 +27,7 @@
         <SendEmail>$sendEmail</SendEmail>
         <Rows>
             #foreach($invoiceItem in $invoiceItems)<Row>
-                <Description>$invoiceItem.xmlDescription</Description>
+                <Description>$invoiceItem.description</Description>
                 <Qty>1</Qty>
                 <Price>$invoiceItem.invoiceTotalCost</Price>
                 <VatCode>$invoiceItem.vat</VatCode>

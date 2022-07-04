@@ -181,7 +181,9 @@ public class WLGInbox extends IndexedEntity {
     @JoinColumn(name = "received_inbox_id")
     private WLGInbox recievedInbox;
 
-	@Transient
+    private String fiduciary;
+
+    @Transient
     private List<WLGExport> files;
 
     @Transient
@@ -937,5 +939,13 @@ public class WLGInbox extends IndexedEntity {
                     .collect(Collectors.toList());
         }
         return null;
+    }
+
+    public String getFiduciary() {
+        return fiduciary;
+    }
+
+    public void setFiduciary(String fiduciary) {
+        this.fiduciary = fiduciary;
     }
 }
