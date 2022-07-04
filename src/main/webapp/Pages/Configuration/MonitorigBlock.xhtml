@@ -2,7 +2,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:h="http://java.sun.com/jsf/html">
-    <p:fieldset legend="#{header}">
+    <p:fieldset legend="#{header}" toggleable="true" toggleSpeed="500" collapsed="false">
         <p:panelGrid styleClass="ui-panelgrid-blank form-group" columns="2">
             <h:outputText value="#{msg.threadStatus}:"/>
             <p:column>

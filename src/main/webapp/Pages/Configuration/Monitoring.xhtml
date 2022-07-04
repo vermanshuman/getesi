@@ -19,12 +19,44 @@
                 PF('socketWV').disconnect();
             }
         </script>
+        <style>
+            body .ui-tabmenu .ui-tabmenu-nav {
+                background: #ffffff !important;
+                border-bottom: 2px solid #dee2e6 !important;
+            }
+
+            body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem.ui-state-active {
+                background: #FFFFFF !important;
+                border-bottom: 2px solid #2196F3 !important;
+            }
+
+            body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem a {
+                color: #6c757d;
+            }
+
+            body .ui-tabs.ui-tabs-top > .ui-tabs-nav {
+                display: none;
+            }
+            body .ui-fieldset .ui-fieldset-legend {
+                border: 1px solid #dee2e6 !important;
+                color: #FFFFFF !important;
+                padding: 0.6em 1em !important;
+                font-weight: normal !important;
+                border-radius: 4px !important;
+                user-select: none !important;
+                font-size: 14px !important;
+                transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+            }
+        </style>
         <p:socket onMessage="handleMessageSocket" channel="/notify" autoConnect="false" widgetVar="socketWV"/>
         <p:remoteCommand name="handleMessageSocket"
                          update="tabs:outpanel,tabs:importXlsServiceProgressPanelId, tabs:importVisureRTFServiceProgressPanelId,
                                  tabs:importVisureDHServiceProgressPanelId, tabs:importRequestOLDServiceProgressPanelId,
                                  tabs:importOmiXlsxServiceProgressPanelId tabs:removeSubjectsServiceProgressPanelId"/>
         <p:remoteCommand oncomplete="#{monitoringBean.updateXlsService()}" autoRun="true"/>
+        <p:tabMenu id="pageTabMenu" style="background-color:#FFFFFF !important;">
+            <p:menuitem value="#{msg.services}"></p:menuitem>
+        </p:tabMenu>
         <p:tabView id="tabs">
             <p:tab title="#{msg.services}">
                 <p:outputPanel id="outpanel">
