@@ -96,7 +96,7 @@ public class FatturaAPI {
             context.put("customerEmail", "");
         context.put("feCustomerPec", invoice.getClient().getMailPEC());
         context.put("feDestinationCode", invoice.getClient().getAddressSDI());
-        context.put("fePaymentCode", invoice.getPaymentType().getCode());
+        context.put("fePaymentCode", invoice.getPaymentType().getCode()); 
         context.put("paymentMethodName", invoice.getPaymentType().getDescription());
         if(!ValidationHelper.isNullOrEmpty( invoice.getPaymentType().getIban()))
             context.put("paymentMethodDescription", invoice.getPaymentType().getIban());

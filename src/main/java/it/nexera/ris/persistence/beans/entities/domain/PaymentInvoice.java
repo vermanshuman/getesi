@@ -22,11 +22,11 @@ public class PaymentInvoice extends IndexedEntity implements Serializable {
     @Column(name = "import")
     private Double paymentImport;
 
-    @Column(name = "date")
+    @Column(name = "date") 
     private Date date;
 
     @Column(name = "description")
-    private String description;
+    private String description; 
 
     @ManyToOne
     @JoinColumn(name = "invoice_id")

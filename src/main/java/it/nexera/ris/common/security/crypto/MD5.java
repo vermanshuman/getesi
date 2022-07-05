@@ -22,6 +22,7 @@ public class MD5 {
      * @param args
      */
     public static void main(String[] args) {
+    	args = new String[] {"india123"};
         if (args.length >= 1) {
             String strEncodongValue = encodeString(args[0], null);
             System.out.println("Source Value : " + args[0]);

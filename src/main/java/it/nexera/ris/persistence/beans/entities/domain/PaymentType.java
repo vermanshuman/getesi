@@ -20,7 +20,7 @@ public class PaymentType extends IndexedEntity implements Serializable {
     private String code;	
 	
     @Column(name = "description")
-    private String description;
+    private String description; 
 
     @Column(name = "beneficiary")
     private String beneficiary;

@@ -24,6 +24,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
@@ -31,8 +32,11 @@ import java.util.UUID;
 
 @ManagedBean(name = "loginBean")
 @ViewScoped
-public class LoginBean extends BaseValidationPageBean {
-    protected transient final Log log = LogFactory.getLog(LoginBean.class);
+public class LoginBean extends BaseValidationPageBean implements Serializable {
+    
+	private static final long serialVersionUID = 387873920390676270L;
+
+	protected transient final Log log = LogFactory.getLog(LoginBean.class);
 
     private String password = null;
 
@@ -110,7 +114,10 @@ public class LoginBean extends BaseValidationPageBean {
     }
 
     public void doLogin() throws IOException, ServletException {
+    	
         this.cleanValidation();
+        
+       
 
         this.validate(this.getUsername(), "j_username", this.getPassword(), "password");
         loginValidate(this.getUsername(), "j_username", this.getPassword(), "password");

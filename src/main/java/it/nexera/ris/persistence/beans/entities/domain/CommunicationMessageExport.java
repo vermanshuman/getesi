@@ -38,7 +38,7 @@ public class CommunicationMessageExport extends IndexedEntity {
 
     public String getFileName() {
         if (!ValidationHelper.isNullOrEmpty(this.getFilePath())) {
-            return FileHelper.getFileName(this.getFilePath());
+            return FileHelper.getFileName(this.getFilePath()); 
         }
 
         return "";

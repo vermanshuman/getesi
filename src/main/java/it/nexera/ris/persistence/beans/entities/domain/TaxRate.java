@@ -24,7 +24,7 @@ public class TaxRate extends IndexedEntity implements Serializable {
     private BigDecimal percentage;
 
     @Column(name = "description")
-    private String description;
+    private String description; 
 
     @Column(name = "code_sdi")
     private String codeSDI;

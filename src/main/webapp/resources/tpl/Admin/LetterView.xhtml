@@ -71,9 +71,12 @@
             </p:selectOneMenu>
 
             <h:outputText value="#{msg.mailTrust}:"/>
-            <p:selectOneMenu id="client_fiduciary_id" value="#{bean.selectedClientFiduciaryId}" styleClass="input-width-mmv w-100">
+            <p:selectOneMenu id="client_fiduciary_id_old"
+            rendered="false" 
+            value="#{bean.selectedClientFiduciaryId}" styleClass="input-width-mmv w-100">
                 <f:selectItems value="#{bean.fiduciaryClientsList}"/>
             </p:selectOneMenu>
+            <p:inputText id="client_fiduciary_id" value="#{bean.clientFiduciary}"  styleClass="w-100"/>
 
             <span>#{msg.clientManager}</span>
             <p:selectCheckboxMenu id="managers" value="#{bean.selectedClientManagers}" styleClass="w-100"
@@ -96,11 +99,11 @@
             <span> #{msg.reference}</span>
             <p:inputTextarea id="referenceShow" value="#{bean.referencePractice}" styleClass="w-100"/>
             <p:outputPanel style="margin-top: 2mm;position: absolute;">
-                <p:commandButton value="#{msg.save}" process="referenceAreaShow" style="background-color: #00CC52 !important; margin-right:5px;width: 110px;" icon="fa fa-floppy-o" iconPos="left"
+                <p:commandButton id="saveReference" value="#{msg.save}" process="referenceAreaShow" style="background-color: #00CC52 !important; margin-right:5px;width: 110px;" icon="fa fa-floppy-o" iconPos="left"
                                  action="#{bean.saveReference(false)}" update="enterPracticeReferenceDialog @form" oncomplete="setTimeout(function() { PF('saveConfirmationDialogWV').hide(); }, 2000);">
                     <f:setPropertyActionListener value="#{true}" target="#{bean.confirmButtonIsClicked}"/>
                 </p:commandButton>
-                <p:commandButton value="#{msg.mailManagerStart}" process="referenceAreaShow" style="background-color: #000066 !important;margin-left: 1cm;width: 110px;"
+                <p:commandButton id="processManagedStateCheck" value="#{msg.mailManagerStart}" process="referenceAreaShow" style="background-color: #000066 !important;margin-left: 1cm;width: 110px;"
                                  action="#{bean.checkFieldsBeforeProcessManagedStateCheck}" update="chooseSingleOrMultipleRequestCreate">
                     <f:setPropertyActionListener value="#{true}" target="#{bean.confirmButtonIsClicked}"/>
                 </p:commandButton>
