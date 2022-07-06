@@ -1576,6 +1576,10 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         getCostManipulationHelper().addExtraCost(extraCostValue, getRequestId());
     }
 
+    public void addExtraCost(String extraCostValue, String note) {
+        getCostManipulationHelper().addExtraCost(extraCostValue, getRequestId(), note);
+    }
+
     public void deleteExtraCost(ExtraCost extraCostToDelete) {
         getCostManipulationHelper().getRequestExtraCosts().remove(extraCostToDelete);
         getCostManipulationHelper().setIncludeNationalCost(null);

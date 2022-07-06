@@ -70,6 +70,10 @@ public class CostManipulationHelper extends PageBean {
 
     private Boolean includeNationalCost;
 
+    private String extraCostMortgageTable;
+
+    private String extraCostLandRegistryTable;
+
     public void saveRequestEstateFormalityCost(Request request) throws PersistenceBeanException {
         if (!ValidationHelper.isNullOrEmpty(getEstateFormalityCost())) {
             try {
@@ -136,7 +140,14 @@ public class CostManipulationHelper extends PageBean {
     }
 
     public void addExtraCost(String extraCostValue, Long requestId) {
+        addExtraCost(extraCostValue, requestId, null);
+    }
+
+    public void addExtraCost(String extraCostValue, Long requestId, String note) {
         ExtraCost newExtraCost = new ExtraCost();
+        if(!ValidationHelper.isNullOrEmpty(note)) {
+            newExtraCost.setNote(note);
+        }
         switch (ExtraCostType.getEnumByCode(extraCostValue)) {
             case IPOTECARIO:
                 Double cost =IPOTECARIO_DEFAULT;
@@ -499,5 +510,19 @@ public class CostManipulationHelper extends PageBean {
         this.extraCostPostalExpense = extraCostPostalExpense;
     }
 
+    public String getExtraCostMortgageTable() {
+        return extraCostMortgageTable;
+    }
 
+    public void setExtraCostMortgageTable(String extraCostMortgageTable) {
+        this.extraCostMortgageTable = extraCostMortgageTable;
+    }
+
+    public String getExtraCostLandRegistryTable() {
+        return extraCostLandRegistryTable;
+    }
+
+    public void setExtraCostLandRegistryTable(String extraCostLandRegistryTable) {
+        this.extraCostLandRegistryTable = extraCostLandRegistryTable;
+    }
 }
