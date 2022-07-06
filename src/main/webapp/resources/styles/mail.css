@@ -1,0 +1,201 @@
+.autocomplete_width li.ui-autocomplete-input-token {
+    width: 100%;
+}
+.autocomplete_width input#mailTo_input {
+    width: 100%;
+}
+.autocomplete_width input#mailCC_input {
+    width: 100%;
+}
+.autocomplete_width input#mailBCC_input {
+    width: 100%;
+}
+.ui-button.close-ui-button {
+    float: right !important;
+    background-color: #F3362B !important;
+}
+
+.ui-button.grey-button {
+    background-color: #3582b8  !important;
+}
+
+.ui-button.red-button {
+    background-color: #F3362B !important;
+    width: 150px;
+}
+
+.ui-button.green-button {
+    background-color: #00cc52 !important;
+    width: 150px;
+}
+
+.button-panel-one {
+    background-color: #EFF3F5;
+    padding: 7px;
+    width: 100%;
+    text-align: -webkit-left;
+    margin-bottom: 7px;
+}
+
+.button-panel-two {
+    background-color: #EFF3F5;
+    margin-top: 7px;
+    width: 99%;
+    text-align: -webkit-left;
+}
+
+.select-client-menu {
+    width: 100%;
+    margin-top: 1%;
+    margin-bottom: 1%
+}
+
+.small-btn-column {
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: center !important;
+}
+
+.small-btn-column i {
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: center !important;
+}
+
+.close-icon {
+    background-color: transparent !important;
+    color: red !important;
+}
+
+.select-email-table .ui-datatable-tablewrapper {
+    overflow: hidden;
+}
+
+.ui-datatable .ui-row-editor .ui-row-editor-pencil span {
+    color: #003871 !important;
+}
+
+.ui-datatable .ui-row-editor span {
+    color: white;
+}
+
+body ui:not(#client_not_manger_or_fiduciary_id_items).ui-state-highlight {
+    color: #D0D7DE !important;
+}
+td.ui-panelgrid-cell {
+    padding: 2px 10px!important;
+}
+
+#settingPanel {
+    position: absolute;
+    z-index: 1;
+    margin-top: 10px;
+    max-width: 560px;
+    right: 33px;
+    border: 1px solid #547ac4;
+}
+
+.alignEnd {
+    place-content: flex-end;
+}
+
+@media screen and (max-width: 1200px) {
+    #settingPanel {
+        margin-top: 90px;
+    }
+    .alignEnd {
+        place-content: flex-start;
+    }
+}
+
+#manageReestablishBtn {
+    box-shadow: 0px 1px 5px 0px;
+    border: none !important;
+}
+
+#hyphen {
+    display: inline-block;
+    width: 20px;
+    height: 5px;
+    margin-right: 12px;
+    border-top: 2px solid #000;
+}
+
+#subjecthyphen {
+    display: inline-block;
+    width: 20px;
+    height: 5px;
+    margin-right: 12px;
+    border-top: 2px solid #000;
+}
+
+.one_mail_letter {
+    line-height: 36px;
+    font-size: 34pt;
+    color: #ffffff;
+}
+
+#button_panel_content {
+    border: none;
+    padding: 0;
+}
+
+#letter_panel_content {
+     border: none;
+}
+
+.button-panel-space button, .button-panel-space span {
+    margin-right: 2px;
+    font-size: 0.95rem;
+    margin-bottom: 3px;
+}
+
+@media screen and (max-width: 1590px) {
+    .button-panel-space span {
+        margin-left: 0px !important;
+    }
+}
+
+@media screen and (max-width: 1383px) {
+    .button-panel-space span {
+        margin-left: -4px !important;
+    }
+}
+
+.layout-wrapper .layout-menu-container .layout-menu li ul li a {
+    text-decoration: none !important;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.td-w-403 td:nth-child(2) {
+    width: 403px;
+}
+
+.td-w-403 td:nth-child(1) {
+    width: 188px;
+}
+
+.ui-button.print-button {
+    background: #fed820;
+    color: #000000;
+    border: 1px solid #fed820;
+    margin-right: 10px;
+}
+
+.filter-container{
+    margin-right: 0px !important;
+    margin-left: auto !important;
+}
+
+body .ui-datatable .ui-paginator.ui-paginator-top{
+    background-color:  #788FA7 !important;
+    color: #ffffff !important;
+}
+
+
+body .ui-datatable .ui-paginator.ui-paginator-bottom{
+    background-color:  #788FA7 !important;
+}

@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+    <style>
+        #tableDocuments_head {
+            display: none;
+        }
+
+        .ui-datatable:not(.borderless) thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+            padding: 4px 10px!important;
+            overflow: hidden!important;
+            border-width: 0 0 0 0 !important;
+            border-style: solid!important;
+        }
+        .ui-dialog .ui-widget-header {
+            background: #f8f9fa !important;
+            color: #495057 !important;
+        }
+
+        .confirm-button {
+            background-color: #00CC52 !important;
+            width: 100px;
+        }
+        .cancel-button {
+            background-color: #F3362B !important;
+            width: 100px;
+            margin-left: 15px !important;
+        }
+        .red-file {
+            background-size: 20px !important;
+            width: 23px;
+            margin-top: -9%;
+        }
+    </style>
+    <span>#{enums.documentGenerationTagsATTACHED_DOCUMENTS}
+        <h:panelGroup rendered="#{not empty block}" style="#{block.isRequired()?'':'display:none;'}">*</h:panelGroup>
+        <h:panelGroup rendered="#{not empty item and not empty item.field}" style="#{item.field.isRequired()?'':'display:none;'}">*</h:panelGroup>
+    </span>
+    <p:panel id="ATTACHED_DOCUMENTS" style="width: 100%; padding: 0; padding-right:1rem; background: transparent; border: none">
+        <div class="ui-g">
+            <div class="ui-g-6">
+                <h:outputText value="#{msg.requestDocumentAddNew}:"/>
+            </div>
+            <div class="ui-g-6">
+                <p:commandButton value="#{msg.requestDocumentAddNewBtn}" oncomplete="PF('documentAddDlgWV').show();"/>
+            </div>
+        </div>
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <!-- <p:dataTable var="doc" id="tableDocuments"
+                             rendered="#{not empty bean.documents}"
+                             emptyMessage="#{msg.noRecordsFound}" value="#{bean.documents}"
+                             rowKey="#{doc.id}" rowIndexVar="rowId"
+                             widgetVar="tableDocumentsWV">
+
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.requestTableOfOtherDocumentsAssociatedWithSubject}"/>
+                    </f:facet>
+
+                    <p:column headerText="#{msg.requestDocumentTitle}" colspan="2">
+                        <h:outputText value="#{doc.title}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.requestFile}" colspan="2">
+                        <h:outputText value="#{doc.nameByPathOrTitle}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.requestDataAcquisition}" colspan="2">
+                        <h:outputText value="#{doc.createDate}" converter="dateTimeConverter"/>
+                    </p:column>
+                    <p:column styleClass=" action_midle_column" headerText="#{msg.pdf}">
+                        <p:commandButton icon="fa fa-fw fa-file-pdf-o"
+                                         action="#{bean.downloadPdfFile(doc)}" ajax="false" update="@form">
+                        </p:commandButton>
+                    </p:column>
+                    <p:column styleClass="action_column" rendered="#{!bean.dbRequest.isNew}" colspan="2">
+                        <p:commandButton icon="fa fa-close" action="#{bean.deleteDocument}" update="ATTACHED_DOCUMENTS">
+                        <f:setPropertyActionListener value="#{doc.title}"
+                                                     target="#{bean.deleteDocumentFileName}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable> -->
+                <p:dataTable var="doc" id="tableDocuments" style="width:60%;"
+                             rendered="#{not empty bean.documents}"
+                             emptyMessage="#{msg.noRecordsFound}" value="#{bean.documents}"
+                             rowKey="#{doc.id}" rowIndexVar="rowId"
+                             widgetVar="tableDocumentsWV">
+
+                    <!--                    <f:facet name="header">-->
+                    <!--                        <h:outputText value="#{msg.requestTableOfOtherDocumentsAssociatedWithSubject}"/>-->
+                    <!--                    </f:facet>-->
+
+                    <p:column style="display:flex !important;">
+                        <!-- <h:outputText value="#{doc.title}"/>
+                        <p:commandButton icon="fa fa-fw fa-file-pdf-o" style="margin-left:20px;"
+                                         action="#{bean.downloadPdfFile(doc)}" ajax="false" update="@form">
+                        </p:commandButton> -->
+                        <i class="fa fa-file-pdf-o red-file"/>
+                        <p:commandLink title="#{msg.download}" update="@form" ajax="false"
+                                       action="#{bean.downloadPdfFile(doc)}" value="&nbsp;#{doc.title}"
+                                       style="color: black; font-size: 13px !important;">
+                        </p:commandLink>
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </div>
+    </p:panel>
+
+    <p:dialog header="#{msg.databaseListDocumentAddDlg}" modal="true" styleClass="dialog-green"
+              id="documentAddDlg" resizable="false" draggable="false"
+              dynamic="true" widgetVar="documentAddDlgWV">
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+
+            <h:outputText value="#{msg.databaseListDocumentTitle}:"/>
+            <p:inputText value="#{bean.documentTitle}"/>
+
+            <h:outputText value="#{msg.databaseListDocumentDocument}:"/>
+            <p:fileUpload mode="simple" value="#{bean.document}" skinSimple="true"
+                          label="#{msg.mailManagerChooseAttachedFiles}"
+                          uploadLabel="#{msg.mailManagerUploadAttachedFiles}"
+                          cancelLabel="#{msg.mailManagerCancelAttachedFiles}"/>
+
+            <h:outputText value="#{msg.databaseListDocumentDate}:"/>
+            <p:calendar id="documentDate" pattern="dd/MM/yyyy" mask="true"
+                        locale="it" navigator="true" popupIconOnly="true"
+                        value="#{bean.documentDate}"/>
+        </p:panelGrid>
+        <div class="btn_line">
+            <p:commandButton value="#{msg.save}" ajax="false" styleClass="confirm-button"
+                             action="#{bean.fillUploadedFileDocumentList}" update=":form:ATTACHED_DOCUMENTS"
+                             oncomplete="PF('documentAddDlgWV').hide();"/>
+            <p:commandButton value="#{msg.cancel}" ajax="false" styleClass="cancel-button"
+                             action="#{bean.cancelSaveFile}" update="@form"
+                             oncomplete="PF('documentAddDlgWV').hide();"/>
+        </div>
+
+    </p:dialog>
+
+</ui:composition>

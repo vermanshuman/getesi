@@ -1,0 +1,16 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html">
+    <p:dialog widgetVar="confirmMoveMailDialog" modal="true" width="600" styleClass="dialog-green">
+
+	    <h3>#{msg.confirmMoveEmail}</h3>
+
+          <div class="btn_line">
+             <p:commandButton value="#{msg.confirm}"
+                              action="#{bean.moveMail}" oncomplete="PF('confirmMoveMailDialog').hide(); #{oncomplete_confirm_move_mail_dialog}"/>
+             <p:commandButton value="#{msg.cancel}" oncomplete="PF('confirmMoveMailDialog').hide();"/>
+         </div>
+    </p:dialog>
+</ui:composition>

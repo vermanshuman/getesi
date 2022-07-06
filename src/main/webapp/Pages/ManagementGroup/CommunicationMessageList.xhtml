@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/resources/tpl/Admin/LazyListTabBase.xhtml">
+    <ui:param name="bean" value="#{communicationMessageListBean}"/>
+    <ui:param name="list_title" value="#{msg.communicationHeader}"/>
+    <ui:param name="list_header" value="#{msg.communicationHeader}"/>
+    <ui:param name="renderTitle" value="false"/>
+    <ui:param name="renderMenu" value="false"/>
+    <ui:param name="centerPartStyleClass" value="false"/>
+    <ui:define name="list_body">
+        <script>
+            function checkDates() {
+                var dateFrom = $('#filterDateFrom_input').val();
+                var dateTo = $('#filterDateTo_input').val();
+
+                var dFrom = new Date(dateFrom.substring(6) + '-'
+                    + dateFrom.substring(3, 5) + '-'
+                    + dateFrom.substring(0, 2));
+                var dTo = new Date(dateTo.substring(6) + '-'
+                    + dateTo.substring(3, 5) + '-' + dateTo.substring(0, 2));
+
+                if (dFrom > dTo) {
+                    $('#filterDateTo_input').val(
+                        $('#filterDateFrom_input').val());
+                    updateCalendarTo();
+                }
+            }
+        </script>
+
+        <p:outputPanel id="searchPanel">
+            <p:remoteCommand name="updateCalendarTo" update=":form:filterDateTo"/>
+            <p:remoteCommand name="filterTableFromPanel" action="#{bean.filterTableFromPanel}" update=":form:table"/>
+            <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group">
+                <p:calendar id="filterDateFrom" readonlyInput="false" showOn="button" pattern="dd/MM/yyyy" mask="true"
+                            onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+                            locale="it" navigator="true" popupIconOnly="true"
+                            onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+                            value="#{bean.dateFrom}" placeholder="#{msg.mailManagerDateFrom}"/>
+
+                <p:calendar id="filterDateTo" readonlyInput="false" showOn="button" pattern="dd/MM/yyyy" mask="true"
+                            onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                            locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateTo}"
+                            onblur="check_date(this)" value="#{bean.dateTo}"/>
+
+                <p:inputText value="#{bean.filterMessage}" placeholder="#{msg.communicationMessage}"/>
+
+                <p:commandButton value="#{msg.search}"
+                                 id="searchButton" onclick="checkDates(); filterTableFromPanel();"
+                                 update=":form:table,searchPanel"/>
+            </p:panelGrid>
+
+            <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
+                <p:commandButton value="#{msg.communicationNew}"
+                                 disabled="#{!bean.canCreate}" action="#{bean.createNewCommunicationMessage}"/>
+            </p:panelGrid>
+        </p:outputPanel>
+
+        <p:dataTable var="item" id="table"
+                     emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyModel}"
+                     rowKey="#{item.id}" rows="10" lazy="true" paginator="true"
+                     paginatorAlwaysVisible="true" rowIndexVar="rowId"
+                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                     rowsPerPageTemplate="10,20,50" widgetVar="tableWV">
+
+            <p:column styleClass="action_column min_padding_margin" exportable="false">
+                <p:commandButton icon="ui-icon pi pi-times"
+                                 style="background-color: red;border: none !important;"
+                                 update=":form"
+                                 oncomplete="PF('dlg2').show()" disabled="#{!bean.canDelete}">
+                    <f:setPropertyActionListener value="#{item.id}"
+                                                 target="#{bean.entityDeleteId}"/>
+                </p:commandButton>
+            </p:column>
+
+            <p:column headerText="#{msg.communicationDateFrom}"
+                      sortBy="#{item.createDate}" style="width: 7.5%;" styleClass="min_padding_margin">
+                <h:outputText value="#{item.createDate}"
+                              converter="dateTimeConverter"/>
+            </p:column>
+
+            <p:column headerText="#{msg.communicationDateTo}" sortBy="#{item.endDate}" styleClass="min_padding_margin"
+                      style="width: 7.5%;">
+                <h:outputText value="#{item.endDate}" converter="dateTimeConverter"/>
+            </p:column>
+
+            <p:column headerText="#{msg.communicationMessage}" sortBy="#{item.message}" filterBy="#{item.message}"
+                      styleClass="min_padding_margin"
+                      style="width: 70%;">
+                <h:outputText value="#{item.message}"/>
+            </p:column>
+        </p:dataTable>
+    </ui:define>
+</ui:composition>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/resources/tpl/Admin/EditBase.xhtml">
+
+    <ui:param name="edit_title" value="#{msg.inputCard}"/>
+    <ui:param name="bean" value="#{inputCardEditBean}"/>
+
+    <ui:define name="edit_body">
+        <span><span class="red">*</span> #{msg.inputCardName}:</span>
+        <p:inputText value="#{bean.entity.name}" id="name" label="#{msg.inputCardName}" style="margin-left: 1%"/>
+        <br/><br/>
+        <p:dataTable value="#{bean.fields}" var="item" emptyMessage="#{msg.noRecordsFound}">
+            <f:facet name="header">
+                <h:outputText value="#{msg.inputCardFields}"/>
+            </f:facet>
+            <p:column styleClass="small-btn-column" width="20">
+                <p:selectBooleanCheckbox value="#{item.selected}"/>
+            </p:column>
+            <p:column>
+                <h:outputText value="#{item.field.field.toString()}"/>
+            </p:column>
+            <p:column width="40">
+                <p:inputNumber inputStyle="width: 75%!important;" value="#{item.field.position}" decimalPlaces="0"/>
+            </p:column>
+            <p:column>
+                <p:selectOneRadio id="console" value="#{item.field.state}">
+                    <f:selectItems value="#{bean.stateValues}"/>
+                </p:selectOneRadio>
+            </p:column>
+        </p:dataTable>
+    </ui:define>
+</ui:composition>

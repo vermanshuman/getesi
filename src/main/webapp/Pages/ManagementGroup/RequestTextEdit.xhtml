@@ -1,0 +1,691 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:pe="http://primefaces.org/ui/extensions"
+                xmlns:p="http://primefaces.org/ui"
+                template="/resources/tpl/Admin/EditBase.xhtml">
+
+    <ui:param name="edit_title" value="#{msg.requestEditorTitle}"/>
+    <ui:param name="bean" value="#{requestTextEditBean}"/>
+    <ui:param name="save_oncomplete" value="onCompleteSave();"/>
+    <ui:param name="errorCloseAction" value="onErrorClose();"/>
+
+    <ui:define name="content">
+        <script type="text/javascript">
+            var heightElement;
+
+            function initHeightElement(key) {
+                heightElement = $("#cke_" + key).height();
+            }
+
+            function addItemToCKeditor(key) {
+                const ck = CKEDITOR.instances[key];
+                var editor = ck.ui.editor;
+                editor.addCommand("internalInsert", {
+                    exec: function (editor) {
+                        let replacement = $.data(document.body, "buffer");
+                        if (replacement) {
+                            ck.insertText(replacement);
+                        } else {
+                            el.parent().css({display: 'none'});
+                        }
+                    }
+                });
+                var internalInsert = {
+                    label: editor.lang.image.menu,
+                    command: 'internalInsert',
+                    group: 'clipboard'
+                };
+                editor.contextMenu.addListener(function (element, selection) {
+                    return {
+                        myCommand: CKEDITOR.TRISTATE_OFF
+                    };
+                });
+                editor.addMenuItems({
+                    myCommand: {
+                        label: '#{msg.pasteFromClipboard}',
+                        command: 'internalInsert',
+                        group: 'clipboard',
+                        order: 9
+                    }
+                });
+            }
+
+            function onInitCkEditor(key) {
+                const ck = CKEDITOR.instances[key];
+                removeAllTooltips('#bodyPanel');
+                /*      ck.ui.editor.toolbar[8].items[0].onClick(125);*/
+                ck.ui.editor.toolbar[8].items[0].onClick(#{bean.pdfZoomValue});
+
+                ck.ui.editor.on('resize', function () {
+                    var editor = ck.ui.editor;
+                    var jqDocument = $(editor.document.$);
+                    var documentHeight = jqDocument.height();
+                    jqDocument.scrollTop($(".cke_wysiwyg_frame").contents().find("body").height());
+                    fixHeightCKEditor(key);
+                });
+                ck.ui.editor.on('key', function (event) {
+                    if (event.data.keyCode === 9) {
+                        ck.insertText("&#x2001;");
+                        return false;
+                    }
+                    return true;
+                });
+
+                ck.on('fixWidth', function () {
+                    fixWidthCKEditor(ck, key);
+                });
+                if (key == "body") {
+                    ck.resize('1215', window.innerHeight - 80);
+                } else {
+                    ck.resize('600', window.innerHeight - 510);
+                }
+                pushListener(ck, key);
+                fixWidthCKEditor(ck, key);
+                fixFont(ck);
+            }
+
+            function pushListener(ck, key) {
+                $($("#" + key + "Panel").find("iframe")[0].contentDocument).mouseup(function () {
+                    this.onkeydown = () => {
+                        return false;
+                    };
+                    setTimeout(() => {
+                        fixFont(ck);
+                        this.onkeydown = () => {
+                            return true;
+                        };
+                    }, 50)
+                });
+
+                $($("#" + key + "Panel").find("iframe")[0].contentDocument).on("copy", function (e) {
+                    let selectedText = this.getSelection().toString();
+                    selectedText = selectedText.replace(/\u200B/g, "");
+                    $.data(document.body, "buffer", selectedText);
+                });
+            }
+
+            function fixFont(ck) {
+                if (ck.name === 'commentArea' || ck.name === 'datafromArea') {
+                    while (ck.ui.editor.toolbar[3].items[0].getValue() === '') {
+                        ck.ui.editor.toolbar[3].items[0].onClick('Courier New');
+                    }
+                    while (ck.ui.editor.toolbar[3].items[1].getValue() === '') {
+                        ck.ui.editor.toolbar[3].items[1].onClick('14');
+                    }
+                } else {
+                    while (ck.ui.editor.toolbar[3].items[0].getValue() === '') {
+                        ck.ui.editor.toolbar[3].items[0].onClick('Calibri');
+                    }
+                    while (ck.ui.editor.toolbar[3].items[1].getValue() === '') {
+                        ck.ui.editor.toolbar[3].items[1].onClick('14');
+                    }
+                }
+            }
+
+            function fixHeightCKEditor(key) {
+                if (key == "body") {
+                    const ck = CKEDITOR.instances[key];
+                    var heightContent = $(".cke_wysiwyg_frame").contents().find("body").height();
+                    var newHeightElement = $("#cke_" + key).height();
+                    var delta = newHeightElement - heightElement;
+                    if (delta > 0) {
+                        if (heightContent &lt; heightElement) {
+                            $(".cke_wysiwyg_frame").contents().find("body").css('height', heightContent + delta + 'px');
+                        } else {
+                            $(".cke_wysiwyg_frame").contents().find("body").css('height', heightElement + delta + 'px');
+                        }
+                    } else {
+                        $(".cke_wysiwyg_frame").contents().find("body").css('height', heightContent + delta + 'px');
+                    }
+                }
+            }
+
+            function fixWidthCKEditor(ck, key) {
+                var newWidth = parseInt(($("#cke_" + key).width() - 270) / (ck.ui.editor.toolbar[8].items[0].lastValue / 100), 10);
+                $(".cke_wysiwyg_frame").contents().find("body").css('width', newWidth + 'px');
+            }
+
+            function onCompleteSave() {
+                var array = $('.not_valid');
+                var validBody = true;
+                for (var i = 0; array.length > i; i++) {
+                    if (array[i].id == "bodyValidator") {
+                        $("#body_parent").addClass('not_valid');
+                        validBody = false;
+                    }
+                }
+
+                if (validBody) {
+                    $("#body_parent").removeClass('not_valid');
+                    $("#body_parent").attr("title", "");
+                }
+            }
+
+            function insertTagTo(id) {
+                var tag = document.getElementById('insertTag').value;
+                if (CKEDITOR.instances[id] &amp;&amp; tag != null &amp;&amp; tag.length > 0) {
+                    CKEDITOR.instances[id].insertText(tag);
+                }
+            }
+
+            function fullscreen() {
+                var elem = document.getElementById("bodyPanel");
+                if (!document.fullscreenElement &amp;&amp;    // alternative standard method
+                    !document.mozFullScreenElement &amp;&amp; !document.webkitFullscreenElement) {  // current working methods
+                    if (elem.requestFullscreen) {
+                        elem.requestFullscreen();
+                    } else if (elem.mozRequestFullScreen) {
+                        elem.mozRequestFullScreen();
+                    } else if (elem.webkitRequestFullscreen) {
+                        elem.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+                    }
+                } else {
+                    if (document.cancelFullScreen) {
+                        document.cancelFullScreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.webkitCancelFullScreen) {
+                        document.webkitCancelFullScreen();
+                    }
+                }
+            }
+        </script>
+        <style type="text/css">
+            .selectBool {
+                height: 30px;
+
+            }
+
+            form .selectBool.ui-button {
+                background-color: #f0f3f5 !important;
+                border: solid;
+                border-width: 2px;
+            }
+
+            form .selectBool.ui-selectbooleanbutton.ui-state-active {
+                background-color: #003871 !important;
+            }
+
+            body .selectBool.ui-button.ui-button-text-icon-left .ui-button-text {
+                padding: 5px 5px 5px 25px !important;
+            }
+
+            .buttonPanel {
+                text-align: center;
+                width: 80%;
+                margin: 0 auto;
+            }
+
+            form .ui-panelgrid-cell {
+                vertical-align: top !important;
+            }
+
+            :-webkit-full-screen {
+                width: 100%;
+                height: 100%;
+                padding-top: 2%;
+            }
+            .ui-dialog-content{
+                max-width: 1200px !important;
+                max-height: 700px !important;
+                margin-bottom: 5px !important;
+            }
+            .margin-left{
+                margin-left: 20px !important;
+            }
+
+            .btn-green {
+                background-color: #00CC52!important;
+                padding-left:0 !important;
+                width: 122px;
+            }
+
+            .ui-c{
+                padding-left:0 !important;
+            }
+
+            body .ui-button.ui-button-text-icon-left .ui-button-text {
+                padding: 0.5rem 1.0rem 0.5rem 2.5rem;
+            }
+
+            .ui-button .ui-button-text {
+                display: block;
+                line-height: normal;
+                padding-left: 15px !important;
+            }
+
+            body .ui-widget, body .ui-widget .ui-widget {
+                /* font-family: "Open Sans","Helvetica Neue",sans-serif !important;
+                text-decoration: none !important;
+                font-size: 14px !important; */
+                font-weight: normal !important;
+            }
+
+            body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
+                background-color: white !important;
+            }
+
+            .simple-table tbody tr {
+                border-color: #5f666c !important;
+                text-align: center;
+            }
+
+            body .ui-datatable .ui-datatable-data > tr > td {
+                border: 1px solid #c9cdd2;
+            }
+
+            body .ui-panel .ui-panel-content {
+                border: none;
+            }
+            .layout-wrapper .layout-main .layout-content {
+                padding: 15px;
+                background-color: #D9E0E7;
+            }
+
+            .cost_titles {
+                padding-top: 20px !important;
+            }
+
+            .cost_titles h3 {
+                font-size: 1.17em !important;
+                font-weight: bold !important;
+            }
+
+            .ui-datatable-scrollable-theadclone tr  {
+                display: none !important;
+            }
+
+            /*#requestExtraCostDialog .ui-dialog-titlebar {*/
+            /*    padding: 0.4em 0.4em 0.4em 1em;*/
+            /*}*/
+            #cke_body {
+                width: 67vw !important;
+            }
+            body .ui-button.ui-button-warning {
+                background: #fed820;
+                color: #000000;
+            }
+
+            #noUpdateDateDialogId{
+                border: 2px solid #D32F2F !important;
+            }
+
+            .text-bold {
+                font-size: 14px !important;
+                font-weight: bold !important;
+            }
+
+            .action_column_width{
+                width: 14% !important;
+                text-align:center
+            }
+
+            /*#requestExtraCostTable .ui-datatable-scrollable-header-box table, .ui-datatable-scrollable-footer-box table, .ui-datatable-scrollable-body table {*/
+            /*    table-layout: auto;*/
+            /*}*/
+        </style>
+
+        <h:form id="form" prependId="false" enctype="multipart/form-data"
+                style="#{bean.getShowEstateTable()?'width: 2700px':''}">
+            <p:growl id="messages" showDetail="true" autoUpdate="false"
+                     widgetVar="messagesVar" globalOnly="true"/>
+            <p:remoteCommand name="onErrorClose" action="#{bean.onErrorClose}" update="validationMessages"/>
+            <p:panel>
+                <p:outputPanel id="fieldsetPanel"
+                               style="align-content: center; width: 100%; padding-bottom: 0; border: 1px solid;">
+                    <p:panelGrid columns="6" style="align-content: center; " styleClass="ui-panelgrid-blank form-group"
+                                 layout="grid">
+                        <div style="margin-top: 8px;">
+                            <span>#{msg.requestPrintTemplate}:</span>
+                        </div>
+                        <p:selectOneMenu id="template" value="#{bean.selectedTemplateId}"
+                                         label="#{msg.requestPrintTemplate}">
+                            <f:selectItems value="#{bean.templates}"/>
+                        </p:selectOneMenu>
+                        <p:commandButton action="#{bean.updateTemplate}" value="#{msg.apply}" update=":edit_text_section @widgetVar(typeError)"
+                                         styleClass="margin-left" style="background-color: #00CC52 !important;">
+                            <f:setPropertyActionListener value="true" target="#{bean.calledByApplicaButton}"/>
+                        </p:commandButton>
+
+                        <p:column/><p:column/>
+                        <!--<p:commandButton value="#{msg.requestPrintSelectRequest}" type="button"
+                                         onclick="PF('dlg1').show();" style="float: right"/>-->
+                    </p:panelGrid>
+                </p:outputPanel>
+                <div id="bodyPanel">
+                    <ui:include src="/resources/tpl/common/ValidationMessages.xhtml"/>
+                    <div align="center">
+                        <h:outputText value="#{bean.externalRequestFrom}" rendered="#{bean.createdByExternalUser}"
+                                      style="font-size: 20px;"/>
+                        <p:panelGrid styleClass="ui-panelgrid-blank form-group verical-top" columns="4">
+                            <p:column>
+                                <p:panelGrid styleClass="ui-panelgrid-blank form-group buttonPanel" columns="1">
+<!--                                    <p:selectBooleanButton id="switch" offLabel="" onLabel=""-->
+<!--                                                           styleClass="selectBool" onchange="fullscreen();"-->
+<!--                                                           offIcon="fa fa-fw fa-bars" onIcon="fa fa-bars"/>-->
+                                    <p:commandButton value="#{msg.requestListOpenProcedure}"
+                                                     action="#{bean.openTableProcedure}"
+                                                     update="estateTab"/>
+                                    <p:commandButton value="#{msg.requestListOpenEdit}" action="#{bean.manageRequest}"/>
+                                </p:panelGrid>
+                            </p:column>
+                            <p:column>
+                                <p:outputPanel id="estateTab">
+                                    <p:outputPanel rendered="#{bean.showEstateTable}" style="width: 1300px">
+                                        <ui:include src="RequestTextEditTable.xhtml"/>
+                                    </p:outputPanel>
+                                </p:outputPanel>
+                            </p:column>
+                            <p:column>
+                                <p:outputPanel id="edit_text_section">
+                                    <pe:ckEditor id="body" value="#{bean.editText}"
+                                                 styleClass="for_editor" width="1200"
+                                                 contentsCss="#{facesContext.externalContext.requestContextPath}/resources/javascript/CKEditorStyles.css"
+                                                 customConfig="#{facesContext.externalContext.requestContextPath}/resources/javascript/configCKEditor.js"
+                                                 widgetVar="ckEditorWV">
+                                        <p:ajax event="initialize" onstart="onInitCkEditor('body')"
+                                                oncomplete="addItemToCKeditor('body'), initHeightElement('body')"/>
+                                        <p:ajax event="wysiwygMode"
+                                                oncomplete="pushListener(CKEDITOR.instances['body'], 'body');" />
+                                    </pe:ckEditor>
+                                </p:outputPanel>
+                            </p:column>
+                            <p:column>
+                                <p:panelGrid id="btn_line" styleClass="ui-panelgrid-blank form-group buttonPane1"
+                                             columns="1">
+                                    <p:commandButton icon="pi pi-print" value="#{msg.requestPrintPrintPdf}" action="#{bean.print}"
+                                                     widgetVar="printButton" style="margin-right: 1cm;width:122px;"
+                                                     onclick="PF('printButton').disable();" styleClass="ui-button-warning"
+                                                     oncomplete="PF('printButton').enable();"/>
+
+                                    <p:commandButton action="#{bean.compareNumberActsBeforeExtraCost}" value="#{msg.requestCost}" style="width:122px;"
+                                                     styleClass="#{bean.examRequest.costButtonConfirmClicked ? '':'btn-green'}"
+                                                     update="btn_line, requestExtraCostDialog"/>
+
+                                    <p:commandButton action="#{bean.checkFormalitiesYear}" value="#{msg.save}"
+                                                     styleClass="#{bean.entity.bodySaved ? '':'btn-green'}"
+                                                     update="btn_line"
+                                                     rendered="#{bean.examRequest.confirmExtraCostsPressed}"
+                                                     oncomplete="#{save_oncomplete}" icon="ui-icon-disk"/>
+
+                                    <p:commandButton action="#{bean.executeRequest}"
+                                                     value="#{bean.createdByExternalUser ? msg.requestPrintRequestEventExternal
+                                                      : msg.requestPrintRequestEvent}" rendered="#{bean.examRequest.confirmExtraCostsPressed}"
+                                                     styleClass="#{bean.entity.documentAttached? '':'btn-green'}"
+                                                     update="btn_line" widgetVar="executeRequest"
+                                                     onclick="PF('executeRequest').disable();"
+                                                     oncomplete="PF('executeRequest').enable();"/>
+
+                                    <p:commandButton action="#{bean.openMailManagerEditor(true)}" value="#{msg.sendEmail}"
+                                                     update="btn_line" rendered="#{!bean.createdByExternalUser and bean.examRequest.confirmExtraCostsPressed}"
+
+                                                     styleClass="#{bean.entity.emailOpened? '':'btn-green'}"/>
+
+                                    <p:commandButton value="#{bean.examRequest.stateId == 7 ? msg.requestTextEditSentToSdi : msg.requestTextEditCreateInvoice}"
+                                                     id="createInvoice" action="#{bean.loadInvoiceDialogData}"
+                                                     styleClass="#{bean.examRequest.stateId == 7 ? '' : 'btn-green'}"
+                                                     update="btn_line :form" rendered="#{bean.billinRequest}"
+                                                     oncomplete="PF('invoiceDialogWV').show();"/>
+
+                                   <!-- <p:commandButton action="#{bean.goBack}" value="#{msg.cancel}" style="width:122px;"
+                                                     icon="ui-icon-circle-close"/>-->
+                                </p:panelGrid>
+                            </p:column>
+                        </p:panelGrid>
+                    </div>
+                </div>
+            </p:panel>
+            <p:dialog widgetVar="categoryNotPresentWV" modal="true" draggable="false" styleClass="dialog-green"
+                      position="center center">
+                <div class="ui-corner-all">
+                    <span >#{val.cadastralNoPresent}</span>
+                </div>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.confirm}"
+                                     action="#{bean.printSpecialPdf}" styleClass="green-button"
+                                     widgetVar="printSpecialPdfButton"
+                                     onclick="PF('printSpecialPdfButton').disable();"
+                                     oncomplete="PF('categoryNotPresentWV').hide(); PF('printSpecialPdfButton').enable();
+                                     PF('requestDocumentDlg').show();"
+                                     update="requestDocumentTable requestDocumentNonSaleTable requestDocumentSaleTable"/>
+                    <p:commandButton value="#{msg.cancel}" styleClass="red-button"
+                                     oncomplete="PF('categoryNotPresentWV').hide();"/>
+                </div>
+            </p:dialog>
+
+            <p:dialog id="saveConfirmation" widgetVar="saveConfirmation" modal="true" draggable="false"
+                      position="center center" resizable="false">
+                <div class="ui-corner-all" style="text-align: center">
+                    <h:outputText escape="false" value="#{val.quotaAndPropertyTypeAreNotSetInAllLines}"/>
+                </div>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.save}"
+                                     action="#{bean.pageSave}" styleClass="green-button"
+                                     oncomplete="PF('saveConfirmation').hide();" update=":form:btn_line"/>
+                    <p:commandButton value="#{msg.cancel}" styleClass="red-button"
+                                     oncomplete="PF('saveConfirmation').hide();"/>
+                </div>
+            </p:dialog>
+
+            <p:dialog widgetVar="typeError" modal="true" draggable="false"
+                      position="center center">
+                <div class="ui-messages-error ui-corner-all">
+                    <span class="ui-messages-error-summary">#{val.validationFailed}</span><br/>
+                    <span class="ui-messages-error-detail">#{val.typeFormalityError}</span><br/>
+                    <span class="ui-messages-error-detail">#{bean.typeFormalityNotConfigureMessage}</span>
+                </div>
+            </p:dialog>
+            <p:dialog widgetVar="dlg1" modal="true" minHeight="40" draggable="false">
+                <p:dataTable var="item" id="table"
+                             emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyModel}"
+                             rowKey="#{item.id}" rows="10" lazy="true" paginator="true"
+                             paginatorAlwaysVisible="true" rowIndexVar="rowId" scrollable="true" scrollHeight="450"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="10,20,50" widgetVar="tableWV">
+
+                    <p:column headerText="#{msg.requestCreateDate}"
+                              sortBy="#{item.createDate}" style="width: 7.2%;" styleClass="min_padding_margin">
+                        <h:outputText value="#{item.createDate}"
+                                      converter="dateTimeConverter"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.requestListClient}">
+                        <h:outputText value="#{item.clientName}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.requestListRequestType}">
+                        <h:outputText value="#{item.requestTypeName}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.requestListService}" styleClass="min_padding_margin">
+                        <h:outputText value="#{item.service}"/>
+                    </p:column>
+
+                    <p:column style="width: 100px;" headerText="#{msg.requestLastBusinessName}">
+                        <h:outputText value="#{item.lastBusinessName}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.requestSubjectFirstName}" style="width: 10.5%"
+                              sortBy="#{item.firstName}">
+                        <h:outputText value="#{item.firstName}"/>
+                    </p:column>
+
+                    <p:column headerText="#{msg.requestFiscalCodeVATNamber}" style="width: 135px; margin-left: 10px;">
+                        <h:outputText value="#{item.fiscalCodeVATNamber}"/>
+                    </p:column>
+
+                    <p:column styleClass="action_column min_padding_margin" style="width: 95px">
+                        <p:commandButton value="#{msg.requestListOpenEditor}" oncomplete="PF('dlg1').hide();"
+                                         action="#{bean.openRequestEditor}">
+                            <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+
+            <p:dialog header="#{val.warning}" style="font-size: 20px;" widgetVar="nonPhysDlg" modal="true"
+                      width="365">
+                <h:outputText value="#{msg.requestTextEditNonPhysicalError}" style="font-size: 20px; color: darkred;"/>
+            </p:dialog>
+
+            <p:dialog widgetVar="dateBeforeRequestCreateDateDialogWV" styleClass="dialog-green"
+                      id="dateBeforeRequestCreateDateDialogId" modal="true" draggable="false"
+                      position="center center">
+                <div class="ui-messages-error ui-corner-all">
+                    <span class="ui-messages-error-summary">#{val.dateBeforeRequestCreateDate}</span><br/>
+                </div>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.confirm}" oncomplete="PF('dateBeforeRequestCreateDateDialogWV').hide();"/>
+                </div>
+            </p:dialog>
+
+            <p:dialog widgetVar="noUpdateDateDialogIdDialogWV" styleClass="dialog-green"
+                      id="noUpdateDateDialogId" modal="true" draggable="false"
+                      position="center center">
+                <div class="ui-messages-error ui-corner-all">
+                    <span class="ui-messages-error-summary">#{val.noUpdateDateIndicated}</span><br/>
+                </div>
+                <div class="btn_line">
+                    <p:commandButton styleClass="ui-button-success" value="#{msg.confirm}" oncomplete="PF('noUpdateDateDialogIdDialogWV').hide();"/>
+                </div>
+            </p:dialog>
+
+            <p:dialog widgetVar="endDateErrorMessageWV" id="endDateErrorMessage" modal="true" draggable="false" styleClass="dialog-green"
+                      position="center center">
+                <div class="ui-messages-error ui-corner-all">
+                    <span class="ui-messages-error-summary">#{val.requestTextEditEndDateErrorMessage}</span><br/>
+                </div>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.save}" action="#{bean.pageSave}"
+                                     onclick="toggleDateCheck();"
+                                     oncomplete="PF('endDateErrorMessageWV').hide();"
+                                     update=":form:btn_line" />
+                </div>
+            </p:dialog>
+
+            <p:remoteCommand name="toggleDateCheck" action="#{bean.checkDate}"/>
+
+            <p:dialog widgetVar="requestsStillBeingWorkedOnDialogWV" modal="true" draggable="false" styleClass="dialog-green"
+                      position="center center">
+                <div class="ui-corner-all">
+                    <span >#{msg.requestsStillBeingWorkedOnMsg}</span>
+                </div>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.confirm}"
+                                     action="#{bean.openMailManagerEditor(false)}" styleClass="green-button"
+                                     oncomplete="PF('requestsStillBeingWorkedOnDialogWV').hide();"
+                                     update="requestDocumentTable requestDocumentNonSaleTable requestDocumentSaleTable"/>
+                    <p:commandButton value="#{msg.cancel}" styleClass="red-button"
+                                     oncomplete="PF('requestsStillBeingWorkedOnDialogWV').hide();"/>
+                </div>
+            </p:dialog>
+
+            <p:dialog widgetVar="checkEstateFormalityDialogWV" modal="true" draggable="false" position="center center" styleClass="dialog-green">
+                <div class="ui-corner-all">
+                    <span >#{msg.requestTextEditNotAccountedFormalitiesExist}</span>
+                </div>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.confirm}" action="#{bean.checkForQuotaAndPropertyTypeIsSet}"
+                                     oncomplete="PF('checkEstateFormalityDialogWV').hide();"/>
+                    <p:commandButton value="#{msg.cancel}" oncomplete="PF('checkEstateFormalityDialogWV').hide();"/>
+                </div>
+            </p:dialog>
+
+            <p:dialog widgetVar="checkEstateFormalitySalesDialogWV" id = "checkEstateFormalitySalesDialog" modal="true" draggable="false"
+                      position="center center" styleClass="dialog-green">
+            <div class="ui-corner-all">
+                    <span>#{msg.checkEstateFormalitySalesMessage}</span>
+                    <p:repeat value="#{bean.estateFormalitySalesMessage}" var="msgItem">
+                        <br/>
+                        <span>#{msgItem}</span>
+                    </p:repeat>
+                </div>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.ok}" oncomplete="PF('checkEstateFormalitySalesDialogWV').hide();"/>
+                    <p:commandButton value="#{msg.cancel}" oncomplete="PF('checkEstateFormalitySalesDialogWV').hide();"/>
+                </div>
+            </p:dialog>
+
+            <p:dialog id="requestNumberActDlg" widgetVar="requestNumberActGreaterThenClientNumberAct" modal="true"
+                      draggable="false" styleClass="dialog-green"
+                      position="center center" resizable="false">
+                <h:outputText escape="false" value="#{bean.numberActDifference}"/>
+                <br/><br/>
+                <p:inputText value="#{bean.requestNumberActUpdate}"
+                             onkeypress="return numbers_only(this, event, 9, 0)" onkeyup="check_numbers(this, 9, 0);"/>
+                <p:commandButton value="#{msg.confirm}"
+                                 action="#{bean.viewExtraCost}" styleClass="green-button, right-side"
+                                 oncomplete="PF('requestNumberActGreaterThenClientNumberAct').hide();"
+                                 update="requestDocumentTable requestDocumentNonSaleTable requestDocumentSaleTable" />
+            </p:dialog>
+
+            <p:dialog 	widgetVar="subjectSelectDlg"
+                         modal="true" draggable="false"
+                         position="center center" width="1500"
+                         onShow="updateSubjectSelectDialog()">
+                <p:remoteCommand name="updateSubjectSelectDialog" update="restoreSubjectTable"/>
+                <p:dataTable value="#{bean.subjectsToSelect}" var="subject" selection="#{bean.selectedSubjectToGenerate}"
+                             rowKey="#{subject.id}" id="restoreSubjectTable" emptyMessage="#{msg.noRecordsFound}">
+                    <p:column selectionMode="single" style="width:35px;text-align:center"/>
+                    <p:column headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_NAME}">
+                        <h:outputText value="#{subject}"/>
+                    </p:column>
+                    <p:column headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_SEX_TYPE}">
+                        <h:outputText value="#{subject.sexType}"/>
+                    </p:column>
+                    <p:column headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_BIRTHDAY}">
+                        <h:outputText value="#{subject.birthDate}" converter="dateTimeConverter"/>
+                    </p:column>
+                    <p:column headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_FISCAL_CODE}">
+                        <h:outputText value="#{subject.fiscalCode}"/>
+                    </p:column>
+                    <p:column headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_PROVINCE}">
+                        <h:outputText value="#{subject.birthProvince}"/>
+                    </p:column>
+                    <p:column headerText="#{enums.documentGenerationTagsSUBJECT_MASTERY_COMUNE}">
+                        <h:outputText value="#{subject.birthCity}"/>
+                    </p:column>
+                    <f:facet name="footer">
+                        <p:commandButton value="#{msg.confirm}" process="restoreSubjectTable"
+                                         oncomplete="PF('subjectSelectDlg').hide();"
+                                         action="#{bean.updateTemplateWithSubjectSelected}"/>
+                    </f:facet>
+                </p:dataTable>
+            </p:dialog>
+
+
+            <p:dialog widgetVar="checkFormalityYearWV" modal="true" draggable="false" position="center center" styleClass="dialog-green">
+                <div class="ui-corner-all">
+                    <span >#{msg.requestTextEditYearFormalityCheck}</span>
+                </div>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.confirm}" action="#{bean.checkRelatedEstateFormalities}"
+                                     oncomplete="PF('checkFormalityYearWV').hide();"
+                                     update="btn_line checkEstateFormalitySalesDialog"
+                                     style="margin-right: 1cm;background-color: #00CC52!important;"/>
+                    <p:commandButton value="#{msg.cancel}"
+                                     oncomplete="PF('checkFormalityYearWV').hide();"
+                                     style="background-color: #F3362B !important;"/>
+                </div>
+            </p:dialog>
+
+            <p:dialog widgetVar="sendInvoiceErrorDialogWV"  modal="true" draggable="false"
+                      position="center center">
+                <div class="ui-messages-error ui-corner-all">
+                    <span class="ui-messages-error-summary">#{bean.apiError}</span><br/>
+                </div>
+                <p:commandButton oncomplete="PF('sendInvoiceErrorDialogWV').hide();"
+                                 value="#{msg.close}" />
+            </p:dialog>
+
+            <ui:include src="../Dialogs/RequestDocumentListDialog.xhtml"/>
+            <ui:include src="../Dialogs/RequestExtraCostDialog.xhtml"/>
+            <ui:include src="../Dialogs/EstateFormalityCostDialog.xhtml"/>
+            <ui:include src="../Dialogs/InvoiceDialog.xhtml"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

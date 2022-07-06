@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui" xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<ui:composition template="/resources/tpl/Admin/template.xhtml">
+    <ui:param name="bean" value="#{structureListBean}"/>
+    <ui:define name="content">
+
+        <h:form id="form">
+            <h:panelGrid columns="2" columnClasses="tree_panel,tree_info">
+                <p:treeTable value="#{structureListBean.root}" var="node"
+                             styleClass="assignment_tree" id="structure_tree" dynamic="false"
+                             cache="false" style="margin: auto; cursor: pointer;"
+                             selection="#{structureListBean.selectedNode}"
+                             selectionMode="single">
+
+                    <p:ajax event="select"
+                            listener="#{structureListBean.onNodeSelect}"
+                            update=":form:mainPanel,structure_tree"/>
+                    <p:ajax event="collapse"
+                            listener="#{structureListBean.onNodeCollapse}"/>
+                    <p:ajax event="expand"
+                            listener="#{structureListBean.onNodeExpand}"
+                            update="structure_tree"/>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{msg.structureManagement} "/>
+                            <p:commandButton value="#{msg.structureAddArea}" styleClass="p-mr-2 p-mb-2"
+                                             action="#{bean.prepareCreateDlg}"
+                                             update=":dialogForm:addAreaPanel"
+                                             oncomplete="PF('addAreaDlgWV').show();"/>
+                        </f:facet>
+                        <p:graphicImage value="#{node.icon}"
+                                        styleClass="treeIcon" alt="#{node.description}"/>
+                        <h:outputText value="#{node.description}"/>
+                    </p:column>
+
+                </p:treeTable>
+
+                <p:outputPanel id="mainPanel" autoUpdate="false">
+                    <p:outputPanel styleClass="button_panel">
+                        <p:commandButton value="#{msg.addNewLevel}" rendered="#{not empty bean.selectedElement}"
+                                         action="#{bean.prepareCreateSubDlg}" oncomplete="PF('addSubDlgWV').show();"
+                                         update=":dialogSubForm:addSubPanel" styleClass="p-mr-2 p-mb-2"/>
+                        <p:commandButton value="#{msg.editCurrentLevel}" rendered="#{not empty bean.selectedElement}"
+                                         action="#{bean.prepareEditSubDlg}" oncomplete="PF('editSubDlgWV').show();"
+                                         update=":dialogEditSubForm:editSubPanel" styleClass="p-mr-2 p-mb-2"/>
+                        <p:commandButton value="#{msg.deleteCurrentLevel}" rendered="#{not empty bean.selectedElement}"
+                                         oncomplete="PF('deleteDlgWV').show();"
+                                         update=":dialogInfoForm:deleteDlgPanel" styleClass="p-mr-2 p-mb-2"/>
+                    </p:outputPanel>
+                    <p:panel>
+                        <h:panelGrid columns="2">
+                            <h:outputText value="#{msg.code}:"/>
+                            <h:outputText value="#{bean.selectedElement.code}"/>
+                            <h:outputText value="#{msg.description}:"/>
+                            <h:outputText value="#{bean.selectedElement.description}"/>
+                        </h:panelGrid>
+                    </p:panel>
+                </p:outputPanel>
+            </h:panelGrid>
+        </h:form>
+        <h:form id="dialogInfoForm" prependId="false" enctype="multipart/form-data">
+            <p:dialog modal="true" id="deleteDlg" widgetVar="deleteDlgWV">
+                <p:outputPanel id="deleteDlgPanel">
+                    <h:outputText value="#{bean.deleteMessage}" escape="false"/>
+                </p:outputPanel>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.yes}" oncomplete="PF('deleteDlgWV').hide();"
+                                     action="#{bean.removeNode}" update=":form" styleClass="p-mr-2 p-mb-2" />
+                    <p:commandButton value="#{msg.no}" oncomplete="PF('deleteDlgWV').hide();" styleClass="p-mr-2 p-mb-2"/>
+                </div>
+            </p:dialog>
+        </h:form>
+        <h:form id="dialogSubForm" prependId="false" enctype="multipart/form-data">
+            <p:dialog modal="true" id="addSubDlg" widgetVar="addSubDlgWV">
+                <h:panelGrid id="addSubPanel" columns="2" columnClasses="label,value">
+
+                    <h:outputText value="#{msg.code}"/>
+                    <p:inputText value="#{bean.codeSub}" required="true"/>
+
+                    <h:outputText value="#{msg.description}"/>
+                    <p:inputText value="#{bean.descriptionSub}" required="true"/>
+                </h:panelGrid>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.save}"
+                                     action="#{bean.saveSub}" update=":form, addSubPanel" styleClass="p-mr-2 p-mb-2"/>
+                    <p:commandButton value="#{msg.cancel}" oncomplete="PF('addSubDlgWV').hide();" styleClass="p-mr-2 p-mb-2"/>
+                </div>
+            </p:dialog>
+        </h:form>
+        <h:form id="dialogEditSubForm" prependId="false" enctype="multipart/form-data">
+            <p:dialog modal="true" id="editSubDlg" widgetVar="editSubDlgWV">
+                <h:panelGrid id="editSubPanel" columns="2" columnClasses="label,value">
+
+                    <h:outputText value="#{msg.code}"/>
+                    <p:inputText value="#{bean.codeSub}" required="true"/>
+
+                    <h:outputText value="#{msg.description}"/>
+                    <p:inputText value="#{bean.descriptionSub}" required="true"/>
+                </h:panelGrid>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.save}"
+                                     action="#{bean.saveEditSub}" update=":form, editSubPanel" styleClass="p-mr-2 p-mb-2"/>
+                    <p:commandButton value="#{msg.cancel}" oncomplete="PF('editSubDlgWV').hide();" styleClass="p-mr-2 p-mb-2"/>
+                </div>
+            </p:dialog>
+        </h:form>
+        <h:form id="dialogForm" prependId="false" enctype="multipart/form-data">
+            <p:dialog modal="true" id="addAreaDlg" widgetVar="addAreaDlgWV">
+                <h:panelGrid id="addAreaPanel" columns="2" columnClasses="label,value">
+
+                    <h:outputText value="#{msg.code}"/>
+                    <p:inputText value="#{bean.code}" required="true"/>
+
+                    <h:outputText value="#{msg.description}"/>
+                    <p:inputText value="#{bean.description}" required="true"/>
+                </h:panelGrid>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.save}"
+                                     action="#{bean.saveArea}" update=":form, addAreaPanel" styleClass="p-mr-2 p-mb-2"/>
+                    <p:commandButton value="#{msg.cancel}" oncomplete="PF('addAreaDlgWV').hide();" styleClass="p-mr-2 p-mb-2"/>
+                </div>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+</ui:composition>
+</html>

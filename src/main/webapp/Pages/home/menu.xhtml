@@ -1,0 +1,302 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pb="http://primefaces.org/babylon">
+
+    <div class="layout-menu-container menu-shadow">
+        <style>
+            #logolink {
+                text-align: center !important;
+                padding-left: 0px !important;
+            }
+
+            .layout-menu-logo a img {
+                margin-top: 5px !important;
+                height: 50px !important;
+            }
+
+            .menu-background {
+                background-color: #FFFFFF;
+            }
+
+            .layout-wrapper.layout-slim.layout-menu-dark .layout-menu-container .layout-menu > li > ul {
+                background-color: #FFFFFF !important;
+            }
+
+            .layout-wrapper.layout-menu-dark .layout-menu-container .layout-menu li a .layout-menuitem-text {
+                color: #000000;
+                font-size: 16px;
+            }
+
+            .layout-wrapper.layout-menu-dark .layout-menu-container .layout-menu li a .layout-menuitem-icon,
+            .layout-wrapper.layout-menu-dark .layout-menu-container .layout-menu li a .layout-submenu-toggler {
+                color: #252529;
+            }
+
+            .layout-wrapper.layout-menu-dark .layout-menu-container .layout-menu>li>div {
+                color: #000000;
+            }
+
+            .layout-wrapper.layout-menu-dark .layout-menu-container .layout-menu li a:hover {
+                background-color: #dee2e6;
+            }
+
+            .menu-shadow {
+                box-shadow: 2px 0px black;
+            }
+            .layout-wrapper .layout-topbar .layout-menu-button {
+                display: none !important;
+            }
+            layout-wrapper.layout-slim.layout-menu-dark .layout-menu-container .layout-menu > li > ul {
+                height: 400px !important;
+            }
+
+            @media screen and (min-width: 992px) {
+                .layout-wrapper.layout-slim .layout-menu-container .layout-menu > li > ul {
+                    max-height: 200px !important;
+                }
+            }
+            .layout-wrapper.layout-slim .layout-menu-container .layout-menu > li > ul {
+                min-width: 300px;
+            }
+            .layout-wrapper.layout-slim.layout-menu-dark .layout-menu-container .layout-menu > li > ul {
+                max-height: 300px !important;
+            }
+        </style>
+        <script type="text/javascript">
+
+            var isOverlayMode =  $('input[id*="overLayModeData"]').attr('value');
+            $(document).ready(function() {
+                umc();
+                urc();
+
+                changeMenuMode ((isOverlayMode === true || isOverlayMode === "true") ? 'layout-overlay layout-overlay-active'  : 'layout-slim' );
+                //changeSectionTheme('light', 'layout-menu');
+                // document.querySelector(".layout-menu-button-mode i").addEventListener("click", () => {
+                //     changeMenuOverlay();
+                // });
+
+
+                function changeMenuOverlay() {
+                    var currentMode =  $('input[id*="overLayModeData"]').attr('value');
+                    isOverlayMode = !currentMode;
+                    if(currentMode === false || currentMode === "false"){
+                        isOverlayMode = true;
+                    }else {
+                        isOverlayMode = false;
+                    }
+                    $('input[name="overLayModeData"]').val(isOverlayMode);
+                    uplm([{name: 'overlay_mode', value: isOverlayMode}]);
+                    changeMenuMode((isOverlayMode === true || isOverlayMode === "true") ?  'layout-overlay layout-overlay-active' :  'layout-slim');
+                }
+
+                function changeMenuMode(menuMode) {
+                    if(menuMode == "layout-overlay layout-overlay-active")
+                        menuMode = 'layout-slim';
+                    else if(menuMode == 'layout-slim')
+                        menuMode = 'layout-static layout-static-active';
+                    else if(menuMode == 'layout-static layout-static-active')
+                        menuMode = 'layout-slim';
+                    var wrapper = $(document.body).children('.layout-wrapper');
+
+                    switch (menuMode) {
+                        case 'layout-static layout-static-active':
+                            wrapper.addClass('layout-static layout-static-active').removeClass('layout-overlay layout-slim layout-horizontal ');
+                            this.clearLayoutState();
+                            break;
+
+                        case 'layout-overlay':
+                            wrapper.addClass('layout-overlay').removeClass('layout-static layout-slim layout-horizontal  layout-static-active');
+                            this.clearLayoutState();
+                            break;
+
+                        case 'layout-horizontal':
+                            wrapper.addClass('layout-horizontal').removeClass('layout-static layout-overlay  layout-slim  layout-static-active');
+                            this.clearLayoutState();
+                            break;
+
+                        case 'layout-slim':
+                            wrapper.addClass('layout-slim').removeClass('layout-static layout-overlay layout-horizontal layout-static-active');
+                            this.clearLayoutState();
+                            break;
+
+                        default:
+                            wrapper.addClass('layout-static').removeClass('layout-overlay layout-slim layout-horizontal ');
+                            this.clearLayoutState();
+                            break;
+                    }
+                };
+
+                function changeSectionTheme(theme, section) {
+                    var wrapperElement = $('.layout-wrapper');
+
+                    var styleClass = wrapperElement.attr('class');
+                    var tokens = styleClass.split(' ');
+                    var sectionClass;
+                    for (var i = 0; i &lt; tokens.length; i++) {
+                        if (tokens[i].indexOf(section + '-') > -1) {
+                            sectionClass = tokens[i];
+                            break;
+                        }
+                    }
+
+                    wrapperElement.attr('class', styleClass.replace(sectionClass, section + '-' + theme));
+                };
+            });
+
+            function clearLayoutState () {
+                var menu = PF('babylonMenuWidget');
+
+                if (menu) {
+                    menu.clearLayoutState();
+                }
+            }
+        </script>
+        <h:panelGroup id="logoBlock" layout="block" styleClass="layout-menu-logo menu-shadow">
+            <p:graphicImage rendered="#{sessionBean.overLayMode}" name="antares-logo.png" library="images"  />
+            <p:graphicImage rendered="#{not sessionBean.overLayMode}" name="getesi-trans.png" library="images" style="width: 100px;margin-top: 2px;"/>
+        </h:panelGroup>
+
+        <div class="layout-menu-wrapper menu-background">
+            <div class="menu-scroll-content">
+                <h:form id="menuform">
+                    <p:remoteCommand name="umc" action="#{sessionBean.updateMailCount()}" update="@widgetVar(babylonMenuWidget)"/>
+                    <p:remoteCommand name="urc" action="#{sessionBean.updateNumberUnclosedRequests()}" update="@widgetVar(babylonMenuWidget)"/>
+                    <p:remoteCommand name="uplm" action="#{sessionBean.updateOverLayMode()}" update="@([id$=overLayModeData]) logoBlock"/>
+                    <ui:fragment id="menuProfile" rendered="#{guestPreferences.profileMode == 'inline' ? true : false}">
+
+                        <div class="layout-profile">
+                            <a class="layout-profile-button" href="#">
+
+                                <p:graphicImage name="images/avatar.png" library="babylon-layout" />
+                                <div class="layout-profile-userinfo">
+                                    <span class="layout-profile-name">Arlene Welch</span>
+                                    <span class="layout-profile-role">Design Ops</span>
+                                </div>
+                                <i class="layout-profile-icon pi pi-angle-down"/>
+                            </a>
+                            <ul class="layout-profile-menu">
+                                <li>
+                                    <a href="#">
+                                        <i class="pi pi-user layout-menuitem-icon"/>
+                                        <span class="layout-menuitem-text">Profile</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <i class="pi pi-cog layout-menuitem-icon"/>
+                                        <span class="layout-menuitem-text">Settings</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <i class="pi pi-envelope layout-menuitem-icon"/>
+                                        <span class="layout-menuitem-text">Messages</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <i class="pi pi-bell layout-menuitem-icon"/>
+                                        <span class="layout-menuitem-text">Notifications</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </ui:fragment>
+
+                    <pb:menu widgetVar="babylonMenuWidget">
+                        <p:menuitem id="homePage" styleClass="main" value="#{msg.home}" icon="topbar-icon home-icon" outcome="/Pages/Home.jsf"/>
+                        <p:menuitem id="mailManager" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/MailManagerList.jsf')}" value="#{msg.headerMailManager}#{sessionBean.mailCounts gt 0 ? ' ('.concat(sessionBean.mailCounts).concat(')') : ''}" icon="topbar-icon email-icon" outcome="/Pages/ManagementGroup/MailManagerList.jsf"/>
+                        <p:menuitem id="requestList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/RequestList.jsf')}" value="#{msg.headerRequestList}#{sessionBean.requestCounts gt 0 ? ' ('.concat(sessionBean.requestCounts).concat(')') : ''}" icon="topbar-icon richieste-icon"
+                                    action="#{sessionBean.getRequestListPage()}" actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>
+                        <p:menuitem id="notarialCertificationList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/NotarialCertificationList.jsf')}" value="Certificazioni#{sessionBean.needShowNumberUnclosedNotarialCertifications ? ' ('.concat(sessionBean.numberUnclosedNotarialCertifications).concat(')') : ''}" icon="esecuzione-immobiliare-icon"
+                                    action="#{sessionBean.getNotarialCertificationListPage()}" actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>
+                        <p:menuitem id="database" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/DatabaseList.jsf')}" value="#{msg.headerDatabase}" icon="topbar-icon banca-bati-icon"
+                                    action="#{sessionBean.getDatabaseListPage()}" actionListener="#{sessionBean.cleanFiltersOnDatabaseListSubjectTable()}"/>
+                        <p:menuitem id="reportList" rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/ReportList.jsf')}" value="#{msg.headerReportList}" icon="topbar-icon reportistica-icon" outcome="/Pages/ManagementGroup/ReportList.jsf"/>
+                        <p:menuitem id="billing_old"
+                                    value="#{msg.headerBilling}#{sessionBean.requestCounts gt 0 ? ' ('.concat(sessionBean.requestCounts).concat(')') : ''}" icon="topbar-icon fatturazione-icon"
+                                    action="#{sessionBean.getBillingListOldPage()}"
+                                    rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/BillingList_Old.jsf')}"
+                                    actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>
+                        <p:menuitem id="billing"
+                                    value="#{msg.headerBilling}" icon="topbar-icon fatturazione-icon"
+                                    action="#{sessionBean.getBillingListPage()}"
+                                    rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/BillingList.jsf')}"
+                                    actionListener="#{sessionBean.cleanFiltersOnRequestManager()}"/>
+                        <p:menuitem id="contactPage" styleClass="main" value="#{msg.headerContact}" icon="topbar-icon contact-icon" outcome="/Pages/ConfigurationArea/ContactList.jsf"/>
+                        <p:submenu id="amministrazione" label="#{msg.menuConfiguration}" icon="pi pi-align-left">
+                            <p:menuitem id="utenti" value="#{msg.user_list}" icon="fa fa-fw fa-users" outcome="/Pages/Configuration/UserList.jsf"
+                                        rendered="#{sessionBean.canViewPageUrl('/Pages/Configuration/UserList.jsf')}" />
+                            <p:menuitem id="ruoli" value="#{msg.role_list}" icon="fa fa-fw fa-user-plus" outcome="/Pages/Configuration/RoleList.jsf" />
+                            <p:menuitem id="configurazione" value="#{msg.application_settings}" icon="fa fa-fw fa-wrench" outcome="/Pages/Configuration/ApplicationSettings.jsf" />
+                            <p:menuitem id="monitoraggio" value="#{msg.monitoring}" icon="fa fa-fw fa-wrench" outcome="/Pages/Configuration/Monitoring.jsf" />
+                            <p:menuitem id="modelliDocumento" value="#{msg.document_template_list}" icon="fa fa-fw fa-folder" outcome="/Pages/Configuration/DocumentTemplateList.jsf" />
+                            <p:menuitem id="gestioneIstanza" value="#{msg.instance_phases_list}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/InstancePhasesList.jsf" />
+                            <p:menuitem id="importCondivisoCatasto" value="#{msg.import_property_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=property" />
+                            <p:menuitem id="importCondivisoElenchi" value="#{msg.import_estate_formality_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=estate_formality"/>
+                            <p:menuitem id="importCondivisoFormalita" value="#{msg.import_formality_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=formality" />
+                            <p:menuitem id="importCondivisoSoggetto" value="#{msg.import_report_formality_subject_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=report_formality_subject" />
+                            <p:menuitem id="importCondivisoVisureRTF" value="#{msg.import_visure_rtf_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=visure_RTF" />
+                            <p:menuitem id="importCondivisoVisureDH" value="#{msg.import_visure_dh_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=visure_DH" />
+                            <p:menuitem id="importCondivisoRequestOLD" value="#{msg.import_request_old_settings}" icon="fa fa-fw fa-download" url="/Pages/Configuration/ImportSettings.jsf?type=request_OLD" />
+                            <p:menuitem id="impostazioniConversioneDocumenti" value="#{msg.document_conversion_settings}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/DocumentConversionSettings.jsf" />
+                            <p:menuitem id="documentiValutazioniOMI" value="#{msg.omi_valuation_documents}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/OMIValuationDocuments.jsf" />
+                            <p:menuitem id="datiAziendali" value="#{msg.dati_aziendali}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/DatiAziendali.jsf" />
+                            <p:menuitem id="codiciConservatorie" value="#{msg.codici_conservatorie}" icon="fa fa-fw fa-cogs" outcome="/Pages/Configuration/CodiciConservatorie.jsf" />
+                        </p:submenu>
+                        <p:submenu id="configurazioni" label="#{msg.menuConfigurationArea}" icon="configurazione-icon">
+                            <p:menuitem id="taxRateList" value="#{msg.tax_rate_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ManagementGroup/TaxRateList.jsf" />
+                            <p:menuitem id="aggregatiDiConservatorie" value="#{msg.aggregation_land_charges_registry_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/AggregationLandChargesRegistryList.jsf"/>
+                            <p:menuitem id="categorieCatastali" value="#{msg.cadastral_category_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CadastralCategoryList.jsf" />
+                            <p:menuitem id="cliente" value="#{msg.client_list}" icon="fa fa-fw fa-user" outcome="/Pages/ConfigurationArea/ClientList.jsf" />
+                            <p:menuitem id="coltureTerreni" value="#{msg.land_culture_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ConfigurationArea/LandCultureList.jsf" />
+                            <p:menuitem id="comuni" value="#{msg.cities_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CitiesList.jsf" />
+                            <p:menuitem id="configurazioneCosti" value="#{msg.cost_configuration_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CostConfigurationList.jsf" />
+                            <p:menuitem id="conservatorieETavolari" value="#{msg.land_charges_registry_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/LandChargesRegistryList.jsf" />
+                            <p:menuitem id="eventi" value="#{msg.event_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Configuration/EventList.jsf" />
+                            <p:menuitem id="fileValutazioniOMI" value="#{msg.omi_kml_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/OMIKmlList.jsf" />
+                            <p:menuitem id="formatiSezioneD" value="#{msg.section_d_format_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/SectionDFormatList.jsf" />
+                            <p:menuitem id="frasiDelGiorno" value="#{msg.day_phrase}" icon="fa fa-fw fa-quote-right" outcome="/Pages/Dictionaries/DayPhraseList.jsf" />
+                            <p:menuitem id="gestioneComunicazioni" value="#{msg.communication_message_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ManagementGroup/CommunicationMessageList.jsf" />
+                            <p:menuitem id="gruppoDati" value="#{msg.data_group_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/DataGroupList.jsf" />
+                            <p:menuitem id="modalitàDiPagamento" value="#{msg.payment_type_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ManagementGroup/PaymentTypeList.jsf" />
+                            <p:menuitem id="invoice" value="#{msg.reportListInvoices}" icon="fa fa-fw fa-bars" outcome="/Pages/ManagementGroup/InvoiceList.jsf"
+                                        rendered="#{sessionBean.canViewPageUrl('/Pages/ManagementGroup/InvoiceList.jsf')}"/>
+                            <p:menuitem id="modelli" value="#{msg.template_document_model_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/TemplateDocumentModelList.jsf" />
+                            <p:menuitem id="notai" value="#{msg.notary_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/NotaryList.jsf" />
+                            <p:menuitem id="percentualiValoriOMICommerciali" value="#{msg.category_percent_value_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ConfigurationArea/CategoryPercentValueList.jsf" />
+                            <p:menuitem id="referenti" value="#{msg.referent_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/ReferentList.jsf" />
+                            <p:menuitem id="regimeConiugi" value="#{msg.regime_coniugi_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/RegimeConiugiList.jsf" />
+                            <p:menuitem id="schedeInput" value="#{msg.input_card_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Configuration/InputCardList.jsf" />
+                            <p:menuitem id="servizi" value="#{msg.request_type_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/RequestTypeList.jsf" />
+                            <p:menuitem id="foreignState" value="#{msg.foreign_state_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/ForeignStateList.jsf" />
+                            <p:menuitem id="struttureEAreeCanche" value="#{msg.structure_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/StructureList.jsf" />
+                            <p:menuitem id="tipologieRichiesta" value="#{msg.service_list}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/ServiceList.jsf" />
+                            <p:menuitem id="tipologieAtti" value="#{msg.type_act}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/TypeActList.jsf" />
+                            <p:menuitem id="tipologieDiritti" value="#{msg.relationship_types}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/RelationshipTypeList.jsf" />
+                            <p:menuitem id="tipologieFormalità" value="#{msg.type_formality}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/TypeFormalityList.jsf" />
+                            <p:menuitem id="toponomastica" value="#{msg.cadastral_topology}" icon="fa fa-fw fa-bars" outcome="/Pages/Dictionaries/CadastralTopology.jsf" />
+                            <p:menuitem id="iban" value="#{msg.iban_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ManagementGroup/IbanList.jsf" />
+                            <p:menuitem id="tribunali" value="#{msg.court_list}" icon="fa fa-fw fa-legal" outcome="/Pages/Dictionaries/CourtList.jsf" />
+                            <p:menuitem id="caloriOMITerreni" value="#{msg.land_omi_list}" icon="fa fa-fw fa-bars" outcome="/Pages/ConfigurationArea/LandOmiList.jsf" />
+
+                        </p:submenu>
+                    </pb:menu>
+
+                    <p:poll interval="#{sessionBean.getTimeToRefresh()}" listener="#{sessionBean.updateMailCount()}"
+                            update="@widgetVar(babylonMenuWidget)"/>
+                    <p:ajaxStatus style=" margin-top: 8px;"
+                                  onsuccess="fixExpandRow(); fixCalendarInput();">
+                        <f:facet name="complete">
+                            <h:outputText value=""/>
+                        </f:facet>
+                    </p:ajaxStatus>
+
+                </h:form>
+            </div>
+        </div>
+    </div>
+</ui:composition>

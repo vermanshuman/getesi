@@ -1,0 +1,196 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui">
+    <p:outputPanel id="clientEmailsPanel">
+        <p:outputLabel value="#{msg.mailManagerSelectClients}"/>
+        <p:selectManyMenu id="client" value="#{bean.selectedClients}" styleClass="select-client-menu"
+                          label="#{msg.mailManagerSelectClients}">
+            <f:selectItems value="#{bean.clients}"/>
+            <p:ajax listener="#{bean.selectClientHandler}" update="tableMails"/>
+        </p:selectManyMenu>
+        <p:dataTable emptyMessage="#{msg.noRecordsFound}" var="item"
+                     value="#{bean.getAvailableClientEmails()}"
+                     id="tableMails" rowKey="#{item.id}" rows="10" paginator="true" paginatorAlwaysVisible="true"
+                     rowIndexVar="rowId"
+                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                     rowsPerPageTemplate="10,20,50">
+
+            <p:column style="width: 20%; vertical-align: top">
+                <f:facet name="header">
+                    <h:outputText style="float: left" value="#{msg.client.toUpperCase()}"/>
+                </f:facet>
+                <h:outputText value="#{item.clientName}"/>
+            </p:column>
+
+            <p:column style="width: 80%">
+                <f:facet name="header">
+                    <h:outputText value="#{msg.clientMail.toUpperCase()}" style="float: left;"/>
+                    <ui:remove>
+                        <p:commandButton value="#{msg.clientReferentAddNew.toUpperCase()}" style="float: right"/>
+                    </ui:remove>
+                </f:facet>
+                <p:dataTable id="referent" var="referent" value="#{item.notDeletedReferents}" editable="true"
+                             disabledSelection="true" styleClass="select-email-table" emptyMessage="#{msg.noRecordsFound}">
+
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.mailManagerReferents.toUpperCase()}"
+                                      style="float: left;"/>
+                        <p:commandButton value="#{msg.mailManagerAddNewEmail.toUpperCase()}" style="float: right"
+                                         update="tableMails, referent" disabled="#{item.addReferent}"
+                                         action="#{bean.openAddNewReferent}">
+                            <f:setPropertyActionListener value="true" target="#{item.addReferent}"/>
+                        </p:commandButton>
+                        <div style="clear: both"/>
+                    </f:facet>
+
+                    <f:facet name="footer">
+                        <p:panelGrid rendered="#{item.addReferent}">
+                            <p:inputText style="width: 20%" value="#{bean.newReferentEmail.referent.surname}"
+                                         placeholder="#{msg.searchSurname}"/>
+                            <p:inputText style="width: 20%" value="#{bean.newReferentEmail.referent.name}"
+                                         placeholder="#{msg.searchName}"/>
+                            <p:inputText style="width: 40%" value="#{bean.newReferentEmail.referent.email}"
+                                         placeholder="#{msg.referentEmail}"/>
+                            <p:commandButton icon="fa fa-fw fa-check" style="width: 6%" update="referent"
+                                             action="#{bean.saveNewReferent}">
+                                <f:setPropertyActionListener value="#{item.client.id}"
+                                                             target="#{bean.editClientId}"/>
+                                <f:setPropertyActionListener value="false" target="#{item.addReferent}"/>
+                            </p:commandButton>
+                            <p:commandButton icon="fa fa-fw fa-times" style="width: 6%" update="referent">
+                                <f:setPropertyActionListener value="false" target="#{item.addReferent}"/>
+                            </p:commandButton>
+                        </p:panelGrid>
+                    </f:facet>
+
+                    <p:column width="7%" styleClass="small-btn-column"
+                              headerText="#{msg.mailManagerSelectCheckbox.toUpperCase()}">
+                        <p:selectBooleanCheckbox value="#{referent.selected}"/>
+                    </p:column>
+
+                    <p:column width="20%" headerText="#{msg.searchSurname.toUpperCase()}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{referent.referent.surname}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{referent.referent.surname}" styleClass="full-width"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column width="20%" headerText="#{msg.searchName.toUpperCase()}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{referent.referent.name}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{referent.referent.name}" styleClass="full-width"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column width="40%" headerText="#{msg.referentEmail.toUpperCase()}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{referent.referent.email}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{referent.referent.email}" styleClass="full-width"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column width="6%" styleClass="small-btn-column">
+                        <p:commandButton style="background-color: transparent!important;" styleClass="close-icon"
+                                         icon="fa fa-times" update="tableMails, referent">
+                            <f:setPropertyActionListener value="true" target="#{referent.deleted}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                    <p:column width="6%" styleClass="small-btn-column">
+                        <p:rowEditor/>
+                    </p:column>
+
+                </p:dataTable>
+
+                <p:dataTable id="email" var="email" value="#{item.notDeletedPersonalEmails}" editable="true"
+                             disabledSelection="true" emptyMessage="#{msg.noRecordsFound}"
+                             styleClass="select-email-table">
+
+                    <f:facet name="header">
+                        <h:outputText value="#{msg.mailManagerEmails.toUpperCase()}"
+                                      style="float: left;"/>
+                        <p:commandButton value="#{msg.mailManagerAddNewEmail.toUpperCase()}" style="float: right"
+                                         update="tableMails, email" disabled="#{item.addPersonalEmail}"
+                                         action="#{bean.openAddNewEmail}">
+                            <f:setPropertyActionListener value="true" target="#{item.addPersonalEmail}"/>
+                        </p:commandButton>
+                        <div style="clear: both"/>
+                    </f:facet>
+
+                    <f:facet name="footer">
+                        <p:panelGrid rendered="#{item.addPersonalEmail}">
+                            <p:inputText style="width: 40%" value="#{bean.newClientEmail.clientEmail.description}"
+                                         placeholder="#{msg.referentEmailDescription}"/>
+                            <p:inputText style="width: 40%" value="#{bean.newClientEmail.clientEmail.email}"
+                                         placeholder="#{msg.referentEmail}" id="emailField"/>
+                            <p:commandButton icon="fa fa-fw fa-check" style="width: 6%" update="email"
+                                             action="#{bean.saveNewMail}">
+                                <f:setPropertyActionListener value="#{item.client.id}"
+                                                             target="#{bean.mailEditWrapper.editClientId}"/>
+                                <f:setPropertyActionListener value="false" target="#{item.addPersonalEmail}"/>
+                            </p:commandButton>
+                            <p:commandButton icon="fa fa-fw fa-times" style="width: 6%" update="email">
+                                <f:setPropertyActionListener value="false" target="#{item.addPersonalEmail}"/>
+                            </p:commandButton>
+                        </p:panelGrid>
+                    </f:facet>
+
+                    <p:column width="7%" styleClass="small-btn-column"
+                              headerText="#{msg.mailManagerSelectCheckbox.toUpperCase()}">
+                        <p:selectBooleanCheckbox value="#{email.selected}"/>
+                    </p:column>
+
+                    <p:column width="40%" headerText="#{msg.referentEmailDescription.toUpperCase()}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{email.clientEmail.description}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{email.clientEmail.description}" styleClass="full-width"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column width="40%" headerText="#{msg.referentEmail.toUpperCase()}">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{email.clientEmail.email}"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{email.clientEmail.email}" styleClass="full-width"/>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column width="6%" styleClass="small-btn-column">
+                        <p:commandButton style="background-color: transparent!important;" styleClass="close-icon"
+                                         icon="fa fa-times" update="tableMails, email">
+                            <f:setPropertyActionListener value="true" target="#{email.delete}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                    <p:column width="6%" styleClass="small-btn-column">
+                        <p:rowEditor/>
+                    </p:column>
+
+                </p:dataTable>
+            </p:column>
+
+        </p:dataTable>
+    </p:outputPanel>
+</ui:composition>

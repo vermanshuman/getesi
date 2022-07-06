@@ -1,0 +1,105 @@
+<head>
+<style>
+p {
+	font-size: 16px !important;
+	margin: 0px !important;
+}
+
+hr {
+	border: none;
+	color: black;
+	background-color: black;
+	height: 1px;
+}
+</style>
+</head>
+<body>
+	<p>
+	<table width="50%" align="left">
+		<tbody>
+			<tr>
+				<td>
+					<p align="left">
+						<strong>Dati della richiesta</strong>
+					</p>
+				</td>
+			</tr>
+			%SUBJECT_ROW%
+			<tr>
+				<td style="width: 50%"><p align="left">Tipo di
+						formalit&#224;:</p></td>
+				<td style="width: 50%"><p align="left">%TYPE_DISPLAYED_FORMALITIES%</p></td>
+			</tr>
+			<tr>
+				<td style="width: 50%"><p align="left">Ulteriori
+						restrizioni:</p></td>
+				<td style="width: 50%"><p align="left">Nessuna</p></td>
+			</tr>
+		</tbody>
+	</table>
+	</p>
+	<hr />
+	<p>
+	<table width="100%" align="left">
+		<tbody>
+			<tr>
+				<td>
+					<p align="left">
+						<strong>Situazione aggiornamento</strong>
+					</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p align="left">Sezione 1:</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p align="left">Periodo informatizzato dal
+						%PERIOD_FROM_COMPUTERIZED% al %PERIOD_TO_COMPUTERIZED%</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p align="left">Periodo recuperate e validato dal
+						%PERIOD_FROM_VALIDATED% al %PERIOD_TO_VALIDATED%</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p align="left">Sezione 2:</p>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<p align="left">Parzialmente recuperato e/o validato nel periodo antecedente al
+						%PERIOD_FROM_VALIDATED%</p>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	</p>
+	<hr />
+	<p align="left">
+		<strong>Elenco omonimi</strong>
+	</p>
+	<br />
+	<p>%SUBJECT_TABLE%</p>
+	<br />
+	<p align="left">%ADDITIONAL_INFORMATION%</p>
+	<p align="left">* Codice fiscale validato in anagrafe tributaria</p>
+	<hr />
+	<p align="left">
+		<strong>Volumi repertori</strong>
+	</p>
+	<br />
+	<p align="left">%VOLUMES_REPERTORIES%</p>
+	<hr />
+	<p align="center">
+		<strong>Elenco sintetico delle formalit&#224;</strong>
+	</p>
+	<hr />
+	<p>%SYNTHETIC_HEADER%</p>
+	<p>%SYNTHETIC_TABLE%</p>
+</body>

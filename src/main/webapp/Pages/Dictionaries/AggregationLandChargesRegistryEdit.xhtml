@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/resources/tpl/Admin/EditBase.xhtml">
+    <ui:param name="bean" value="#{aggregationLandChargesRegistryEditBean}"/>
+    <ui:param name="edit_title"
+              value="#{bean.entity.isNew ? msg.aggregationLandChargesRegistryNew : msg.aggregationLandChargesRegistryEdit}"/>
+    <ui:define name="edit_body">
+
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+            <span><span class="red">*</span>#{msg.name}:</span>
+            <p:inputText value="#{bean.entity.name}" id="name" maxlength="50" styleClass="input-width"/>
+
+            <span><span class="red">*</span>#{msg.aggregationLandChargesRegistryLands}:</span>
+            <p:pickList value="#{bean.registries}" var="registry"
+                        effect="explode" itemValue="#{registry}"
+                        itemLabel="#{registry.name}" showSourceFilter="true"
+                        showTargetFilter="true" id="registries" filterMatchMode="contains"
+                        converter="landChargesRegistryConverter"/>
+
+            <span><span class="red">*</span>#{msg.aggregationLandChargesRegistryNational}:</span>
+            <p:selectBooleanCheckbox value="#{bean.entity.national}" id="national"/>
+
+        </p:panelGrid>
+
+    </ui:define>
+</ui:composition>

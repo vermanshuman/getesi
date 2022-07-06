@@ -1,0 +1,244 @@
+	<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+			"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	<html xmlns="http://www.w3.org/1999/xhtml"
+		  xmlns:ui="http://java.sun.com/jsf/facelets"
+		  xmlns:h="http://java.sun.com/jsf/html"
+		  xmlns:f="http://java.sun.com/jsf/core"
+		  xmlns:p="http://primefaces.org/ui">
+	<ui:composition template="/resources/tpl/Admin/EmptyBase.xhtml">
+
+		<ui:param name="view_title" value="#{msg.editData}" />
+
+
+		<ui:define name="view_body">
+
+			<ui:param name="bean" value="#{excelDataEdit}" />
+			<ui:param name="invoiceBean" value="#{bean.invoiceDialogBean}" />
+
+			<p:remoteCommand name="updateButtonPanel" action="#{bean.updateButtonPanel}" update="createInvoice"/>
+			<p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group">
+				<h:outputText value="#{msg.client}:"/>
+				<p:selectOneMenu id="client_not_manger_or_fiduciary_id"
+								 value="#{bean.selectedNotManagerOrFiduciaryClientId}"
+								 styleClass="input-width-mmv">
+					<f:selectItems value="#{bean.notManagerOrFiduciaryClients}"/>
+					<p:ajax event="change" listener="#{bean.initOfficesList}" update="managers mail_ofice_id client_invoice_id"/>
+				</p:selectOneMenu>
+				<h:outputText value="#{msg.billingCustomer}" />
+				<p:selectOneMenu id="client_invoice_id"
+					value="#{bean.excelClientInvoiceId}" styleClass="input-width-mmv">
+					<f:selectItems value="#{bean.invoiceClients}" />
+				</p:selectOneMenu>
+				<h:outputText value=""/>
+				<h:outputText value=""/>
+				<h:outputText value="#{msg.fatturaN}:"/>
+				<p:inputText id="fatturaN" value="#{bean.excelFatturaN}" styleClass="ui-inputfield-border"
+					style="width: 100%" disabled="true"/>
+				<h:outputText value="#{msg.excelData}:"/>
+				<p:calendar id="excelDate" readonlyInput="false" showOn="button"
+					onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+					pattern="dd/MM/yyyy" mask="true" locale="it" navigator="true"
+					popupIconOnly="true"
+					onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+					value="#{bean.excelDate}" placeholder="#{msg.excelData}:" disabled="true"/>
+				<h:outputText value="#{msg.reportN}:"/>
+				<p:inputText id="reportN" value="#{bean.excelReportN}" styleClass="ui-inputfield-border"
+					style="width: 100%" disabled="true"/>
+
+				<h:outputText value="#{msg.subjectViewFormalityConservatoryCap}:"/>
+				<p:selectOneMenu id="mail_ofice_id" value="#{bean.selectedOfficeId}" styleClass="input-width-mmv">
+					<f:selectItems value="#{bean.officeList}"/>
+				</p:selectOneMenu>
+				<h:outputText value="#{msg.managerText}"/>
+				<p:selectCheckboxMenu id="managers" value="#{bean.selectedClientManagers}" style="width: 100%"
+									  label="#{enums.documentGenerationTagsMANAGER}"
+									  converter="#{bean.clientSelectItemWrapperConverter}"
+									  multiple="true" filter="true" filterMatchMode="startsWith" >
+					<f:selectItems value="#{bean.clientManagers}" var="con" itemValue="#{con}"
+								   itemLabel="#{con.label}"/>
+					<p:ajax process="managers"/>
+				</p:selectCheckboxMenu>
+				<h:outputText value="#{msg.clientTrust}:"/>
+				<p:inputText id="fiduciary_text" value="#{bean.fiduciary}"  styleClass="w-100"/>
+				<span> #{msg.ndgText}</span>
+				<p:inputText id="ndgShow" value="#{bean.excelReportNDG}" styleClass="ui-inputfield-border"
+					style="width: 100%" />
+
+				<span> #{msg.referenceRequest}</span>
+				<p:inputText id="referenceRequest" value="#{bean.referenceRequest}" styleClass="ui-inputfield-border"
+					style="width: 100%" />
+			</p:panelGrid>
+
+			<ui:repeat value="#{bean.excelDataTable}" var="excelData">
+				<p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
+					<h:outputText value="#{excelData.requestName}" style="font-weight:bold;font-size: 20px;"/>
+					 <p:dataTable value="#{excelData.requests}" var="req" rowIndexVar="row" emptyMessage="#{msg.noRecordsFound}">
+						<p:columns value="#{excelData.columnNames}" var="column">
+							<f:facet name="header">
+								<h:outputText value="#{column}" />
+							</f:facet>
+							<h:outputText value="#{excelData.columnValues[column.concat('_').concat(req.tempId)]}" rendered="#{column eq msg.excelNote}" escape="false"/>
+							<h:outputText value="#{excelData.columnValues[column.concat('_').concat(req.tempId)]}" rendered="#{column ne msg.excelNote}"/>
+							<f:facet name="footer">
+								<h:outputText value="#{excelData.footerValues[column]}" style="font-weight:bold;font-size: 15px;"/>
+							</f:facet>
+						</p:columns>
+						 <p:column exportable="false" styleClass="action_midle_column">
+							<p:commandButton icon="fa fa-pencil-square-o" action="#{bean.viewExtraCost()}">
+								<f:setPropertyActionListener value="#{req.id ne null ? req.id : req.multipleRequestId}" target="#{bean.requestId}"/>
+							</p:commandButton>
+						</p:column>
+					</p:dataTable>
+				</p:panelGrid>
+			</ui:repeat>
+
+			<ui:remove>
+				<p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+					<div class="additional_button">
+						<div align="center">
+							<p:commandButton id="submit_btn" style="background-color: #00CC52 !important;"
+								action="#{bean.generateXlsRequestCost}"
+								value="#{msg.submit}"
+								ajax="false" update="@form"/>
+						</div>
+					</div>
+				</p:panelGrid>
+			</ui:remove>
+			<p:outputPanel id="btn_line">
+				<p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group additional_button" id="excel_button_panel">
+
+						<p:commandButton id="excel_btn" style="background-color: #00CC52 !important;"
+										 action="#{bean.generateXlsRequestCost}"
+										 value="#{msg.submit}"
+										 onclick="updateButtonPanel();" update="@form "
+										 ajax="false"/>
+					<!-- <p:commandButton id="pdf_btn"
+										 action="#{bean.generatePdfRequestCost}"
+										 value="#{msg.pdf}"
+										 icon="fa fa-fw fa-file-pdf-o"
+										 ajax="false" update="@form "/> -->
+					<p:commandButton id="pdf_btn" styleClass="pdf-button" style="border: 1px solid #AD0B00 !important;"
+									 action="#{bean.generatePdfRequestCost}"
+									 value="#{msg.pdf}"
+									 icon="pdf-icon"
+									 ajax="false" update="@form"/>
+
+					<h:panelGroup layout="block" style="display: none" id="createInvoiceDiv">
+							<!-- <p:commandButton style="margin-left: 2px;"
+											 value="#{msg.requestTextEditCreateInvoice}"
+											 action="#{bean.preCheckInvoice}"
+											 styleClass="ui-button-success" id="createInvoice"
+											 update="@widgetVar(mailManagerViewRequestsForInvoiceDlg)"/> -->
+								<p:commandButton style="margin-left: 2px;"
+											 value="#{msg.requestTextEditCreateInvoice}"
+                                 			 action="#{bean.preCheckDocument}" 
+                                 			 update="invoiceAlreadyCreatedDialog otherRequestsExistsForInvoiceDialog mailManagerViewRequestsForInvoiceDialog"
+                                 			 id="createInvoice"
+											 styleClass="ui-button-success" />
+						</h:panelGroup>
+					<!--			<p:commandButton style="margin-left: 2px;"-->
+					<!--							 value="#{msg.requestTextEditCreateInvoice}"-->
+					<!--							 id="createInvoice" styleClass="ui-button-success"-->
+					<!--							 action="#{bean.createInvoice}"-->
+					<!--							 update="@widgetVar(invoiceDialogExcelWV)"-->
+					<!--							 oncomplete="PF('invoiceDialogExcelWV').show();"/>-->
+				</p:panelGrid>
+			</p:outputPanel>
+
+			<p:outputPanel style="visibility: hidden; position: absolute;">
+				<script>
+					function updateButtonPanel() {
+						$('#createInvoiceDiv').show();
+					}
+				</script>
+
+			</p:outputPanel>
+
+			<p:dialog id="invoiceAlreadyCreatedDialog" widgetVar="invoiceAlreadyCreatedDialogWV" modal="true" styleClass="dialog-green"
+					  resizable="false" draggable="false" effect="SLIDE" header="">
+            <span>
+                <h:outputText value="#{bean.invoiceAlreadyCreated}"/>
+            </span>
+				<div class="btn_line">
+					<p:commandButton value="#{msg.ok}" update="@form" styleClass="confirm-button"
+									 style="margin-right: 15px;" action="#{bean.preCheckDocumentOtherRequests}"
+									 oncomplete="PF('invoiceAlreadyCreatedDialogWV').hide();"/>
+					<p:commandButton value="#{msg.cancel}" oncomplete="PF('invoiceAlreadyCreatedDialogWV').hide();"
+									 style="background-color: #F3362B !important; width: 100px;" update="@form" />
+				</div>
+			</p:dialog>
+
+			<p:dialog id="otherRequestsExistsForInvoiceDialog" widgetVar="otherRequestsExistsForInvoiceDialogWV" modal="true" styleClass="dialog-green"
+					  resizable="false" draggable="false" effect="SLIDE" header="">
+            <span>
+                <h:outputText value="#{bean.otherRequestsExistsForInvoice}"/>
+            </span>
+				<div class="btn_line">
+					<p:commandButton value="#{msg.yes}"  styleClass="confirm-button"
+									 style="margin-right: 15px;" action="#{bean.checkDocument(true)}" oncomplete="PF('otherRequestsExistsForInvoiceDialogWV').hide();"
+									 update="@widgetVar(mailManagerViewRequestsForInvoiceDlg) @widgetVar(requestsTableConsideredForInvoiceWV)"/>
+					<p:commandButton value="#{msg.no}" oncomplete="PF('otherRequestsExistsForInvoiceDialogWV').hide();" action="#{bean.checkDocument(false)}"
+									 style="background-color: #F3362B !important;"
+									 update="@widgetVar(mailManagerViewRequestsForInvoiceDlg) @widgetVar(requestsTableConsideredForInvoiceWV)" />
+				</div>
+			</p:dialog>
+
+			<p:dialog id="nullTaxRateErrorDialog" widgetVar="nullTaxRateErrorDialogWV" modal="true" position="center center"
+					  resizable="false" draggable="false" effect="SLIDE">
+				<div class="ui-messages-error ui-corner-all">
+	            <span class="ui-messages-error-summary" style="margin-left:0px !important;">
+	            	<h:outputText value="#{invoiceDialogBean.invoiceErrorMessage}" escape="false"/>
+	            </span><br/>
+				</div>
+				<div class="btn_line">
+					<p:commandButton action="#{bean.loadInvoiceDataAfterError}" oncomplete="PF('nullTaxRateErrorDialogWV').hide();"
+									 value="#{msg.close}" style="background-color: #F3362B !important;" />
+				</div>
+			</p:dialog>
+
+			<style>
+				#excel_button_panel .ui-panelgrid-cell {
+					border: 0px solid #dee2e6 !important;
+				}
+
+				.ui-dialog .ui-widget-header {
+					background: #f8f9fa !important;
+					color: #495057 !important;
+				}
+
+				body .ui-inputfield-border {
+					border: 1px solid #a8acb1 !important;
+					opacity: inherit;
+				}
+
+				body .ui-selectcheckboxmenu {
+					border: 1px solid #a8acb1 !important;
+				}
+
+				body .ui-selectonemenu {
+					border: 1px solid #a8acb1 !important;
+				}
+
+				#excelDate_input {
+					border: 1px solid #a8acb1 !important;
+					opacity: inherit;
+				}
+
+				#excelDate .ui-inputfield-border {
+					border: 1px solid #ffffff !important;
+					opacity: unset;
+				}
+
+				.pdf-button {
+					background-color: #FFFFFF !important;
+					color: #AD0B00 !important;
+					width: 100px !important;
+				}
+			</style>
+			<ui:include src="../Dialogs/RequestExtraCostDialog.xhtml"/>
+			<ui:include src="../Dialogs/InvoiceDialogExcel.xhtml"/>
+			<ui:include src="../Dialogs/MailManagerViewRequestsForInvoiceDialog.xhtml"></ui:include>
+			<ui:include src="../Dialogs/InvoiceMissingBillingClientDialog.xhtml"></ui:include>
+		</ui:define>
+	</ui:composition>
+	</html>

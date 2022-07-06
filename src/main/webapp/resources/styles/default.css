@@ -1,0 +1,1207 @@
+.btn_line {
+    margin-top: 10px;
+    text-align: center;
+    width: 100%;
+}
+
+.zoom {
+    display: none !important;
+}
+
+.red {
+    color: #F00;
+}
+
+.ui-selectcheckboxmenu.not_valid, .ui-scrollpanel.not_valid, .not_valid .ui-chkbox-box, .not_valid .ui-commandlink, .not_valid .ui-radiobutton-box, select.not_valid, .ui-inputfield.not_valid, .ui-widget-content .ui-inputfield.not_valid, .ui-widget-header .ui-inputfield.not_valid, .ui-selectonemenu.not_valid, .ui-widget-header .ui-state-default.not_valid label, .not_valid input[type="password"], .not_valid .ui-widget-content, .not_valid .ui-editor, .not_valid .ui-inputfield, .ui-widget-content .not_valid .ui-inputfield, .ui-widget-header .not_valid .ui-inputfield, .mceEditor.not_valid .mceLayout, .not_valid .ui-button, button.not_valid {
+    border: 1px solid red !important;
+}
+
+.no_datatable_header.ui-datatable table thead tr {
+    display: none;
+}
+
+.not_valid .ui-inputfield.ui-selectonemenu-label {
+    border: 0;
+}
+
+.border-omi-value {
+    border: 1px solid;
+}
+
+.background-lightblue-td .ui-panelgrid-cell {
+    background: #d0d9e6 !important;
+}
+
+.background-lightorange-td .ui-panelgrid-cell {
+    background: #fed8b1 !important;
+}
+
+.background-lightorange-td .ui-editable-column {
+    background: #fed8b1 !important;
+}
+
+
+.menu-scroll-content ul li > ul {
+    width: max-content !important;
+    height: 500px;
+    overflow: hidden auto;
+}
+
+.action_column {
+    width: 32px;
+    text-align: center;
+}
+
+.visible-cell-editor-value .ui-cell-editor-output {
+    color: #5f666c;
+}
+
+.action_midle_column {
+    width: 50px;
+    text-align: center;
+}
+.estate-table table { width: unset !important; }
+
+.action_large_column {
+    width: 80px;
+    text-align: center;
+}
+
+.info_column {
+    width: 500px;
+}
+
+.datii_column {
+    width: 300px;
+}
+
+.datid_column {
+    width: 560px;
+}
+
+.altrei_column {
+    width: 390px;
+}
+
+.action_button_column {
+    width: 90px;
+}
+
+.additional_button {
+    margin-top: 8px;
+}
+
+.dropdown_filter {
+    width: 75% !important;
+}
+
+.button_column {
+    width: 90px;
+}
+
+div.myGrid {
+    width: 250px !important;
+    color: black !important;
+}
+
+.css_grid_label {
+    text-align: right;
+}
+
+.css_grid_value > input {
+    width: 98%;
+}
+
+.table-center {
+    border: none !important;
+    background: #f2f5f7;
+    margin-left: 5%;
+    margin-right: 15%;
+}
+
+.cadastral_table td {
+    height: 18px !important;
+    background-color: white;
+}
+
+.cadastral_text {
+    font-size: 1.1em !important;
+    font-weight:bold !important;
+}
+
+.ui-datatable .ui-column-filter {
+    width: 75% !important;
+}
+
+.select-width {
+    width: 94%;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.cost_titles h3 {
+    font-size: 1.17em !important;
+    font-weight: bold !important;
+}
+
+.cost_titles_table h3 {
+    margin-block-start: 0;
+    margin-block-end: 0;
+}
+
+.cost_form_column {
+    padding: 0 !important;
+}
+
+.input-width {
+    width: 98% !important;
+}
+
+.input-width-mmv {
+    width: 30% !important;
+}
+
+.input-width input {
+    width: 98% !important;
+}
+
+.calendar-width input {
+    width: 98% !important;
+}
+
+.special-calendar-width input {
+    width: 80% !important;
+}
+
+.formality-calendar-width input {
+    width: 90% !important;
+}
+
+.right-side span {
+    float: right !important;
+}
+
+.right-side {
+    float: right !important;
+}
+
+/*experiment*/
+
+#list_panel {
+    width: 100%;
+    border: 0 hidden transparent;
+}
+
+#list_panel div {
+    vertical-align: top;
+}
+
+.message_info {
+    color: black;
+}
+
+.message_info tr {
+    background-color: transparent !important;
+
+}
+
+.message_info tr td {
+    border-width: 0 !important;
+    border-style: hidden !important;
+    border-color: transparent !important;
+}
+
+.message-author {
+    font-style: normal;
+    font-family: Calibri;
+    font-size: 16pt;
+}
+
+.message-view {
+    font-family: Calibri;
+    font-size: 11pt;
+}
+
+.left_info {
+    text-align: left !important;
+}
+
+.right_info {
+    text-align: right !important;
+}
+
+.no_border {
+    border: 0 hidden transparent !important;
+}
+
+#list_panel .ui-datatable .ui-datatable-data tr.ui-datatable-even.ui-state-highlight,
+#list_panel .ui-datatable .ui-datatable-data tr.ui-state-highlight {
+    border-top-width: medium;
+    border-bottom-width: medium;
+}
+
+#typeSelectCheckboxPanelDataTable ul {
+    background-color: #ffffff;
+    width: 100%;
+}
+
+#typeSelectCheckboxPanelDataTable ul li a {
+    color: #2f8ee5;
+}
+
+.mail_button {
+    margin: 5px 5px;
+}
+
+.standard_button{
+    margin: 5px 5px;
+}
+
+.margin_bottom{
+    margin-bottom: 10px;
+}
+
+.no_padding_margin {
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.min_padding_margin {
+    text-align: center;
+    table-layout: auto;
+    margin-left: 2px !important;
+    padding-left: 2px !important;
+    padding-right: 4px !important;
+}
+
+.no_break_header thead th span {
+    overflow-wrap: break-word !important;
+}
+
+.bold_text {
+    font-weight: bold;
+}
+
+.icon_column {
+    width: 25px !important;
+    text-align: center;
+}
+
+.data_table_auto {
+    table-layout: fixed !important;
+}
+
+.data_table_auto table {
+    table-layout: auto;
+}
+
+.mailRowStyle {
+    background-color: white !important;
+    border-right: none 0 transparent !important;
+    border-left: none 0 transparent !important;
+
+}
+
+.mailRowStyle:hover {
+    color: black !important;
+}
+
+th.header_small_font {
+    font-size: 7pt !important;
+}
+
+#table_div .fa {
+    font-size: 11pt;
+}
+
+.menuseparator {
+    background-color: #00acac;
+    height: 3px;
+    margin: 5px 0;
+}
+
+.searchContent {
+    height: 45px;
+    margin-bottom: 10px;
+}
+
+#letter_panel {
+    margin-top: 10px;
+    height: 100%;
+}
+
+.letter_panel_line {
+    background-color: #788FA7;
+    padding: 5px;
+    width: 99%;
+    text-align: -webkit-left;
+    margin-bottom: 5px;
+}
+
+.letter_panel_line > button,
+.letter_panel_line > div {
+    margin-left: 10px;
+    background-color: white;
+}
+
+.upload_square_clip {
+    position: relative;
+    padding: 5px 0;
+}
+
+.upload_square_clip input {
+    cursor: pointer;
+    position: absolute;
+    z-index: 1;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.one_mail_letter {
+    line-height: 36px;
+    font-size: 34pt;
+    color: #ffffff;
+}
+
+.enumeration_grid > div.ui-datagrid-content {
+    border: 0px hidden transparent !important;
+}
+
+.enumeration_grid table {
+    border: 0px hidden transparent !important;
+}
+
+.grey-opacity {
+    color: #5f666c;
+    opacity: 0.75;
+}
+
+.right-side-warning {
+    padding: 0px !important;
+    display: inline-block !important;
+}
+
+#logo {
+    display: inline-block;
+    position: absolute;
+    vertical-align: middle;
+    top: 11%;
+    width: 100px;
+    height: 57px;
+    background: url("../images/logo.png") top left no-repeat;
+}
+
+#notarial_certification_list_logo {
+    display: inline-block;
+    vertical-align: middle;
+    background-size: 79% !important;
+    top: 11%;
+    width: 46.28px;
+    height: 36px;
+    background: url("../images/notarial-cerification-list-logo.png") top left no-repeat;
+}
+
+.login_header {
+    position: absolute;
+    z-index: 0;
+    background-color: #740000;
+    top: 0.5%;
+    right: 0.5%;
+    width: 99%;
+    height: 15%;
+}
+
+.login_main {
+    position: absolute;
+    background-color: #1e1e1e;
+    height: 83.4%;
+    width: 40%;
+    top: 15.6%;
+    right: 0.5%;
+}
+
+.login_info {
+    position: absolute;
+    background-color: #005586;
+    height: 83.4%;
+    width: 58.9%;
+    left: 0.5%;
+    top: 15.6%;
+}
+
+.login_h1 {
+    color: white;
+    font-size: 35px;
+    font-weight: bold;
+    margin: 40px 0 60px 0;
+}
+
+.login_col {
+    position: relative;
+    width: 90%;
+    left: 5%;
+}
+
+.login_col input[type="text"],
+.login_col input[type="password"] {
+    width: 90%;
+    height: 35px;
+    margin: 10px 0px 10px 0px;
+    padding: 10px 16px;
+    font-size: 20px;
+    line-height: 30px;
+    border-radius: 6px;
+}
+
+.login_btn {
+    width: 95%;
+    height: 60px;
+    margin: 10px 0px 10px 0px;
+    padding: 10px 16px;
+    font-size: 22px !important;
+    line-height: 30px !important;
+    border-radius: 6px;
+    color: white !important;
+    background: #005586 !important;
+    border-color: #005586 !important;
+    display: inline-block;
+    font-weight: bold;
+}
+
+.login_text {
+    color: white;
+    font-size: 25px !important;
+    font-weight: normal;
+}
+
+.login_img {
+    position: relative;
+    width: auto;
+    height: 100%;
+}
+
+.login_error {
+    z-index: 100;
+    position: absolute;
+    right: 2%;
+    top: 3%;
+}
+
+.edit_col {
+    width: 20%;
+}
+
+.dest_edit_col {
+    width: 80%;
+}
+
+#mail_edit_grid .edit_col button {
+    float: right;
+}
+
+#mail_edit_grid textarea {
+    width: 100%;
+}
+
+.autocomplete_width > ul {
+    width: 100% !important;
+}
+
+.semi_columns tr td {
+    width: 50%;
+}
+
+.ui-paginator {
+    background-color: #788FA7 !important;
+}
+
+.layout-wrapper .topbar-items > li > a {
+    color: #003871 !important;
+}
+
+.layout-wrapper .topbar-items > li > a > div:hover {
+    filter: invert(12%) sepia(93%) saturate(2101%) hue-rotate(197deg) brightness(103%) contrast(101%) !important;
+    transition: 0.3s;
+}
+
+.layout-wrapper .topbar-items > li > a > div {
+    filter: invert(04%) sepia(18%) saturate(2800%) hue-rotate(198deg) brightness(74%) contrast(110%);
+}
+
+body .ui-widget-header {
+    background-color: #788FA7 !important;
+}
+
+body .ui-tabs.ui-tabs-top .ui-tabs-nav li.ui-state-active, body .ui-tabs.ui-tabs-bottom .ui-tabs-nav li.ui-state-active, body .ui-tabs.ui-tabs-left .ui-tabs-nav li.ui-state-active, body .ui-tabs.ui-tabs-right .ui-tabs-nav li.ui-state-active {
+    background-color: #003871 !important;
+}
+
+body .ui-button {
+    background-color: #003871 !important;
+}
+
+body .grey-btn {
+    background-color: #788FA7 !important;
+}
+
+body .btn-red {
+    background-color: red !important;
+}
+
+body .ui-button:hover {
+    background-color: #788FA7 !important;
+}
+
+body .ui-fieldset .ui-fieldset-legend {
+    background-color: #788FA7 !important;
+}
+
+body .ui-chkbox .ui-chkbox-box.ui-state-active {
+    background-color: #003871 !important;
+    border-color: #003871 !important;
+}
+
+
+
+body .ui-tabs.ui-tabs-top .ui-tabs-nav li a, body .ui-tabs.ui-tabs-bottom .ui-tabs-nav li a, body .ui-tabs.ui-tabs-left .ui-tabs-nav li a, body .ui-tabs.ui-tabs-right .ui-tabs-nav li a {
+    color: #ffffff !important;
+}
+
+.ui-timepicker-table td a.ui-state-active {
+    background-color: #788FA7 !important;
+}
+
+.request-table .ui-paginator-pages .ui-state-active {
+    color: ffffff !important;
+}
+
+.request-table .ui-paginator-pages :not(.ui-state-active) {
+    color: #ffffff !important;
+}
+
+body .ui-paginator .ui-paginator-pages .ui-paginator-page :not(.request-table) {
+    color: #ffffff !important;
+    transition: color 0.3s !important;
+}
+
+body .ui-button.ui-button-text-only .ui-button-text {
+	color: #ffffff;
+}
+
+body {
+    border-radius: 0 !important;
+}
+
+.search_group {
+    margin: 0 1% 0 0;
+    width: 15%;
+}
+
+.search_group input {
+    width: 13%;
+}
+
+.button_group button {
+    margin-bottom: 1%;
+}
+
+.receive_new_mail_style {
+    color: black !important;
+    font-weight: bold !important;
+}
+
+.mail_style {
+    color: #4c5156 !important;
+}
+
+.mail-tab-DELETE-SEND {
+    background-color: white !important;
+}
+
+.first-menu-icon i {
+    float: left !important;
+    width: auto !important;
+    font-size: 16px !important;
+    margin: 0 11px 0 0 !important;
+    color: white !important;
+}
+
+.first-menu-icon span {
+    float: right !important;
+    font-size: 16px !important;
+}
+
+.first-menu-icon {
+    background-color: #003871 !important;
+    color: white !important;
+    float: left;
+}
+
+.last-menu-icon i {
+    float: right !important;
+    width: auto !important;
+    font-size: 16px !important;
+    margin: 0 0 0 11px !important;
+    color: white !important;
+}
+
+.last-menu-icon span {
+    float: left !important;
+    font-size: 16px !important;
+}
+
+.last-menu-icon {
+    background-color: #003871 !important;
+    color: white !important;
+    float: right !important;
+    right: 35px !important;
+}
+
+@media (min-width: 641px) {
+    .layout-wrapper.menu-layout-horizontal .layout-menu-container .layout-menu > li:last-child {
+        float: right !important;
+        right: 35px !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .layout-wrapper.menu-layout-horizontal .layout-menu-container .layout-menu > li:last-child {
+        float: right !important;
+        right: 50px !important;
+    }
+}
+
+body .ui-datepicker table td a.ui-state-highlight {
+    color: white !important;
+    background-color: #788FA7 !important;
+}
+
+body .ui-datepicker table td a.ui-state-active {
+    color: white !important;
+}
+
+.fc td.fc-today {
+    background-color: #788FA7 !important;
+    opacity: 0.1;
+}
+
+.fc-ltr .fc-basic-view .fc-day-number {
+    opacity: 1;
+}
+
+.fc .fc-button-group > * {
+    background-color: #788FA7 !important;
+}
+
+body .ui-button.ui-state-active {
+    background-color: #003871 !important;
+}
+
+.without-header thead {
+    display: none;
+}
+
+.forecast-text-center {
+    vertical-align: super;
+}
+
+.forecast-big-icon {
+    background-color: #2f8ee5;
+    border-radius: 5px;
+    margin-right: 1%;
+    margin-left: 1%;
+    width: 40px;
+    height: 40px;
+}
+
+.forecast-small-icon {
+    background-color: #2f8ee5;
+    border-radius: 5px;
+    height: 30px;
+    width: 30px;
+}
+
+.forecast-date-column {
+    width: 26%
+}
+
+.forecast-temp-column {
+    width: 24%;
+    text-align: center
+}
+
+.forecast-temp-arrow-up {
+    color: red
+}
+
+.forecast-temp-arrow-down {
+    color: #2f8ee5
+}
+
+.ui-steps-number {
+    display: none !important;
+}
+
+.steps-style {
+    border-top: none !important;
+    border-left: none !important;
+    border-right: none !important;
+}
+
+.request-select-radio {
+    width: 100%;
+}
+
+.request-select-radio td {
+    width: 50%;
+}
+
+#btn_new {
+    background-color: #00cc52 !important;
+    margin-bottom: 1% !important;
+}
+
+#btn_new_multiple {
+    background-color: #00cc52 !important;
+    margin-bottom: 1% !important;
+}
+
+body .btn-green {
+    background-color: #00cc52 !important;
+}
+
+#request-btns .green-request-btn {
+    background-color: #00cc52 !important;
+    width: 150px;
+}
+
+#request-btns .grey-request-btn {
+    background-color: #788FA7 !important;
+    width: 150px;
+}
+
+@media (min-width: 641px) {
+    .layout-wrapper.menu-layout-horizontal .layout-menu-container .layout-menu > li > ul {
+        top: 36px !important;
+    }
+}
+
+.simple-table thead th {
+    border-color: #5f666c !important;
+    text-align: center;
+}
+
+.simple-table tbody tr {
+    background-color: white !important;
+    border-color: #5f666c !important;
+    text-align: center;
+}
+
+.estate-situation-edit-select .ui-state-highlight{
+    color: #5f666c !important;
+}
+
+.user-row {
+    color: darkgrey;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.delete-row {
+    color: darkgrey;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.row-update {
+    background-color: #8c6ac9 !important;
+    color: #740000;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.special-toggler .ui-row-toggler {
+    border: 1px grey solid;
+    border-radius: 2px;
+    margin-top: 5%;
+    width: max-content;
+}
+
+.special-upload .ui-widget-header {
+    background-color: transparent !important;
+    width: 210px;
+}
+
+.big-upload .ui-widget-header {
+    width: 310px !important;
+}
+
+.middle-size-upload .ui-widget-header {
+    width: 310px !important;
+}
+
+.special-upload .ui-widget-content {
+    border: none;
+}
+
+.special-upload {
+    width: 210px;
+}
+
+.special-upload .ui-progressbar .ui-progressbar-value {
+    background-color: #788FA7 !important;
+}
+
+.big-upload {
+    width: 310px !important;
+}
+
+.middle-size-upload {
+    width: 240px !important;
+}
+
+.special-upload .ui-icon-plusthick {
+    display: none !important;
+}
+
+.special-upload .ui-button-text {
+    padding-left: 1em !important;
+}
+
+.ui-selectcheckboxmenu-multiple .ui-selectcheckboxmenu-trigger .ui-icon {
+    top: auto !important;
+}
+
+.white-black-file {
+    color: #fff;
+    text-shadow: 1px 0 0 #000, 0 -1px 0 #000, 0 1px 0 #000, -1px 0 0 #000;
+}
+
+.light-blue-file {
+    color: lightblue;
+}
+
+.blue-file {
+    color: blue;
+}
+
+.green-file {
+    color: green;
+}
+
+.red-file {
+    color: red;
+}
+
+p.MsoNormal span {
+    color: black !important;
+}
+
+.email-body-black {
+    color: black !important;
+}
+
+.email-body-black span {
+    color: black !important;
+}
+
+.email-body-black * {
+    color: black !important;
+}
+
+.email-body-black > * {
+    color: black !important;
+}
+
+#commentDialog, #datafromDialog {
+    left: 25% !important;
+    top: 10% !important;
+}
+
+.estate-grid td.ui-panelgrid-cell {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: none;
+}
+
+.estate-grid tr.ui-widget-content {
+    display: table;
+    border: none;
+}
+
+.ui-datatable.style1-sectionC thead th,
+.ui-datatable.style1-sectionC tbody,
+.ui-datatable.style1-sectionC tbody tr,
+.ui-datatable.style1-sectionC tbody td {
+    border-style: none;
+    text-align: center;
+}
+
+.not-display td:nth-child(-n + 7) {
+    color: transparent !important;
+}
+
+.not-display td:nth-child(-n + 7) div {
+    display: none !important;
+}
+
+.non_displayed_button{
+    display: none;
+}
+
+.tree_panel {
+    width: 30%;
+}
+
+.tree_info {
+    width: 69%;
+    position: absolute;
+}
+
+.ui-treetable-selectable-node .treeIcon {
+    float: left;
+}
+
+.treeIcon {
+    margin-right: 3px;
+    vertical-align: middle;
+}
+
+.label {
+    height: 27px;
+    line-height: 24px;
+    text-align: right;
+    vertical-align: top;
+    width: 45%;
+}
+
+.value input {
+    float: left;
+    width: 200px;
+}
+
+.value input.short_input {
+    float: left;
+    width: 50px;
+}
+
+input.pe-timepicker-input {
+    width: 50px;
+}
+
+.value input.pe-timepicker-input.time_only {
+    width: 25px;
+}
+
+.value select {
+    width: 210px;
+    height: 100px;
+}
+
+.value textarea.ui-inputtextarea {
+    width: 200px;
+    height: 100px;
+    float: left;
+    resize: none;
+}
+
+.value .ui-autocomplete .ui-button-text {
+    line-height: 1.2;
+}
+
+.value .ui-autocomplete input {
+    width: 176px;
+}
+
+.value button.adv_button {
+    -moz-border-radius-topleft: 0px /*{cornerRadius}*/;
+    -webkit-border-top-left-radius: 0px /*{cornerRadius}*/;
+    border-top-left-radius: 0px /*{cornerRadius}*/;
+    -moz-border-radius-bottomleft: 0px /*{cornerRadius}*/;
+    -webkit-border-bottom-left-radius: 0px /*{cornerRadius}*/;
+    border-bottom-left-radius: 0px /*{cornerRadius}*/;
+}
+
+.value button.adv_button, .value button.ui-button-icon-only {
+    height: 26px;
+    width: 23px;
+    vertical-align: top;
+}
+
+.value button.adv_button {
+    margin-left: -6px;
+}
+
+.value button.edit_button {
+    margin-left: 2px;
+}
+
+.button_panel {
+    background-color: #788fa7;
+    padding: 12px 0px 12px 12px;
+    width: 99%;
+    text-align: -webkit-left;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.house-button {
+    background-image: url("../images/house.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 36px;
+    height: 36px;
+    margin: 0 auto;
+    display: block;
+}
+
+.house-button span {
+    display: none !important;
+}
+
+#city_panel .ui-selectonemenu-filter-container {
+    width: 92% !important;
+}
+
+#pageTabMenu .ui-menuitem-text {
+   color: white;
+}
+
+.fileupload-simple > .ui-fileupload-content {
+    display: none;
+}
+.fileupload-simple > .ui-fileupload-buttonbar {
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.anagrafico-icon {
+    background-image: url("../images/servizio_anagrafico.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 25px;
+    height: 25px;
+    margin: 0 auto;
+    display: block;
+}
+
+.camerale-icon {
+    background-image: url("../images/servizio_camerale.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 25px;
+    height: 25px;
+    margin: 0 auto;
+    display: block;
+}
+
+.immobiliare-icon {
+    background-image: url("../images/servizio_immobiliare.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 25px;
+    height: 25px;
+    margin: 0 auto;
+    display: block;
+}
+
+.investigativo-icon {
+    background-image: url("../images/servizio_investigativo.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 25px;
+    height: 25px;
+    margin: 0 auto;
+    display: block;
+}
+
+.anagrafico-icon-3x {
+    background-image: url("../images/servizio_anagrafico.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 36px;
+    height: 40px;
+    margin: 0 auto;
+    display: block;
+    background-size: cover;
+}
+
+.camerale-icon-3x {
+    background-image: url("../images/servizio_camerale.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 36px;
+    height: 40px;
+    margin: 0 auto;
+    display: block;
+    background-size: cover;
+}
+
+.immobiliare-icon-3x {
+    background-image: url("../images/servizio_immobiliare.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 36px;
+    height: 40px;
+    margin: 0 auto;
+    display: block;
+    background-size: cover;
+}
+
+.investigativo-icon-3x {
+    background-image: url("../images/servizio_investigativo.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 36px;
+    height: 40px;
+    margin: 0 auto;
+    display: block;
+    background-size: cover;
+}
+
+.mail-icon {
+    background-image: url("../images/mail.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 28px;
+    height: 28px;
+    margin: 0 auto;
+    display: block;
+}
+
+.user-icon {
+    background-image: url("../images/user.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 28px;
+    height: 28px;
+    margin: 0 auto;
+    display: block;
+}
+
+.attachment-icon {
+    background-image: url("../images/attachment.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 23px;
+    height: 23px;
+    margin: 0 auto;
+    display: block;
+}
+
+.move-icon {
+    background-image: url("../images/moveto.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 23px;
+    height: 23px;
+    margin: 0 auto;
+    display: block;
+}
+.landOmiSearchContent {
+    margin-bottom: 10px;
+}

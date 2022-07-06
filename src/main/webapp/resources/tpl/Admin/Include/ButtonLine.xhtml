@@ -1,0 +1,63 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:p="http://primefaces.org/ui">
+    <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/mail.css"
+          media="all" rel="stylesheet" type="text/css"/>
+    <div class="button-panel-one p-grid">
+    <div class="p-col-9">
+        <p:commandButton value="#{msg.mailManagerSend.toUpperCase()}"
+                         action="#{bean.sendMail}" update="@form"
+                         icon="fa fa-paper-plane" onstart="setIsSend(true);"
+                         styleClass="green-button"
+                         onclick="PF('mailManagerSendTop').disable();PF('mailManagerSendBottom').disable();"
+                         oncomplete="PF('mailManagerSendTop').enable();PF('mailManagerSendBottom').enable();"
+                         widgetVar="mailManagerSendTop"/>
+        <ui:remove>
+            <p:commandButton action="#{bean.doSaveWithoutValidation}"
+                             rendered="#{empty showSave ? true : showSave}" oncomplete="loadMailList();"
+                             value="#{empty save_button_text ? msg.save.toUpperCase() : save_button_text.toUpperCase()}"
+                             styleClass="grey-button"
+                             icon="ui-icon-disk"/>
+            <p:commandButton icon="fa fa-paperclip" oncomplete="PF('attachedFileWV').show();" styleClass="grey-button"/>
+            <p:commandButton icon="fa fa-reply"
+                             rendered="#{(bean.selectedInboxes.size() == 1) and not mailManagerListBean.selectedInboxes[0].isNew and bean.mailEditWrapper.wlgInboxEdit.serverId !=0 and bean.canCreate}"
+                             action="#{bean.replyMail}" update=":form"/>
+            <p:commandButton icon="fa fa-reply-all"
+                             rendered="#{(bean.selectedInboxes.size() == 1) and not mailManagerListBean.selectedInboxes[0].isNew and bean.mailEditWrapper.wlgInboxEdit.serverId !=0 and bean.canCreate}"
+                             action="#{bean.replyToAllMail}" update=":form"/>
+            <p:commandButton icon="fa fa-refresh" rendered="#{bean.selectedInboxes.size() == 1}"
+                             update="mail_edit_general_panel"/>
+            <p:commandButton
+                    rendered="#{(not empty mailManagerListBean.selectedInboxes) and bean.canDeleteMail}"
+                    action="#{mailManagerListBean.cancelMail}"
+                    icon="fa fa-trash" disabled="true"/>
+        </ui:remove>
+
+    </div>
+    <div class="p-col-3" style="text-align:right;">
+        <p:commandButton icon="pi pi-print" title="#{msg.mailManagerPrint}" value="#{msg.mailManagerPrint}" update="form:print_panel"
+                         styleClass="print-button" action="#{bean.generateMailPdf}" style="background: #000066;">
+        <f:setPropertyActionListener value="true" target="#{bean.printPdf}"/>
+        </p:commandButton>
+
+        <p:commandButton update=":form" styleClass="close-ui-button" value="#{msg.close.toUpperCase()}"
+                         actionListener="#{bean.goMain}"/>
+    </div>
+        <ui:remove>
+            <p:commandButton rendered="#{(not empty mailManagerListBean.selectedInboxes)}"
+                             icon="fa fa-exchange"
+                             oncomplete="PF('editStateDlgWV').show();"/>
+            <p:commandButton icon="fa fa-hdd-o"
+                             disabled="#{not bean.selectedCanActivateProcedure}"
+                             rendered="#{not empty mailManagerListBean.selectedInboxes}"
+                             action="#{bean.archiveMail}" update=":form"/>
+            <p:commandButton icon="fa fa-lock"
+                             rendered="#{(not empty mailManagerListBean.selectedInboxes) and bean.canAssignPractice}"
+                             oncomplete="PF('assignUserDlgWV').show();"/>
+        </ui:remove>
+    </div>
+
+</ui:composition>

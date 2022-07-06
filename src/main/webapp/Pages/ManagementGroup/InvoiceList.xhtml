@@ -1,0 +1,236 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:ff="http://readytech.com/functions"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/resources/tpl/Admin/LazyListTabBase.xhtml">
+    <ui:param name="bean" value="#{invoiceListBean}"/>
+    <ui:param name="renderTitle" value="false"/>
+    <ui:param name="renderMenu" value="false"/>
+    <ui:param name="centerPartStyleClass" value="false"/>
+    <ui:define name="list_body">
+        <script>
+            function checkDates() {
+                var dateFrom = $('#filterDateFrom_input').val();
+                var dateTo = $('#filterDateTo_input').val();
+
+                var dFrom = new Date(dateFrom.substring(6) + '-'
+                    + dateFrom.substring(3, 5) + '-'
+                    + dateFrom.substring(0, 2));
+                var dTo = new Date(dateTo.substring(6) + '-'
+                    + dateTo.substring(3, 5) + '-' + dateTo.substring(0, 2));
+
+                if (dFrom > dTo) {
+                    $('#filterDateTo_input').val(
+                        $('#filterDateFrom_input').val());
+                    updateCalendarTo();
+                }
+            }
+            ;
+        </script>
+
+       <p:outputPanel id="searchPanel">
+        <p:remoteCommand name="updateCalendarTo" update=":form:filterDateTo"/>
+            <p:remoteCommand name="filterTableFromPanel"
+                             action="#{bean.filterTableFromPanel}" update=":form:table"/>
+            <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                         columnClasses="ui-grid-col-3, ui-grid-col-3, ui-grid-col-3, ui-grid-col-3">
+                <p:column>
+                    <br/>
+                    <p:calendar id="filterDateFrom" readonlyInput="false" showOn="button"
+                                onkeypress="if(!searchOnEnter(event, 'searchButton')) return true;"
+                                pattern="dd/MM/yyyy" mask="true"
+                                locale="it" navigator="true" popupIconOnly="true"
+                                onblur="setTimeout(function(){checkDates();}, 500);check_date(this);"
+                                value="#{bean.dateFrom}" placeholder="#{msg.mailManagerDateFrom}"/>
+                    <p:calendar id="filterDateTo" readonlyInput="false" showOn="button"
+                                onkeypress="if(!searchOnEnter(event, 'searchButton')) return false;"
+                                pattern="dd/MM/yyyy" mask="true"
+                                locale="it" navigator="true" popupIconOnly="true" placeholder="#{msg.mailManagerDateTo}"
+                                onblur="check_date(this)" value="#{bean.dateTo}"/>
+                </p:column>
+
+                <p:column>
+                    <br/>
+                    <p:selectOneMenu id="client" value="#{bean.selectedClientId}"
+                                     label="#{msg.invoiceClient}" styleClass="select-width">
+                        <f:selectItems value="#{bean.clients}"/>
+                    </p:selectOneMenu>
+                </p:column>
+                <p:column>
+                    <br/>
+                    <p:selectOneMenu id="paymentType" value="#{bean.selectedPaymentTypeId}"
+                                     label="#{msg.invoicePaymentType}" styleClass="select-width">
+                        <f:selectItems value="#{bean.paymentTypes}"/>
+                    </p:selectOneMenu>
+                </p:column>
+                <p:column>
+                	<br/>
+         		   <span> #{msg.invoiceSplitPayment}:<span class="red">*</span>:</span><br/>
+          		   <p:selectBooleanCheckbox value="#{bean.splitPayment}"/>
+                </p:column>
+                <p:column>
+                	<br/>
+         		   <span> #{msg.invoiceSent}:<span class="red">*</span>:</span><br/>
+          		   <p:selectBooleanCheckbox value="#{bean.sent}"/>
+                </p:column>
+            </p:panelGrid>
+            <p:commandButton value="#{msg.search}" style="float: right;margin-right: 50px;"
+                             id="searchButton" onclick="checkDates(); filterTableFromPanel();"
+                             update=":form:table,searchPanel"/>     
+            
+            <p:commandButton value="#{msg.invoiceNew}" id="btn_new" styleClass="btn-green"
+                             disabled="#{!bean.canCreate}" action="#{bean.createNewInvoice}"/>
+            
+        </p:outputPanel>
+
+        <p:dataTable var="item" id="table"
+                     emptyMessage="#{msg.noRecordsFound}" value="#{bean.lazyModel}"
+                     rowKey="#{item.id}" rows="10" lazy="true" paginator="true"
+                     paginatorAlwaysVisible="true" rowIndexVar="rowId"
+                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                     rowsPerPageTemplate="10,20,50" widgetVar="tableWV">
+
+            <p:column headerText="#{msg.invoiceCreateDate}" sortBy="#{item.createDate}" style="width: 72px; text-align: center;">
+                <h:outputText value="#{item.createDate}" converter="dateTimeConverter"/>
+                <br/>
+                <h:outputText value="#{item.createDate}" converter="timeConverter"/>
+            </p:column>
+	    
+	   <p:column headerText="#{msg.invoiceDate}" sortBy="#{item.date}" style="width: 72px; text-align: center;">
+                <h:outputText value="#{item.date}" converter="dateTimeConverter"/>
+                <br/>
+                <h:outputText value="#{item.date}" converter="timeConverter"/>
+            </p:column>
+
+            <p:column headerText="#{msg.invoiceClient}" sortBy="#{item.client}">
+                <h:outputText value="#{item.client}"/>
+            </p:column>
+
+            <p:column headerText="#{msg.invoiceNote}" styleClass="action_midle_column">
+                <h:outputText value="#{item.notes}"/>
+            </p:column>
+
+           <p:column headerText="#{msg.invoicePaymentType}" styleClass="action_midle_column" sortBy="#{item.paymentType}">
+                <h:outputText value="#{item.paymentType}"/>
+            </p:column>
+
+            <p:column style="width: 100px;" headerText="#{msg.invoiceSplitPayment}" sortBy="#{item.splitPayment}">
+                <h:outputText value="#{item.splitPayment}"/>
+            </p:column>
+	    
+	    <p:column style="width: 100px;" headerText="#{msg.invoiceSent}" sortBy="#{item.sent}">
+                <h:outputText value="#{item.sent}"/>
+            </p:column>
+            
+            <p:column styleClass="action_midle_column" headerText="#{msg.invoiceSend}">
+            	<p:commandButton oncomplete="PF('confirmSendDialogWV').show();" 
+            		value="#{msg.invoiceSend}">
+            		<f:setPropertyActionListener value="#{item.id}"
+            									 target="#{bean.entityEditId}" />
+            	</p:commandButton>
+            </p:column>
+            
+            <p:column exportable="false" styleClass="action_midle_column" headerText="#{msg.edit}"
+                      rendered="#{!bean.getCurrentUser().isExternal()}">
+                <p:commandButton icon="fa fa-pencil-square-o"
+                                 disabled="#{!bean.canEdit}" action="#{bean.manageRequest}">
+                    <f:setPropertyActionListener value="#{item.id}"
+                                                 target="#{bean.entityEditId}"/>
+                </p:commandButton>
+            </p:column>
+            
+            <p:column styleClass="action_column">
+                <p:commandButton icon="ui-icon ui-icon-close" update=":form" styleClass="btn-red"
+                                 oncomplete="PF('dlg2').show()" disabled="#{!bean.canDelete}">
+                    <f:setPropertyActionListener value="#{item.id}"
+                                                 target="#{bean.entityDeleteId}"/>
+                </p:commandButton>
+            </p:column>
+        </p:dataTable>
+
+        <p:dialog id="dlg2" widgetVar="dlg2" modal="true" resizable="false"
+                  draggable="false" effect="SLIDE">
+            #{msg.deleteRequestConfirmation}<br/>
+            <br/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.yes}" action="#{bean.deleteEntity}"
+                                 oncomplete="PF('dlg2').hide()" update=":form,:form:messages"/>
+                <p:commandButton value="#{msg.no}" onclick="PF('dlg2').hide()"/>
+            </div>
+        </p:dialog>
+
+        <p:dialog id="confirmSendDialog"
+        		 widgetVar="confirmSendDialogWV" modal="true" resizable="false"
+                  draggable="false" effect="SLIDE">
+            #{msg.invoiceSendConfirmation}<br/>
+            <br/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.yes}" action="#{bean.sendInvoice}"
+                                 oncomplete="PF('confirmSendDialogWV').hide()" 
+                                 update=":form,:form:messages"/>
+                <p:commandButton value="#{msg.no}" 
+                				 onclick="PF('confirmSendDialogWV').hide()"/>
+            </div>
+        </p:dialog>
+        
+            <p:dialog widgetVar="sendInvoiceErrorDialogWV"  modal="true" draggable="false"
+                  position="center center">
+            <div class="ui-messages-error ui-corner-all">
+                <span class="ui-messages-error-summary">#{bean.apiError}</span><br/>
+            </div>
+	    <p:commandButton oncomplete="PF('sendInvoiceErrorDialogWV').hide();"
+	     value="#{msg.close}" /> 
+	     </p:dialog>
+	     
+	     <p:dialog widgetVar="editInvoiceErrorDialogWV"  modal="true" draggable="false"
+                  position="center center">
+            <div class="ui-messages-error ui-corner-all">
+                <span class="ui-messages-error-summary">#{msg.editInvoiceErrorMsg}</span><br/>
+            </div>
+	    <p:commandButton oncomplete="PF('editInvoiceErrorDialogWV').hide();"
+	     value="#{msg.close}" /> 
+	     </p:dialog>
+	     
+	     <p:dialog widgetVar="removeInvoiceErrorDialogWV"  modal="true" draggable="false"
+                  position="center center">
+            <div class="ui-messages-error ui-corner-all">
+                <span class="ui-messages-error-summary">#{msg.removeInvoiceErrorMsg}</span><br/>
+            </div>
+	    <p:commandButton oncomplete="PF('removeInvoiceErrorDialogWV').hide();"
+	     value="#{msg.close}" /> 
+	     </p:dialog>
+	     
+	    <p:dialog widgetVar="sendInvoiceOkDialogWV"  modal="true" draggable="false"
+                  position="center center">
+            <div class="ui-messages-info ui-corner-all">
+                <span class="ui-messages-info-summary">#{msg.sendInvoiceOkMsg}</span><br/>
+            </div>
+	    <p:commandButton oncomplete="PF('sendInvoiceOkDialogWV').hide();"
+	     value="#{msg.close}" /> 
+    	</p:dialog>
+    	
+    		    <p:dialog widgetVar="editInvoiceOkDialogWV"  modal="true" draggable="false"
+                  position="center center">
+            <div class="ui-messages-info ui-corner-all">
+                <span class="ui-messages-info-summary">#{msg.editInvoiceOkMsg}</span><br/>
+            </div>
+	    <p:commandButton oncomplete="PF('editInvoiceOkDialogWV').hide();"
+	     value="#{msg.close}" /> 
+    	</p:dialog>
+    	
+    		    <p:dialog widgetVar="removeInvoiceOkDialogWV"  modal="true" draggable="false"
+                  position="center center">
+            <div class="ui-messages-info ui-corner-all">
+                <span class="ui-messages-info-summary">#{msg.removeInvoiceOkMsg}</span><br/>
+            </div>
+	    <p:commandButton oncomplete="PF('removeInvoiceOkDialogWV').hide();"
+	     value="#{msg.close}" /> 
+    	</p:dialog>
+
+    </ui:define>
+</ui:composition>
+</html>

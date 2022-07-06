@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui">
+
+    <span>#{enums.manageTypeFieldsPROPERTY_DATA}
+        <h:panelGroup rendered="#{not empty block}" style="#{block.isRequired()?'':'display:none;'}">*</h:panelGroup>
+        <h:panelGroup rendered="#{not empty item and not empty item.field}" style="#{item.field.isRequired()?'':'display:none;'}">*</h:panelGroup>
+    </span>
+    <p:panel id="PROPERTY_DATA" style="background: transparent; border: none">
+
+        <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" layout="grid" style="width: 100%;">
+            <p:column>
+                <h:outputText value="#{enums.documentGenerationTagsPROPERTY_DATA_LANDED_BUILDING}"/><br/>
+                <p:selectOneRadio id="PROPERTY_DATA_LANDED_BUILDING" value="#{bean.wrapper.selectedBuildingId}"
+                                  update="PROPERTY_DATA">
+                    <f:selectItems value="#{bean.wrapper.buildings}"/>
+                    <p:ajax update="PROPERTY_DATA"/>
+                </p:selectOneRadio>
+            </p:column>
+            <p:column>
+                <h:outputText value="#{enums.documentGenerationTagsPROPERTY_DATA_SHEET}"/><br/>
+                <p:inputText id="PROPERTY_DATA_SHEET" value="#{bean.entity.sheet}" styleClass="input-width"/>
+            </p:column>
+            <p:column>
+                <h:outputText value="#{enums.documentGenerationTagsPROPERTY_DATA_PARTICLE}"/><br/>
+                <p:inputText id="PROPERTY_DATA_PARTICLE" value="#{bean.entity.particle}" styleClass="input-width"/>
+            </p:column>
+            <p:column>
+                <h:outputText value="#{enums.documentGenerationTagsPROPERTY_DATA_SUB}"/><br/>
+                <p:inputText id="PROPERTY_DATA_SUB" value="#{bean.entity.sub}" styleClass="input-width"/>
+            </p:column>
+            <p:column>
+                <h:outputText value="#{enums.documentGenerationTagsPROPERTY_DATA_ADDRESS}"/><br/>
+                <p:inputText id="PROPERTY_DATA_ADDRESS" value="#{bean.entity.addressProperty}"
+                             styleClass="input-width"/>
+            </p:column>
+            <p:column>
+                <h:outputText value="#{enums.documentGenerationTagsPROPERTY_DATA_SESSION}"
+                              rendered="#{bean.wrapper.renderSession()}"/><br/>
+                <p:inputText id="PROPERTY_DATA_SESSION" value="#{bean.entity.section}" styleClass="input-width"
+                             rendered="#{bean.wrapper.renderSession()}"/>
+            </p:column>
+        </p:panelGrid>
+    </p:panel>
+</ui:composition>
