@@ -59,9 +59,15 @@
 					<p:ajax process="managers"/>
 				</p:selectCheckboxMenu>
 				<h:outputText value="#{msg.clientTrust}:"/>
-				<p:selectOneMenu id="client_fiduciary_id" value="#{bean.selectedClientFiduciaryId}" styleClass="input-width-mmv">
+				<p:selectOneMenu id="client_fiduciary_id_old"
+				rendered="false" 
+				value="#{bean.selectedClientFiduciaryId}" 
+				styleClass="input-width-mmv">
 					<f:selectItems value="#{bean.fiduciaryClientsList}"/>
 				</p:selectOneMenu>
+				<p:inputText id="client_fiduciary_id" value="#{bean.clientFiduciary}"  styleClass="ui-inputfield-border"
+				    style="width: 100%"/>
+				
 				<span> #{msg.ndgText}</span>
 				<p:inputText id="ndgShow" value="#{bean.excelReportNDG}" styleClass="ui-inputfield-border"
 					style="width: 100%" />
