@@ -26,6 +26,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
@@ -1159,7 +1160,11 @@ public class ExcelDataEdit extends BaseEntityPageBean {
 				excelDataWrapper.setClientFiduciary(DaoManager.get(Client.class, getSelectedClientFiduciaryId()));
 			}
 
-			excelDataWrapper.setFiduciary(getClientFiduciary());
+			if (StringUtils.isNotBlank(getClientFiduciary())) {
+				excelDataWrapper.setFiduciary(getClientFiduciary().trim());
+			} else {
+				excelDataWrapper.setFiduciary(null);
+			}
 
 			List<Request> recievedInboxRequests = null;
 			if (!ValidationHelper.isNullOrEmpty(getMail())

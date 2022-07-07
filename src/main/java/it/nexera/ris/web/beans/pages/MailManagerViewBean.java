@@ -1183,7 +1183,11 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 				getEntity().setClientInvoice(null);
 			}
 
-			getEntity().setFiduciary(getClientFiduciary());
+			if (StringUtils.isNotBlank(getClientFiduciary())) {
+				getEntity().setFiduciary(getClientFiduciary().trim());
+			} else {
+				getEntity().setFiduciary(null);
+			}
 
 			if (!ValidationHelper.isNullOrEmpty(getSelectedClientFiduciaryId())) {
 				getEntity().setClientFiduciary(DaoManager.get(Client.class, getSelectedClientFiduciaryId()));
