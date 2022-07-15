@@ -722,7 +722,7 @@
                             <f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}" itemValue="#{null}"
                                           noSelectionOption="true"/>
                             <f:selectItems value="#{bean.clients}" />
-                            <p:ajax event="itemSelect" update="@this"/>
+                            <p:ajax event="itemSelect" listener="#{bean.filterByClient}" update="@this slides1"/>
                         </p:selectOneMenu>
 
                         <p:selectOneMenu id="year" value="#{bean.selectedYear}" label="#{msg.requestClient}"
@@ -731,7 +731,7 @@
                             <f:selectItem itemLabel="#{ff:upper(msg.billingListYear)}" itemValue="#{null}"
                                           noSelectionOption="true"/>
                             <f:selectItems value="#{bean.years}"/>
-                            <p:ajax event="itemSelect" update="@this"/>
+                            <p:ajax event="itemSelect" listener="#{bean.filterByYear}" update="@this slides1"/>
                         </p:selectOneMenu>
                     </p:panelGrid>
 

@@ -69,6 +69,8 @@ public class DateTimeHelper extends BaseHelper {
     private static String xmlSecondDateRegex = "^([0-9]{4}[-/]?((0[13-9]|1[012])[-/]?(0[1-9]|[12][0-9]|30)|(0[13578]|1[02])[-/]?31|02[-/]?(0[1-9]|1[0-9]|2[0-8]))|([0-9]{2}(([2468][048]|[02468][48])|[13579][26])|([13579][26]|[02468][048]|0[0-9]|1[0-6])00)[-/]?02[-/]?29)$";
 
     private static String monthWordDatePattert = "dd MMMM yyyy";
+    
+    private static String datePatternWithoutDate = "MM/yyyy";
 
     private static DateFormat createDateFormat(String pattern) {
         return createDateFormat(pattern, null);
@@ -803,4 +805,37 @@ public class DateTimeHelper extends BaseHelper {
         cal.setTime(date);
         return (cal.get(Calendar.MONTH) + 1);
     }
+
+    public static int getDay(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return (cal.get(Calendar.DAY_OF_MONTH));
+    }
+    
+    public static Date getFirstDateOfMonth(String dateString) {
+	    DateFormat dateFormat = new SimpleDateFormat(datePatternWithoutDate);
+	    Calendar calendar = Calendar.getInstance();
+	    try {
+			calendar.setTime(dateFormat.parse(dateString));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	    calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMinimum(Calendar.DAY_OF_MONTH));
+	    return calendar.getTime();
+	}
+	
+	public static Date getLastDateOfMonth(String dateString) {
+	    DateFormat dateFormat = new SimpleDateFormat(datePatternWithoutDate);
+	    Calendar calendar = Calendar.getInstance();
+	    try {
+			calendar.setTime(dateFormat.parse(dateString));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	    calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+	    calendar.set(Calendar.HOUR, 23);
+	    calendar.set(Calendar.MINUTE, 59);
+	    calendar.set(Calendar.SECOND, 59);
+	    return calendar.getTime();
+	}
 }

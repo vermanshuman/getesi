@@ -46,7 +46,7 @@ public class WLGInboxShort extends IndexedEntity {
     @Column(name = "xpriority")
     private Integer xpriority;
 
-    @Column(name = "send_date", columnDefinition = "TIMESTAMP", nullable = false)
+    @Column(name = "send_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", nullable = false)
     private Date sendDate;
 
     @Column(name = "email_from", length = 200)

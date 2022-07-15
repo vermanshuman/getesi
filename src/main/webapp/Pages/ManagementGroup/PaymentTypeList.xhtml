@@ -76,7 +76,7 @@
                 }
             </style>
             <p:remoteCommand name="updateFilterInput"
-                             update=":filterDescription :filterCode :filterBeneficiary :filterIstitutionName :filterIban"/>
+                             update=":filterDescription :filterAcronym :filterCode :filterBeneficiary :filterIstitutionName :filterIban"/>
             <p:remoteCommand name="filterTableFromPanel"
                              action="#{bean.filterTableFromPanel}" update=":form:table"/>
             <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" styleClass="panelSetting" style="display: none;">
@@ -138,7 +138,7 @@
                     <div class="p-col-6">
                         <div style="">
                             <h:outputText style="color: #003871;"
-                                          value=""/>
+                                          value="#{ff:upper(msg.acronym)}:"/>
                         </div>
                     </div>
                     <div class="p-col-6">
@@ -148,8 +148,7 @@
                     </div>
                     <div class="p-col-6">
                         <div style="">
-                            <h:outputText style="color: #003871;"
-                                          value=""/>
+                            <p:inputText id="filterAcronym" onblur="updateFilterInput()" value="#{bean.acronym}" style="width: 99%;min-height: 38px;" styleClass="#{bean.acronym ne null and bean.acronym ne '' ? 'green-border' : ''}" />
                         </div>
                     </div>
                     <div class="p-col-12" style="text-align: center;">
@@ -165,6 +164,10 @@
     <ui:define name="columns">
         <p:column sortBy="#{item.description}" headerText="#{msg.description}">
             <h:outputText value="#{item.description}"/>
+        </p:column>
+
+        <p:column sortBy="#{item.acronym}" headerText="#{msg.acronym}">
+            <h:outputText value="#{item.acronym}"/>
         </p:column>
 
         <p:column sortBy="#{item.code}" headerText="#{msg.code}">
@@ -199,6 +202,11 @@
                             <p:inputText id="description"
                                          value="#{bean.entity.description}"
                                          label="#{msg.description}"/>
+
+                            <span>#{msg.acronym}:</span>
+                            <p:inputText id="acronym"
+                                         value="#{bean.entity.acronym}"
+                                         label="#{msg.acronym}"/>
 
                             <span>#{msg.code}:</span>
                             <p:inputText id="code"

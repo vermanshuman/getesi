@@ -756,10 +756,11 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
                 joiner.add(ResourcesHelper.getString("mailManagerEditGoodMorning"));
             }
 
+            joiner.add("</br>");
             if (requestList.size() == 1) {
-                joiner.add(ResourcesHelper.getString("mailManagerEditAttachedOneRequest"));
+                joiner.add("&nbsp;" + ResourcesHelper.getString("mailManagerEditAttachedOneRequest"));
             } else {
-                joiner.add(ResourcesHelper.getString("mailManagerEditAttachedManyRequests"));
+                joiner.add("&nbsp;" + ResourcesHelper.getString("mailManagerEditAttachedManyRequests"));
             }
 
             joiner.add("</br></br>" + (table
@@ -1411,7 +1412,7 @@ public class MailManagerEditBean extends EntityViewPageBean<WLGInbox> implements
                 String path = FileHelper.writeFileToFolder("costs-" + getRequestId() + ".pdf",
                         new File(FileHelper.getApplicationProperties().getProperty("requestReportSavePath")
                                 + File.separator + getRequestId()),
-                        PrintPDFHelper.convertToPDF(null, bodyTable, null, DocumentType.INVOICE_REPORT));
+                        PrintPDFHelper.convertToPDF(null, bodyTable, null, DocumentType.INVOICE_REPORT, true));
 
 
                 Document document = new Document();

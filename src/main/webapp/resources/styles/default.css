@@ -804,12 +804,6 @@ body .btn-green {
     color: #5f666c !important;
 }
 
-.user-row {
-    color: darkgrey;
-    font-weight: bold;
-    text-decoration: underline;
-}
-
 .delete-row {
     color: darkgrey;
     font-weight: bold;

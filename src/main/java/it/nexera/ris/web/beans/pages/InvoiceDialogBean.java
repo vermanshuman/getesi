@@ -359,6 +359,10 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
     private WLGInbox entity;
     
     private Boolean invoiceSaveAsDraft;
+    
+    private List<Invoice> unlockedInvoicesDialog;
+    
+    private Invoice selectedUnlockedInvoiceDialog;
 
     @Override
     protected void onConstruct() {
@@ -1839,7 +1843,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         String body = getPdfRequestBody(invoice);
         log.info("Invoice PDF body" + body);
         byte[] fileContent = PrintPDFHelper.convertToPDF(null, body, null,
-                DocumentType.INVOICE);
+                DocumentType.INVOICE, true);
 
         if (fileContent != null) {
             String fileName = "FE-" + invoice.getNumber() + " "
@@ -1868,7 +1872,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
             IOException, PersistenceBeanException, IllegalAccessException {
         String body = getPdfRequestBody(invoice);
         log.info("Invoice PDF body" + body);
-        byte[] fileContent = PrintPDFHelper.convertToPDF(null, body, null, documentType);
+        byte[] fileContent = PrintPDFHelper.convertToPDF(null, body, null, documentType, true);
 
         if (fileContent != null) {
             String fileName = "FE-" + invoice.getNumber() + " "
@@ -2312,7 +2316,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
             executeJS("PF('sendInvoiceErrorDialogWV').show();");
             return;
         }
-        executeJS("PF('invoiceDialogBillingWV').hide();");
+        executeJS("PF('invoiceDialogExcelWV').hide();");
         redierctToBilling();
         //closeInvoiceDialog();
     }
@@ -2379,5 +2383,30 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
 
     public void redierctToBilling() {
         RedirectHelper.goTo(PageTypes.BILLING_LIST);
+    }
+    
+    public void loadUnlockedInvoiceDialogData() throws IllegalAccessException, PersistenceBeanException {
+    	setUnlockedInvoicesDialog(DaoManager.load(Invoice.class,
+                new Criterion[]{Restrictions.eq("status", InvoiceStatus.UNLOCKED), Restrictions.isNotNull("number")}, new Order[]{
+                        Order.desc("number")}));
+    }
+    
+    public void unlockInvoices() throws HibernateException, PersistenceBeanException, IllegalAccessException, InstantiationException {
+    	if(!ValidationHelper.isNullOrEmpty(getSelectedInvoice()) && !ValidationHelper.isNullOrEmpty(getSelectedUnlockedInvoiceDialog())) {
+    		Long currentInvoiceNumber = getSelectedInvoice().getNumber();
+    		getSelectedInvoice().setNumber(getSelectedUnlockedInvoiceDialog().getNumber());
+    		getSelectedInvoice().setInvoiceNumber(getSelectedUnlockedInvoiceDialog().getInvoiceNumber());
+    		getSelectedInvoice().setDate(getSelectedUnlockedInvoiceDialog().getDate());
+    		DaoManager.save(getSelectedInvoice(), true);
+    		
+    		getSelectedUnlockedInvoiceDialog().setNumber(null);
+    		getSelectedUnlockedInvoiceDialog().setInvoiceUnlockedId(currentInvoiceNumber);
+    		DaoManager.save(getSelectedUnlockedInvoiceDialog(), true);
+    		
+    		loadInvoiceDialogData(getSelectedInvoice());
+    		executeJS("PF('invoiceDialogExcelWV').show();");
+    		setActiveTabIndex(1);
+    		RequestContext.getCurrentInstance().update("invoiceDialogExcel");
+    	}
     }
 }

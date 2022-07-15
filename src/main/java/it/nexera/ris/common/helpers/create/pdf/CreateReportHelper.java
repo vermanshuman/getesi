@@ -277,6 +277,9 @@ public abstract class CreateReportHelper extends BaseHelper {
     public Double getCostEstate(Request request, Service service, Boolean billingClient, boolean restictionForPriceList)
             throws PersistenceBeanException, IllegalAccessException {
         double result = 0d;
+        if(!ValidationHelper.isNullOrEmpty(request.getUnauthorizedQuote()) && request.getUnauthorizedQuote()){
+            return result;
+        }
         List<PriceList> priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
                 new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
                         Restrictions.eq("client", (billingClient == null || !billingClient)

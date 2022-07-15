@@ -336,6 +336,12 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     
     private Long selectedPaymentOutcome;
     
+    private List<Invoice> unlockedInvoicesDialog;
+    
+    private Invoice selectedUnlockedInvoiceDialog;
+    
+    private PaymentInvoice selectedPaymentInvoice;
+    
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
         if (!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.BILLING_LIST))) {
@@ -1585,17 +1591,37 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         	setInvoiceSaveAsDraft(Boolean.TRUE);
     }
     
-    public void loadPaymentData() throws HibernateException, IllegalAccessException, PersistenceBeanException{
-        if(!ValidationHelper.isNullOrEmpty(getSelectedInvoice()))
-        	setPaymentAmount(getSelectedInvoice().getTotalGrossAmount());
-        //set Tipo Bonifico as default
-        setSelectedPaymentTypeDescription(2l);
-        setPaymentTypeDescriptions(ComboboxHelper.fillList(InvoicePaymentType.class, false));
-        List<PaymentType> paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("code", "MP05"), 
-				Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                Restrictions.isNull("isDeleted"))});
-        setSelectedPaymentOutcome(getSelectedInvoice().getPaymentType().getId());
-		setPaymentOutcomes(ComboboxHelper.fillList(paymentTypes, false));
+    public void loadPaymentData(PaymentInvoice paymentInvoice) throws HibernateException, IllegalAccessException, PersistenceBeanException{
+        if(ValidationHelper.isNullOrEmpty(paymentInvoice)) {
+        	setSelectedPaymentInvoice(null);
+	    	if(!ValidationHelper.isNullOrEmpty(getSelectedInvoice()))
+	        	setPaymentAmount(getSelectedInvoice().getTotalGrossAmount());
+	        //set Tipo Bonifico as default
+	        setSelectedPaymentTypeDescription(2l);
+	        setPaymentTypeDescriptions(ComboboxHelper.fillList(InvoicePaymentType.class, false));
+	        List<PaymentType> paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("code", "MP05"), 
+					Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+	                Restrictions.isNull("isDeleted"))});
+	        setSelectedPaymentOutcome(getSelectedInvoice().getPaymentType().getId());
+			setPaymentOutcomes(ComboboxHelper.fillList(paymentTypes, false));
+        } else {
+        	setSelectedPaymentInvoice(paymentInvoice);
+        	setPaymentAmount(paymentInvoice.getPaymentImport());
+        	setPaymentDate(paymentInvoice.getDate());
+        	setPaymentTypeDescriptions(ComboboxHelper.fillList(InvoicePaymentType.class, false));
+        	List<PaymentType> paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("description", paymentInvoice.getDescription()), 
+					Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+			                Restrictions.isNull("isDeleted"))});
+        	PaymentType paymentType = paymentTypes.get(0);
+        	if(paymentType.getCode().equals("MP02"))
+        		setSelectedPaymentTypeDescription(InvoicePaymentType.Check.getId());
+        	if(paymentType.getCode().equals("MP05"))
+        		setSelectedPaymentTypeDescription(InvoicePaymentType.Transfer.getId());
+        	if(paymentType.getCode().equals("MP01"))
+        		setSelectedPaymentTypeDescription(InvoicePaymentType.Cash.getId());
+        	setSelectedPaymentOutcome(paymentInvoice.getInvoice().getPaymentType().getId());
+			setPaymentOutcomes(ComboboxHelper.fillList(paymentTypes, false));
+        }
     }
     
     public void invoicePaymentTypeListner(SelectEvent selectEvent) throws HibernateException, IllegalAccessException, PersistenceBeanException {
@@ -1680,11 +1706,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         else
             throw new Exception("Client invoice is null, Can't create invoice");
 
-//        if(selectedRequestList.size() > 0) {
-//            //invoice.setClient(selectedRequestList.get(0).getClient());
-//
-//        }
-
         setSelectedInvoiceClient(invoice.getClient());
         if(!ValidationHelper.isNullOrEmpty(getSelectedInvoiceClient()))
             setSelectedInvoiceClientId(getSelectedInvoiceClient().getId());
@@ -1715,6 +1736,10 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         		totalCost += 0d;
         	else
         		totalCost += Double.parseDouble(request.getTotalCost().replaceAll(",", "."));
+        	if (!ValidationHelper.isNullOrEmpty(request.getService())
+                    && !ValidationHelper.isNullOrEmpty(request.getService().getNationalPrice())) {
+        		totalCost += request.getService().getNationalPrice();
+        	}
         }
         BigDecimal tot = BigDecimal.valueOf(totalCost);
         tot = tot.setScale(2, RoundingMode.HALF_UP);
@@ -1776,7 +1801,6 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     && checkSpecialCharacters(goodsServicesFieldWrapper.getDescription())){
                 isSpecialCharacters = true;
                 String description = goodsServicesFieldWrapper.getDescription();
-                System.out.println(getInvoiceErrorMessage() + ">>>>>>>> " + description);
                 goodsServicesFieldWrapper.setDescription(description.replaceAll(InvoiceHelper.specialCharacters, ""));
             }
         }
@@ -2920,6 +2944,9 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
     public void saveInvoicePayment() throws HibernateException, PersistenceBeanException, IllegalAccessException, InstantiationException {
         PaymentInvoice paymentInvoice = new PaymentInvoice();
+        if(!ValidationHelper.isNullOrEmpty(getSelectedPaymentInvoice())) {
+        	paymentInvoice = getSelectedPaymentInvoice();
+        }
         paymentInvoice.setPaymentImport(getPaymentAmount());
         paymentInvoice.setDate(getPaymentDate());
         //paymentInvoice.setDescription(getPaymentDescription());
@@ -2930,6 +2957,13 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         paymentInvoice.setInvoice(getSelectedInvoice());
         DaoManager.save(paymentInvoice, true);
         List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[]{Restrictions.eq("invoice", getSelectedInvoice())}, new Order[]{
+                Order.asc("date")});
+        setPaymentInvoices(paymentInvoicesList);
+    }
+    
+    public void deleteInvoicePayment(PaymentInvoice paymentInvoice) throws HibernateException, PersistenceBeanException, IllegalAccessException {
+		DaoManager.remove(paymentInvoice, true);
+		List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[]{Restrictions.eq("invoice", getSelectedInvoice())}, new Order[]{
                 Order.asc("date")});
         setPaymentInvoices(paymentInvoicesList);
     }
@@ -3201,8 +3235,14 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     requestType = requestType + " + ";
                 requestType = requestType + request;
             }
-
-            emailBody = dearCustomer + ",</br></br>"
+            
+            String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
+                    String.class, new Criterion[]{Restrictions.eq("id", Long.parseLong(
+                            ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.SENT_SERVER_ID)
+                                    .getValue()))}).get(0);
+            String mail_footer = MAIL_FOOTER.replace("info@brexa.it", emailsFrom);
+            
+            emailBody = dearCustomer + ",</br>"
                     + attachedCopyMessage + "</br></br>"
                     + "<table style='border:none;'>"
                     + (!ndg.isEmpty() ? "<tr><td style='border:none;'>NDG: " +"</td><td style='padding-left: 50px; border:none;'>" + ndg + "</td></tr>" : "")
@@ -3210,7 +3250,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     + (!requestType.isEmpty() ? "<tr><td style='border:none;'>REQUEST: " +"</td><td style='padding-left: 50px; border:none;'>" + requestType + "</td></tr>" : "")
                     + "</table></br>"
                     + thanksMessage
-                    + MAIL_FOOTER;
+                    + mail_footer;
         }
         return emailBody;
     }
@@ -3308,6 +3348,31 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
 
     public void redierctToBilling() {
         RedirectHelper.goTo(PageTypes.BILLING_LIST);
+    }
+    
+    public void loadUnlockedInvoiceDialogData() throws IllegalAccessException, PersistenceBeanException {
+    	setUnlockedInvoicesDialog(DaoManager.load(Invoice.class,
+                new Criterion[]{Restrictions.eq("status", InvoiceStatus.UNLOCKED), Restrictions.isNotNull("number")}, new Order[]{
+                        Order.desc("number")}));
+    }
+    
+    public void unlockInvoices() throws HibernateException, PersistenceBeanException, IllegalAccessException, InstantiationException {
+    	if(!ValidationHelper.isNullOrEmpty(getSelectedInvoice()) && !ValidationHelper.isNullOrEmpty(getSelectedUnlockedInvoiceDialog())) {
+    		Long currentInvoiceNumber = getSelectedInvoice().getNumber();
+    		getSelectedInvoice().setNumber(getSelectedUnlockedInvoiceDialog().getNumber());
+    		getSelectedInvoice().setInvoiceNumber(getSelectedUnlockedInvoiceDialog().getInvoiceNumber());
+    		getSelectedInvoice().setDate(getSelectedUnlockedInvoiceDialog().getDate());
+    		DaoManager.save(getSelectedInvoice(), true);
+    		
+    		getSelectedUnlockedInvoiceDialog().setNumber(null);
+    		getSelectedUnlockedInvoiceDialog().setInvoiceUnlockedId(currentInvoiceNumber);
+    		DaoManager.save(getSelectedUnlockedInvoiceDialog(), true);
+    		
+    		loadInvoiceDialogData(getSelectedInvoice());
+    		executeJS("PF('invoiceDialogBillingWV').show();");
+    		setActiveTabIndex(1);
+    		RequestContext.getCurrentInstance().update("invoiceDialogBilling");
+    	}
     }
 
 }

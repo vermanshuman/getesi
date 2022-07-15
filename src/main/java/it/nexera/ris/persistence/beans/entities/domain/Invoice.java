@@ -4,9 +4,12 @@ import it.nexera.ris.common.enums.InvoiceStatus;
 import it.nexera.ris.common.enums.VatCollectability;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.DateTimeHelper;
+import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
+
+import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
 
 
@@ -90,6 +93,9 @@ public class Invoice extends IndexedEntity implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "email_from")
 	private WLGInbox emailFrom;
+	
+	@Column(name = "invoice_unlocked_id")
+	private Long invoiceUnlockedId;
 
 	@Transient
 	private String documentType;
@@ -105,6 +111,9 @@ public class Invoice extends IndexedEntity implements Serializable {
 
 	@Transient
 	private Double totalPayment;
+	
+	@Transient
+	private Double totalVat;
 
 	public Long getCloudId() {
 		return cloudId;
@@ -282,6 +291,25 @@ public class Invoice extends IndexedEntity implements Serializable {
 		paymentImportTotal = tot.doubleValue();
 		return paymentImportTotal;
 	}
+	
+	public Double getTotalVat() throws PersistenceBeanException, IllegalAccessException, HibernateException, InstantiationException{
+		List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, Restrictions.eq("invoice.id", this.getId()));
+		double total = 0.0;
+		for(InvoiceItem invoiceItem : invoiceItems) {
+			if (!ValidationHelper.isNullOrEmpty(invoiceItem.getInvoiceTotalCost())) {
+                if (!ValidationHelper.isNullOrEmpty(invoiceItem.getTaxRate())) {
+                    TaxRate taxrate = DaoManager.get(TaxRate.class, invoiceItem.getTaxRate().getId());
+                    if (!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())) {
+                    	total +=invoiceItem.getInvoiceTotalCost().doubleValue() * (taxrate.getPercentage().doubleValue() / 100);
+                    }
+                }
+            }
+		}
+		BigDecimal tot = BigDecimal.valueOf(total);
+		tot = tot.setScale(2, RoundingMode.HALF_UP);
+		total = tot.doubleValue();
+		return total;
+	}
 
 	public String getDateString() {
 		if(getDate() != null) {
@@ -315,4 +343,13 @@ public class Invoice extends IndexedEntity implements Serializable {
 		this.managers = managers;
 	}
 
+	public Long getInvoiceUnlockedId() {
+		return invoiceUnlockedId;
+	}
+
+	public void setInvoiceUnlockedId(Long invoiceUnlockedId) {
+		this.invoiceUnlockedId = invoiceUnlockedId;
+	}
+
+	
 }

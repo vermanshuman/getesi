@@ -188,10 +188,10 @@
 
             <span> #{msg.requestExtraCostMortgageTable.toUpperCase()}</span>
             <p:column>
-                <p:inputText id="inputExtraCostMortgageTable" value="#{bean.costManipulationHelper.extraCostMortgageTable}"/>
+                <p:inputNumber id="inputExtraCostMortgageTable" value="#{bean.costManipulationHelper.extraCostMortgageTable}"/>
             </p:column>
             <p:column/>
-            <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('IPOTECARIO', 'TAVOLARE')}"
+            <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('IPOTECARIO_TAVOLARE')}"
                              update="extraCostArea, requestExtraCostTable"/>
 
             <span> #{msg.requestExtraCostLandRegistry.toUpperCase()}</span>
@@ -204,11 +204,12 @@
 
             <span> #{msg.requestExtraCostLandRegistryTable.toUpperCase()}</span>
             <p:column>
-                <p:inputText id="inputCostLandRegistryTable" value="#{bean.costManipulationHelper.extraCostLandRegistryTable}"/>
+                <p:inputNumber id="inputCostLandRegistryTable" value="#{bean.costManipulationHelper.extraCostLandRegistryTable}"/>
             </p:column>
             <p:column/>
-            <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('CATASTO', 'TAVOLARE')}"
+            <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('CATASTO_TAVOLARE')}"
                              update="extraCostArea, requestExtraCostTable"/>
+
 
             <c:if test="#{bean.showRequestCost ne null and bean.showRequestCost}">
                 <span> #{msg.requestExtraCostStamps.toUpperCase()}</span>

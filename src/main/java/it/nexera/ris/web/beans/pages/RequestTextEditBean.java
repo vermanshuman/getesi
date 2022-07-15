@@ -310,6 +310,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         setEstateFormalityTypes(ComboboxHelper.fillList(EstateFormalityType.class, false));
         setPropertyTypeList(ComboboxHelper.fillList(PropertyTypeEnum.class, false, false));
 
+        setRegimes(ComboboxHelper.fillList(Regime.class, true));
         setCostManipulationHelper(new CostManipulationHelper());
         getCostManipulationHelper().setMortgageTypeList(ComboboxHelper.fillList(MortgageType.class, false, false));
 
@@ -1566,18 +1567,16 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         log.debug("Fecthing extra cost for request " + getExamRequest());
+        Request request = DaoManager.get(Request.class, getExamRequest().getId());
+        log.debug("View Extra cost :" + request.getSumOfGroupedEstateFormalities());
         if (!ValidationHelper.isNullOrEmpty(getRequestNumberActUpdate())) {
-            getExamRequest().setNumberActUpdate(Double.valueOf(getRequestNumberActUpdate()));
+            request.setNumberActUpdate(Double.valueOf(getRequestNumberActUpdate()));
         }
-        getCostManipulationHelper().viewExtraCost(getExamRequest(), recalculate);
+        getCostManipulationHelper().viewExtraCost(request, recalculate);
     }
 
     public void addExtraCost(String extraCostValue) {
         getCostManipulationHelper().addExtraCost(extraCostValue, getRequestId());
-    }
-
-    public void addExtraCost(String extraCostValue, String note) {
-        getCostManipulationHelper().addExtraCost(extraCostValue, getRequestId(), note);
     }
 
     public void deleteExtraCost(ExtraCost extraCostToDelete) {
@@ -1606,8 +1605,8 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     }
     
     public void updateCosts(boolean reCalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        getCostManipulationHelper().updateExamRequestParametersFromHelper(getExamRequest());
-        getCostManipulationHelper().viewExtraCost(getExamRequest(), reCalculate);
+         getCostManipulationHelper().updateExamRequestParametersFromHelper(getExamRequest());
+         getCostManipulationHelper().viewExtraCost(getExamRequest(), reCalculate);
     }
 
     public void editExcelDataRequest() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
@@ -1732,6 +1731,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         setCurrentProperty(null);
         setEstateSelectedRegime(null);
         setCurrentEstateSituation(null);
+        setEstateSelectedRegime(null);
 
         switch (getCurrentComment()) {
             case SELECTED_PROPERTY:
@@ -1774,6 +1774,10 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         this.setQuote1(this.getEditRelationship().getQuote1());
         this.setQuote2(this.getEditRelationship().getQuote2());
         this.setPropertyType(this.getEditRelationship().getType());
+        if(!ValidationHelper.isNullOrEmpty(this.getEditRelationship().getRegime())){
+            this.setSelectedRegime(this.getEditRelationship().getRegime().getId());
+        }else
+            this.setSelectedRegime(null);
     }
 
     public void saveRelationship() {

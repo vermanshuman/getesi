@@ -1192,6 +1192,12 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
         double totalCostByColumns = getMortgageCost(request) + getCatastalCost(request)
                 + (ValidationHelper.isNullOrEmpty(request.getCostPay()) ? 0d : request.getCostPay());
         request.setCalculateCost(null);
+        if (!ValidationHelper.isNullOrEmpty(request.getService())
+                && !ValidationHelper.isNullOrEmpty(request.getService().getNationalPrice())) {
+        	calculatedTotalCost += request.getService().getNationalPrice();
+        	totalCostFromRequest += request.getService().getNationalPrice();
+        	totalCostByColumns += request.getService().getNationalPrice();
+        }
         log.info("For " + request.getFiscalCodeVATNamber());
         log.info("calculatedTotalCost " + calculatedTotalCost + ", totalCostFromRequest " + totalCostFromRequest + ", totalCostByColumns  " + totalCostByColumns);
 

@@ -373,6 +373,27 @@
     		width: 59px !important;
     		margin-right: 20px !important;
 		}
+		
+		body .custom-design-tooltip .ui-tooltip-text {
+			background: #D9E0E7;
+			color: #6688AA;
+			border: 10px solid #68a;
+			border-radius: 10px;
+			padding: 10px !important;
+			box-shadow: none;
+			position: relative;
+			top: 20px;
+			min-width: 220px !important;
+		}
+		
+		body .custom-design-tooltip .ui-tooltip-arrow {
+			display: none;
+		}
+		
+		#unlockedInvoices .ui-widget-header {
+    		background-color: #FFFFFF !important;
+    		text-align: center;
+    	}
     </style>
 
     <p:dialog widgetVar="invoiceDialogExcelWV" modal="true" width="1350" draggable="false" id="invoiceDialogExcel"
@@ -411,6 +432,15 @@
                                 <!-- ROW 1 -->
                                 <div class="p-col-1 vertical-center">
                                     <p:outputLabel value="#{msg.number}"/>
+                                    <p:commandButton id="unlockButton" styleClass="unlock-icon" oncomplete="PF('unlockedInvoiceDialogWV').show();"
+                                                     style="color: transparent !important;background-color: transparent !important;
+                                                      		border-color: transparent !important;margin-left: 4px;cursor: pointer;"
+                                                     update="unlockedInvoiceDialog">
+                                    </p:commandButton>
+                                    <p:tooltip for="unlockButton" styleClass="custom-design-tooltip">
+                                    	<h:outputText value="#{msg.numberUnblockedInvoice}"
+                                        		style="font-weight:bold;color:#003871;"/>
+                                    </p:tooltip>
                                 </div>
                                 <div class="p-col-2">
                                     <p:inputText value="#{invoiceDialogBean.number}" id="number"
@@ -1145,7 +1175,7 @@
         </div>
         <script>
             $(".ui-dialog-titlebar-close").on("click", function() {
-                if($(this).closest(".addPaymentDialog").length > 0){
+                if($(this).closest(".addPaymentDialog").length > 0 || $(this).closest(".unlockedInvoiceDialog").length > 0){
                 }else {
                     closeInvoiceDialog();
                 }
@@ -1241,5 +1271,30 @@
             <p:commandButton value="#{msg.cancel}" style="background-color: #F3362B !important; width: 100px;"
                              oncomplete="PF('invoiceSpecialCharactersDialogWV').hide();"/>
         </div>
+    </p:dialog>
+    
+    <p:dialog widgetVar="unlockedInvoiceDialogWV"  id="unlockedInvoiceDialog" modal="true" draggable="false" 
+    		  width="700" styleClass="dialog-white-bg unlockedInvoiceDialog" 
+              position="center center" header="#{msg.selectUnblockedInvoice}" onShow="loadUnlockedInvoiceData();">
+        <p:remoteCommand name="loadUnlockedInvoiceData" action="#{invoiceDialogBean.loadUnlockedInvoiceDialogData}" update="unlockedInvoices"/>
+        <p:dataTable id="unlockedInvoices" value="#{invoiceDialogBean.unlockedInvoicesDialog}" emptyMessage="#{msg.noRecordsFound}" style="margin-top: 20px;"
+                    var="unlockedInvoiceData" rows="15" lazy="true" rowKey="#{unlockedInvoiceData.id}"
+                    paginator="#{invoiceDialogBean.unlockedInvoicesDialog.size() > 15 ? true : false}" paginatorAlwaysVisible="true" 
+                    paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                    rowsPerPageTemplate="15, 30, 45, 60" selection="#{invoiceDialogBean.selectedUnlockedInvoiceDialog}">
+        	<p:column width="3%" selectionMode="single">
+        	</p:column>
+        	<p:column headerText="#{msg.billingListNumber}" sortBy="#{unlockedInvoiceData.number}" style="width: 11%">
+               	<h:outputText value="#{unlockedInvoiceData.number}"/>
+           	</p:column>
+           	<p:column headerText="#{msg.billingListDate}" sortBy="#{unlockedInvoiceData.dateString}" style="width: 11%">
+               	<h:outputText value="#{unlockedInvoiceData.dateString}"/>
+           	</p:column>
+           	<f:facet name="footer">
+                <p:commandButton process="unlockedInvoices" update="invoiceDialogExcel" value="#{msg.submit}" 
+                				 action="#{invoiceDialogBean.unlockInvoices}"
+                                 oncomplete="PF('unlockedInvoiceDialogWV').hide();"/>
+            </f:facet>
+    	</p:dataTable>
     </p:dialog>
 </ui:composition>

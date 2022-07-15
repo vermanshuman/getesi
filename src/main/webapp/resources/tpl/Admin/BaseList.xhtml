@@ -282,7 +282,7 @@
                                 <div class="btn_line">
                                     <p:commandButton value="#{msg.confirm}" action="#{bean.deleteEntity}" style="margin-right: 10px;background-color: #00CC52!important;"
                                                      oncomplete="goToPreviousPage();PF('dlg2').hide();#{dynamicOnComplete}"
-                                                     update="table,:form:messages"/>
+                                                     update="table table1 :form:messages"/>
                                     <p:commandButton value="#{msg.cancel}" onclick="PF('dlg2').hide()" style="background-color: #F3362B !important;"/>
                                 </div>
 

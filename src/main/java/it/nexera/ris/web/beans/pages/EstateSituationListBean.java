@@ -287,7 +287,12 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
     }
 
     public void viewExtraCost() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        viewExtraCost(false);
+        log.debug("Fecthing extra cost for request(EstateSituation) " + getExamRequest());
+        boolean reCalculate = true;
+        if(getExamRequest().getCostButtonConfirmClicked() != null && getExamRequest().getCostButtonConfirmClicked()){
+            reCalculate = false;
+        }
+        viewExtraCost(reCalculate);
     }
 
     public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {

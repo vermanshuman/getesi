@@ -74,6 +74,7 @@ public class CostManipulationHelper extends PageBean {
 
     private String extraCostLandRegistryTable;
 
+
     public void saveRequestEstateFormalityCost(Request request) throws PersistenceBeanException {
         if (!ValidationHelper.isNullOrEmpty(getEstateFormalityCost())) {
             try {
@@ -140,103 +141,137 @@ public class CostManipulationHelper extends PageBean {
     }
 
     public void addExtraCost(String extraCostValue, Long requestId) {
-        addExtraCost(extraCostValue, requestId, null);
-    }
-
-    public void addExtraCost(String extraCostValue, Long requestId, String note) {
         ExtraCost newExtraCost = new ExtraCost();
-        if(!ValidationHelper.isNullOrEmpty(note)) {
-            newExtraCost.setNote(note);
-        }
-        switch (ExtraCostType.getEnumByCode(extraCostValue)) {
-            case IPOTECARIO:
-                Double cost =IPOTECARIO_DEFAULT;
-                if(getSelectedMortgageNote().equals(MortgageType.AdditionalFormality.getName())) {
-                    cost = IPOTECARIO_ADDITIONAL_FORMALITY;
-                }else if(getSelectedMortgageNote().equals(MortgageType.Titolo.getName())) {
-                    cost = IPOTECARIO_TITOLO;
-                }
-                newExtraCost.setPrice((getSpinnerNumber() == null ? 1 : getSpinnerNumber()) * (cost));
-                newExtraCost.setType(ExtraCostType.IPOTECARIO);
-                newExtraCost.setNote(MortgageType.valueOf(getSelectedMortgageNote()).toString());
-                break;
-            case CATASTO:
-                if (!ValidationHelper.isNullOrEmpty(getExtraCostLandRegistry())) {
-                    try {
-                        Double.parseDouble(getExtraCostLandRegistry().replaceAll(",", "."));
-                        if ((Double.parseDouble(getExtraCostLandRegistry().replaceAll(",", ".")) / CATASTO_DIVISIBLE) % 1 != 0) {
+        ExtraCostType extraCostType = ExtraCostType.getEnumByCode(extraCostValue);
+        if(extraCostType != null){
+            switch (ExtraCostType.getEnumByCode(extraCostValue)) {
+                case IPOTECARIO:
+                    Double cost =IPOTECARIO_DEFAULT;
+                    if(getSelectedMortgageNote().equals(MortgageType.AdditionalFormality.getName())) {
+                        cost = IPOTECARIO_ADDITIONAL_FORMALITY;
+                    }else if(getSelectedMortgageNote().equals(MortgageType.Titolo.getName())) {
+                        cost = IPOTECARIO_TITOLO;
+                    }
+                    newExtraCost.setPrice((getSpinnerNumber() == null ? 1 : getSpinnerNumber()) * (cost));
+                    newExtraCost.setType(ExtraCostType.IPOTECARIO);
+                    newExtraCost.setNote(MortgageType.valueOf(getSelectedMortgageNote()).toString());
+                    break;
+                case CATASTO:
+                    if (!ValidationHelper.isNullOrEmpty(getExtraCostLandRegistry())) {
+                        try {
+                            Double.parseDouble(getExtraCostLandRegistry().replaceAll(",", "."));
+                            if ((Double.parseDouble(getExtraCostLandRegistry().replaceAll(",", ".")) / CATASTO_DIVISIBLE) % 1 != 0) {
+                                markInvalid("inputCostLandRegistry", "warning");
+                                setExtraCostLandRegistry(null);
+                                return;
+                            }
+                        } catch (NumberFormatException e) {
                             markInvalid("inputCostLandRegistry", "warning");
                             setExtraCostLandRegistry(null);
                             return;
                         }
-                    } catch (NumberFormatException e) {
-                        markInvalid("inputCostLandRegistry", "warning");
-                        setExtraCostLandRegistry(null);
+                        newExtraCost.setPrice(Double.valueOf(getExtraCostLandRegistry().replaceAll(",", ".")));
+                        newExtraCost.setType(ExtraCostType.CATASTO);
+                        cleanValidation();
+                    } else {
                         return;
                     }
-                    newExtraCost.setPrice(Double.valueOf(getExtraCostLandRegistry().replaceAll(",", ".")));
-                    newExtraCost.setType(ExtraCostType.CATASTO);
-                    cleanValidation();
-                } else {
-                    return;
-                }
-                break;
-            case ALTRO:
-                if (!ValidationHelper.isNullOrEmpty(getExtraCostOther())) {
-                    try {
-                        Double.parseDouble(getExtraCostOther().replaceAll(",", "."));
-                    } catch (NumberFormatException e) {
-                        setExtraCostOther(null);
-                        return;
-                    }
-                    newExtraCost.setPrice(
-                            Double.valueOf(Double.parseDouble(getExtraCostOther().replaceAll(",", "."))));
+                    break;
+                case ALTRO:
+                    if (!ValidationHelper.isNullOrEmpty(getExtraCostOther())) {
+                        try {
+                            Double.parseDouble(getExtraCostOther().replaceAll(",", "."));
+                        } catch (NumberFormatException e) {
+                            setExtraCostOther(null);
+                            return;
+                        }
+                        newExtraCost.setPrice(
+                                Double.valueOf(Double.parseDouble(getExtraCostOther().replaceAll(",", "."))));
 
-                    newExtraCost.setType(ExtraCostType.ALTRO);
-                    newExtraCost.setNote(getExtraCostOtherNote());
-                } else {
-                    return;
-                }
-                break;
-            case NAZIONALEPOSITIVA:
-                if (!ValidationHelper.isNullOrEmpty(getExtraCostOther())) {
-                    try {
-                        Double.parseDouble(getExtraCostOther().replaceAll(",", "."));
-                    } catch (NumberFormatException e) {
-                        setExtraCostOther(null);
+                        newExtraCost.setType(ExtraCostType.ALTRO);
+                        newExtraCost.setNote(getExtraCostOtherNote());
+                    } else {
                         return;
                     }
-                    newExtraCost.setPrice(Double.valueOf(getExtraCostOther()));
-                    newExtraCost.setType(ExtraCostType.NAZIONALEPOSITIVA);
-                    newExtraCost.setNote(getExtraCostOtherNote());
-                } else {
-                    return;
-                }
-                break;
-            case MARCA:
-                Double stampcost = MARCHE_DA_BOLLO_DEFAULT;
-                newExtraCost.setPrice((getStampSpinnerNumber() == null ? 1 : getStampSpinnerNumber()) * (stampcost));
-                newExtraCost.setType(ExtraCostType.MARCA);
-                newExtraCost.setNote("Marca da bollo");
-                break;
-            case POSTALE:
-                if (!ValidationHelper.isNullOrEmpty(getExtraCostPostalExpense())) {
-                    try {
-                        Double.parseDouble(getExtraCostPostalExpense().replaceAll(",", "."));
-                    } catch (NumberFormatException e) {
-                        markInvalid("inputCostPostalExp", "warning");
-                        setExtraCostPostalExpense(null);
+                    break;
+                case NAZIONALEPOSITIVA:
+                    if (!ValidationHelper.isNullOrEmpty(getExtraCostOther())) {
+                        try {
+                            Double.parseDouble(getExtraCostOther().replaceAll(",", "."));
+                        } catch (NumberFormatException e) {
+                            setExtraCostOther(null);
+                            return;
+                        }
+                        newExtraCost.setPrice(Double.valueOf(getExtraCostOther()));
+                        newExtraCost.setType(ExtraCostType.NAZIONALEPOSITIVA);
+                        newExtraCost.setNote(getExtraCostOtherNote());
+                    } else {
                         return;
                     }
-                    newExtraCost.setPrice(Double.valueOf(getExtraCostPostalExpense().replaceAll(",", ".")));
-                    newExtraCost.setType(ExtraCostType.POSTALE);
-                    newExtraCost.setNote("Spese postali");
-                    cleanValidation();
-                } else {
-                    return;
-                }
-                break;
+                    break;
+                case MARCA:
+                    Double stampcost = MARCHE_DA_BOLLO_DEFAULT;
+                    newExtraCost.setPrice((getStampSpinnerNumber() == null ? 1 : getStampSpinnerNumber()) * (stampcost));
+                    newExtraCost.setType(ExtraCostType.MARCA);
+                    newExtraCost.setNote("Marca da bollo");
+                    break;
+                case POSTALE:
+                    if (!ValidationHelper.isNullOrEmpty(getExtraCostPostalExpense())) {
+                        try {
+                            Double.parseDouble(getExtraCostPostalExpense().replaceAll(",", "."));
+                        } catch (NumberFormatException e) {
+                            markInvalid("inputCostPostalExp", "warning");
+                            setExtraCostPostalExpense(null);
+                            return;
+                        }
+                        newExtraCost.setPrice(Double.valueOf(getExtraCostPostalExpense().replaceAll(",", ".")));
+                        newExtraCost.setType(ExtraCostType.POSTALE);
+                        newExtraCost.setNote("Spese postali");
+                        cleanValidation();
+                    } else {
+                        return;
+                    }
+                    break;
 
+            }
+        }else {
+            switch (extraCostValue) {
+                case "IPOTECARIO_TAVOLARE":
+                    if (!ValidationHelper.isNullOrEmpty(getExtraCostMortgageTable())) {
+                        try {
+                            Double.parseDouble(getExtraCostMortgageTable().replaceAll(",", "."));
+                        } catch (NumberFormatException e) {
+                            setExtraCostMortgageTable(null);
+                            return;
+                        }
+                        newExtraCost.setPrice(
+                                Double.valueOf(Double.parseDouble(getExtraCostMortgageTable().replaceAll(",", "."))));
+
+                        newExtraCost.setType(ExtraCostType.IPOTECARIO);
+                        newExtraCost.setNote("Tavolare ipotecario");
+                    } else {
+                        return;
+                    }
+                    break;
+
+                case "CATASTO_TAVOLARE":
+                    if (!ValidationHelper.isNullOrEmpty(getExtraCostLandRegistryTable())) {
+                        try {
+                            Double.parseDouble(getExtraCostLandRegistryTable().replaceAll(",", "."));
+                        } catch (NumberFormatException e) {
+                            setExtraCostLandRegistryTable(null);
+                            return;
+                        }
+                        newExtraCost.setPrice(
+                                Double.valueOf(Double.parseDouble(getExtraCostLandRegistryTable().replaceAll(",", "."))));
+
+                        newExtraCost.setType(ExtraCostType.CATASTO);
+                        newExtraCost.setNote("Tavolare catasto");
+                    } else {
+                        return;
+                    }
+                    break;
+            }
         }
 
         newExtraCost.setRequestId(requestId);
@@ -257,8 +292,10 @@ public class CostManipulationHelper extends PageBean {
     public void deleteExtraCost(ExtraCost extraCostToDelete) {
         getRequestExtraCosts().remove(extraCostToDelete);
     }
-
     public void saveRequestExtraCost(Request request) throws Exception {
+        saveRequestExtraCost(request, Boolean.TRUE);
+    }
+    public void saveRequestExtraCost(Request request, Boolean costButtonConfirmClicked) throws Exception {
         List<ExtraCost> removeList = DaoManager.load(ExtraCost.class, new Criterion[]{
                 Restrictions.eq("requestId", request.getId())});
 
@@ -292,7 +329,7 @@ public class CostManipulationHelper extends PageBean {
                     }
 
                 }
-                request.setCostButtonConfirmClicked(true);
+                request.setCostButtonConfirmClicked(costButtonConfirmClicked);
                 request.setConfirmExtraCostsPressed(true);
                 request.setLastCostChanging(true);
                 request.setIncludeNationalCost(getIncludeNationalCost());

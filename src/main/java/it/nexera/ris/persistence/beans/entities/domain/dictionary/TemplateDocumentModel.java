@@ -27,4 +27,8 @@ public class TemplateDocumentModel extends IndexedEntity {
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;
+
+    public String toString() {
+        return name;
+    }
 }

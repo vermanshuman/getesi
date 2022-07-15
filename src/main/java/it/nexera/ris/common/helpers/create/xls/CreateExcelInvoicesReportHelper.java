@@ -1,5 +1,6 @@
 package it.nexera.ris.common.helpers.create.xls;
 
+import it.nexera.ris.common.enums.InvoicePaymentType;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.DateTimeHelper;
 import it.nexera.ris.common.helpers.InvoiceHelper;
@@ -23,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -96,11 +98,15 @@ public class CreateExcelInvoicesReportHelper extends CreateExcelReportHelper {
         headerFont.setFontHeightInPoints((short) 9);
         headerFont.setColor(IndexedColors.GREEN.getIndex());
 
+        Font textFont = getWorkbook().createFont();
+        textFont.setFontHeightInPoints((short) 9);
+
         CellStyle borderCellStyle = getWorkbook().createCellStyle();
         borderCellStyle.setBorderBottom(BorderStyle.THIN);
         borderCellStyle.setBorderLeft(BorderStyle.THIN);
         borderCellStyle.setBorderRight(BorderStyle.THIN);
         borderCellStyle.setBorderTop(BorderStyle.THIN);
+        borderCellStyle.setFont(textFont);
 
         CellStyle headerCellStyle = getWorkbook().createCellStyle();
         headerCellStyle.cloneStyleFrom(borderCellStyle);
@@ -149,6 +155,7 @@ public class CreateExcelInvoicesReportHelper extends CreateExcelReportHelper {
         int count = invoices.size() + 1;
         int index = 2;
         Map<Long, Double> taxMapping = new HashMap<>();
+        Map<Long, Double> nonTaxMapping = new HashMap<>();
         Map<Long, Double> ivaMapping = new HashMap<>();
         Map<Long, Double> amountMapping = new HashMap<>();
         for (Invoice invoice : invoices) {
@@ -168,20 +175,53 @@ public class CreateExcelInvoicesReportHelper extends CreateExcelReportHelper {
             }
 
             List<GoodsServicesFieldWrapper>  wrapperList = goodsServicesFields(invoice, invoiceHelper);
-            Double value = invoiceHelper.getAllTotalLine(wrapperList);
+            Double value = invoiceHelper.getNonZeroTotalLine(wrapperList);
             taxMapping.put(invoice.getId(), value);
             row.createCell(3).setCellValue(value);
-//                            .replace(".",","));
             row.getCell(3).setCellStyle(numberCellStyle);
-            row.createCell(4).setCellStyle(borderCellStyle);
-            value = invoiceHelper.getTotalVat(wrapperList);
+            value = invoiceHelper.getZeroTotalLine(wrapperList);
+            nonTaxMapping.put(invoice.getId(), value);
+            row.createCell(4).setCellValue(value);
+            row.getCell(4).setCellStyle(numberCellStyle);
+            value = invoiceHelper.getNonZeroTotalVat(wrapperList);
             ivaMapping.put(invoice.getId(), value);
             row.createCell(5).setCellValue(value);//.replace(".",","));
             row.getCell(5).setCellStyle(numberCellStyle);
             Double grossAmount = invoiceHelper.getTotalGrossAmount(wrapperList);
             row.createCell(6).setCellValue(grossAmount);//.replace(".",","));
             row.getCell(6).setCellStyle(numberCellStyle);
-            row.createCell(7).setCellStyle(borderCellStyle);
+            List<PaymentInvoice> paymentInvoices = DaoManager.load(PaymentInvoice.class,
+                    Restrictions.eq("invoice.id", invoice.getId()));
+            String paymentData = "";
+            if(!ValidationHelper.isNullOrEmpty(invoice.getPaymentType())){
+                String payment = "";
+                if(!ValidationHelper.isNullOrEmpty(invoice.getPaymentType().getCode())){
+                    if(invoice.getPaymentType().getCode().equalsIgnoreCase("MP01"))
+                        payment += InvoicePaymentType.Cash.toString().toUpperCase();
+                    else if(invoice.getPaymentType().getCode().equalsIgnoreCase("MP02"))
+                        payment += InvoicePaymentType.Check.toString().toUpperCase();
+                    else if(invoice.getPaymentType().getCode().equalsIgnoreCase("MP05"))
+                        payment += InvoicePaymentType.Transfer.toString().toUpperCase();
+                }
+                if(!ValidationHelper.isNullOrEmpty(invoice.getPaymentType().getAcronym()))
+                    payment += " " + invoice.getPaymentType().getAcronym();
+
+                payment += " DEL";
+
+                if(!ValidationHelper.isNullOrEmpty(paymentInvoices)){
+
+                    for(PaymentInvoice paymentInvoice : paymentInvoices){
+                        if(!ValidationHelper.isNullOrEmpty(paymentInvoice.getDate())){
+                            if(StringUtils.isNotBlank(paymentData))
+                                paymentData += "\n";
+                            paymentData += payment + " " + String.format("%02d",DateTimeHelper.getDay(paymentInvoice.getDate()))
+                                    + String.format("%02d",DateTimeHelper.getMonth(paymentInvoice.getDate()));
+                        }
+                    }
+                }
+            }
+            row.createCell(7).setCellValue(paymentData.trim());
+            row.getCell(7).setCellStyle(borderCellStyle);
             Double totalPayments = invoiceHelper.getTotalPayment(invoice);
             amountMapping.put(invoice.getId(), totalPayments);
             row.createCell(8).setCellValue(totalPayments);//.replace(".",","));
@@ -226,11 +266,14 @@ public class CreateExcelInvoicesReportHelper extends CreateExcelReportHelper {
             }
         }
 
-        index = 2;
-
+        index = 3;
+        row = createRowAfterDefinedEmptyRows(1);
         for (Map.Entry<Client, List<Invoice>> entry : groupedInvoicesByClient.entrySet()) {
             row = createRowAfterDefinedEmptyRows(1);
             String clientName = "";
+            if(!ValidationHelper.isNullOrEmpty(entry.getKey())){
+                log.info("Invoice Excel : " + entry.getKey().getId());
+            }
             if(!ValidationHelper.isNullOrEmpty(entry.getKey())
                     && !ValidationHelper.isNullOrEmpty(entry.getKey().getClientName())){
                 clientName = entry.getKey().getClientName().toUpperCase();
@@ -253,55 +296,9 @@ public class CreateExcelInvoicesReportHelper extends CreateExcelReportHelper {
                 row.createCell(7).setCellFormula("IF(E" + index + ">0,G" + index + "/E" + index + ",0)");
                 row.getCell(7).setCellStyle(percentageCellStyle);
             }
-
-
             index++;
         }
 
-        initInvoiceMonthReport();
-        Map<Integer, List<Invoice>> groupedInvoicesByMonth = invoices.stream()
-                .filter(i -> !ValidationHelper.isNullOrEmpty(i.getDate()))
-                .collect(Collectors.groupingBy(i -> DateTimeHelper.getMonth(i.getDate())));
-
-        row = createRow();
-        addSeparator(row, headerCellStyle);
-
-        for (int i = 0; i < getColumns().length; i++) {
-            getSheet().setColumnWidth(i, 256 * 14);
-        }
-        index = 3;
-        createRowAfterDefinedEmptyRows(1);
-        for (Map.Entry<Integer, List<Invoice>> entry : groupedInvoicesByMonth.entrySet()) {
-            row = createRowAfterDefinedEmptyRows(1);
-            row.createCell(0).setCellValue(DateTimeHelper.getMonth(entry.getKey()));
-            row.getCell(0).setCellStyle(borderCellStyle);
-            double totalTax = entry.getValue()
-                    .stream()
-                    .filter(i -> taxMapping.containsKey(i.getId()))
-                    .mapToDouble(o->taxMapping.get(o.getId())).sum();
-            row.createCell(1).setCellValue(totalTax);
-            row.getCell(1).setCellStyle(numberCellStyle);
-            row.createCell(2).setCellStyle(borderCellStyle);
-            double totalIva = entry.getValue()
-                    .stream()
-                    .filter(i -> ivaMapping.containsKey(i.getId()))
-                    .mapToDouble(o->ivaMapping.get(o.getId())).sum();
-            row.createCell(3).setCellValue(totalIva);
-            row.getCell(3).setCellStyle(numberCellStyle);
-            row.createCell(4).setCellFormula("B" + index + "+ C" + index + "+ D" + index);
-            row.getCell(4).setCellStyle(numberCellStyle);
-            double totalAmount = entry.getValue()
-                    .stream()
-                    .filter(i -> amountMapping.containsKey(i.getId()))
-                    .mapToDouble(o->amountMapping.get(o.getId())).sum();
-            row.createCell(5).setCellValue(totalAmount);
-            row.getCell(5).setCellStyle(numberCellStyle);
-            row.createCell(6).setCellFormula("E" + index + "-F" + index);
-            row.getCell(6).setCellStyle(numberCellStyle);
-            row.createCell(7).setCellFormula("IF(E" + index + ">0,G" + index + "/E" + index + ",0)");
-            row.getCell(7).setCellStyle(percentageCellStyle);
-            index++;
-        }
 
         HSSFPalette palette = getWorkbook().getCustomPalette();
         HSSFColor blueColor = palette.findSimilarColor(0, 0, 255);
@@ -329,6 +326,78 @@ public class CreateExcelInvoicesReportHelper extends CreateExcelReportHelper {
         percentageValueStyle.setDataFormat(createHelper.createDataFormat().getFormat("0.00%"));
         percentageValueStyle.setFont(valueFont);
 
+        row = createRowAfterDefinedEmptyRows(2);
+        row.createCell(0).setCellValue(ResourcesHelper.getString("invoicesExcelTotali"));
+        row.getCell(0).setCellStyle(totalCellStyle);
+        row.createCell(1).setCellFormula("SUM(B3:B" + (index-1) + ")");
+        row.getCell(1).setCellStyle(totalValueCellStyle);
+        row.createCell(2).setCellFormula("SUM(C3:C" + (index-1) + ")");
+        row.getCell(2).setCellStyle(totalValueCellStyle);
+        row.createCell(3).setCellFormula("SUM(D3:D" + (index-1) + ")");
+        row.getCell(3).setCellStyle(totalValueCellStyle);
+        row.createCell(4).setCellFormula("SUM(E3:E" + (index-1) + ")");
+        row.getCell(4).setCellStyle(totalValueCellStyle);
+        row.createCell(5).setCellFormula("SUM(F3:F" + (index-1) + ")");
+        row.getCell(5).setCellStyle(totalValueCellStyle);
+        row.createCell(6).setCellFormula("SUM(G3:G" + (index-1) + ")");
+        row.getCell(6).setCellStyle(totalValueCellStyle);
+        row.createCell(7).setCellFormula("IF(E" + (row.getRowNum() + 1) + ">0,G" + (row.getRowNum() + 1) + "/E" + (row.getRowNum() + 1 ) + ",0)");
+        row.getCell(7).setCellStyle(percentageValueStyle);
+
+        initInvoiceMonthReport();
+        Map<Integer, List<Invoice>> groupedInvoicesByMonth = invoices.stream()
+                .filter(i -> !ValidationHelper.isNullOrEmpty(i.getDate()))
+                .collect(Collectors.groupingBy(i -> DateTimeHelper.getMonth(i.getDate())));
+
+        row = createRow();
+        addSeparator(row, headerCellStyle);
+
+        for (int i = 0; i < getColumns().length; i++) {
+            getSheet().setColumnWidth(i, 256 * 14);
+        }
+        index = 3;
+        createRowAfterDefinedEmptyRows(1);
+        String[] months = new String[]{"Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"};
+        for(int m=0; m < months.length;m++){
+            row = createRowAfterDefinedEmptyRows(1);
+            row.createCell(0).setCellValue(months[m].toUpperCase());
+            row.getCell(0).setCellStyle(borderCellStyle);
+            row.createCell(1).setCellStyle(numberCellStyle);
+            row.createCell(2).setCellStyle(numberCellStyle);
+            row.createCell(3).setCellStyle(numberCellStyle);
+            row.createCell(4).setCellStyle(numberCellStyle);
+            row.createCell(5).setCellStyle(numberCellStyle);
+            row.createCell(6).setCellStyle(numberCellStyle);
+            row.createCell(7).setCellStyle(percentageCellStyle);
+            if(groupedInvoicesByMonth.containsKey(m+1)){
+                List<Invoice> invoicesForMonth = groupedInvoicesByMonth.get(m+1);
+                    double totalTax = invoicesForMonth
+                            .stream()
+                            .filter(i -> taxMapping.containsKey(i.getId()))
+                            .mapToDouble(o->taxMapping.get(o.getId())).sum();
+                row.getCell(1).setCellValue(totalTax);
+
+                double nonTotalTax = invoicesForMonth
+                        .stream()
+                        .filter(i -> nonTaxMapping.containsKey(i.getId()))
+                        .mapToDouble(o->nonTaxMapping.get(o.getId())).sum();
+                row.getCell(2).setCellValue(nonTotalTax);
+                double totalIva = invoicesForMonth
+                        .stream()
+                        .filter(i -> ivaMapping.containsKey(i.getId()))
+                        .mapToDouble(o->ivaMapping.get(o.getId())).sum();
+                row.getCell(3).setCellValue(totalIva);
+                row.getCell(4).setCellFormula("B" + index + "+ C" + index + "+ D" + index);
+                double totalAmount = invoicesForMonth
+                        .stream()
+                        .filter(i -> amountMapping.containsKey(i.getId()))
+                        .mapToDouble(o->amountMapping.get(o.getId())).sum();
+                row.getCell(5).setCellValue(totalAmount);
+                row.getCell(6).setCellFormula("E" + index + "-F" + index);
+                row.getCell(7).setCellFormula("IF(E" + index + ">0,G" + index + "/E" + index + ",0)");
+            }
+            index++;
+        }
         row = createRowAfterDefinedEmptyRows(2);
         row.createCell(0).setCellValue(ResourcesHelper.getString("invoicesExcelTotal"));
         row.getCell(0).setCellStyle(totalCellStyle);
@@ -366,14 +435,9 @@ public class CreateExcelInvoicesReportHelper extends CreateExcelReportHelper {
         for (InvoiceItem invoiceItem : invoiceItems) {
             GoodsServicesFieldWrapper wrapper = invoiceHelper.createGoodsServicesFieldWrapper();
             wrapper.setCounter(counter);
-//            if(invoiceItem.getId() == null){
-//                wrapper.setInvoiceItemId(invoiceItem.getId());
-//            }else {
-//                invoiceItem.setUuid(UUID.randomUUID().toString());
-//                wrapper.setInvoiceItemUUID(invoiceItem.getUuid());
-//            }
             wrapper.setInvoiceTotalCost(invoiceItem.getInvoiceTotalCost());
             wrapper.setSelectedTaxRateId(invoiceItem.getTaxRate().getId());
+            wrapper.setPercentage(invoiceItem.getTaxRate().getPercentage());
             wrapper.setInvoiceItemAmount(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount()) ? 0.0 : invoiceItem.getAmount());
             double totalcost = !(ValidationHelper.isNullOrEmpty(invoiceItem.getInvoiceTotalCost())) ? invoiceItem.getInvoiceTotalCost().doubleValue() : 0.0;
             double amount = !(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount())) ? invoiceItem.getAmount().doubleValue() : 0.0;

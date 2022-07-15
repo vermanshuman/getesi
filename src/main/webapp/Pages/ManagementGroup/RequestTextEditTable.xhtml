@@ -1147,15 +1147,22 @@
         <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" id="relationshipArea">
             <span> #{msg.databaseListRealEstateQuote}:</span>
             <p:column>
-                <p:inputText id="inputQuote1" value="#{bean.quote1}" onkeypress="numbers_only('#inputQuote1');"/>
+                <p:inputText id="inputQuote1" value="#{bean.quote1}" onkeypress="numbers_only('#inputQuote1');" style="width:45%"/>
                 <h:outputText value=" / "/>
-                <p:inputText id="inputQuote2" value="#{bean.quote2}" onkeypress="numbers_only('#inputQuote2');"/>
+                <p:inputText id="inputQuote2" value="#{bean.quote2}" onkeypress="numbers_only('#inputQuote2');" style="width:45%"/>
             </p:column>
             <p:column/>
             <span> #{msg.databaseListRealEstatePropertyType}:</span>
             <p:column>
                 <p:selectOneMenu value="#{bean.propertyType}" id="propertyType">
                     <f:selectItems value="#{bean.propertyTypeList}"/>
+                </p:selectOneMenu>
+            </p:column>
+            <p:column/>
+            <span> #{msg.databaseListRegime}:</span>
+            <p:column>
+                <p:selectOneMenu value="#{bean.selectedRegime}" id="regimeType">
+                    <f:selectItems value="#{bean.regimes}"/>
                 </p:selectOneMenu>
             </p:column>
             <p:commandButton icon="fa fa-plus" action="#{bean.saveRelationship}"

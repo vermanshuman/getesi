@@ -279,6 +279,18 @@ public class Client extends IndexedEntity implements Serializable {
 
     @Column(name = "invoice_expiration_days")
     private Double invoiceExpirationDays;
+    
+    @ManyToOne
+    @JoinColumn(name = "tax_rate_unauthorized_cost_pay")
+    private TaxRate taxRateUnauthorizedCostPay;
+    
+    @ManyToOne
+    @JoinColumn(name = "tax_rate_unauthorized_cost_cadastral")
+    private TaxRate taxRateUnauthorizedCostCadastral;
+    
+    @ManyToOne
+    @JoinColumn(name = "tax_rate_unauthorized_cost_formality")
+    private TaxRate taxRateUnauthorizedCostFormality;
 
     @Override
     public String toString() {
@@ -906,4 +918,29 @@ public class Client extends IndexedEntity implements Serializable {
     public void setInvoiceExpirationDays(Double invoiceExpirationDays) {
         this.invoiceExpirationDays = invoiceExpirationDays;
     }
+
+	public TaxRate getTaxRateUnauthorizedCostPay() {
+		return taxRateUnauthorizedCostPay;
+	}
+
+	public void setTaxRateUnauthorizedCostPay(TaxRate taxRateUnauthorizedCostPay) {
+		this.taxRateUnauthorizedCostPay = taxRateUnauthorizedCostPay;
+	}
+
+	public TaxRate getTaxRateUnauthorizedCostCadastral() {
+		return taxRateUnauthorizedCostCadastral;
+	}
+
+	public void setTaxRateUnauthorizedCostCadastral(TaxRate taxRateUnauthorizedCostCadastral) {
+		this.taxRateUnauthorizedCostCadastral = taxRateUnauthorizedCostCadastral;
+	}
+
+	public TaxRate getTaxRateUnauthorizedCostFormality() {
+		return taxRateUnauthorizedCostFormality;
+	}
+
+	public void setTaxRateUnauthorizedCostFormality(TaxRate taxRateUnauthorizedCostFormality) {
+		this.taxRateUnauthorizedCostFormality = taxRateUnauthorizedCostFormality;
+	}
+    
 }

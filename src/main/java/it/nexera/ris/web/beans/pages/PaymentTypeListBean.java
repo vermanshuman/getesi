@@ -36,6 +36,8 @@ public class PaymentTypeListBean extends EntityLazyListPageBean<PaymentType>
 
     private String description;
 
+    private String acronym;
+
     private String code;
 
     private String beneficiary;
@@ -70,6 +72,9 @@ public class PaymentTypeListBean extends EntityLazyListPageBean<PaymentType>
         if (!ValidationHelper.isNullOrEmpty(getIban())) {
             restrictions.add(Restrictions.ilike("iban", getIban(), MatchMode.ANYWHERE));
         }
+        if (!ValidationHelper.isNullOrEmpty(getAcronym())) {
+            restrictions.add(Restrictions.ilike("acronym", getAcronym(), MatchMode.ANYWHERE));
+        }
         restrictions.add(Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
                 Restrictions.isNull("isDeleted")));
         this.loadList(PaymentType.class, restrictions.toArray(new Criterion[0]),
@@ -83,6 +88,7 @@ public class PaymentTypeListBean extends EntityLazyListPageBean<PaymentType>
         setBeneficiary(null);
         setIban(null);
         setIstitutionName(null);
+        setAcronym(null);
         filterTableFromPanel();
     }
 

@@ -21,6 +21,8 @@ import javax.faces.model.SelectItem;
 
 import it.nexera.ris.persistence.beans.entities.domain.*;
 import org.hibernate.HibernateException;
+import org.hibernate.StaleObjectStateException;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -231,7 +233,13 @@ public class ClientEditBean extends EntityEditPageBean<Client>
     private String emptyPriceListMessage;
 
     private List<PriceList> priceListToCopy;
-
+    
+    private Long selectedTaxRateUnauthorizedCostPay;
+    
+    private Long selectedTaxRateUnauthorizedCostCadastral;
+    
+    private Long selectedTaxRateUnauthorizedCostFormality;
+    
     /*
      * (non-Javadoc)
      *
@@ -407,6 +415,13 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                                         (ValidationHelper.isNullOrEmpty(c.getFiduciary()) || !c.getFiduciary())
                         )
                 ).sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList()), Boolean.TRUE));
+        
+        if(!ValidationHelper.isNullOrEmpty(getEntity().getTaxRateUnauthorizedCostPay()))
+        	setSelectedTaxRateUnauthorizedCostPay(getEntity().getTaxRateUnauthorizedCostPay().getId());
+        if(!ValidationHelper.isNullOrEmpty(getEntity().getTaxRateUnauthorizedCostCadastral()))
+        	setSelectedTaxRateUnauthorizedCostCadastral(getEntity().getTaxRateUnauthorizedCostCadastral().getId());
+        if(!ValidationHelper.isNullOrEmpty(getEntity().getTaxRateUnauthorizedCostFormality()))
+        	setSelectedTaxRateUnauthorizedCostFormality(getEntity().getTaxRateUnauthorizedCostFormality().getId());
     }
 
     public void initAreasAndOffices() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -509,9 +524,9 @@ public class ClientEditBean extends EntityEditPageBean<Client>
         List<Long> selectedIds;
         if (!ValidationHelper.isNullOrEmpty(getBillingRecipientTable())) {
             selectedIds = getBillingRecipientTable().stream().map(ClientView::getId).collect(Collectors.toList());
-            if(!ValidationHelper.isNullOrEmpty(getEntity().getId())) {
+            /*if(!ValidationHelper.isNullOrEmpty(getEntity().getId())) {
                 selectedIds.add(getEntity().getId());
-            }
+            }*/
             setBillingRecipients(ComboboxHelper.fillList(ClientView.class, Order.asc("name"), new Criterion[]{
                     Restrictions.or(
                             Restrictions.eq("isDeleted", Boolean.FALSE),
@@ -1140,11 +1155,23 @@ public class ClientEditBean extends EntityEditPageBean<Client>
             } else {
                 getEntity().setPaymentTypeList(null);
             }
-
+            
+            if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateUnauthorizedCostPay())) {
+            	this.getEntity().setTaxRateUnauthorizedCostPay(DaoManager.get(TaxRate.class, getSelectedTaxRateUnauthorizedCostPay()));
+            }
+            
+            if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateUnauthorizedCostFormality())) {
+            	this.getEntity().setTaxRateUnauthorizedCostFormality(DaoManager.get(TaxRate.class, getSelectedTaxRateUnauthorizedCostFormality()));
+            }
+            
+            if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateUnauthorizedCostCadastral())) {
+            	this.getEntity().setTaxRateUnauthorizedCostCadastral(DaoManager.get(TaxRate.class, getSelectedTaxRateUnauthorizedCostCadastral()));
+            }
+            
             DaoManager.save(getEntity());
             this.saveAgencies();
-            this.savePriceList();
-            this.saveTaxRateExtraCostList();
+            //this.savePriceList();
+            //this.saveTaxRateExtraCostList();
             this.saveClientServiceInfo();
             this.saveEmails();
             this.saveInvoiceColumns();
@@ -1699,8 +1726,30 @@ public class ClientEditBean extends EntityEditPageBean<Client>
     }
     
     public void saveConfigurePriceListData() {
-    	setRunAfterSave(false);
-    	pageSave();
+    	Transaction transaction = null;
+    	try {
+            transaction = DaoManager.getSession().beginTransaction();
+            savePriceList();
+            saveTaxRateExtraCostList();
+        } catch (Exception e) {
+            if (transaction != null) {
+            	transaction.rollback();
+            }
+            LogHelper.log(log, e);
+        } finally {
+            if (transaction != null && !transaction.wasRolledBack()
+                    && transaction.isActive()) {
+                try {
+                	transaction.commit();
+                } catch (StaleObjectStateException e) {
+                    LogHelper.log(log, e);
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    LogHelper.log(log, e);
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public void lastStepListener(boolean isLast) {
@@ -2336,4 +2385,29 @@ public class ClientEditBean extends EntityEditPageBean<Client>
     public void setPriceListToCopy(List<PriceList> priceListToCopy) {
         this.priceListToCopy = priceListToCopy;
     }
+
+	public Long getSelectedTaxRateUnauthorizedCostPay() {
+		return selectedTaxRateUnauthorizedCostPay;
+	}
+
+	public void setSelectedTaxRateUnauthorizedCostPay(Long selectedTaxRateUnauthorizedCostPay) {
+		this.selectedTaxRateUnauthorizedCostPay = selectedTaxRateUnauthorizedCostPay;
+	}
+
+	public Long getSelectedTaxRateUnauthorizedCostCadastral() {
+		return selectedTaxRateUnauthorizedCostCadastral;
+	}
+
+	public void setSelectedTaxRateUnauthorizedCostCadastral(Long selectedTaxRateUnauthorizedCostCadastral) {
+		this.selectedTaxRateUnauthorizedCostCadastral = selectedTaxRateUnauthorizedCostCadastral;
+	}
+
+	public Long getSelectedTaxRateUnauthorizedCostFormality() {
+		return selectedTaxRateUnauthorizedCostFormality;
+	}
+
+	public void setSelectedTaxRateUnauthorizedCostFormality(Long selectedTaxRateUnauthorizedCostFormality) {
+		this.selectedTaxRateUnauthorizedCostFormality = selectedTaxRateUnauthorizedCostFormality;
+	}
+
 }

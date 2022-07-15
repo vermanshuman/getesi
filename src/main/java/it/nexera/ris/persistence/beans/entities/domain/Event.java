@@ -14,10 +14,10 @@ public class Event extends IndexedEntity {
     @Column(name = "date", nullable = false)
     private Date date;
 
-    @Column(name = "start_date", columnDefinition = "TIMESTAMP", nullable = false)
+    @Column(name = "start_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", nullable = false)
     private Date startDate;
 
-    @Column(name = "end_date", columnDefinition = "TIMESTAMP", nullable = false)
+    @Column(name = "end_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", nullable = false)
     private Date endDate;
 
     @Column(name = "text", columnDefinition = "TEXT")

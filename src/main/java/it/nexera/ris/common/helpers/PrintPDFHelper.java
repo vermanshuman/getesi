@@ -213,6 +213,11 @@ public class PrintPDFHelper extends BaseHelper {
 
     public static byte[] convertToPDF(String header, String body, String footer, DocumentType type)
             throws InvalidParameterException, IOException {
+
+        return convertToPDF(header, body, footer, type, false);
+    }
+    public static byte[] convertToPDF(String header, String body, String footer, DocumentType type, Boolean enableSmartTableBreaks)
+            throws InvalidParameterException, IOException {
         if (body == null) {
             return null;
         }
@@ -310,7 +315,9 @@ public class PrintPDFHelper extends BaseHelper {
             Class<?> beanClass = urlClassLoader.loadClass("org.zefer.pd4ml.PD4ML");
             Constructor<?> constructor = beanClass.getConstructor();
             Object beanObj = constructor.newInstance();
-            Method method = beanClass.getMethod("outputFormat",new Class[]{String.class});
+            Method method = beanClass.getMethod("enableSmartTableBreaks",new Class[]{boolean.class});
+            method.invoke(beanObj,enableSmartTableBreaks);
+            method = beanClass.getMethod("outputFormat",new Class[]{String.class});
             method.invoke(beanObj,PD4Constants.getField("PDF").get(null));
            
             method = beanClass.getMethod("useTTF",new Class[]{String.class, boolean.class});

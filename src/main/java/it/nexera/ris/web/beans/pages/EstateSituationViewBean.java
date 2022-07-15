@@ -1292,7 +1292,7 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 				getCostManipulationHelper().addExtraCost("NAZIONALEPOSITIVA", getRequestId());
 
 				Request requestDb  = DaoManager.get(Request.class, getRequestId());
-				getCostManipulationHelper().saveRequestExtraCost(requestDb);
+				getCostManipulationHelper().saveRequestExtraCost(requestDb, null);
 				CostCalculationHelper calculation = new CostCalculationHelper(requestDb);
 				calculation.calculateAllCosts(true);
 				setShowAddNationalCostButton(false);

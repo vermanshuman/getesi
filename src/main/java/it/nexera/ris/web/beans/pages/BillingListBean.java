@@ -97,17 +97,17 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     private Integer selectedYear;
 
-    private Double monthJanFebAmount = getRandomNumber(10, 50);
+    private Double monthJanFebAmount; 
 
-    private Double monthMarAprAmount = getRandomNumber(100, 150);
+    private Double monthMarAprAmount;
 
-    private Double monthMayJunAmount = getRandomNumber(200, 250);
+    private Double monthMayJunAmount; 
 
-    private Double monthJulAugAmount = getRandomNumber(100, 150);
+    private Double monthJulAugAmount; 
 
-    private Double monthSepOctAmount = getRandomNumber(200, 250);
+    private Double monthSepOctAmount; 
 
-    private Double monthNovDecAmount = getRandomNumber(50, 100);
+    private Double monthNovDecAmount; 
 
     private List<Integer> turnoverPerMonth = new ArrayList<>();
 
@@ -428,6 +428,12 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private String filterNdgAdmin;
 
     private String filterPracticeAdmin;
+    
+    private List<Invoice> unlockedInvoicesDialog;
+    
+    private Invoice selectedUnlockedInvoiceDialog;
+    
+    private PaymentInvoice selectedPaymentInvoice;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -481,6 +487,12 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             setNextInvoiceNumber(getNumber());
         }
         setPaymentAmount(null);
+        setMonthJanFebAmount(getInvoiceVatAmountBetweenMonths("01", "02", false, false, false));
+        setMonthMarAprAmount(getInvoiceVatAmountBetweenMonths("03", "04", false, false, false));
+        setMonthMayJunAmount(getInvoiceVatAmountBetweenMonths("05", "06", false, false, false));
+        setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", false, false, false));
+        setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", false, false, false));
+        setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", false, false, false));
     }
 
     private void loadRequestPanel() throws PersistenceBeanException, IllegalAccessException {
@@ -491,8 +503,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                         Restrictions.isNull("category"))});
 
         notExternalCategoryUsers.forEach(u -> getUserWrappers().add(new UserFilterWrapper(u)));
+        setStateWrappers(new ArrayList<>());
         getStateWrappers().add(new RequestStateWrapper(true, RequestState.EVADED));
-        getStateWrappers().add(new RequestStateWrapper(true, RequestState.SENT_TO_SDI));
+        getStateWrappers().add(new RequestStateWrapper(false, RequestState.SENT_TO_SDI));
 
         List<RequestType> requestTypes = DaoManager.load(RequestType.class, new Criterion[]{Restrictions.isNotNull("name")});
         if (!ValidationHelper.isNullOrEmpty(requestTypes)) {
@@ -536,9 +549,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         quadrimesterEndIdx = endIdx;
     }
 
-    private double getRandomNumber(int min, int max) {
+    /*private double getRandomNumber(int min, int max) {
         return Math.random() * (max - min + 1) + min;
-    }
+    }*/
 
     public List<Integer> getTestTurnoverPerMonth() {
         turnoverPerMonth.add(1);
@@ -1065,12 +1078,14 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setInvoiceErrorMessage(null);
         setShowRequestTab(true);
         setActiveTabIndex(0);
-        setInvoicedRequests(DaoManager.load(Request.class,
-                new Criterion[]{
-                        Restrictions.eq("invoice", invoicedb),
-                        Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                                Restrictions.isNull("isDeleted"))
-                }));
+        if(!ValidationHelper.isNullOrEmpty(invoicedb) && !invoicedb.isNew()){
+            setInvoicedRequests(DaoManager.load(Request.class,
+                    new Criterion[]{
+                            Restrictions.eq("invoice", invoicedb),
+                            Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                                    Restrictions.isNull("isDeleted"))
+                    }));
+        }
         if (!ValidationHelper.isNullOrEmpty(invoicedb) && !invoicedb.isNew()) {
             List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[]{Restrictions.eq("invoice", invoicedb)}, new Order[]{
                     Order.asc("date")});
@@ -1198,17 +1213,38 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         //executeJS("PF('invoiceDialogBillingWV').show();");
     }
 
-    public void loadPaymentData() throws HibernateException, IllegalAccessException, PersistenceBeanException{
-        if(!ValidationHelper.isNullOrEmpty(getSelectedInvoice()))
-        	setPaymentAmount(getSelectedInvoice().getTotalGrossAmount());
-        //set Tipo Bonifico as default
-        setSelectedPaymentTypeDescription(2l);
-        setPaymentTypeDescriptions(ComboboxHelper.fillList(InvoicePaymentType.class, false));
-        List<PaymentType> paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("code", "MP05"), 
-				Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                Restrictions.isNull("isDeleted"))});
-        setSelectedPaymentOutcome(getSelectedInvoice().getPaymentType().getId());
-		setPaymentOutcomes(ComboboxHelper.fillList(paymentTypes, false));
+    public void loadPaymentData(PaymentInvoice paymentInvoice) throws HibernateException, IllegalAccessException, PersistenceBeanException{
+        if(ValidationHelper.isNullOrEmpty(paymentInvoice)) {
+        	setSelectedPaymentInvoice(null);
+	    	if(!ValidationHelper.isNullOrEmpty(getSelectedInvoice()))
+	        	setPaymentAmount(getSelectedInvoice().getTotalGrossAmount());
+	        //set Tipo Bonifico as default
+	        setSelectedPaymentTypeDescription(2l);
+	        setPaymentTypeDescriptions(ComboboxHelper.fillList(InvoicePaymentType.class, false));
+	        List<PaymentType> paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("code", "MP05"), 
+					Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+	                Restrictions.isNull("isDeleted"))});
+	        setSelectedPaymentOutcome(getSelectedInvoice().getPaymentType().getId());
+			setPaymentOutcomes(ComboboxHelper.fillList(paymentTypes, false));
+        } else {
+        	setSelectedPaymentInvoice(paymentInvoice);
+        	setPaymentAmount(paymentInvoice.getPaymentImport());
+        	System.out.println(paymentInvoice.getDate());
+        	setPaymentDate(paymentInvoice.getDate());
+        	setPaymentTypeDescriptions(ComboboxHelper.fillList(InvoicePaymentType.class, false));
+        	List<PaymentType> paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("description", paymentInvoice.getDescription()), 
+					Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+			                Restrictions.isNull("isDeleted"))});
+        	PaymentType paymentType = paymentTypes.get(0);
+        	if(paymentType.getCode().equals("MP02"))
+        		setSelectedPaymentTypeDescription(InvoicePaymentType.Check.getId());
+        	if(paymentType.getCode().equals("MP05"))
+        		setSelectedPaymentTypeDescription(InvoicePaymentType.Transfer.getId());
+        	if(paymentType.getCode().equals("MP01"))
+        		setSelectedPaymentTypeDescription(InvoicePaymentType.Cash.getId());
+        	setSelectedPaymentOutcome(paymentInvoice.getInvoice().getPaymentType().getId());
+			setPaymentOutcomes(ComboboxHelper.fillList(paymentTypes, false));
+        }
     }
     
     public void invoicePaymentTypeListner(SelectEvent selectEvent) throws HibernateException, IllegalAccessException, PersistenceBeanException {
@@ -1752,7 +1788,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 String body = RequestHelper.getPdfRequestBody(request);
                 files.put(fileCounter++ + "_richiesta-" + request.getStrId() + ".pdf",
                         PrintPDFHelper.convertToPDF(null, body, null,
-                                DocumentType.ESTATE_FORMALITY));
+                                DocumentType.ESTATE_FORMALITY, true));
             }
             FileHelper.downloadFiles(files);
         } catch (Exception e) {
@@ -1854,7 +1890,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             String body = RequestHelper.getPdfRequestBody(request);
             FileHelper.sendFile("richiesta-" + request.getStrId() + ".pdf",
                     PrintPDFHelper.convertToPDF(null, body, null,
-                            DocumentType.ESTATE_FORMALITY));
+                            DocumentType.ESTATE_FORMALITY, true));
         } catch (Exception e) {
             LogHelper.log(log, e);
         }
@@ -2574,6 +2610,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     public void saveInvoicePayment() throws HibernateException, PersistenceBeanException, IllegalAccessException, InstantiationException {
         PaymentInvoice paymentInvoice = new PaymentInvoice();
+        if(!ValidationHelper.isNullOrEmpty(getSelectedPaymentInvoice())) {
+        	paymentInvoice = getSelectedPaymentInvoice();
+        }
         paymentInvoice.setPaymentImport(getPaymentAmount());
         paymentInvoice.setDate(getPaymentDate());
         //paymentInvoice.setDescription(getPaymentDescription());
@@ -2584,6 +2623,13 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         paymentInvoice.setInvoice(getSelectedInvoice());
         DaoManager.save(paymentInvoice, true);
         List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[]{Restrictions.eq("invoice", getSelectedInvoice())}, new Order[]{
+                Order.asc("date")});
+        setPaymentInvoices(paymentInvoicesList);
+    }
+    
+    public void deleteInvoicePayment(PaymentInvoice paymentInvoice) throws HibernateException, PersistenceBeanException, IllegalAccessException {
+		DaoManager.remove(paymentInvoice, true);
+		List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[]{Restrictions.eq("invoice", getSelectedInvoice())}, new Order[]{
                 Order.asc("date")});
         setPaymentInvoices(paymentInvoicesList);
     }
@@ -3027,7 +3073,13 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                     requestType = requestType + request;
                 }
 
-                String emailBody = dearCustomer + ",</br></br>"
+                String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
+                        String.class, new Criterion[]{Restrictions.eq("id", Long.parseLong(
+                                ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.SENT_SERVER_ID)
+                                        .getValue()))}).get(0);
+                String mail_footer = MAIL_FOOTER.replace("info@brexa.it", emailsFrom);
+                
+                String emailBody = dearCustomer + ",</br>"
                         + attachedCopyMessage + "</br></br>"
                         + "<table style='border:none;'>"
                         + (!ndg.isEmpty() ? "<tr><td style='border:none;'>NDG: " + "</td><td style='padding-left: 50px; border:none;'>" + ndg + "</td></tr>" : "")
@@ -3035,7 +3087,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                         + (!requestType.isEmpty() ? "<tr><td style='border:none;'>REQUEST: " + "</td><td style='padding-left: 50px; border:none;'>" + requestType + "</td></tr>" : "")
                         + "</table></br>"
                         + thanksMessage
-                        + MAIL_FOOTER;
+                        + mail_footer;
                 return emailBody;
             } else if (ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
                 String dearCustomer = ResourcesHelper.getString("dearCustomer");
@@ -3413,5 +3465,131 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setFilterPracticeAdmin(null);
         filterTableFromPanelAdmin();
     }
+    
+    public void loadUnlockedInvoiceDialogData() throws IllegalAccessException, PersistenceBeanException {
+    	setUnlockedInvoicesDialog(DaoManager.load(Invoice.class,
+                new Criterion[]{Restrictions.eq("status", InvoiceStatus.UNLOCKED), Restrictions.isNotNull("number")}, new Order[]{
+                        Order.desc("number")}));
+    }
+    
+    public void unlockInvoices() throws HibernateException, PersistenceBeanException, IllegalAccessException, InstantiationException {
+    	if(!ValidationHelper.isNullOrEmpty(getSelectedInvoice()) && !ValidationHelper.isNullOrEmpty(getSelectedUnlockedInvoiceDialog())) {
+    		Long currentInvoiceNumber = getSelectedInvoice().getNumber();
+    		getSelectedInvoice().setNumber(getSelectedUnlockedInvoiceDialog().getNumber());
+    		getSelectedInvoice().setInvoiceNumber(getSelectedUnlockedInvoiceDialog().getInvoiceNumber());
+    		getSelectedInvoice().setDate(getSelectedUnlockedInvoiceDialog().getDate());
+    		DaoManager.save(getSelectedInvoice(), true);
+    		
+    		getSelectedUnlockedInvoiceDialog().setNumber(null);
+    		getSelectedUnlockedInvoiceDialog().setInvoiceUnlockedId(currentInvoiceNumber);
+    		DaoManager.save(getSelectedUnlockedInvoiceDialog(), true);
+    		
+    		loadInvoiceDialogData(getSelectedInvoice());
+    		executeJS("PF('invoiceDialogBillingWV').show();");
+    		setActiveTabIndex(1);
+    		RequestContext.getCurrentInstance().update("invoiceDialogBilling");
+    	}
+    }
+    
+	private Double getInvoiceVatAmountBetweenMonths(String startMonth, String endMonth, boolean clientFilter, boolean yearFilter, boolean bothFilter)
+			throws IllegalAccessException, PersistenceBeanException, HibernateException, InstantiationException {
+		Calendar calendar = Calendar.getInstance(Locale.ITALY);
+		int year = calendar.get(Calendar.YEAR);
+		Date startDate = DateTimeHelper.getFirstDateOfMonth(startMonth + "/" + year);
+		Date endDate = DateTimeHelper.getLastDateOfMonth(endMonth + "/" + year);
+		List<Invoice> invoices = DaoManager.load(Invoice.class, new Criterion[] {
+				Restrictions.eq("status", InvoiceStatus.DELIVERED), Restrictions.between("date", startDate, endDate)});
+		if(clientFilter) {
+			invoices = DaoManager.load(Invoice.class, new Criterion[] {
+					Restrictions.eq("status", InvoiceStatus.DELIVERED), Restrictions.between("date", startDate, endDate),
+					Restrictions.eq("client.id", getSelectedClientId())});
+		}
+		if(yearFilter) {
+			year = getSelectedYear();
+			startDate = DateTimeHelper.getFirstDateOfMonth(startMonth + "/" + year);
+			endDate = DateTimeHelper.getLastDateOfMonth(endMonth + "/" + year);
+			invoices = DaoManager.load(Invoice.class, new Criterion[] {
+					Restrictions.eq("status", InvoiceStatus.DELIVERED), Restrictions.between("date", startDate, endDate)});
+		}
+		if(bothFilter) {
+			year = getSelectedYear();
+			startDate = DateTimeHelper.getFirstDateOfMonth(startMonth + "/" + year);
+			endDate = DateTimeHelper.getLastDateOfMonth(endMonth + "/" + year);
+			invoices = DaoManager.load(Invoice.class, new Criterion[] {
+					Restrictions.eq("status", InvoiceStatus.DELIVERED), Restrictions.between("date", startDate, endDate),
+					Restrictions.eq("client.id", getSelectedClientId())});
+		}
+		double totalIVA = 0d;
+		for (Invoice invoice : invoices) {
+			if (!ValidationHelper.isNullOrEmpty(invoice.getTotalVat())) {
+				totalIVA += invoice.getTotalVat().doubleValue();
+			}
+		}
+		return totalIVA;
+	}
+	
+	public void filterByClient() throws IllegalAccessException, HibernateException, InstantiationException, PersistenceBeanException {
+		if(!ValidationHelper.isNullOrEmpty(getSelectedClientId()) && ValidationHelper.isNullOrEmpty(getSelectedYear())) {
+			setMonthJanFebAmount(getInvoiceVatAmountBetweenMonths("01", "02", true, false, false));
+	        setMonthMarAprAmount(getInvoiceVatAmountBetweenMonths("03", "04", true, false, false));
+	        setMonthMayJunAmount(getInvoiceVatAmountBetweenMonths("05", "06", true, false, false));
+	        setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", true, false, false));
+	        setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", true, false, false));
+	        setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", true, false, false));
+		} else if(!ValidationHelper.isNullOrEmpty(getSelectedClientId()) && !ValidationHelper.isNullOrEmpty(getSelectedYear())) {
+			setMonthJanFebAmount(getInvoiceVatAmountBetweenMonths("01", "02", false, false, true));
+	        setMonthMarAprAmount(getInvoiceVatAmountBetweenMonths("03", "04", false, false, true));
+	        setMonthMayJunAmount(getInvoiceVatAmountBetweenMonths("05", "06", false, false, true));
+	        setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", false, false, true));
+	        setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", false, false, true));
+	        setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", false, false, true));
+		} else if(ValidationHelper.isNullOrEmpty(getSelectedClientId()) && !ValidationHelper.isNullOrEmpty(getSelectedYear())) {
+			setMonthJanFebAmount(getInvoiceVatAmountBetweenMonths("01", "02", false, true, false));
+	        setMonthMarAprAmount(getInvoiceVatAmountBetweenMonths("03", "04", false, true, false));
+	        setMonthMayJunAmount(getInvoiceVatAmountBetweenMonths("05", "06", false, true, false));
+	        setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", false, true, false));
+	        setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", false, true, false));
+	        setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", false, true, false));
+		} else {
+			setMonthJanFebAmount(getInvoiceVatAmountBetweenMonths("01", "02", false, false, false));
+	        setMonthMarAprAmount(getInvoiceVatAmountBetweenMonths("03", "04", false, false, false));
+	        setMonthMayJunAmount(getInvoiceVatAmountBetweenMonths("05", "06", false, false, false));
+	        setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", false, false, false));
+	        setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", false, false, false));
+	        setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", false, false, false));
+		}
+	}
+	
+	public void filterByYear() throws IllegalAccessException, HibernateException, InstantiationException, PersistenceBeanException {
+		if(!ValidationHelper.isNullOrEmpty(getSelectedYear()) && ValidationHelper.isNullOrEmpty(getSelectedClientId())) {
+			setMonthJanFebAmount(getInvoiceVatAmountBetweenMonths("01", "02", false, true, false));
+	        setMonthMarAprAmount(getInvoiceVatAmountBetweenMonths("03", "04", false, true, false));
+	        setMonthMayJunAmount(getInvoiceVatAmountBetweenMonths("05", "06", false, true, false));
+	        setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", false, true, false));
+	        setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", false, true, false));
+	        setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", false, true, false));
+		} else if(!ValidationHelper.isNullOrEmpty(getSelectedYear()) && !ValidationHelper.isNullOrEmpty(getSelectedClientId())) {
+			setMonthJanFebAmount(getInvoiceVatAmountBetweenMonths("01", "02", false, false, true));
+	        setMonthMarAprAmount(getInvoiceVatAmountBetweenMonths("03", "04", false, false, true));
+	        setMonthMayJunAmount(getInvoiceVatAmountBetweenMonths("05", "06", false, false, true));
+	        setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", false, false, true));
+	        setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", false, false, true));
+	        setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", false, false, true));
+		} else if(ValidationHelper.isNullOrEmpty(getSelectedYear()) && !ValidationHelper.isNullOrEmpty(getSelectedClientId())) {
+			setMonthJanFebAmount(getInvoiceVatAmountBetweenMonths("01", "02", true, false, false));
+	        setMonthMarAprAmount(getInvoiceVatAmountBetweenMonths("03", "04", true, false, false));
+	        setMonthMayJunAmount(getInvoiceVatAmountBetweenMonths("05", "06", true, false, false));
+	        setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", true, false, false));
+	        setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", true, false, false));
+	        setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", true, false, false));
+		} else {
+			setMonthJanFebAmount(getInvoiceVatAmountBetweenMonths("01", "02", false, false, false));
+	        setMonthMarAprAmount(getInvoiceVatAmountBetweenMonths("03", "04", false, false, false));
+	        setMonthMayJunAmount(getInvoiceVatAmountBetweenMonths("05", "06", false, false, false));
+	        setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", false, false, false));
+	        setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", false, false, false));
+	        setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", false, false, false));
+		}
+	}
 
 }

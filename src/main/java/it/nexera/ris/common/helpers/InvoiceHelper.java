@@ -23,6 +23,7 @@ import org.hibernate.sql.JoinType;
 
 import javax.faces.model.SelectItem;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -65,21 +66,23 @@ public class InvoiceHelper {
                     requestPriceList.addAll(priceList);
                 }
 
-                priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
-                        new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                        Restrictions.eq("client", (costCalculationHelper.isBillingClient() == null || !costCalculationHelper.isBillingClient())
-                                ? request.getClient() : request.getBillingClient()),
+                if(ValidationHelper.isNullOrEmpty(request.getUnauthorizedQuote()) || !request.getUnauthorizedQuote()){
+                    priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
+                            new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
+                            Restrictions.eq("client", (costCalculationHelper.isBillingClient() == null || !costCalculationHelper.isBillingClient())
+                                    ? request.getClient() : request.getBillingClient()),
 
-                        costCalculationHelper.restrictionForPriceList() ?
-                                Restrictions.in("cc.id", request.getService().getServiceCostUnauthorizedQuoteList()
-                                        .stream().map(IndexedEntity::getId).collect(Collectors.toList())) :
-                                Restrictions.isNotNull("cc.id"),
+                            costCalculationHelper.restrictionForPriceList() ?
+                                    Restrictions.in("cc.id", request.getService().getServiceCostUnauthorizedQuoteList()
+                                            .stream().map(IndexedEntity::getId).collect(Collectors.toList())) :
+                                    Restrictions.isNotNull("cc.id"),
 
-                        Restrictions.eq("service", request.getService()),
-                        Restrictions.eq("cc.typeId", CostType.DEPENDING_ON_NUMBER_OF_FORMALITIES.getId())});
+                            Restrictions.eq("service", request.getService()),
+                            Restrictions.eq("cc.typeId", CostType.DEPENDING_ON_NUMBER_OF_FORMALITIES.getId())});
 
-                if (!ValidationHelper.isNullOrEmpty(priceList)) {
-                    requestPriceList.addAll(priceList);
+                    if (!ValidationHelper.isNullOrEmpty(priceList)) {
+                        requestPriceList.addAll(priceList);
+                    }
                 }
 
                 priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
@@ -110,45 +113,78 @@ public class InvoiceHelper {
                         requestPriceList.addAll(priceList);
                     }
                 }
-
-
-//                priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
-//                        new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-//                        Restrictions.eq("client", (costCalculationHelper.isBillingClient() == null || !costCalculationHelper.isBillingClient())
-//                                ? request.getClient() : request.getBillingClient()),
-//
-//                        costCalculationHelper.restrictionForPriceList() ?
-//                                Restrictions.in("cc.id", request.getService().getServiceCostUnauthorizedQuoteList()
-//                                        .stream().map(IndexedEntity::getId).collect(Collectors.toList())) :
-//                                Restrictions.isNotNull("cc.id"),
-//
-//                        Restrictions.eq("service", request.getService()),
-//                        Restrictions.eq("cc.typeId", CostType.BASED_OF_NUMBER_OF_FORMALITIES_CONSULTED.getId())});
-//
-//                if (!ValidationHelper.isNullOrEmpty(priceList)) {
-//                    requestPriceList.addAll(priceList);
-//                }
-
-            }else if(!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
-                for(Service service : request.getMultipleServices()) {
-                    List<PriceList>  priceList =  costCalculationHelper.loadPriceList(costCalculationHelper.isBillingClient(), costCalculationHelper.restrictionForPriceList(),service);
-                    if (!ValidationHelper.isNullOrEmpty(priceList)) {
-                        requestPriceList.addAll(priceList);
+                
+                //if unautorized quote
+                if(!ValidationHelper.isNullOrEmpty(request.getUnauthorizedQuote()) && request.getUnauthorizedQuote()) {
+                	requestPriceList.clear();
+                	Double costCadastral = costCalculationHelper.getCostCadastral();
+                    Double costEstate = costCalculationHelper.getCostEstate(costCalculationHelper.isBillingClient(), costCalculationHelper.restrictionForPriceList());
+                    Double costEstateFormality = costCalculationHelper.getCostEstateFormality(costCalculationHelper.isBillingClient(), costCalculationHelper.restrictionForPriceList());
+                    Double costPlus = costCalculationHelper.getCostPlus(costCalculationHelper.isBillingClient(), costCalculationHelper.restrictionForPriceList());
+                    costEstateFormality += costPlus;
+                    costEstateFormality += costEstate;
+                    Double costPay = costCalculationHelper.getCostPay(costCalculationHelper.isBillingClient(), costCalculationHelper.restrictionForPriceList());
+            		
+                    if(!ValidationHelper.isNullOrEmpty(request.getClient().getTaxRateUnauthorizedCostCadastral())) {
+	                    PriceList pricesCostCadastral = new PriceList();
+	            		pricesCostCadastral.setPrice(String.valueOf(costCadastral.doubleValue()));
+	            		pricesCostCadastral.setTaxRate(request.getClient().getTaxRateUnauthorizedCostCadastral());
+	            		pricesCostCadastral.setClient(request.getClient());
+	            		pricesCostCadastral.setService(request.getService());
+	            		requestPriceList.add(pricesCostCadastral);
                     }
-                    priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
-                            new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                            Restrictions.eq("client", (costCalculationHelper.isBillingClient() == null || !costCalculationHelper.isBillingClient())
-                                    ? request.getClient() : request.getBillingClient()),
+            		
+                    if(!ValidationHelper.isNullOrEmpty(request.getClient().getTaxRateUnauthorizedCostFormality()) && costPlus.doubleValue() > 0.0) {
+                        priceList = costCalculationHelper.loadPriceList(costCalculationHelper.isBillingClient(), costCalculationHelper.restrictionForPriceList());
+                        if (!ValidationHelper.isNullOrEmpty(priceList)) {
+                            PriceList first = priceList.get(0);
+                            PriceList pricesCostFormality = new PriceList();
+    	            		pricesCostFormality.setPrice(String.valueOf(costEstateFormality.doubleValue()));
+    	            		pricesCostFormality.setTaxRate(first.getTaxRate());
+    	            		pricesCostFormality.setClient(request.getClient());
+    	            		pricesCostFormality.setService(request.getService());
+    	            		requestPriceList.add(pricesCostFormality);
+                        }
+                    } else {
+                    	PriceList pricesCostFormality = new PriceList();
+	            		pricesCostFormality.setPrice(String.valueOf(costEstateFormality.doubleValue()));
+	            		pricesCostFormality.setTaxRate(request.getClient().getTaxRateUnauthorizedCostFormality());
+	            		pricesCostFormality.setClient(request.getClient());
+	            		pricesCostFormality.setService(request.getService());
+	            		requestPriceList.add(pricesCostFormality);
+                    }
+            		
+            		if(!ValidationHelper.isNullOrEmpty(request.getClient().getTaxRateUnauthorizedCostPay())) {
+	            		PriceList pricesCostPay = new PriceList();
+	            		pricesCostPay.setPrice(String.valueOf(costPay.doubleValue()));
+	            		pricesCostPay.setTaxRate(request.getClient().getTaxRateUnauthorizedCostPay());
+	            		pricesCostPay.setClient(request.getClient());
+	            		pricesCostPay.setService(request.getService());
+	            		requestPriceList.add(pricesCostPay);
+            		}
+                }
+            }else if(!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
+                if(ValidationHelper.isNullOrEmpty(request.getUnauthorizedQuote()) || !request.getUnauthorizedQuote()){
+                    for(Service service : request.getMultipleServices()) {
+                        List<PriceList>  priceList =  costCalculationHelper.loadPriceList(costCalculationHelper.isBillingClient(), costCalculationHelper.restrictionForPriceList(),service);
+                        if (!ValidationHelper.isNullOrEmpty(priceList)) {
+                            requestPriceList.addAll(priceList);
+                        }
+                        priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
+                                new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
+                                Restrictions.eq("client", (costCalculationHelper.isBillingClient() == null || !costCalculationHelper.isBillingClient())
+                                        ? request.getClient() : request.getBillingClient()),
 
-                            costCalculationHelper.restrictionForPriceList() ?
-                                    Restrictions.in("cc.id", request.getService().getServiceCostUnauthorizedQuoteList()
-                                            .stream().map(IndexedEntity::getId).collect(Collectors.toList())) :
-                                    Restrictions.isNotNull("cc.id"),
+                                costCalculationHelper.restrictionForPriceList() ?
+                                        Restrictions.in("cc.id", request.getService().getServiceCostUnauthorizedQuoteList()
+                                                .stream().map(IndexedEntity::getId).collect(Collectors.toList())) :
+                                        Restrictions.isNotNull("cc.id"),
 
-                            Restrictions.eq("service", service),
-                            Restrictions.eq("cc.typeId", CostType.DEPENDING_ON_NUMBER_OF_FORMALITIES.getId())});
-                    if (!ValidationHelper.isNullOrEmpty(priceList)) {
-                        requestPriceList.addAll(priceList);
+                                Restrictions.eq("service", service),
+                                Restrictions.eq("cc.typeId", CostType.DEPENDING_ON_NUMBER_OF_FORMALITIES.getId())});
+                        if (!ValidationHelper.isNullOrEmpty(priceList)) {
+                            requestPriceList.addAll(priceList);
+                        }
                     }
                 }
                 List<PriceList>  priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
@@ -177,36 +213,6 @@ public class InvoiceHelper {
                     }
                 }
             }
-//
-//            if(!ValidationHelper.isNullOrEmpty(request.getService())) {
-//                priceList = DaoManager.load(PriceList.class,
-//                        new Criterion[]{
-//                                Restrictions.eq("client", request.getClient() != null ? request.getClient() : request.getBillingClient()),
-//                                Restrictions.eq("isNegative", true),
-//                                Restrictions.eq("service", request.getService())});
-//
-//            }else if(!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
-//                priceList = DaoManager.load(PriceList.class,
-//                        new Criterion[]{
-//                                Restrictions.eq("client", request.getClient() != null ? request.getClient() : request.getBillingClient()),
-//                                Restrictions.eq("isNegative", true),
-//                                Restrictions.in("service", request.getMultipleServices())});
-//            }
-
-            /*if(!ValidationHelper.isNullOrEmpty(request.getService())) {
-              priceList = DaoManager.load(PriceList.class,
-                     new Criterion[]{
-                              Restrictions.eq("client", request.getClient() != null ? request.getClient() : request.getBillingClient()),
-                              Restrictions.eq("isNegative", true),
-                              Restrictions.eq("service", request.getService())});
-
-          }else if(!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
-              priceList = DaoManager.load(PriceList.class,
-                      new Criterion[]{
-                              Restrictions.eq("client", request.getClient() != null ? request.getClient() : request.getBillingClient()),
-                              Restrictions.eq("isNegative", true),
-                              Restrictions.in("service", request.getMultipleServices())});
-         }*/
             priceListMap.put(request.getId(), requestPriceList);
         }
 
@@ -223,11 +229,6 @@ public class InvoiceHelper {
                     request.setSelectedTemplateId(requestPrint.getTemplate().getId());
                 }
             }
-//            String totalCostStr = request.getTotalCost() != null ? request.getTotalCost() : "0.0";
-//            if(totalCostStr.contains(",")) {
-//                totalCostStr = totalCostStr.replace(",", ".");
-//            }
-            //  Double totalCost = Double.parseDouble(totalCostStr);
             List<PriceList> prices = entry.getValue();
             for(PriceList priceList : prices) {
                 Double totalCost = 0.0;
@@ -272,6 +273,18 @@ public class InvoiceHelper {
 
                         List<Double> numberOfGroupedEstateFormality = request.getSumOfGroupedEstateFormalities();
                         Integer numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
+
+                        boolean isServiceUpdate = false;
+                        if (!ValidationHelper.isNullOrEmpty(request.getService())
+                                && !ValidationHelper.isNullOrEmpty(request.getService().getIsUpdate())
+                                && request.getService().getIsUpdate()) {
+                            isServiceUpdate = true;
+                        }
+
+                        if(isServiceUpdate){
+                            numberOfGroupedEstateFormality = Collections.singletonList(getNumActs(request.getId()).doubleValue());
+                            numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
+                        }
                         for (Integer i = 0; i < numberOfGroupsByDocumentOfEstateFormality; i++) {
                             if (!ValidationHelper.isNullOrEmpty(priceList.getNumberNextBlock())
                                     && !ValidationHelper.isNullOrEmpty(priceList.getNextPrice())) {
@@ -293,7 +306,7 @@ public class InvoiceHelper {
                     }else  if(priceList.getCostConfiguration().getTypeId().equals(CostType.EXTRA_COST.getId())){
                         totalCost += Double.parseDouble(priceList.getPrice().replaceAll("\\,", "."));
                         requestPriceListModel.setTaxRate(priceList.getTaxRate());
-                    } else  if(priceList.getCostConfiguration().getTypeId().equals(
+                    } else if(priceList.getCostConfiguration().getTypeId().equals(
                             CostType.DEPENDING_ON_NUMBER_OF_FORMALITIES.getId())){
                         requestPriceListModel.setTaxRate(priceList.getTaxRate());
                         if (!ValidationHelper.isNullOrEmpty(request.getNumberActUpdate())) {
@@ -399,6 +412,12 @@ public class InvoiceHelper {
                                 .getNumberOfVisualizedLandChargesRegistries();
                     }
                 }
+                
+                //if unautorized quote
+                else if(!ValidationHelper.isNullOrEmpty(request.getUnauthorizedQuote()) && request.getUnauthorizedQuote()) {
+                	requestPriceListModel.setTaxRate(priceList.getTaxRate());
+                	totalCost = Double.parseDouble(priceList.getPrice().replaceAll(",", "."));
+                }
 
                 requestPriceListModel.setRequestId(requestId);
                 requestPriceListModel.setRequest(request);
@@ -444,39 +463,56 @@ public class InvoiceHelper {
                 }
             }
 
-            List<Document> documents = DaoManager.load(Document.class, new Criterion[]{
-                    Restrictions.eq("request.id", requestId)});
-            if (!ValidationHelper.isNullOrEmpty(documents)) {
-                for (Document document : documents) {
-                    if (DocumentType.CADASTRAL.getId().equals(document.getTypeId())
-                            && !ValidationHelper.isNullOrEmpty(document.getCost())) {
-                        String cost = document.getCost().replaceAll(",", ".");
-                        RequestPriceListModel requestPriceListModel = new RequestPriceListModel();
-                        requestPriceListModel.setRequestId(requestId);
-                        requestPriceListModel.setRequest(request);
-                        requestPriceListModel.setTotalCost(Double.parseDouble(cost));
-                        requestPriceListModel.setClient(request.getClient());
-                        requestPriceListModel.setService(request.getService());
-                        List<TaxRateExtraCost> taxRateExtraCosts = DaoManager.load(TaxRateExtraCost.class, new Criterion[]{
-                                Restrictions.isNotNull("extraCostType"),
-                                Restrictions.isNotNull("clientId"),
-                                Restrictions.isNotNull("service"),
-                                Restrictions.eq("clientId", request.getClient().getId()),
-                                Restrictions.eq("service", request.getService()),
-                                Restrictions.eq("extraCostType", ExtraCostType.CATASTO)});
-                        if (!ValidationHelper.isNullOrEmpty(taxRateExtraCosts)) {
-                            requestPriceListModel.setTaxRate(taxRateExtraCosts.get(0).getTaxRate());
-                            requestPriceListModels.add(requestPriceListModel);
-                        }
-                    }
-                }
+            if(!(!ValidationHelper.isNullOrEmpty(request.getUnauthorizedQuote()) && request.getUnauthorizedQuote())) {
+	            List<Document> documents = DaoManager.load(Document.class, new Criterion[]{
+	                    Restrictions.eq("request.id", requestId)});
+	            if (!ValidationHelper.isNullOrEmpty(documents)) {
+	                for (Document document : documents) {
+	                    if (DocumentType.CADASTRAL.getId().equals(document.getTypeId())
+	                            && !ValidationHelper.isNullOrEmpty(document.getCost())) {
+	                        String cost = document.getCost().replaceAll(",", ".");
+	                        RequestPriceListModel requestPriceListModel = new RequestPriceListModel();
+	                        requestPriceListModel.setRequestId(requestId);
+	                        requestPriceListModel.setRequest(request);
+	                        requestPriceListModel.setTotalCost(Double.parseDouble(cost));
+	                        requestPriceListModel.setClient(request.getClient());
+	                        requestPriceListModel.setService(request.getService());
+	                        List<TaxRateExtraCost> taxRateExtraCosts = DaoManager.load(TaxRateExtraCost.class, new Criterion[]{
+	                                Restrictions.isNotNull("extraCostType"),
+	                                Restrictions.isNotNull("clientId"),
+	                                Restrictions.isNotNull("service"),
+	                                Restrictions.eq("clientId", request.getClient().getId()),
+	                                Restrictions.eq("service", request.getService()),
+	                                Restrictions.eq("extraCostType", ExtraCostType.CATASTO)});
+	                        if (!ValidationHelper.isNullOrEmpty(taxRateExtraCosts)) {
+	                            requestPriceListModel.setTaxRate(taxRateExtraCosts.get(0).getTaxRate());
+	                            requestPriceListModels.add(requestPriceListModel);
+	                        }
+	                    }
+	                }
+	            }
             }
         }
         return requestPriceListModels;
     }
 
+    private static BigInteger getNumActs(Long requestId) throws PersistenceBeanException, IllegalAccessException {
+        BigInteger countFormality = DaoManager.countQuery("select count(*) " +
+                "from request_formality where request_id=" + requestId);
+        BigInteger countSuccessFormality = DaoManager.countQuery("select count(*)" +
+                "from (estate_formality_success inner join request_formality on " +
+                "estate_formality_success.estate_formality_id=request_formality.formality_id) " +
+                "where estate_formality_success.note_type=\"NOTE_TYPE_A\" and request_formality.request_id=" + requestId);
+        BigInteger countCommunication = DaoManager.countQuery("select count(*) " +
+                "from (communication inner join request_formality on " +
+                "communication.estate_formality_id=request_formality.formality_id) " +
+                "where request_formality.request_id=" + requestId);
+        return countFormality.add(countSuccessFormality).add(countCommunication);
+    }
+
     public static List<InvoiceItem> getInvoiceItems(List<RequestPriceListModel> requestPriceListModels, String causal,
                                                     List<Request> selectedRequestList) {
+
         Map<TaxRate, List<RequestPriceListModel>> taxRateMap = requestPriceListModels
                 .stream()
                 .filter(rp -> !ValidationHelper.isNullOrEmpty(rp.getTaxRate())
@@ -548,6 +584,53 @@ public class InvoiceHelper {
         if(!ValidationHelper.isNullOrEmpty(goodsServicesFields)) {
             total = goodsServicesFields.stream().collect(
                     Collectors.summingDouble(GoodsServicesFieldWrapper::getTotalLine));
+            BigDecimal tot = BigDecimal.valueOf(total);
+            tot = tot.setScale(2, RoundingMode.HALF_UP);
+            total = tot.doubleValue();
+        }
+        return total;
+    }
+
+    public Double getNonZeroTotalLine(List<GoodsServicesFieldWrapper> goodsServicesFields) {
+        Double total = 0D;
+        if(!ValidationHelper.isNullOrEmpty(goodsServicesFields)) {
+            total = goodsServicesFields.stream()
+                    .filter(gs -> (gs.getPercentage() != null && gs.getPercentage().compareTo(BigDecimal.ZERO) != 0))
+                    .collect(Collectors.summingDouble(GoodsServicesFieldWrapper::getTotalLine));
+            BigDecimal tot = BigDecimal.valueOf(total);
+            tot = tot.setScale(2, RoundingMode.HALF_UP);
+            total = tot.doubleValue();
+        }
+        return total;
+    }
+
+    public Double getZeroTotalLine(List<GoodsServicesFieldWrapper> goodsServicesFields) {
+        Double total = 0D;
+        if(!ValidationHelper.isNullOrEmpty(goodsServicesFields)) {
+            total = goodsServicesFields.stream()
+                    .filter(gs -> (gs.getPercentage() == null || gs.getPercentage().compareTo(BigDecimal.ZERO) == 0))
+                    .collect(
+                            Collectors.summingDouble(GoodsServicesFieldWrapper::getTotalLine));
+            BigDecimal tot = BigDecimal.valueOf(total);
+            tot = tot.setScale(2, RoundingMode.HALF_UP);
+            total = tot.doubleValue();
+        }
+        return total;
+    }
+
+    public Double getNonZeroTotalVat(List<GoodsServicesFieldWrapper> goodsServicesFields) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+        Double total = 0D;
+        if(!ValidationHelper.isNullOrEmpty(goodsServicesFields)) {
+            for(GoodsServicesFieldWrapper wrapper: goodsServicesFields) {
+                if(!ValidationHelper.isNullOrEmpty(wrapper.getTotalLine())) {
+                    if(!ValidationHelper.isNullOrEmpty(wrapper.getSelectedTaxRateId())) {
+                        TaxRate taxrate = DaoManager.get(TaxRate.class, wrapper.getSelectedTaxRateId());
+                        if(!ValidationHelper.isNullOrEmpty(taxrate.getPercentage()) && (taxrate.getPercentage().compareTo(BigDecimal.ZERO) != 0)){
+                            total += wrapper.getTotalLine().doubleValue() * (taxrate.getPercentage().doubleValue()/100);
+                        }
+                    }
+                }
+            }
             BigDecimal tot = BigDecimal.valueOf(total);
             tot = tot.setScale(2, RoundingMode.HALF_UP);
             total = tot.doubleValue();

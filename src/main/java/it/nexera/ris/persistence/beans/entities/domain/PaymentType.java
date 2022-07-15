@@ -34,6 +34,8 @@ public class PaymentType extends IndexedEntity implements Serializable {
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
+    private String acronym;
+
     public String toString() {
         return description;
     }

@@ -837,22 +837,45 @@
                             <p:row>
                                 <p:column style="width: 15%!important;">
                                     <span><h:outputText value="#{msg.clientUnauthorizedCostPay}"/></span><br/>
-                                    <p:inputText value="#{bean.entity.unauthorizedCostPay}">
+                                    <p:inputText value="#{bean.entity.unauthorizedCostPay}" style="width: 100%;">
                                         <p:keyFilter mask="num" />
                                     </p:inputText>
                                 </p:column>
                                 <p:column style="width: 10%!important;">
                                     <span><h:outputText value="#{msg.clientUnauthorizedCostFormality}"/> </span><br/>
-                                    <p:inputText value="#{bean.entity.unauthorizedCostFormality}">
+                                    <p:inputText value="#{bean.entity.unauthorizedCostFormality}" style="width: 100%;">
                                         <p:keyFilter mask="num" />
                                     </p:inputText>
                                 </p:column>
                                 <p:column style="width: 10%!important;">
                                     <span><h:outputText value="#{msg.clientUnauthorizedCostCadastral}"/> </span><br/>
-                                    <p:inputText value="#{bean.entity.unauthorizedCostCadastral}">
+                                    <p:inputText value="#{bean.entity.unauthorizedCostCadastral}" style="width: 100%;">
                                         <p:keyFilter mask="num" />
                                     </p:inputText>
                                 </p:column>
+                            </p:row>
+                            <p:row>
+                            	<p:column>
+                            		<p:selectOneMenu value="#{bean.selectedTaxRateUnauthorizedCostPay}"
+                                             label="#{msg.taxRate}">
+		                                <f:selectItems value="#{bean.taxRates}"/>
+		                                <p:ajax event="itemSelect" update="@this"/>
+		                            </p:selectOneMenu>
+                            	</p:column>
+                            	<p:column>
+                            		<p:selectOneMenu value="#{bean.selectedTaxRateUnauthorizedCostFormality}"
+                                             label="#{msg.taxRate}">
+		                                <f:selectItems value="#{bean.taxRates}"/>
+		                                <p:ajax event="itemSelect" update="@this"/>
+		                            </p:selectOneMenu>
+                            	</p:column>
+                            	<p:column>
+                            		<p:selectOneMenu value="#{bean.selectedTaxRateUnauthorizedCostCadastral}"
+                                             label="#{msg.taxRate}">
+		                                <f:selectItems value="#{bean.taxRates}"/>
+		                                <p:ajax event="itemSelect" update="@this"/>
+		                            </p:selectOneMenu>
+                            	</p:column>
                             </p:row>
                         </p:panelGrid>
                     </p:panelGrid>
@@ -1376,7 +1399,7 @@
                     <p:commandButton value="#{msg.yes}"
                                      oncomplete="PF('invoicesRecipientDlg').hide();"
                                      action="#{bean.addInvoicesRecipient}" update=":form:wizard:subjectInvoice"/>
-                    <p:commandButton value="#{msg.no}"
+                    <p:commandButton value="#{msg.no}" style="margin-left:15px;"
                                      onclick="PF('invoicesRecipientDlg').hide();"/>
                 </div>
             </p:dialog>

@@ -62,10 +62,10 @@ public class WLGInbox extends IndexedEntity {
     @Column(name = "message_uid", length = 200)
     private String messageUid;
 
-    @Column(name = "receive_date", columnDefinition = "TIMESTAMP", nullable = false)
+    @Column(name = "receive_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", nullable = false)
     private Date receiveDate;
 
-    @Column(name = "send_date", columnDefinition = "TIMESTAMP", nullable = false)
+    @Column(name = "send_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", nullable = false)
     private Date sendDate;
 
     @Column(name = "process_date", columnDefinition = "TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP")

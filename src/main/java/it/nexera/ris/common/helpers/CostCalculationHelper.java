@@ -336,7 +336,6 @@ public class CostCalculationHelper {
         requestCosts.costEstateFormality += getCostPlus(isBillingClient, restrictionForPriceList);
         requestCosts.costEstateFormality += requestCosts.costEstate;
         requestCosts.costPay = getCostPay(isBillingClient, restrictionForPriceList);
-
         requestCosts.costTaxable = getCostTaxable(isBillingClient, restrictionForPriceList);
         requestCosts.finalCost = (double) Math.round((requestCosts.costCadastral + requestCosts.costExtra
                 + requestCosts.costEstateFormality + requestCosts.costPay)
@@ -367,7 +366,7 @@ public class CostCalculationHelper {
         return result;
     }
 
-    private Double getCostCadastral() throws PersistenceBeanException, IllegalAccessException {
+    public Double getCostCadastral() throws PersistenceBeanException, IllegalAccessException {
         double result = 0d;
         if(!ValidationHelper.isNullOrEmpty(getRequest().getUnauthorizedQuote()) && getRequest().getUnauthorizedQuote()
                 &&  ValidationHelper.isNullOrEmpty(getRequest().getPropertyList())) {
@@ -429,24 +428,21 @@ public class CostCalculationHelper {
     public Double getCostEstate(Boolean billingClient, boolean restictionForPriceList)
             throws PersistenceBeanException, IllegalAccessException {
         double result = 0d;
+        if(!ValidationHelper.isNullOrEmpty(getRequest().getUnauthorizedQuote()) && getRequest().getUnauthorizedQuote()){
+            return result;
+        }
         if (!ValidationHelper.isNullOrEmpty(getRequest().getService())) {
-            List<PriceList> priceList = null;
-            if(!ValidationHelper.isNullOrEmpty(getRequest().getUnauthorizedQuote()) && getRequest().getUnauthorizedQuote()
-                    &&  ValidationHelper.isNullOrEmpty(getRequest().getEstateFormalityList())) {
-                priceList = new ArrayList<>();
-            } else {
-                priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
-                        new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                        Restrictions.eq("client", getRequest().getClient()),
+            List<PriceList> priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
+                    new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
+                    Restrictions.eq("client", getRequest().getClient()),
 
-                        restictionForPriceList ?
-                                Restrictions.in("cc.id", getRequest().getService().getServiceCostUnauthorizedQuoteList()
-                                        .stream().map(IndexedEntity::getId).collect(Collectors.toList())) :
-                                Restrictions.isNotNull("cc.id"),
+                    restictionForPriceList ?
+                            Restrictions.in("cc.id", getRequest().getService().getServiceCostUnauthorizedQuoteList()
+                                    .stream().map(IndexedEntity::getId).collect(Collectors.toList())) :
+                            Restrictions.isNotNull("cc.id"),
 
-                        Restrictions.eq("service", getRequest().getService()),
-                        Restrictions.eq("cc.typeId", CostType.DEPENDING_ON_NUMBER_OF_FORMALITIES.getId())});
-            }
+                    Restrictions.eq("service", getRequest().getService()),
+                    Restrictions.eq("cc.typeId", CostType.DEPENDING_ON_NUMBER_OF_FORMALITIES.getId())});
 
             if (!ValidationHelper.isNullOrEmpty(priceList) && !ValidationHelper.isNullOrEmpty(priceList.get(0).getPrice())) {
 
@@ -460,23 +456,17 @@ public class CostCalculationHelper {
             }
         } else if (!ValidationHelper.isNullOrEmpty(getRequest().getMultipleServices())) {
             for (Service service : getRequest().getMultipleServices()) {
-                List<PriceList> priceList = null;
-                if(!ValidationHelper.isNullOrEmpty(getRequest().getUnauthorizedQuote()) && getRequest().getUnauthorizedQuote()
-                        &&  ValidationHelper.isNullOrEmpty(getRequest().getEstateFormalityList())) {
-                    priceList = new ArrayList<>();
-                } else {
-                    priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
-                            new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
-                            Restrictions.eq("client", getRequest().getClient()),
+                List<PriceList> priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
+                        new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
+                        Restrictions.eq("client", getRequest().getClient()),
 
-                            restictionForPriceList ?
-                                    Restrictions.in("cc.id", getRequest().getService().getServiceCostUnauthorizedQuoteList()
-                                            .stream().map(IndexedEntity::getId).collect(Collectors.toList())) :
-                                    Restrictions.isNotNull("cc.id"),
+                        restictionForPriceList ?
+                                Restrictions.in("cc.id", getRequest().getService().getServiceCostUnauthorizedQuoteList()
+                                        .stream().map(IndexedEntity::getId).collect(Collectors.toList())) :
+                                Restrictions.isNotNull("cc.id"),
 
-                            Restrictions.eq("service", service),
-                            Restrictions.eq("cc.typeId", CostType.DEPENDING_ON_NUMBER_OF_FORMALITIES.getId())});
-                }
+                        Restrictions.eq("service", service),
+                        Restrictions.eq("cc.typeId", CostType.DEPENDING_ON_NUMBER_OF_FORMALITIES.getId())});
                 if (!ValidationHelper.isNullOrEmpty(priceList) && !ValidationHelper.isNullOrEmpty(priceList.get(0).getPrice())) {
 
                     if (!ValidationHelper.isNullOrEmpty(getRequest().getNumberActUpdate())) {
@@ -492,7 +482,7 @@ public class CostCalculationHelper {
         return result;
     }
 
-    private Double getCostEstateFormality(Boolean billingClient, boolean restrictionForPriceList)
+    public Double getCostEstateFormality(Boolean billingClient, boolean restrictionForPriceList)
             throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         double result = 0d;
         if(!ValidationHelper.isNullOrEmpty(getRequest().getUnauthorizedQuote()) && getRequest().getUnauthorizedQuote()
@@ -549,19 +539,11 @@ public class CostCalculationHelper {
             isServiceUpdate = true;
         }
 
-//        if (!ValidationHelper.isNullOrEmpty(getRequest().getNumberActUpdate())) {
-//            numberOfGroupedEstateFormality = Collections.singletonList(getRequest().getNumberActUpdate());
-//            numberOfGroupsByDocumentOfEstateFormality = getRequest().getNumberOfGroupsByDocumentOfEstateFormality();
-//        }
-
         if(isServiceUpdate){
             numberOfGroupedEstateFormality = Collections.singletonList(getNumActs(getRequest().getId()).doubleValue());
             numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
         }
-        if (!ValidationHelper.isNullOrEmpty(getRequest().getNumberActUpdate()) && getRequest().getNumberActUpdate() > 0) {
-        	numberOfGroupedEstateFormality = Collections.singletonList(getRequest().getNumberActUpdate());
-        	numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
-        }
+
         boolean isPriceList = Boolean.FALSE;
         if (!ValidationHelper.isNullOrEmpty(getRequest().getService())) {
             List<PriceList> priceList = loadPriceList(billingClient, restrictionForPriceList, getRequest().getService());
@@ -658,10 +640,9 @@ public class CostCalculationHelper {
 
     public List<PriceList> loadPriceList(Boolean billingClient, boolean restrictionForPriceList, Service service)
             throws PersistenceBeanException, IllegalAccessException {
-        if(!ValidationHelper.isNullOrEmpty(getRequest().getUnauthorizedQuote()) && getRequest().getUnauthorizedQuote()
-                &&  ValidationHelper.isNullOrEmpty(getRequest().getEstateFormalityList())) {
-            return new ArrayList<>();
-        }
+//        if(!ValidationHelper.isNullOrEmpty(getRequest().getUnauthorizedQuote()) && getRequest().getUnauthorizedQuote()) {
+//            return new ArrayList<>();
+//        }
         return DaoManager.load(PriceList.class, new CriteriaAlias[]{
                 new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
                 Restrictions.eq("client", getRequest().getClient()),
@@ -675,7 +656,7 @@ public class CostCalculationHelper {
                 Restrictions.eq("cc.typeId", CostType.FIXED_COST.getId())});
     }
 
-    private Double getCostPlus(Boolean billingClient, boolean restrictionForPriceList)
+    public Double getCostPlus(Boolean billingClient, boolean restrictionForPriceList)
             throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         double result = 0D;
         double firstPrice = 0D;
@@ -692,6 +673,9 @@ public class CostCalculationHelper {
             numRegistry = getRequest().getAggregationLandChargesRegistry().getNumberOfVisualizedLandChargesRegistries();
         }
 
+        if (!Hibernate.isInitialized(getRequest().getRequestFormalities())) {
+            getRequest().reloadRequestFormalities();
+        }
         if (!ValidationHelper.isNullOrEmpty(getRequest().getRequestFormalities())) {
             List<Long> documentIds = getRequest().getRequestFormalities().stream()
                     .filter(rf -> !ValidationHelper.isNullOrEmpty(rf.getDocumentId()))
@@ -734,7 +718,7 @@ public class CostCalculationHelper {
         return result;
     }
 
-    private Double getCostPay(Boolean billingClient, boolean restrictionForPriceList)
+    public Double getCostPay(Boolean billingClient, boolean restrictionForPriceList)
             throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         Double result = 0d;
         if (isModelIdOfTemplateEqualsTo(2L)) {

@@ -1,6 +1,7 @@
 package it.nexera.ris.web.beans.wrappers;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.faces.model.SelectItem;
@@ -31,5 +32,7 @@ public class GoodsServicesFieldWrapper implements Serializable {
     private Double totalLine;
 
     private Integer counter;
+
+    private BigDecimal percentage;
 
 }
