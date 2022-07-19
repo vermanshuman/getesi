@@ -96,8 +96,201 @@
     </ui:define>
 
     <ui:define name="dialogs_body">
-        <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/estate-situation.css"
-              media="all" rel="stylesheet" type="text/css"/>
+        <style>
+            body .ui-fieldset .ui-fieldset-legend {
+                border: 1px solid #c9cdd2;
+                background: #f8f9fa;
+                color: #FFFFFF !important;
+                padding: 1rem;
+                font-weight: 200 !important;
+                border-radius: 4px;
+                user-select: none;
+                transition: background-color 0.2s, color 0.2s, border-color 0.2s,
+                box-shadow 0.2s;
+            }
+
+            legend {
+                font-size: 14px !important;
+            }
+
+            body .ui-fieldset .ui-fieldset-content {
+                padding: 8px 14px;
+            }
+
+            div {
+                display: block;
+            }
+
+            fieldset div {
+                font-size: 14px;
+                text-align: left;
+            }
+
+            .special-upload {
+                width: 210px;
+            }
+
+            .special-upload .ui-fileupload-choose {
+                background: #fed820;
+                color: #000000;
+                margin-left: -27px;
+            }
+
+            .special-upload .ui-icon-plusthick {
+                color: #000000 !important;
+            }
+
+            body .ui-fileupload .ui-fileupload-buttonbar {
+                padding: 8px 14px;
+            }
+
+            .special-upload .ui-widget-header {
+                background-color: transparent !important;
+                width: 210px;
+            }
+
+            body .ui-fileupload .ui-fileupload-content {
+                border: none;
+                height: 40px;
+            }
+
+            body .ui-fileupload .ui-fileupload-buttonbar {
+                border: none;
+            }
+
+            body .ui-button {
+                color: #ffffff;
+                margin-right: 3px;
+                margin-bottom: 3px;
+                border: none !important;
+            }
+
+            body .ui-icon {
+                width: 16px;
+                height: 16px;
+                line-height: 16px;
+            }
+
+            .card {
+                padding: 0;
+                border: none;
+            }
+
+            .red-btn {
+                background: red !important;
+                background-color: red !important;
+                color: #FFFFFF !important;
+            }
+
+            .without-header thead {
+                display: none;
+            }
+
+            body .ui-datatable .ui-paginator.ui-paginator-top {
+                /*background-color: #2f8ee5 !important;*/
+                color: #ffffff !important;
+            }
+
+            body .ui-datatable .ui-paginator.ui-paginator-bottom {
+                /*background-color: #2f8ee5 !important;*/
+                color: #ffffff !important;
+            }
+
+            body .ui-paginator .ui-paginator-current, body .ui-paginator .ui-paginator-pages .ui-paginator-page,
+            body .ui-paginator .ui-paginator-first, body .ui-paginator .ui-paginator-prev,
+            body .ui-paginator .ui-paginator-next, body .ui-paginator .ui-paginator-last {
+                color: #FFFFFF !important;
+            }
+
+            body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+                background: #FFF !important;
+                color: #000000 !important;
+            }
+
+            .layout-wrapper .route-bar {
+                border-bottom: 1px solid #c9cdd2;
+            }
+
+            .layout-footer {
+                border-top: 1px solid #c9cdd2;
+            }
+
+            .ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+                border: 1px solid #c9cdd2 !important;
+            }
+
+            /* body .ui-widget, body .ui-widget .ui-widget {
+                font-family: "Open Sans","Helvetica Neue",sans-serif !important;
+                text-decoration: none !important;
+                font-size: 14px !important;
+            } */
+
+            body .ui-datatable .ui-datatable-data > tr {
+                color: #5f666c;
+            }
+
+            body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-button {
+                background: #00CC52;
+            }
+            fieldset {
+                margin-top: 10px;
+                margin-left: 1cm;
+                margin-right: 1cm;
+            }
+            #list_panel {
+                margin-top: 10px;
+                margin-left: 1cm;
+                margin-right: 1cm;
+            }
+            div[id*='menuform1:menu_div'] {
+                margin-left: -4px;
+            }
+            .btn-green {
+                background-color: #00CC52!important;
+            }
+
+            .cost_titles {
+                padding-top: 20px !important;
+            }
+
+            .cost_titles h3 {
+                font-size: 1.17em !important;
+                font-weight: bold !important;
+            }
+
+            .ui-datatable-scrollable-theadclone tr  {
+                display: none !important;
+            }
+
+            #requestExtraCostDialog .ui-dialog-titlebar {
+                padding: 0.4em 0.4em 0.4em 1em;
+                background: #ffffff !important;
+            }
+            #cke_body {
+                width: 67vw !important;
+            }
+            body .ui-button.ui-button-warning {
+                background: #fed820;
+                color: #000000;
+            }
+            .ui-dialog-content{
+                max-width: 1200px !important;
+                max-height: 700px !important;
+                margin-bottom: 5px !important;
+            }
+            .ui-spinner-up,.ui-spinner-down{
+                margin-bottom: 0px !important;
+                margin-right: 0px !important;
+
+            }
+            .cost_titles > .p-field > .p-col-fixed {
+                font-size: 14px !important;
+                font-weight: bold !important;
+            }
+            .ui-dialog .ui-dialog-titlebar{
+                padding: 3px !important;
+            }
+        </style>
         <br/><br/><br/>
         <p:fieldset class="fieldset" legend="#{msg.estateSituationListDocuments}" toggleable="true" toggleSpeed="500" collapsed="true">
             <p:fileUpload label="#{msg.upload}" fileUploadListener="#{bean.saveDocumentXML}"

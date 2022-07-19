@@ -1736,9 +1736,17 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
         		totalCost += 0d;
         	else
         		totalCost += Double.parseDouble(request.getTotalCost().replaceAll(",", "."));
-        	if (!ValidationHelper.isNullOrEmpty(request.getService())
-                    && !ValidationHelper.isNullOrEmpty(request.getService().getNationalPrice())) {
-        		totalCost += request.getService().getNationalPrice();
+        	if (!ValidationHelper.isNullOrEmpty(request.getService())) {
+                List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
+                        Restrictions.eq("requestId", request.getId())});
+                Double nationalCost = 0d;
+                for (ExtraCost cost : extraCost) {
+                    if(ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
+                    	nationalCost = cost.getPrice();
+                        break;
+                    }
+                }
+                totalCost += nationalCost;
         	}
         }
         BigDecimal tot = BigDecimal.valueOf(totalCost);

@@ -991,16 +991,16 @@
                                                             <div class="month_inner">Tot.</div>
                                                         </div>
                                                     </div>
-                                                    <c:forEach var="item" items="#{bean.getTestTurnoverPerMonth()}"
+                                                    <c:forEach var="item" items="#{bean.turnoverPerMonth}" 
                                                                varStatus="loop">
                                                         <c:if test="${loop.index ge bean.quadrimesterStartIdx and loop.index le bean.quadrimesterEndIdx}">
                                                             <div class="month_div"
                                                                  style="border: 0px;padding-bottom: 0px;#{(loop.index eq 0 or loop.index eq 4 or loop.index eq 8) ? '' : 'padding-top: 0px;'}">
                                                                 <div class="month_outer column_outer">
                                                                     <div class="month_inner">#{bean.months[loop.index]}</div>
-                                                                    <div class="month_inner">10.00</div>
-                                                                    <div class="month_inner">5.00</div>
-                                                                    <div class="month_inner">15.00</div>
+                                                                    <div class="month_inner">#{item.totalTax}</div>
+                                                                    <div class="month_inner">#{item.nonTotalTax}</div>
+                                                                    <div class="month_inner">#{item.total}</div>
                                                                 </div>
                                                             </div>
                                                         </c:if>
@@ -1053,16 +1053,16 @@
                                                             <div class="month_inner">Tot.</div>
                                                         </div>
                                                     </div>
-                                                    <c:forEach var="item" items="#{bean.getTestTurnoverPerCustomer()}"
+                                                    <c:forEach var="item" items="#{bean.turnoverPerCustomer}"
                                                                varStatus="loop">
                                                         <c:if test="${loop.index ge bean.quadrimesterStartIdx and loop.index le bean.quadrimesterEndIdx}">
                                                             <div class="month_div"
                                                                  style="border: 0px;padding-bottom: 0px;#{(loop.index eq 0 or loop.index eq 4 or loop.index eq 8) ? '' : 'padding-top: 0px;'}">
                                                                 <div class="month_outer column_outer">
-                                                                    <div class="month_inner">#{item}</div>
-                                                                    <div class="month_inner">10.00</div>
-                                                                    <div class="month_inner">15.00</div>
-                                                                    <div class="month_inner">25.00</div>
+                                                                    <div class="month_inner">#{item.clientName}</div>
+                                                                    <div class="month_inner">#{item.totalTax}</div>
+                                                                    <div class="month_inner">#{item.nonTotalTax}</div>
+                                                                    <div class="month_inner">#{item.total}</div>
                                                                 </div>
                                                             </div>
                                                         </c:if>
@@ -2190,7 +2190,7 @@
                 <div id="content_tab5" class="hide" style="display: none;">
                     <ui:include src="/resources/tpl/common/ValidationMessages.xhtml"/>
                     <p:remoteCommand name="loadAdministrationTab" action="#{bean.loadAdministrationTab}"
-                                     update=":unlockedInvoiceTable :filterClientAdmin :managerAdmin :officeAdmin"/>
+                                     update=":unlockedInvoiceTable :filterClientAdmin :managerAdmin :officeAdmin :inumber"/>
                     <div class="p-grid">
                         <div class="p-col-12 p-md-12">
                             <div class="card"

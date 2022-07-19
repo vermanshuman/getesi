@@ -1192,12 +1192,20 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
         double totalCostByColumns = getMortgageCost(request) + getCatastalCost(request)
                 + (ValidationHelper.isNullOrEmpty(request.getCostPay()) ? 0d : request.getCostPay());
         request.setCalculateCost(null);
-        if (!ValidationHelper.isNullOrEmpty(request.getService())
-                && !ValidationHelper.isNullOrEmpty(request.getService().getNationalPrice())) {
-        	calculatedTotalCost += request.getService().getNationalPrice();
-        	totalCostFromRequest += request.getService().getNationalPrice();
-        	totalCostByColumns += request.getService().getNationalPrice();
-        }
+        if (!ValidationHelper.isNullOrEmpty(request.getService())) {
+            List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
+                    Restrictions.eq("requestId", request.getId())});
+            Double nationalCost = 0d;
+            for (ExtraCost cost : extraCost) {
+                if(ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
+                	nationalCost = cost.getPrice();
+                    break;
+                }
+            }
+            calculatedTotalCost += nationalCost;
+            totalCostFromRequest += nationalCost;
+            totalCostByColumns += nationalCost;
+    	}
         log.info("For " + request.getFiscalCodeVATNamber());
         log.info("calculatedTotalCost " + calculatedTotalCost + ", totalCostFromRequest " + totalCostFromRequest + ", totalCostByColumns  " + totalCostByColumns);
 

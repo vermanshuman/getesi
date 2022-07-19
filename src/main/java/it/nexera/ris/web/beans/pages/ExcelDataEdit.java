@@ -144,7 +144,8 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                 } catch (Exception e) {
                     LogHelper.log(log, e);
                 }
-            }
+            }else
+                setSelectedRequestClient(null);
             SessionHelper.removeObject("selectedRequestClientId");
             setSelectedRequestIds(selectedRequestIds);
         }
@@ -1685,6 +1686,8 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                 if(!ValidationHelper.isNullOrEmpty(getMail())
                         && !ValidationHelper.isNullOrEmpty(getMail().getClientInvoice()))
                     invoice.setClient(getMail().getClientInvoice());
+                else if(!ValidationHelper.isNullOrEmpty(getSelectedRequestClient()))
+                    invoice.setClient(getSelectedRequestClient());
                 else
                     throw new Exception("Client invoice is null, Can't create invoice");
             }
@@ -1893,6 +1896,18 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             } else {
                 executeJS("PF('invoiceOpenErrorDialogWV').show();");
             }
+        }else  {
+            setRequestsConsideredForInvoice(new ArrayList<>());
+            List<Request> requestListForInvoice = getSelectedRequests().stream()
+                    .filter(x ->  x.isDeletedRequest() && ValidationHelper.isNullOrEmpty(x.getInvoice())
+                            && !ValidationHelper.isNullOrEmpty(x.getStateId())
+                            && (RequestState.EVADED.getId().equals(x.getStateId())))
+                    .collect(Collectors.toList());
+            if (!ValidationHelper.isNullOrEmpty(requestListForInvoice)) {
+                requestListForInvoice.stream().forEach(r -> r.setSelectedForInvoice(true));
+                getRequestsConsideredForInvoice().addAll(requestListForInvoice);
+            }
+            executeJS("PF('mailManagerViewRequestsForInvoiceDlg').show();");
         }
     }
     

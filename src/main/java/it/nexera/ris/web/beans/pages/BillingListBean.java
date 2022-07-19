@@ -16,6 +16,7 @@ import it.nexera.ris.persistence.view.ClientView;
 import it.nexera.ris.persistence.view.RequestView;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.beans.EntityLazyListPageBean;
+import it.nexera.ris.web.beans.wrappers.BillingListTurnoverWrapper;
 import it.nexera.ris.web.beans.wrappers.GoodsServicesFieldWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.*;
 import it.nexera.ris.web.common.EntityLazyListModel;
@@ -109,9 +110,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     private Double monthNovDecAmount; 
 
-    private List<Integer> turnoverPerMonth = new ArrayList<>();
+    private List<BillingListTurnoverWrapper> turnoverPerMonth;
 
-    private List<String> turnoverPerCustomer = new ArrayList<>();
+    private List<BillingListTurnoverWrapper> turnoverPerCustomer;
 
     public String[] months = new String[]{"Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"};
 
@@ -493,6 +494,12 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", false, false, false));
         setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", false, false, false));
         setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", false, false, false));
+        
+        Calendar calendar = Calendar.getInstance(Locale.ITALY);
+		int year = calendar.get(Calendar.YEAR);
+		TurnoverHelper turnoverHelper = new TurnoverHelper();
+		setTurnoverPerMonth(turnoverHelper.getTurnoversPerMonth(year));
+		setTurnoverPerCustomer(turnoverHelper.getTurnoversPerClient(year));
     }
 
     private void loadRequestPanel() throws PersistenceBeanException, IllegalAccessException {
@@ -553,7 +560,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         return Math.random() * (max - min + 1) + min;
     }*/
 
-    public List<Integer> getTestTurnoverPerMonth() {
+    /*public List<Integer> getTestTurnoverPerMonth() {
         turnoverPerMonth.add(1);
         turnoverPerMonth.add(2);
         turnoverPerMonth.add(3);
@@ -567,9 +574,18 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         turnoverPerMonth.add(11);
         turnoverPerMonth.add(12);
         return turnoverPerMonth;
-    }
+    }*/
+    
+    /*public Set<BillingListTurnoverWrapper> getTestTurnoverPerMonth() throws HibernateException, IllegalAccessException, InstantiationException, PersistenceBeanException {
+    	Calendar calendar = Calendar.getInstance(Locale.ITALY);
+		int year = calendar.get(Calendar.YEAR);
+		TurnoverHelper turnoverHelper = new TurnoverHelper();
+		return turnoverHelper.getTurnoversPerMonth(year);
+    }*/
+    
+    
 
-    public List<String> getTestTurnoverPerCustomer() {
+   /* public List<String> getTestTurnoverPerCustomer() {
         turnoverPerCustomer.add("BCP");
         turnoverPerCustomer.add("Banca Sella");
         turnoverPerCustomer.add("Intrum");
@@ -583,7 +599,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         turnoverPerCustomer.add("Intrum2");
         turnoverPerCustomer.add("Penelope SR2");
         return turnoverPerCustomer;
-    }
+    }*/
 
     public BillingListBean() {
         model = new BarChartModel();
@@ -1229,7 +1245,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         } else {
         	setSelectedPaymentInvoice(paymentInvoice);
         	setPaymentAmount(paymentInvoice.getPaymentImport());
-        	System.out.println(paymentInvoice.getDate());
         	setPaymentDate(paymentInvoice.getDate());
         	setPaymentTypeDescriptions(ComboboxHelper.fillList(InvoicePaymentType.class, false));
         	List<PaymentType> paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("description", paymentInvoice.getDescription()), 
@@ -1468,7 +1483,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             Invoice invoice = saveInvoice(InvoiceStatus.DRAFT, true);
             setInvoiceSaveAsDraft(Boolean.TRUE);
             loadInvoiceDialogData(invoice);
-            setMaxInvoiceNumber();
+            // setMaxInvoiceNumber();
             String nextNumber = ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.NEXT_INVOICE_NUMBER).getValue();
             if(StringUtils.isNotBlank(nextNumber)){
                 Long invoiceNumber= Long.parseLong(nextNumber.trim());
@@ -3388,6 +3403,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     }
     
     public void loadAdministrationTab() throws HibernateException, IllegalAccessException, PersistenceBeanException {
+        setMaxInvoiceNumber();
     	setUnlockedInvoices(DaoManager.load(Invoice.class,
                 new Criterion[]{Restrictions.eq("status", InvoiceStatus.UNLOCKED)}, new Order[]{
                         Order.desc("number")}));
