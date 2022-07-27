@@ -17,6 +17,7 @@
     <ui:param name="centerPartStyleClass" value="false"/>
     <ui:param name="disableSelection" value="true"/>
     <ui:param name="tableInsideField" value="true"></ui:param>
+    <p:remoteCommand name="cancelSaveRequestExtraCost" action="#{bean.cancelSaveRequestExtraCost}"/>
     <ui:define name="back_buttons_panel">
         <p:commandButton id="add_btn" action="#{bean.addEstate}" value="#{msg.estateAddButton}" styleClass="p-mr-2 p-mb-2"/>
         <p:commandButton id="cancel_btn" action="#{bean.goBack}" value="#{msg.requestListOpenEdit}"
@@ -483,6 +484,7 @@
         </p:dialog>
         <ui:include src="../Dialogs/RequestDocumentListDialog.xhtml"/>
         <ui:include src="../Dialogs/RequestExtraCostDialog.xhtml"/>
+        <ui:include src="../Dialogs/ConfirmRequestToEvasaDialog.xhtml"/>
     </ui:define>
 </ui:composition>
 </html>

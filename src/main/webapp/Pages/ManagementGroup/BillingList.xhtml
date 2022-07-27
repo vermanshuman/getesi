@@ -1339,6 +1339,11 @@
                                                  action="#{bean.downloadAttachment(invoice)}"/>
                                 <p:commandButton id="unlock-btn" value="#{ff:upper(msg.unLock)}" class="action-btn" style="display: none;"
                                                  action="#{bean.unlockInvoice(invoice)}" update="invoiceTable"/>
+                                <p:commandButton id="elimina-btn" value="#{ff:upper(msg.reset)}" class="action-btn" style="display: none;"
+                                                 oncomplete="PF('invoice_delete_dlg').show()">
+                                    <f:setPropertyActionListener value="#{invoice.id}"
+                                                                 target="#{bean.invoiceDeleteId}"/>
+                                </p:commandButton>
                                 <div class="icon-block" style="justify-content: left;">
                                     <i class="email-icon-new"></i>
                                     <p:commandLink id="actionPnl" global="false" style="outline: none;" immediate="true"
@@ -1371,6 +1376,10 @@
                                                              onclick="document.getElementById('invoiceTable:#{rowId}:unlock-btn').click()"
                                                              rendered="#{invoice.status.toString() != 'SBLOCCATA'}"
                                                              style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;"/>
+                                            <p:commandButton value="#{ff:upper(msg.reset)}" styleClass="action-btn"
+                                                             onclick="document.getElementById('invoiceTable:#{rowId}:elimina-btn').click()"
+                                                             rendered="#{bean.currentUser.isAdmin()}"
+                                                             style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;"/>
                                         </p:outputPanel>
                                     </p:tooltip>
                                 </div>
@@ -1381,6 +1390,12 @@
                                 </p:commandButton>
                                 <p:commandButton id="unlock-btn-server" value="#{ff:upper(msg.unLock)}" class="action-btn" style="display: none;"
                                                  action="#{bean.unlockInvoice(invoice)}" update="invoiceTable"/>
+                                <p:commandButton id="elimina-btn-server" value="#{ff:upper(msg.reset)}" class="action-btn" style="display: none;"
+                                                 oncomplete="PF('invoice_delete_dlg').show()">
+                                    <f:setPropertyActionListener value="#{invoice.id}"
+                                                                 target="#{bean.invoiceDeleteId}"/>
+                                </p:commandButton>
+
                                 <div class="icon-block" style="justify-content: left;">
                                     <i class="email-check-icon"></i>
                                     <p:commandLink id="actionPnl1" global="false" style="outline: none;" immediate="true" readonly="true">
@@ -1400,6 +1415,10 @@
                                             <p:commandButton value="#{ff:upper(msg.unLock)}" styleClass="action-btn"
                                                              onclick="document.getElementById('invoiceTable:#{rowId}:unlock-btn-server').click()"
                                                              rendered="#{invoice.status.toString() != 'SBLOCCATA'}"
+                                                             style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;"/>
+                                            <p:commandButton value="#{ff:upper(msg.reset)}" styleClass="action-btn"
+                                                             onclick="document.getElementById('invoiceTable:#{rowId}:elimina-btn-server').click()"
+                                                             rendered="#{bean.currentUser.isAdmin()}"
                                                              style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;"/>
                                         </p:outputPanel>
                                     </p:tooltip>
@@ -2474,6 +2493,17 @@
                 }
             }
         </script>
+
+        <p:dialog id="invoiceDelete" widgetVar="invoice_delete_dlg" modal="true" resizable="false" styleClass="dialog-green dialog-green-width"
+                  draggable="false" effect="SLIDE" >
+            #{msg.deleteInvoiceConfirmation}<br/>
+            <br/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" action="#{bean.deleteInvoice}" style="margin-right: 1cm;background-color: #00CC52!important;"
+                                 oncomplete="PF('invoice_delete_dlg').hide(); filterTableFromPanel();"/>
+                <p:commandButton value="#{msg.cancel}" onclick="PF('invoice_delete_dlg').hide()" style="background-color: #F3362B !important;"/>
+            </div>
+        </p:dialog>
 
         <p:dialog id="documentDialog" widgetVar="documentDialog" modal="true" resizable="false" draggable="false"
                   width="700">

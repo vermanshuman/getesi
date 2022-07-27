@@ -334,6 +334,7 @@
             <p:growl id="messages" showDetail="true" autoUpdate="false"
                      widgetVar="messagesVar" globalOnly="true"/>
             <p:remoteCommand name="onErrorClose" action="#{bean.onErrorClose}" update="validationMessages"/>
+            <p:remoteCommand name="cancelSaveRequestExtraCost" action="#{bean.cancelSaveRequestExtraCost}"/>
             <p:panel>
                 <p:outputPanel id="fieldsetPanel"
                                style="align-content: center; width: 100%; padding-bottom: 0; border: 1px solid;">
@@ -686,6 +687,7 @@
             <ui:include src="../Dialogs/RequestExtraCostDialog.xhtml"/>
             <ui:include src="../Dialogs/EstateFormalityCostDialog.xhtml"/>
             <ui:include src="../Dialogs/InvoiceDialog.xhtml"/>
+            <ui:include src="../Dialogs/ConfirmRequestToEvasaDialog.xhtml"/>
         </h:form>
     </ui:define>
 </ui:composition>

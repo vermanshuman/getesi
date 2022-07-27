@@ -341,7 +341,11 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     private Invoice selectedUnlockedInvoiceDialog;
     
     private PaymentInvoice selectedPaymentInvoice;
-    
+
+    private List<SelectItem> userFolders;
+
+    private Long selectedFolderId;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
         if (!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.BILLING_LIST))) {
@@ -1677,7 +1681,10 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     gestore = "GESTORE: " + managerNames;
             }
             String fiduciario = "";
-            if(!ValidationHelper.isNullOrEmpty(getEntity().getClientFiduciary()) && !ValidationHelper.isNullOrEmpty(getEntity().getClientFiduciary().getClientName()))
+            if (StringUtils.isNotBlank(getEntity().getFiduciary()))
+                fiduciario = "FIDUCIARIO: " + getEntity().getFiduciary();
+            else if (!ValidationHelper.isNullOrEmpty(getEntity().getClientFiduciary())
+                    && !ValidationHelper.isNullOrEmpty(getEntity().getClientFiduciary().getClientName()))
                 fiduciario = "FIDUCIARIO: " + getEntity().getClientFiduciary().getClientName();
             causal = reference +
                     (!reference.isEmpty() && !ndg.isEmpty() ? " - " : "") +
@@ -2340,6 +2347,27 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                 });
             }
 
+            if (!ValidationHelper.isNullOrEmpty(getSelectedInvoice().getEmailFrom())
+                    && ValidationHelper.isNullOrEmpty(getSelectedInvoice().getEmailFrom().getFolder())) {
+                List<WLGFolder> folders = null;
+                try {
+                    folders = DaoManager.load(WLGFolder.class, new CriteriaAlias[]{
+                            new CriteriaAlias("emails", "email", JoinType.INNER_JOIN)
+                    }, new Criterion[]{
+                            Restrictions.eq("email.emailFrom", getSelectedInvoice().getEmailFrom().getEmailFrom())
+                    });
+                } catch (PersistenceBeanException | IllegalAccessException e) {
+                    LogHelper.log(log, e);
+                }
+                if (!ValidationHelper.isNullOrEmpty(folders)) {
+                    setUserFolders(ComboboxHelper.fillList(folders, false, false));
+                    setSelectedFolderId(folders.get(0).getId());
+                    executeJS("PF('selectFolderWV').show();");
+                    return;
+                }
+            }
+            executeJS("closeInvoiceDialog();");
+
         } catch (Exception e) {
             log.info("Mail is not sent");
             LogHelper.log(log, e);
@@ -2569,6 +2597,11 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
             if (!ValidationHelper.isNullOrEmpty(getEntity().getOffice())) {
                 excelDataWrapper.setOffice(getEntity().getOffice().getDescription());
             }
+            
+            if(!ValidationHelper.isNullOrEmpty(document.getNote())) {
+            	excelDataWrapper.setDocumentNote(document.getNote());
+            }
+            
             List<Request> filteredRequests = DaoManager.load(Request.class,
                     new Criterion[]{
                             Restrictions.eq("invoice", invoiceRequest.getInvoice()),
@@ -3381,6 +3414,17 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
     		setActiveTabIndex(1);
     		RequestContext.getCurrentInstance().update("invoiceDialogBilling");
     	}
+    }
+
+    public void confirmSelectFolder(Boolean needFolder) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        if (needFolder) {
+            if (!ValidationHelper.isNullOrEmpty(getSelectedFolderId())) {
+                getSelectedInvoice().getEmailFrom().setFolder(DaoManager.get(WLGFolder.class, getSelectedFolderId()));
+                getSelectedInvoice().getEmailFrom().setUserChangedFolder(DaoManager.get(User.class, getCurrentUser().getId()));
+                DaoManager.save(getSelectedInvoice().getEmailFrom(), true);
+            }
+        }
+        executeJS("closeInvoiceDialog();");
     }
 
 }

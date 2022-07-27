@@ -834,14 +834,17 @@
             </div>
         </p:dialog>
         <p:dialog widgetVar="previousRequest"
-                  modal="true" resizable="false" effect="SLIDE">
+                  modal="true" resizable="false" effect="SLIDE"
+                  styleClass="dialog-green" style="text-align: center;">
             #{bean.previousRequestListMessage}<br/>
             <span>#{msg.estateSituationPreviousRequestUpload}</span>
             <br/>
             <div class="btn_line">
                 <p:commandButton value="#{msg.submit}" action="#{bean.associatePreviousData}"
-                                 onclick="PF('previousRequest').hide()" update=":form"/>
-                <p:commandButton value="#{msg.no}" onclick="PF('previousRequest').hide()"/>
+                                 onclick="PF('previousRequest').hide()" update=":form"
+                                 style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"/>
+                <p:commandButton value="#{msg.no}" onclick="PF('previousRequest').hide()"
+                                 style="background-color: #F3362B !important; width: 100px;"/>
             </div>
         </p:dialog>
 

@@ -1,0 +1,19 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html">
+	
+	<p:dialog id="confirmRequestToEvasaDialog" widgetVar="confirmRequestToEvasaDialogWV" modal="true" width="600" styleClass="dialog-green">
+
+		<p:outputLabel value="#{msg.requestStateToEvasa}"></p:outputLabel>
+
+		<div class="btn_line">
+			<p:commandButton value="#{msg.yes}" styleClass="confirm-button" style="width: 50px;"
+						update="@form" action="#{bean.saveRequestAsEvasa}"
+						oncomplete="PF('confirmRequestToEvasaDialogWV').hide();" />
+			<p:commandButton value="#{msg.no}" style="background-color: #F3362B !important; margin-left:15px;width: 50px;"
+						oncomplete="PF('confirmRequestToEvasaDialogWV').hide();" />
+		</div>
+	</p:dialog>
+</ui:composition>

@@ -21,6 +21,7 @@ import it.nexera.ris.web.common.RequestPriceListModel;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
@@ -128,15 +129,19 @@ public class ExcelDataEdit extends BaseEntityPageBean {
     
     private Invoice tempInvoice;
     
+    private String documentNote;
+    
     @Override
     protected void onConstruct() {
         setMailId(null);
         setSelectedRequestIds(null);
         if(!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.ID_PARAMETER))){
+            SessionHelper.removeObject("selectedRequestIds");
+            SessionHelper.removeObject("selectedRequestClientId");
             setMailId(Long.valueOf(getRequestParameter(RedirectHelper.ID_PARAMETER)));
         }else if(!ValidationHelper.isNullOrEmpty(SessionHelper.get("selectedRequestIds"))) {
             List<Long> selectedRequestIds =(List<Long>)SessionHelper.get("selectedRequestIds");
-            SessionHelper.removeObject("selectedRequestIds");
+            // SessionHelper.removeObject("selectedRequestIds");
             if(!ValidationHelper.isNullOrEmpty(SessionHelper.get("selectedRequestClientId"))) {
                 Long clientId = (Long)SessionHelper.get("selectedRequestClientId");
                 try {
@@ -146,7 +151,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                 }
             }else
                 setSelectedRequestClient(null);
-            SessionHelper.removeObject("selectedRequestClientId");
+            // SessionHelper.removeObject("selectedRequestClientId");
             setSelectedRequestIds(selectedRequestIds);
         }
         loadPage();
@@ -198,7 +203,9 @@ public class ExcelDataEdit extends BaseEntityPageBean {
                 setDocument(document);
                 if(!ValidationHelper.isNullOrEmpty(document))
                     setExcelFatturaN(document.getInvoiceNumber());
-
+                
+                if(!ValidationHelper.isNullOrEmpty(document) && !ValidationHelper.isNullOrEmpty(document.getNote()))
+                	setDocumentNote(document.getNote());
                 setExcelReportN(document.getReportNumber());
 
                 setExcelDate((document == null || document.getInvoiceDate() == null ?
@@ -999,6 +1006,9 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             excelDataWrapper.setReferenceRequest(getReferenceRequest());
             excelDataWrapper.setFatturan(getExcelFatturaN());
             excelDataWrapper.setData(getExcelDate());
+            if(!ValidationHelper.isNullOrEmpty(getDocumentNote())) {
+            	excelDataWrapper.setDocumentNote(getDocumentNote());
+            }
             if (!ValidationHelper.isNullOrEmpty(getExcelClientInvoiceId())) {
                 excelDataWrapper.setClientInvoice(DaoManager.get(Client.class, getExcelClientInvoiceId()));
             }
@@ -1116,6 +1126,10 @@ public class ExcelDataEdit extends BaseEntityPageBean {
 
     public void generateXlsRequestCost() {
         try {
+            if(!ValidationHelper.isNullOrEmpty(getDocument()) && !ValidationHelper.isNullOrEmpty(getDocumentNote())) {
+            	getDocument().setNote(getDocumentNote());
+            	DaoManager.save(getDocument(), true);
+            }
             log.info("Inside generateXlsRequestCost");
             byte[] excelFile = getXlsBytes();
             if(!ValidationHelper.isNullOrEmpty(excelFile)) {
@@ -1349,11 +1363,15 @@ public class ExcelDataEdit extends BaseEntityPageBean {
     }
 
     public void saveRequestExtraCost() throws Exception {
-        getCostManipulationHelper().setCostNote(getCostNote());
+        //getCostManipulationHelper().setCostNote(getCostNote());
         DaoManager.refresh(getExamRequest());
         getCostManipulationHelper().saveRequestExtraCost(getExamRequest());
         CostCalculationHelper calculation = new CostCalculationHelper(getExamRequest());
         calculation.calculateAllCosts(true);
+        loadPage();
+    }
+
+    public void cancelSaveRequestExtraCost() throws Exception {
         loadPage();
     }
 
@@ -1557,17 +1575,27 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         this.excelFatturaN = excelFatturaN;
     }
 
-    public void viewExtraCost() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+    public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        log.debug("Fecthing extra cost for request(Regenerate) " + getExamRequest());
+        Request request = DaoManager.get(Request.class, getExamRequest().getId());
+        if(recalculate)
+            getExamRequest().setNumberActUpdate(null);
+        log.info("View Extra cost(Regenerate) :" + request.getSumOfGroupedEstateFormalities());
+        getCostManipulationHelper().viewExtraCost(request, recalculate);
+    }
+
+    public void viewExtraCost(Map<String, String> valuesMap, String tempId) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         Request request =  DaoManager.get(Request.class, getRequestId());
         log.debug("Fecthing extra cost for request(ExcelData) " + request);
         boolean reCalculate = true;
         if(request.getCostButtonConfirmClicked() != null && request.getCostButtonConfirmClicked()){
             reCalculate = false;
         }
-        viewExtraCost(reCalculate);
+        
+        viewExtraCost(reCalculate, valuesMap, tempId);
     }
 
-    public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+    public void viewExtraCost(boolean recalculate, Map<String, String> valuesMap, String tempId) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         setCostNote(null);
         setCostManipulationHelper(new CostManipulationHelper());
         Request request =  DaoManager.get(Request.class, getRequestId());
@@ -1613,7 +1641,17 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             }
         }else
             setCostNote(getExamRequest().getCostNote());
-
+        
+        String columnName = ResourcesHelper.getString("excelNote") + "_" + tempId;
+        String value = valuesMap.entrySet().stream().filter(x -> columnName.equals(x.getKey())).map(x->x.getValue())
+        		.collect(Collectors.joining());
+        if(!ValidationHelper.isNullOrEmpty(value)) {
+        	if(value.contains("Anomalia costi")) {
+        		value = "Anomalia costi";
+        	}
+        	getCostManipulationHelper().setCostNote(value);
+        }
+        
         getCostManipulationHelper().viewExtraCost(getExamRequest(), recalculate);
         setExcelDataTable(new ArrayList<>());
         if(!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
@@ -1721,6 +1759,18 @@ public class ExcelDataEdit extends BaseEntityPageBean {
             		totalCost += 0d;
             	else
             		totalCost += Double.parseDouble(request.getTotalCost().replaceAll(",", "."));
+            	if (!ValidationHelper.isNullOrEmpty(request.getService())) {
+                    List<ExtraCost> extraCost = DaoManager.load(ExtraCost.class, new Criterion[]{
+                            Restrictions.eq("requestId", request.getId())});
+                    Double nationalCost = 0d;
+                    for (ExtraCost cost : extraCost) {
+                        if(ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
+                        	nationalCost = cost.getPrice();
+                            break;
+                        }
+                    }
+                    totalCost += nationalCost;
+            	}
             }
             BigDecimal tot = BigDecimal.valueOf(totalCost);
             tot = tot.setScale(2, RoundingMode.HALF_UP);
@@ -1755,7 +1805,7 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         getInvoiceDialogBean().setInvoiceNumber(invoiceNumber);
         getInvoiceDialogBean().setNumber(lastInvoiceNumber + 1);
     }*/
-    
+
     public void setMaxInvoiceNumber() throws HibernateException {
         LocalDate currentdate = LocalDate.now();
         int currentYear = currentdate.getYear();
@@ -1767,11 +1817,21 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         } catch (PersistenceBeanException | IllegalAccessException e) {
             LogHelper.log(log, e);
         }
-        if(lastInvoiceNumber == null)
+        if (lastInvoiceNumber == null)
             lastInvoiceNumber = 0l;
-        String invoiceNumber = (lastInvoiceNumber + 1) + "-" + currentYear + "-FE";
+        String nextNumber = ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.NEXT_INVOICE_NUMBER).getValue();
+        Long nextInvoiceNumber = 0l;
+        if(StringUtils.isNotBlank(nextNumber)) {
+            nextInvoiceNumber = Long.parseLong(nextNumber.trim());
+        }
+        if(nextInvoiceNumber > lastInvoiceNumber)
+            lastInvoiceNumber = nextInvoiceNumber;
+        else {
+            lastInvoiceNumber += 1;
+        }
+        String invoiceNumber = lastInvoiceNumber + "-" + currentYear + "-FE";
         getInvoiceDialogBean().setInvoiceNumber(invoiceNumber);
-        getInvoiceDialogBean().setNumber(lastInvoiceNumber + 1);
+        getInvoiceDialogBean().setNumber(lastInvoiceNumber);
     }
 
 

@@ -543,6 +543,20 @@ public class CostCalculationHelper {
             numberOfGroupedEstateFormality = Collections.singletonList(getNumActs(getRequest().getId()).doubleValue());
             numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
         }
+        
+        if (!ValidationHelper.isNullOrEmpty(getRequest().getRequestFormalities())) {
+        	if(!Hibernate.isInitialized(getRequest().getRequestFormalities())){
+                Hibernate.initialize(getRequest().getRequestFormalities());
+            }
+            List<Long> documentIds = getRequest().getRequestFormalities().stream()
+                    .filter(rf -> !ValidationHelper.isNullOrEmpty(rf.getDocumentId()))
+                    .map(RequestFormality::getDocumentId)
+                    .distinct().collect(Collectors.toList());
+            if (ValidationHelper.isNullOrEmpty(documentIds) && isServiceUpdate) {
+            	numberOfGroupedEstateFormality = getRequest().getSumOfGroupedEstateFormalities();
+                numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
+            }
+        }
 
         boolean isPriceList = Boolean.FALSE;
         if (!ValidationHelper.isNullOrEmpty(getRequest().getService())) {
@@ -673,10 +687,10 @@ public class CostCalculationHelper {
             numRegistry = getRequest().getAggregationLandChargesRegistry().getNumberOfVisualizedLandChargesRegistries();
         }
 
-        if (!Hibernate.isInitialized(getRequest().getRequestFormalities())) {
-            getRequest().reloadRequestFormalities();
-        }
         if (!ValidationHelper.isNullOrEmpty(getRequest().getRequestFormalities())) {
+        	if(!Hibernate.isInitialized(getRequest().getRequestFormalities())){
+                Hibernate.initialize(getRequest().getRequestFormalities());
+            }
             List<Long> documentIds = getRequest().getRequestFormalities().stream()
                     .filter(rf -> !ValidationHelper.isNullOrEmpty(rf.getDocumentId()))
                     .map(RequestFormality::getDocumentId)

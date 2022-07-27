@@ -1288,7 +1288,7 @@ public class ExcelDataRequestEdit extends BaseEntityPageBean {
     }
 
     public void saveRequestExtraCost() throws Exception {
-        getCostManipulationHelper().setCostNote(getCostNote());
+        //getCostManipulationHelper().setCostNote(getCostNote());
         DaoManager.refresh(getExamRequest());
         getCostManipulationHelper().saveRequestExtraCost(getExamRequest());
         CostCalculationHelper calculation = new CostCalculationHelper(getExamRequest());
@@ -1664,5 +1664,9 @@ public class ExcelDataRequestEdit extends BaseEntityPageBean {
 
     public void setShowRequestCost(Boolean showRequestCost) {
         this.showRequestCost = showRequestCost;
+    }
+
+    public void cancelSaveRequestExtraCost() throws Exception {
+        loadPage();
     }
 }

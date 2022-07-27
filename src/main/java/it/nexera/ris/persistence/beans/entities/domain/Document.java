@@ -86,6 +86,9 @@ public class Document extends DocumentTagEntity implements Cloneable {
     
     @Column(name = "report_numer")
     private Long reportNumber;
+    
+    @Column(name = "note")
+    private String note;
 
     private Boolean complete;
 
@@ -208,7 +211,9 @@ public class Document extends DocumentTagEntity implements Cloneable {
         documentClone.setRequest(this.getRequest());
         documentClone.setMail(this.getMail());
         documentClone.setFormalityDuplicated(this.getFormalityDuplicated());
-
+        if(!ValidationHelper.isNullOrEmpty(this.getNote())) {
+            documentClone.setNote(this.getNote());
+        }
         return documentClone;
     }
 
@@ -411,4 +416,14 @@ public class Document extends DocumentTagEntity implements Cloneable {
     public void setComplete(Boolean complete) {
         this.complete = complete;
     }
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
+	}
+    
+    
 }

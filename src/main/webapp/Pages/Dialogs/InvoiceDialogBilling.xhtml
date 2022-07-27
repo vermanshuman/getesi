@@ -1063,10 +1063,10 @@
                                              style="margin-left:5px;" action="#{bean.saveMailInDraft}"/>
                             <p:commandButton value="#{msg.sendEmail}" action="#{bean.sendMail}"
                                              styleClass="ui-button-success p-mr-2 p-mb-2"
-                            onsuccess="PF('invoiceDialogBillingWV').hide(); closeInvoiceDialog();"/>
+                            onsuccess="PF('invoiceDialogBillingWV').hide();" update="selectFolder"/>
                         </div>
                     </div>
-
+                    <!--                            onsuccess="PF('invoiceDialogBillingWV').hide();"/>-->
                     <script>
                         function onInitCkEditor() {
                             console.log("start init CKEditor");
@@ -1320,5 +1320,23 @@
                                  oncomplete="PF('unlockedInvoiceDialogWV').hide();"/>
             </f:facet>
     	</p:dataTable>
+    </p:dialog>
+
+    <p:dialog id="selectFolder" widgetVar="selectFolderWV" modal="true" resizable="false" draggable="false"
+              styleClass="dialog-green" >
+        <h:outputText value="#{msg.invoiceMailSelectFolder}"/>
+        <h:outputText rendered="#{bean.userFolders.size()==1}" value=" #{bean.userFolders[0].label}"/>
+        <h:outputText value="?"/><br/>
+        <div class="btn_line">
+            <p:selectOneMenu value="#{bean.selectedFolderId}" rendered="#{bean.userFolders.size()!=1}">
+                <f:selectItems value="#{bean.userFolders}"/>
+            </p:selectOneMenu>
+        </div>
+        <div class="btn_line">
+            <p:commandButton value="#{msg.confirm}" action="#{bean.confirmSelectFolder(true)}"
+                             style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;" oncomplete="PF('selectFolderWV').hide();"/>
+            <p:commandButton value="#{msg.no.toUpperCase()}" action="#{bean.confirmSelectFolder(false)}"
+                             style="background-color: #F3362B !important; width: 100px;" oncomplete="PF('selectFolderWV').hide();"/>
+        </div>
     </p:dialog>
 </ui:composition>

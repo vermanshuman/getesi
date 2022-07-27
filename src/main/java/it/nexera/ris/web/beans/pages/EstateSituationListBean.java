@@ -22,6 +22,7 @@ import it.nexera.ris.common.enums.MailEditType;
 import it.nexera.ris.common.enums.MortgageType;
 import it.nexera.ris.common.enums.PageTypes;
 import it.nexera.ris.common.enums.RequestOutputTypes;
+import it.nexera.ris.common.enums.RequestState;
 import it.nexera.ris.common.enums.RoleTypes;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.ComboboxHelper;
@@ -296,6 +297,8 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
     }
 
     public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        if(recalculate)
+            getExamRequest().setNumberActUpdate(null);
         getCostManipulationHelper().viewExtraCost(getExamRequest(), recalculate);
     }
 
@@ -309,9 +312,15 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
     }
 
     public void saveRequestExtraCost() throws Exception {
+    	if(!ValidationHelper.isNullOrEmpty(getExamRequest().getUnauthorizedQuote()) && getExamRequest().getUnauthorizedQuote()
+    			&& !getExamRequest().getStateId().equals(RequestState.EVADED.getId())) {
+    		executeJS("PF('confirmRequestToEvasaDialogWV').show();");
+            return;
+    	}
+    		
         getCostManipulationHelper().saveRequestExtraCost(getExamRequest());
     }
-
+    
     public void updateNationalCost() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
 
         if(!ValidationHelper.isNullOrEmpty(getCostManipulationHelper().getIncludeNationalCost())
@@ -379,6 +388,11 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
         }
     }
 
+    public void saveRequestAsEvasa() throws Exception {
+    	getCostManipulationHelper().saveRequestExtraCost(getExamRequest());
+    	getExamRequest().setStateId(RequestState.EVADED.getId());
+    	DaoManager.save(getExamRequest(), true);
+    }
 
     public Long getRequestId() {
         return requestId;
@@ -529,5 +543,8 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
 
     public void setShowRequestCost(Boolean showRequestCost) {
         this.showRequestCost = showRequestCost;
+    }
+
+    public void cancelSaveRequestExtraCost() {
     }
 }

@@ -186,9 +186,12 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 							Restrictions.isNotNull("aggregationLandChargesRegistry") :
 								Restrictions.eq("aggregationLandChargesRegistry.id",
 										getRequestEntity().getAggregationLandChargesRegistry().getId())),
-					Restrictions.eq("stateId", RequestState.EVADED.getId()),
+					Restrictions.or(
+							Restrictions.eq("stateId", RequestState.EVADED.getId()),
+							Restrictions.eq("stateId", RequestState.INVOICED.getId()),
+							Restrictions.eq("stateId", RequestState.SENT_TO_SDI.getId())
+					),
 					Restrictions.ne("id", getRequestEntity().getId())});
-
 			if (!ValidationHelper.isNullOrEmpty(requests)) {
 				setPreviousRequestList(requests);
 				Request lastRequest = requests.get(requests.size()-1);

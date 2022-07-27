@@ -457,6 +457,12 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                     firstRowNum, getSheet().getLastRowNum(), 0, getColumns().length-1));
             resizeRequestColumns();
         }
+        
+        if(!ValidationHelper.isNullOrEmpty(excelDataWrapper.getDocumentNote())) {
+            row = createRowAfterDefinedEmptyRows(4);
+            row.createCell(0).setCellValue(ResourcesHelper.getString("requestExtraCostNote")+ ":" + excelDataWrapper.getDocumentNote());
+            row.getCell(0).setCellStyle(mainCellStyle);
+        }
 
         int colIndex = getIndex(ResourcesHelper.getString("excelForm"), requestsColumns);
         getSheet().setColumnWidth(colIndex, 12*256);
@@ -1598,8 +1604,9 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
             }else  if(index != -2) {
                 String note = "";
                 if (!ValidationHelper.isNullOrEmpty(request.getCostNote())) {
-                    row.createCell(colIndex, CellType.STRING).setCellValue(request.getCostNote());
-                    row.getCell(colIndex).setCellStyle(cellStyle);
+                    //row.createCell(colIndex, CellType.STRING).setCellValue(request.getCostNote());
+                    //row.getCell(colIndex).setCellStyle(cellStyle);
+                	note = request.getCostNote();
                 } else {
                     boolean isAdded = Boolean.FALSE;
                     List<Document> requestDocuments = DaoManager.load(Document.class,

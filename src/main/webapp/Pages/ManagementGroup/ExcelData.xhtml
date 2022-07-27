@@ -16,6 +16,7 @@
 			<ui:param name="invoiceBean" value="#{bean.invoiceDialogBean}" />
 
 			<p:remoteCommand name="updateButtonPanel" action="#{bean.updateButtonPanel}" update="createInvoice"/>
+			<p:remoteCommand name="cancelSaveRequestExtraCost" action="#{bean.cancelSaveRequestExtraCost}" update="@form" />
 			<p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group">
 				<h:outputText value="#{msg.client}:"/>
 				<p:selectOneMenu id="client_not_manger_or_fiduciary_id"
@@ -84,14 +85,19 @@
 							</f:facet>
 						</p:columns>
 						 <p:column exportable="false" styleClass="action_midle_column">
-							<p:commandButton icon="fa fa-pencil-square-o" action="#{bean.viewExtraCost()}">
+							<p:commandButton icon="fa fa-pencil-square-o" action="#{bean.viewExtraCost(excelData.columnValues, req.tempId)}">
 								<f:setPropertyActionListener value="#{req.id ne null ? req.id : req.multipleRequestId}" target="#{bean.requestId}"/>
 							</p:commandButton>
 						</p:column>
 					</p:dataTable>
 				</p:panelGrid>
 			</ui:repeat>
-
+			
+			<p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+				<span class="p-col-fixed text-bold">#{msg.requestExtraCostNote}</span>
+				<p:inputTextarea value="#{bean.documentNote}" rows="2" style="width: 235px; height: 50px;"></p:inputTextarea>
+			</p:panelGrid>
+			
 			<ui:remove>
 				<p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
 					<div class="additional_button">

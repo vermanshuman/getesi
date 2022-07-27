@@ -285,6 +285,20 @@ public class InvoiceHelper {
                             numberOfGroupedEstateFormality = Collections.singletonList(getNumActs(request.getId()).doubleValue());
                             numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
                         }
+                        
+                        if (!ValidationHelper.isNullOrEmpty(request.getRequestFormalities())) {
+                        	if(!Hibernate.isInitialized(request.getRequestFormalities())){
+                                Hibernate.initialize(request.getRequestFormalities());
+                            }
+                            List<Long> documentIds = request.getRequestFormalities().stream()
+                                    .filter(rf -> !ValidationHelper.isNullOrEmpty(rf.getDocumentId()))
+                                    .map(RequestFormality::getDocumentId)
+                                    .distinct().collect(Collectors.toList());
+                            if (ValidationHelper.isNullOrEmpty(documentIds) && isServiceUpdate) {
+                            	numberOfGroupedEstateFormality = request.getSumOfGroupedEstateFormalities();
+                                numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
+                            }
+                        }
                         for (Integer i = 0; i < numberOfGroupsByDocumentOfEstateFormality; i++) {
                             if (!ValidationHelper.isNullOrEmpty(priceList.getNumberNextBlock())
                                     && !ValidationHelper.isNullOrEmpty(priceList.getNextPrice())) {
@@ -450,16 +464,14 @@ public class InvoiceHelper {
                         requestPriceListModels.add(requestPriceListModel);
                     }
                 } else {
-                    if(!ValidationHelper.isNullOrEmpty(request.getService().getNationalTaxRate())) {
-                        RequestPriceListModel requestPriceListModel = new RequestPriceListModel();
-                        requestPriceListModel.setRequestId(requestId);
-                        requestPriceListModel.setRequest(request);
-                        requestPriceListModel.setTotalCost(cost.getPrice());
-                        requestPriceListModel.setClient(request.getClient());
-                        requestPriceListModel.setService(request.getService());
-                        requestPriceListModel.setTaxRate(request.getService().getNationalTaxRate());
-                        requestPriceListModels.add(requestPriceListModel);
-                    }
+                    RequestPriceListModel requestPriceListModel = new RequestPriceListModel();
+                    requestPriceListModel.setRequestId(requestId);
+                    requestPriceListModel.setRequest(request);
+                    requestPriceListModel.setTotalCost(cost.getPrice());
+                    requestPriceListModel.setClient(request.getClient());
+                    requestPriceListModel.setService(request.getService());
+                    requestPriceListModel.setTaxRate(request.getService().getNationalTaxRate());
+                    requestPriceListModels.add(requestPriceListModel);
                 }
             }
 

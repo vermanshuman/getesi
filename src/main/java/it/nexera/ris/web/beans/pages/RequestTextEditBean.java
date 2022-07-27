@@ -1567,11 +1567,15 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         log.debug("Fecthing extra cost for request " + getExamRequest());
+        //DaoManager.getSession().evict(getExamRequest());
         Request request = DaoManager.get(Request.class, getExamRequest().getId());
-        log.debug("View Extra cost :" + request.getSumOfGroupedEstateFormalities());
-        if (!ValidationHelper.isNullOrEmpty(getRequestNumberActUpdate())) {
+        log.info("View Extra cost :" + request.getSumOfGroupedEstateFormalities());
+        if(recalculate)
+            request.setNumberActUpdate(null);
+        else if (!ValidationHelper.isNullOrEmpty(getRequestNumberActUpdate())) {
             request.setNumberActUpdate(Double.valueOf(getRequestNumberActUpdate()));
         }
+
         getCostManipulationHelper().viewExtraCost(request, recalculate);
     }
 
@@ -1585,6 +1589,11 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     }
 
     public void saveRequestExtraCost() throws Exception {
+    	if(!ValidationHelper.isNullOrEmpty(getExamRequest().getUnauthorizedQuote()) && getExamRequest().getUnauthorizedQuote()
+    			&& !getExamRequest().getStateId().equals(RequestState.EVADED.getId())) {
+    		executeJS("PF('confirmRequestToEvasaDialogWV').show();");
+            return;
+    	}
         getCostManipulationHelper().saveRequestExtraCost(getExamRequest());
         CostCalculationHelper calculation = new CostCalculationHelper(getExamRequest());
         calculation.calculateAllCosts(true);
@@ -1605,8 +1614,11 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     }
     
     public void updateCosts(boolean reCalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-         getCostManipulationHelper().updateExamRequestParametersFromHelper(getExamRequest());
-         getCostManipulationHelper().viewExtraCost(getExamRequest(), reCalculate);
+        DaoManager.getSession().evict(getExamRequest());
+        Request request = DaoManager.get(Request.class, getExamRequest().getId());
+        log.info("View Extra cost :" + request.getSumOfGroupedEstateFormalities());
+        getCostManipulationHelper().updateExamRequestParametersFromHelper(request);
+        getCostManipulationHelper().viewExtraCost(request, reCalculate);
     }
 
     public void editExcelDataRequest() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
@@ -2199,6 +2211,20 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         for(PaymentInvoice paymentInvoice : paymentInvoicesList) {
             totalImport = totalImport + paymentInvoice.getPaymentImport().doubleValue();
         }
+    }
+    
+    public void saveRequestAsEvasa() throws Exception {
+    	getCostManipulationHelper().saveRequestExtraCost(getExamRequest());
+        CostCalculationHelper calculation = new CostCalculationHelper(getExamRequest());
+        calculation.calculateAllCosts(true);
+        if(!ValidationHelper.isNullOrEmpty(getExamRequest().getRequestPrint())) {
+            updateTemplate();
+        }
+        SessionHelper.put("templateIdForExcelData", getSelectedTemplateId());
+    	
+        getExamRequest().setStateId(RequestState.EVADED.getId());
+    	DaoManager.save(getExamRequest(), true);
+    	editExcelDataRequest();
     }
 
     public String getEditText() {
@@ -2994,5 +3020,8 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
 
     public void setEstateSelectedRegime(Long estateSelectedRegime) {
         this.estateSelectedRegime = estateSelectedRegime;
+    }
+
+    public void cancelSaveRequestExtraCost() {
     }
 }

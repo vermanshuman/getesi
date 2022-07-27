@@ -122,6 +122,9 @@ public class CostManipulationHelper extends PageBean {
             executeJS("PF('estateFormalityCostDlg').show();");
             return;
         }
+        
+        if(!ValidationHelper.isNullOrEmpty(request.getCostNote()))
+        	setCostNote(request.getCostNote());
 
         CostCalculationHelper calculation = new CostCalculationHelper(request);
 
@@ -333,6 +336,8 @@ public class CostManipulationHelper extends PageBean {
                 request.setConfirmExtraCostsPressed(true);
                 request.setLastCostChanging(true);
                 request.setIncludeNationalCost(getIncludeNationalCost());
+                if(!ValidationHelper.isNullOrEmpty(getCostNote()))
+                	request.setCostNote(getCostNote());
                 if (isEditable()) {
                     updateExamRequestParametersFromHelper(request);
                 }

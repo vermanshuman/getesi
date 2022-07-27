@@ -92,8 +92,11 @@
                 border-color: #808080 !important;
             }
             body .ui-fileupload .ui-fileupload-buttonbar,body .ui-fileupload .ui-fileupload-content{
-
                 border: 1px solid #808080 !important;
+            }
+
+            .ui-dialog .ui-dialog-titlebar {
+                padding: 3px !important;
             }
         </style>
 
@@ -468,7 +471,9 @@
                                  oncomplete="PF('confirmRedirect').hide();"/>
             </div>
         </p:dialog>
-        <p:dialog id="selectFolder" widgetVar="selectFolderWV" modal="true" resizable="false" draggable="false">
+
+        <p:dialog id="selectFolder" widgetVar="selectFolderWV" modal="true" resizable="false" draggable="false"
+                  styleClass="dialog-green" >
             <h:outputText value="#{msg.mailManagerSelectFolder}"/>
             <h:outputText rendered="#{bean.userFolders.size()==1}" value=" #{bean.userFolders[0].label}"/>
             <h:outputText value="?"/><br/>
@@ -478,10 +483,10 @@
                 </p:selectOneMenu>
             </div>
             <div class="btn_line">
-                <p:commandButton value="#{msg.yes.toUpperCase()}" action="#{bean.confirmSelectFolder(true)}"
-                                 styleClass="green-button" oncomplete="PF('selectFolderWV').hide();"/>
+                <p:commandButton value="#{msg.confirm}" action="#{bean.confirmSelectFolder(true)}"
+                                 style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;" oncomplete="PF('selectFolderWV').hide();"/>
                 <p:commandButton value="#{msg.no.toUpperCase()}" action="#{bean.confirmSelectFolder(false)}"
-                                 styleClass="red-button" oncomplete="PF('selectFolderWV').hide();"/>
+                                 style="background-color: #F3362B !important; width: 100px;" oncomplete="PF('selectFolderWV').hide();"/>
             </div>
         </p:dialog>
         <p:dialog widgetVar="showSendErrorDialog" modal="true" resizable="false" draggable="false" styleClass="dialog-green">

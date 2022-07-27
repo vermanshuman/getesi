@@ -6,6 +6,8 @@ import it.nexera.ris.common.enums.*;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.*;
 import it.nexera.ris.common.helpers.create.xls.CreateExcelRequestsReportHelper;
+import it.nexera.ris.persistence.UserHolder;
+import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
@@ -37,6 +39,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.primefaces.component.tabview.TabView;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -364,6 +367,12 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
     
     private Invoice selectedUnlockedInvoiceDialog;
 
+    private List<SelectItem> userFolders;
+
+    private Long selectedFolderId;
+
+    private static final String MAIL_FOOTER = ResourcesHelper.getString("emailFooter");
+
     @Override
     protected void onConstruct() {
         invoiceHelper = new InvoiceHelper();
@@ -546,6 +555,10 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
 
             if (!ValidationHelper.isNullOrEmpty(baseMail.getOffice())) {
                 excelDataWrapper.setOffice(baseMail.getOffice().getDescription());
+            }
+            
+            if(!ValidationHelper.isNullOrEmpty(document.getNote())) {
+            	excelDataWrapper.setDocumentNote(document.getNote());
             }
 
             List<Request> filteredRequests = emptyIfNull(getInvoicedRequests()).stream().filter(r -> r.isDeletedRequest()).collect(Collectors.toList());
@@ -868,7 +881,10 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
                     gestore = "GESTORE: " + managerNames;
             }
             String fiduciario = "";
-            if (!ValidationHelper.isNullOrEmpty(getEntity().getClientFiduciary()) && !ValidationHelper.isNullOrEmpty(getEntity().getClientFiduciary().getClientName()))
+            if (StringUtils.isNotBlank(getEntity().getFiduciary()))
+                fiduciario = "FIDUCIARIO: " + getEntity().getFiduciary();
+            else if (!ValidationHelper.isNullOrEmpty(getEntity().getClientFiduciary())
+                    && !ValidationHelper.isNullOrEmpty(getEntity().getClientFiduciary().getClientName()))
                 fiduciario = "FIDUCIARIO: " + getEntity().getClientFiduciary().getClientName();
             causal = reference +
                     (!reference.isEmpty() && !ndg.isEmpty() ? " - " : "") +
@@ -884,51 +900,51 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
     }
 
 
-    public void loadDraftEmail() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
-        Invoice invoice = DaoManager.get(Invoice.class, new Criterion[]{
-                Restrictions.eq("number", getNumber())
-        });
-        if (!ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
-            WLGInbox inbox = DaoManager.get(WLGInbox.class, invoice.getEmail().getId());
-
-            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailFrom()))
-                setEmailFrom(inbox.getEmailFrom());
-            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailTo()))
-                setEmailTo(inbox.getEmailTo());
-            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailCC()))
-                setEmailCC(inbox.getEmailCC());
-
-            if (!ValidationHelper.isNullOrEmpty(getEmailFrom()))
-                setSendFrom(Arrays.asList(getEmailFrom().split(",")));
-
-            if (!ValidationHelper.isNullOrEmpty(getEmailTo()))
-                setSendTo(Arrays.asList(getEmailTo().split(",")));
-
-            if (!ValidationHelper.isNullOrEmpty(getEmailCC()))
-                setSendCC(Arrays.asList(getEmailCC().split(",")));
-
-            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailBodyToEditor()))
-                setEmailBodyToEditor(inbox.getEmailBodyToEditor());
-
-            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailSubject()))
-                setEmailSubject(inbox.getEmailSubject());
-        } else {
-            if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
-                WLGInbox inbox = DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId());
-                List<Client> managers = inbox.getManagers();
-                List<ClientEmail> allEmailList = new ArrayList<>();
-                CollectionUtils.emptyIfNull(managers).stream().forEach(manager -> {
-                    if (!ValidationHelper.isNullOrEmpty(manager.getEmails()))
-                        allEmailList.addAll(manager.getEmails());
-                });
-                sendTo = new LinkedList<>();
-                CollectionUtils.emptyIfNull(allEmailList).stream().forEach(email -> {
-                    if (!ValidationHelper.isNullOrEmpty(email.getEmail()))
-                        sendTo.addAll(MailHelper.parseMailAddress(email.getEmail()));
-                });
-            }
-        }
-    }
+//    public void loadDraftEmail() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+//        Invoice invoice = DaoManager.get(Invoice.class, new Criterion[]{
+//                Restrictions.eq("number", getNumber())
+//        });
+//        if (!ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
+//            WLGInbox inbox = DaoManager.get(WLGInbox.class, invoice.getEmail().getId());
+//
+//            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailFrom()))
+//                setEmailFrom(inbox.getEmailFrom());
+//            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailTo()))
+//                setEmailTo(inbox.getEmailTo());
+//            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailCC()))
+//                setEmailCC(inbox.getEmailCC());
+//
+//            if (!ValidationHelper.isNullOrEmpty(getEmailFrom()))
+//                setSendFrom(Arrays.asList(getEmailFrom().split(",")));
+//
+//            if (!ValidationHelper.isNullOrEmpty(getEmailTo()))
+//                setSendTo(Arrays.asList(getEmailTo().split(",")));
+//
+//            if (!ValidationHelper.isNullOrEmpty(getEmailCC()))
+//                setSendCC(Arrays.asList(getEmailCC().split(",")));
+//
+//            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailBodyToEditor()))
+//                setEmailBodyToEditor(inbox.getEmailBodyToEditor());
+//
+//            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailSubject()))
+//                setEmailSubject(inbox.getEmailSubject());
+//        } else {
+//            if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
+//                WLGInbox inbox = DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId());
+//                List<Client> managers = inbox.getManagers();
+//                List<ClientEmail> allEmailList = new ArrayList<>();
+//                CollectionUtils.emptyIfNull(managers).stream().forEach(manager -> {
+//                    if (!ValidationHelper.isNullOrEmpty(manager.getEmails()))
+//                        allEmailList.addAll(manager.getEmails());
+//                });
+//                sendTo = new LinkedList<>();
+//                CollectionUtils.emptyIfNull(allEmailList).stream().forEach(email -> {
+//                    if (!ValidationHelper.isNullOrEmpty(email.getEmail()))
+//                        sendTo.addAll(MailHelper.parseMailAddress(email.getEmail()));
+//                });
+//            }
+//        }
+//    }
 
     public Double getTotalGrossAmount() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         return invoiceHelper.getTotalGrossAmount(getGoodsServicesFields());
@@ -2103,16 +2119,27 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         try {
             Invoice invoice = getSelectedInvoice();
             String refrequest = "";
+            List<Request> filteredRequests = DaoManager.load(Request.class,
+                    new Criterion[]{
+                            Restrictions.eq("invoice", getSelectedInvoice()),
+                            Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                                    Restrictions.isNull("isDeleted"))
+                    });
+            if (!ValidationHelper.isNullOrEmpty(filteredRequests)) {
+                setInvoicedRequests(filteredRequests);
+            }
             if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
-                if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())
-                        && !ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getRequests())) {
-                    setInvoicedRequests(invoice.getEmailFrom().getRequests()
-                            .stream()
-                            .filter(r -> !ValidationHelper.isNullOrEmpty(r.getStateId()) &&
-                                    (r.getStateId().equals(RequestState.EVADED.getId()) || r.getStateId().equals(RequestState.SENT_TO_SDI.getId())))
-                            .collect(Collectors.toList()));
-                    refrequest = invoice.getEmailFrom().getReferenceRequest();
-                }
+
+                refrequest = invoice.getEmailFrom().getReferenceRequest();
+//                if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())
+//                        && !ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getRequests())) {
+//                    setInvoicedRequests(invoice.getEmailFrom().getRequests()
+//                            .stream()
+//                            .filter(r -> !ValidationHelper.isNullOrEmpty(r.getStateId()) &&
+//                                    (r.getStateId().equals(RequestState.EVADED.getId()) || r.getStateId().equals(RequestState.SENT_TO_SDI.getId())))
+//                            .collect(Collectors.toList()));
+//                    refrequest = invoice.getEmailFrom().getReferenceRequest();
+//                }
             }
             String landscapePDF = "";
             String tempDir = FileHelper.getLocalTempDir() + File.separator + UUID.randomUUID();
@@ -2408,5 +2435,272 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
     		setActiveTabIndex(1);
     		RequestContext.getCurrentInstance().update("invoiceDialogExcel");
     	}
+    }
+
+    public void sendMail() throws PersistenceBeanException, IllegalAccessException, HibernateException, InstantiationException, IOException {
+        Invoice invoice = DaoManager.get(Invoice.class, new Criterion[]{
+                Restrictions.eq("number", getNumber())
+        });
+        sendMail(invoice, false);
+        executeJS("PF('invoiceDialogBillingWV').hide();");
+    }
+
+    public void sendMail(Invoice invoice, boolean isDefault) throws PersistenceBeanException, IllegalAccessException, HibernateException, InstantiationException, IOException {
+        cleanValidation();
+        if (getValidationFailed()) {
+            return;
+        }
+        updateFrom();
+        updateDestination();
+        updateCC();
+        if (isDefault) {
+            Invoice selectedInvoice = DaoManager.get(Invoice.class, new CriteriaAlias[]{
+                    new CriteriaAlias("client", "c", JoinType.INNER_JOIN),
+                    new CriteriaAlias("c.addressCityId", "c_city", JoinType.INNER_JOIN),
+                    new CriteriaAlias("c.addressProvinceId", "c_province", JoinType.INNER_JOIN)
+            }, new Criterion[]{
+                    Restrictions.eq("id", invoice.getId())
+            });
+            loadDraftEmail(selectedInvoice);
+            prepareEmail(selectedInvoice);
+        }
+        WLGInbox wlgInbox = saveMail(MailManagerStatuses.NEW.getId(), invoice);
+        try {
+            MailHelper.sendMail(wlgInbox, getInvoiceEmailAttachedFiles(), null);
+        } catch (Exception e) {
+            log.info("Mail is not sent");
+            LogHelper.log(log, e);
+            executeJS("showNotSendMsg();");
+            return;
+        }
+        log.info("Mail is sent");
+        if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
+            wlgInbox.setRecievedInbox(DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId()));
+        }
+        if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())
+                && !ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getManagers())) {
+            wlgInbox.setManagers(new ArrayList<>(invoice.getEmailFrom().getManagers()));
+        }
+        wlgInbox.setServerId(Long.parseLong(ApplicationSettingsHolder.getInstance()
+                .getByKey(ApplicationSettingsKeys.SENT_SERVER_ID).getValue()));
+
+        DaoManager.save(wlgInbox, true);
+
+        if (!ValidationHelper.isNullOrEmpty(getInvoicedRequests())) {
+            CollectionUtils.emptyIfNull(getInvoicedRequests()).stream().forEach(r -> {
+                try {
+                    r.setStateId(RequestState.INVOICED.getId());
+                    DaoManager.save(r, true);
+                } catch (PersistenceBeanException e) {
+                    log.error("error in saving request after sending mail ", e);
+                }
+            });
+        }
+        if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())
+                && ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getFolder())) {
+            List<WLGFolder> folders = null;
+            try {
+                folders = DaoManager.load(WLGFolder.class, new CriteriaAlias[]{
+                        new CriteriaAlias("emails", "email", JoinType.INNER_JOIN)
+                }, new Criterion[]{
+                        Restrictions.eq("email.emailFrom", invoice.getEmailFrom().getEmailFrom())
+                });
+            } catch (PersistenceBeanException | IllegalAccessException e) {
+                LogHelper.log(log, e);
+            }
+            if (!ValidationHelper.isNullOrEmpty(folders)) {
+                setUserFolders(ComboboxHelper.fillList(folders, false, false));
+                setSelectedFolderId(folders.get(0).getId());
+                executeJS("PF('selectFolderWV').show();");
+                return;
+            }
+        }
+        executeJS("closeInvoiceDialog();");
+    }
+
+    public void updateDestination() {
+        if (!ValidationHelper.isNullOrEmpty(getSendTo())) {
+            setEmailTo(getSendTo().stream()
+                    .map(MailHelper::prepareEmailToSend).collect(Collectors.joining(DELIM)));
+        } else {
+            setEmailTo(null);
+        }
+    }
+
+    public void updateCC() {
+        if (!ValidationHelper.isNullOrEmpty(getSendCC())) {
+            setEmailCC(getSendCC().stream()
+                    .map(MailHelper::prepareEmailToSend).collect(Collectors.joining(DELIM)));
+        } else {
+            setEmailCC(null);
+        }
+    }
+
+
+    public void loadDraftEmail() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        loadDraftEmail(null);
+    }
+
+    public void loadDraftEmail(Invoice invoice) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        if (ValidationHelper.isNullOrEmpty(invoice))
+            invoice = DaoManager.get(Invoice.class, new Criterion[]{
+                    Restrictions.eq("number", getNumber())
+            });
+        if (!ValidationHelper.isNullOrEmpty(invoice) && !ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
+            WLGInbox inbox = DaoManager.get(WLGInbox.class, invoice.getEmail().getId());
+
+            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailFrom()))
+                setEmailFrom(inbox.getEmailFrom());
+            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailTo()))
+                setEmailTo(inbox.getEmailTo());
+            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailCC()))
+                setEmailCC(inbox.getEmailCC());
+
+            if (!ValidationHelper.isNullOrEmpty(getEmailFrom()))
+                setSendFrom(Arrays.asList(getEmailFrom().split(",")));
+
+            if (!ValidationHelper.isNullOrEmpty(getEmailTo()))
+                setSendTo(Arrays.asList(getEmailTo().split(",")));
+
+            if (!ValidationHelper.isNullOrEmpty(getEmailCC()))
+                setSendCC(Arrays.asList(getEmailCC().split(",")));
+
+            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailBodyToEditor()))
+                setEmailBodyToEditor(inbox.getEmailBodyToEditor());
+
+            if (!ValidationHelper.isNullOrEmpty(inbox.getEmailSubject()))
+                setEmailSubject(inbox.getEmailSubject());
+        } else {
+            if (!ValidationHelper.isNullOrEmpty(invoice) &&
+                    !ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
+                WLGInbox inbox = DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId());
+                List<Client> managers = inbox.getManagers();
+                List<ClientEmail> allEmailList = new ArrayList<>();
+                CollectionUtils.emptyIfNull(managers).stream().forEach(manager -> {
+                    if (!ValidationHelper.isNullOrEmpty(manager.getEmails()))
+                        allEmailList.addAll(manager.getEmails());
+                });
+                sendTo = new LinkedList<>();
+                CollectionUtils.emptyIfNull(allEmailList).stream().forEach(email -> {
+                    if (!ValidationHelper.isNullOrEmpty(email.getEmail()))
+                        sendTo.addAll(MailHelper.parseMailAddress(email.getEmail()));
+                });
+            }
+            setEmailBodyToEditor(createInvoiceEmailDefaultBody(invoice));
+        }
+    }
+
+    public String createInvoiceEmailDefaultBody(Invoice invoice) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        if (!ValidationHelper.isNullOrEmpty(invoice)) {
+            if (ValidationHelper.isNullOrEmpty(invoice.getEmail()) && !ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
+                String dearCustomer = ResourcesHelper.getString("dearCustomer");
+                String attachedCopyMessage = ResourcesHelper.getString("attachedCopyMessage");
+                String thanksMessage = ResourcesHelper.getString("thanksMessage");
+                String reference = "";
+                String ndg = "";
+                if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getNdg()))
+                    ndg = invoice.getEmailFrom().getNdg();
+                if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getReferenceRequest()))
+                    reference = invoice.getEmailFrom().getReferenceRequest();
+                String requestType = "";
+                List<Request> requests = DaoManager.load(Request.class, new Criterion[]{
+                        Restrictions.eq("invoice", invoice),
+                        Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                                Restrictions.isNull("isDeleted"))
+                });
+                Set<String> requestTypeSet = new HashSet<>();
+                requests.stream().forEach(request -> {
+                    requestTypeSet.add(request.getRequestType().getName());
+                });
+                for (String request : requestTypeSet) {
+                    if (!requestType.isEmpty())
+                        requestType = requestType + " + ";
+                    requestType = requestType + request;
+                }
+
+                String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
+                        String.class, new Criterion[]{Restrictions.eq("id", Long.parseLong(
+                                ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.SENT_SERVER_ID)
+                                        .getValue()))}).get(0);
+                String mail_footer = MAIL_FOOTER.replace("info@brexa.it", emailsFrom);
+
+                String emailBody = dearCustomer + ",</br>"
+                        + attachedCopyMessage + "</br></br>"
+                        + "<table style='border:none;'>"
+                        + (!ndg.isEmpty() ? "<tr><td style='border:none;'>NDG: " + "</td><td style='padding-left: 50px; border:none;'>" + ndg + "</td></tr>" : "")
+                        + (!reference.isEmpty() ? "<tr><td style='border:none;'>RIF: " + "</td><td style='padding-left: 50px; border:none;'>" + reference + "</td></tr>" : "")
+                        + (!requestType.isEmpty() ? "<tr><td style='border:none;'>REQUEST: " + "</td><td style='padding-left: 50px; border:none;'>" + requestType + "</td></tr>" : "")
+                        + "</table></br>"
+                        + thanksMessage
+                        + mail_footer;
+                return emailBody;
+            } else if (ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
+                String dearCustomer = ResourcesHelper.getString("dearCustomer");
+                String attachedMessage = ResourcesHelper.getString("attachedMessage");
+                String thanksMessage = ResourcesHelper.getString("thanksMessage");
+
+                String emailBody = dearCustomer + ",</br></br>"
+                        + attachedMessage + "</br></br>"
+                        + thanksMessage;
+
+                return emailBody;
+            }
+        }
+        return "";
+    }
+
+    private void prepareEmail(Invoice invoice)
+            throws PersistenceBeanException, InstantiationException, IllegalAccessException, IOException {
+        if (ValidationHelper.isNullOrEmpty(invoice))
+            invoice = DaoManager.get(Invoice.class, new Criterion[]{
+                    Restrictions.eq("number", getNumber())
+            });
+        if (!ValidationHelper.isNullOrEmpty(invoice)) {
+            if (ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
+                attachInvoiceData(invoice);
+            } else {
+                fillAttachedFiles(invoice.getEmail());
+            }
+        }
+    }
+
+    public WLGInbox saveMail(Long mailManagerStatus, Invoice invoice) throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
+        Boolean loadData = false;
+        String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
+                String.class, new Criterion[]{Restrictions.eq("id", Long.parseLong(
+                        ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.SENT_SERVER_ID)
+                                .getValue()))}).get(0);
+        if (invoice == null) {
+            loadData = true;
+            invoice = DaoManager.get(Invoice.class, new Criterion[]{
+                    Restrictions.eq("number", getNumber())
+            });
+        }
+        WLGInbox inbox = new WLGInbox();
+        if (!ValidationHelper.isNullOrEmpty(invoice.getEmail())) {
+            inbox = DaoManager.get(WLGInbox.class, invoice.getEmail().getId());
+        }
+        inbox.setEmailFrom(emailsFrom);
+        inbox.setEmailTo(getEmailTo());
+        inbox.setEmailCC(getEmailCC());
+        inbox.setEmailSubject(getEmailSubject());
+        inbox.setEmailBody(MailHelper.htmlToText(getEmailBodyToEditor()));
+        inbox.setEmailBodyHtml(getEmailBodyToEditor());
+        inbox.setClient(getSelectedInvoiceClient());
+        if (inbox.isNew())
+            log.info("setting new mail state to :: " + MailManagerStatuses.findById(mailManagerStatus));
+        else
+            log.info("setting mail :: " + inbox.getId() + " state to :: " + MailManagerStatuses.findById(mailManagerStatus)
+                    + " by user:: " + UserHolder.getInstance().getCurrentUser().getId());
+        inbox.setState(mailManagerStatus);
+        inbox.setSendDate(new Date());
+        inbox.setReceiveDate(new Date());
+        DaoManager.save(inbox, true);
+        invoice.setEmail(inbox);
+        DaoManager.save(invoice, true);
+        saveFiles(inbox, getInvoiceEmailAttachedFiles(), true);
+        if (loadData)
+            loadInvoiceDialogData(invoice);
+        return inbox;
     }
 }

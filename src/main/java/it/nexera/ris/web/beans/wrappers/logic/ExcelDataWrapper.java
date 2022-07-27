@@ -41,4 +41,6 @@ public class ExcelDataWrapper implements Serializable {
     private String invoiceNumber;
 
     private String fiduciary;
+    
+    private String documentNote;
 }
