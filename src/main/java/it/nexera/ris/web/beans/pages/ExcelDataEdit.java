@@ -1309,7 +1309,9 @@ public class ExcelDataEdit extends BaseEntityPageBean {
     }
 
     protected void sortRequestsByType(List<Request> requests, Map<RequestType, List<Request>> sortedRequests) {
-        Collections.sort(requests, Comparator.comparing(r -> r.getSubject().getId()));
+        Collections.sort(requests, Comparator.comparing(r -> r.getSubject().getId(),
+                Comparator.nullsFirst(Comparator.naturalOrder())));
+
         for (Request elem : requests) {
             elem.setTempId(UUID.randomUUID().toString());
             if (!sortedRequests.containsKey(elem.getRequestType())) {

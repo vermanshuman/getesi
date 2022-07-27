@@ -21,12 +21,12 @@
 				<h:outputText value="#{msg.client}:"/>
 				<p:selectOneMenu id="client_not_manger_or_fiduciary_id"
 								 value="#{bean.selectedNotManagerOrFiduciaryClientId}"
-								 styleClass="input-width-mmv">
+								 styleClass="input-width-mmv" style="min-width: 191px;height: 35px;">
 					<f:selectItems value="#{bean.notManagerOrFiduciaryClients}"/>
 					<p:ajax event="change" listener="#{bean.initOfficesList}" update="managers mail_ofice_id client_invoice_id"/>
 				</p:selectOneMenu>
 				<h:outputText value="#{msg.billingCustomer}" />
-				<p:selectOneMenu id="client_invoice_id"
+				<p:selectOneMenu id="client_invoice_id" style="min-width: 191px;height: 35px;"
 					value="#{bean.excelClientInvoiceId}" styleClass="input-width-mmv">
 					<f:selectItems value="#{bean.invoiceClients}" />
 				</p:selectOneMenu>
@@ -44,14 +44,14 @@
 					value="#{bean.excelDate}" placeholder="#{msg.excelData}:" disabled="true"/>
 				<h:outputText value="#{msg.reportN}:"/>
 				<p:inputText id="reportN" value="#{bean.excelReportN}" styleClass="ui-inputfield-border"
-					style="width: 100%" disabled="true"/>
+					style="width: 100%;min-width: 191px;" disabled="true"/>
 
 				<h:outputText value="#{msg.subjectViewFormalityConservatoryCap}:"/>
-				<p:selectOneMenu id="mail_ofice_id" value="#{bean.selectedOfficeId}" styleClass="input-width-mmv">
+				<p:selectOneMenu id="mail_ofice_id" value="#{bean.selectedOfficeId}" styleClass="input-width-mmv" style="min-width: 191px;height: 35px;">
 					<f:selectItems value="#{bean.officeList}"/>
 				</p:selectOneMenu>
 				<h:outputText value="#{msg.managerText}"/>
-				<p:selectCheckboxMenu id="managers" value="#{bean.selectedClientManagers}" style="width: 100%"
+				<p:selectCheckboxMenu id="managers" value="#{bean.selectedClientManagers}" style="width: 100%;height: 35px;"
 									  label="#{enums.documentGenerationTagsMANAGER}"
 									  converter="#{bean.clientSelectItemWrapperConverter}"
 									  multiple="true" filter="true" filterMatchMode="startsWith" >
@@ -60,7 +60,7 @@
 					<p:ajax process="managers"/>
 				</p:selectCheckboxMenu>
 				<h:outputText value="#{msg.clientTrust}:"/>
-				<p:inputText id="fiduciary_text" value="#{bean.fiduciary}"  styleClass="w-100"/>
+				<p:inputText id="fiduciary_text" value="#{bean.fiduciary}"  styleClass="w-100" style="height: 35px;"/>
 				<span> #{msg.ndgText}</span>
 				<p:inputText id="ndgShow" value="#{bean.excelReportNDG}" styleClass="ui-inputfield-border"
 					style="width: 100%" />
@@ -239,6 +239,9 @@
 					background-color: #FFFFFF !important;
 					color: #AD0B00 !important;
 					width: 100px !important;
+				}
+				#managers .ui-selectcheckboxmenu-multiple-container.ui-inputfield{
+					padding: 0.2rem 0.5rem !important;
 				}
 			</style>
 			<ui:include src="../Dialogs/RequestExtraCostDialog.xhtml"/>
