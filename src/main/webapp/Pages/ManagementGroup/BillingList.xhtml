@@ -722,7 +722,7 @@
                             <f:selectItem itemLabel="#{ff:upper(msg.billingListClient)}" itemValue="#{null}"
                                           noSelectionOption="true"/>
                             <f:selectItems value="#{bean.clients}" />
-                            <p:ajax event="itemSelect" listener="#{bean.filterByClient}" update="@this slides1"/>
+                            <p:ajax event="itemSelect" listener="#{bean.filterByClient}" update="@this slides1 barChartWidget costPanel"/>
                         </p:selectOneMenu>
 
                         <p:selectOneMenu id="year" value="#{bean.selectedYear}" label="#{msg.requestClient}"
@@ -731,99 +731,101 @@
                             <f:selectItem itemLabel="#{ff:upper(msg.billingListYear)}" itemValue="#{null}"
                                           noSelectionOption="true"/>
                             <f:selectItems value="#{bean.years}"/>
-                            <p:ajax event="itemSelect" listener="#{bean.filterByYear}" update="@this slides1"/>
+                            <p:ajax event="itemSelect" listener="#{bean.filterByYear}" update="@this slides1 barChartWidget costPanel"/>
                         </p:selectOneMenu>
                     </p:panelGrid>
 
                     <div class="react-grid-layout" style="height: 600px;">
-                        <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"
-                                     cellpadding="3" cellspacing="0"
-                                     columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3"
-                                     layout="grid">
-                            <div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
-                                 style="width: calc(25% - 9px); height: 100px; line-height: 100px; position: absolute; transform: translate(-4px, 0px); box-sizing: border-box;">
-                                <div>
-                                    <div class="ricavi_outer_div">
-                                        <div class="inner_div">
-                                            <i class="ricavi-img"></i>
+                        <p:outputPanel id = "costPanel">
+                            <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"
+                                         cellpadding="3" cellspacing="0"
+                                         columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3"
+                                         layout="grid">
+                                <div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
+                                     style="width: calc(25% - 9px); height: 100px; line-height: 100px; position: absolute; transform: translate(-4px, 0px); box-sizing: border-box;">
+                                    <div>
+                                        <div class="ricavi_outer_div">
+                                            <div class="inner_div">
+                                                <i class="ricavi-img"></i>
+                                            </div>
+                                            <div color="#fff" class="box_header">#{msg.billingListRevenues}</div>
+                                            <div class="cost">#{bean.revenue} €</div>
                                         </div>
-                                        <div color="#fff" class="box_header">#{msg.billingListRevenues}</div>
-                                        <div class="cost">0 €</div>
-                                    </div>
 
-                                    <div class="list_icon"
-                                         style="font-size: 17px; color: rgb(255, 255, 255);" title="">
-                                        <i class="fa fa-fw fa-list11"
-                                           style="font-size: inherit;"></i>
-                                    </div>
-
-                                </div>
-                                <span class="resizable_icon"></span>
-                            </div>
-
-                            <div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
-                                 style="width: calc(25% - 9px); height: 100px; line-height: 100px; position: absolute; transform: translate(calc(100% + 6px), 0px); box-sizing: border-box;">
-                                <div>
-                                    <div class="costi_outer_div">
-                                        <div class="inner_div">
-                                            <i class="ricavi-img"></i>
+                                        <div class="list_icon"
+                                             style="font-size: 17px; color: rgb(255, 255, 255);" title="">
+                                            <i class="fa fa-fw fa-list11"
+                                               style="font-size: inherit;"></i>
                                         </div>
-                                        <div color="#fff" class=" box_header">#{msg.billingListCosts}</div>
-                                        <div class="cost">0 €</div>
-                                    </div>
-                                    <div class="list_icon"
-                                         style="font-size: 17px; color: rgb(255, 255, 255);" title="">
-                                        <i class="fa fa-fw fa-list11"
-                                           style="font-size: inherit;"></i>
-                                    </div>
 
+                                    </div>
+                                    <span class="resizable_icon"></span>
                                 </div>
-                                <span class="resizable_icon"></span>
-                            </div>
 
-                            <div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
-                                 style="width: calc(25% - 9px); height: 100px; line-height: 100px; position: absolute; transform: translate(calc(200% + 16px), 0px); box-sizing: border-box;">
-                                <div>
-                                    <div class="incassi_outer_div">
-                                        <div class="inner_div">
-                                            <i class="incassi-bianco-img"></i>
+                                <div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
+                                     style="width: calc(25% - 9px); height: 100px; line-height: 100px; position: absolute; transform: translate(calc(100% + 6px), 0px); box-sizing: border-box;">
+                                    <div>
+                                        <div class="costi_outer_div">
+                                            <div class="inner_div">
+                                                <i class="ricavi-img"></i>
+                                            </div>
+                                            <div color="#fff" class=" box_header">#{msg.billingListCosts}</div>
+                                            <div class="cost">#{bean.unsolved} €</div>
                                         </div>
-                                        <div color="#fff" class=" box_header">#{msg.billingListTributes}</div>
-                                        <div class="cost">0 €</div>
-                                    </div>
-
-                                    <div class="list_icon"
-                                         style="font-size: 17px; color: rgb(255, 255, 255);" title="">
-                                        <i class="fa fa-fw fa-list11"
-                                           style="font-size: inherit;"></i>
-                                    </div>
-
-                                </div>
-                                <span class="resizable_icon"></span>
-                            </div>
-
-                            <div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
-                                 style="width: calc(25% - 9px); height: 100px; line-height: 100px; position: absolute; transform: translate(calc(300% + 26px), 0px); box-sizing: border-box;">
-                                <div>
-                                    <div class="tributi_outer_div">
-                                        <div class="inner_div" style="position: absolute;">
-                                            <i class="fa fa-university"
-                                               style="position: relative; left: -9px; bottom: -18px; font-size: 80px;"></i>
+                                        <div class="list_icon"
+                                             style="font-size: 17px; color: rgb(255, 255, 255);" title="">
+                                            <i class="fa fa-fw fa-list11"
+                                               style="font-size: inherit;"></i>
                                         </div>
-                                        <div color="#fff" class=" box_header"><!-- #{msg.billingListTributes} --></div>
-                                        <div class="cost">&nbsp;</div>
-                                    </div>
 
-                                    <div class="list_icon"
-                                         style="font-size: 17px; color: rgb(255, 255, 255);" title="">
-                                        <i class="fa fa-fw fa-list11"
-                                           style="font-size: inherit;"></i>
                                     </div>
-
+                                    <span class="resizable_icon"></span>
                                 </div>
-                                <span class="resizable_icon"></span>
-                            </div>
-                        </p:panelGrid>
+
+                                <div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
+                                     style="width: calc(25% - 9px); height: 100px; line-height: 100px; position: absolute; transform: translate(calc(200% + 16px), 0px); box-sizing: border-box;">
+                                    <div>
+                                        <div class="incassi_outer_div">
+                                            <div class="inner_div">
+                                                <i class="incassi-bianco-img"></i>
+                                            </div>
+                                            <div color="#fff" class=" box_header">#{msg.billingListTributes}</div>
+                                            <div class="cost">#{bean.nextInvoiceNumber}</div>
+                                        </div>
+
+                                        <div class="list_icon"
+                                             style="font-size: 17px; color: rgb(255, 255, 255);" title="">
+                                            <i class="fa fa-fw fa-list11"
+                                               style="font-size: inherit;"></i>
+                                        </div>
+
+                                    </div>
+                                    <span class="resizable_icon"></span>
+                                </div>
+
+                                <div class="react-grid-item react-draggable cssTransforms react-resizable-hide react-resizable"
+                                     style="width: calc(25% - 9px); height: 100px; line-height: 100px; position: absolute; transform: translate(calc(300% + 26px), 0px); box-sizing: border-box;">
+                                    <div>
+                                        <div class="tributi_outer_div">
+                                            <div class="inner_div" style="position: absolute;">
+                                                <i class="fa fa-university"
+                                                   style="position: relative; left: -9px; bottom: -18px; font-size: 80px;"></i>
+                                            </div>
+                                            <div color="#fff" class=" box_header">#{msg.billingInvoicesCount}</div>
+                                            <div class="cost">#{bean.unLockedInvoicesCount}</div>
+                                        </div>
+
+                                        <div class="list_icon"
+                                             style="font-size: 17px; color: rgb(255, 255, 255);" title="">
+                                            <i class="fa fa-fw fa-list11"
+                                               style="font-size: inherit;"></i>
+                                        </div>
+
+                                    </div>
+                                    <span class="resizable_icon"></span>
+                                </div>
+                            </p:panelGrid>
+                        </p:outputPanel>
 
                         <div class="layout-dashboard" style="max-width: 98%;">
                             <h:panelGroup id="slides1" layout="block" styleClass="p-grid"
@@ -998,9 +1000,21 @@
                                                                  style="border: 0px;padding-bottom: 0px;#{(loop.index eq 0 or loop.index eq 4 or loop.index eq 8) ? '' : 'padding-top: 0px;'}">
                                                                 <div class="month_outer column_outer">
                                                                     <div class="month_inner">#{bean.months[loop.index]}</div>
-                                                                    <div class="month_inner">#{item.totalTax}</div>
-                                                                    <div class="month_inner">#{item.nonTotalTax}</div>
-                                                                    <div class="month_inner">#{item.total}</div>
+                                                                    <div class="month_inner">
+                                                                    	<h:outputText value="#{item.totalTax}">
+                                                                    		<f:convertNumber pattern="#0.00"/>
+                                                                		</h:outputText>
+                                                                    </div>
+                                                                    <div class="month_inner">
+                                                                    	<h:outputText value="#{item.nonTotalTax}">
+                                                                    		<f:convertNumber pattern="#0.00"/>
+                                                                		</h:outputText>
+                                                                	</div>
+                                                                    <div class="month_inner">
+                                                                    	<h:outputText value="#{item.total}">
+                                                                    		<f:convertNumber pattern="#0.00"/>
+                                                                		</h:outputText>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </c:if>
@@ -1060,9 +1074,21 @@
                                                                  style="border: 0px;padding-bottom: 0px;#{(loop.index eq 0 or loop.index eq 4 or loop.index eq 8) ? '' : 'padding-top: 0px;'}">
                                                                 <div class="month_outer column_outer">
                                                                     <div class="month_inner">#{item.clientName}</div>
-                                                                    <div class="month_inner">#{item.totalTax}</div>
-                                                                    <div class="month_inner">#{item.nonTotalTax}</div>
-                                                                    <div class="month_inner">#{item.total}</div>
+                                                                    <div class="month_inner">
+                                                                    	<h:outputText value="#{item.totalTax}">
+                                                                    		<f:convertNumber pattern="#0.00"/>
+                                                                		</h:outputText>
+                                                                    </div>
+                                                                    <div class="month_inner">
+                                                                    	<h:outputText value="#{item.nonTotalTax}">
+                                                                    		<f:convertNumber pattern="#0.00"/>
+                                                                		</h:outputText>
+                                                                	</div>
+                                                                    <div class="month_inner">
+                                                                    	<h:outputText value="#{item.total}">
+                                                                    		<f:convertNumber pattern="#0.00"/>
+                                                                		</h:outputText>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </c:if>
@@ -2234,7 +2260,7 @@
                                     </div>
                                     <div class="p-col-2" >
 			                            <p:commandButton value="#{msg.save}" styleClass="ui-button-success" iconPos="left"
-			                                             action="#{bean.saveNextInvoiceNumber}" update="inumber"/>
+			                                             action="#{bean.saveNextInvoiceNumber}" update="inumber costPanel"/>
 			                        </div>
 			                        
 			                        <div class="p-col-6" style="padding-bottom: 0px !important;">

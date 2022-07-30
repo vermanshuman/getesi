@@ -74,7 +74,7 @@ public class CitiesListBean extends EntityLazyListPageBean<City> implements Seri
             restrictions.add(Restrictions.ilike("cap", getCap(), MatchMode.ANYWHERE));
         }
         if (!ValidationHelper.isNullOrEmpty(getCfis())) {
-            restrictions.add(Restrictions.ilike("cfis", getCap(), MatchMode.ANYWHERE));
+            restrictions.add(Restrictions.ilike("cfis", getCfis(), MatchMode.ANYWHERE));
         }
         if (!ValidationHelper.isNullOrEmpty(getSelectedFilterProvinceId())) {
             restrictions.add(Restrictions.eq("province",

@@ -76,6 +76,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
@@ -446,6 +447,12 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     private Long selectedFolderId;
 
+    private String revenue;
+
+    private String unsolved;
+
+    private Integer unLockedInvoicesCount;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
@@ -466,16 +473,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 ).sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList()), Boolean.TRUE));
         fillYears();
 
-        /* filterTableFromPanel();
-
-        setManagerClients(ComboboxHelper.fillList(ClientView.class, Order.asc("name"), new Criterion[]{
-                Restrictions.eq("manager", Boolean.TRUE),
-        }, Boolean.FALSE));
-
-        setOffices(ComboboxHelper.fillList(Office.class, Boolean.TRUE));
-        loadCompanies(clients);
-
-        loadRequestPanel();*/
         setStatesForSelect(new ArrayList<>());
         setPaginator(new ListPaginator(10, 1, 1, 1,
                 "DESC", "createDate"));
@@ -510,6 +507,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 		TurnoverHelper turnoverHelper = new TurnoverHelper();
 		setTurnoverPerMonth(turnoverHelper.getTurnoversPerMonth(year));
 		setTurnoverPerCustomer(turnoverHelper.getTurnoversPerClient(year));
+
+		getChartData(false, false, false);
+        calculateCostWidgets();
     }
 
     private void loadRequestPanel() throws PersistenceBeanException, IllegalAccessException {
@@ -564,83 +564,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     public void setQuadrimesterIdx(int startIdx, int endIdx) {
         quadrimesterStartIdx = startIdx;
         quadrimesterEndIdx = endIdx;
-    }
-
-    /*private double getRandomNumber(int min, int max) {
-        return Math.random() * (max - min + 1) + min;
-    }*/
-
-    /*public List<Integer> getTestTurnoverPerMonth() {
-        turnoverPerMonth.add(1);
-        turnoverPerMonth.add(2);
-        turnoverPerMonth.add(3);
-        turnoverPerMonth.add(4);
-        turnoverPerMonth.add(5);
-        turnoverPerMonth.add(6);
-        turnoverPerMonth.add(7);
-        turnoverPerMonth.add(8);
-        turnoverPerMonth.add(9);
-        turnoverPerMonth.add(10);
-        turnoverPerMonth.add(11);
-        turnoverPerMonth.add(12);
-        return turnoverPerMonth;
-    }*/
-    
-    /*public Set<BillingListTurnoverWrapper> getTestTurnoverPerMonth() throws HibernateException, IllegalAccessException, InstantiationException, PersistenceBeanException {
-    	Calendar calendar = Calendar.getInstance(Locale.ITALY);
-		int year = calendar.get(Calendar.YEAR);
-		TurnoverHelper turnoverHelper = new TurnoverHelper();
-		return turnoverHelper.getTurnoversPerMonth(year);
-    }*/
-    
-    
-
-   /* public List<String> getTestTurnoverPerCustomer() {
-        turnoverPerCustomer.add("BCP");
-        turnoverPerCustomer.add("Banca Sella");
-        turnoverPerCustomer.add("Intrum");
-        turnoverPerCustomer.add("Penelope SR");
-        turnoverPerCustomer.add("BCP1");
-        turnoverPerCustomer.add("Banca Sella1");
-        turnoverPerCustomer.add("Intrum1");
-        turnoverPerCustomer.add("Penelope SR1");
-        turnoverPerCustomer.add("BCP2");
-        turnoverPerCustomer.add("Banca Sella2");
-        turnoverPerCustomer.add("Intrum2");
-        turnoverPerCustomer.add("Penelope SR2");
-        return turnoverPerCustomer;
-    }*/
-
-    public BillingListBean() {
-        model = new BarChartModel();
-        ChartSeries m1 = new ChartSeries();
-        m1.setLabel("m1");
-        m1.set("Jan", 120);
-        m1.set("Feb", 20);
-        m1.set("Mar", 100);
-        m1.set("Apr", 50);
-        m1.set("May", 60);
-        m1.set("Jun", 80);
-        m1.set("Jul", 90);
-        m1.set("Aug", 100);
-        m1.set("Sep", 70);
-        m1.set("Oct", 30);
-        m1.set("Nov", 90);
-        m1.set("Dec", 100);
-        model.addSeries(m1);
-        model.setTitle("Indice di redditività");
-        model.setLegendPosition("ne");
-        model.setSeriesColors("DDDDDD60");
-        model.setShadow(false);
-        model.setExtender("customExtender");
-        Axis xAxis = model.getAxis(AxisType.X);
-        xAxis.setLabel("");
-        Axis yAxis = model.getAxis(AxisType.Y);
-        //   yAxis.setLabel("Sales");
-        yAxis.setMin(0);
-        yAxis.setMax(160);
-        yAxis.setTickInterval("20.000");
-        yAxis.setTickFormat("%'.3f");
     }
 
     public void filterTableFromPanel() throws IllegalAccessException, PersistenceBeanException {
@@ -3615,6 +3538,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 	        setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", true, false, false));
 	        setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", true, false, false));
 	        setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", true, false, false));
+	        getChartData(true, false, false);
 		} else if(!ValidationHelper.isNullOrEmpty(getSelectedClientId()) && !ValidationHelper.isNullOrEmpty(getSelectedYear())) {
 			setMonthJanFebAmount(getInvoiceVatAmountBetweenMonths("01", "02", false, false, true));
 	        setMonthMarAprAmount(getInvoiceVatAmountBetweenMonths("03", "04", false, false, true));
@@ -3622,6 +3546,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 	        setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", false, false, true));
 	        setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", false, false, true));
 	        setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", false, false, true));
+	        getChartData(false, false, true);
 		} else if(ValidationHelper.isNullOrEmpty(getSelectedClientId()) && !ValidationHelper.isNullOrEmpty(getSelectedYear())) {
 			setMonthJanFebAmount(getInvoiceVatAmountBetweenMonths("01", "02", false, true, false));
 	        setMonthMarAprAmount(getInvoiceVatAmountBetweenMonths("03", "04", false, true, false));
@@ -3629,6 +3554,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 	        setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", false, true, false));
 	        setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", false, true, false));
 	        setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", false, true, false));
+	        getChartData(false, true, false);
 		} else {
 			setMonthJanFebAmount(getInvoiceVatAmountBetweenMonths("01", "02", false, false, false));
 	        setMonthMarAprAmount(getInvoiceVatAmountBetweenMonths("03", "04", false, false, false));
@@ -3636,10 +3562,57 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 	        setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", false, false, false));
 	        setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", false, false, false));
 	        setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", false, false, false));
+	        getChartData(false, false, false);
 		}
-	}
-	
-	public void filterByYear() throws IllegalAccessException, HibernateException, InstantiationException, PersistenceBeanException {
+        calculateCostWidgets();
+    }
+
+    private void calculateCostWidgets() throws PersistenceBeanException, IllegalAccessException {
+        Double revenue = 0.0;
+        Double unsolved = 0.0;
+        Calendar calendar = Calendar.getInstance(Locale.ITALY);
+        AtomicInteger selectedYear = new AtomicInteger(calendar.get(Calendar.YEAR));
+        if(getSelectedYear() != null && getSelectedYear() > 0){
+            selectedYear.set(getSelectedYear());
+        }
+        List<Criterion> restrictions = new ArrayList<>();
+        if (!ValidationHelper.isNullOrEmpty(getSelectedClientId())) {
+            restrictions.add(Restrictions.eq("client.id", getSelectedClientId()));
+        }
+        List<Invoice> invoices = DaoManager.load(Invoice.class, restrictions.toArray(new Criterion[0]),
+                new Order[]{
+                        Order.desc("number")});
+        if(!ValidationHelper.isNullOrEmpty(invoices)){
+            List<Invoice> filteredInvoices = invoices.stream()
+                    .filter(i -> !ValidationHelper.isNullOrEmpty(i.getDate())
+                            && DateTimeHelper.getYear(i.getDate()) == selectedYear.get())
+                    .collect(Collectors.toList());
+            for (Invoice invoice : filteredInvoices) {
+                List<GoodsServicesFieldWrapper>  wrapperList = invoiceHelper.goodsServicesFields(invoice);
+                revenue += invoiceHelper.getNonZeroTotalLine(wrapperList);
+            }
+            unsolved = filteredInvoices.stream()
+                    .parallel()
+                    .mapToDouble(i -> {
+                        try {
+                            return i.getOnBalance();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        return 0.0;
+                    }).sum();
+        }
+        setUnsolved(String.valueOf(unsolved));
+        setRevenue(InvoiceHelper.format(revenue));
+
+        List<Invoice> unlockedInvoices = DaoManager.load(Invoice.class, new Criterion[]{
+                Restrictions.eq("status", InvoiceStatus.UNLOCKED)});
+
+        setUnLockedInvoicesCount(unlockedInvoices.size());
+
+    }
+
+    public void filterByYear() throws IllegalAccessException, HibernateException, InstantiationException, PersistenceBeanException {
 		if(!ValidationHelper.isNullOrEmpty(getSelectedYear()) && ValidationHelper.isNullOrEmpty(getSelectedClientId())) {
 			setMonthJanFebAmount(getInvoiceVatAmountBetweenMonths("01", "02", false, true, false));
 	        setMonthMarAprAmount(getInvoiceVatAmountBetweenMonths("03", "04", false, true, false));
@@ -3647,6 +3620,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 	        setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", false, true, false));
 	        setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", false, true, false));
 	        setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", false, true, false));
+	        getChartData(false, true, false);
 		} else if(!ValidationHelper.isNullOrEmpty(getSelectedYear()) && !ValidationHelper.isNullOrEmpty(getSelectedClientId())) {
 			setMonthJanFebAmount(getInvoiceVatAmountBetweenMonths("01", "02", false, false, true));
 	        setMonthMarAprAmount(getInvoiceVatAmountBetweenMonths("03", "04", false, false, true));
@@ -3654,6 +3628,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 	        setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", false, false, true));
 	        setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", false, false, true));
 	        setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", false, false, true));
+	        getChartData(false, false, true);
 		} else if(ValidationHelper.isNullOrEmpty(getSelectedYear()) && !ValidationHelper.isNullOrEmpty(getSelectedClientId())) {
 			setMonthJanFebAmount(getInvoiceVatAmountBetweenMonths("01", "02", true, false, false));
 	        setMonthMarAprAmount(getInvoiceVatAmountBetweenMonths("03", "04", true, false, false));
@@ -3661,6 +3636,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 	        setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", true, false, false));
 	        setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", true, false, false));
 	        setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", true, false, false));
+	        getChartData(true, false, false);
 		} else {
 			setMonthJanFebAmount(getInvoiceVatAmountBetweenMonths("01", "02", false, false, false));
 	        setMonthMarAprAmount(getInvoiceVatAmountBetweenMonths("03", "04", false, false, false));
@@ -3668,7 +3644,9 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 	        setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", false, false, false));
 	        setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", false, false, false));
 	        setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", false, false, false));
+	        getChartData(false, false, false);
 		}
+        calculateCostWidgets();
 	}
 
     public void deleteInvoice() throws HibernateException,
@@ -3752,5 +3730,75 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             }
         }
         executeJS("closeInvoiceDialog();");
+    }
+    
+    public void getChartData(boolean clientFilter, boolean yearFilter, boolean bothFilter) throws HibernateException, 
+    			IllegalAccessException, InstantiationException, PersistenceBeanException {
+    	model = new BarChartModel();
+        ChartSeries m1 = new ChartSeries();
+        m1.setLabel("m1");
+        m1.set("Jan", getInvoicesDataByMonth("01", clientFilter, yearFilter, bothFilter));
+        m1.set("Feb", getInvoicesDataByMonth("02", clientFilter, yearFilter, bothFilter));
+        m1.set("Mar", getInvoicesDataByMonth("03", clientFilter, yearFilter, bothFilter));
+        m1.set("Apr", getInvoicesDataByMonth("04", clientFilter, yearFilter, bothFilter));
+        m1.set("May", getInvoicesDataByMonth("05", clientFilter, yearFilter, bothFilter));
+        m1.set("Jun", getInvoicesDataByMonth("06", clientFilter, yearFilter, bothFilter));
+        m1.set("Jul", getInvoicesDataByMonth("07", clientFilter, yearFilter, bothFilter));
+        m1.set("Aug", getInvoicesDataByMonth("08", clientFilter, yearFilter, bothFilter));
+        m1.set("Sep", getInvoicesDataByMonth("09", clientFilter, yearFilter, bothFilter));
+        m1.set("Oct", getInvoicesDataByMonth("10", clientFilter, yearFilter, bothFilter));
+        m1.set("Nov", getInvoicesDataByMonth("11", clientFilter, yearFilter, bothFilter));
+        m1.set("Dec", getInvoicesDataByMonth("12", clientFilter, yearFilter, bothFilter));
+     
+        model.addSeries(m1);
+        model.setTitle("Indice di redditività");
+        model.setLegendPosition("ne");
+        model.setSeriesColors("DDDDDD60");
+        model.setShadow(false);
+        model.setExtender("customExtender");
+        Axis xAxis = model.getAxis(AxisType.X);
+        xAxis.setLabel("");
+        Axis yAxis = model.getAxis(AxisType.Y);
+        //   yAxis.setLabel("Sales");
+        yAxis.setMin(0);
+        
+        yAxis.setMax(1000);
+        yAxis.setTickInterval("100.000");
+        yAxis.setTickFormat("%'.3f");
+    }
+    
+    public Double getInvoicesDataByMonth(String month, boolean clientFilter, boolean yearFilter, boolean bothFilter) 
+    		throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
+    	Calendar calendar = Calendar.getInstance(Locale.ITALY);
+		int year = calendar.get(Calendar.YEAR);
+    	Date startDate = DateTimeHelper.getFirstDateOfMonth(month + "/" + year);
+		Date endDate = DateTimeHelper.getLastDateOfMonth(month + "/" + year);
+		List<Invoice> invoices = DaoManager.load(Invoice.class,
+				new Criterion[] { Restrictions.ne("status", InvoiceStatus.UNLOCKED), Restrictions.between("date", startDate, endDate)});
+		if(clientFilter) {
+			invoices = DaoManager.load(Invoice.class, new Criterion[] {
+					Restrictions.ne("status", InvoiceStatus.UNLOCKED), Restrictions.between("date", startDate, endDate),
+					Restrictions.eq("client.id", getSelectedClientId())});
+		}
+		if(yearFilter) {
+			year = getSelectedYear();
+			startDate = DateTimeHelper.getFirstDateOfMonth(month + "/" + year);
+			endDate = DateTimeHelper.getLastDateOfMonth(month + "/" + year);
+			invoices = DaoManager.load(Invoice.class, new Criterion[] {
+					Restrictions.ne("status", InvoiceStatus.UNLOCKED), Restrictions.between("date", startDate, endDate)});
+		}
+		if(bothFilter) {
+			year = getSelectedYear();
+			startDate = DateTimeHelper.getFirstDateOfMonth(month + "/" + year);
+			endDate = DateTimeHelper.getLastDateOfMonth(month + "/" + year);
+			invoices = DaoManager.load(Invoice.class, new Criterion[] {
+					Restrictions.ne("status", InvoiceStatus.UNLOCKED), Restrictions.between("date", startDate, endDate),
+					Restrictions.eq("client.id", getSelectedClientId())});
+		}
+		Double total = 0d;
+		for(Invoice invoice : invoices) {
+			total += invoice.getTotalAmountWithoutTax();
+		}
+		return total;
     }
 }

@@ -811,6 +811,12 @@ public class DateTimeHelper extends BaseHelper {
         cal.setTime(date);
         return (cal.get(Calendar.DAY_OF_MONTH));
     }
+
+    public static int getYear(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return (cal.get(Calendar.YEAR));
+    }
     
     public static Date getFirstDateOfMonth(String dateString) {
 	    DateFormat dateFormat = new SimpleDateFormat(datePatternWithoutDate);

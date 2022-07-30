@@ -692,4 +692,33 @@ public class InvoiceHelper {
         }
         return "";
     }
+
+    public List<GoodsServicesFieldWrapper> goodsServicesFields(Invoice invoice) throws PersistenceBeanException, IllegalAccessException {
+        List<GoodsServicesFieldWrapper> wrapperList = new ArrayList<>();
+        int counter = 1;
+        List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class,
+                new Criterion[]{Restrictions.eq("invoice", invoice)});
+        for (InvoiceItem invoiceItem : invoiceItems) {
+            GoodsServicesFieldWrapper wrapper = createGoodsServicesFieldWrapper();
+            wrapper.setCounter(counter);
+            wrapper.setInvoiceTotalCost(invoiceItem.getInvoiceTotalCost());
+            wrapper.setSelectedTaxRateId(invoiceItem.getTaxRate().getId());
+            wrapper.setPercentage(invoiceItem.getTaxRate().getPercentage());
+            wrapper.setInvoiceItemAmount(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount()) ? 0.0 : invoiceItem.getAmount());
+            double totalcost = !(ValidationHelper.isNullOrEmpty(invoiceItem.getInvoiceTotalCost())) ? invoiceItem.getInvoiceTotalCost().doubleValue() : 0.0;
+            double amount = !(ValidationHelper.isNullOrEmpty(invoiceItem.getAmount())) ? invoiceItem.getAmount().doubleValue() : 0.0;
+            double totalLine;
+            if(amount != 0.0) {
+                totalLine = totalcost * amount;
+            } else {
+                totalLine = totalcost;
+            }
+            wrapper.setTotalLine(totalLine);
+            if(!ValidationHelper.isNullOrEmpty(invoiceItem.getDescription()))
+                wrapper.setDescription(invoiceItem.getDescription());
+            wrapperList.add(wrapper);
+            counter = counter + 1;
+        }
+        return wrapperList;
+    }
 }

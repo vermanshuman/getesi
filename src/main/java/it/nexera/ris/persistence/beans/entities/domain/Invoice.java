@@ -8,6 +8,7 @@ import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
+import it.nexera.ris.web.beans.wrappers.GoodsServicesFieldWrapper;
 
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
@@ -19,6 +20,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "invoice")
@@ -97,6 +99,9 @@ public class Invoice extends IndexedEntity implements Serializable {
 	@Column(name = "invoice_unlocked_id")
 	private Long invoiceUnlockedId;
 
+	@OneToMany(mappedBy = "invoice")
+	private List<PaymentInvoice> paymentInvoices;
+
 	@Transient
 	private String documentType;
 
@@ -114,6 +119,9 @@ public class Invoice extends IndexedEntity implements Serializable {
 	
 	@Transient
 	private Double totalVat;
+	
+	@Transient
+	private Double totalAmountWithoutTax;
 
 	public Long getCloudId() {
 		return cloudId;
@@ -264,9 +272,10 @@ public class Invoice extends IndexedEntity implements Serializable {
 	}
 
 	public Double getOnBalance() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-		List<PaymentInvoice> paymentInvoices = DaoManager.load(PaymentInvoice.class, Restrictions.eq("invoice.id", this.getId()));
+//		List<PaymentInvoice> paymentInvoices = DaoManager.load(PaymentInvoice.class,
+//				Restrictions.eq("invoice.id", this.getId()));
 		double paymentImportTotal = 0.0;
-		for(PaymentInvoice paymentInvoice : paymentInvoices) {
+		for(PaymentInvoice paymentInvoice : getPaymentInvoices()) {
 			Double total = paymentInvoice.getPaymentImport().doubleValue();
 			paymentImportTotal = paymentImportTotal + total;
 		}
@@ -310,6 +319,20 @@ public class Invoice extends IndexedEntity implements Serializable {
 		total = tot.doubleValue();
 		return total;
 	}
+	
+	public Double getTotalAmountWithoutTax() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+		List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, Restrictions.eq("invoice.id", this.getId()));
+		double totalAmount = 0.0;
+		for(InvoiceItem invoiceItem : invoiceItems) {
+			if(!ValidationHelper.isNullOrEmpty(invoiceItem.getInvoiceTotalCost())) {
+				totalAmount = totalAmount + invoiceItem.getInvoiceTotalCost().doubleValue();
+			}
+		}
+        BigDecimal tot = BigDecimal.valueOf(totalAmount);
+        tot = tot.setScale(2, RoundingMode.HALF_UP);
+        totalAmount = tot.doubleValue();
+		return totalAmount;
+	}
 
 	public String getDateString() {
 		if(getDate() != null) {
@@ -351,5 +374,11 @@ public class Invoice extends IndexedEntity implements Serializable {
 		this.invoiceUnlockedId = invoiceUnlockedId;
 	}
 
-	
+	public List<PaymentInvoice> getPaymentInvoices() {
+		return paymentInvoices;
+	}
+
+	public void setPaymentInvoices(List<PaymentInvoice> paymentInvoices) {
+		this.paymentInvoices = paymentInvoices;
+	}
 }
