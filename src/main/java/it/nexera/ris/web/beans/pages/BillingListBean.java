@@ -453,6 +453,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     private Integer unLockedInvoicesCount;
 
+    private String unLockedInvoicesTooltip;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
@@ -3609,6 +3611,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 Restrictions.eq("status", InvoiceStatus.UNLOCKED)});
 
         setUnLockedInvoicesCount(unlockedInvoices.size());
+        setUnLockedInvoicesTooltipText(unlockedInvoices);
 
     }
 
@@ -3800,5 +3803,16 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 			total += invoice.getTotalAmountWithoutTax();
 		}
 		return total;
+    }
+
+    private void setUnLockedInvoicesTooltipText(List<Invoice> unlockedInvoices) {
+        String text = "";
+        if(unlockedInvoices != null) {
+            for (int i=0; i<unlockedInvoices.size();i++) {
+                Invoice invoice = unlockedInvoices.get(i);
+                text += i<unlockedInvoices.size()-1 ? invoice.getInvoiceNumber() + "\n" : invoice.getInvoiceNumber();
+            }
+        }
+        setUnLockedInvoicesTooltip(text);
     }
 }

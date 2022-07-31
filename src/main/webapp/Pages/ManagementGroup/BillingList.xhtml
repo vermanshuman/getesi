@@ -169,6 +169,7 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
                 color: rgb(255, 255, 255);
+                height: 65%;
             }
 
             .cost {
@@ -812,7 +813,7 @@
                                                    style="position: relative; left: -9px; bottom: -18px; font-size: 80px;"></i>
                                             </div>
                                             <div color="#fff" class=" box_header">#{msg.billingInvoicesCount}</div>
-                                            <div class="cost">#{bean.unLockedInvoicesCount}</div>
+                                            <div class="cost" title="#{bean.unLockedInvoicesTooltip}">#{bean.unLockedInvoicesCount}</div>
                                         </div>
 
                                         <div class="list_icon"
