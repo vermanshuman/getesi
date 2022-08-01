@@ -1,5 +1,7 @@
 package it.nexera.ris.web.beans.pages;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import it.nexera.ris.api.FatturaAPI;
 import it.nexera.ris.api.FatturaAPIResponse;
 import it.nexera.ris.common.enums.*;
@@ -18,7 +20,9 @@ import it.nexera.ris.persistence.view.RequestView;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.beans.EntityLazyListPageBean;
 import it.nexera.ris.web.beans.wrappers.BillingListTurnoverWrapper;
+import it.nexera.ris.web.beans.wrappers.ChartWrapper;
 import it.nexera.ris.web.beans.wrappers.GoodsServicesFieldWrapper;
+import it.nexera.ris.web.beans.wrappers.MixChartDataWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.*;
 import it.nexera.ris.web.common.EntityLazyListModel;
 import it.nexera.ris.web.common.ListPaginator;
@@ -454,6 +458,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private Integer unLockedInvoicesCount;
 
     private String unLockedInvoicesTooltip;
+
+    private String barChartData;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -3737,7 +3743,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     
     public void getChartData(boolean clientFilter, boolean yearFilter, boolean bothFilter) throws HibernateException, 
     			IllegalAccessException, InstantiationException, PersistenceBeanException {
-    	model = new BarChartModel();
+    	/*model = new BarChartModel();
         ChartSeries m1 = new ChartSeries();
         m1.setLabel("m1");
         m1.set("Jan", getInvoicesDataByMonth("01", clientFilter, yearFilter, bothFilter));
@@ -3767,7 +3773,70 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         
         yAxis.setMax(1000);
         yAxis.setTickInterval("100.000");
-        yAxis.setTickFormat("%'.3f");
+        yAxis.setTickFormat("%'.3f");*/
+
+
+
+
+
+        ChartWrapper chartWrapper = new ChartWrapper();
+        chartWrapper.setType("bar");
+
+        List<String> chartXAxisData = new ArrayList<>();
+        chartXAxisData.add("Jan");
+        chartXAxisData.add("Feb");
+        chartXAxisData.add("Mar");
+        chartXAxisData.add("Apr");
+        chartXAxisData.add("May");
+        chartXAxisData.add("Jun");
+        chartXAxisData.add("Jul");
+        chartXAxisData.add("Aug");
+        chartXAxisData.add("Sep");
+        chartXAxisData.add("Oct");
+        chartXAxisData.add("Nov");
+        chartXAxisData.add("Dec");
+
+        List<MixChartDataWrapper> dataSets = new ArrayList<>();
+        List<Double> data = new ArrayList<>();
+
+        Map<RequestType, List<String>> tooltips = new HashMap<>();
+
+        data.add(getInvoicesDataByMonth("01", clientFilter, yearFilter, bothFilter));
+        data.add(getInvoicesDataByMonth("02", clientFilter, yearFilter, bothFilter));
+        data.add(getInvoicesDataByMonth("03", clientFilter, yearFilter, bothFilter));
+        data.add(getInvoicesDataByMonth("04", clientFilter, yearFilter, bothFilter));
+        data.add(getInvoicesDataByMonth("05", clientFilter, yearFilter, bothFilter));
+        data.add(getInvoicesDataByMonth("06", clientFilter, yearFilter, bothFilter));
+        data.add(getInvoicesDataByMonth("07", clientFilter, yearFilter, bothFilter));
+        data.add(getInvoicesDataByMonth("08", clientFilter, yearFilter, bothFilter));
+        data.add(getInvoicesDataByMonth("09", clientFilter, yearFilter, bothFilter));
+        data.add(getInvoicesDataByMonth("10", clientFilter, yearFilter, bothFilter));
+        data.add(getInvoicesDataByMonth("11", clientFilter, yearFilter, bothFilter));
+        data.add(getInvoicesDataByMonth("12", clientFilter, yearFilter, bothFilter));
+
+        if (data.size() > 0) {
+            List<String> borderColors = new ArrayList<>();
+            List<String> backgroundColors = new ArrayList<>();
+
+            List<List<String>> tooltipData = new ArrayList<>();
+            for (Double value:data) {
+                List<String> tooltip = new ArrayList<>();
+                tooltip.add(String.valueOf(value));
+                tooltipData.add(tooltip);
+            }
+            MixChartDataWrapper dataSet = MixChartDataWrapper.builder()
+                    .data(data)
+                    .backgroundColor(backgroundColors)
+                    .borderColor(borderColors)
+                    .borderWidth(2)
+                    .tooltip(tooltipData)
+                    .build();
+            dataSets.add(dataSet);
+        }
+        chartWrapper.setLabels(chartXAxisData);
+        chartWrapper.setDatasets(dataSets);
+        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+        setBarChartData(gson.toJson(chartWrapper));
     }
     
     public Double getInvoicesDataByMonth(String month, boolean clientFilter, boolean yearFilter, boolean bothFilter) 

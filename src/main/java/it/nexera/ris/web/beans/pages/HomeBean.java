@@ -160,8 +160,8 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
 
 
         List<MixChartDataWrapper> dataSets = new ArrayList<>();
-        List<Integer> data = new ArrayList<>();
-        Map<RequestType, Integer> dataMapping = new HashMap<>();
+        List<Double> data = new ArrayList<>();
+        Map<RequestType, Double> dataMapping = new HashMap<>();
         Collections.shuffle(colors);
         Map<RequestType, List<String>> tooltips = new HashMap<>();
         //List<List<String>> tooltips = new ArrayList<>();
@@ -223,7 +223,7 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
 
             if (!ValidationHelper.isNullOrEmpty(tooltip))
                 tooltips.put(requestType, tooltip);
-            Integer requestCount = requests.size();
+            Double requestCount = Double.valueOf(requests.size());
             if (requestCount > 0) {
                 dataMapping.put(requestType, requestCount);
             }
