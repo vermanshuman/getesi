@@ -1,0 +1,55 @@
+#wizard ul {
+    background-color: transparent !important;
+    text-transform: uppercase;
+}
+
+#wizard ul::before {
+    border-bottom: none;
+}
+
+#wizard ul li:not(.ui-tabs-selected.ui-state-active ) a {
+    color: gray !important;
+    border-bottom: 2px solid #dee2e6;
+}
+
+#wizard ul li.ui-tabs-selected.ui-state-active {
+    background-color: transparent !important;
+}
+
+#wizard ul li.ui-tabs-selected.ui-state-active a {
+    color: #000 !important;
+    border-bottom: 3px solid #4872F2;
+    font-weight: bold;
+}
+
+#wizard *:not(.ui-icon) {
+    font-size: 18px;
+}
+
+#wizard .action_column {
+    width: 60px;
+}
+#wizard .close_btn {
+    float: right;
+    bottom: 20px;
+    right: 40px;
+    position: absolute;
+}
+
+body .ui-panel .ui-panel-content {
+    border: none;
+}
+
+.ui-button.green-button {
+    background-color: #00cc52 !important;
+    width: 150px;
+    margin-bottom: 10px;
+}
+
+.align-right {
+    float:right !important;
+}
+
+.ui-inputnumber input {
+    width: 100%;
+}

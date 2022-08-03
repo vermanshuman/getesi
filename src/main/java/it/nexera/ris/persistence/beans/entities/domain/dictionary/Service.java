@@ -116,6 +116,12 @@ public class Service extends IndexedEntity {
     @ManyToOne
     @JoinColumn(name = "national_tax_rate")
     private TaxRate nationalTaxRate;
+    
+    @Column(name = "manage_transcription")
+    private Boolean manageTranscription;
+    
+    @Column(name = "manage_certification")
+    private Boolean manageCertification;
 
     @Override
     public String toString() {
@@ -343,6 +349,21 @@ public class Service extends IndexedEntity {
 	public void setNationalTaxRate(TaxRate nationalTaxRate) {
 		this.nationalTaxRate = nationalTaxRate;
 	}
-	
+
+	public Boolean getManageTranscription() {
+		return manageTranscription;
+	}
+
+	public void setManageTranscription(Boolean manageTranscription) {
+		this.manageTranscription = manageTranscription;
+	}
+
+	public Boolean getManageCertification() {
+		return manageCertification;
+	}
+
+	public void setManageCertification(Boolean manageCertification) {
+		this.manageCertification = manageCertification;
+	}
 	
 }

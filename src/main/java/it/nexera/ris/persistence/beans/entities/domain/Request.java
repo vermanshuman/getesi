@@ -398,6 +398,9 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     private String fiduciary;
 
+    @Column(name = "visible_external")
+    private Boolean visibleExternal;
+
     @Transient
     private Boolean haveRequestReport;
 
@@ -2401,5 +2404,13 @@ public class Request extends DocumentTagEntity implements BeforeSave {
 
     public void setFiduciary(String fiduciary) {
         this.fiduciary = fiduciary;
+    }
+
+    public Boolean getVisibleExternal() {
+        return visibleExternal;
+    }
+
+    public void setVisibleExternal(Boolean visibleExternal) {
+        this.visibleExternal = visibleExternal;
     }
 }

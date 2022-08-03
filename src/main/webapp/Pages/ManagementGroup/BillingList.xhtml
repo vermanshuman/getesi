@@ -857,7 +857,7 @@
                                                         <div class="cost_outer">
                                                             <div class="cost_inner">
                                                                 <h:outputText value="#{bean.monthJanFebAmount}">
-                                                                    <f:convertNumber pattern="#0.00"/>
+                                                                    <f:convertNumber locale="it_IT"/>
                                                                 </h:outputText> €
                                                             </div>
                                                         </div>
@@ -869,7 +869,7 @@
                                                         <div class="cost_outer">
                                                             <div class="cost_inner">
                                                                 <h:outputText value="#{bean.monthMarAprAmount}">
-                                                                    <f:convertNumber pattern="#0.00"/>
+                                                                    <f:convertNumber locale="it_IT"/>
                                                                 </h:outputText> €
                                                             </div>
                                                         </div>
@@ -881,7 +881,7 @@
                                                         <div class="cost_outer">
                                                             <div class="cost_inner">
                                                                 <h:outputText value="#{bean.monthMayJunAmount}">
-                                                                    <f:convertNumber pattern="#0.00"/>
+                                                                    <f:convertNumber locale="it_IT"/>
                                                                 </h:outputText> €
                                                             </div>
                                                         </div>
@@ -890,7 +890,7 @@
                                                 <div class="cost_total">
                                                     <h:outputText
                                                             value="#{bean.monthJanFebAmount+bean.monthMarAprAmount+bean.monthMayJunAmount}">
-                                                        <f:convertNumber pattern="#0.00"/>
+                                                        <f:convertNumber locale="it_IT"/>
                                                     </h:outputText> €
                                                 </div>
                                             </div>
@@ -920,7 +920,7 @@
                                                         <div class="cost_outer">
                                                             <div class="cost_inner">
                                                                 <h:outputText value="#{bean.monthJulAugAmount}">
-                                                                    <f:convertNumber pattern="#0.00"/>
+                                                                    <f:convertNumber locale="it_IT"/>
                                                                 </h:outputText> €
                                                             </div>
                                                         </div>
@@ -932,7 +932,7 @@
                                                         <div class="cost_outer">
                                                             <div class="cost_inner">
                                                                 <h:outputText value="#{bean.monthSepOctAmount}">
-                                                                    <f:convertNumber pattern="#0.00"/>
+                                                                    <f:convertNumber locale="it_IT"/>
                                                                 </h:outputText> €
                                                             </div>
                                                         </div>
@@ -944,7 +944,7 @@
                                                         <div class="cost_outer">
                                                             <div class="cost_inner">
                                                                 <h:outputText value="#{bean.monthNovDecAmount}">
-                                                                    <f:convertNumber pattern="#0.00"/>
+                                                                    <f:convertNumber locale="it_IT"/>
                                                                 </h:outputText> €
                                                             </div>
                                                         </div>
@@ -953,7 +953,7 @@
                                                 <div class="cost_total">
                                                     <h:outputText
                                                             value="#{bean.monthJulAugAmount+bean.monthSepOctAmount+bean.monthNovDecAmount}">
-                                                        <f:convertNumber pattern="#0.00"/>
+                                                        <f:convertNumber locale="it_IT"/>
                                                     </h:outputText> €
                                                 </div>
                                             </div>
@@ -1008,17 +1008,17 @@
                                                                     <div class="month_inner">#{bean.months[loop.index]}</div>
                                                                     <div class="month_inner">
                                                                     	<h:outputText value="#{item.totalTax}">
-                                                                    		<f:convertNumber pattern="#0.00"/>
+                                                                    		<f:convertNumber locale="it_IT"/>
                                                                 		</h:outputText>
                                                                     </div>
                                                                     <div class="month_inner">
                                                                     	<h:outputText value="#{item.nonTotalTax}">
-                                                                    		<f:convertNumber pattern="#0.00"/>
+                                                                    		<f:convertNumber locale="it_IT"/>
                                                                 		</h:outputText>
                                                                 	</div>
                                                                     <div class="month_inner">
                                                                     	<h:outputText value="#{item.total}">
-                                                                    		<f:convertNumber pattern="#0.00"/>
+                                                                    		<f:convertNumber locale="it_IT"/>
                                                                 		</h:outputText>
                                                                     </div>
                                                                 </div>
@@ -1082,17 +1082,17 @@
                                                                     <div class="month_inner">#{item.clientName}</div>
                                                                     <div class="month_inner">
                                                                     	<h:outputText value="#{item.totalTax}">
-                                                                    		<f:convertNumber pattern="#0.00"/>
+                                                                    		<f:convertNumber locale="it_IT"/>
                                                                 		</h:outputText>
                                                                     </div>
                                                                     <div class="month_inner">
                                                                     	<h:outputText value="#{item.nonTotalTax}">
-                                                                    		<f:convertNumber pattern="#0.00"/>
+                                                                    		<f:convertNumber locale="it_IT"/>
                                                                 		</h:outputText>
                                                                 	</div>
                                                                     <div class="month_inner">
                                                                     	<h:outputText value="#{item.total}">
-                                                                    		<f:convertNumber pattern="#0.00"/>
+                                                                    		<f:convertNumber locale="it_IT"/>
                                                                 		</h:outputText>
                                                                     </div>
                                                                 </div>
@@ -1370,7 +1370,7 @@
                                 <p:commandButton id="downloadattachment-btn" value="#{ff:upper(msg.downloadAttachment)}" class="action-btn" style="display: none;"
                                                  action="#{bean.downloadAttachment(invoice)}"/>
                                 <p:commandButton id="unlock-btn" value="#{ff:upper(msg.unLock)}" class="action-btn" style="display: none;"
-                                                 action="#{bean.unlockInvoice(invoice)}" update="invoiceTable"/>
+                                                 action="#{bean.unlockInvoice(invoice)}" update="invoiceTable :costPanel"/>
                                 <p:commandButton id="elimina-btn" value="#{ff:upper(msg.reset)}" class="action-btn" style="display: none;"
                                                  oncomplete="PF('invoice_delete_dlg').show()">
                                     <f:setPropertyActionListener value="#{invoice.id}"
@@ -1421,7 +1421,7 @@
                                                  action="#{bean.loadInvoiceDialogDataEdit(invoice)}" oncomplete="PF('invoiceDialogBillingWV').show();" update="invoiceDialogBilling">
                                 </p:commandButton>
                                 <p:commandButton id="unlock-btn-server" value="#{ff:upper(msg.unLock)}" class="action-btn" style="display: none;"
-                                                 action="#{bean.unlockInvoice(invoice)}" update="invoiceTable"/>
+                                                 action="#{bean.unlockInvoice(invoice)}" update="invoiceTable :costPanel"/>
                                 <p:commandButton id="elimina-btn-server" value="#{ff:upper(msg.reset)}" class="action-btn" style="display: none;"
                                                  oncomplete="PF('invoice_delete_dlg').show()">
                                     <f:setPropertyActionListener value="#{invoice.id}"
@@ -2509,7 +2509,7 @@
                 }
                 console.log(this.cfg);
             }
-            
+
             function checkDatesAdmin() {
                 var dateFrom = $('#filterDateFromAdmin_input').val();
                 var dateTo = $('#filterDateToAdmin_input').val();
@@ -2576,7 +2576,6 @@
             });
             // ]]>
         </script>
-
         <p:dialog id="invoiceDelete" widgetVar="invoice_delete_dlg" modal="true" resizable="false" styleClass="dialog-green dialog-green-width"
                   draggable="false" effect="SLIDE" >
             #{msg.deleteInvoiceConfirmation}<br/>

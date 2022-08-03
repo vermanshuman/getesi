@@ -107,17 +107,17 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 
     private Integer selectedYear;
 
-    private Double monthJanFebAmount; 
+    private Double monthJanFebAmount;
 
     private Double monthMarAprAmount;
 
-    private Double monthMayJunAmount; 
+    private Double monthMayJunAmount;
 
-    private Double monthJulAugAmount; 
+    private Double monthJulAugAmount;
 
-    private Double monthSepOctAmount; 
+    private Double monthSepOctAmount;
 
-    private Double monthNovDecAmount; 
+    private Double monthNovDecAmount;
 
     private List<BillingListTurnoverWrapper> turnoverPerMonth;
 
@@ -404,33 +404,33 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private Boolean invoiceSaveAsDraft;
 
     private Long nextInvoiceNumber;
-    
+
     private List<SelectItem> paymentTypeDescriptions;
-    
+
     private Long selectedPaymentTypeDescription;
-    
+
     private List<SelectItem> paymentOutcomes;
-    
+
     private Long selectedPaymentOutcome;
-    
+
     private List<Invoice> unlockedInvoices;
-    
+
     private Long filterInvoiceNumberAdmin;
-    
+
     private List<SelectItem> companiesAdmin;
 
     private Long selectedCompanyIdAdmin;
-    
+
     private Date dateFromAdmin;
 
     private Date dateToAdmin;
-    
+
     private Long managerClientFilteridAdmin;
-    
+
     private List<SelectItem> managerClientsAdmin;
 
     private Long selectedOfficeIdAdmin;
-    
+
     private List<SelectItem> officesAdmin;
 
     private String filterNotesAdmin;
@@ -438,11 +438,11 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     private String filterNdgAdmin;
 
     private String filterPracticeAdmin;
-    
+
     private List<Invoice> unlockedInvoicesDialog;
-    
+
     private Invoice selectedUnlockedInvoiceDialog;
-    
+
     private PaymentInvoice selectedPaymentInvoice;
 
     private Long invoiceDeleteId;
@@ -465,6 +465,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException,
             IllegalAccessException, IOException {
+
+        setUnLockedInvoicesCount(0);
 
         if (!ValidationHelper.isNullOrEmpty(getRequestParameter(RedirectHelper.BILLING_LIST))) {
             openSubjectsToBeInvoicedTab();
@@ -509,7 +511,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setMonthJulAugAmount(getInvoiceVatAmountBetweenMonths("07", "08", false, false, false));
         setMonthSepOctAmount(getInvoiceVatAmountBetweenMonths("09", "10", false, false, false));
         setMonthNovDecAmount(getInvoiceVatAmountBetweenMonths("11", "12", false, false, false));
-        
+
         Calendar calendar = Calendar.getInstance(Locale.ITALY);
 		int year = calendar.get(Calendar.YEAR);
 		TurnoverHelper turnoverHelper = new TurnoverHelper();
@@ -683,7 +685,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setCompanies(companies.stream()
                 .sorted(Comparator.comparing(SelectItem::getLabel))
                 .collect(Collectors.toList()));
-        
+
         setCompaniesAdmin(companies.stream()
                 .sorted(Comparator.comparing(SelectItem::getLabel))
                 .collect(Collectors.toList()));
@@ -1186,7 +1188,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 	        //set Tipo Bonifico as default
 	        setSelectedPaymentTypeDescription(2l);
 	        setPaymentTypeDescriptions(ComboboxHelper.fillList(InvoicePaymentType.class, false));
-	        List<PaymentType> paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("code", "MP05"), 
+	        List<PaymentType> paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("code", "MP05"),
 					Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
 	                Restrictions.isNull("isDeleted"))});
 	        setSelectedPaymentOutcome(getSelectedInvoice().getPaymentType().getId());
@@ -1196,7 +1198,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         	setPaymentAmount(paymentInvoice.getPaymentImport());
         	setPaymentDate(paymentInvoice.getDate());
         	setPaymentTypeDescriptions(ComboboxHelper.fillList(InvoicePaymentType.class, false));
-        	List<PaymentType> paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("description", paymentInvoice.getDescription()), 
+        	List<PaymentType> paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("description", paymentInvoice.getDescription()),
 					Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
 			                Restrictions.isNull("isDeleted"))});
         	PaymentType paymentType = paymentTypes.get(0);
@@ -1210,25 +1212,25 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 			setPaymentOutcomes(ComboboxHelper.fillList(paymentTypes, false));
         }
     }
-    
+
     public void invoicePaymentTypeListner(SelectEvent selectEvent) throws HibernateException, IllegalAccessException, PersistenceBeanException {
     	if(!ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeDescription()) && !ValidationHelper.isNullOrEmpty(getSelectedInvoice())) {
     		List<PaymentType> paymentTypes = new ArrayList<>();
     		//If Tipo is Assegno
     		if(getSelectedPaymentTypeDescription().equals(1l)) {
-    			paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("code", "MP02"), 
+    			paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("code", "MP02"),
     					Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
                         Restrictions.isNull("isDeleted"))});
     		}
     		//If Tipo is Bonifico
     		if(getSelectedPaymentTypeDescription().equals(2l)) {
-    			paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("code", "MP05"), 
+    			paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("code", "MP05"),
     					Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
                         Restrictions.isNull("isDeleted"))});
     		}
     		//If Tipo is Contanti
     		if(getSelectedPaymentTypeDescription().equals(3l)) {
-    			paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("code", "MP01"), 
+    			paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("code", "MP01"),
     					Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
                         Restrictions.isNull("isDeleted"))});
     		}
@@ -2631,7 +2633,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 Order.asc("date")});
         setPaymentInvoices(paymentInvoicesList);
     }
-    
+
     public void deleteInvoicePayment(PaymentInvoice paymentInvoice) throws HibernateException, PersistenceBeanException, IllegalAccessException {
 		DaoManager.remove(paymentInvoice, true);
 		List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[]{Restrictions.eq("invoice", getSelectedInvoice())}, new Order[]{
@@ -2894,7 +2896,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             if (!ValidationHelper.isNullOrEmpty(baseMail.getOffice())) {
                 excelDataWrapper.setOffice(baseMail.getOffice().getDescription());
             }
-            
+
             if(!ValidationHelper.isNullOrEmpty(document.getNote())) {
             	excelDataWrapper.setDocumentNote(document.getNote());
             }
@@ -3087,7 +3089,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                                 ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.SENT_SERVER_ID)
                                         .getValue()))}).get(0);
                 String mail_footer = MAIL_FOOTER.replace("info@brexa.it", emailsFrom);
-                
+
                 String emailBody = dearCustomer + ",</br>"
                         + attachedCopyMessage + "</br></br>"
                         + "<table style='border:none;'>"
@@ -3382,6 +3384,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                 }
             });
         }
+        setUnlockedInvoices();
     }
     public void saveNextInvoiceNumber() {
         setValidationFailed(false);
@@ -3395,7 +3398,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             setValidationFailed(true);
         }
     }
-    
+
     public void loadAdministrationTab() throws HibernateException, IllegalAccessException, PersistenceBeanException {
         setMaxInvoiceNumber();
     	setUnlockedInvoices(DaoManager.load(Invoice.class,
@@ -3407,8 +3410,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setOfficesAdmin(ComboboxHelper.fillList(Office.class, Boolean.TRUE));
         loadCompanies(getClientList());
     }
-    
-    
+
+
     public void filterTableFromPanelAdmin() throws IllegalAccessException, PersistenceBeanException {
         List<Criterion> restrictions = new ArrayList<>();
         List<Criterion> restrictionsLike = new ArrayList<>();
@@ -3475,13 +3478,13 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         setFilterPracticeAdmin(null);
         filterTableFromPanelAdmin();
     }
-    
+
     public void loadUnlockedInvoiceDialogData() throws IllegalAccessException, PersistenceBeanException {
     	setUnlockedInvoicesDialog(DaoManager.load(Invoice.class,
                 new Criterion[]{Restrictions.eq("status", InvoiceStatus.UNLOCKED), Restrictions.isNotNull("number")}, new Order[]{
                         Order.desc("number")}));
     }
-    
+
     public void unlockInvoices() throws HibernateException, PersistenceBeanException, IllegalAccessException, InstantiationException {
     	if(!ValidationHelper.isNullOrEmpty(getSelectedInvoice()) && !ValidationHelper.isNullOrEmpty(getSelectedUnlockedInvoiceDialog())) {
     		Long currentInvoiceNumber = getSelectedInvoice().getNumber();
@@ -3489,18 +3492,18 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
     		getSelectedInvoice().setInvoiceNumber(getSelectedUnlockedInvoiceDialog().getInvoiceNumber());
     		getSelectedInvoice().setDate(getSelectedUnlockedInvoiceDialog().getDate());
     		DaoManager.save(getSelectedInvoice(), true);
-    		
+
     		getSelectedUnlockedInvoiceDialog().setNumber(null);
     		getSelectedUnlockedInvoiceDialog().setInvoiceUnlockedId(currentInvoiceNumber);
     		DaoManager.save(getSelectedUnlockedInvoiceDialog(), true);
-    		
+
     		loadInvoiceDialogData(getSelectedInvoice());
     		executeJS("PF('invoiceDialogBillingWV').show();");
     		setActiveTabIndex(1);
     		RequestContext.getCurrentInstance().update("invoiceDialogBilling");
     	}
     }
-    
+
 	private Double getInvoiceVatAmountBetweenMonths(String startMonth, String endMonth, boolean clientFilter, boolean yearFilter, boolean bothFilter)
 			throws IllegalAccessException, PersistenceBeanException, HibernateException, InstantiationException {
 		Calendar calendar = Calendar.getInstance(Locale.ITALY);
@@ -3537,7 +3540,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
 		}
 		return totalIVA;
 	}
-	
+
 	public void filterByClient() throws IllegalAccessException, HibernateException, InstantiationException, PersistenceBeanException {
 		if(!ValidationHelper.isNullOrEmpty(getSelectedClientId()) && ValidationHelper.isNullOrEmpty(getSelectedYear())) {
 			setMonthJanFebAmount(getInvoiceVatAmountBetweenMonths("01", "02", true, false, false));
@@ -3610,15 +3613,17 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                         return 0.0;
                     }).sum();
         }
-        setUnsolved(String.valueOf(unsolved));
+        setUnsolved(InvoiceHelper.format(unsolved));
         setRevenue(InvoiceHelper.format(revenue));
+        setUnlockedInvoices();
+    }
 
+    private void setUnlockedInvoices() throws PersistenceBeanException, IllegalAccessException {
         List<Invoice> unlockedInvoices = DaoManager.load(Invoice.class, new Criterion[]{
                 Restrictions.eq("status", InvoiceStatus.UNLOCKED)});
 
         setUnLockedInvoicesCount(unlockedInvoices.size());
         setUnLockedInvoicesTooltipText(unlockedInvoices);
-
     }
 
     public void filterByYear() throws IllegalAccessException, HibernateException, InstantiationException, PersistenceBeanException {
@@ -3740,9 +3745,10 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
         executeJS("closeInvoiceDialog();");
     }
-    
-    public void getChartData(boolean clientFilter, boolean yearFilter, boolean bothFilter) throws HibernateException, 
-    			IllegalAccessException, InstantiationException, PersistenceBeanException {
+
+
+    public void getChartData(boolean clientFilter, boolean yearFilter, boolean bothFilter) throws HibernateException,
+            IllegalAccessException, InstantiationException, PersistenceBeanException {
     	/*model = new BarChartModel();
         ChartSeries m1 = new ChartSeries();
         m1.setLabel("m1");
@@ -3758,7 +3764,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         m1.set("Oct", getInvoicesDataByMonth("10", clientFilter, yearFilter, bothFilter));
         m1.set("Nov", getInvoicesDataByMonth("11", clientFilter, yearFilter, bothFilter));
         m1.set("Dec", getInvoicesDataByMonth("12", clientFilter, yearFilter, bothFilter));
-     
+
         model.addSeries(m1);
         model.setTitle("Indice di redditività");
         model.setLegendPosition("ne");
@@ -3770,7 +3776,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         Axis yAxis = model.getAxis(AxisType.Y);
         //   yAxis.setLabel("Sales");
         yAxis.setMin(0);
-        
+
         yAxis.setMax(1000);
         yAxis.setTickInterval("100.000");
         yAxis.setTickFormat("%'.3f");*/
@@ -3818,10 +3824,13 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
             List<String> borderColors = new ArrayList<>();
             List<String> backgroundColors = new ArrayList<>();
 
+            for (int c = 0; c < chartXAxisData.size(); c++) {
+                borderColors.add("rgb(169,169,169)");
+            }
             List<List<String>> tooltipData = new ArrayList<>();
             for (Double value:data) {
                 List<String> tooltip = new ArrayList<>();
-                tooltip.add(String.valueOf(value));
+                tooltip.add(InvoiceHelper.format(value));
                 tooltipData.add(tooltip);
             }
             MixChartDataWrapper dataSet = MixChartDataWrapper.builder()
@@ -3838,8 +3847,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
         setBarChartData(gson.toJson(chartWrapper));
     }
-    
-    public Double getInvoicesDataByMonth(String month, boolean clientFilter, boolean yearFilter, boolean bothFilter) 
+
+    public Double getInvoicesDataByMonth(String month, boolean clientFilter, boolean yearFilter, boolean bothFilter)
     		throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
     	Calendar calendar = Calendar.getInstance(Locale.ITALY);
 		int year = calendar.get(Calendar.YEAR);

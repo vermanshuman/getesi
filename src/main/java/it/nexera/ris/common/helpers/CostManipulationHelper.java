@@ -3,6 +3,7 @@ package it.nexera.ris.common.helpers;
 import it.nexera.ris.common.enums.ExtraCostType;
 import it.nexera.ris.common.enums.MortgageType;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
+import it.nexera.ris.common.helpers.create.xls.CreateExcelRequestsReportHelper;
 import it.nexera.ris.persistence.Action;
 import it.nexera.ris.persistence.TransactionExecuter;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
@@ -11,14 +12,13 @@ import it.nexera.ris.persistence.beans.entities.domain.EstateFormality;
 import it.nexera.ris.persistence.beans.entities.domain.ExtraCost;
 import it.nexera.ris.persistence.beans.entities.domain.Request;
 import it.nexera.ris.web.beans.PageBean;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.primefaces.context.RequestContext;
 
 import javax.faces.model.SelectItem;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,7 +83,6 @@ public class CostManipulationHelper extends PageBean {
                 setEstateFormalityCost(null);
                 return;
             }
-
             request.setNumberActUpdate(Double.valueOf(getEstateFormalityCost()));
             DaoManager.save(request, true);
         }
@@ -102,7 +101,7 @@ public class CostManipulationHelper extends PageBean {
         } else {
             updateHelperParametersFromRequest(request);
         }
-
+        CreateExcelRequestsReportHelper createExcelRequestsReportHelper = new CreateExcelRequestsReportHelper();
         setIncludeNationalCost(request.getIncludeNationalCost());
 
         List<EstateFormality> estateFormalitiesUpdated = DaoManager.load(EstateFormality.class, new CriteriaAlias[]{
@@ -122,9 +121,11 @@ public class CostManipulationHelper extends PageBean {
             executeJS("PF('estateFormalityCostDlg').show();");
             return;
         }
-        
-        if(!ValidationHelper.isNullOrEmpty(request.getCostNote()))
-        	setCostNote(request.getCostNote());
+
+
+        setCostNote(createExcelRequestsReportHelper.generateCorrectNote(request));
+        //if (!ValidationHelper.isNullOrEmpty(request.getCostNote()))
+            //setCostNote(request.getCostNote());
 
         CostCalculationHelper calculation = new CostCalculationHelper(request);
 
@@ -134,7 +135,12 @@ public class CostManipulationHelper extends PageBean {
                 Restrictions.eq("requestId", request.getId())});
 
         setRequestExtraCosts(extraCosts);
-
+        boolean isCostMismatch = createExcelRequestsReportHelper.checkTotalCostSpecialColumn( request);
+        if(isCostMismatch){
+            String note = !ValidationHelper.isNullOrEmpty(getCostNote()) ? (getCostNote() + "\n") : "";
+            note += "Anomalia costi";
+            setCostNote(note);
+        }
         updateHelperParametersFromRequest(request);
         RequestContext.getCurrentInstance().update("requestExtraCostTable");
         RequestContext.getCurrentInstance().update("requestExtraCostDialog");
@@ -146,13 +152,13 @@ public class CostManipulationHelper extends PageBean {
     public void addExtraCost(String extraCostValue, Long requestId) {
         ExtraCost newExtraCost = new ExtraCost();
         ExtraCostType extraCostType = ExtraCostType.getEnumByCode(extraCostValue);
-        if(extraCostType != null){
+        if (extraCostType != null) {
             switch (ExtraCostType.getEnumByCode(extraCostValue)) {
                 case IPOTECARIO:
-                    Double cost =IPOTECARIO_DEFAULT;
-                    if(getSelectedMortgageNote().equals(MortgageType.AdditionalFormality.getName())) {
+                    Double cost = IPOTECARIO_DEFAULT;
+                    if (getSelectedMortgageNote().equals(MortgageType.AdditionalFormality.getName())) {
                         cost = IPOTECARIO_ADDITIONAL_FORMALITY;
-                    }else if(getSelectedMortgageNote().equals(MortgageType.Titolo.getName())) {
+                    } else if (getSelectedMortgageNote().equals(MortgageType.Titolo.getName())) {
                         cost = IPOTECARIO_TITOLO;
                     }
                     newExtraCost.setPrice((getSpinnerNumber() == null ? 1 : getSpinnerNumber()) * (cost));
@@ -237,7 +243,7 @@ public class CostManipulationHelper extends PageBean {
                     break;
 
             }
-        }else {
+        } else {
             switch (extraCostValue) {
                 case "IPOTECARIO_TAVOLARE":
                     if (!ValidationHelper.isNullOrEmpty(getExtraCostMortgageTable())) {
@@ -295,9 +301,11 @@ public class CostManipulationHelper extends PageBean {
     public void deleteExtraCost(ExtraCost extraCostToDelete) {
         getRequestExtraCosts().remove(extraCostToDelete);
     }
+
     public void saveRequestExtraCost(Request request) throws Exception {
         saveRequestExtraCost(request, Boolean.TRUE);
     }
+
     public void saveRequestExtraCost(Request request, Boolean costButtonConfirmClicked) throws Exception {
         List<ExtraCost> removeList = DaoManager.load(ExtraCost.class, new Criterion[]{
                 Restrictions.eq("requestId", request.getId())});
@@ -317,7 +325,7 @@ public class CostManipulationHelper extends PageBean {
                     }
 
                     for (ExtraCost cost : getRequestExtraCosts()) {
-                        if(ValidationHelper.isNullOrEmpty(cost.getType()) ||
+                        if (ValidationHelper.isNullOrEmpty(cost.getType()) ||
                                 !ExtraCostType.NAZIONALEPOSITIVA.equals(cost.getType())) {
                             requestCost += cost.getPrice();
                         }
@@ -336,8 +344,10 @@ public class CostManipulationHelper extends PageBean {
                 request.setConfirmExtraCostsPressed(true);
                 request.setLastCostChanging(true);
                 request.setIncludeNationalCost(getIncludeNationalCost());
-                if(!ValidationHelper.isNullOrEmpty(getCostNote()))
-                	request.setCostNote(getCostNote());
+                if (!ValidationHelper.isNullOrEmpty(getCostNote())){
+                    request.setCostNote(getCostNote().replaceAll("Anomalia costi", ""));
+                }
+
                 if (isEditable()) {
                     updateExamRequestParametersFromHelper(request);
                 }
@@ -372,15 +382,15 @@ public class CostManipulationHelper extends PageBean {
         request.setCostEstateFormality(getCostEstateFormalityTemp());
         request.setNumberActUpdate(getNumberActOrSumOfEstateFormalitiesAndOtherTemp());
         request.setTaxable(getTaxableCostTemp());
-        request.setCostNote(getCostNote());
+        request.setCostNote(getCostNote().replaceAll("Anomalia costi", ""));
         Double totalCost = 0.0;
-        if(!ValidationHelper.isNullOrEmpty(getCostPayTemp()))
+        if (!ValidationHelper.isNullOrEmpty(getCostPayTemp()))
             totalCost += getCostPayTemp();
 
-        if(!ValidationHelper.isNullOrEmpty(getCostCadastralTemp()))
+        if (!ValidationHelper.isNullOrEmpty(getCostCadastralTemp()))
             totalCost += getCostCadastralTemp();
 
-        if(!ValidationHelper.isNullOrEmpty(getCostEstateFormalityTemp()))
+        if (!ValidationHelper.isNullOrEmpty(getCostEstateFormalityTemp()))
             totalCost += getCostEstateFormalityTemp();
 
         request.setTotalCost(String.format("%.2f", totalCost));

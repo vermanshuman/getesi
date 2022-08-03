@@ -1538,7 +1538,7 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
             RequestContext.getCurrentInstance().update("requestNumberActDlg");
             executeJS("PF('requestNumberActGreaterThenClientNumberAct').show()");
         } else {
-            this.viewExtraCost();
+            this.viewExtraCost(false);
         }
     }
 
@@ -1547,10 +1547,15 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
     }
 
     public void saveRequestEstateFormalityCost() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
-        if (!Hibernate.isInitialized(getExamRequest().getRequestFormalities())) {
-            getExamRequest().reloadRequestFormalities();
+        Request request = DaoManager.get(Request.class, getExamRequest().getId());
+        if (!Hibernate.isInitialized(request.getRequestFormalities())) {
+            request.reloadRequestFormalities();
         }
-        getCostManipulationHelper().saveRequestEstateFormalityCost(getExamRequest());
+        if (!Hibernate.isInitialized(request.getRequestSubjects())) {
+            request.reloadRequestSubjects();
+        }
+        getCostManipulationHelper().saveRequestEstateFormalityCost(request);
+        setExamRequest(request);
         if (!ValidationHelper.isNullOrEmpty(getExamRequest().getNumberActUpdate())) {
             compareNumberActsBeforeExtraCost();
         }
@@ -1570,12 +1575,15 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         //DaoManager.getSession().evict(getExamRequest());
         Request request = DaoManager.get(Request.class, getExamRequest().getId());
         log.info("View Extra cost :" + request.getSumOfGroupedEstateFormalities());
-        if(recalculate)
+        if(recalculate) {
             request.setNumberActUpdate(null);
+            request.setCostNote(null);
+            getCostManipulationHelper().setCostNote(null);
+        }
         else if (!ValidationHelper.isNullOrEmpty(getRequestNumberActUpdate())) {
             request.setNumberActUpdate(Double.valueOf(getRequestNumberActUpdate()));
         }
-
+        setExamRequest(request);
         getCostManipulationHelper().viewExtraCost(request, recalculate);
     }
 

@@ -571,7 +571,8 @@ public class MailManagerListBean extends EntityLazyListPageBean<WLGInboxShort> i
     }
 
     public boolean getCanGotoFolders() {
-        return getCurrentUser().getPermissions().get("PMMF").isCanView() ||
+        return !ValidationHelper.isNullOrEmpty(getCurrentUser().getPermissions().get("PMMF"))
+                && getCurrentUser().getPermissions().get("PMMF").isCanView() ||
                 getCurrentUser().getPermissions().get("PMMF").isCanCreate() ||
                 getCurrentUser().getPermissions().get("PMMF").isCanDelete() ||
                 getCurrentUser().getPermissions().get("PMMF").isCanEdit() ||

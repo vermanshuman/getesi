@@ -10,7 +10,7 @@
 
     <ui:define name="view_body">
         <ui:param name="bean" value="#{excelDataRequestEdit}" />
-
+		<p:panel id="dataTablePanel">
         <ui:repeat value="#{bean.dataTable}" var="key">
             <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group">
                 <h:outputText value="#{key.requestName}" style="font-weight:bold;font-size: 20px;"/>
@@ -26,14 +26,14 @@
                         </f:facet>
                     </p:columns>
                     <p:column exportable="false" styleClass="action_midle_column">
-                        <p:commandButton icon="fa fa-pencil-square-o" action="#{bean.viewExtraCost()}">
+                        <p:commandButton icon="fa fa-pencil-square-o" action="#{bean.viewExtraCost(key.columnValues, req.tempId)}">
                             <f:setPropertyActionListener value="#{req.id ne null ? req.id : req.multipleRequestId}" target="#{bean.requestId}"/>
                         </p:commandButton>
                     </p:column>
                 </p:dataTable>
             </p:panelGrid>
         </ui:repeat>
-
+		</p:panel>
         <p:panelGrid columns="2" styleClass="ui-panelgr id-blank form-group additional_button">
             <p:commandButton id="pdf_btn"
                              action="#{bean.generatePdfRequestCost}"

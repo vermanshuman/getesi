@@ -296,6 +296,9 @@ public class RequestView extends IndexedView {
     @Transient
     private Long managerId;
 
+    @Transient
+    private Boolean manageTranscription;
+
     public Boolean getHaveDocuments() {
         if (haveDocuments == null) {
             try {
@@ -580,9 +583,10 @@ public class RequestView extends IndexedView {
     public String getServiceName() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         
         if(!ValidationHelper.isNullOrEmpty(getServiceId())) {
-            Service service = DaoManager.get(Service.class, getServiceId()); 
+            Service service = DaoManager.get(Service.class, getServiceId());
             if(service != null) {
-               setServiceName(service.getName()); 
+               setServiceName(service.getName());
+               setManageTranscription(service.getManageTranscription());
             }
         }
         return serviceName;
@@ -955,5 +959,13 @@ public class RequestView extends IndexedView {
 
     public void setInvoiceId(Long invoiceId) {
         this.invoiceId = invoiceId;
+    }
+
+    public Boolean getManageTranscription() {
+        return manageTranscription;
+    }
+
+    public void setManageTranscription(Boolean manageTranscription) {
+        this.manageTranscription = manageTranscription;
     }
 }

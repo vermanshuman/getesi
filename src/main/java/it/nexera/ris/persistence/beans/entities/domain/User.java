@@ -119,6 +119,8 @@ public class User extends IndexedEntity {
     @JoinColumn(name = "office_id")
     private Office office;
 
+    @Column(name = "phone")
+    private String phone;
 
     public boolean isPhysical() {
         return getType() != null && getType() == UserType.PHYSICAL;
@@ -391,4 +393,12 @@ public class User extends IndexedEntity {
 	public void setPasswordChanged(Boolean passwordChanged) {
 		this.passwordChanged = passwordChanged;
 	}
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 }

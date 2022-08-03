@@ -32,6 +32,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
+import org.primefaces.context.RequestContext;
 
 import it.nexera.ris.common.enums.ApplicationSettingsKeys;
 import it.nexera.ris.common.enums.BillingTypeFields;
@@ -1294,6 +1295,7 @@ public class ExcelDataRequestEdit extends BaseEntityPageBean {
         CostCalculationHelper calculation = new CostCalculationHelper(getExamRequest());
         calculation.calculateAllCosts(true);
         loadPage();
+        RequestContext.getCurrentInstance().update("dataTablePanel");
     }
 
     public void updateCosts() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -1517,6 +1519,10 @@ public class ExcelDataRequestEdit extends BaseEntityPageBean {
         setCostNote(null);
         setCostManipulationHelper(new CostManipulationHelper());
         Request request = DaoManager.get(Request.class, getRequestId());
+        if(recalculate) {
+        	request.setNumberActUpdate(null);
+        	request.setCostNote(null);
+        }
         request.setSelectedTemplateId(null);
         if(!ValidationHelper.isNullOrEmpty(request.getRequestFormalities())) {
             if(!Hibernate.isInitialized(request.getRequestFormalities())){
@@ -1628,6 +1634,90 @@ public class ExcelDataRequestEdit extends BaseEntityPageBean {
 
     public void addExtraCost(String extraCostValue) {
         getCostManipulationHelper().addExtraCost(extraCostValue, getRequestId());
+    }
+    
+    public void viewExtraCost(Map<String, String> valuesMap, String tempId) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        Request request =  DaoManager.get(Request.class, getRequestId());
+        log.debug("Fecthing extra cost for request(ExcelData) " + request);
+        boolean reCalculate = true;
+        if(request.getCostButtonConfirmClicked() != null && request.getCostButtonConfirmClicked()){
+            reCalculate = false;
+        }
+        
+        viewExtraCost(reCalculate, valuesMap, tempId);
+    }
+    
+    public void viewExtraCost(boolean recalculate, Map<String, String> valuesMap, String tempId) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        setCostNote(null);
+        setCostManipulationHelper(new CostManipulationHelper());
+        Request request = DaoManager.get(Request.class, getRequestId());
+        request.setSelectedTemplateId(null);
+        if(!ValidationHelper.isNullOrEmpty(request.getRequestFormalities())) {
+            if(!Hibernate.isInitialized(request.getRequestFormalities())){
+                request.reloadRequestFormalities();
+            }
+        }
+        setExamRequest(request);
+        RequestPrint requestPrint = DaoManager.get(RequestPrint.class,
+                new CriteriaAlias[]{new CriteriaAlias("request", "rq", JoinType.INNER_JOIN)},
+                new Criterion[]{Restrictions.eq("rq.id", getRequestId())});
+        if (requestPrint != null) {
+            if (requestPrint.getTemplate() != null) {
+                getExamRequest().setSelectedTemplateId(requestPrint.getTemplate().getId());
+            }
+        }
+        getCostManipulationHelper().setMortgageTypeList(ComboboxHelper.fillList(MortgageType.class, false, false));
+        if(ValidationHelper.isNullOrEmpty(getExamRequest().getCostNote())) {
+            try {
+                List<Document> requestDocuments = DaoManager.load(Document.class,
+                        new CriteriaAlias[]{new CriteriaAlias("request", "request", JoinType.INNER_JOIN)},
+                        new Criterion[]{Restrictions.and(Restrictions.eq("request.id", getExamRequest().getId()), Restrictions.eq("typeId", 2L))});
+                boolean isAdded = Boolean.FALSE;
+                if (!ValidationHelper.isNullOrEmpty(requestDocuments)) {
+                    if(getExamRequest().getService() !=null
+                            && getExamRequest().getService().getUnauthorizedQuote()!=null
+                            && getExamRequest().getService().getUnauthorizedQuote()){
+                        costNote = "Preventivo non autorizzato";
+                        isAdded = Boolean.TRUE;
+                    }
+                }
+                if(!isAdded && getExamRequest().getAuthorizedQuote()!= null
+                        && getExamRequest().getAuthorizedQuote()){
+                    costNote = "Preventivo autorizzato";
+                }
+                if(!isAdded && getExamRequest().getUnauthorizedQuote()!= null
+                        && getExamRequest().getUnauthorizedQuote()){
+                    costNote = "Preventivo non autorizzato";
+                }
+                costNote = ValidationHelper.isNullOrEmpty(costNote) ? new CreateExcelRequestsReportHelper().generateCorrectNote(getExamRequest()) : costNote.concat(" ").concat(new CreateExcelRequestsReportHelper().generateCorrectNote(getExamRequest()));
+            } catch (PersistenceBeanException | IllegalAccessException e) {
+                LogHelper.log(log, e);
+            }
+        }else
+            setCostNote(getExamRequest().getCostNote());
+        
+        String columnName = ResourcesHelper.getString("excelNote") + "_" + tempId;
+        String value = valuesMap.entrySet().stream().filter(x -> columnName.equals(x.getKey())).map(x->x.getValue())
+        		.collect(Collectors.joining());
+        if(!ValidationHelper.isNullOrEmpty(value)) {
+        	if(value.contains("Anomalia costi")) {
+        		if(value.contains("<br/>")) {
+                	String[] valueArray = value.split("<br/>");
+                	value = valueArray[0];
+                } else
+                	value = "";
+        	}
+        	getCostManipulationHelper().setCostNote(value);
+        }
+        
+        getCostManipulationHelper().viewExtraCost(getExamRequest(), recalculate);
+        setDataTable(new ArrayList<>());
+        if(!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
+                !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox().getRequests())) {
+            prepareTables(getMail().getRecievedInbox().getRequests());
+        }else if (!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getRequests())) {
+            prepareTables(getMail().getRequests());
+        }
     }
 
     public Request getExamRequest() {

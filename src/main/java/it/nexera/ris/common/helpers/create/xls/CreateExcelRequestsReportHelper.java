@@ -1127,6 +1127,7 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
         optimizeColumnSizeIfItLessMinimalSize(getIndex(ResourcesHelper.getString("excelNote"), requestsColumns) + 1);
         optimizeColumnSizeIfItLessMinimalSize(getColumns().length);
     }
+
     private void checkTotalCostSpecialColumn(Row row, Request request, int colIndex)
 
             throws PersistenceBeanException, IllegalAccessException, InstantiationException {

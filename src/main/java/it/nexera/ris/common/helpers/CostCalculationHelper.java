@@ -542,6 +542,9 @@ public class CostCalculationHelper {
         if(isServiceUpdate){
             numberOfGroupedEstateFormality = Collections.singletonList(getNumActs(getRequest().getId()).doubleValue());
             numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
+        }else if (!ValidationHelper.isNullOrEmpty(getRequest().getNumberActUpdate()) && getRequest().getNumberActUpdate() > 0) {
+            numberOfGroupedEstateFormality = Collections.singletonList(getRequest().getNumberActUpdate());
+            numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
         }
         
         if (!ValidationHelper.isNullOrEmpty(getRequest().getRequestFormalities())) {
@@ -557,7 +560,6 @@ public class CostCalculationHelper {
                 numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
             }
         }
-
         boolean isPriceList = Boolean.FALSE;
         if (!ValidationHelper.isNullOrEmpty(getRequest().getService())) {
             List<PriceList> priceList = loadPriceList(billingClient, restrictionForPriceList, getRequest().getService());

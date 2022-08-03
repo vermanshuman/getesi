@@ -297,8 +297,11 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
     }
 
     public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        if(recalculate)
+        if(recalculate) {
             getExamRequest().setNumberActUpdate(null);
+            getExamRequest().setCostNote(null);
+            getCostManipulationHelper().setCostNote(null);
+        }
         getCostManipulationHelper().viewExtraCost(getExamRequest(), recalculate);
     }
 

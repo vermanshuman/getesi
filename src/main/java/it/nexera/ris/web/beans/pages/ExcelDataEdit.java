@@ -1578,11 +1578,65 @@ public class ExcelDataEdit extends BaseEntityPageBean {
 
     public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         log.debug("Fecthing extra cost for request(Regenerate) " + getExamRequest());
+        setCostNote(null);
+        setCostManipulationHelper(new CostManipulationHelper());
         Request request = DaoManager.get(Request.class, getExamRequest().getId());
-        if(recalculate)
-            getExamRequest().setNumberActUpdate(null);
+        if(recalculate) {
+        	request.setNumberActUpdate(null);
+        	request.setCostNote(null);
+        }
+        request.setSelectedTemplateId(null);
+        if(!Hibernate.isInitialized(request.getRequestFormalities())){
+            request.reloadRequestFormalities();
+        }
+        setExamRequest(request);
+        RequestPrint requestPrint = DaoManager.get(RequestPrint.class,
+                new CriteriaAlias[]{new CriteriaAlias("request", "rq", JoinType.INNER_JOIN)},
+                new Criterion[]{Restrictions.eq("rq.id", getRequestId())});
+        if (requestPrint != null) {
+            if (requestPrint.getTemplate() != null) {
+                getExamRequest().setSelectedTemplateId(requestPrint.getTemplate().getId());
+            }
+        }
+        getCostManipulationHelper().setMortgageTypeList(ComboboxHelper.fillList(MortgageType.class, false, false));
+        if(ValidationHelper.isNullOrEmpty(getExamRequest().getCostNote())) {
+            try {
+                List<Document> requestDocuments = DaoManager.load(Document.class,
+                        new CriteriaAlias[]{new CriteriaAlias("request", "request", JoinType.INNER_JOIN)},
+                        new Criterion[]{Restrictions.and(Restrictions.eq("request.id", getExamRequest().getId()), Restrictions.eq("typeId", 2L))});
+                boolean isAdded = Boolean.FALSE;
+                if (!ValidationHelper.isNullOrEmpty(requestDocuments)) {
+                    if(getExamRequest().getService() !=null
+                            && getExamRequest().getService().getUnauthorizedQuote()!=null
+                            && getExamRequest().getService().getUnauthorizedQuote()){
+                        costNote = "Preventivo non autorizzato";
+                        isAdded = Boolean.TRUE;
+                    }
+                }
+                if(!isAdded && getExamRequest().getAuthorizedQuote()!= null
+                        && getExamRequest().getAuthorizedQuote()){
+                    costNote = "Preventivo autorizzato";
+                }
+                if(!isAdded && getExamRequest().getUnauthorizedQuote()!=null
+                        && getExamRequest().getUnauthorizedQuote()){
+                    costNote = "Preventivo non autorizzato";
+                }
+                costNote = ValidationHelper.isNullOrEmpty(costNote) ? new CreateExcelRequestsReportHelper().generateCorrectNote(getExamRequest()) : costNote.concat(" ").concat(new CreateExcelRequestsReportHelper().generateCorrectNote(getExamRequest()));
+            } catch (PersistenceBeanException | IllegalAccessException e) {
+                LogHelper.log(log, e);
+            }
+        }else
+            setCostNote(getExamRequest().getCostNote());
+        
         log.info("View Extra cost(Regenerate) :" + request.getSumOfGroupedEstateFormalities());
-        getCostManipulationHelper().viewExtraCost(request, recalculate);
+        getCostManipulationHelper().viewExtraCost(getExamRequest(), recalculate);
+        setExcelDataTable(new ArrayList<>());
+        if(!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox()) &&
+                !ValidationHelper.isNullOrEmpty(getMail().getRecievedInbox().getRequests())) {
+            prepareTables(getMail().getRecievedInbox().getRequests());
+        }else if (!ValidationHelper.isNullOrEmpty(getMail()) && !ValidationHelper.isNullOrEmpty(getMail().getRequests())) {
+            prepareTables(getMail().getRequests());
+        }
     }
 
     public void viewExtraCost(Map<String, String> valuesMap, String tempId) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -1648,7 +1702,11 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         		.collect(Collectors.joining());
         if(!ValidationHelper.isNullOrEmpty(value)) {
         	if(value.contains("Anomalia costi")) {
-        		value = "Anomalia costi";
+        		if(value.contains("<br/>")) {
+                	String[] valueArray = value.split("<br/>");
+                	value = valueArray[0];
+                } else
+                	value = "";
         	}
         	getCostManipulationHelper().setCostNote(value);
         }

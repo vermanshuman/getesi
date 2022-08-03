@@ -1766,4 +1766,9 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     public void setResetSettingPanel(boolean resetSettingPanel) {
         this.resetSettingPanel = resetSettingPanel;
     }
+
+    public void openTransactionManagement() {
+        updateFilterValueInSession();
+        RedirectHelper.goTo(PageTypes.TRANSACTION_MANAGEMENT, getEntityEditId());
+    }
 }
