@@ -53,3 +53,16 @@ body .ui-panel .ui-panel-content {
 .ui-inputnumber input {
     width: 100%;
 }
+
+.special-upload {
+	width: 900px;
+}
+
+.special-upload .ui-fileupload-choose {
+	background: #fed820;
+	color: #000000;
+}
+
+.special-upload .ui-fileupload-content {
+	min-height: 80px;
+}

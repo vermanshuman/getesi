@@ -6,7 +6,7 @@
       xmlns:ff="http://readytech.com/functions"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition template="/resources/tpl/Admin/LazyListBase.xhtml">
-    <ui:param name="list_title" value="#{msg.regimeConiugi}"/>
+    <ui:param name="list_title" value="#{msg.payment_type_list}"/>
     <ui:param name="bean" value="#{paymentTypeListBean}"/>
     <ui:param name="entity_name" value="#{msg.requestTypeEntity}"/>
     <ui:param name="disableSelection" value="true"/>
@@ -190,7 +190,7 @@
         <p:remoteCommand name="refreshTable" update="@form"/>
         <p:dialog widgetVar="addPaymentTypeDialogWV"  id="addPaymentTypeDialog" modal="true" draggable="false"
                   width="600" styleClass="dialog-white-bg addPaymentDialog newEntityDialog"
-                  position="center center" header="#{msg.regimeConiugi}">
+                  position="center center" header="#{msg.payment_type_list}">
             <div class="p-grid">
                 <div class="p-col-12 p-md-12">
                     <div class="card"

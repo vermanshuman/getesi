@@ -1,6 +1,7 @@
 package it.nexera.ris.web.beans.pages;
 
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
+import it.nexera.ris.common.helpers.DateTimeHelper;
 import it.nexera.ris.persistence.beans.entities.domain.Request;
 import it.nexera.ris.web.beans.EntityEditPageBean;
 import lombok.Getter;
@@ -21,12 +22,14 @@ public class TransactionManagementBean extends EntityEditPageBean<Request> imple
 
     private static final long serialVersionUID = 5504028298870066325L;
     private int activeTabIndex;
-    private Date birthDate;
+    private Date courierDate;
+    private String expirationDate;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
             PersistenceBeanException, InstantiationException, IllegalAccessException {
-        setBirthDate(new Date());
+        setCourierDate(new Date());
+        setExpirationDate(DateTimeHelper.toFormatedString(getEntity().getExpirationDate(), DateTimeHelper.getDatePattern()));
     }
 
     @Override

@@ -15,6 +15,11 @@
     <ui:define name="view_body">
         <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/transactionmanagement.css"
               media="all" rel="stylesheet" type="text/css"/>
+        <style>
+        	.special-upload .ui-widget-header {
+                background-color: transparent !important;
+            }
+        </style>
         <p:tabView widgetVar="transactionWizard" id="wizard" activeIndex="#{bean.activeTabIndex}">
             <p:tab id="wizardTabLETTER" title="#{msg.wizardTabLETTER.toUpperCase()}">
                 <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
@@ -52,10 +57,28 @@
                     <h:outputLabel for="transactionCourierReservation" value="#{msg.transactionCourierReservation}:"/>
                     <p:selectBooleanCheckbox id="transactionCourierReservation" styleClass="booleanCheckbox"/>
                     <h:outputLabel for="transactionCourierDate" value="#{msg.transactionCourierDate}:"/>
-                    <p:calendar id="transactionCourierDate" value="#{bean.birthDate}"
+                    <p:calendar id="transactionCourierDate" value="#{bean.courierDate}"
                                 pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
                                 converter="fullDateTimeConverter"/>
+
+                    <h:outputText value="#{msg.transactionCourierLabel}" style="font-weight:bold"/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+
+                    <p:fileUpload label="#{msg.upload}"
+                          multiple="false" mode="advanced" styleClass="special-upload" auto="true"/>
+                    
                 </p:panelGrid>
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.save}" styleClass="green-button align-right"/>
+                </p:outputPanel>
+                <br/>
+                <br/>
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                    <p:commandButton value="#{msg.transactionManagementSendNote}"
+                                     styleClass="green-button align-right" disabled="true"/>
+                </p:outputPanel>
                 <br/>
                 <br/>
             </p:tab>
@@ -86,13 +109,22 @@
                 </p:outputPanel>
             </p:tab>
             <p:tab id="wizardTabSEND" title="#{msg.wizardTabSend.toUpperCase()}">
+                <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                             columnClasses="ui-grid-col-2, ui-grid-col-1, ui-grid-col-1, ui-grid-col-4">
+                    <h:outputText value="#{msg.transactionInvoiceLabel}" style="font-weight:bold"/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+                    <p:fileUpload label="#{msg.upload}"
+                                  multiple="false" mode="advanced" styleClass="special-upload" auto="true"/>
 
+                </p:panelGrid>
             </p:tab>
         </p:tabView>
         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
                      columnClasses="ui-grid-col-2, ui-grid-col-4">
             <h:outputLabel for="transactionRequestDeadline" value="#{msg.transactionRequestDeadline}"/>
-            <p:inputText styleClass="input-width" value="#{bean.entity.expirationDate}"
+            <p:inputText styleClass="input-width" value="#{bean.expirationDate}"
                          maxlength="200" id="transactionRequestDeadline" label="#{msg.transactionRequestDeadline}" disabled="true"/>
 
 
