@@ -151,6 +151,16 @@
                     <h:outputText value=""/>
                     <p:fileUpload label="#{msg.upload}"
                                   multiple="false" mode="advanced" styleClass="special-upload" auto="true"/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+
+                    <p:outputPanel styleClass="transaction-date">
+                        <p:outputPanel style="width: 100px;padding-top: 4px;">
+                            <h:outputText value="#{msg.transactionDateLabel}:" style="font-weight:bold"/>
+                        </p:outputPanel>
+                        <p:inputText style="width: 200px;" />
+                    </p:outputPanel>
 
                 </p:panelGrid>
             </p:tab>
