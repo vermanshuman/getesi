@@ -1202,7 +1202,7 @@
                     </script>
                 </p:tab>
             </p:tabView>
-            <p:remoteCommand name="closeInvoiceDialog" action="#{bean.closeInvoiceDialog}" update=":form" />
+            <p:remoteCommand name="closeInvoiceDialog" onstart="deHighlightRow();" action="#{bean.closeInvoiceDialog}" update=":form" />
         </div>
         <script>
             $(".ui-dialog-titlebar-close").on("click", function() {

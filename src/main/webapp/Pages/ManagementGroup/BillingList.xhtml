@@ -1328,16 +1328,14 @@
                             </div>
                         </ui:fragment>
                         <script type="text/javascript">
-                            // <![CDATA[
-                            jQuery(document).ready(function() {
-                                $(document).on('click', '#invoiceTable_data tr', function () {
-                                    $('#invoiceTable_data tr').attr('id','');
-                                    $(this).attr('id','selected-row');
-                                    // For more classes: .toggle('class1 class2'); - will remove what exists and add what is missing
-                                    // For more precise toggling: .toggle('classN', trueIfToAdd)
-                                });
-                            });
-                            // ]]>
+                            function highlightRow(idx) {
+                                $('#invoiceTable_data tr').attr('id', '');
+                                $('#invoiceTable_data tr:eq('+idx+')').attr('id', 'selected-row');
+                            }
+                            function deHighlightRow() {
+                                $('#invoiceTable_data tr').attr('id', '');
+                                console.log('test');
+                            }
                         </script>
                         <p:dataTable id="invoiceTable" value="#{bean.lazyModel}" emptyMessage="#{msg.noRecordsFound}"
                                      var="invoice" rows="15" lazy="true"
@@ -1402,7 +1400,7 @@
                                         <p:outputPanel id="actionGrid" styleClass="actionPnl-panel">
                                             <p:commandButton value="#{ff:upper(msg.dataVerification)}" styleClass="action-btn"
                                                              rendered="#{invoice.client ne null and invoice.client.id ne null and  invoice.client.id gt 0}"
-                                                             onclick="document.getElementById('invoiceTable:#{rowId}:openinvoice-btn').click()"
+                                                             onclick="highlightRow(#{rowId});document.getElementById('invoiceTable:#{rowId}:openinvoice-btn').click()"
                                                              oncomplete="PF('invoiceDialogBillingWV').show();"
                                                              style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;">
                                             </p:commandButton>
@@ -1453,7 +1451,7 @@
                                         <p:outputPanel id="actionGrid1" styleClass="actionPnl-panel">
                                             <p:commandButton value="#{ff:upper(msg.dataVerification)}" styleClass="action-btn"
                                                              rendered="#{invoice.client ne null and invoice.client.id ne null and  invoice.client.id gt 0}"
-                                                             onclick="document.getElementById('invoiceTable:#{rowId}:openinvoice-btn-server').click()"
+                                                             onclick="highlightRow(#{rowId});document.getElementById('invoiceTable:#{rowId}:openinvoice-btn-server').click();"
                                                              oncomplete="PF('invoiceDialogBillingWV').show();"
                                                              style="width:120px;margin-left: 5px; margin-right: 5px; margin-top:5px; margin-bottom:8px;"/>
                                             <p:commandButton value="#{ff:upper(msg.downloadAttachment)}" styleClass="action-btn"
