@@ -7,10 +7,7 @@ import it.nexera.ris.common.helpers.create.xls.CreateExcelRequestsReportHelper;
 import it.nexera.ris.persistence.UserHolder;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
-import it.nexera.ris.persistence.beans.entities.domain.Client;
-import it.nexera.ris.persistence.beans.entities.domain.Document;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
-import it.nexera.ris.persistence.beans.entities.domain.User;
+import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
@@ -1767,8 +1764,19 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         this.resetSettingPanel = resetSettingPanel;
     }
 
-    public void openTransactionManagement() {
+    public void openTranscriptionManagement() throws
+            PersistenceBeanException, InstantiationException, IllegalAccessException {
+        TranscriptionData transcriptionData =  DaoManager.get(TranscriptionData.class,
+                new CriteriaAlias[]{
+                        new CriteriaAlias("request", "r", JoinType.INNER_JOIN)
+                },
+                new Criterion[]{Restrictions.eq("request.id", getEntityEditId())
+        });
         updateFilterValueInSession();
-        RedirectHelper.goTo(PageTypes.TRANSACTION_MANAGEMENT, getEntityEditId());
+        if(!ValidationHelper.isNullOrEmpty(transcriptionData)) {
+        	RedirectHelper.goTo(PageTypes.TRANSCRIPTION_MANAGEMENT, getEntityEditId(), transcriptionData.getId());
+        } else {
+        	RedirectHelper.goTo(PageTypes.TRANSCRIPTION_MANAGEMENT, getEntityEditId(), null);
+        }
     }
 }

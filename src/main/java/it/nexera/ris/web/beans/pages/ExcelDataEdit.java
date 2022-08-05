@@ -1582,7 +1582,6 @@ public class ExcelDataEdit extends BaseEntityPageBean {
         setCostManipulationHelper(new CostManipulationHelper());
         Request request = DaoManager.get(Request.class, getExamRequest().getId());
         if(recalculate) {
-        	request.setNumberActUpdate(null);
         	request.setCostNote(null);
         }
         request.setSelectedTemplateId(null);

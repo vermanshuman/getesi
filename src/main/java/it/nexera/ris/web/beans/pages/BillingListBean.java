@@ -2451,24 +2451,6 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         } else {
             if (!ValidationHelper.isNullOrEmpty(invoice) &&
                     !ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
-//                String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
-//                        String.class, new Criterion[]{Restrictions.eq("id", Long.parseLong(
-//                                ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.SENT_SERVER_ID)
-//                                        .getValue()))}).get(0);
-//                if (invoice.getEmailFrom().getEmailCC().contains(emailsFrom)) {
-//                    sendTo = new LinkedList<>();
-//                    sendTo.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailFrom()));
-//                    sendTo.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailTo()));
-//                    sendCC = new LinkedList<>();
-//                    sendCC = MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailCC()).stream()
-//                            .filter(m -> !m.contains(emailsFrom)).collect(Collectors.toList());
-//                } else {
-//                    sendTo = MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailFrom());
-//                    sendCC = new LinkedList<>();
-//                    sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailTo()).stream()
-//                            .filter(m -> !m.contains(emailsFrom)).collect(Collectors.toList()));
-//                    sendCC.addAll(MailHelper.parseMailAddress(invoice.getEmailFrom().getEmailCC()));
-//                }
                 WLGInbox inbox = DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId());
                 List<Client> managers = inbox.getManagers();
                 List<ClientEmail> allEmailList = new ArrayList<>();
@@ -2481,30 +2463,8 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                     if (!ValidationHelper.isNullOrEmpty(email.getEmail()))
                         sendTo.addAll(MailHelper.parseMailAddress(email.getEmail()));
                 });
-//                WLGInbox baseMail = DaoManager.get(WLGInbox.class, invoice.getEmailFrom().getId());
-//                String sendDate;
-//                if (invoice.getEmailFrom().getSendDate() == null) {
-//                    sendDate = "";
-//                } else if (baseMail.getReceived()) {
-//                    sendDate = DateTimeHelper.toFormatedStringLocal(invoice.getEmailFrom().getSendDate(),
-//                            DateTimeHelper.getMySQLDateTimePattern(), null);
-//                } else {
-//                    sendDate = DateTimeHelper.ToMySqlStringWithSeconds(invoice.getEmailFrom().getSendDate());
-//                }
-//                StringBuilder html = new StringBuilder();
-//
-//                String emailPrefix = String.format(MAIL_RERLY_FOOTER,
-//                        prepareEmailAddress(invoice.getEmailFrom().getEmailFrom()),
-//                        sendDate,
-//                        prepareEmailAddress(invoice.getEmailFrom().getEmailTo()),
-//                        invoice.getEmailFrom().getEmailCC(),
-//                        invoice.getEmailFrom().getEmailSubject());
-//                html.append(emailPrefix);
-//                html.append(invoice.getEmailFrom().getEmailBody());
-//                html.append(invoice.getEmailFrom().getEmailPostfix());
-//                setEmailBodyToEditor(html.toString());
             }
-            setEmailBodyToEditor(createInvoiceEmailDefaultBody(invoice));
+            setEmailBodyToEditor(invoiceDialogBean.createInvoiceEmailDefaultBody(invoice));
         }
     }
 
@@ -3056,7 +3016,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
         }
     }
 
-    public String createInvoiceEmailDefaultBody(Invoice invoice) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+    public String createInvoiceEmailDefaultBody_del(Invoice invoice) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         if (!ValidationHelper.isNullOrEmpty(invoice)) {
             if (ValidationHelper.isNullOrEmpty(invoice.getEmail()) && !ValidationHelper.isNullOrEmpty(invoice.getEmailFrom())) {
                 String dearCustomer = ResourcesHelper.getString("dearCustomer");
@@ -3083,6 +3043,11 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                         requestType = requestType + " + ";
                     requestType = requestType + request;
                 }
+                String fiduciario = "";
+                if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getClientFiduciary()))
+                    fiduciario = invoice.getEmailFrom().getClientFiduciary().toString();
+                else if(!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getFiduciary()))
+                    fiduciario = invoice.getEmailFrom().getFiduciary();
 
                 String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
                         String.class, new Criterion[]{Restrictions.eq("id", Long.parseLong(
@@ -3096,6 +3061,7 @@ public class BillingListBean extends EntityLazyListPageBean<Invoice>
                         + (!ndg.isEmpty() ? "<tr><td style='border:none;'>NDG: " + "</td><td style='padding-left: 50px; border:none;'>" + ndg + "</td></tr>" : "")
                         + (!reference.isEmpty() ? "<tr><td style='border:none;'>RIF: " + "</td><td style='padding-left: 50px; border:none;'>" + reference + "</td></tr>" : "")
                         + (!requestType.isEmpty() ? "<tr><td style='border:none;'>REQUEST: " + "</td><td style='padding-left: 50px; border:none;'>" + requestType + "</td></tr>" : "")
+                        + (!fiduciario.isEmpty() ? "<tr><td style='border:none;'>REQUEST: " + "</td><td style='padding-left: 50px; border:none;'>" + fiduciario + "</td></tr>" : "")
                         + "</table></br>"
                         + thanksMessage
                         + mail_footer;

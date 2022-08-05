@@ -1576,11 +1576,11 @@ public class RequestTextEditBean extends EntityEditPageBean<RequestPrint> {
         Request request = DaoManager.get(Request.class, getExamRequest().getId());
         log.info("View Extra cost :" + request.getSumOfGroupedEstateFormalities());
         if(recalculate) {
-            request.setNumberActUpdate(null);
             request.setCostNote(null);
             getCostManipulationHelper().setCostNote(null);
         }
-        else if (!ValidationHelper.isNullOrEmpty(getRequestNumberActUpdate())) {
+
+        if (!ValidationHelper.isNullOrEmpty(getRequestNumberActUpdate())) {
             request.setNumberActUpdate(Double.valueOf(getRequestNumberActUpdate()));
         }
         setExamRequest(request);

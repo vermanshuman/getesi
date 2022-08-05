@@ -121,7 +121,7 @@ public enum PageTypes {
     INVOICE_LIST("/Pages/ManagementGroup/InvoiceList.jsf"),
     INVOICE_EDIT("/Pages/ManagementGroup/InvoiceEdit.jsf"),
 
-    TRANSACTION_MANAGEMENT("/Pages/ManagementGroup/TransactionManagement.jsf"),
+    TRANSCRIPTION_MANAGEMENT("/Pages/ManagementGroup/TranscriptionManagement.jsf"),
 
     CITIES_LIST("/Pages/Dictionaries/CitiesList.jsf"),
 

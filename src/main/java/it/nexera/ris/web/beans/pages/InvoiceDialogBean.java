@@ -43,6 +43,7 @@ import org.hibernate.sql.JoinType;
 import org.primefaces.component.tabview.TabView;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.LazyDataModel;
@@ -370,6 +371,16 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
     private List<SelectItem> userFolders;
 
     private Long selectedFolderId;
+    
+    private PaymentInvoice selectedPaymentInvoice;
+    
+    private List<SelectItem> paymentTypeDescriptions;
+
+    private Long selectedPaymentTypeDescription;
+    
+    private List<SelectItem> paymentOutcomes;
+
+    private Long selectedPaymentOutcome;
 
     private static final String MAIL_FOOTER = ResourcesHelper.getString("emailFooter");
 
@@ -1230,6 +1241,8 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
             }
             if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getClientFiduciary())) {
                 mailTrust = invoice.getEmailFrom().getClientFiduciary().toString();
+            }else if(!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getFiduciary())){
+                mailTrust = invoice.getEmailFrom().getFiduciary();
             }
             if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getOffice()) &&
                     !ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getOffice().getDescription())) {
@@ -2617,6 +2630,11 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
                         requestType = requestType + " + ";
                     requestType = requestType + request;
                 }
+                String fiduciario = "";
+                if (!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getClientFiduciary()))
+                    fiduciario = invoice.getEmailFrom().getClientFiduciary().toString();
+                else if(!ValidationHelper.isNullOrEmpty(invoice.getEmailFrom().getFiduciary()))
+                    fiduciario = invoice.getEmailFrom().getFiduciary();
 
                 String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
                         String.class, new Criterion[]{Restrictions.eq("id", Long.parseLong(
@@ -2630,6 +2648,7 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
                         + (!ndg.isEmpty() ? "<tr><td style='border:none;'>NDG: " + "</td><td style='padding-left: 50px; border:none;'>" + ndg + "</td></tr>" : "")
                         + (!reference.isEmpty() ? "<tr><td style='border:none;'>RIF: " + "</td><td style='padding-left: 50px; border:none;'>" + reference + "</td></tr>" : "")
                         + (!requestType.isEmpty() ? "<tr><td style='border:none;'>REQUEST: " + "</td><td style='padding-left: 50px; border:none;'>" + requestType + "</td></tr>" : "")
+                        + (!fiduciario.isEmpty() ? "<tr><td style='border:none;'>FIDUCIARIO: " + "</td><td style='padding-left: 50px; border:none;'>" + fiduciario + "</td></tr>" : "")
                         + "</table></br>"
                         + thanksMessage
                         + mail_footer;
@@ -2702,5 +2721,105 @@ public class InvoiceDialogBean extends BaseEntityPageBean implements Serializabl
         if (loadData)
             loadInvoiceDialogData(invoice);
         return inbox;
+    }
+    
+    public void loadPaymentData(PaymentInvoice paymentInvoice) throws HibernateException, IllegalAccessException, PersistenceBeanException{
+        if(ValidationHelper.isNullOrEmpty(paymentInvoice)) {
+        	setSelectedPaymentInvoice(null);
+	    	if(!ValidationHelper.isNullOrEmpty(getSelectedInvoice()))
+	        	setPaymentAmount(getSelectedInvoice().getTotalGrossAmount());
+	        //set Tipo Bonifico as default
+	        setSelectedPaymentTypeDescription(2l);
+	        setPaymentTypeDescriptions(ComboboxHelper.fillList(InvoicePaymentType.class, false));
+	        List<PaymentType> paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("code", "MP05"),
+					Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+	                Restrictions.isNull("isDeleted"))});
+	        setSelectedPaymentOutcome(getSelectedInvoice().getPaymentType().getId());
+			setPaymentOutcomes(ComboboxHelper.fillList(paymentTypes, false));
+        } else {
+        	setSelectedPaymentInvoice(paymentInvoice);
+        	setPaymentAmount(paymentInvoice.getPaymentImport());
+        	setPaymentDate(paymentInvoice.getDate());
+        	setPaymentTypeDescriptions(ComboboxHelper.fillList(InvoicePaymentType.class, false));
+        	List<PaymentType> paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("description", paymentInvoice.getDescription()),
+					Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+			                Restrictions.isNull("isDeleted"))});
+        	PaymentType paymentType = paymentTypes.get(0);
+        	if(paymentType.getCode().equals("MP02"))
+        		setSelectedPaymentTypeDescription(InvoicePaymentType.Check.getId());
+        	if(paymentType.getCode().equals("MP05"))
+        		setSelectedPaymentTypeDescription(InvoicePaymentType.Transfer.getId());
+        	if(paymentType.getCode().equals("MP01"))
+        		setSelectedPaymentTypeDescription(InvoicePaymentType.Cash.getId());
+        	setSelectedPaymentOutcome(paymentInvoice.getInvoice().getPaymentType().getId());
+			setPaymentOutcomes(ComboboxHelper.fillList(paymentTypes, false));
+        }
+    }
+    
+    public void invoicePaymentTypeListner(SelectEvent selectEvent) throws HibernateException, IllegalAccessException, PersistenceBeanException {
+    	if(!ValidationHelper.isNullOrEmpty(getSelectedPaymentTypeDescription()) && !ValidationHelper.isNullOrEmpty(getSelectedInvoice())) {
+    		List<PaymentType> paymentTypes = new ArrayList<>();
+    		//If Tipo is Assegno
+    		if(getSelectedPaymentTypeDescription().equals(1l)) {
+    			paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("code", "MP02"),
+    					Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                        Restrictions.isNull("isDeleted"))});
+    		}
+    		//If Tipo is Bonifico
+    		if(getSelectedPaymentTypeDescription().equals(2l)) {
+    			paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("code", "MP05"),
+    					Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                        Restrictions.isNull("isDeleted"))});
+    		}
+    		//If Tipo is Contanti
+    		if(getSelectedPaymentTypeDescription().equals(3l)) {
+    			paymentTypes = DaoManager.load(PaymentType.class, new Criterion[]{Restrictions.eq("code", "MP01"),
+    					Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                        Restrictions.isNull("isDeleted"))});
+    		}
+    		setSelectedPaymentOutcome(getSelectedInvoice().getPaymentType().getId());
+    		setPaymentOutcomes(ComboboxHelper.fillList(paymentTypes, false));
+    	}
+    }
+    
+    public void loadInvoiceDialogDataPayment(Invoice invoice) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        setActiveTabIndex(1);
+        List<Request> requests = DaoManager.load(Request.class, new Criterion[]{
+                Restrictions.eq("invoice", invoice),
+                Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                        Restrictions.isNull("isDeleted"))
+        });
+        if (requests != null && !requests.isEmpty()) {
+            setActiveTabIndex(2);
+        }
+        setNumber(invoice.getNumber());
+        loadInvoiceDialogData(invoice);
+
+    }
+    
+    public void saveInvoicePayment() throws HibernateException, PersistenceBeanException, IllegalAccessException, InstantiationException {
+        PaymentInvoice paymentInvoice = new PaymentInvoice();
+        if(!ValidationHelper.isNullOrEmpty(getSelectedPaymentInvoice())) {
+        	paymentInvoice = getSelectedPaymentInvoice();
+        }
+        paymentInvoice.setPaymentImport(getPaymentAmount());
+        paymentInvoice.setDate(getPaymentDate());
+        //paymentInvoice.setDescription(getPaymentDescription());
+        if(!ValidationHelper.isNullOrEmpty(getSelectedPaymentOutcome())) {
+        	PaymentType paymentType = DaoManager.get(PaymentType.class, getSelectedPaymentOutcome());
+        	paymentInvoice.setDescription(paymentType.getDescription());
+        }
+        paymentInvoice.setInvoice(getSelectedInvoice());
+        DaoManager.save(paymentInvoice, true);
+        List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[]{Restrictions.eq("invoice", getSelectedInvoice())}, new Order[]{
+                Order.asc("date")});
+        setPaymentInvoices(paymentInvoicesList);
+    }
+
+    public void deleteInvoicePayment(PaymentInvoice paymentInvoice) throws HibernateException, PersistenceBeanException, IllegalAccessException {
+		DaoManager.remove(paymentInvoice, true);
+		List<PaymentInvoice> paymentInvoicesList = DaoManager.load(PaymentInvoice.class, new Criterion[]{Restrictions.eq("invoice", getSelectedInvoice())}, new Order[]{
+                Order.asc("date")});
+        setPaymentInvoices(paymentInvoicesList);
     }
 }

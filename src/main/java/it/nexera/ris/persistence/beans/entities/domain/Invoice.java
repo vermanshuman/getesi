@@ -275,16 +275,18 @@ public class Invoice extends IndexedEntity implements Serializable {
 //		List<PaymentInvoice> paymentInvoices = DaoManager.load(PaymentInvoice.class,
 //				Restrictions.eq("invoice.id", this.getId()));
 		double paymentImportTotal = 0.0;
-		for(PaymentInvoice paymentInvoice : getPaymentInvoices()) {
-			Double total = paymentInvoice.getPaymentImport().doubleValue();
-			paymentImportTotal = paymentImportTotal + total;
-		}
 		Double onBalance = 0.0;
-		if(getTotalGrossAmount() != null)
-			onBalance = getTotalGrossAmount().doubleValue() - paymentImportTotal;
-		BigDecimal balance = BigDecimal.valueOf(onBalance);
-		balance = balance.setScale(2, RoundingMode.HALF_UP);
-		onBalance = balance.doubleValue();
+		if(!ValidationHelper.isNullOrEmpty(getPaymentInvoices())) {
+			for(PaymentInvoice paymentInvoice : getPaymentInvoices()) {
+				Double total = paymentInvoice.getPaymentImport().doubleValue();
+				paymentImportTotal = paymentImportTotal + total;
+			}
+			if(getTotalGrossAmount() != null)
+				onBalance = getTotalGrossAmount().doubleValue() - paymentImportTotal;
+			BigDecimal balance = BigDecimal.valueOf(onBalance);
+			balance = balance.setScale(2, RoundingMode.HALF_UP);
+			onBalance = balance.doubleValue();
+		}
 		return onBalance;
 	}
 

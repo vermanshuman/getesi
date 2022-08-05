@@ -8,15 +8,7 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import it.nexera.ris.persistence.beans.entities.domain.*;
@@ -822,39 +814,132 @@ public class CreateExcelRequestsReportHelper extends CreateExcelReportHelper {
                 result += "<br/>";
             result += titleCost;
         }
-        if(!ValidationHelper.isNullOrEmpty(request.getService())
-                && !ValidationHelper.isNullOrEmpty(request.getService().getIsUpdate()) &&
-            request.getService().getIsUpdate()){
-            CostCalculationHelper costCalculationHelper = new CostCalculationHelper(request);
-            Boolean billingClient = isBillingClient(request);
-            boolean restrictionForPriceList = restrictionForPriceList(request);
+
+        List<Double> numberOfGroupedEstateFormality = request.getSumOfGroupedEstateFormalities();
+        Integer numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
+        boolean isServiceUpdate = false;
+        if (!ValidationHelper.isNullOrEmpty(request.getService())
+                && !ValidationHelper.isNullOrEmpty(request.getService().getIsUpdate())
+                && request.getService().getIsUpdate()) {
+            isServiceUpdate = true;
+        }
+
+        if(isServiceUpdate){
+            numberOfGroupedEstateFormality = Collections.singletonList(getNumActs(request.getId()).doubleValue());
+            numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
+        }else if (!ValidationHelper.isNullOrEmpty(request.getNumberActUpdate()) && request.getNumberActUpdate() > 0) {
+            numberOfGroupedEstateFormality = Collections.singletonList(request.getNumberActUpdate());
+            numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(request.getRequestFormalities())) {
+            if(!Hibernate.isInitialized(request.getRequestFormalities())){
+                Hibernate.initialize(request.getRequestFormalities());
+            }
+            List<Long> documentIds = request.getRequestFormalities().stream()
+                    .filter(rf -> !ValidationHelper.isNullOrEmpty(rf.getDocumentId()))
+                    .map(RequestFormality::getDocumentId)
+                    .distinct().collect(Collectors.toList());
+            if (ValidationHelper.isNullOrEmpty(documentIds) && isServiceUpdate) {
+                numberOfGroupedEstateFormality = request.getSumOfGroupedEstateFormalities();
+                numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
+            }
+        }
+        boolean isPriceList = Boolean.FALSE;
+        CostCalculationHelper costCalculationHelper = new CostCalculationHelper(request);
+        Boolean billingClient = isBillingClient(request);
+        boolean restrictionForPriceList = restrictionForPriceList(request);
+        double fixedCost = 0;
+        if (!ValidationHelper.isNullOrEmpty(request.getService())) {
             List<PriceList> priceList = costCalculationHelper.loadPriceList(billingClient, restrictionForPriceList);
             if (!ValidationHelper.isNullOrEmpty(priceList)) {
-                double fixedCost = 0;
+                isPriceList = true;
                 PriceList first = priceList.get(0);
-                List<Double> numberOfGroupedEstateFormality = request.getSumOfGroupedEstateFormalities();
-                Integer numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
                 for (Integer i = 0; i < numberOfGroupsByDocumentOfEstateFormality; i++) {
                     if (!ValidationHelper.isNullOrEmpty(first.getNumberNextBlock())
                             && !ValidationHelper.isNullOrEmpty(first.getNextPrice())) {
                         if (numberOfGroupedEstateFormality.size() > i
                                 && numberOfGroupedEstateFormality.get(i) > Double.parseDouble(first.getNumberFirstBlock())) {
+
                             double y = (numberOfGroupedEstateFormality.get(i) - Double.parseDouble(first.getNumberFirstBlock()))
                                     / Double.parseDouble(first.getNumberNextBlock());
                             y = Math.ceil(y);
                             double yCost = y * Double.parseDouble(first.getNextPrice().replaceAll(",", "."));
 
                             fixedCost += yCost + Double.parseDouble(first.getFirstPrice().replaceAll(",", "."));
+                        } else {
+                            fixedCost += Double.parseDouble(first.getFirstPrice().replaceAll(",", "."));
                         }
                     }
                 }
-                if(fixedCost > 0d){
-                    if(StringUtils.isNotBlank(result))
-                        result += "<br/>";
-                    result += "Costo ispezione ipotecaria: €" + fixedCost;
+            }
+        } else if (!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
+            for (Service service : request.getMultipleServices()) {
+                List<PriceList> priceList = costCalculationHelper.loadPriceList(billingClient, restrictionForPriceList, service);
+                if (!ValidationHelper.isNullOrEmpty(priceList)) {
+                    isPriceList = true;
+                    PriceList first = priceList.get(0);
+                    for (Integer i = 0; i < numberOfGroupsByDocumentOfEstateFormality; i++) {
+                        if (!ValidationHelper.isNullOrEmpty(first.getNumberNextBlock())
+                                && !ValidationHelper.isNullOrEmpty(first.getNextPrice())) {
+                            if (numberOfGroupedEstateFormality.size() > i
+                                    && numberOfGroupedEstateFormality.get(i) > Double.parseDouble(first.getNumberFirstBlock())) {
+
+                                double y = (numberOfGroupedEstateFormality.get(i) - Double.parseDouble(first.getNumberFirstBlock()))
+                                        / Double.parseDouble(first.getNumberNextBlock());
+                                y = Math.ceil(y);
+                                double yCost = y * Double.parseDouble(first.getNextPrice().replaceAll(",", "."));
+
+                                fixedCost += yCost + Double.parseDouble(first.getFirstPrice().replaceAll(",", "."));
+                            } else {
+                                fixedCost += Double.parseDouble(first.getFirstPrice().replaceAll(",", "."));
+                            }
+
+                        }
+                    }
                 }
             }
         }
+        if (!isPriceList) {
+            fixedCost = numberOfGroupedEstateFormality.stream().mapToDouble(Double::doubleValue).sum();
+        }
+        if(fixedCost > 0d){
+            if(StringUtils.isNotBlank(result))
+                result += "<br/>";
+            result += "Costo ispezione ipotecaria: €" + fixedCost;
+        }
+
+//        if(!ValidationHelper.isNullOrEmpty(request.getService())
+//                && !ValidationHelper.isNullOrEmpty(request.getService().getIsUpdate()) &&
+//            request.getService().getIsUpdate()){
+//            CostCalculationHelper costCalculationHelper = new CostCalculationHelper(request);
+//            Boolean billingClient = isBillingClient(request);
+//            boolean restrictionForPriceList = restrictionForPriceList(request);
+//            List<PriceList> priceList = costCalculationHelper.loadPriceList(billingClient, restrictionForPriceList);
+//            if (!ValidationHelper.isNullOrEmpty(priceList)) {
+//                double fixedCost = 0;
+//                PriceList first = priceList.get(0);
+//                for (Integer i = 0; i < numberOfGroupsByDocumentOfEstateFormality; i++) {
+//                    if (!ValidationHelper.isNullOrEmpty(first.getNumberNextBlock())
+//                            && !ValidationHelper.isNullOrEmpty(first.getNextPrice())) {
+//                        if (numberOfGroupedEstateFormality.size() > i
+//                                && numberOfGroupedEstateFormality.get(i) > Double.parseDouble(first.getNumberFirstBlock())) {
+//                            double y = (numberOfGroupedEstateFormality.get(i) - Double.parseDouble(first.getNumberFirstBlock()))
+//                                    / Double.parseDouble(first.getNumberNextBlock());
+//                            y = Math.ceil(y);
+//                            double yCost = y * Double.parseDouble(first.getNextPrice().replaceAll(",", "."));
+//
+//                            fixedCost += yCost + Double.parseDouble(first.getFirstPrice().replaceAll(",", "."));
+//                        }
+//                    }
+//                }
+//                if(fixedCost > 0d){
+//                    if(StringUtils.isNotBlank(result))
+//                        result += "<br/>";
+//                    result += "Costo ispezione ipotecaria: €" + fixedCost;
+//                }
+//            }
+//        }
         return result;
     }
 

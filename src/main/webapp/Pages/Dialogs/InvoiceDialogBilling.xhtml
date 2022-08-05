@@ -639,6 +639,7 @@
                                         <p:inputText id="total_cost" value="#{key.invoiceTotalCost}" disabled="#{bean.invoiceSentStatus}"
                                                      styleClass="total_cost_#{key.counter}" onchange="updateTotalLine(this);" >
                                             <p:keyFilter mask="num" />
+                                            <f:convertNumber pattern="#0.00" locale="EN" />
                                         </p:inputText>
                                     </div>
                                     <div class="p-col-1">
@@ -671,6 +672,7 @@
                                         <h:outputText value="#{msg.totalLine}#{key.counter}"></h:outputText>
                                         <p:inputText id="total_line" value="#{key.totalLine}" styleClass="total_line_#{key.counter}" >
                                             <p:keyFilter mask="num" />
+                                            <f:convertNumber pattern="#0.00" locale="EN" />
                                         </p:inputText>
                                     </div>
 
@@ -727,6 +729,7 @@
                                 <div class="p-col-2">
                                     <p:inputText id="invoiceTotalAmount" value="#{bean.allTotalLine}" disabled="true">
                                         <p:keyFilter mask="num" />
+                                        <f:convertNumber pattern="#0.00" locale="EN" />
                                     </p:inputText>
                                 </div>
 
@@ -738,6 +741,7 @@
                                 <div class="p-col-2">
                                     <p:inputText id="invoiceToVAT" value="#{bean.totalVat}" disabled="true">
                                         <p:keyFilter mask="num" />
+                                        <f:convertNumber pattern="#0.00" locale="EN" />
                                     </p:inputText>
                                 </div>
 
@@ -753,6 +757,7 @@
                                 <div class="p-col-2">
                                     <p:inputText id="totalGA" value="#{bean.totalGrossAmount}" disabled="true">
                                         <p:keyFilter mask="num" />
+                                        <f:convertNumber pattern="#0.00" locale="EN" />
                                     </p:inputText>
                                 </div>
 
@@ -768,6 +773,7 @@
                                 <div class="p-col-2">
                                     <p:inputText value="#{bean.totalGrossAmount}" disabled="true">
                                         <p:keyFilter mask="num" />
+                                        <f:convertNumber pattern="#0.00" locale="EN" />
                                     </p:inputText>
                                 </div>
 
@@ -874,13 +880,20 @@
                         </div>
                         <p:panel id="table_div" widgetVar="paymentInvoicePanelWV">
                             <div class="p-col-12">
-                                <p:outputLabel  value="#{msg.amountToBeCollected} : #{bean.selectedInvoice.onBalance}" style="font-weight: 700 !important; float:right;"/>
+                            	<p:panel style="float:right;">
+                                	<p:outputLabel  value="#{msg.amountToBeCollected} : " style="font-weight: 700 !important;"/>
+                                	<p:outputLabel  value="#{bean.selectedInvoice.onBalance}" style="font-weight: 700 !important;">
+                                		<f:convertNumber pattern="#0.00" locale="EN"/>
+                                	</p:outputLabel>
+                                </p:panel>
                             </div>
                             <p:dataTable id="paymentInvoiceTable" value="#{bean.paymentInvoices}" emptyMessage="#{msg.noRecordsFound}" widgetVar="paymentInvoiceTableWV"
                                          var="paymentInvoice"  lazy="true"
                                          paginator="true" paginatorAlwaysVisible="true" rowIndexVar="rowId">
                                 <p:column headerText="#{msg.importAmount}">
-                                    <h:outputText value="#{paymentInvoice.paymentImport}"/>
+                                    <h:outputText value="#{paymentInvoice.paymentImport}">
+                                    	<f:convertNumber pattern="#0.00" locale="EN"/>
+                                	</h:outputText>
                                 </p:column>
                                 <p:column headerText="#{msg.date}">
                                     <h:outputText value="#{paymentInvoice.dateString}"/>
@@ -902,8 +915,16 @@
                         		</p:column>
                             </p:dataTable>
                             <div class="p-col-12">
-                                <p:outputLabel value="#{msg.totalPayments} : #{bean.selectedInvoice.totalPayment} #{msg.outOf} #{bean.selectedInvoice.totalGrossAmount}" 
-                                			   style="font-weight: 700 !important; float:right;"/>
+                             	<p:panel style="float:right;">
+	                              	<p:outputLabel value="#{msg.totalPayments} : " style="font-weight: 700 !important;"/>
+	                              	<p:outputLabel value="#{bean.selectedInvoice.totalPayment}" style="font-weight: 700 !important;">
+	                              		<f:convertNumber pattern="#0.00" locale="EN"/>
+	                              	</p:outputLabel>
+	                              	<p:outputLabel value=" #{msg.outOf} " style="font-weight: 700 !important;"/>
+	                              	<p:outputLabel id="paymentTotalGross" value="#{bean.selectedInvoice.totalGrossAmount}" style="font-weight: 700 !important;">
+	                              		<f:convertNumber for="paymentTotalGross" pattern="#0.00" locale="EN"/>
+	                              	</p:outputLabel>
+                              	</p:panel>
                             </div>
 
                         </p:panel>
@@ -1220,6 +1241,7 @@
                         <div class="p-col-8">
                             <p:inputText id="paymentAmount" value="#{bean.paymentAmount}" >
                                 <p:keyFilter mask="num" />
+                                <f:convertNumber pattern="#0.00" locale="EN" />
                             </p:inputText>
                         </div>
                         <div class="p-col-4 vertical-center" style="padding-bottom: 0px !important;">

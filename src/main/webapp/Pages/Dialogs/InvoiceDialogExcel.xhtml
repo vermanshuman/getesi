@@ -639,6 +639,7 @@
                                         <p:inputText id="total_cost" value="#{key.invoiceTotalCost}" disabled="#{invoiceDialogBean.invoiceSentStatus}"
                                                      styleClass="total_cost_#{key.counter}" onchange="updateTotalLine(this);" >
                                             <p:keyFilter mask="num" />
+                                            <f:convertNumber pattern="#0.00" locale="EN" />
                                         </p:inputText>
                                     </div>
                                     <div class="p-col-1">
@@ -671,6 +672,7 @@
                                         <h:outputText value="#{msg.totalLine}#{key.counter}"></h:outputText>
                                         <p:inputText id="total_line" value="#{key.totalLine}" styleClass="total_line_#{key.counter}" >
                                             <p:keyFilter mask="num" />
+                                            <f:convertNumber pattern="#0.00" locale="EN" />
                                         </p:inputText>
                                     </div>
 
@@ -727,6 +729,7 @@
                                 <div class="p-col-2">
                                     <p:inputText id="invoiceTotalAmount" value="#{invoiceDialogBean.allTotalLine}" disabled="true">
                                         <p:keyFilter mask="num" />
+                                        <f:convertNumber pattern="#0.00" locale="EN" />
                                     </p:inputText>
                                 </div>
 
@@ -738,6 +741,7 @@
                                 <div class="p-col-2">
                                     <p:inputText id="invoiceToVAT" value="#{invoiceDialogBean.totalVat}" disabled="true">
                                         <p:keyFilter mask="num" />
+                                        <f:convertNumber pattern="#0.00" locale="EN" />
                                     </p:inputText>
                                 </div>
 
@@ -753,6 +757,7 @@
                                 <div class="p-col-2">
                                     <p:inputText id="totalGA" value="#{invoiceDialogBean.totalGrossAmount}" disabled="true">
                                         <p:keyFilter mask="num" />
+                                        <f:convertNumber pattern="#0.00" locale="EN" />
                                     </p:inputText>
                                 </div>
 
@@ -768,6 +773,7 @@
                                 <div class="p-col-2">
                                     <p:inputText value="#{invoiceDialogBean.totalGrossAmount}" disabled="true">
                                         <p:keyFilter mask="num" />
+                                        <f:convertNumber pattern="#0.00" locale="EN" />
                                     </p:inputText>
                                 </div>
 
@@ -869,17 +875,25 @@
                     <div class="p-grid">
                         <div class="p-col-12">
                             <p:commandButton value=" #{msg.addPayment}" icon="fa fa-plus" oncomplete="PF('addPaymentDialogWV').show();"
+                            				 action="#{invoiceDialogBean.loadPaymentData(null)}" update="paymentAmount paymentTypeDescriptions paymentOutcomes"
                                              styleClass="ui-button-success p-mr-2 p-mb-2"/>
                         </div>
                         <p:panel id="table_div" widgetVar="paymentInvoicePanelWV">
                             <div class="p-col-12">
-                                <p:outputLabel  value="#{msg.amountToBeCollected} : #{invoiceDialogBean.selectedInvoice.onBalance}" style="font-weight: 700 !important; float:right;"/>
+                            	<p:panel style="float:right;">
+                                	<p:outputLabel  value="#{msg.amountToBeCollected} : " style="font-weight: 700 !important;"/>
+                                	<p:outputLabel  value="#{invoiceDialogBean.selectedInvoice.onBalance}" style="font-weight: 700 !important;">
+                                		<f:convertNumber pattern="#0.00" locale="EN"/>
+                                	</p:outputLabel>
+                                </p:panel>
                             </div>
                             <p:dataTable id="paymentInvoiceTable" value="#{invoiceDialogBean.paymentInvoices}" emptyMessage="#{msg.noRecordsFound}" widgetVar="paymentInvoiceTableWV"
                                          var="paymentInvoice"  lazy="true"
                                          paginator="true" paginatorAlwaysVisible="true" rowIndexVar="rowId">
                                 <p:column headerText="#{msg.importAmount}">
-                                    <h:outputText value="#{paymentInvoice.paymentImport}"/>
+                                    <h:outputText value="#{paymentInvoice.paymentImport}">
+                                    	<f:convertNumber pattern="#0.00" locale="EN"/>
+                                	</h:outputText>
                                 </p:column>
                                 <p:column headerText="#{msg.date}">
                                     <h:outputText value="#{paymentInvoice.dateString}"/>
@@ -887,13 +901,30 @@
                                 <p:column headerText="#{msg.description}">
                                     <h:outputText value="#{paymentInvoice.description}"/>
                                 </p:column>
-                                <p:column style="text-align: right;">
-                                    <p:commandButton icon="pi pi-pencil">
-                                    </p:commandButton>
+                                <p:column styleClass="action_column" exportable="false" style="text-align: right;">
+                                    <p:commandButton icon="pi pi-pencil" action="#{invoiceDialogBean.loadPaymentData(paymentInvoice)}" 
+                                    				 update="paymentAmount paymentDate paymentTypeDescriptions paymentOutcomes"
+                                                     oncomplete="PF('addPaymentDialogWV').show();">
+                                    </p:commandButton> 
                                 </p:column>
+                                <p:column styleClass="action_column" exportable="false" style="text-align: right;">
+                            		<p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn" 
+                            						 action="#{invoiceDialogBean.deleteInvoicePayment(paymentInvoice)}"
+                                               		 update="@widgetVar(paymentInvoicePanelWV)">
+                            		</p:commandButton>
+                        		</p:column>
                             </p:dataTable>
                             <div class="p-col-12">
-                                <p:outputLabel value="#{msg.totalPayments} : #{invoiceDialogBean.selectedInvoice.totalPayment} #{msg.outOf} #{invoiceDialogBean.selectedInvoice.totalGrossAmount}" style="font-weight: 700 !important; float:right;"/>
+                            	<p:panel style="float:right;">
+	                              	<p:outputLabel value="#{msg.totalPayments} : " style="font-weight: 700 !important;"/>
+	                              	<p:outputLabel value="#{invoiceDialogBean.selectedInvoice.totalPayment}" style="font-weight: 700 !important;">
+	                              		<f:convertNumber pattern="#0.00" locale="EN"/>
+	                              	</p:outputLabel>
+	                              	<p:outputLabel value=" #{msg.outOf} " style="font-weight: 700 !important;"/>
+	                              	<p:outputLabel id="paymentTotalGross" value="#{invoiceDialogBean.selectedInvoice.totalGrossAmount}" style="font-weight: 700 !important;">
+	                              		<f:convertNumber for="paymentTotalGross" pattern="#0.00" locale="EN"/>
+	                              	</p:outputLabel>
+                              	</p:panel>
                             </div>
 
                         </p:panel>
@@ -1207,8 +1238,9 @@
                             <h:outputText value="#{msg.importAmount}"/>
                         </div>
                         <div class="p-col-8">
-                            <p:inputText value="#{invoiceDialogBean.paymentAmount}" >
+                            <p:inputText id="paymentAmount" value="#{invoiceDialogBean.paymentAmount}" >
                                 <p:keyFilter mask="num" />
+                                <f:convertNumber pattern="#0.00" locale="EN" />
                             </p:inputText>
                         </div>
                         <div class="p-col-4 vertical-center" style="padding-bottom: 0px !important;">
@@ -1225,11 +1257,24 @@
                             </p:calendar>
                         </div>
                         <div class="p-col-4 vertical-center" style="padding-bottom: 0px !important;">
-                            <h:outputText value="#{msg.description}"/>
+                            <h:outputText value="#{msg.paymentType}"/>
                         </div>
                         <div class="p-col-8">
-                            <p:inputText value="#{invoiceDialogBean.paymentDescription}" >
-                            </p:inputText>
+                        	<p:selectOneMenu id="paymentTypeDescriptions" value="#{invoiceDialogBean.selectedPaymentTypeDescription}" 
+                        				style="width:100%;" label="#{msg.paymentType}">
+                            	<f:selectItems value="#{invoiceDialogBean.paymentTypeDescriptions}"/>
+                            	<p:ajax event="itemSelect" listener="#{invoiceDialogBean.invoicePaymentTypeListner}" update="paymentOutcomes"/>
+                            </p:selectOneMenu>
+                        </div>
+                        <div class="p-col-4 vertical-center" style="padding-bottom: 0px !important;">
+                            <h:outputText value="#{msg.paymentOutcome}"/>
+                        </div>
+                        <div class="p-col-8">
+                            <p:selectOneMenu id="paymentOutcomes" value="#{invoiceDialogBean.selectedPaymentOutcome}" 
+                        				style="width:100%;" label="#{msg.paymentOutcome}">
+                            	<f:selectItems value="#{invoiceDialogBean.paymentOutcomes}"/>
+                            	<p:ajax event="itemSelect" update="@this"/>
+                            </p:selectOneMenu>
                         </div>
                         <div class="p-col-12" style="text-align:center;">
                             <p:commandButton oncomplete="PF('addPaymentDialogWV').hide();"

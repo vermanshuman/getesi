@@ -2306,7 +2306,7 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     });
                 }
                 //            setEmailBodyToEditor(getEntity().getEmailBodyToEditor());
-                setEmailBodyToEditor(createInvoiceEmailDefaultBody(invoice));
+                setEmailBodyToEditor(invoiceDialogBean.createInvoiceEmailDefaultBody(invoice));
             }
         }
     }
@@ -3276,13 +3276,13 @@ public class MailManagerViewBean extends EntityViewPageBean<WLGInbox> implements
                     requestType = requestType + " + ";
                 requestType = requestType + request;
             }
-            
+
             String emailsFrom = DaoManager.loadField(WLGServer.class, "login",
                     String.class, new Criterion[]{Restrictions.eq("id", Long.parseLong(
                             ApplicationSettingsHolder.getInstance().getByKey(ApplicationSettingsKeys.SENT_SERVER_ID)
                                     .getValue()))}).get(0);
             String mail_footer = MAIL_FOOTER.replace("info@brexa.it", emailsFrom);
-            
+
             emailBody = dearCustomer + ",</br>"
                     + attachedCopyMessage + "</br></br>"
                     + "<table style='border:none;'>"

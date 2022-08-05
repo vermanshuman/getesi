@@ -284,8 +284,12 @@ public class InvoiceHelper {
                         if(isServiceUpdate){
                             numberOfGroupedEstateFormality = Collections.singletonList(getNumActs(request.getId()).doubleValue());
                             numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
+                        }else if (!ValidationHelper.isNullOrEmpty(request.getNumberActUpdate()) && request.getNumberActUpdate() > 0) {
+                            numberOfGroupedEstateFormality = Collections.singletonList(request.getNumberActUpdate());
+                            numberOfGroupsByDocumentOfEstateFormality = numberOfGroupedEstateFormality.size();
                         }
-                        
+
+
                         if (!ValidationHelper.isNullOrEmpty(request.getRequestFormalities())) {
                         	if(!Hibernate.isInitialized(request.getRequestFormalities())){
                                 Hibernate.initialize(request.getRequestFormalities());

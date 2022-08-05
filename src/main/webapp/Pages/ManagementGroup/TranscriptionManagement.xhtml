@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                template="/resources/tpl/Admin/FormBase.xhtml">
+    <ui:param name="bean" value="#{transcriptionManagementBean}"/>
+    <ui:param name="view_title" value="#{msg.transcriptionManagement}"/>
+    <ui:param name="goBackRendered" value="false"/>
+    <ui:param name="showSave" value="false"/>
+    <ui:param name="showCancel" value="false"/>
+
+    <ui:define name="form_body">
+        <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/transcriptionManagement.css"
+              media="all" rel="stylesheet" type="text/css"/>
+        <style>
+
+        </style>
+        <p:tabView widgetVar="transcriptionWizard" id="wizard" activeIndex="#{bean.activeTabIndex}">
+            <p:tab id="wizardTabLETTER" title="#{msg.wizardTabLETTER.toUpperCase()}">
+                <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                             columnClasses="ui-grid-col-2, ui-grid-col-4">
+                    <h:outputLabel for="transcriptionManagementAmount" value="#{msg.transcriptionManagementAmount}"/>
+                    <p:inputNumber id="transcriptionManagementAmount" label="#{msg.transcriptionManagementAmount}"
+                        value="#{bean.entity.transcriptionAmount}"/>
+                    <h:outputLabel for="transcriptionManagementRevenue" value="#{msg.transcriptionManagementRevenue}"/>
+                    <p:inputText styleClass="input-width"
+                                 maxlength="200" id="transcriptionManagementRevenue" label="#{msg.transcriptionManagementRevenue}"
+                                 value="#{bean.entity.numberRevenueStamp}">
+                        <p:keyFilter mask="pint" />
+                    </p:inputText>
+                    <h:outputLabel for="transcriptionManagementBrand" value="#{msg.transcriptionManagementBrand}"/>
+                    <p:inputText styleClass="input-width"
+                                 maxlength="200" id="transcriptionManagementBrand" label="#{msg.transcriptionManagementBrand}"
+                                 value="#{bean.entity.numberServiceStamp}">
+                        <p:keyFilter mask="pint" />
+                    </p:inputText>
+                    <h:outputLabel for="transcriptionManagementPacket" value="#{msg.transcriptionManagementPacket}"/>
+                    <p:inputText styleClass="input-width"
+                                 maxlength="200" id="transcriptionManagementPacket" label="#{msg.transcriptionManagementPacket}"
+                                 value="#{bean.entity.packetNumber}">
+                        <p:keyFilter mask="pint" />
+                    </p:inputText>
+                    <h:outputLabel for="transcriptionManagementEnvelope" value="#{msg.transcriptionManagementRevenue}"/>
+                    <p:selectBooleanCheckbox id="transcriptionManagementEnvelope"
+                                             styleClass="booleanCheckbox" value="#{bean.entity.envelopStamp}"/>
+                    <h:outputLabel for="transcriptionManagementMobile" value="#{msg.transcriptionManagementMobile}"/>
+                    <p:selectBooleanCheckbox id="transcriptionManagementMobile" styleClass="booleanCheckbox"
+                                             value="#{bean.entity.userPhone}"/>
+                </p:panelGrid>
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.save}" styleClass="green-button align-right"
+                                         action="#{bean.saveTranscription}" update="@form"/>
+                </p:outputPanel>
+                <br/>
+                <br/>
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                    <p:commandButton value="#{msg.transcriptionManagementLetterInvite}"
+                                     styleClass="green-button align-right" disabled="true"/>
+                </p:outputPanel>
+            </p:tab>
+            <p:tab id="wizardTabCOURIERSERVICE" title="#{msg.wizardTabCourierService.toUpperCase()}">
+                <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"  style="width: 100%" id="panelGrid"
+                             columnClasses="ui-grid-col-2, ui-grid-col-1, ui-grid-col-1, ui-grid-col-4">
+                    <h:outputLabel for="transcriptionCourierReservation" value="#{msg.transcriptionCourierReservation}:"/>
+                    <p:selectBooleanCheckbox id="transcriptionCourierReservation" styleClass="booleanCheckbox"
+                        value="#{bean.entity.courierEnvelope}"/>
+                    <h:outputLabel for="transcriptionCourierDate" value="#{msg.transcriptionDate}:"/>
+                    <p:calendar id="transcriptionCourierDate" value="#{bean.entity.courierEnvelopeDate}"
+                                pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                converter="fullDateTimeConverter"/>
+
+                    <h:outputText value="#{msg.transcriptionCourierLabel}" style="font-weight:bold"/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+
+                    <p:fileUpload fileUploadListener="#{bean.handleCourierFileUpload}" label="#{msg.upload}" value="#{bean.courierDocument}"
+                                   mode="advanced" auto="true" styleClass="special-upload" update="panelGrid"/>
+                    <p:panel style="margin-top: 6px; width: 400px;" id="courierFilePanel" rendered="#{not empty bean.courierFileName}">
+                    	<h:outputText id="courierFileName" value="#{bean.courierFileName}" />
+                    	<p:commandButton icon="fa fa-cloud-download" title="#{msg.download}" update=":form, messages"
+                                     	 ajax="false" action="#{bean.downloadCourierDocument}"
+                                         style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                        </p:commandButton>
+                    	<p:commandButton icon="fa fa-close" title="#{msg.delete}" update="panelGrid"
+                                         ajax="true" action="#{bean.deleteCourierDocument}"
+                                         style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                        </p:commandButton>
+                    </p:panel>
+                    <h:outputText value="" rendered="#{empty bean.courierFileName}"/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+
+                    <p:outputPanel styleClass="transaction-date">
+                        <p:outputPanel style="width: 100px;padding-top: 4px;">
+                            <h:outputText value="#{msg.transactionDateLabel}:" style="font-weight:bold"/>
+                        </p:outputPanel>
+                        <p:calendar id="expirationNote"
+                                    pattern="dd/MM/yyyy" style="width: 200px;" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.entity.expirationNote}"/>
+                    </p:outputPanel>
+
+                </p:panelGrid>
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.save}" styleClass="green-button align-right"
+                                         action="#{bean.saveTranscription}" update="@form"/>
+                </p:outputPanel>
+                <br/>
+                <br/>
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                    <p:commandButton value="#{msg.transcriptionManagementSendNote}"
+                                     styleClass="green-button align-right" disabled="true"/>
+                </p:outputPanel>
+                <br/>
+                <br/>
+            </p:tab>
+            <p:tab id="wizardTabEXPENSEREPORT" title="#{msg.wizardTabExpenseReport.toUpperCase()}">
+                <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                             columnClasses="ui-grid-col-2, ui-grid-col-4">
+                    <h:outputLabel for="transcriptionMortgageCost" value="#{msg.transcriptionMortgageCost}"/>
+                    <p:inputNumber id="transcriptionMortgageCost"
+                                   label="#{msg.transcriptionMortgageCost}"/>
+
+                    <h:outputLabel for="transcriptionShippingCost" value="#{msg.transcriptionShippingCost}"/>
+                    <p:inputNumber id="transcriptionShippingCost"
+                                   label="#{msg.transcriptionShippingCost}"/>
+                </p:panelGrid>
+
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                    <p:commandButton value="#{msg.transcriptionPDFReport.toUpperCase()}"/>
+                </p:outputPanel>
+
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                    <p:commandButton value="#{msg.save}" styleClass="green-button align-right"
+                                     action="#{bean.saveTranscription}" update="@form"/>
+                </p:outputPanel>
+                <br/>
+                <br/>
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                    <p:commandButton value="#{msg.transcriptionManagementSendInvoice}"
+                                     styleClass="green-button align-right" disabled="true"/>
+                </p:outputPanel>
+            </p:tab>
+            <p:tab id="wizardTabSEND" title="#{msg.wizardTabSend.toUpperCase()}">
+                <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                             columnClasses="ui-grid-col-2, ui-grid-col-1, ui-grid-col-1, ui-grid-col-4">
+                    <h:outputText value="#{msg.transcriptionInvoiceLabel}" style="font-weight:bold"/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+                    <p:fileUpload label="#{msg.upload}"
+                                  multiple="false" mode="advanced" styleClass="special-upload" auto="true"/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+                    <p:outputPanel styleClass="transaction-date">
+                        <p:outputPanel style="width: 100px;padding-top: 4px;">
+                            <h:outputText value="#{msg.transactionDateLabel}:" style="font-weight:bold"/>
+                        </p:outputPanel>
+                        <p:calendar id="expirationDuplo"
+                                    pattern="dd/MM/yyyy" style="width: 200px;" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.entity.expirationDuplo}"/>
+                    </p:outputPanel>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+                    <h:outputLabel for="transcriptionInviteDHL" value="#{msg.transcriptionInviteDHL}:"/>
+                    <p:selectBooleanCheckbox id="transcriptionInviteDHL" styleClass="booleanCheckbox"
+                     value="#{bean.entity.courierClient}"/>
+                    <h:outputLabel for="transcriptionInviteDate" value="#{msg.transcriptionDate}:"/>
+                    <p:calendar id="transcriptionInviteDate"
+                                pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                converter="fullDateTimeConverter" value="#{bean.entity.expirationCourierClient}"/>
+
+                </p:panelGrid>
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                    <p:commandButton value="#{msg.save}" styleClass="green-button align-right"
+                                     action="#{bean.saveTranscription}" update="@form"/>
+                </p:outputPanel>
+                <br/>
+                <br/>
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                    <p:commandButton value="#{msg.transcriptionManagementSendInvite}"
+                                     styleClass="green-button align-right" disabled="true"/>
+                </p:outputPanel>
+                <br/>
+                <br/>
+            </p:tab>
+        </p:tabView>
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                     columnClasses="ui-grid-col-2, ui-grid-col-4">
+            <h:outputLabel for="transcriptionExpirationDate" value="#{msg.transcriptionRequestDeadline}"/>
+            <p:calendar id="transcriptionExpirationDate"
+                        pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                        converter="fullDateTimeConverter" value="#{bean.entity.expiration}"/>
+        </p:panelGrid>
+    </ui:define>
+</ui:composition>
