@@ -568,6 +568,10 @@
                 background: #e9ecef !important;
             }
 
+            #selected-row {
+                background: #a9a9a970 !important;
+            }
+
             /* body .ui-widget, body .ui-widget .ui-widget {
                 font-family: "Open Sans","Helvetica Neue",sans-serif;
                 text-decoration: none;
@@ -1323,7 +1327,18 @@
 
                             </div>
                         </ui:fragment>
-
+                        <script type="text/javascript">
+                            // <![CDATA[
+                            jQuery(document).ready(function() {
+                                $(document).on('click', '#invoiceTable_data tr', function () {
+                                    $('#invoiceTable_data tr').attr('id','');
+                                    $(this).attr('id','selected-row');
+                                    // For more classes: .toggle('class1 class2'); - will remove what exists and add what is missing
+                                    // For more precise toggling: .toggle('classN', trueIfToAdd)
+                                });
+                            });
+                            // ]]>
+                        </script>
                         <p:dataTable id="invoiceTable" value="#{bean.lazyModel}" emptyMessage="#{msg.noRecordsFound}"
                                      var="invoice" rows="15" lazy="true"
                                      paginator="true" paginatorAlwaysVisible="true" rowIndexVar="rowId"
@@ -1381,7 +1396,7 @@
                                     <p:commandLink id="actionPnl" global="false" style="outline: none;" immediate="true"
                                                    readonly="true">
                                         <i class="menu-dots-icon" style="font-size: x-large;"
-                                           onmouseover="document.getElementById('invoiceTable:#{rowId}:actionPnl').focus();" />
+                                           onclick="document.getElementById('invoiceTable:#{rowId}:actionPnl').focus();" />
                                     </p:commandLink>
                                     <p:tooltip for="actionPnl" hideEvent="blur" showEvent="focus" styleClass="actionPnl-tooltip">
                                         <p:outputPanel id="actionGrid" styleClass="actionPnl-panel">
@@ -1432,7 +1447,7 @@
                                     <i class="email-check-icon"></i>
                                     <p:commandLink id="actionPnl1" global="false" style="outline: none;" immediate="true" readonly="true">
                                         <i class="menu-dots-icon" style="font-size: x-large;"
-                                           onmouseover="document.getElementById('invoiceTable:#{rowId}:actionPnl1').focus();" />
+                                           onclick="document.getElementById('invoiceTable:#{rowId}:actionPnl1').focus();" />
                                     </p:commandLink>
                                     <p:tooltip for="actionPnl1" hideEvent="blur" showEvent="focus" styleClass="actionPnl-tooltip">
                                         <p:outputPanel id="actionGrid1" styleClass="actionPnl-panel">
