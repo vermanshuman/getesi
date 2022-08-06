@@ -18,6 +18,25 @@
             .to-bottom-text td.ui-panelgrid-cell {
                 vertical-align: bottom !important;
             }
+
+            body .ui-fieldset .ui-fieldset-legend {
+                background-color: #788FA7 !important;
+                color: #ffffff;
+                padding: 0.6em 1em;
+                font-size: 15px;
+                font-weight: normal;
+            }
+            fieldset div {
+                text-align: left !important;
+            }
+            .additional_button button {
+                margin-right: 0.2em;
+            }
+            .pdf-button {
+                background-color: #FFFFFF !important;
+                color: #AD0B00 !important;
+                width: 100px !important;
+            }
         </style>
         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group to-bottom-text">
             <h:outputText style="font-size: 20px" value="#{msg.formalityTitle}"/>
@@ -361,8 +380,8 @@
 		<p:commandButton action="#{bean.goTextEdit}"
 			value="#{msg.requestPrintRequestEvent}"
 			rendered="#{bean.showButtons}" />
-		<p:commandButton action="#{bean.downloadFormalityPdf}" 
-			value="#{msg.pdf}" 
+		<p:commandButton action="#{bean.downloadFormalityPdf}" icon="pdf-icon"
+			value="#{msg.pdf}" styleClass="pdf-button" style="border: 1px solid #AD0B00 !important;"
 			rendered="#{bean.showButtons}" ajax="false"/>
 	</ui:define>
     
