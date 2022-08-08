@@ -64,8 +64,11 @@
             .additional_button div {
                 text-align: center !important;
             }
+            #groupFieldset {
+                border: none !important;
+                padding: 0 !important;
+            }
         </style>
-        <!--<p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group to-bottom-text">-->
 
         <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group">
             <h:outputText  value="#{msg.formalityTitle}"/>
@@ -78,7 +81,7 @@
 
             <p:selectOneMenu  value="#{bean.selectedType}">
                 <f:selectItems value="#{bean.types}"/>
-                <p:ajax listener="#{bean.showPartsOfSectionABySelectedType}" update=":selectedTypeUpdate"/>
+                <p:ajax listener="#{bean.showPartsOfSectionABySelectedType}" update="formalitySectionA"/>
             </p:selectOneMenu>
 
             <h:outputText value="#{msg.formalityGeneralRegister}"/>
@@ -97,12 +100,9 @@
 
 
         </p:panelGrid>
-        <!--            <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group">
 
-                    </p:panelGrid>-->
-        <!--</p:panelGrid>-->
-        <p:fieldset legend="#{msg.formalitySectionA}" collapsed="false" toggleable="true" id="formalitySectionA">
-            test - #{bean.typeAtto}
+        <p:fieldset id="groupFieldset">
+            <p:fieldset legend="#{msg.formalitySectionA}" collapsed="false" toggleable="true" id="formalitySectionA">
             <h:outputText style="font-size: 20px" value="#{msg.formalityDataRelation}"/>
             <p:panelGrid columns="4"
                          styleClass="ui-panelgrid-blank form-group">
@@ -139,7 +139,6 @@
                 <p:inputText id="safc" value="#{bean.sectionA.fiscalCode}" />
 
             </p:panelGrid>
-            <ui:fragment id="selectedTypeUpdate">
             <h:outputText style="font-size: 20px" value="#{msg.formalityAnnotationDate}"
                           rendered="#{bean.typeAtto=='ANNOTAMENTO'}"/>
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
@@ -159,9 +158,10 @@
 
             </p:panelGrid>
             <h:outputText style="font-size: 20px" value="#{msg.formalityDataPrivilege}"
-                          rendered="#{bean.typeAtto=='ISCRIZIONE'}" id="formalityDataPrivilegeText"/>
+                          rendered="#{bean.typeAtto=='ISCRIZIONE'}"/>
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
-                         rendered="#{bean.typeAtto=='ISCRIZIONE'}" id="formalityDataPrivilege">
+                         rendered="#{bean.typeAtto=='ISCRIZIONE'}"
+            >
 
                 <h:outputText value="#{msg.formalityTypePrivilege}"/>
                 <p:inputText value="#{bean.sectionA.mortgageSpecies}" styleClass="input-width"/>
@@ -250,6 +250,7 @@
                 <h:outputText value=""/>
                 <h:outputText value=""/>
             </p:panelGrid>
+            </p:fieldset>
         </p:fieldset>
 
         <br/>
