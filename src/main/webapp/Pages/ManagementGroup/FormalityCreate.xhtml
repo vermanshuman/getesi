@@ -61,7 +61,9 @@
                 border-color: #808080 !important;
                 color: #5f666c !important;
             }
-
+            .additional_button div {
+                text-align: center !important;
+            }
         </style>
         <!--<p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group to-bottom-text">-->
 
@@ -76,7 +78,7 @@
 
             <p:selectOneMenu  value="#{bean.selectedType}">
                 <f:selectItems value="#{bean.types}"/>
-                <p:ajax listener="#{bean.showPartsOfSectionABySelectedType}" update="formalitySectionA"/>
+                <p:ajax listener="#{bean.showPartsOfSectionABySelectedType}" update=":selectedTypeUpdate"/>
             </p:selectOneMenu>
 
             <h:outputText value="#{msg.formalityGeneralRegister}"/>
@@ -100,6 +102,7 @@
                     </p:panelGrid>-->
         <!--</p:panelGrid>-->
         <p:fieldset legend="#{msg.formalitySectionA}" collapsed="false" toggleable="true" id="formalitySectionA">
+            test - #{bean.typeAtto}
             <h:outputText style="font-size: 20px" value="#{msg.formalityDataRelation}"/>
             <p:panelGrid columns="4"
                          styleClass="ui-panelgrid-blank form-group">
@@ -136,6 +139,7 @@
                 <p:inputText id="safc" value="#{bean.sectionA.fiscalCode}" />
 
             </p:panelGrid>
+            <ui:fragment id="selectedTypeUpdate">
             <h:outputText style="font-size: 20px" value="#{msg.formalityAnnotationDate}"
                           rendered="#{bean.typeAtto=='ANNOTAMENTO'}"/>
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
@@ -155,10 +159,9 @@
 
             </p:panelGrid>
             <h:outputText style="font-size: 20px" value="#{msg.formalityDataPrivilege}"
-                          rendered="#{bean.typeAtto=='ISCRIZIONE'}"/>
+                          rendered="#{bean.typeAtto=='ISCRIZIONE'}" id="formalityDataPrivilegeText"/>
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
-                         rendered="#{bean.typeAtto=='ISCRIZIONE'}"
-            >
+                         rendered="#{bean.typeAtto=='ISCRIZIONE'}" id="formalityDataPrivilege">
 
                 <h:outputText value="#{msg.formalityTypePrivilege}"/>
                 <p:inputText value="#{bean.sectionA.mortgageSpecies}" styleClass="input-width"/>
@@ -433,14 +436,14 @@
                     <h:outputText value="#{subj.numberVAT}"/>
                 </p:column>
                 <p:column styleClass="action_column">
-                    <p:commandButton icon="ui-icon ui-icon-pencil" update=":form"
+                    <p:commandButton icon="pi pi-pencil" update=":form"
                                      oncomplete="PF('sectionCAddDlgWV').show();"
                                      action="#{bean.handleEditSubject(subj,bean.aFavoreSectionC)}">
                     </p:commandButton>
                 </p:column>
 
                 <p:column styleClass="action_column">
-                    <p:commandButton icon="ui-icon ui-icon-close" update=":form"
+                    <p:commandButton icon="pi pi-times" update=":form"
                                      action="#{bean.handleDeleteSubject(subj,bean.aFavoreSectionC)}">
                     </p:commandButton>
                 </p:column>
