@@ -1,5 +1,7 @@
 package it.nexera.ris.web.beans.pages;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import it.nexera.ris.api.ApiFacade;
 import it.nexera.ris.common.enums.*;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.*;
@@ -8,19 +10,26 @@ import it.nexera.ris.persistence.UserHolder;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.*;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
-import it.nexera.ris.persistence.beans.entities.domain.readonly.RequestShort;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import it.nexera.ris.persistence.view.ClientView;
-import it.nexera.ris.persistence.view.RequestView;
+import it.nexera.ris.persistence.view.RequestSubjectView;
 import it.nexera.ris.web.beans.EntityLazyListPageBean;
+import it.nexera.ris.web.beans.wrappers.AZRequestWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.RequestStateWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.RequestTypeFilterWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.ServiceFilterWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.UserFilterWrapper;
 import it.nexera.ris.web.common.EntityLazyListModel;
 import it.nexera.ris.web.common.ListPaginator;
+import it.nexera.ris.web.dto.AZSendRequestDTO;
+import it.nexera.ris.web.dto.AZSendRequestResponseDTO;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.HibernateException;
@@ -29,6 +38,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
+import org.primefaces.context.RequestContext;
 import org.primefaces.model.SortOrder;
 
 import javax.faces.application.FacesMessage;
@@ -43,9 +53,11 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+
 @ManagedBean(name = "requestListBean")
 @ViewScoped
-public class RequestListBean extends EntityLazyListPageBean<RequestView>
+public class RequestListBean extends EntityLazyListPageBean<RequestSubjectView>
         implements Serializable {
 
     private static transient final Log log = LogFactory.getLog(RequestListBean.class);
@@ -110,7 +122,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     private List<Criterion> filterRestrictions;
 
-    private List<RequestView> allRequestViewsToModify;
+    private List<RequestSubjectView> allRequestSubjectViewsToModify;
 
     private String selectedUserType;
 
@@ -160,9 +172,81 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     private Integer pageNumber;
 
+    private Integer requestType;
+
     @Getter
     @Setter
     private ListPaginator paginator;
+
+    private boolean resetSettingPanel = true;
+
+    String filterState = null;
+
+    @Getter
+    @Setter
+    private List<Request> sendToBrexaRequests;
+
+    @Getter
+    @Setter
+    private Long selectedAZRequestId;
+
+    @Getter
+    @Setter
+    private List<AZRequestWrapper> azServices;
+
+    @Getter
+    @Setter
+    private List<AZRequestWrapper> selectedAZServices;
+
+    @Getter
+    @Setter
+    private EntityLazyListModel brexaLazyModel;
+
+    @Getter
+    @Setter
+    private String azApiErrorMessage;
+
+    private boolean selectAllSendToBrexaRequests = false;
+
+    @Getter
+    @Setter
+    private TranscriptionAndCertificationHelper transcriptionAndCertificationHelper;
+
+    @Getter
+    @Setter
+    private List<AZRequestWrapper> sendToAzRequests;
+
+    @Getter
+    @Setter
+    private List<AZRequestWrapper> selectedAZRequests;
+
+    @Getter
+    @Setter
+    private List<SelectItem> suppliers;
+
+    @Getter
+    @Setter
+    private Long selectedSupplierId;
+
+    @Getter
+    @Setter
+    private Boolean disableAllRowCheck;
+
+    @Getter
+    @Setter
+    private Boolean azCheckTop;
+
+    @Getter
+    @Setter
+    private Boolean azCheckBottom;
+    
+    @Getter
+    @Setter
+    private String cancelRequestComment;
+    
+    @Getter
+    @Setter
+    private Long cancelRequestId;
 
     private static final String KEY_CLIENT_ID = "KEY_CLIENT_ID_SESSION_KEY_NOT_COPY";
     private static final String KEY_STATES = "KEY_STATES_SESSION_KEY_NOT_COPY";
@@ -186,6 +270,13 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             PersistenceBeanException, InstantiationException,
             IllegalAccessException, IOException {
 
+        Map<String, Object> viewMap = FacesContext.getCurrentInstance().getViewRoot().getViewMap();
+        RequestEditBean requestEditBean = (RequestEditBean) viewMap.get("requestEditBean");
+        if (ValidationHelper.isNullOrEmpty(SessionHelper.get("loadRequestFilters"))
+                && ValidationHelper.isNullOrEmpty(requestEditBean)) {
+            clearFilterValueFromSession();
+        }
+
         setPaginator(new ListPaginator(10, 1, 1, 1,
                 "DESC", "createDate"));
 
@@ -201,10 +292,12 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         setRequestTypeWrappers(new ArrayList<>());
         setRequestTypesForSelect(new ArrayList<>());
 
-
         setClients(ComboboxHelper.fillList(DaoManager.load(Client.class, new Criterion[]{
                 Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
-                        Restrictions.isNull("deleted"))
+                        Restrictions.isNull("deleted"),
+                        Restrictions.or(
+                                Restrictions.eq("brexa", Boolean.FALSE),
+                                Restrictions.isNull("brexa")))
         }).stream()
                 .filter(c -> (
                                 (ValidationHelper.isNullOrEmpty(c.getManager()) || !c.getManager()) &&
@@ -214,12 +307,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
         setRequestTypes(ComboboxHelper.fillList(RequestType.class, Boolean.FALSE));
         if (getRequestTypes().size() > 0) {
-            Collections.sort(getRequestTypes(), new Comparator<SelectItem>() {
-                @Override
-                public int compare(final SelectItem object1, final SelectItem object2) {
-                    return object1.getLabel().toUpperCase().compareTo(object2.getLabel().toUpperCase());
-                }
-            });
+            Collections.sort(getRequestTypes(), (object1, object2) -> object1.getLabel().toUpperCase().compareTo(object2.getLabel().toUpperCase()));
         }
 
         setServiceTypes(ComboboxHelper.fillList(Service.class, Boolean.TRUE));
@@ -246,7 +334,9 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         List<User> notExternalCategoryUsers = DaoManager.load(User.class
                 , new Criterion[]{Restrictions.or(
                         Restrictions.eq("category", UserCategories.INTERNO),
-                        Restrictions.isNull("category"))});
+                        Restrictions.isNull("category")), Restrictions.eq("status", UserStatuses.ACTIVE),
+                        Restrictions.isNotNull("getesi"),
+                        Restrictions.eq("getesi", Boolean.TRUE)});
 
         notExternalCategoryUsers.forEach(u -> getUserWrappers().add(new UserFilterWrapper(u)));
 
@@ -294,17 +384,11 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         } else {
             setExpirationDays(null);
             Arrays.asList(RequestState.values()).forEach(st -> getStateWrappers()
-                    .add(new RequestStateWrapper(PageTypes.REPORT_LIST.equals(getCurrentPage())
-                            ? RequestState.EVADED.equals(st) : st.isNeedShow(), st)));
+                    .add(new RequestStateWrapper(false, st)));
 
             List<RequestType> requestTypes = DaoManager.load(RequestType.class, new Criterion[]{Restrictions.isNotNull("name")});
             if (!ValidationHelper.isNullOrEmpty(requestTypes)) {
-                Collections.sort(requestTypes, new Comparator<RequestType>() {
-                    @Override
-                    public int compare(final RequestType object1, final RequestType object2) {
-                        return object1.toString().toUpperCase().compareTo(object2.toString().toUpperCase());
-                    }
-                });
+                Collections.sort(requestTypes, Comparator.comparing(object -> object.toString().toUpperCase()));
                 requestTypes.forEach(r -> getRequestTypeWrappers().add(new RequestTypeFilterWrapper(r)));
             }
 
@@ -321,7 +405,14 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             SessionHelper.removeObject("REQUEST_LIST_FILTER_BY");
         }
         loadFilterValueFromSession();
+        if(StringUtils.isNotBlank(getSearchLastName()) || StringUtils.isNotBlank(getSearchFiscalCode())
+                || StringUtils.isNotBlank(getSearchCreateUser())){
+            filterState = "true";
+        }
         filterTableFromPanel();
+        setTranscriptionAndCertificationHelper(new TranscriptionAndCertificationHelper());
+        this.setSuppliers(ComboboxHelper.fillList(Supplier.class, Order.asc("name"),
+                Restrictions.eq("getesi", Boolean.TRUE)));
     }
 
     public void loadRequestDocuments() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -386,7 +477,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
             Request request = DaoManager.get(Request.class, downloadRequestId);
 
-            String body = getPdfRequestBody(request);
+            String body = RequestHelper.getPdfRequestBody(request);
             updateFilterValueInSession();
 
             FileHelper.sendFile("richiesta-" + request.getStrId() + ".pdf",
@@ -397,363 +488,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         }
     }
 
-    public static String getPdfRequestBody(Request request) {
-        return getFirstPart(request) + getSecondPart(request) +
-                getThirdPart(request);
-    }
-
-    public static String getPdfRequestBody(Request request, Subject subject) {
-        return getFirstPart(request, subject) + getSecondPart(request, subject) +
-                getThirdPart(request, subject);
-    }
-
-    public static String getThirdPart(Request request) {
-        return ((request == null) || (request.getSubject() == null)) ? "" :
-                getThirdPart(request, request.getSubject());
-    }
-
-    public static String getThirdPart(Request request, Subject subject) {
-        String thirdPart = "";
-
-        try {
-
-            if (!ValidationHelper.isNullOrEmpty(subject)) {
-
-                thirdPart += "<hr/>";
-                thirdPart += "<b>Richieste</b>:<br/>";
-
-                List<RequestShort> requestList;
-                List<Criterion> criteria = new ArrayList<Criterion>();
-
-                List<Long> subjectsIds = EstateSituationHelper.getIdSubjects(request);
-                subjectsIds.add(subject.getId());
-
-                criteria.add(Restrictions.in("subject.id", subjectsIds));
-
-                if (request != null)
-                    criteria.add(Restrictions.ne("id", request.getId()));
-
-                criteria.add(Restrictions.or(Restrictions.eq("isDeleted", false),
-                        Restrictions.isNull("isDeleted")));
-
-                requestList = DaoManager.load(RequestShort.class, criteria.toArray(new Criterion[0]),
-                        Order.desc("createDate"));
-
-
-                for (RequestShort r : requestList) {
-                    thirdPart +=
-                            (request.getSubject().getId().equals(r.getSubject().getId()) ? "" : "PRES - ") +
-                                    r.getCreateDateStr() +
-                                    " - " +
-                                    r.getClientName() +
-                                    " - " +
-                                    r.getServiceName() +
-                                    " - " +
-                                    r.getAggregationLandChargesRegistryName() +
-                                    "<br/>";
-
-                    if (!ValidationHelper.isNullOrEmpty(r.getMultipleServices())) {
-                        thirdPart += "<ul>";
-                        for (Service service : r.getMultipleServices()) {
-                            thirdPart += "<li>";
-                            thirdPart += service.getName();
-                            thirdPart += "</li>";
-                        }
-                        thirdPart += "</ul>";
-                    }
-                }
-
-                List<RequestOLD> requestOLDS = DaoManager.load(RequestOLD.class, new Criterion[]{
-                        subject.getTypeIsPhysicalPerson() ?
-                                Restrictions.eq("fiscalCodeVat", subject.getFiscalCode()) :
-                                Restrictions.eq("fiscalCodeVat", subject.getNumberVAT())});
-
-                for (RequestOLD old : requestOLDS) {
-                    thirdPart +=
-                            old.getRequestDateString() + " - " +
-                                    old.getClient() + " - " +
-                                    old.getType() + " - " +
-                                    old.getLandChargesRegistry() +
-                                    "<br/>";
-                }
-//                
-//                if(!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
-//                    thirdPart += "<ul>";
-//                    for(Service service : request.getMultipleServices()) {
-//                        thirdPart += "<li>";
-//                        thirdPart += service.getName();
-//                        thirdPart += "</li>";
-//                    }
-//                    thirdPart += "</ul>";
-//                }
-
-                thirdPart += "<br/>";
-
-                thirdPart += "<hr/>";
-
-                thirdPart += "<b>Visure a testo:</b><br/>";
-
-                List<VisureRTF> visureRTFS = DaoManager.load(VisureRTF.class, new Criterion[]{
-                        subject.getTypeIsPhysicalPerson() ?
-                                Restrictions.eq("fiscalCodeVat", subject.getFiscalCode()) :
-                                Restrictions.eq("fiscalCodeVat", subject.getNumberVAT())});
-
-                for (VisureRTF rtf : visureRTFS) {
-                    thirdPart +=
-                            DateTimeHelper.toString(rtf.getUpdateDate()) + " - " +
-                                    rtf.getNumFormality() + " - " +
-                                    rtf.getLandChargesRegistry() +
-                                    "<br/>";
-                }
-
-                thirdPart += "<br/>";
-
-                thirdPart += "<hr/>";
-
-                thirdPart += "<b>Visure DH:</b><br/>";
-
-                List<VisureDH> visureDHS = DaoManager.load(VisureDH.class, new Criterion[]{
-                        subject.getTypeIsPhysicalPerson() ?
-                                Restrictions.eq("fiscalCodeVat", subject.getFiscalCode()) :
-                                Restrictions.eq("fiscalCodeVat", subject.getNumberVAT())});
-
-                for (VisureDH dh : visureDHS) {
-                    thirdPart +=
-                            dh.getType() + " - " +
-                                    DateTimeHelper.toString(dh.getUpdateDate()) + " - " +
-                                    dh.getNumFormality() + " - " +
-                                    dh.getNumberPractice() + " - " +
-                                    dh.getLandChargesRegistry() +
-                                    "<br/>";
-                }
-
-                thirdPart += "<br/>";
-
-                thirdPart += "<hr/>";
-
-                thirdPart += "<b>Formalit&agrave;:</b><br/>";
-
-                int countOfRequests = 0;
-
-                if (request != null) {
-                    countOfRequests = 1;
-                } else {
-                    countOfRequests = requestList.size();
-                }
-
-                List<Formality> formalityList = new ArrayList<>();
-
-                for (int i = 0; i < countOfRequests; ++i) {
-
-                    List<Long> listIds = EstateSituationHelper.getIdSubjects(subject);
-                    listIds.add(subject.getId());
-                    criteria = new ArrayList<>();
-
-                    criteria.add(Restrictions.in("sub.id", listIds));
-                    List<Formality> list =
-                            DaoManager.load(Formality.class, new CriteriaAlias[]{new CriteriaAlias
-                                    ("sectionC", "sectionC", JoinType.INNER_JOIN),
-                                    new CriteriaAlias("sectionC.subject", "sub", JoinType.INNER_JOIN)
-                            }, criteria.toArray(new Criterion[0]));
-
-                    formalityList.addAll(list);
-                }
-
-                for (Formality f : formalityList) {
-                    boolean isPresumptive = f.getSectionC().stream().map(SectionC::getSubject).flatMap(List::stream)
-                            .noneMatch(x -> x.getId().equals(request.getSubject().getId()));
-
-                    thirdPart +=
-                            (isPresumptive ? "PRES - " : "") +
-                                    f.getConservatoryStr() + " - " +
-                                    DateTimeHelper.toString(f.getPresentationDate()) + " - " +
-                                    (f.getType() == null || "null".equalsIgnoreCase(f.getType()) ? "" : f.getType().toUpperCase() + " - ") +
-                                    (f.getParticularRegister() == null ? "" : f.getParticularRegister() + " - ") +
-                                    (f.getGeneralRegister() == null ? "" : f.getGeneralRegister() + " - ") +
-                                    f.getActType();
-
-                    thirdPart += "<br/>";
-                }
-
-                thirdPart += "<br/>";
-
-                thirdPart += "<hr/>";
-
-                thirdPart += "<b>Segnalazioni:</b><br/>";
-
-                List<ReportFormalitySubject> rfsList =
-                        DaoManager.load(ReportFormalitySubject.class,
-                                new Criterion[]{
-                                        subject.getTypeIsPhysicalPerson() ?
-                                                Restrictions.eq("fiscalCode", subject.getFiscalCode()) :
-                                                Restrictions.eq("numberVAT", subject.getNumberVAT())
-                                }, Order.desc("createDate"));
-
-                for (ReportFormalitySubject rfs : rfsList) {
-                    if (rfs.getTypeFormalityId().equals(1L)) {
-                        thirdPart += "Trascrizione - ";
-                    } else if (rfs.getTypeFormalityId().equals(2L)) {
-                        thirdPart += "Iscrizione - ";
-                    } else {
-                        thirdPart += "Annotamento - ";
-                    }
-                    thirdPart +=
-                            DateTimeHelper.toString(rfs.getDate()) + " - " +
-                                    (rfs.getNumber() == null ? "" : rfs.getNumber() + " - ") +
-                                    ((rfs.getLandChargesRegistry() == null) ? "" : rfs.getLandChargesRegistry().getName()) +
-                                    "<br/>";
-                }
-
-
-                if (subject.getTypeIsPhysicalPerson()) {
-                    thirdPart += "<hr/>";
-                    thirdPart += "<b>Presumibili:</b><br/>";
-
-
-                    List<Subject> subjects = SubjectHelper.getPresumablesForSubject(
-                            subject);
-
-                    subjects.removeIf(s -> s.equals(subject));
-                    for (Subject s : subjects) {
-
-                        thirdPart += s.getFullName() + " - " + s.getSexType().getShortValue() + " - " +
-                                DateTimeHelper.toString(s.getBirthDate()) + " - " +
-                                ((s.getForeignCountry() != null && s.getForeignCountry())
-                                        ? (s.getCountry().getDescription() + " (EE) ")
-                                        : (s.getBirthCityDescription()
-                                        + (s.getBirthProvince() != null ? s.getBirthProvince().getCode() : " ")))
-                                + "nato il " + DateTimeHelper.toString(s.getBirthDate()) + " - " +
-                                s.getFiscalCode() +
-                                "<br/>";
-                    }
-                }
-            }
-        } catch (Exception e) {
-            LogHelper.log(log, e);
-            return "ERROR IN THIRD PART";
-        }
-
-        return thirdPart;
-    }
-
-    private static String getSecondPart(Request request) {
-        return ((request == null) || (request.getSubject() == null)) ? "" :
-                getSecondPart(request, request.getSubject());
-    }
-
-    private static String getSecondPart(Request request, Subject subject) {
-        String secondPart = "";
-
-        if (!ValidationHelper.isNullOrEmpty(request)) {
-
-            if (!ValidationHelper.isNullOrEmpty(request.getNdg())) {
-                secondPart += "NDG: " + request.getNdg() + "<br/>";
-            }
-            if (!ValidationHelper.isNullOrEmpty(request.getPosition())) {
-                secondPart += "Posizione: " + request.getPosition() + "<br/>";
-            }
-            if (!ValidationHelper.isNullOrEmpty(request.getCreateUserId())) {
-                secondPart += "Utente: " + request.getCreateUserName() + "<br/>";
-            }
-            if (!ValidationHelper.isNullOrEmpty(request.getUserOfficeId())) {
-                Office office = new Office();
-                try {
-                    office = DaoManager.get(Office.class, request.getUserOfficeId());
-                } catch (PersistenceBeanException | InstantiationException | IllegalAccessException e) {
-                    //  LogHelper.log(log, e);
-                }
-                if (!ValidationHelper.isNullOrEmpty(office)) {
-                    secondPart += "Filiale: " + office.getCode() + " " + office.getDescription() + "<br/>";
-                }
-            }
-            if (!ValidationHelper.isNullOrEmpty(request.getNote())) {
-                secondPart += "Note: " + request.getNote() + "<br/>";
-            } else if (!ValidationHelper.isNullOrEmpty(request.getUltimaResidenza())) {
-                secondPart += "Note: " + request.getUltimaResidenza() + "<br/>";
-            }
-
-        }
-
-        return secondPart;
-    }
-
-    public static String getFirstPart(Request request) {
-        return ((request == null) || (request.getSubject() == null)) ? "" :
-                getFirstPart(request, request.getSubject());
-    }
-
-    private static String getFirstPart(Request request, Subject subject) {
-        String result = "";
-
-        if (!ValidationHelper.isNullOrEmpty(request)) {
-
-            if (!ValidationHelper.isNullOrEmpty(request.getClientName())) {
-                result += "Cliente: " + request.getClientName() + "<br/>";
-            }
-            if (!ValidationHelper.isNullOrEmpty(request.getCreateDate())) {
-                result += "Data richiesta: " + request.getCreateDateStr() + "<br/>";
-            }
-            if (!ValidationHelper.isNullOrEmpty(request.getRequestType())) {
-                result += "Servizio: " + request.getRequestTypeName() + "<br/>";
-            }
-            if (!ValidationHelper.isNullOrEmpty(request.getService())) {
-                result += "Tipo Richiesta: " + request.getServiceName() + "<br/>";
-                result += "Ufficio: " + request.getService().getEmailTextCamelCase() + " ";
-            }
-            if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())) {
-                result += request.getAggregationLandChargesRegistryName() + "<br/>";
-            } else if (!ValidationHelper.isNullOrEmpty(request.getCity())) {
-                result += request.getCityDescription() + "<br/>";
-            }
-
-            if (!ValidationHelper.isNullOrEmpty(request.getUrgent()) && request.getUrgent()) {
-                result += "Urgente: <b>S</b> <br/>";
-            } else {
-                result += "Urgente: <b>N</b> <br/>";
-            }
-        }
-
-        if (!ValidationHelper.isNullOrEmpty(subject)) {
-            if (subject.getTypeIsPhysicalPerson()) {
-                result += "Soggetto: " + subject.getSurnameUpper() + " "
-                        + subject.getNameUpper() + "<br/>";
-                result += "Tipo: " + subject.getSexType().getShortValue() + "<br/>";
-            } else if (!ValidationHelper.isNullOrEmpty(subject.getBusinessName())) {
-                result += "Soggetto: " + subject.getBusinessName() + "<br/>";
-
-            }
-            if (!ValidationHelper.isNullOrEmpty(subject.getBirthCity()) &&
-                    !ValidationHelper.isNullOrEmpty(subject.getBirthProvince())) {
-
-                result += "Dati Anagrafici: " + (subject.getTypeIsPhysicalPerson() ? "nato a " : "con sede in ")
-                        +
-                        ((subject.getForeignCountry() != null &&
-                                subject.getForeignCountry()) ?
-                                (subject.getCountry().getDescription() + " (EE) ") :
-
-                                (subject.getBirthCityDescription() + " ( "
-                                        + subject.getBirthProvince().getCode() + " ) "));
-
-                if (!ValidationHelper.isNullOrEmpty(subject.getBirthDate())) {
-                    result += "il " + DateTimeHelper.toString(subject.getBirthDate());
-                }
-            } else if (!ValidationHelper.isNullOrEmpty(subject.getCountry())) {
-                result += "Dati Anagrafici: " + (subject.getTypeIsPhysicalPerson() ? "nato in " : "con sede in ")
-                        + (subject.getCountry().getDescription() + " (EE) ");
-            }
-
-            result += "<br/>";
-            if (!ValidationHelper.isNullOrEmpty(subject.getFiscalCode())) {
-                result += "C.F. " + subject.getFiscalCode() + "<br/>";
-            } else if (!ValidationHelper.isNullOrEmpty(subject.getNumberVAT())) {
-                result += " P.IVA: " + subject.getNumberVAT() + "<br/>";
-            }
-        }
-
-        return result;
-    }
-
-    public void prepareToModify() {
+    public void prepareToModify() throws IllegalAccessException, InstantiationException, PersistenceBeanException {
         setShowPrintButton(true);
         getStatesForSelect().add(SelectItemHelper.getNotSelected());
         getUsersForSelect().add(SelectItemHelper.getNotSelected());
@@ -764,15 +499,18 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         getUserWrappers().forEach(u -> getUsersForSelect().add(new SelectItem(u.getId(), u.getValue())));
         getServiceWrappers().forEach(s -> getServicesForSelect().add(new SelectItem(s.getId(), s.getValue())));
         getRequestTypeWrappers().forEach(r -> getRequestTypesForSelect().add(new SelectItem(r.getId(), r.getValue())));
+        filterState = "TRUE";
+        filterTableFromPanel();
+
     }
 
     public void modifyRequests()
             throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         filterTableFromPanel();
-        setAllRequestViewsToModify(
-                DaoManager.load(RequestView.class, getFilterRestrictions().toArray(new Criterion[0])));
-        List<Long> requestIdList = getAllRequestViewsToModify().stream()
-                .map(RequestView::getId).collect(Collectors.toList());
+        setAllRequestSubjectViewsToModify(
+                DaoManager.load(RequestSubjectView.class, getFilterRestrictions().toArray(new Criterion[0])));
+        List<Long> requestIdList = getAllRequestSubjectViewsToModify().stream()
+                .map(RequestSubjectView::getId).collect(Collectors.toList());
         if (!ValidationHelper.isNullOrEmpty(getSelectedState())) {
             for (Long id : requestIdList) {
                 RequestHelper.updateState(id, getSelectedState());
@@ -787,9 +525,9 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     public void loadRequestsExcel() throws PersistenceBeanException,
             IllegalAccessException, IOException, InstantiationException {
-        filterTableFromPanel();
-        setAllRequestViewsToModify(DaoManager.load(RequestView.class, getFilterRestrictions().toArray(new Criterion[0])));
-        List<Long> requestIdList = getAllRequestViewsToModify().stream().map(RequestView::getId).collect(Collectors.toList());
+        //filterTableFromPanel();
+        setAllRequestSubjectViewsToModify(DaoManager.load(RequestSubjectView.class, getFilterRestrictions().toArray(new Criterion[0])));
+        List<Long> requestIdList = getAllRequestSubjectViewsToModify().stream().map(RequestSubjectView::getId).collect(Collectors.toList());
         if (!ValidationHelper.isNullOrEmpty(requestIdList)) {
             List<Request> requests = DaoManager.load(Request.class, new Criterion[]{Restrictions.in("id", requestIdList)});
             String fileName = "evasioni" + ".xls";
@@ -838,10 +576,10 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public void loadRequestsPdf() throws PersistenceBeanException, IllegalAccessException {
-        setAllRequestViewsToModify(DaoManager.load(RequestView.class,
+        setAllRequestSubjectViewsToModify(DaoManager.load(RequestSubjectView.class,
                 getFilterRestrictions().toArray(new Criterion[0])));
-        List<Long> requestIdList = getAllRequestViewsToModify().stream()
-                .map(RequestView::getId).collect(Collectors.toList());
+        List<Long> requestIdList = getAllRequestSubjectViewsToModify().stream()
+                .map(RequestSubjectView::getId).collect(Collectors.toList());
         try {
             Map<String, byte[]> files = new HashMap<>();
             Integer fileCounter = 1;
@@ -869,7 +607,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                     }
                 }
 
-                String body = getPdfRequestBody(request);
+                String body = RequestHelper.getPdfRequestBody(request);
                 files.put(fileCounter++ + "_richiesta-" + request.getStrId() + ".pdf",
                         PrintPDFHelper.convertToPDF(null, body, null,
                                 DocumentType.ESTATE_FORMALITY));
@@ -894,6 +632,8 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                 case FORMALITY:
                 case REQUEST_REPORT:
                 case ALLEGATI:
+                case ATTACHMENT_C:
+                case SINGLE_FULFILMENT_FILE:
                 case OTHER: {
                     File file = new File(document.getPath());
                     if (!ValidationHelper.isNullOrEmpty(document)) {
@@ -944,10 +684,21 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public void filterTableFromPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        filterTableFromPanel(null);
+    }
+
+    public void filterTableFromPanel(String searchClicked) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         updateFilterValueInSession();
         List<Criterion> restrictions = RequestHelper.filterTableFromPanel(getDateFrom(), getDateTo(), getDateFromEvasion(),
                 getDateToEvasion(), getSelectedClientId(), getRequestTypeWrappers(), getStateWrappers(), getUserWrappers(),
                 getServiceWrappers(), getSelectedUserType(), getAggregationFilterId(), getSelectedServiceType(), Boolean.FALSE);
+
+        if ((filterState == null || !Boolean.parseBoolean(filterState)) && ValidationHelper.isNullOrEmpty(getSelectedStates()))
+            restrictions.add(Restrictions.or(Restrictions.eq("stateId", RequestState.INSERTED.getId()),
+                    Restrictions.eq("stateId", RequestState.IN_WORK.getId()),
+                    Restrictions.eq("stateId", RequestState.TO_BE_SENT.getId()),
+                    Restrictions.eq("stateId", RequestState.PROFILED.getId()),
+                    Restrictions.eq("stateId", RequestState.EST_TO_SENT.getId())));
 
         if (!ValidationHelper.isNullOrEmpty(getSearchLastName())) {
             restrictions.add(
@@ -961,7 +712,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                                     .replaceAll("\\s+", " ")
                                     .replaceAll("'", "").trim() + "%'")
                     )
-
             );
         }
 
@@ -1001,25 +751,19 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             }
         }
 
-        if (!ValidationHelper.isNullOrEmpty(getFiduciaryClientFilterId())) {
-            restrictions.add(Restrictions.eq("fiduciaryId",
-                    getFiduciaryClientFilterId()));
-        }
-
-
-        if (!ValidationHelper.isNullOrEmpty(getManagerClientFilterid())) {
-            restrictions.add(Restrictions.eq("managerId",
-                    getManagerClientFilterid()));
-        }
+//        restrictions.add(Restrictions.or(Restrictions.eq("managedBy", 1),
+//                Restrictions.isNull("managedBy"), Restrictions.eq("managedBy", 0)));
 
         setFilterRestrictions(restrictions);
-//        loadList(RequestView.class, restrictions.toArray(new Criterion[0]),
-//                new Order[]{Order.desc("createDate")});
-        this.setLazyModel(new EntityLazyListModel<>(RequestView.class, restrictions.toArray(new Criterion[0]),
+        EntityLazyListModel<RequestSubjectView> model = new EntityLazyListModel<>(RequestSubjectView.class, restrictions.toArray(new Criterion[0]),
                 new Order[]{
                         Order.desc("createDate")
-                }));
-
+                });
+        // loadSendToBrexaTable(model);
+        this.setLazyModel(model);
+        this.setBrexaLazyModel(model);
+        Arrays.stream(restrictions.toArray(new Criterion[0]))
+                .forEach(r -> LogHelper.debugInfo(log, "Restriction(RequestList) : " + r));
         getLazyModel().load((getPaginator().getTablePage() - 1) * getPaginator().getRowsPerPage(), getPaginator().getRowsPerPage(),
                 getPaginator().getTableSortColumn(),
                 (getPaginator().getTableSortOrder() == null || getPaginator().getTableSortOrder().equalsIgnoreCase("DESC")
@@ -1032,13 +776,69 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         getPaginator().setRowCount(getLazyModel().getRowCount());
         getPaginator().setTotalPages(totalPages);
         getPaginator().setPage(getPaginator().getCurrentPageNumber());
+    }
 
-        List<RequestView> requestList = DaoManager.load(RequestView.class, restrictions.toArray(new Criterion[0]));
+    public void loadSendToBrexaTable() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        List<RequestSubjectView> list = getBrexaLazyModel().loadList(getPaginator().getTableSortColumn(),
+                (getPaginator().getTableSortOrder() == null || getPaginator().getTableSortOrder().equalsIgnoreCase("DESC")
+                        || getPaginator().getTableSortOrder().equalsIgnoreCase("UNSORTED")) ? SortOrder.DESCENDING : SortOrder.ASCENDING, new HashMap<>());
+
+        setSendToBrexaRequests(new ArrayList<>());
+        for (RequestSubjectView RequestSubjectView : list) {
+            if (!ValidationHelper.isNullOrEmpty(RequestSubjectView.getId())) {
+                Request request = DaoManager.get(Request.class, RequestSubjectView.getId());
+                request.setSelectedForVisibleExternal(!ValidationHelper.isNullOrEmpty(RequestSubjectView.getVisibleExternal()) ? RequestSubjectView.getVisibleExternal() : Boolean.FALSE);
+                if (!ValidationHelper.isNullOrEmpty(request.getRequestType()) &&
+                        !ValidationHelper.isNullOrEmpty(request.getRequestType().getSendBrexa())
+                        && request.getRequestType().getSendBrexa() && (request.getStateId() == null || !request.getStateId().equals(RequestState.EXTERNAL.getId()))) {
+                    getSendToBrexaRequests().add(request);
+                }
+            }
+        }
+        RequestContext.getCurrentInstance().update("sendToBrexaRequestsDialog");
+    }
+
+    public void setVisibleExternalStatus() throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
+        for (Request request : getSendToBrexaRequests()) {
+            if (request.isSelectedForVisibleExternal()) {
+                RequestManagedBy managedByGetesi = new RequestManagedBy();
+                managedByGetesi.setManagedBy(1);
+                managedByGetesi.setRequest(request);
+                DaoManager.save(managedByGetesi, true);
+
+                request.setVisibleExternal(Boolean.TRUE);
+                request.setStateId(RequestState.EXTERNAL.getId());
+                request.setCertificationStateId(RequestState.EXTERNAL.getId());
+                User brexaUser = DaoManager.get(User.class, new Criterion[]{Restrictions.eq("firstName", "Brexa"), Restrictions.eq("lastName", "Brexa")});
+                if (!ValidationHelper.isNullOrEmpty(brexaUser))
+                    request.setUser(brexaUser);
+                DaoManager.save(request, true);
+
+                RequestManagedBy managedByBrexa = new RequestManagedBy();
+                managedByBrexa.setManagedBy(2);
+                managedByBrexa.setRequest(request);
+                DaoManager.save(managedByBrexa, true);
+            }
+        }
+        if (filterState != null && Boolean.parseBoolean(filterState))
+            filterTableFromPanel("TRUE");
+        else
+            filterTableFromPanel();
+    }
+
+    public void loadFilterData() throws PersistenceBeanException, IllegalAccessException {
+        if (ValidationHelper.isNullOrEmpty(getCities()))
+            populateCities(getFilterRestrictions());
+    }
+
+    private void populateCities(List<Criterion> restrictions)
+            throws PersistenceBeanException, IllegalAccessException {
+        List<RequestSubjectView> requestList = DaoManager.load(RequestSubjectView.class, restrictions.toArray(new Criterion[0]));
 
         List<Long> cityIds = new ArrayList<>();
 
 
-        for (RequestView request : requestList) {
+        for (RequestSubjectView request : requestList) {
             if (!ValidationHelper.isNullOrEmpty(request.getCityId()) && !cityIds.contains(request.getCityId())) {
                 cityIds.add(request.getCityId());
             }
@@ -1049,7 +849,6 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                     new Criterion[]{Restrictions.isNotNull("province.id")
                             , Restrictions.eq("external", Boolean.TRUE), Restrictions.in("id", cityIds)}, Boolean.FALSE));
         }
-
     }
 
     public void verifyRequests() throws PersistenceBeanException, InstantiationException, IllegalAccessException, IOException {
@@ -1061,8 +860,8 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                         Restrictions.eq("serviceIsUpdate", Boolean.FALSE)
                 ), Restrictions.isNotNull("numberActUpdate")));
 
-        List<RequestView> requestViews = DaoManager.load(RequestView.class, criterionList.toArray(new Criterion[0]));
-        List<Long> requestIdList = requestViews.stream().map(RequestView::getId).collect(Collectors.toList());
+        List<RequestSubjectView> RequestSubjectViews = DaoManager.load(RequestSubjectView.class, criterionList.toArray(new Criterion[0]));
+        List<Long> requestIdList = RequestSubjectViews.stream().map(RequestSubjectView::getId).collect(Collectors.toList());
         if (!ValidationHelper.isNullOrEmpty(requestIdList)) {
             List<Request> anomalyRequests = DaoManager.load(Request.class, new Criterion[]{Restrictions.in("id", requestIdList)});
             anomalyRequests = anomalyRequests.stream().filter(r -> !r.getNumberActUpdate().equals(
@@ -1089,7 +888,9 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                 Restrictions.or(
                         Restrictions.like("firstName", searchCreateUser),
                         Restrictions.like("lastName", searchCreateUser),
-                        Restrictions.like("businessName", searchCreateUser)
+                        Restrictions.like("businessName", searchCreateUser),
+                        Restrictions.isNotNull("getesi"),
+                        Restrictions.eq("getesi", Boolean.TRUE)
                 )
         });
         if (!ValidationHelper.isNullOrEmpty(users)) {
@@ -1310,6 +1111,10 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         RedirectHelper.goTo(PageTypes.MAIL_MANAGER_VIEW, getEntityEditId());
     }
 
+    public void openRequestMailNew() {
+        RedirectHelper.goTo(PageTypes.MAIL_MANAGER_VIEW, getEntityEditId(), true);
+    }
+
     public void openRequestSubject() {
         updateFilterValueInSession();
         RedirectHelper.goToOnlyView(PageTypes.SUBJECT, getEntityEditId());
@@ -1318,58 +1123,73 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     private void updateFilterValueInSession() {
         if (!ValidationHelper.isNullOrEmpty(getSelectedClientId())) {
             SessionHelper.put(KEY_CLIENT_ID, getSelectedClientId());
-        }
+        } else
+            SessionHelper.removeObject(KEY_CLIENT_ID);
         if (!ValidationHelper.isNullOrEmpty(getStateWrappers())) {
             SessionHelper.put(KEY_STATES, getStateWrappers());
-        }
+        } else
+            SessionHelper.removeObject(KEY_STATES);
+
         if (!ValidationHelper.isNullOrEmpty(getRequestTypeWrappers())) {
             SessionHelper.put(KEY_REQUEST_TYPE, getRequestTypeWrappers());
-        }
+        } else
+            SessionHelper.removeObject(KEY_REQUEST_TYPE);
         if (!ValidationHelper.isNullOrEmpty(getServiceWrappers())) {
             SessionHelper.put(KEY_SERVICES, getServiceWrappers());
-        }
+        } else
+            SessionHelper.removeObject(KEY_SERVICES);
         if (!ValidationHelper.isNullOrEmpty(getManagerClientFilterid())) {
             SessionHelper.put(KEY_CLIENT_MANAGER_ID, getManagerClientFilterid());
-        }
+        } else
+            SessionHelper.removeObject(KEY_CLIENT_MANAGER_ID);
         if (!ValidationHelper.isNullOrEmpty(getFiduciaryClientFilterId())) {
             SessionHelper.put(KEY_CLIENT_FIDUCIARY_ID, getFiduciaryClientFilterId());
-        }
+        } else
+            SessionHelper.removeObject(KEY_CLIENT_FIDUCIARY_ID);
         if (!ValidationHelper.isNullOrEmpty(getAggregationFilterId())) {
             SessionHelper.put(KEY_AGGREAGATION, getAggregationFilterId());
-        }
+        } else
+            SessionHelper.removeObject(KEY_AGGREAGATION);
         if (!ValidationHelper.isNullOrEmpty(getDateExpiration())) {
             SessionHelper.put(KEY_DATE_EXPIRATION, getDateExpiration());
-        }
+        } else
+            SessionHelper.removeObject(KEY_DATE_EXPIRATION);
         if (!ValidationHelper.isNullOrEmpty(getDateFrom())) {
             SessionHelper.put(KEY_DATE_FROM_REQ, getDateFrom());
-        }
+        } else
+            SessionHelper.removeObject(KEY_DATE_FROM_REQ);
         if (!ValidationHelper.isNullOrEmpty(getDateTo())) {
             SessionHelper.put(KEY_DATE_TO_REQ, getDateTo());
-        }
+        } else
+            SessionHelper.removeObject(KEY_DATE_TO_REQ);
         if (!ValidationHelper.isNullOrEmpty(getDateFromEvasion())) {
             SessionHelper.put(KEY_DATE_FROM_EVASION, getDateFromEvasion());
-        }
+        } else
+            SessionHelper.removeObject(KEY_DATE_FROM_EVASION);
         if (!ValidationHelper.isNullOrEmpty(getDateToEvasion())) {
             SessionHelper.put(KEY_DATE_TO_EVASION, getDateToEvasion());
-        }
+        } else
+            SessionHelper.removeObject(KEY_DATE_TO_EVASION);
         if (!ValidationHelper.isNullOrEmpty(getSearchLastName())) {
             SessionHelper.put(KEY_NOMINATIVO, getSearchLastName());
-        }
+        } else
+            SessionHelper.removeObject(KEY_NOMINATIVO);
         if (!ValidationHelper.isNullOrEmpty(getSearchFiscalCode())) {
             SessionHelper.put(KEY_CF, getSearchFiscalCode());
-        }
-
+        } else
+            SessionHelper.removeObject(KEY_CF);
         if (!ValidationHelper.isNullOrEmpty(getRowsPerPage())) {
             SessionHelper.put(KEY_ROWS_PER_PAGE, getRowsPerPage());
-        }
+        } else
+            SessionHelper.removeObject(KEY_ROWS_PER_PAGE);
 
-        if (!ValidationHelper.isNullOrEmpty(getPageNumber())) {
-            SessionHelper.put(KEY_PAGE_NUMBER, getPageNumber());
-        }
+        if (!ValidationHelper.isNullOrEmpty(getPaginator().getCurrentPageNumber())) {
+            SessionHelper.put(KEY_PAGE_NUMBER, getPaginator().getCurrentPageNumber());
+        } else
+            SessionHelper.removeObject(KEY_PAGE_NUMBER);
     }
 
     private void loadFilterValueFromSession() {
-
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_ID))) {
             setSelectedClientId((Long) SessionHelper.get(KEY_CLIENT_ID));
         } else {
@@ -1377,21 +1197,13 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_STATES))) {
             setStateWrappers((List<RequestStateWrapper>) SessionHelper.get(KEY_STATES));
-        } else {
-            setStateWrappers(new ArrayList<>());
-            for (RequestState rs : RequestState.values()) {
-                getStateWrappers().add(new RequestStateWrapper(!RequestState.EVADED.equals(rs), rs));
-            }
         }
+
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_REQUEST_TYPE))) {
             setRequestTypeWrappers((List<RequestTypeFilterWrapper>) SessionHelper.get(KEY_REQUEST_TYPE));
-        } else {
-            setRequestTypeWrappers(new ArrayList<>());
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_SERVICES))) {
             setServiceWrappers((List<ServiceFilterWrapper>) SessionHelper.get(KEY_SERVICES));
-        } else {
-            setServiceWrappers(new ArrayList<>());
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_CLIENT_MANAGER_ID))) {
             setManagerClientFilterid((Long) SessionHelper.get(KEY_CLIENT_MANAGER_ID));
@@ -1452,10 +1264,11 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             setRowsPerPage(10);
         }
         if (!ValidationHelper.isNullOrEmpty(SessionHelper.get(KEY_PAGE_NUMBER))) {
-            setPageNumber((Integer) SessionHelper.get(KEY_PAGE_NUMBER));
+            getPaginator().setCurrentPageNumber((Integer) SessionHelper.get(KEY_PAGE_NUMBER));
         } else {
-            setPageNumber(0);
+            getPaginator().setCurrentPageNumber(0);
         }
+        getPaginator().setTablePage(getPaginator().getCurrentPageNumber());
 //        executeJS("if (PF('tableWV').getPaginator() != null ) " +
 //                "PF('tableWV').getPaginator().setPage(" + getPageNumber() + ");");
     }
@@ -1670,12 +1483,12 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         this.usersForSelect = usersForSelect;
     }
 
-    public List<RequestView> getAllRequestViewsToModify() {
-        return allRequestViewsToModify;
+    public List<RequestSubjectView> getAllRequestSubjectViewsToModify() {
+        return allRequestSubjectViewsToModify;
     }
 
-    public void setAllRequestViewsToModify(List<RequestView> allRequestViewsToModify) {
-        this.allRequestViewsToModify = allRequestViewsToModify;
+    public void setAllRequestSubjectViewsToModify(List<RequestSubjectView> allRequestSubjectViewsToModify) {
+        this.allRequestSubjectViewsToModify = allRequestSubjectViewsToModify;
     }
 
     public List<Criterion> getFilterRestrictions() {
@@ -1886,6 +1699,7 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public void reset() throws PersistenceBeanException, IOException, InstantiationException, IllegalAccessException {
+        clearFilterValueFromSession();
         setSelectedClientId(null);
         setManagerClientFilterid(null);
         setFiduciaryClientFilterId(null);
@@ -1954,10 +1768,15 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
             builder.append("tabindex=\"0\" href=\"#\" onclick=\"changePage(" + i + ",event)\">" + i + "</a>");
         }
         getPaginator().setPaginatorString(builder.toString());
+        FacesContext.getCurrentInstance().getExternalContext().getRequestMap().put("fromPageChange", "true");
         filterTableFromPanel();
     }
 
     public void onPageChange() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        onPageChange(true);
+    }
+
+    public void onPageChange(Boolean filter) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         String rowsPerPage = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("rowsPerPageSelected");
         String pageNumber = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get("pageNumber");
         if (!ValidationHelper.isNullOrEmpty(rowsPerPage))
@@ -2003,11 +1822,14 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
                 getPaginator().setPageNavigationEnd(builder.toString());
             }
             getPaginator().setTablePage(currentPage);
-            filterTableFromPanel();
+            FacesContext.getCurrentInstance().getExternalContext().getRequestMap().put("fromPageChange", "true");
+            if (filter)
+                filterTableFromPanel();
         }
     }
 
-    public void clearFiltraPanel() {
+    public void clearFiltraPanel() throws PersistenceBeanException, IllegalAccessException {
+        loadFilterData();
         setSelectedClientId(null);
         setDateFrom(null);
         setDateTo(null);
@@ -2018,7 +1840,12 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         setManagerClientFilterid(null);
         setFiduciaryClientFilterId(null);
         setAggregationFilterId(null);
+        setSelectedServices(null);
+        clearFilterValueFromSession();
+        resetSettingPanel = false;
+    }
 
+    private void clearFilterValueFromSession() {
         SessionHelper.removeObject(KEY_CLIENT_ID);
         SessionHelper.removeObject(KEY_DATE_FROM_REQ);
         SessionHelper.removeObject(KEY_DATE_TO_REQ);
@@ -2029,6 +1856,14 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
         SessionHelper.removeObject(KEY_CLIENT_MANAGER_ID);
         SessionHelper.removeObject(KEY_CLIENT_FIDUCIARY_ID);
         SessionHelper.removeObject(KEY_AGGREAGATION);
+        SessionHelper.removeObject(KEY_SERVICES);
+        SessionHelper.removeObject(KEY_CF);
+        SessionHelper.removeObject(KEY_NOMINATIVO);
+        SessionHelper.removeObject(KEY_STATES);
+        SessionHelper.removeObject(KEY_PAGE_NUMBER);
+        SessionHelper.removeObject("searchLastName");
+        SessionHelper.removeObject("searchFiscalCode");
+        SessionHelper.removeObject("searchCreateUser");
     }
 
     public void setSelectedRequestTypes(List<RequestType> selectedRequestTypes) {
@@ -2050,7 +1885,13 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
     }
 
     public void createNewMultipleRequests() {
+        // executeJS("PF('chooseSingleOrMultipleRequestCreateWV').show();");
         String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE";
+        RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT, queryParam);
+    }
+
+    public void redirectToNewMultipleRequests() {
+        String queryParam = RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE&" + RedirectHelper.REQUEST_TYPE_PARAM + "=" + getRequestType();
         RedirectHelper.goToMultiple(PageTypes.REQUEST_EDIT, queryParam);
     }
 
@@ -2068,5 +1909,434 @@ public class RequestListBean extends EntityLazyListPageBean<RequestView>
 
     public void setPageNumber(Integer pageNumber) {
         this.pageNumber = pageNumber;
+    }
+
+    public Integer getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(Integer requestType) {
+        this.requestType = requestType;
+    }
+
+    public boolean isResetSettingPanel() {
+        return resetSettingPanel;
+    }
+
+    public void setResetSettingPanel(boolean resetSettingPanel) {
+        this.resetSettingPanel = resetSettingPanel;
+    }
+
+    public void openTranscriptionManagement() throws
+            PersistenceBeanException, InstantiationException, IllegalAccessException {
+        updateFilterValueInSession();
+        getTranscriptionAndCertificationHelper().openTranscriptionManagement(getEntityEditId()); }
+
+    public void setRequestVisibleExternal() throws
+            PersistenceBeanException, InstantiationException, IllegalAccessException {
+        Request request = DaoManager.get(Request.class,
+                new Criterion[]{Restrictions.eq("id", getEntityEditId())
+                });
+
+        RequestManagedBy managedByGetesi = new RequestManagedBy();
+        managedByGetesi.setManagedBy(1);
+        managedByGetesi.setRequest(request);
+        managedByGetesi.setCreateDate(new Date());
+        DaoManager.save(managedByGetesi, true);
+
+        request.setVisibleExternal(Boolean.TRUE);
+        request.setStateId(RequestState.EXTERNAL.getId());
+        request.setCertificationStateId(RequestState.EXTERNAL.getId());
+        User brexaUser = DaoManager.get(User.class, new Criterion[]{Restrictions.eq("firstName", "Brexa"), Restrictions.eq("lastName", "Brexa")});
+        if (!ValidationHelper.isNullOrEmpty(brexaUser))
+            request.setUser(brexaUser);
+        DaoManager.save(request, true);
+
+        RequestManagedBy managedByBrexa = new RequestManagedBy();
+        managedByBrexa.setManagedBy(2);
+        managedByBrexa.setRequest(request);
+        managedByBrexa.setCreateDate(new Date());
+        DaoManager.save(managedByBrexa, true);
+
+        filterTableFromPanel();
+    }
+
+    @SneakyThrows
+    public void resetPage() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        onPageChange(false);
+        filterTableFromPanel("true");
+    }
+
+    public void resetPageSearch(Boolean searchClicked) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        if (searchClicked != null && searchClicked)
+            filterState = "TRUE";
+        onPageChange(false);
+        filterTableFromPanel("true");
+
+    }
+    public void updateAZRequests() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+        updateAZRequests(Boolean.TRUE);
+    }
+    public void updateAZRequests(Boolean update) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+        setDisableAllRowCheck(Boolean.FALSE);
+        cleanValidation();
+        if(update)
+            setSelectedSupplierId(null);
+        Request request = DaoManager.get(Request.class, new CriteriaAlias[]{
+                new CriteriaAlias("multipleServices", "m", JoinType.LEFT_OUTER_JOIN)
+        }, new Criterion[]{
+                Restrictions.eq("id", getSelectedAZRequestId())});
+        setAzServices(new ArrayList<>());
+        if (!ValidationHelper.isNullOrEmpty(request)) {
+            if (!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
+                for (int s = 0; s < request.getMultipleServices().size(); s++) {
+                    Service service = request.getMultipleServices().get(s);
+                    AZRequestWrapper azRequestWrapper = new AZRequestWrapper();
+                    azRequestWrapper.setService(service);
+                    azRequestWrapper.setRequestId(request.getId());
+                    azRequestWrapper.setServiceId(service.getId());
+                    azRequestWrapper.setMultiple(Boolean.TRUE);
+                    if (getSelectedSupplierId() != null && getSelectedSupplierId() > 0 && (ValidationHelper.isNullOrEmpty(service.getSupplier())
+                            || !getSelectedSupplierId().equals(service.getSupplier().getId()))) {
+                        setDisableAllRowCheck(Boolean.TRUE);
+                        azRequestWrapper.setDifferentSupplier(Boolean.TRUE);
+                    }
+                    getAzServices().add(azRequestWrapper);
+                }
+            } else if(!ValidationHelper.isNullOrEmpty(request.getService())){
+                AZRequestWrapper azRequestWrapper = new AZRequestWrapper();
+                azRequestWrapper.setService(request.getService());
+                azRequestWrapper.setRequestId(request.getId());
+                azRequestWrapper.setServiceId(request.getService().getId());
+                if (getSelectedSupplierId() != null && getSelectedSupplierId() > 0
+                        && (ValidationHelper.isNullOrEmpty(request.getService().getSupplier())
+                        || !getSelectedSupplierId().equals(request.getService().getSupplier().getId()))) {
+                    setDisableAllRowCheck(Boolean.TRUE);
+                    azRequestWrapper.setDifferentSupplier(Boolean.TRUE);
+                }
+                getAzServices().add(azRequestWrapper);
+            }
+        }
+    }
+
+    public void sendToAZ() {
+        log.info("In sendToAZ");
+        setAzApiErrorMessage(null);
+        String serviceParameter = null;
+        this.cleanValidation();
+        if(ValidationHelper.isNullOrEmpty(getSelectedSupplierId())){
+            addFieldException("supplierList", "supplierMissing");
+        }
+        if (this.getValidationFailed()) {
+            return;
+        }
+        try {
+            List<AZRequestWrapper> selectedServices = null;
+            if(!ValidationHelper.isNullOrEmpty(getAzServices()))
+                selectedServices = getAzServices()
+                    .stream().filter(s -> s.getSelected() != null && s.getSelected())
+                    .collect(Collectors.toList());
+            else if(!ValidationHelper.isNullOrEmpty(getSelectedAZRequests()))
+                selectedServices = getSelectedAZRequests()
+                        .stream().filter(s -> s.getSelected() != null && s.getSelected())
+                        .collect(Collectors.toList());
+
+            if (!ValidationHelper.isNullOrEmpty(selectedServices)) {
+                List<Long> selectedServiceIds = selectedServices
+                        .stream()
+                        .map(AZRequestWrapper::getServiceId)
+                        .collect(Collectors.toList());
+                List<AggregationService> aggregationServices = DaoManager.load(AggregationService.class,
+                        new CriteriaAlias[]{
+                                new CriteriaAlias("services", "s", JoinType.LEFT_OUTER_JOIN)
+                        },
+                        new Criterion[]{
+                                Restrictions.in("s.id", selectedServiceIds)});
+
+                if (!ValidationHelper.isNullOrEmpty(aggregationServices))
+                    for (Iterator<AggregationService> it = aggregationServices.iterator(); it.hasNext(); ) {
+                        AggregationService as = it.next();
+                        if (!ValidationHelper.isNullOrEmpty(as.getServices())) {
+                            List<Long> aggreationServiceIds = as.getServices()
+                                    .stream()
+                                    .map(Service::getId)
+                                    .collect(Collectors.toList());
+                            Collections.sort(selectedServiceIds, Comparator.naturalOrder());
+                            Collections.sort(aggreationServiceIds, Comparator.naturalOrder());
+
+                            if (!Objects.equals(selectedServiceIds, aggreationServiceIds)) {
+                                it.remove();
+                            }
+                        }
+                    }
+                if (aggregationServices != null && !aggregationServices.isEmpty()) {
+                    AggregationService aggregationService = aggregationServices.get(0);
+                    if (aggregationService.getAggregationAZ() != null
+                            && StringUtils.isNotBlank(aggregationService.getAggregationAZ().getCode()))
+                        serviceParameter = aggregationServices.get(0).getAggregationAZ().getCode();
+                }
+            }
+            AZSendRequestDTO requestDTO = new AZSendRequestDTO();
+            if (StringUtils.isNotBlank(serviceParameter))
+                requestDTO.setService(serviceParameter);
+            else {
+                log.info("serviceParameter null");
+                setAzApiErrorMessage(ResourcesHelper.getString("azAPISendRequestMissingServiceError"));
+                setValidationFailed(true);
+                executeJS("PF('azAPIErrorDialogWV').show();");
+                RequestContext.getCurrentInstance().update("azAPIErrorDialog");
+                return;
+            }
+
+            Request request = DaoManager.get(Request.class, new CriteriaAlias[]{
+                    new CriteriaAlias("subject", "s", JoinType.LEFT_OUTER_JOIN)
+            }, new Criterion[]{
+                    Restrictions.eq("id", getSelectedAZRequestId())});
+
+            if (!ValidationHelper.isNullOrEmpty(request) && !ValidationHelper.isNullOrEmpty(request.getSubject())) {
+                requestDTO.setFiscalCode(request.getSubject().getFiscalCodeVATNamber());
+            }
+            requestDTO.setCustomCode(Arrays.asList(getSelectedAZRequestId()));
+            AZSendRequestResponseDTO responseDto = ApiFacade.SINGLETON.sendAZRequest(requestDTO);
+            boolean apiFailed= false;
+            if (responseDto != null && responseDto.getSuccess() != null && responseDto.getSuccess()) {
+                if(responseDto.getData() != null && StringUtils.isNotBlank(responseDto.getData().getTicketid())){
+                    log.info("Get Ticket data " + responseDto.getData().getTicketid());
+                    if (getSelectedSupplierId() != null) {
+                        for (AZRequestWrapper azRequestWrapper : selectedServices) {
+                            if (azRequestWrapper.getMultiple() != null && azRequestWrapper.getMultiple()) {
+                                Request azRequest = DaoManager.get(Request.class,
+                                        new CriteriaAlias[]{
+                                                new CriteriaAlias("requestServices", "rs", JoinType.INNER_JOIN)
+                                        },
+                                        new Criterion[]{Restrictions.eq("id", azRequestWrapper.getRequestId())
+                                        });
+                                List<RequestService> filteredServices = emptyIfNull(azRequest.getRequestServices())
+                                        .stream()
+                                        .filter(rs -> rs.getService().getId().equals(azRequestWrapper.getServiceId()))
+                                        .collect(Collectors.toList());
+                                filteredServices
+                                        .stream()
+                                        .forEach(rs -> {
+                                            rs.setSupplier_id(getSelectedSupplierId());
+                                            DaoManager.saveWeak(rs, true);
+                                        });
+                            }else {
+                                Request azRequest = DaoManager.get(Request.class,
+                                        new Criterion[]{Restrictions.eq("id", azRequestWrapper.getRequestId())});
+                                azRequest.setSupplier(DaoManager.get(Supplier.class, getSelectedSupplierId()));
+                                DaoManager.save(azRequest, true);
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (responseDto != null) {
+                    log.error("Send az response " + new ObjectMapper().writeValueAsString(responseDto));
+                }
+                apiFailed = true;
+            }
+            if(apiFailed){
+                setAzApiErrorMessage(String.format(
+                        ResourcesHelper.getString("azAPISendRequestError"), "GHJGHJ66A13F839R"));
+                setValidationFailed(true);
+                executeJS("PF('azAPIErrorDialogWV').show();");
+                RequestContext.getCurrentInstance().update("azAPIErrorDialog");
+            }else {
+                executeJS("PF('sendToAZDialogWV').hide();");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean getSelectedAllSendToBrexaRequests() {
+        if (this.getSendToBrexaRequests() != null) {
+            for (Request request : this.getSendToBrexaRequests()) {
+                if (!request.isSelectedForVisibleExternal()) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public void setSelectedAllSendToBrexaRequests(boolean selectedAllSendToBrexaRequests) {
+        selectAllSendToBrexaRequests = !selectAllSendToBrexaRequests;
+        if (this.getSendToBrexaRequests() != null) {
+            for (Request request : this.getSendToBrexaRequests()) {
+                request.setSelectedForVisibleExternal(selectAllSendToBrexaRequests);
+            }
+        }
+    }
+
+    public void loadSendToAZTable() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        loadSendToAZTable(Boolean.TRUE);
+    }
+
+    public void loadSendToAZTable(Boolean update) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        cleanValidation();
+         setSelectedAZRequests(null);
+        if(update)
+            setSelectedSupplierId(null);
+        setSendToAzRequests(null);
+        setDisableAllRowCheck(Boolean.FALSE);
+
+        List<RequestSubjectView> list = getBrexaLazyModel().loadList(getPaginator().getTableSortColumn(),
+                (getPaginator().getTableSortOrder() == null || getPaginator().getTableSortOrder().equalsIgnoreCase("DESC")
+                        || getPaginator().getTableSortOrder().equalsIgnoreCase("UNSORTED")) ? SortOrder.DESCENDING : SortOrder.ASCENDING, new HashMap<>());
+
+        setSendToAzRequests(new ArrayList<>());
+        Integer index = 1;
+        for (RequestSubjectView requestSubjectView : list) {
+            Request request = DaoManager.get(Request.class, requestSubjectView.getId());
+
+            if (!ValidationHelper.isNullOrEmpty(request.getMultipleServices())) {
+                int span = request.getMultipleServices().size();
+                for (int s = 0; s < request.getMultipleServices().size(); s++) {
+                    Service service = request.getMultipleServices().get(s);
+                    AZRequestWrapper azRequestWrapper = new AZRequestWrapper();
+                    azRequestWrapper.setService(service);
+                    azRequestWrapper.setIndex(s);
+                    azRequestWrapper.setRequestId(request.getId());
+                    azRequestWrapper.setId(index++);
+                    azRequestWrapper.setSubject(request.getMailViewSubject());
+                    azRequestWrapper.setMultiple(Boolean.TRUE);
+                    azRequestWrapper.setSpan(span);
+                    azRequestWrapper.setServiceId(service.getId());
+                    if (getSelectedSupplierId() != null && getSelectedSupplierId() > 0 && (ValidationHelper.isNullOrEmpty(service.getSupplier())
+                            || !getSelectedSupplierId().equals(service.getSupplier().getId()))) {
+                        setDisableAllRowCheck(Boolean.TRUE);
+                        azRequestWrapper.setDifferentSupplier(Boolean.TRUE);
+                    }
+                    getSendToAzRequests().add(azRequestWrapper);
+                }
+            } else if(!ValidationHelper.isNullOrEmpty(request.getService())){
+                AZRequestWrapper azRequestWrapper = new AZRequestWrapper();
+                azRequestWrapper.setService(request.getService());
+                azRequestWrapper.setId(index++);
+                azRequestWrapper.setSubject(request.getMailViewSubject());
+                azRequestWrapper.setRequestId(request.getId());
+                azRequestWrapper.setServiceId(request.getService().getId());
+                if (getSelectedSupplierId() != null && getSelectedSupplierId() > 0
+                        && (ValidationHelper.isNullOrEmpty(request.getService().getSupplier())
+                        || !getSelectedSupplierId().equals(request.getService().getSupplier().getId()))) {
+                    setDisableAllRowCheck(Boolean.TRUE);
+                    azRequestWrapper.setDifferentSupplier(Boolean.TRUE);
+                }
+                getSendToAzRequests().add(azRequestWrapper);
+            }
+        }
+        if(update)
+            RequestContext.getCurrentInstance().update("sendToAZRequestsDialog");
+    }
+
+    public void sendMultipleToAZ() {
+        log.info("In sendMultipleToAZ");
+        setAzApiErrorMessage(null);
+        setSelectedAZServices(new ArrayList<>());
+        this.cleanValidation();
+        if(ValidationHelper.isNullOrEmpty(getSelectedSupplierId())){
+            addFieldException("supplierList", "supplierMissing");
+        }
+        if (this.getValidationFailed()) {
+            RequestContext.getCurrentInstance().update("dialogValidationMessages");
+            return;
+        }
+
+        boolean requestError = true;
+        try {
+            if (!ValidationHelper.isNullOrEmpty(getSendToAzRequests())) {
+                Map<Long, List<AZRequestWrapper>> requestMap = new HashMap<>();
+                for (AZRequestWrapper azRequestWrapper : getSendToAzRequests()) {
+                    if (!requestMap.containsKey(azRequestWrapper.getRequestId()))
+                        requestMap.put(azRequestWrapper.getRequestId(), new ArrayList<>());
+                    requestMap.get(azRequestWrapper.getRequestId()).add(azRequestWrapper);
+
+                }
+                for (Map.Entry<Long, List<AZRequestWrapper>> entry : requestMap.entrySet()) {
+                    setSelectedAZRequests(entry.getValue());
+                    setSelectedAZRequestId(entry.getKey());
+                    try {
+                        sendToAZ();
+                    } catch (Exception e) {
+                        requestError = true;
+                        e.printStackTrace();
+                    }
+                }
+            }
+            if(!requestError){
+                RequestContext.getCurrentInstance().update("sendToAZRequestsTable");
+                executeJS("PF('sendToAZDialogWV').hide();");
+            }
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+            e.printStackTrace();
+        }
+    }
+
+    public void azTopChangeListener() {
+        boolean checkAll = getAzCheckTop() != null && getAzCheckTop();
+        setAzCheckBottom(checkAll);
+        if(!ValidationHelper.isNullOrEmpty(getAzServices()))
+            this.getAzServices()
+                    .stream()
+                    .forEach(s -> s.setSelected(checkAll));
+
+        if(!ValidationHelper.isNullOrEmpty(getSendToAzRequests()))
+            this.getSendToAzRequests()
+                    .stream()
+                    .forEach(s -> s.setSelected(checkAll));
+
+    }
+
+    public void azDownChangeListener() {
+        boolean checkAll = getAzCheckBottom() != null && getAzCheckBottom();
+        setAzCheckTop(checkAll);
+        if(!ValidationHelper.isNullOrEmpty(getAzServices()))
+            this.getAzServices()
+                    .stream()
+                    .forEach(s -> s.setSelected(checkAll));
+
+        if(!ValidationHelper.isNullOrEmpty(getSendToAzRequests()))
+            this.getSendToAzRequests()
+                    .stream()
+                    .forEach(s -> s.setSelected(checkAll));
+    }
+
+    public void azItemChangeListener() {
+        AZRequestWrapper unselectedRequest = null;
+
+        if(!ValidationHelper.isNullOrEmpty(getAzServices()))
+            unselectedRequest = getAzServices()
+                .stream().filter(s -> s.getSelected() == null || !s.getSelected())
+                .findFirst().orElse(null);
+
+        if(!ValidationHelper.isNullOrEmpty(getSendToAzRequests()))
+            unselectedRequest = getSendToAzRequests()
+                    .stream().filter(s -> s.getSelected() == null || !s.getSelected())
+                    .findFirst().orElse(null);
+
+        if (unselectedRequest != null) {
+            setAzCheckBottom(false);
+            setAzCheckTop(false);
+        } else {
+            setAzCheckBottom(true);
+            setAzCheckTop(true);
+        }
+    }
+    
+    public void cancelRequest() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+    	if(!ValidationHelper.isNullOrEmpty(getCancelRequestId())) {
+    		Request request = DaoManager.get(Request.class, getCancelRequestId());
+    		if(!ValidationHelper.isNullOrEmpty(request)) {
+    			if(!ValidationHelper.isNullOrEmpty(getCancelRequestComment())) {
+    				request.setComment(getCancelRequestComment());
+    			}
+    			request.setStateId(RequestState.CANCELLED.getId());
+    			DaoManager.save(request, true);
+    		}
+    	}
     }
 }

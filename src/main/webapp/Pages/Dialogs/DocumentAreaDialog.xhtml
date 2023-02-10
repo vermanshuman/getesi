@@ -1,0 +1,128 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+<style>
+
+	#containerPanel_content {
+		border: 1px solid #dee2e6;
+	}
+	
+	#fileUploadPanelGrid > * .ui-panelgrid-cell {
+		border: none;
+	}
+	
+	#fieldsPanelGrid > * .ui-panelgrid-cell {
+		border: none;
+	}
+	
+	#otherFilePanel .ui-panelgrid-cell {
+		padding: 0px;
+	}
+	
+	#otherFileUpload .ui-fileupload-buttonbar {
+		border: none;
+		padding: 0px;
+	}
+	
+	#otherFileUpload .ui-fileupload-content {
+		display: none;
+	}
+	
+	#otherFileUpload .ui-widget-header {
+		background: #FFFFFF !important;
+    	color: #495057 !important;
+    }
+    
+</style>
+
+<p:dialog widgetVar="documentAreaDlg" id="documentAreaDlgId" modal="true" width="950" header="#{msg.documentArea}"
+		  position="center center" draggable="false">
+  <!-- <p:fileUpload id="otherFileUpload" label="#{msg.upload}" fileUploadListener="#{bean.handleOtherDocumentUpload}" style="margin-top:15px;"
+                  multiple="false" mode="advanced" styleClass="special-upload" auto="true"
+                  update="documentPanel">
+    	 <p:panelGrid id="documentPanel" columns="4" style="width: 500%;">
+    		<p:column>
+    			<p:panelGrid columns="2" id="otherFilePanel" rendered="#{not empty bean.otherFileNameTemp}" style="margin-top: 10px;">
+                    <h:outputText id="otherFileName" value="#{bean.otherFileNameTemp}" />
+                    <p:commandButton icon="fa fa-close" title="#{msg.delete}" update="documentPanel"
+                                     ajax="true" action="#{bean.deleteOtherTempDocument}"
+                                     style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                    </p:commandButton>
+                </p:panelGrid>
+    		</p:column>
+    		<p:column>
+                <h:outputText value="#{msg.name}"/>
+                <p:inputText styleClass="input-width" value="#{bean.otherDocumentName}" />
+            </p:column>
+            <p:column>
+                <h:outputText value="#{msg.note}"/>
+                <p:inputText styleClass="input-width" value="#{bean.otherDocumentNote}" />
+            </p:column>
+            <p:column>
+				<p:commandButton value="#{msg.save.toUpperCase()}" style="margin-top: 23px;"
+								 action="#{bean.saveOtherDocument}" update="otherDocumentsTable otherFileUpload"
+								 styleClass="ui-button-success p-mr-2 p-mb-2" />
+			</p:column>
+    	</p:panelGrid>
+    </p:fileUpload>  -->
+    <p:panel id="containerPanel">
+    	<p:panelGrid id="fileUploadPanelGrid" columns="2" style="width: 100%;"
+            			 columnClasses="ui-grid-col-2, ui-grid-col-10">
+			 <p:column>
+				 <p:fileUpload 	id="otherFileUpload" label="#{msg.upload}" fileUploadListener="#{bean.handleOtherDocumentUpload}" 
+		                  		multiple="false" mode="advanced"  auto="true" update="fileUploadPanelGrid">
+		        </p:fileUpload>          		
+	    	</p:column>
+    		<p:column>
+  				<p:panelGrid columns="2" id="otherFilePanel" rendered="#{not empty bean.otherFileNameTemp}" style="padding: 0px;">
+	            	<h:outputText id="otherFileName" value="#{bean.otherFileNameTemp}" />
+	            	<p:commandButton icon="fa fa-close" title="#{msg.delete}" update="fileUploadPanelGrid"
+	                             	 ajax="true" action="#{bean.deleteOtherTempDocument}"
+	                             	 style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+	            	</p:commandButton>
+            	</p:panelGrid>
+  			</p:column>
+  		</p:panelGrid>
+  		<p:panelGrid id="fieldsPanelGrid" columns="3" style="width: 100%;" columnClasses="ui-grid-col-4, ui-grid-col-4, ui-grid-col-4">
+  			<p:column>
+                <h:outputText value="#{msg.name}"/>
+                <p:inputText styleClass="input-width" value="#{bean.otherDocumentName}" />
+            </p:column>
+            <p:column>
+                <h:outputText value="#{msg.note}"/>
+                <p:inputText styleClass="input-width" value="#{bean.otherDocumentNote}" />
+            </p:column>
+            <p:column>
+            	<p:commandButton value="#{msg.save.toUpperCase()}" style="margin-top: 23px;"
+								 action="#{bean.saveOtherDocument}" update="otherDocumentsTable containerPanel"
+								 styleClass="ui-button-success p-mr-2 p-mb-2" />
+            </p:column>
+    	</p:panelGrid>
+    </p:panel> 
+    <br /><br />
+    <p:dataTable value="#{bean.otherDocuments}" var="doc" id="otherDocumentsTable" emptyMessage="#{msg.noRecordsFound}">
+        <p:column headerText="#{msg.name}">
+            <h:outputText value="#{doc.title}"/>
+        </p:column>
+        <p:column headerText="#{msg.note}">
+            <h:outputText value="#{doc.note}"/>
+        </p:column>
+        <p:column styleClass="action_column">
+            <p:commandButton icon="fa fa-fw new-pdf-icon" title="#{msg.download}" update="messages"
+                             ajax="false"
+                             action="#{doc.downloadFile}" 
+                             rendered="#{not empty doc.title}"
+                             style="background-color: transparent!important; padding-right: 5px; font-size:18px !important;">
+            </p:commandButton>
+        </p:column>
+        <p:column styleClass="action_column">
+            <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn" update="otherDocumentsTable"
+                             action="#{bean.deleteOtherDocument}">
+                <f:setPropertyActionListener value="#{doc.id}" target="#{bean.otherDocumentId}"/>
+            </p:commandButton>
+        </p:column>
+    </p:dataTable>
+</p:dialog>
+</ui:composition>

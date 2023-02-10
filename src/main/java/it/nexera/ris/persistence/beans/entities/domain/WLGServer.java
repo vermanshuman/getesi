@@ -42,6 +42,8 @@ public class WLGServer extends IndexedEntity {
     @Column(name = "alias")
     private String alias;
 
+    private String sender;
+
     public String getName() {
         return name;
     }
@@ -122,4 +124,11 @@ public class WLGServer extends IndexedEntity {
         this.alias = alias;
     }
 
+    public String getSender() {
+        return sender;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
 }

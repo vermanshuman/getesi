@@ -5,8 +5,12 @@ import it.nexera.ris.persistence.beans.entities.Dictionary;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -56,6 +60,18 @@ public class TypeFormality extends Dictionary {
     private Boolean salesDevelopmentOMI;
 
     private Boolean renewal;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
+    @Column(name = "visible")
+    private Boolean visible;
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "typeFormaility")
+    private List<ImportF24> importF24List;
+
+    @Column(name = "preposition")
+    private String preposition;
 
     @Override
     public String toString() {

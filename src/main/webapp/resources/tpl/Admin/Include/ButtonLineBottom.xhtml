@@ -38,7 +38,7 @@
         </div>
         <div class="p-col-3" style="text-align:right;">
             <p:commandButton icon="pi pi-print" title="#{msg.mailManagerPrint}" value="#{msg.mailManagerPrint}" update="form:print_panel"
-                             styleClass="print-button" action="#{bean.generateMailPdf}">
+                             styleClass="print-button" action="#{bean.generateMailPdf}" style="background: #000066;">
                 <f:setPropertyActionListener value="true" target="#{bean.printPdf}"/>
             </p:commandButton>
 

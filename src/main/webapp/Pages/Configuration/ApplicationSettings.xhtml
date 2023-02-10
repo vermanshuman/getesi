@@ -13,7 +13,7 @@
             <p:tab title="#{msg.editAppSettingsTabGeneralSettings}"
                    id="tabGeneralSettings">
 
-                <p:fieldset legend="#{msg.general}">
+                <p:fieldset legend="#{msg.general}" class="fieldset" toggleable="true" toggleSpeed="500">
                     <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
                                  cellpadding="3" cellspacing="0" columnClasses="ui-grid-col-2,ui-grid-col-3"
                                  layout="grid">
@@ -26,7 +26,7 @@
                     </p:panelGrid>
                 </p:fieldset>
                 <br/>
-                <p:fieldset legend="#{msg.editAppSettingsAsapSioSettingsFileEntity}">
+                <p:fieldset legend="#{msg.editAppSettingsAsapSioSettingsFileEntity}" class="fieldset" toggleable="true" toggleSpeed="500">
                     <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
                                  columnClasses="ui-grid-col-2,ui-grid-col-3" layout="grid"
                                  cellpadding="3" cellspacing="0">
@@ -37,7 +37,7 @@
                     </p:panelGrid>
                 </p:fieldset>
                 <br/>
-                <p:fieldset legend="#{msg.editAppSettingsSessionTimeoutSettings}">
+                <p:fieldset legend="#{msg.editAppSettingsSessionTimeoutSettings}" class="fieldset" toggleable="true" toggleSpeed="500">
                     <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
                                  columnClasses="ui-grid-col-2,ui-grid-col-3" layout="grid"
                                  cellpadding="3" cellspacing="0">
@@ -56,7 +56,7 @@
                     </p:panelGrid>
                 </p:fieldset>
                 <br/>
-                <p:fieldset legend="#{msg.editAppSettingsMailParametersReceive}">
+                <p:fieldset legend="#{msg.editAppSettingsMailParametersReceive}" class="fieldset" toggleable="true" toggleSpeed="500">
 
                     <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
                                  columnClasses="ui-grid-col-2,ui-grid-col-3" layout="grid"
@@ -99,7 +99,7 @@
                     </p:panelGrid>
                 </p:fieldset>
                 <br/>
-                <p:fieldset legend="#{msg.editAppSettingsMailParametersSend}">
+                <p:fieldset legend="#{msg.editAppSettingsMailParametersSend}" class="fieldset" toggleable="true" toggleSpeed="500">
 
                     <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
                                  columnClasses="ui-grid-col-2,ui-grid-col-3" layout="grid"
@@ -115,6 +115,9 @@
                         <p:inputText value="#{bean.mailServerSend.port}"
                                      onkeypress="return numbers_only(this, event, 5, 0)"
                                      onkeyup="check_numbers(this, 5, 0);"/>
+
+                        <span>#{msg.editAppSettingsMailSender}:</span>
+                        <p:inputText value="#{bean.mailServerSend.sender}"/>
 
                         <span>#{msg.editAppSettingsMailLogin}:</span>
                         <p:inputText value="#{bean.mailServerSend.login}"/>
@@ -142,16 +145,26 @@
                     </p:panelGrid>
                 </p:fieldset>
                 
-                <p:fieldset legend="#{msg.editAppSettingsCloud}">
+                <p:fieldset legend="#{msg.editAppSettingsCloud}" class="fieldset" toggleable="true" toggleSpeed="500">
                     <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
                                  cellpadding="3" cellspacing="0" columnClasses="ui-grid-col-2,ui-grid-col-3"
                                  layout="grid">
-                        <span>#{msg.editAppSettingsCloudApiUid}:</span>
+                        <span>#{msg.editAppSettingsCloudApiURL}:</span>
                         <p:inputText id="cloudApiUid"
                                      value="#{bean.settingsCloudApiURL.value}" />
                         <span>#{msg.editAppSettingsCloudApiKey}:</span>
                         <p:inputText id="cloudApiKey"
                                      value="#{bean.settingsCloudApiKey.value}" />
+                    </p:panelGrid>
+                </p:fieldset>
+
+                <p:fieldset legend="#{msg.editAppSettingsAPI}" class="fieldset" toggleable="true" toggleSpeed="500">
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"
+                                 cellpadding="3" cellspacing="0" columnClasses="ui-grid-col-2,ui-grid-col-3"
+                                 layout="grid">
+                        <span>#{msg.editAppSettingsCloudApiURL}:</span>
+                        <p:inputText id="apiURL"
+                                     value="#{bean.settingsApiURL.value}" />
                     </p:panelGrid>
                 </p:fieldset>
                 

@@ -1,42 +1,60 @@
 package it.nexera.ris.persistence.beans.entities.domain;
 
+import it.nexera.ris.common.enums.InvoiceStatus;
 import it.nexera.ris.common.enums.VatCollectability;
+import it.nexera.ris.common.exceptions.PersistenceBeanException;
+import it.nexera.ris.common.helpers.DateTimeHelper;
+import it.nexera.ris.common.helpers.ValidationHelper;
+import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
+import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
+import it.nexera.ris.web.beans.wrappers.GoodsServicesFieldWrapper;
+
+import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "invoice")
 public class Invoice extends IndexedEntity implements Serializable {
 
 	private static final long serialVersionUID = -203805995863279495L;
-	
+
     @ManyToOne
     @JoinColumn(name = "client_id")
-    private Client client;	
-	
+    private Client client;
+
 	@Column(name = "number")
-    private Long number;	
-	
+    private Long number;
+
 	@Column(name = "date")
-    private Date date;	
-	
-	@Column(name = "notes")
-    private String notes;	
-	
+    private Date date;
+
+	@Column(name = "causal")
+    private String notes;
+
     @ManyToOne
     @JoinColumn(name = "payment_type_id")
-    private PaymentType paymentType;		
-	
+    private PaymentType paymentType;
+
     @Column(name = "split_payment")
     private Boolean splitPayment;
 
     @Column(name = "sent")
     private Boolean sent;
-    
+
     @Column(name = "fiscalCode")
     private String fiscalCode;
 
@@ -49,8 +67,65 @@ public class Invoice extends IndexedEntity implements Serializable {
 	@Column(name = "invoice_number")
 	private String invoiceNumber;
 
+	@Enumerated(EnumType.STRING)
+	@Column(name = "status")
+	private InvoiceStatus status;
+
+	@ManyToMany
+	@JoinTable(name = "invoice_manager", joinColumns = {
+			@JoinColumn(name = "invoice_id", table = "invoice")
+	}, inverseJoinColumns = {
+			@JoinColumn(name = "manager_id", table = "client")
+	})
+	private List<Client> managers;
+
+	@ManyToOne
+	@JoinColumn(name = "office_id")
+	private Office office;
+
+	@Column(name = "ndg")
+	private String ndg;
+
+	@Column(name = "pratica")
+	private String practice;
+
+	@ManyToOne
+	@JoinColumn(name = "mail_id")
+	private WLGInbox email;
+
+	@Column(name = "totale_lordo")
+	private Double totalGrossAmount;
+
+	@ManyToOne
+	@JoinColumn(name = "email_from")
+	private WLGInbox emailFrom;
+	
+	@Column(name = "invoice_unlocked_id")
+	private Long invoiceUnlockedId;
+
+	@OneToMany(mappedBy = "invoice")
+	private List<PaymentInvoice> paymentInvoices;
+
 	@Transient
 	private String documentType;
+
+	@Transient
+	private Double totalAmount;
+
+	@Transient
+	private Double onBalance;
+
+	@Transient
+	private String dateString;
+
+	@Transient
+	private Double totalPayment;
+	
+	@Transient
+	private Double totalVat;
+	
+	@Transient
+	private Double totalAmountWithoutTax;
 
 	public Long getCloudId() {
 		return cloudId;
@@ -146,5 +221,183 @@ public class Invoice extends IndexedEntity implements Serializable {
 
 	public void setInvoiceNumber(String invoiceNumber) {
 		this.invoiceNumber = invoiceNumber;
+	}
+
+	public InvoiceStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(InvoiceStatus status) {
+		this.status = status;
+	}
+
+	public Office getOffice() {
+		return office;
+	}
+
+	public void setOffice(Office office) {
+		this.office = office;
+	}
+
+	public String getNdg() {
+		return ndg;
+	}
+
+	public void setNdg(String ndg) {
+		this.ndg = ndg;
+	}
+
+	public String getPractice() {
+		return practice;
+	}
+
+	public void setPractice(String practice) {
+		this.practice = practice;
+	}
+
+	public WLGInbox getEmail() {
+		return email;
+	}
+
+	public void setEmail(WLGInbox email) {
+		this.email = email;
+	}
+
+	public Double getTotalAmount() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+		List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, Restrictions.eq("invoice.id", this.getId()));
+		double totalAmount = 0.0;
+		for(InvoiceItem invoiceItem : invoiceItems) {
+			if(invoiceItem.getAmount() != null) {
+				Double total = invoiceItem.getAmount().doubleValue() + invoiceItem.getVatAmount().doubleValue();
+				totalAmount = totalAmount + total;
+			}
+		}
+		return totalAmount;
+	}
+
+	public Double getOnBalance() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+		double paymentImportTotal = 0.0;
+		Double onBalance = 0.0;
+		if(getPaymentInvoices() != null){
+			if (!Hibernate.isInitialized(this.getPaymentInvoices())) {
+				try {
+					reloadPaymentInvoices();
+				} catch (IllegalAccessException | PersistenceBeanException e) {
+					e.printStackTrace();
+				}
+			}
+			for(PaymentInvoice paymentInvoice : getPaymentInvoices()) {
+				Double total = paymentInvoice.getPaymentImport().doubleValue();
+				paymentImportTotal = paymentImportTotal + total;
+			}
+			if(getTotalGrossAmount() != null)
+				onBalance = getTotalGrossAmount().doubleValue() - paymentImportTotal;
+			BigDecimal balance = BigDecimal.valueOf(onBalance);
+			balance = balance.setScale(2, RoundingMode.HALF_UP);
+			onBalance = balance.doubleValue();
+		}
+		return onBalance;
+	}
+
+
+	public void reloadPaymentInvoices() throws PersistenceBeanException, IllegalAccessException {
+		setPaymentInvoices(DaoManager.load(PaymentInvoice.class, new Criterion[]{
+				Restrictions.eq("invoice.id", this.getId())
+		}, new CriteriaAlias[]{}));
+	}
+
+
+	public Double getTotalPayment() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+		List<PaymentInvoice> paymentInvoices = DaoManager.load(PaymentInvoice.class, Restrictions.eq("invoice.id", this.getId()));
+		double paymentImportTotal = 0.0;
+		for(PaymentInvoice paymentInvoice : paymentInvoices) {
+			Double total = paymentInvoice.getPaymentImport().doubleValue();
+			paymentImportTotal = paymentImportTotal + total;
+		}
+		BigDecimal tot = BigDecimal.valueOf(paymentImportTotal);
+		tot = tot.setScale(2, RoundingMode.HALF_UP);
+		paymentImportTotal = tot.doubleValue();
+		return paymentImportTotal;
+	}
+	
+	public Double getTotalVat() throws PersistenceBeanException, IllegalAccessException, HibernateException, InstantiationException{
+		List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, Restrictions.eq("invoice.id", this.getId()));
+		double total = 0.0;
+		for(InvoiceItem invoiceItem : invoiceItems) {
+			if (!ValidationHelper.isNullOrEmpty(invoiceItem.getInvoiceTotalCost())) {
+                if (!ValidationHelper.isNullOrEmpty(invoiceItem.getTaxRate())) {
+                    TaxRate taxrate = DaoManager.get(TaxRate.class, invoiceItem.getTaxRate().getId());
+                    if (!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())) {
+                    	total +=invoiceItem.getInvoiceTotalCost().doubleValue() * (taxrate.getPercentage().doubleValue() / 100);
+                    }
+                }
+            }
+		}
+		BigDecimal tot = BigDecimal.valueOf(total);
+		tot = tot.setScale(2, RoundingMode.HALF_UP);
+		total = tot.doubleValue();
+		return total;
+	}
+	
+	public Double getTotalAmountWithoutTax() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+		List<InvoiceItem> invoiceItems = DaoManager.load(InvoiceItem.class, Restrictions.eq("invoice.id", this.getId()));
+		double totalAmount = 0.0;
+		for(InvoiceItem invoiceItem : invoiceItems) {
+			if(!ValidationHelper.isNullOrEmpty(invoiceItem.getInvoiceTotalCost())) {
+				totalAmount = totalAmount + invoiceItem.getInvoiceTotalCost().doubleValue();
+			}
+		}
+        BigDecimal tot = BigDecimal.valueOf(totalAmount);
+        tot = tot.setScale(2, RoundingMode.HALF_UP);
+        totalAmount = tot.doubleValue();
+		return totalAmount;
+	}
+
+	public String getDateString() {
+		if(getDate() != null) {
+			return DateTimeHelper.toFormatedStringLocal(getDate(),
+					DateTimeHelper.getDatePattern(), null);
+		}
+		return dateString;
+	}
+
+	public Double getTotalGrossAmount() {
+		return totalGrossAmount;
+	}
+
+	public void setTotalGrossAmount(Double totalGrossAmount) {
+		this.totalGrossAmount = totalGrossAmount;
+	}
+
+	public WLGInbox getEmailFrom() {
+		return emailFrom;
+	}
+
+	public void setEmailFrom(WLGInbox emailFrom) {
+		this.emailFrom = emailFrom;
+	}
+
+	public List<Client> getManagers() {
+		return managers;
+	}
+
+	public void setManagers(List<Client> managers) {
+		this.managers = managers;
+	}
+
+	public Long getInvoiceUnlockedId() {
+		return invoiceUnlockedId;
+	}
+
+	public void setInvoiceUnlockedId(Long invoiceUnlockedId) {
+		this.invoiceUnlockedId = invoiceUnlockedId;
+	}
+
+	public List<PaymentInvoice> getPaymentInvoices() {
+		return paymentInvoices;
+	}
+
+	public void setPaymentInvoices(List<PaymentInvoice> paymentInvoices) {
+		this.paymentInvoices = paymentInvoices;
 	}
 }

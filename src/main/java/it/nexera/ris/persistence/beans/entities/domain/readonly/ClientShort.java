@@ -107,6 +107,8 @@ public class ClientShort extends IndexedEntity implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "office_id")
     private Office office;
+
+    private Boolean brexa;
     
     public Office getOffice() {
         return office;
@@ -321,5 +323,13 @@ public class ClientShort extends IndexedEntity implements Serializable {
 
     public void setReferenceClients(List<Client> referenceClients) {
         this.referenceClients = referenceClients;
+    }
+
+    public Boolean getBrexa() {
+        return brexa;
+    }
+
+    public void setBrexa(Boolean brexa) {
+        this.brexa = brexa;
     }
 }

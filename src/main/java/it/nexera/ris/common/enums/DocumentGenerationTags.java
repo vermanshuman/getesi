@@ -63,7 +63,8 @@ public enum DocumentGenerationTags {
     INIT_TEXT_REGISTRY_OR_TABLE("init_text_registry_or_table"),
     ATTACHMENT_INDICATION("Indicazione allegati"),
     ATTACHMENT_A("Allegato A"),
-    ATTACHMENT_B("Allegato B");
+    ATTACHMENT_B("Allegato B"),
+    ATTACHMENT_C("Allegato C");
 
 
     private String tag;

@@ -1,11 +1,9 @@
 package it.nexera.ris.persistence.beans.entities.domain;
 
-import it.nexera.ris.common.enums.UserCategories;
-import it.nexera.ris.common.enums.UserLevel;
-import it.nexera.ris.common.enums.UserStatuses;
-import it.nexera.ris.common.enums.UserType;
+import it.nexera.ris.common.enums.*;
 import it.nexera.ris.common.helpers.ListHelper;
 import it.nexera.ris.common.helpers.LogHelper;
+import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.SessionManager;
 import it.nexera.ris.persistence.UserHolder;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
@@ -13,8 +11,10 @@ import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Area;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
+import it.nexera.ris.web.beans.wrappers.logic.RoleWrapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Hibernate;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
@@ -119,6 +119,14 @@ public class User extends IndexedEntity {
     @JoinColumn(name = "office_id")
     private Office office;
 
+    @Column(name = "phone")
+    private String phone;
+    
+    @Column(name = "getesi")
+    private Boolean getesi;
+    
+    @Column(name = "brexa")
+    private Boolean brexa;
 
     public boolean isPhysical() {
         return getType() != null && getType() == UserType.PHYSICAL;
@@ -175,6 +183,19 @@ public class User extends IndexedEntity {
         return !this.getId()
                 .equals(UserHolder.getInstance().getCurrentUser().getId())
                 && notDeletable;
+    }
+
+    @Transient
+    public boolean isAdmin() {
+        if(!Hibernate.isInitialized(this.getRoles()))
+        if (!ValidationHelper.isNullOrEmpty(this.getRoles())) {
+            for (Role role : this.getRoles()) {
+                if (RoleTypes.ADMINISTRATOR.equals(role.getType())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Transient
@@ -377,5 +398,29 @@ public class User extends IndexedEntity {
 
 	public void setPasswordChanged(Boolean passwordChanged) {
 		this.passwordChanged = passwordChanged;
+	}
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+    
+    public Boolean getGetesi() {
+		return getesi;
+	}
+
+	public void setGetesi(Boolean getesi) {
+		this.getesi = getesi;
+	}
+
+	public Boolean getBrexa() {
+		return brexa;
+	}
+
+	public void setBrexa(Boolean brexa) {
+		this.brexa = brexa;
 	}
 }

@@ -1,0 +1,166 @@
+.special-upload {
+    display: flex;
+    max-height: 180px;
+}
+.special-upload .ui-widget-header {
+    background-color: transparent !important;
+    width: 30%;
+    border-right: none !important;
+}
+.special-upload .ui-widget-content {
+    width: 70%;
+    border-left: none !important;
+    border-top: 1px solid #dee2e6 !important;
+}
+.special-upload .ui-fileupload-choose {
+    margin-top: 6px;
+}
+.special-upload .ui-fileupload-files {
+    margin-top: -5px !important;
+}
+.transaction-date {
+    width: 900px;
+    display: flex;
+    border: 1px solid #dee2e6 !important;
+    padding: 1.5rem;
+    margin-top: -30px;
+}
+
+
+#wizard ul {
+    background-color: transparent !important;
+    text-transform: uppercase;
+}
+
+#wizard ul::before {
+    border-bottom: none;
+}
+
+#wizard ul li:not(.ui-tabs-selected.ui-state-active ) a {
+    color: gray !important;
+    border-bottom: 2px solid #dee2e6;
+}
+
+#wizard ul li.ui-tabs-selected.ui-state-active {
+    background-color: transparent !important;
+}
+
+#wizard ul li.ui-tabs-selected.ui-state-active a {
+    color: #000 !important;
+    border-bottom: 3px solid #4872F2;
+    font-weight: bold;
+}
+
+#wizard *:not(.ui-icon) {
+    font-size: 18px;
+}
+
+#wizard .action_column {
+    width: 60px;
+}
+#wizard .close_btn {
+    float: right;
+    bottom: 20px;
+    right: 40px;
+    position: absolute;
+}
+
+body .ui-panel .ui-panel-content {
+    border: none;
+}
+
+.ui-button.green-button {
+    background-color: #00cc52 !important;
+    width: 150px;
+    margin-bottom: 10px;
+}
+
+.ui-button.blue-button {
+    background-color: #547ac4 !important;
+    width: 150px;
+    margin-bottom: 10px;
+}
+
+.align-right {
+    float:right !important;
+}
+
+.ui-inputnumber input {
+    width: 100%;
+}
+
+.special-upload {
+    width: 900px;
+}
+
+.special-upload .ui-fileupload-choose {
+    background: #fed820;
+    color: #000000;
+}
+
+.special-upload .ui-fileupload-content {
+    min-height: 80px;
+}
+
+.manage-certificate-date {
+    width: 372px;
+    display: flex;
+    border: 1px solid #dee2e6 !important;
+    padding: 1.5rem;
+    padding-top: 2rem;
+    min-height: 92px;
+}
+
+.minW372 {
+    min-width: 372px;
+}
+
+
+.br-none {
+    border-right: none !important;
+}
+
+body .ui-panel .ui-panel-content {
+    background-color: transparent;
+}
+
+.special-upload-mapFile {
+	display: flex;
+	border: 1px solid #dee2e6 !important;
+}
+.special-upload-mapFile .ui-widget-header {
+    background-color: transparent !important;
+    width: 30%;
+    border-right: none !important;
+}
+.special-upload-mapFile .ui-widget-content {
+	border: none !important;
+}
+
+.special-upload-mapFile .ui-fileupload-choose {
+    margin-top: 6px;
+}
+
+.special-upload-mapFile .ui-fileupload-buttonbar {
+    border: none !important;
+}
+
+.ui-dialog .ui-widget-header {
+    background: #FFFFFF !important;
+    color: #495057 !important;
+}
+
+.pdf-button {
+	background-color: #FFFFFF !important;
+	color: #AD0B00 !important;
+	width: 100px !important;
+}
+
+
+
+.excel-button {
+	background-color: #FFFFFF !important;
+	color: #217346 !important;
+	width: 100px !important;
+}
+

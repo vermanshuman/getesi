@@ -1,9 +1,22 @@
 package it.nexera.ris.common.helpers;
 
 import it.nexera.ris.common.enums.SexTypes;
+import it.nexera.ris.common.exceptions.PersistenceBeanException;
+import it.nexera.ris.persistence.PersistenceSession;
+import it.nexera.ris.persistence.beans.dao.ConnectionManager;
+import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 
+import java.time.LocalDate;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 public class CalcoloCodiceFiscale {
     private static final String mesi = "ABCDEHLMPRST";
@@ -228,4 +241,39 @@ public class CalcoloCodiceFiscale {
         return s.substring(11, 15);
     }
 
+
+    public static City getCityFromFiscalCode(String fiscalCode) throws Exception {
+        if(StringUtils.isBlank(fiscalCode))
+            return null;
+        PersistenceSession ps = new PersistenceSession();
+        Session session = ps.getSession();
+
+        List<City> cityList = ConnectionManager.load(City.class, new Criterion[]{
+                Restrictions.eq("cfis", fiscalCode.substring(11, 15))
+        }, session);
+        if(!ValidationHelper.isNullOrEmpty(cityList))
+            return cityList.get(0);
+        return null;
+    }
+    public static Date getBirthDateFromFiscalCode(String fiscalCode) throws Exception {
+        String birthDatePart = fiscalCode.substring(6, 11);
+        String yearPart = birthDatePart.substring(0,2);
+        Integer year = Integer.parseInt("19" + yearPart);
+        LocalDate currentdate = LocalDate.now();
+        int currentYear = currentdate.getYear();
+        if((currentYear - year) > 100 )
+            year = Integer.parseInt("20" + yearPart);
+        int month = mesi.indexOf(birthDatePart.substring(2,3));
+        String dayPart = String.format("%02d", Integer.parseInt(birthDatePart.substring(3)));
+        int day = Integer.parseInt(dayPart);
+        Calendar birthDate = Calendar.getInstance();
+        birthDate.set(GregorianCalendar.MONTH, month);
+        birthDate.set(GregorianCalendar.YEAR, year);
+        birthDate.set(GregorianCalendar.DAY_OF_MONTH, day);
+        birthDate.set(GregorianCalendar.HOUR_OF_DAY, 0);
+        birthDate.set(GregorianCalendar.MINUTE, 0);
+        birthDate.set(GregorianCalendar.SECOND, 0);
+        birthDate.set(GregorianCalendar.MILLISECOND, 0);
+        return birthDate.getTime();
+    }
 }

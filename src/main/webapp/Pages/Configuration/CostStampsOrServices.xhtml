@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ff="http://readytech.com/functions"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<ui:composition template="/resources/tpl/Admin/EditBase.xhtml">
+
+    <ui:param name="edit_title" value="#{msg.costStampsOrServices}"/>
+    <ui:param name="bean" value="#{costStampsOrServicesBean}"/>
+    <ui:param name="entity_name" value="#{msg.costStampsOrServices}"/>
+    <ui:param name="disableSelection" value="true"/>
+    <ui:param name="additionalEditAction" value="window.scrollTo(0,0);"/>
+
+    <ui:define name="edit_body">
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" style="width: 40%">
+            <span><span class="red"></span>#{msg.taxStampCost}</span>
+            <p:inputText id="taxStampCost" value="#{bean.entity.taxStampCost}" label="#{msg.taxStampCost}"
+                         onkeypress="return numbers_only(this, event, 10, 2)"
+                         onkeyup="check_numbers(this, 10, 2);"
+                         styleClass="input-width"/>
+            <span><span class="red"></span>#{msg.servicesStampCost}</span>
+            <p:inputText id="servicesStampCost" value="#{bean.entity.servicesStampCost}" label="#{msg.servicesStampCost}"
+                         onkeypress="return numbers_only(this, event, 10, 2)"
+                         onkeyup="check_numbers(this, 10, 2);"
+                         styleClass="input-width"/>
+        </p:panelGrid>
+    </ui:define>
+</ui:composition>
+</html>

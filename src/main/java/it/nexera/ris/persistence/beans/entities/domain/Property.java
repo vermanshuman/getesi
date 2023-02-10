@@ -48,11 +48,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -157,7 +153,7 @@ public class Property extends IndexedEntity implements BeforeSave {
     }, inverseJoinColumns = {
             @JoinColumn(name = "cadastral_data_id", table = "cadastral_data")
     })
-    private List<CadastralData> cadastralData;
+    private Set<CadastralData> cadastralData;
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.REMOVE)
     private List<Relationship> relationships;
@@ -257,6 +253,12 @@ public class Property extends IndexedEntity implements BeforeSave {
 
     @Transient
     private LandCadastralCulture cadastralCulture;
+
+    @Transient
+    private LandCulture landCulture;
+
+    @Transient
+    private Boolean landOmiValueRelated;
 
     @Override
     public void beforeSave() {
@@ -513,7 +515,8 @@ public class Property extends IndexedEntity implements BeforeSave {
     public List<String> getSectionList() {
         if (!ValidationHelper.isNullOrEmpty(getCadastralData())) {
             return getCadastralData().stream().distinct()
-                    .map(p -> !ValidationHelper.isNullOrEmpty(p.getSection()) ? p.getSection() : "")
+                    .map(p -> p.getSection())
+                    .filter(section -> !ValidationHelper.isNullOrEmpty(section))
                     .collect(Collectors.toList());
         }
         return new ArrayList<>();
@@ -538,6 +541,19 @@ public class Property extends IndexedEntity implements BeforeSave {
                 .collect(Collectors.joining(", "));
     }
 
+    private double extractDouble(String s) {
+        String num = s.replaceAll("[^\\d.]", "");
+        // return 0 if no digits found
+        return num.isEmpty() ? 0 : Double.parseDouble(num);
+    }
+
+    public double getSortedSheets() {
+        if(getSheetList().size() > 0)
+            return extractDouble(getSheetList().get(0));
+        else
+            return 0;
+    }
+
     public List<String> getParticleList() {
         if (!ValidationHelper.isNullOrEmpty(getCadastralData())) {
             return getCadastralData().stream().distinct()
@@ -552,10 +568,18 @@ public class Property extends IndexedEntity implements BeforeSave {
                 .collect(Collectors.joining(", "));
     }
 
+    public double getSortedParticles() {
+        if(getParticleList().size() > 0)
+            return extractDouble(getParticleList().get(0));
+        else
+            return 0;
+    }
+
     public List<String> getSubList() {
         if (!ValidationHelper.isNullOrEmpty(getCadastralData())) {
             return getCadastralData().stream().distinct()
-                    .map(p -> !ValidationHelper.isNullOrEmpty(p.getSub()) ? p.getSub() : "")
+                    .map(p -> p.getSub())
+                    .filter(sub -> !ValidationHelper.isNullOrEmpty(sub))
                     .collect(Collectors.toList());
         }
         return new ArrayList<>();
@@ -564,6 +588,13 @@ public class Property extends IndexedEntity implements BeforeSave {
     public String getSubs() {
         return getSubList().stream().map(Object::toString)
                 .collect(Collectors.joining(", "));
+    }
+
+    public String getSortedSubs() {
+        if(getSubList().size() > 0)
+            return getParticleList().get(0);
+        else
+            return "";
     }
 
     public String getTypeTitle() {
@@ -614,7 +645,6 @@ public class Property extends IndexedEntity implements BeforeSave {
             return "";
         }
     }
-
     public String getAllFields(boolean addCommercialAndOmi, boolean addLandData) {
         String estateCardList = ResourcesHelper.getString("estateCardListPrefix");
         String estatePlan = ResourcesHelper.getString("estatePlanPrefix");
@@ -630,8 +660,9 @@ public class Property extends IndexedEntity implements BeforeSave {
         DaoManager.refresh(this);
 
         String beggingOfCommentWrap = "";
-        String estimateOMIRequestText = PropertyEntityHelper.getEstimateOMIRequestText(this);
-        String estimateLastCommercialValueRequestText = PropertyEntityHelper.getEstimateLastCommercialValueRequestText(this);
+        String estimateOMIRequestText = GeneralFunctionsHelper.formatOMIString(PropertyEntityHelper.getLastEstimateOMIRequestText(this));
+
+        String estimateLastCommercialValueRequestText = PropertyEntityHelper.getLastEstimateLastCommercialValueRequestText(this);
 
         if (ValidationHelper.isNullOrEmpty(estimateOMIRequestText)
                 && ValidationHelper.isNullOrEmpty(estimateLastCommercialValueRequestText)) {
@@ -639,6 +670,28 @@ public class Property extends IndexedEntity implements BeforeSave {
         }
 
         StringBuilder sb = new StringBuilder("<div style=\"text-align: justify;\">- ");
+
+        String categoryValue = "";
+
+        if(getCategory() != null){
+            if(StringUtils.isNotBlank(getCategoryCode())){
+                if(getCategoryCode().startsWith("A")){
+                    categoryValue = getCurrentString(estateConsistency, getConsistencyTrimmed(), false);
+                }else if(getCategoryCode().startsWith("C")){
+                    if(getCadastralArea() == null || getCadastralArea() == 0){
+                        categoryValue = getCurrentString(estateMq, getConsistencyNumber(), false);
+                    }
+                }else if(getCategoryCode().startsWith("EU")){
+                    categoryValue = getCurrentString(estateMq, getConsistencEu(), false);
+                }else if(getCategoryCode().startsWith("F")){
+                    if (!ValidationHelper.isNullOrEmpty(getConsistency()) && getConsistency().toLowerCase().contains("mq")) {
+                        categoryValue = getCurrentString(estateMq, getConsistencyNumber(), false);
+                    }else if (!ValidationHelper.isNullOrEmpty(getConsistency()) && getConsistency().toLowerCase().contains("vani")) {
+                        categoryValue = getCurrentString(estateConsistency, getConsistencyTrimmed(), false);
+                    }
+                }
+            }
+        }
 
         sb.append((getCategory() != null ? getCurrentString("", getCategory().getTextInTag(), false) : ""))
                 .append(getCurrentString((getAddress() == null ? "" : getAddressPrefix()) + " ",
@@ -650,20 +703,41 @@ public class Property extends IndexedEntity implements BeforeSave {
                 .append(getCurrentString(estatePlan, getFloor(), false))
                 .append(getCurrentString(estateInterno, getInterno(), false))
                 .append(getCurrentString(estateScala, getScala(), false))
-                .append((getCategory() != null && getCategory().getCode() != null && getCategory().getCode().startsWith("A") ? getCurrentString(estateConsistency, getConsistencyTrimmed(), false) :
-                        getCategory() != null && getCategory().getCode() != null && getCategory().getCode().startsWith("C") && (getCadastralArea() == null || getCadastralArea() == 0) ? getCurrentString(estateMq, getConsistencyNumber(), false) : ""))
+                .append(categoryValue)
                 .append(getCurrentString(estateMq, (getCadastralArea() == null || getCadastralArea() == 0) ? null : Long.toString(getCadastralArea().longValue()), false))
                 .append(getCurrentString(estateAnnuity, manageMoneyView(getRevenue()), true));
 
         if (addCommercialAndOmi) {
             if(!StringUtils.endsWith(sb, "<br/>"))
         	    sb.append("<br/>");
+
             sb.append(NumberUtils.isParsable(estimateOMIRequestText.replaceAll(",", ".")) ?
                     getCurrentString(estateValueOMI, manageMoneyView(estimateOMIRequestText), true) :
-                    getCurrentString(estateValueOMI.replaceAll("&euro;", ""), estimateOMIRequestText, true));
+                    getCurrentString(estateValueOMI, estimateOMIRequestText, true));
             sb.append(NumberUtils.isParsable(estimateLastCommercialValueRequestText.replaceAll(",", ".")) ?
                     getCurrentString(estateIndicativeCommercial, manageMoneyView(estimateLastCommercialValueRequestText), true) :
                     getCurrentString(estateIndicativeCommercial.replaceAll("&euro;", ""), estimateLastCommercialValueRequestText, true));
+        }
+       try {
+           if(!ValidationHelper.isNullOrEmpty(getCurrentRequest()) && !ValidationHelper.isNullOrEmpty(getCurrentRequest().getClient())
+                   && !ValidationHelper.isNullOrEmpty(getCurrentRequest().getClient().getFiscalValue()) &&
+                   getCurrentRequest().getClient().getFiscalValue()){
+
+               if(StringUtils.isNotBlank(getRevenue()) && !ValidationHelper.isNullOrEmpty(getCategory())){
+
+                   String estateIndicativeFiscalValue = PropertyEntityHelper.getFiscalValue(this);
+                   if(StringUtils.isNotBlank(estateIndicativeFiscalValue)){
+                       String estateIndicativeFiscal = ResourcesHelper.getString("estateIndicativeFiscalPrefix");
+
+                       sb.append(NumberUtils.isParsable(estateIndicativeFiscalValue.replaceAll(",", ".")) ?
+                               getCurrentString(estateIndicativeFiscal, manageMoneyView(estateIndicativeFiscalValue), true) :
+                               getCurrentString(estateIndicativeFiscal, estateIndicativeFiscalValue, true));
+                   }
+               }
+           }
+        }catch(Exception e){
+            e.printStackTrace();
+            log.error(log, e);
         }
         if (addLandData ) {
             sb.append("&nbsp;mq&nbsp;");
@@ -752,7 +826,7 @@ public class Property extends IndexedEntity implements BeforeSave {
         return !ValidationHelper.isNullOrEmpty(result) ? result : WordUtils.capitalizeFully(address);
     }
 
-    private String manageMoneyView(String number) {
+    public String manageMoneyView(String number) {
         if (!ValidationHelper.isNullOrEmpty(number)) {
             String temp = "";
             String rest = "";
@@ -807,7 +881,7 @@ public class Property extends IndexedEntity implements BeforeSave {
         return "";
     }
 
-    private String getCurrentString(String prefix, String str, boolean br) {
+    public String getCurrentString(String prefix, String str, boolean br) {
         return str == null || Objects.equals(str, "") ? "" : br ? " " + prefix + str + "<br/>" : " " + prefix + str;
     }
 
@@ -837,16 +911,22 @@ public class Property extends IndexedEntity implements BeforeSave {
             String estateSubGraft = ResourcesHelper.getString("estateSubGraftPrefix");
             String scheda = ResourcesHelper.getString("schedaPrefix");
             String dataScheda = ResourcesHelper.getString("dataSchedaPrefix");
-            if (!ValidationHelper.isNullOrEmpty(getSectionList().get(0))) {
+            if (!ValidationHelper.isNullOrEmpty(getSectionList()) &&
+                    !ValidationHelper.isNullOrEmpty(getSectionList().get(0))) {
                 str.append(getCurrentString(estateSezione, getSectionList().get(0), false, true));
             }
-            if (ValidationHelper.isNullOrEmpty(getSchedaList().get(0))) {
-                str.append(getCurrentString(estateCard, getSheetList().get(0), false, true));
-                str.append(getCurrentString(estatePart, getParticleList().get(0), false, true));
-                str.append(getCurrentString(estateSub, getSubList().get(0), false, true));
+            if (ValidationHelper.isNullOrEmpty(getSchedaList())
+                    || ValidationHelper.isNullOrEmpty(getSchedaList().get(0))) {
+                if(!ValidationHelper.isNullOrEmpty(getSheetList()))
+                    str.append(getCurrentString(estateCard, getSheetList().get(0), false, true));
+                if(!ValidationHelper.isNullOrEmpty(getParticleList()))
+                    str.append(getCurrentString(estatePart, getParticleList().get(0), false, true));
+                if(!ValidationHelper.isNullOrEmpty(getSubList()))
+                    str.append(getCurrentString(estateSub, getSubList().get(0), false, true));
             } else {
                 str.append(getCurrentString(scheda, getSchedaList().get(0), false, true));
-                str.append(getCurrentString(dataScheda, getDataSchedaList().get(0), false, true));
+                if(!ValidationHelper.isNullOrEmpty(getDataSchedaList()))
+                    str.append(getCurrentString(dataScheda, getDataSchedaList().get(0), false, true));
             }
             return str.toString();
         }
@@ -1023,7 +1103,17 @@ public class Property extends IndexedEntity implements BeforeSave {
 
     public String getConsistencyTrimmed() {
         if (!ValidationHelper.isNullOrEmpty(getConsistency())) {
-            return getConsistency().replaceAll("[vV][aA][nN][iI]", "").trim();
+            String consistency = getConsistency().toLowerCase().replaceAll(",", ".");
+            if (consistency.contains("mq")) {
+                return getConsistency().replaceAll("mq", "").trim();
+            } else if (consistency.contains("vani")) {
+                return getConsistency().replaceAll("[vV][aA][nN][iI]", "").trim();
+            } else if (consistency.contains("metri quadri")) {
+                return getConsistency().replaceAll("metri quadri", "").trim();
+            } else if (consistency.contains("metri quadrati")) {
+                return getConsistency().replaceAll("metri quadrati", "").trim();
+            }
+            return getConsistency();
         } else {
             return "";
         }
@@ -1031,7 +1121,18 @@ public class Property extends IndexedEntity implements BeforeSave {
 
     public String getConsistencyNumber() {
         if (!ValidationHelper.isNullOrEmpty(getConsistency())) {
-            return getConsistency().replaceAll("([vV][aA][nN][iI])|([mM][qQ])", "").trim();
+            String consistency = getConsistency().toLowerCase().replaceAll(",", ".");
+            if (consistency.contains("mq")) {
+                return getConsistency().replaceAll("mq|MQ", "").trim();
+            } else if (consistency.contains("vani")) {
+                return getConsistency().replaceAll("([vV][aA][nN][iI])|([mM][qQ])", "")
+                        .trim();
+            } else if (consistency.contains("metri quadri")) {
+                return getConsistency().replaceAll("metri quadri|METRI QUADRI", "").trim();
+            } else if (consistency.contains("metri quadrati")) {
+                return getConsistency().replaceAll("metri quadrati|METRI QUADRATI", "").trim();
+            }
+            return getConsistency();
         } else {
             return "";
         }
@@ -1067,6 +1168,14 @@ public class Property extends IndexedEntity implements BeforeSave {
             landMQ = GeneralFunctionsHelper.formatDoubleString(landMQ);
         }
         return landMQ;
+    }
+
+    public String getConsistencEu() {
+        if (!ValidationHelper.isNullOrEmpty(getConsistency())) {
+            return getConsistency().replace("centiare", "").replace("are", "").replaceAll("\\s", "").trim();
+        } else {
+            return "";
+        }
     }
 
     public String getConsistency() {
@@ -1189,11 +1298,11 @@ public class Property extends IndexedEntity implements BeforeSave {
         this.numberOfRooms = numberOfRooms;
     }
 
-    public List<CadastralData> getCadastralData() {
+    public Set<CadastralData> getCadastralData() {
         return cadastralData;
     }
 
-    public void setCadastralData(List<CadastralData> cadastralData) {
+    public void setCadastralData(Set<CadastralData> cadastralData) {
         this.cadastralData = cadastralData;
     }
 
@@ -1242,6 +1351,17 @@ public class Property extends IndexedEntity implements BeforeSave {
             return list.get(0).getCommercialValue();
         }
 
+        return null;
+    }
+
+    public CommercialValueHistory getLastCommercial() {
+        if (!ValidationHelper.isNullOrEmpty(getCommercialValueHistory())) {
+            List<CommercialValueHistory> list = getCommercialValueHistory();
+
+            list.sort(new CommercialValueHistoryComparator());
+
+            return list.get(0);
+        }
         return null;
     }
 
@@ -1524,4 +1644,40 @@ public class Property extends IndexedEntity implements BeforeSave {
         }
         return cadastralCulture;
     }
+    public LandCulture getLandCulture() throws PersistenceBeanException, IllegalAccessException {
+        return landCulture;
+    }
+
+    public void setLandCulture(LandCulture landCulture) {
+        this.landCulture = landCulture;
+    }
+
+    public Boolean getLandOmiValueRelated() throws PersistenceBeanException, IllegalAccessException {
+        landOmiValueRelated = Boolean.FALSE;
+        if(!ValidationHelper.isNullOrEmpty(getQuality())) {
+            List<LandCadastralCulture> landCadastralCultures = DaoManager.load(LandCadastralCulture.class,
+                    new Criterion[]{Restrictions.eq("description", getQuality()).ignoreCase()
+                    });
+            if (!ValidationHelper.isNullOrEmpty(landCadastralCultures)) {
+                LandCulture landCulture = landCadastralCultures.get(0).getLandCulture();
+                if(!ValidationHelper.isNullOrEmpty(landCulture)){
+                    List<LandOmiValue> landOmiValues = DaoManager.load(LandOmiValue.class,
+                            new Criterion[]{Restrictions.eq("landCulture", landCulture)
+                            });
+                    if (!ValidationHelper.isNullOrEmpty(landOmiValues) && !ValidationHelper.isNullOrEmpty(getCity())) {
+                        List<LandOmiValue> cityLandOmiValues = landOmiValues
+                                .stream()
+                                .filter(lov -> !ValidationHelper.isNullOrEmpty(lov.getLandOmi())
+                                        && !ValidationHelper.isNullOrEmpty(lov.getLandOmi().getCities())
+                                        && lov.getLandOmi().getCities().contains(getCity()))
+                                .collect(Collectors.toList());
+                        if (!ValidationHelper.isNullOrEmpty(cityLandOmiValues))
+                            landOmiValueRelated = Boolean.TRUE;
+                    }
+                }
+            }
+        }
+        return landOmiValueRelated;
+    }
+
 }

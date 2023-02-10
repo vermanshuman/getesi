@@ -1,10 +1,7 @@
 package it.nexera.ris.web.beans.pages;
 
 import it.nexera.ris.common.annotations.ReattachIgnore;
-import it.nexera.ris.common.enums.DocumentType;
-import it.nexera.ris.common.enums.PageTypes;
-import it.nexera.ris.common.enums.RealEstateType;
-import it.nexera.ris.common.enums.RequestState;
+import it.nexera.ris.common.enums.*;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.exceptions.TypeActNotConfigureException;
 import it.nexera.ris.common.helpers.*;
@@ -130,6 +127,10 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 
 	private List<SelectItem> landCultures;
 
+	private CostManipulationHelper costManipulationHelper;
+
+	private Boolean showAddNationalCostButton;
+
 	@Override
 	public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
 		String id = getRequestParameter(RedirectHelper.ID_PARAMETER);
@@ -156,7 +157,11 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 		setUploadedPdfFiles(new LinkedList<>());
 		setLandAggregations(ComboboxHelper.fillList(LandChargesRegistry.class, Order.asc("name")));
 		checkPreviousRequest();
-
+		if (!ValidationHelper.isNullOrEmpty(getRequestEntity())
+				&& (ValidationHelper.isNullOrEmpty(getRequestEntity().getIncludeNationalCost())
+				|| (!ValidationHelper.isNullOrEmpty(getRequestEntity().getIncludeNationalCost())
+				&& !getRequestEntity().getIncludeNationalCost())))
+			setShowAddNationalCostButton(true);
 	}
 
 	private void checkPreviousRequest() throws PersistenceBeanException, IllegalAccessException {
@@ -181,9 +186,13 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 							Restrictions.isNotNull("aggregationLandChargesRegistry") :
 								Restrictions.eq("aggregationLandChargesRegistry.id",
 										getRequestEntity().getAggregationLandChargesRegistry().getId())),
-					Restrictions.eq("stateId", RequestState.EVADED.getId()),
+					Restrictions.or(
+							Restrictions.eq("stateId", RequestState.EVADED.getId()),
+							Restrictions.eq("stateId", RequestState.INVOICED.getId()),
+							Restrictions.eq("stateId", RequestState.TURNOVER_OLD.getId()),
+							Restrictions.eq("stateId", RequestState.SENT_TO_SDI.getId())
+					),
 					Restrictions.ne("id", getRequestEntity().getId())});
-
 			if (!ValidationHelper.isNullOrEmpty(requests)) {
 				setPreviousRequestList(requests);
 				Request lastRequest = requests.get(requests.size()-1);
@@ -257,6 +266,9 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 							&& !DocumentType.ALLEGATI.getId().equals(x.getTypeId())
 							&& !DocumentType.OTHER.getId().equals(x.getTypeId())).collect(Collectors.toList())) {
 				Document newDocument = document.clone();
+				// https://trello.com/c/oz5LC11l/1220-import-data-from-previous-request start
+				newDocument.setSelectedForEmail(null);
+				// https://trello.com/c/oz5LC11l/1220-import-data-from-previous-request end
 				newDocument.setRequest(getRequestEntity());
 				DaoManager.save(newDocument, true);
 			}
@@ -289,7 +301,6 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 		Hibernate.initialize(getRequestEntity().getSituationEstateLocations());
 		Hibernate.initialize(getRequestEntity().getPropertyList());
 		Hibernate.initialize(getRequestEntity().getEstateFormalityList());
-
 		onLoad();
 	}
 
@@ -531,6 +542,8 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 			throws PersistenceBeanException, IllegalAccessException, InstantiationException {
 		Subject differentSubject = GeneralFunctionsHelper.checkSubjectPropertyUpload(event.getFile().getFileName(),
 				event.getFile().getContents(), getRequestEntity(), DaoManager.getSession());
+
+
 		getViewState().put("estateSituationViewBean", this);
 		if (differentSubject == null) {
 			GeneralFunctionsHelper.handleFileUpload(event.getFile().getFileName(),
@@ -930,9 +943,11 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 	}
 
 	public void goCancel() throws PersistenceBeanException, IllegalAccessException {
-		List<EstateFormality> formalityList = (List<EstateFormality>) getLazyFormalityList().getWrappedData();
-		for (EstateFormality formality : formalityList) {
-			DaoManager.save(formality, true);
+		if(!ValidationHelper.isNullOrEmpty(getLazyFormalityList())){
+			List<EstateFormality> formalityList = (List<EstateFormality>) getLazyFormalityList().getWrappedData();
+			for (EstateFormality formality : formalityList) {
+				DaoManager.save(formality, true);
+			}
 		}
 		RedirectHelper.goTo(PageTypes.REQUEST_ESTATE_SITUATION_LIST, getRequestEntity().getId());
 	}
@@ -1240,7 +1255,100 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 		}
 	}
 
+	public void updateNationalCost() throws Exception {
+		Request request = DaoManager.get(Request.class, new Criterion[]{
+				Restrictions.eq("id", getRequestId())});
 
+		setCostManipulationHelper(new CostManipulationHelper());
+		getCostManipulationHelper().setIncludeNationalCost(true);
+		getCostManipulationHelper().setRequestExtraCosts(new ArrayList<>());
+		List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
+				Restrictions.eq("requestId", request.getId())});
+		if(!ValidationHelper.isNullOrEmpty(extraCosts))
+			getCostManipulationHelper().setRequestExtraCosts(extraCosts);
+
+		if(!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry()) &&
+				!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getNational()) &&
+				request.getAggregationLandChargesRegistry().getNational()) {
+
+			getCostManipulationHelper().setIncludeNationalCost(false);
+			executeJS("PF('includeNationalCost2DialogWV').show();");
+			return;
+		}
+		if(!ValidationHelper.isNullOrEmpty(getCostManipulationHelper().getIncludeNationalCost())
+				&& getCostManipulationHelper().getIncludeNationalCost()) {
+			if(!ValidationHelper.isNullOrEmpty(request.getMail())) {
+				List<Request> requestsWithSameMailId = DaoManager.load(Request.class,
+						new Criterion[] {Restrictions.and(Restrictions.eq("mail.id", request.getMail().getId()),
+								Restrictions.eq("subject.id", request.getSubject().getId()))
+						});
+				boolean haveAnyWithIncludeSet = requestsWithSameMailId.stream().anyMatch(
+						x->!ValidationHelper.isNullOrEmpty(x.getIncludeNationalCost()) && x.getIncludeNationalCost());
+				if(haveAnyWithIncludeSet) {
+					getCostManipulationHelper().setIncludeNationalCost(false);
+					executeJS("PF('includeNationalCostDialogWV').show();");
+					return;
+				}
+			}
+
+			if(!ValidationHelper.isNullOrEmpty(request) && !ValidationHelper.isNullOrEmpty(request.getService())
+					&& !ValidationHelper.isNullOrEmpty(request.getService().getNationalPrice())) {
+				getCostManipulationHelper().setExtraCostOther(request.getService().getNationalPrice().toString());
+				getCostManipulationHelper().setExtraCostOtherNote(ResourcesHelper.getString("requestServiceNationalPriceNote"));
+				getCostManipulationHelper().addExtraCost("NAZIONALEPOSITIVA", getRequestId());
+
+				Request requestDb  = DaoManager.get(Request.class, getRequestId());
+				getCostManipulationHelper().saveRequestExtraCost(requestDb, null);
+				CostCalculationHelper calculation = new CostCalculationHelper(requestDb);
+				calculation.calculateAllCosts(true);
+				setShowAddNationalCostButton(false);
+			}
+		}
+	}
+
+	public void deleteNationalCost() throws Exception {
+		Request request = DaoManager.get(Request.class, new Criterion[]{
+				Restrictions.eq("id", getRequestId())});
+
+		setCostManipulationHelper(new CostManipulationHelper());
+		getCostManipulationHelper().setIncludeNationalCost(false);
+		getCostManipulationHelper().setRequestExtraCosts(new ArrayList<>());
+		List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
+				Restrictions.eq("requestId", request.getId())});
+		if(!ValidationHelper.isNullOrEmpty(extraCosts)) {
+			getCostManipulationHelper().setRequestExtraCosts(extraCosts);
+			Optional<ExtraCost> nationalExtraCost =  getCostManipulationHelper().getRequestExtraCosts()
+					.stream()
+					.filter(ec -> ec.getType().equals(ExtraCostType.NAZIONALEPOSITIVA))
+					.findFirst();
+			if(nationalExtraCost.isPresent()) {
+				getCostManipulationHelper().getRequestExtraCosts().remove(nationalExtraCost.get());
+				getCostManipulationHelper().setIncludeNationalCost(null);
+				Request requestDb  = DaoManager.get(Request.class, getRequestId());
+				getCostManipulationHelper().saveRequestExtraCost(requestDb);
+				CostCalculationHelper calculation = new CostCalculationHelper(requestDb);
+				calculation.calculateAllCosts(true);
+				setShowAddNationalCostButton(true);
+			}
+		}
+	}
+	
+	public void preCheckAddNationalCost() throws Exception {
+    	Request request = DaoManager.get(Request.class, new Criterion[]{
+                Restrictions.eq("id", getRequestId())});
+    	if(!ValidationHelper.isNullOrEmpty(request) && !ValidationHelper.isNullOrEmpty(request.getSubject())) {
+    		List<Request> otherRequests = DaoManager.load(Request.class, new Criterion[]{
+                    Restrictions.eq("subject", request.getSubject()), 
+                    Restrictions.or(Restrictions.eq("stateId", RequestState.INSERTED.getId()), Restrictions.eq("stateId", RequestState.IN_WORK.getId())),
+                    Restrictions.eq("includeNationalCost", Boolean.TRUE)});
+    		if(!ValidationHelper.isNullOrEmpty(otherRequests)) {
+    			executeJS("PF('nationalCostAlreadyEnteredDialogWV').show();");
+    			RequestContext.getCurrentInstance().update("nationalCostAlreadyEnteredDialog");
+    			return;
+    		}
+    	} 
+    	executeJS("PF('confirmAddNationalCostDialogWV').show();");
+    }
 
 	public boolean isViewRelatedEstate() {
 		return viewRelatedEstate;
@@ -1579,5 +1687,21 @@ public class EstateSituationViewBean extends EntityViewPageBean<EstateSituation>
 
 	public void setSelectedLandCultureId(String selectedLandCultureId) {
 		this.selectedLandCultureId = selectedLandCultureId;
+	}
+
+	public CostManipulationHelper getCostManipulationHelper() {
+		return costManipulationHelper;
+	}
+
+	public void setCostManipulationHelper(CostManipulationHelper costManipulationHelper) {
+		this.costManipulationHelper = costManipulationHelper;
+	}
+
+	public Boolean getShowAddNationalCostButton() {
+		return showAddNationalCostButton;
+	}
+
+	public void setShowAddNationalCostButton(Boolean showAddNationalCostButton) {
+		this.showAddNationalCostButton = showAddNationalCostButton;
 	}
 }

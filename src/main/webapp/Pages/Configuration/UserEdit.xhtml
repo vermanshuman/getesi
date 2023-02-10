@@ -113,6 +113,10 @@
                     <span> #{msg.email}: </span>
                     <p:inputText id="email" maxlength="129" value="#{bean.entity.email}" styleClass="input-width"/>
 
+                    <span> #{msg.clientCell}: </span>
+                    <p:inputText id="userCell" maxlength="50" value="#{bean.entity.phone}"
+                                 styleClass="input-width" onkeyup="validate_phone(this);"/>
+
                     <span> #{msg.userCode}: </span>
                     <p:inputText id="userCode" maxlength="30" styleClass="input-width"
                                  value="#{bean.entity.userCode}"

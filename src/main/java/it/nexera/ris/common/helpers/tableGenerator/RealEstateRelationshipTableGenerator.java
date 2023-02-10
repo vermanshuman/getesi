@@ -12,7 +12,8 @@ import it.nexera.ris.persistence.beans.entities.domain.EstateSituation;
 import it.nexera.ris.persistence.beans.entities.domain.Formality;
 import it.nexera.ris.persistence.beans.entities.domain.Request;
 import it.nexera.ris.web.beans.pages.RequestTextEditBean;
-import org.hibernate.HibernateException;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 
@@ -24,6 +25,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static it.nexera.ris.common.helpers.TemplatePdfTableHelper.distinctByKey;
 
 public class RealEstateRelationshipTableGenerator extends TagTableGenerator {
 
@@ -76,7 +79,10 @@ public class RealEstateRelationshipTableGenerator extends TagTableGenerator {
                 showAgriculturalIncome = estateSituation.getRequest().getClient().getShowAgriculturalIncome();
             }
 
-            List<String> property = TemplatePdfTableHelper.groupPropertiesByQuoteTypeList(estateSituation.getPropertyList(),
+            List<String> property = TemplatePdfTableHelper.groupPropertiesByQuoteTypeList(
+                    CollectionUtils.emptyIfNull(estateSituation.getPropertyList())
+                            .stream().filter(distinctByKey(x -> x.getId()))
+                            .collect(Collectors.toList()),
                     estateSituation.getRequest().getSubject(), estateSituation.getRequest(), true, showCadastralIncome, showAgriculturalIncome);
             if (!ValidationHelper.isNullOrEmpty(property)) {
                 wrapper.descriptionRows.addAll(property);
@@ -172,11 +178,20 @@ public class RealEstateRelationshipTableGenerator extends TagTableGenerator {
     }
 
     private String generateEstateSituationSecondCol(EstateSituation situation) {
-        if (!ValidationHelper.isNullOrEmpty(situation.getPropertyList())
-                && !ValidationHelper.isNullOrEmpty(situation.getPropertyList().get(0))
-                && !ValidationHelper.isNullOrEmpty(situation.getPropertyList().get(0).getCity())) {
-            return situation.getPropertyList().get(0).getCity().getDescription();
+        StringBuilder cityData = new StringBuilder();
+        if (!ValidationHelper.isNullOrEmpty(situation.getPropertyList()) &&
+                !ValidationHelper.isNullOrEmpty(situation.getPropertyList().get(0))){
+            if (!ValidationHelper.isNullOrEmpty(situation.getPropertyList().get(0).getCity())) {
+                cityData.append(situation.getPropertyList().get(0).getCity().getDescription());
+            }
+            if(StringUtils.isNotBlank(situation.getPropertyList().get(0).getSectionCity())){
+                if(cityData.length() > 0)
+                    cityData.append("<br/>");
+                cityData.append("(Sez. ");
+                cityData.append(situation.getPropertyList().get(0).getSectionCity());
+                cityData.append(")");
+            }
         }
-        return "";
+        return cityData.toString();
     }
 }

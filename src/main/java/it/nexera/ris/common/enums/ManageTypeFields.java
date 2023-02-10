@@ -35,7 +35,14 @@ public enum ManageTypeFields {
     ULTIMA_RESIDENZA(new EnumPropsWrapper(26l)),
     NOTARY(new EnumPropsWrapper(27l)),
     ACT_ATTACHMENT(new EnumPropsWrapper(28l)),
-    SUBJECT_LIST(new EnumPropsWrapper(29l));
+    SUBJECT_LIST(new EnumPropsWrapper(29l)),
+    CONSERVATORY_TALOVARE(new EnumPropsWrapper(30l)),
+    SPECIAL_FORMALITY(new EnumPropsWrapper(31l)),
+    IDENTIFICATION_NUMBER_F24(new EnumPropsWrapper(32l)),
+    LAST_NOTIFICATION_DATE(new EnumPropsWrapper(33l)),
+    CONSERVANCY_VERIFICATION(new EnumPropsWrapper(34l)),
+    REFERENCE_YEAR(new EnumPropsWrapper(35l)),
+    MORTAGAGE_IMPORT(new EnumPropsWrapper(36l));
 
     private EnumPropsWrapper enumPropsWrapper;
 

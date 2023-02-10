@@ -21,6 +21,8 @@ import javax.faces.model.SelectItem;
 
 import it.nexera.ris.persistence.beans.entities.domain.*;
 import org.hibernate.HibernateException;
+import org.hibernate.StaleObjectStateException;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -207,19 +209,39 @@ public class ClientEditBean extends EntityEditPageBean<Client>
     private List<SelectItem> nonManagerOrFiduciaryClientLists;
 
     private Long[] selectedNonManagerOrFiduciaryClientIds;
-    
+
     private PriceList negativePriceList;
-    
+
     private List<SelectItem> requestTypeNames;
-    
+
     private Long selectedBillingRequestTypeId;
-    
+
     private List<RequestTypeInvoiceColumnWrapper> requestTypeInvoiceColumns;
 
     private List<SelectItem> paymentTypes;
 
     private Long paymentTypeId;
 
+    private List<SelectItem> taxRates;
+
+    private Boolean fromContactList;
+
+    private Long selectedClientIdToCopy;
+
+    private List<SelectItem> clientsToCopy;
+
+    private String emptyPriceListMessage;
+
+    private List<PriceList> priceListToCopy;
+    
+    private Long selectedTaxRateUnauthorizedCostPay;
+    
+    private Long selectedTaxRateUnauthorizedCostCadastral;
+    
+    private Long selectedTaxRateUnauthorizedCostFormality;
+
+    private Long f24TaxRateId;
+    
     /*
      * (non-Javadoc)
      *
@@ -233,6 +255,12 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                 && ((Boolean) SessionHelper.get(ONLY_VIEW_CLIENT))) {
             SessionHelper.removeObject(ONLY_VIEW_CLIENT);
             this.setOnlyView(true);
+        }
+
+        if (!ValidationHelper.isNullOrEmpty((Boolean) SessionHelper.get("REDIRECT_FROM_CONTACT_LIST"))
+                && ((Boolean) SessionHelper.get("REDIRECT_FROM_CONTACT_LIST"))) {
+            SessionHelper.removeObject("REDIRECT_FROM_CONTACT_LIST");
+            this.setFromContactList(true);
         }
 
         if (this.getSession().get("fromPatientSearchList") == Boolean.TRUE) {
@@ -292,10 +320,10 @@ public class ClientEditBean extends EntityEditPageBean<Client>
             setServices(services.stream().map(s -> new ServiceWrapper(s, getEntity())).collect(Collectors.toList()));
         }
 
-        
+
         List<SelectItem> requestTypeNames = ComboboxHelper.fillList(RequestType.class, false);
         this.setRequestTypeNames(requestTypeNames.stream().sorted(Comparator.comparing(SelectItem::getLabel)).collect(Collectors.toList()));
-        
+
         setForeignCountry(getEntity().getForeignCountry());
 
         setTempEmailId(new AtomicLong());
@@ -356,21 +384,49 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                 Restrictions.or(Restrictions.eq("manager", Boolean.FALSE),
                         Restrictions.isNull("manager"))
         },  Order.asc("clientName"), null));
-        
+
         if (!ValidationHelper.isNullOrEmpty(getEntity().getReferenceClients())) {
-        	setSelectedNonManagerOrFiduciaryClientIds(
-        			getEntity().getReferenceClients()
-        			.stream()
-        			.map(c -> c.getId())
-        			.toArray(Long[] :: new)
-        			);
+            setSelectedNonManagerOrFiduciaryClientIds(
+                    getEntity().getReferenceClients()
+                            .stream()
+                            .map(c -> c.getId())
+                            .toArray(Long[] :: new)
+            );
         }
-//        if (!ValidationHelper.isNullOrEmpty(getEntity().getClient())) {
-//            setSelectedNonManagerOrFiduciaryClientId(getEntity().getClient().getId());
-//        }
         initAreasAndOffices();
         setSelectedOfficeAndArea();
         setNegativePriceList(null);
+        setTaxRates(new ArrayList<>());
+        getTaxRates().add(SelectItemHelper.getNotSelected());
+        List<TaxRate> activeTaxRates = DaoManager.load(TaxRate.class, new Criterion[]{
+                Restrictions.and(
+                        Restrictions.isNotNull("use"),
+                        Restrictions.eq("use", Boolean.TRUE)
+                )
+        });
+        activeTaxRates.forEach(tr -> {
+            getTaxRates().add(new SelectItem(tr.getId(), tr.getPercentage() +  "% - " + tr.getDescription()));
+        });
+
+        List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
+                Restrictions.or(Restrictions.eq("deleted", Boolean.FALSE),
+                        Restrictions.isNull("deleted")),
+                Restrictions.or(
+                        Restrictions.eq("brexa", Boolean.FALSE),
+                        Restrictions.isNull("brexa"))});
+        setClientsToCopy(ComboboxHelper.fillList(clients.stream()
+                .filter(c -> (
+                                (ValidationHelper.isNullOrEmpty(c.getManager()) || !c.getManager()) &&
+                                        (ValidationHelper.isNullOrEmpty(c.getFiduciary()) || !c.getFiduciary())
+                        )
+                ).sorted(Comparator.comparing(Client::toString)).collect(Collectors.toList()), Boolean.TRUE));
+        
+        if(!ValidationHelper.isNullOrEmpty(getEntity().getTaxRateUnauthorizedCostPay()))
+        	setSelectedTaxRateUnauthorizedCostPay(getEntity().getTaxRateUnauthorizedCostPay().getId());
+        if(!ValidationHelper.isNullOrEmpty(getEntity().getTaxRateUnauthorizedCostCadastral()))
+        	setSelectedTaxRateUnauthorizedCostCadastral(getEntity().getTaxRateUnauthorizedCostCadastral().getId());
+        if(!ValidationHelper.isNullOrEmpty(getEntity().getTaxRateUnauthorizedCostFormality()))
+        	setSelectedTaxRateUnauthorizedCostFormality(getEntity().getTaxRateUnauthorizedCostFormality().getId());
     }
 
     public void initAreasAndOffices() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -380,31 +436,31 @@ public class ClientEditBean extends EntityEditPageBean<Client>
         setSelectedOffice(SelectItemHelper.getNotSelectedWrapper());
 
         if(!ValidationHelper.isNullOrEmpty(getSelectedNonManagerOrFiduciaryClientIds())){
-        	List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
+            List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
                     Restrictions.in("id", getSelectedNonManagerOrFiduciaryClientIds())
             });
-        	
-        	if(!ValidationHelper.isNullOrEmpty(clients)) {
-        		List<Area> areas = clients.stream()
-        				.filter(c -> !ValidationHelper.isNullOrEmpty(c.getAreas()))
-        				.map(Client:: getAreas)
-        				.flatMap(List:: stream).collect(Collectors.toList());
-        		setAreas(ComboboxHelper.fillWrapperList(emptyIfNull(areas), true));
-        		
-        		List<Office> offices = clients.stream()
-        				.filter(c -> !ValidationHelper.isNullOrEmpty(c.getOffices()))
-        				.map(Client:: getOffices)
-        				.flatMap(List:: stream).collect(Collectors.toList());
-        		setAllOfficesList(offices);
-        	}
+
+            if(!ValidationHelper.isNullOrEmpty(clients)) {
+                List<Area> areas = clients.stream()
+                        .filter(c -> !ValidationHelper.isNullOrEmpty(c.getAreas()))
+                        .map(Client:: getAreas)
+                        .flatMap(List:: stream).collect(Collectors.toList());
+                setAreas(ComboboxHelper.fillWrapperList(emptyIfNull(areas), true));
+
+                List<Office> offices = clients.stream()
+                        .filter(c -> !ValidationHelper.isNullOrEmpty(c.getOffices()))
+                        .map(Client:: getOffices)
+                        .flatMap(List:: stream).collect(Collectors.toList());
+                setAllOfficesList(offices);
+            }
 //        if(!ValidationHelper.isNullOrEmpty(getSelectedNonManagerOrFiduciaryClientId())){
 //            Client client = DaoManager.get(Client.class, getSelectedNonManagerOrFiduciaryClientId());
 //            setAreas(ComboboxHelper.fillWrapperList(emptyIfNull(client.getAreas()), true));
 //            setAllOfficesList(client.getOffices());
 //
         }else{
-        	setAreas(ComboboxHelper.fillWrapperList(Area.class, new Criterion[]{}, true));
-        	setAllOfficesList(DaoManager.load(Office.class));
+            setAreas(ComboboxHelper.fillWrapperList(Area.class, new Criterion[]{}, true));
+            setAllOfficesList(DaoManager.load(Office.class));
         }
 
         if(getAllOfficesList().size() > 0) {
@@ -414,7 +470,7 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                     return object1.getDescription().compareTo(object2.getDescription());
                 }
             });
-       }
+        }
         setOffices(ComboboxHelper.fillWrapperList(getAllOfficesList(), true));
 
         setAreaConverter(new SelectItemWrapperConverter<>(Area.class, new ArrayList<>(getAreas())));
@@ -455,9 +511,9 @@ public class ClientEditBean extends EntityEditPageBean<Client>
     private void checkFiduciaryAndManagerField() {
         setClientFiduciaryOrManager(
                 (!ValidationHelper.isNullOrEmpty(this.getEntity().getManager())
-                    && this.getEntity().getManager())
-                || (!ValidationHelper.isNullOrEmpty(this.getEntity().getFiduciary())
-                    && this.getEntity().getFiduciary()));
+                        && this.getEntity().getManager())
+                        || (!ValidationHelper.isNullOrEmpty(this.getEntity().getFiduciary())
+                        && this.getEntity().getFiduciary()));
     }
 
     private void addOrRemoveNotSelectionFieldFromAreas() {
@@ -473,9 +529,9 @@ public class ClientEditBean extends EntityEditPageBean<Client>
         List<Long> selectedIds;
         if (!ValidationHelper.isNullOrEmpty(getBillingRecipientTable())) {
             selectedIds = getBillingRecipientTable().stream().map(ClientView::getId).collect(Collectors.toList());
-            if(!ValidationHelper.isNullOrEmpty(getEntity().getId())) {
+            /*if(!ValidationHelper.isNullOrEmpty(getEntity().getId())) {
                 selectedIds.add(getEntity().getId());
-            }
+            }*/
             setBillingRecipients(ComboboxHelper.fillList(ClientView.class, Order.asc("name"), new Criterion[]{
                     Restrictions.or(
                             Restrictions.eq("isDeleted", Boolean.FALSE),
@@ -582,6 +638,8 @@ public class ClientEditBean extends EntityEditPageBean<Client>
             this.setAddressCityId(this.getEntity().getAddressCityId() != null
                     ? this.getEntity().getAddressCityId().getId() : null);
         }
+        this.setF24TaxRateId(this.getEntity().getF24TaxRat() != null
+                ? this.getEntity().getF24TaxRat().getId() : null);
         this.setAddressOperationalHeadquartersProvinceId(this.getEntity()
                 .getAddressOperationalHeadquartersProvinceId() != null
                 ? this.getEntity().getAddressOperationalHeadquartersProvinceId().getId()
@@ -599,6 +657,12 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                     .findAny().orElse(null);
             if (service != null) {
                 service.fillPriceLists();
+                service.getPriceLists()
+                        .stream().filter(s -> !ValidationHelper.isNullOrEmpty(s.getTaxRate()))
+                        .forEach( s -> {
+                            s.setSelectedTaxRateId(s.getTaxRate().getId());
+                        });
+                service.fillTaxRateExtraCostLists();
                 setSelectedService(service);
                 try {
                     List<PriceList> priceLists = DaoManager.load(PriceList.class, new Criterion[]{
@@ -608,6 +672,8 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                     });
                     if(priceLists!=null && priceLists.size() >0 ) {
                         setNegativePriceList(priceLists.get(0));
+                        if(!ValidationHelper.isNullOrEmpty(getNegativePriceList().getTaxRate()))
+                            getNegativePriceList().setSelectedTaxRateId(getNegativePriceList().getTaxRate().getId());
                     }else {
                         setNegativePriceList(new PriceList());
                     }
@@ -659,7 +725,7 @@ public class ClientEditBean extends EntityEditPageBean<Client>
         options.put("contentWidth", "100%");
         options.put("contentHeight", "100%");
         RequestContext.getCurrentInstance()
-                .openDialog(PageTypes.REFERENT_EDIT.getPage(), options, null);
+                .openDialog(PageTypes.REFERENT_LIST.getPage(), options, null);
     }
 
     public void editAgency() {
@@ -844,13 +910,13 @@ public class ClientEditBean extends EntityEditPageBean<Client>
             PersistenceBeanException, IllegalAccessException {
         if (!Province.FOREIGN_COUNTRY_ID.equals(this.getAddressProvinceId())) {
             this.setForeignCountry(Boolean.FALSE);
-           
-          
+
+
             this.setAddressCities(  ComboboxHelper.fillList(City.class, Order.asc("description"),
                     new Criterion[]{
                             Restrictions.eq("province.id", this.getAddressProvinceId()),
-                           Restrictions.eq("external", Boolean.TRUE)
-                   }));
+                            Restrictions.eq("external", Boolean.TRUE)
+                    }));
         } else {
             this.setForeignCountry(Boolean.TRUE);
         }
@@ -862,8 +928,8 @@ public class ClientEditBean extends EntityEditPageBean<Client>
         this.setAddressOperationalHeadquartersCities(ComboboxHelper.fillList(City.class, Order.asc("description"),
                 new Criterion[]{
                         Restrictions.eq("province.id", this.getAddressOperationalHeadquartersProvinceId()),
-                       Restrictions.eq("external", Boolean.TRUE)
-               }));
+                        Restrictions.eq("external", Boolean.TRUE)
+                }));
     }
 
     @Override
@@ -894,7 +960,7 @@ public class ClientEditBean extends EntityEditPageBean<Client>
      */
     @Override
     public void onValidate() throws PersistenceBeanException {
-    	if (this.getEntity().isNew()) {
+        if (this.getEntity().isNew()) {
             this.checkSameEntity();
         }
         cleanValidation();
@@ -961,63 +1027,63 @@ public class ClientEditBean extends EntityEditPageBean<Client>
     public void onSave() throws HibernateException, PersistenceBeanException,
             NumberFormatException, IOException, InstantiationException, IllegalAccessException {
         try {
-			this.getEntity().setHasHeadquarters(this.isHasHeadquarters());
-			this.getEntity().setSubjectInvoice(this.isSubjectInvoice());
+            this.getEntity().setHasHeadquarters(this.isHasHeadquarters());
+            this.getEntity().setSubjectInvoice(this.isSubjectInvoice());
 
-			if (!ValidationHelper.isNullOrEmpty(this.getAddressCityId())) {
-			    this.getEntity().setAddressCityId(DaoManager.get(City.class, this.getAddressCityId()));
-			} else {
-			    this.getEntity().setAddressCityId(null);
-			}
+            if (!ValidationHelper.isNullOrEmpty(this.getAddressCityId())) {
+                this.getEntity().setAddressCityId(DaoManager.get(City.class, this.getAddressCityId()));
+            } else {
+                this.getEntity().setAddressCityId(null);
+            }
 
-			if (!ValidationHelper.isNullOrEmpty(this.getAddressOperationalHeadquartersCityId())) {
-			    this.getEntity().setAddressOperationalHeadquartersCityId(
-			            DaoManager.get(City.class, this.getAddressOperationalHeadquartersCityId()));
-			} else {
-			    this.getEntity().setAddressOperationalHeadquartersCityId(null);
-			}
+            if (!ValidationHelper.isNullOrEmpty(this.getAddressOperationalHeadquartersCityId())) {
+                this.getEntity().setAddressOperationalHeadquartersCityId(
+                        DaoManager.get(City.class, this.getAddressOperationalHeadquartersCityId()));
+            } else {
+                this.getEntity().setAddressOperationalHeadquartersCityId(null);
+            }
 
-			if (!ValidationHelper.isNullOrEmpty(this.getAddressOperationalHeadquartersProvinceId())) {
-			    this.getEntity().setAddressOperationalHeadquartersProvinceId(
-			            DaoManager.get(Province.class, this.getAddressOperationalHeadquartersProvinceId()));
-			} else {
-			    this.getEntity().setAddressOperationalHeadquartersProvinceId(null);
-			}
+            if (!ValidationHelper.isNullOrEmpty(this.getAddressOperationalHeadquartersProvinceId())) {
+                this.getEntity().setAddressOperationalHeadquartersProvinceId(
+                        DaoManager.get(Province.class, this.getAddressOperationalHeadquartersProvinceId()));
+            } else {
+                this.getEntity().setAddressOperationalHeadquartersProvinceId(null);
+            }
 
-			if (!ValidationHelper.isNullOrEmpty(this.getAddressProvinceId())) {
-			    this.getEntity().setAddressProvinceId(DaoManager.get(Province.class, this.getAddressProvinceId()));
-			} else {
-			    this.getEntity().setAddressProvinceId(null);
-			}
+            if (!ValidationHelper.isNullOrEmpty(this.getAddressProvinceId())) {
+                this.getEntity().setAddressProvinceId(DaoManager.get(Province.class, this.getAddressProvinceId()));
+            } else {
+                this.getEntity().setAddressProvinceId(null);
+            }
 
-			if (this.getAddressProvinceId() != null && !Province.FOREIGN_COUNTRY_ID.equals(this.getAddressProvinceId())) {
-			    Province province = DaoManager.get(Province.class, this.getAddressProvinceId());
-			    this.getEntity().setAddressProvinceId(province);
-			}
+            if (this.getAddressProvinceId() != null && !Province.FOREIGN_COUNTRY_ID.equals(this.getAddressProvinceId())) {
+                Province province = DaoManager.get(Province.class, this.getAddressProvinceId());
+                this.getEntity().setAddressProvinceId(province);
+            }
 
-			if (getForeignCountry() && !ValidationHelper.isNullOrEmpty(this.getSelectedCountryId())) {
-			    Country country = DaoManager.get(Country.class, this.getSelectedCountryId());
-			    this.getEntity().setCountry(country);
-			}
+            if (getForeignCountry() && !ValidationHelper.isNullOrEmpty(this.getSelectedCountryId())) {
+                Country country = DaoManager.get(Country.class, this.getSelectedCountryId());
+                this.getEntity().setCountry(country);
+            }
 
-			this.getEntity().setForeignCountry(getForeignCountry());
-			if (!ValidationHelper.isNullOrEmpty(getBillingRecipientTable())) {
-			    getEntity().setBillingRecipientList(DaoManager.load(Client.class, new Criterion[]{
-			            Restrictions.in("id", getBillingRecipientTable().stream()
-			                    .map(ClientView::getId).collect(Collectors.toList()))
-			    }));
-			} else {
-			    getEntity().setBillingRecipientList(null);
-			}
+            this.getEntity().setForeignCountry(getForeignCountry());
+            if (!ValidationHelper.isNullOrEmpty(getBillingRecipientTable())) {
+                getEntity().setBillingRecipientList(DaoManager.load(Client.class, new Criterion[]{
+                        Restrictions.in("id", getBillingRecipientTable().stream()
+                                .map(ClientView::getId).collect(Collectors.toList()))
+                }));
+            } else {
+                getEntity().setBillingRecipientList(null);
+            }
 
-			if (!ValidationHelper.isNullOrEmpty(getReferentRecipientTable())) {
-			    getEntity().setReferentRecipientList(DaoManager.load(Client.class, new Criterion[]{
-			            Restrictions.in("id", getReferentRecipientTable().stream()
-			                    .map(ClientView::getId).collect(Collectors.toList()))
-			    }));
-			} else {
-			    getEntity().setReferentRecipientList(null);
-			}
+            if (!ValidationHelper.isNullOrEmpty(getReferentRecipientTable())) {
+                getEntity().setReferentRecipientList(DaoManager.load(Client.class, new Criterion[]{
+                        Restrictions.in("id", getReferentRecipientTable().stream()
+                                .map(ClientView::getId).collect(Collectors.toList()))
+                }));
+            } else {
+                getEntity().setReferentRecipientList(null);
+            }
 
             if (!ValidationHelper.isNullOrEmpty(getSelectedArea()) && isHasAgency()
                     && isClientFiduciaryOrManager()) {
@@ -1037,15 +1103,15 @@ public class ClientEditBean extends EntityEditPageBean<Client>
             }
 
             if (!ValidationHelper.isNullOrEmpty(getSelectedNonManagerOrFiduciaryClientIds())) {
-            	List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
+                List<Client> clients = DaoManager.load(Client.class, new Criterion[]{
                         Restrictions.in("id", getSelectedNonManagerOrFiduciaryClientIds())
                 });
-            	 this.getEntity().setReferenceClients(clients);
+                this.getEntity().setReferenceClients(clients);
 
             }else {
-            	this.getEntity().setReferenceClients(null);
+                this.getEntity().setReferenceClients(null);
             }
-//            
+//
 //            if (!ValidationHelper.isNullOrEmpty(getSelectedNonManagerOrFiduciaryClientId())) {
 //                this.getEntity().setClient(DaoManager.get(Client.class, getSelectedNonManagerOrFiduciaryClientId()));
 //            } else {
@@ -1072,22 +1138,22 @@ public class ClientEditBean extends EntityEditPageBean<Client>
             this.getEntity().setHasAgency(isHasAgency());
             this.getEntity().setHasAgencyOffice(isHasAgencyOffice());
 
-			if (!ValidationHelper.isNullOrEmpty(getClientIbanId())) {
-			    this.getEntity().setIban(DaoManager.get(Iban.class, new Criterion[]{
-			            Restrictions.eq("id", getClientIbanId())}));
-			}
+            if (!ValidationHelper.isNullOrEmpty(getClientIbanId())) {
+                this.getEntity().setIban(DaoManager.get(Iban.class, new Criterion[]{
+                        Restrictions.eq("id", getClientIbanId())}));
+            }
 
-			if (!ValidationHelper.isNullOrEmpty(getSelectedCostOutput())) {
-			    this.getEntity().setCostOutput(getSelectedCostOutput());
-			}
+            if (!ValidationHelper.isNullOrEmpty(getSelectedCostOutput())) {
+                this.getEntity().setCostOutput(getSelectedCostOutput());
+            }
 
-			this.getEntity().setMaxNumberAct(getMaximumFormalities());
-			
-			if (ClientType.PROFESSIONAL.getId().equals(getEntity().getTypeId())) {
-			    this.getEntity().setClientName(this.getEntity().getNameProfessional() != null ? this.getEntity().getNameProfessional().toLowerCase() : "");
-			}else {
-			    this.getEntity().setClientName(this.getEntity().getNameOfTheCompany() != null ? this.getEntity().getNameOfTheCompany().toLowerCase() : "");
-			}
+            this.getEntity().setMaxNumberAct(getMaximumFormalities());
+
+            if (ClientType.PROFESSIONAL.getId().equals(getEntity().getTypeId())) {
+                this.getEntity().setClientName(this.getEntity().getNameProfessional() != null ? this.getEntity().getNameProfessional().toLowerCase() : "");
+            }else {
+                this.getEntity().setClientName(this.getEntity().getNameOfTheCompany() != null ? this.getEntity().getNameOfTheCompany().toLowerCase() : "");
+            }
 
             if (!ValidationHelper.isNullOrEmpty(getPaymentTypeId())) {
                 getEntity().setPaymentTypeList(DaoManager.load(PaymentType.class, new Criterion[]{
@@ -1096,17 +1162,37 @@ public class ClientEditBean extends EntityEditPageBean<Client>
             } else {
                 getEntity().setPaymentTypeList(null);
             }
-
+            
+            if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateUnauthorizedCostPay())) {
+            	this.getEntity().setTaxRateUnauthorizedCostPay(DaoManager.get(TaxRate.class, getSelectedTaxRateUnauthorizedCostPay()));
+            }
+            
+            if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateUnauthorizedCostFormality())) {
+            	this.getEntity().setTaxRateUnauthorizedCostFormality(DaoManager.get(TaxRate.class, getSelectedTaxRateUnauthorizedCostFormality()));
+            }
+            
+            if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateUnauthorizedCostCadastral())) {
+            	this.getEntity().setTaxRateUnauthorizedCostCadastral(DaoManager.get(TaxRate.class, getSelectedTaxRateUnauthorizedCostCadastral()));
+            }
+            if (!ValidationHelper.isNullOrEmpty(this.getF24TaxRateId())) {
+                this.getEntity().setF24TaxRat(DaoManager.get(TaxRate.class, this.getF24TaxRateId()));
+            } else {
+                this.getEntity().setF24TaxRat(null);
+            }
             DaoManager.save(getEntity());
-			this.saveAgencies();
-			this.savePriceList();
-			this.saveClientServiceInfo();
-			this.saveEmails();
-			this.saveInvoiceColumns();
-			this.saveRequestTypeInvoicecolumns();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+            this.saveAgencies();
+            //this.savePriceList();
+            //this.saveTaxRateExtraCostList();
+            this.saveClientServiceInfo();
+            this.saveEmails();
+            this.saveInvoiceColumns();
+            this.saveRequestTypeInvoicecolumns();
+            if(!ValidationHelper.isNullOrEmpty(this.getFromContactList()) && this.getFromContactList()){
+                RedirectHelper.goTo(PageTypes.CONTACT_LIST);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void saveEmails() throws PersistenceBeanException {
@@ -1129,7 +1215,9 @@ public class ClientEditBean extends EntityEditPageBean<Client>
 
     private void saveClientServiceInfo() throws PersistenceBeanException {
         for (ServiceWrapper wrapper : getServices()) {
-            if (!wrapper.getInfo().isNew() || !ValidationHelper.isNullOrEmpty(wrapper.getInfo().getDaysToExpire())) {
+            if (!wrapper.getInfo().isNew() || !ValidationHelper.isNullOrEmpty(wrapper.getInfo().getDaysToExpire()) 
+            		|| !ValidationHelper.isNullOrEmpty(wrapper.getInfo().getSingleEvasionFile())
+            		|| !ValidationHelper.isNullOrEmpty(wrapper.getInfo().getVisible())) {
                 DaoManager.save(wrapper.getInfo());
             }
         }
@@ -1140,7 +1228,13 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                 .filter(priceList -> !ValidationHelper.isNullOrEmpty(priceList.getPrice())
                         || !ValidationHelper.isNullOrEmpty(priceList.getFirstPrice())).collect(Collectors.toList())) {
             priceList.setClient(getEntity());
-
+            if(!ValidationHelper.isNullOrEmpty(priceList.getSelectedTaxRateId())){
+                try {
+                    priceList.setTaxRate(DaoManager.get(TaxRate.class, priceList.getSelectedTaxRateId()));
+                } catch (Exception e) {
+                    LogHelper.log(log, e);
+                }
+            }
             if (priceList.getConfigureDate() == null) {
                 priceList.setConfigureDate(new Date());
             }
@@ -1151,15 +1245,52 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                 LogHelper.log(log, e);
             }
         }
-        
-        if(getSelectedService() != null && getSelectedService().getService() != null && 
-                getSelectedService().getService().getIsNegative() != null && 
+
+        if(getSelectedService() != null && getSelectedService().getService() != null &&
+                getSelectedService().getService().getIsNegative() != null &&
                 getSelectedService().getService().getIsNegative()) {
             if(ValidationHelper.isNullOrEmpty(getNegativePriceList().getClient()))
                 getNegativePriceList().setClient(getSelectedService().getClient());
             if(ValidationHelper.isNullOrEmpty(getNegativePriceList().getService()))
                 getNegativePriceList().setService(getSelectedService().getService());
-            getNegativePriceList().setIsNegative(true);    
+            getNegativePriceList().setIsNegative(true);
+            try {
+                if(!ValidationHelper.isNullOrEmpty(getNegativePriceList().getSelectedTaxRateId())){
+                    getNegativePriceList().setTaxRate(DaoManager.get(TaxRate.class, getNegativePriceList().getSelectedTaxRateId()));
+                }
+                DaoManager.save(getNegativePriceList());
+
+            } catch (HibernateException | PersistenceBeanException | InstantiationException | IllegalAccessException e) {
+                LogHelper.log(log, e);
+            }
+        }
+    }
+
+    private void saveTaxRateExtraCostList() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+        for (TaxRateExtraCost taxRateExtraCost :
+                getServices().stream().map(
+                        ServiceWrapper::getTaxRateExtraCosts).flatMap(List::stream).collect(Collectors.toList())) {
+            taxRateExtraCost.setClientId(getEntity().getId());
+            if(!ValidationHelper.isNullOrEmpty(taxRateExtraCost.getTaxRateId()))
+                taxRateExtraCost.setTaxRate(DaoManager.get(TaxRate.class, taxRateExtraCost.getTaxRateId()));
+            else
+                taxRateExtraCost.setTaxRate(null);
+
+            try {
+                DaoManager.save(taxRateExtraCost);
+            } catch (Exception e) {
+                LogHelper.log(log, e);
+            }
+        }
+
+        if(getSelectedService() != null && getSelectedService().getService() != null &&
+                getSelectedService().getService().getIsNegative() != null &&
+                getSelectedService().getService().getIsNegative()) {
+            if(ValidationHelper.isNullOrEmpty(getNegativePriceList().getClient()))
+                getNegativePriceList().setClient(getSelectedService().getClient());
+            if(ValidationHelper.isNullOrEmpty(getNegativePriceList().getService()))
+                getNegativePriceList().setService(getSelectedService().getService());
+            getNegativePriceList().setIsNegative(true);
 
             try {
                 DaoManager.save(getNegativePriceList());
@@ -1167,11 +1298,9 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                 LogHelper.log(log, e);
             }
         }
-        
-
     }
 
-     public void setOfficesByArea() {
+    public void setOfficesByArea() {
         final List<Long> areaIds;
         if (isHasAgency()) {
             if (!ValidationHelper.isNullOrEmpty(getSelectedArea()) && isClientFiduciaryOrManager()
@@ -1391,152 +1520,152 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                 addRequiredFieldException("wizard:operationalHeadquartersCity");
             }
         }
-        
+
         getValidationFailed();
     }
-    
+
     private void loadVariables() throws HibernateException, IllegalAccessException, PersistenceBeanException {
-    	try {
-    	    
-    	    List<Long> requestTypeIds = new ArrayList<Long>();
-    		List<InvoiceColumnWrapper> sourceInvoiceColumns = new LinkedList<>();
-    		for (BillingTypeFields field : BillingTypeFields.values()) {
-    			sourceInvoiceColumns.add(new InvoiceColumnWrapper(field));
-    		}
-    		List<InvoiceColumnWrapper> targetInvoiceColumns = new LinkedList<>();
-    		if (!ValidationHelper
-    				.isNullOrEmpty(this.getEntity().getClientInvoiceManageColumns())) {
-    			for(ClientInvoiceManageColumn clientInvoiceManageColumn : 
-    				this.getEntity().getClientInvoiceManageColumns()) {
-    			    if(clientInvoiceManageColumn.getRequestType() == null)
-    			        targetInvoiceColumns.add(new InvoiceColumnWrapper(clientInvoiceManageColumn));
-    			    else {
-    			        getRequestTypeNames().removeIf(s -> ((Long)s.getValue()).equals(clientInvoiceManageColumn.getRequestType().getId()));
-    			        if(!requestTypeIds.contains(clientInvoiceManageColumn.getRequestType().getId()))
-    			            requestTypeIds.add(clientInvoiceManageColumn.getRequestType().getId());
-    			    }
-    			}
-    		}
-    		for (InvoiceColumnWrapper invoiceColumnWrapper : targetInvoiceColumns) {
-    			sourceInvoiceColumns.stream().filter(c -> c.getField().getField().equals(invoiceColumnWrapper.getField().getField()))
-    			.findAny().ifPresent(cv -> sourceInvoiceColumns.remove(cv));
-    		}
+        try {
 
-    		targetInvoiceColumns.sort(new Comparator<InvoiceColumnWrapper>() {
-    			@Override
-    			public int compare(InvoiceColumnWrapper iw1, InvoiceColumnWrapper iw2) {
-    				return iw1.getField().getPosition().compareTo(iw2.getField().getPosition());
-    			}
-    		});
-    		this.setInvoiceColumns(new DualListModel<>(sourceInvoiceColumns, targetInvoiceColumns));
-    		
-    		this.getRequestTypeInvoiceColumns().clear();
+            List<Long> requestTypeIds = new ArrayList<Long>();
+            List<InvoiceColumnWrapper> sourceInvoiceColumns = new LinkedList<>();
+            for (BillingTypeFields field : BillingTypeFields.values()) {
+                sourceInvoiceColumns.add(new InvoiceColumnWrapper(field));
+            }
+            List<InvoiceColumnWrapper> targetInvoiceColumns = new LinkedList<>();
+            if (!ValidationHelper
+                    .isNullOrEmpty(this.getEntity().getClientInvoiceManageColumns())) {
+                for(ClientInvoiceManageColumn clientInvoiceManageColumn :
+                        this.getEntity().getClientInvoiceManageColumns()) {
+                    if(clientInvoiceManageColumn.getRequestType() == null)
+                        targetInvoiceColumns.add(new InvoiceColumnWrapper(clientInvoiceManageColumn));
+                    else {
+                        getRequestTypeNames().removeIf(s -> ((Long)s.getValue()).equals(clientInvoiceManageColumn.getRequestType().getId()));
+                        if(!requestTypeIds.contains(clientInvoiceManageColumn.getRequestType().getId()))
+                            requestTypeIds.add(clientInvoiceManageColumn.getRequestType().getId());
+                    }
+                }
+            }
+            for (InvoiceColumnWrapper invoiceColumnWrapper : targetInvoiceColumns) {
+                sourceInvoiceColumns.stream().filter(c -> c.getField().getField().equals(invoiceColumnWrapper.getField().getField()))
+                        .findAny().ifPresent(cv -> sourceInvoiceColumns.remove(cv));
+            }
 
-    		if (!ValidationHelper
+            targetInvoiceColumns.sort(new Comparator<InvoiceColumnWrapper>() {
+                @Override
+                public int compare(InvoiceColumnWrapper iw1, InvoiceColumnWrapper iw2) {
+                    return iw1.getField().getPosition().compareTo(iw2.getField().getPosition());
+                }
+            });
+            this.setInvoiceColumns(new DualListModel<>(sourceInvoiceColumns, targetInvoiceColumns));
+
+            this.getRequestTypeInvoiceColumns().clear();
+
+            if (!ValidationHelper
                     .isNullOrEmpty(requestTypeIds)) {
-    		    List<ClientInvoiceManageColumn> clientInvoiceManageColumns = DaoManager.load(ClientInvoiceManageColumn.class, new CriteriaAlias[]{
+                List<ClientInvoiceManageColumn> clientInvoiceManageColumns = DaoManager.load(ClientInvoiceManageColumn.class, new CriteriaAlias[]{
                         new CriteriaAlias("client", "client", JoinType.INNER_JOIN),
                         new CriteriaAlias("requestType", "requestType", JoinType.INNER_JOIN)
                 }, new Criterion[]{
                         Restrictions.and(Restrictions.eq("client.id", getEntity().getId())
                                 ,Restrictions.in("requestType.id",requestTypeIds))
                 });
-    		    
-    		    for(Long requestTypeId : requestTypeIds) {
-    		        List<ClientInvoiceManageColumn> serviceClientInvoiceManageColumns = 
-    		                clientInvoiceManageColumns.stream().filter(
-    		                        c -> c.getRequestType().getId().equals(requestTypeId))
-                    .collect(Collectors.toList());
-    		        
-    		        List<InvoiceColumnWrapper> serviceSourceInvoiceColumns = new LinkedList<>();
-    	            for (BillingTypeFields field : BillingTypeFields.values()) {
-    	                serviceSourceInvoiceColumns.add(new InvoiceColumnWrapper(field));
-    	            }
-    	            List<InvoiceColumnWrapper> serviceTargetInvoiceColumns = new LinkedList<>(); 
-    	            if (!ValidationHelper
-    	                    .isNullOrEmpty(serviceClientInvoiceManageColumns)) {
-    	                for(ClientInvoiceManageColumn clientInvoiceManageColumn : 
-    	                    serviceClientInvoiceManageColumns) {
-    	                    serviceTargetInvoiceColumns.add(new InvoiceColumnWrapper(clientInvoiceManageColumn));
-    	                }
-    	            }
-    	            
-    	            for (InvoiceColumnWrapper invoiceColumnWrapper : serviceTargetInvoiceColumns) {
-    	                serviceSourceInvoiceColumns.stream().filter(c -> c.getField().getField().equals(invoiceColumnWrapper.getField().getField()))
-    	                .findAny().ifPresent(cv -> serviceSourceInvoiceColumns.remove(cv));
-    	            }
-    	            
-    	            serviceTargetInvoiceColumns.sort(new Comparator<InvoiceColumnWrapper>() {
-    	                @Override
-    	                public int compare(InvoiceColumnWrapper iw1, InvoiceColumnWrapper iw2) {
-    	                    return iw1.getField().getPosition().compareTo(iw2.getField().getPosition());
-    	                }
-    	            });
-    	            
-    	            RequestTypeInvoiceColumnWrapper requestTypeInvoiceColumnWrapper = new RequestTypeInvoiceColumnWrapper(new DualListModel<>(serviceSourceInvoiceColumns, serviceTargetInvoiceColumns),
-    	                    DaoManager.get(RequestType.class, requestTypeId));
-    	            getRequestTypeInvoiceColumns().add(requestTypeInvoiceColumnWrapper);
-    		    }
-    		    
-    		}
-    		
-    	} catch (Exception e) {
-    		LogHelper.log(log, e);
-    	}
+
+                for(Long requestTypeId : requestTypeIds) {
+                    List<ClientInvoiceManageColumn> serviceClientInvoiceManageColumns =
+                            clientInvoiceManageColumns.stream().filter(
+                                    c -> c.getRequestType().getId().equals(requestTypeId))
+                                    .collect(Collectors.toList());
+
+                    List<InvoiceColumnWrapper> serviceSourceInvoiceColumns = new LinkedList<>();
+                    for (BillingTypeFields field : BillingTypeFields.values()) {
+                        serviceSourceInvoiceColumns.add(new InvoiceColumnWrapper(field));
+                    }
+                    List<InvoiceColumnWrapper> serviceTargetInvoiceColumns = new LinkedList<>();
+                    if (!ValidationHelper
+                            .isNullOrEmpty(serviceClientInvoiceManageColumns)) {
+                        for(ClientInvoiceManageColumn clientInvoiceManageColumn :
+                                serviceClientInvoiceManageColumns) {
+                            serviceTargetInvoiceColumns.add(new InvoiceColumnWrapper(clientInvoiceManageColumn));
+                        }
+                    }
+
+                    for (InvoiceColumnWrapper invoiceColumnWrapper : serviceTargetInvoiceColumns) {
+                        serviceSourceInvoiceColumns.stream().filter(c -> c.getField().getField().equals(invoiceColumnWrapper.getField().getField()))
+                                .findAny().ifPresent(cv -> serviceSourceInvoiceColumns.remove(cv));
+                    }
+
+                    serviceTargetInvoiceColumns.sort(new Comparator<InvoiceColumnWrapper>() {
+                        @Override
+                        public int compare(InvoiceColumnWrapper iw1, InvoiceColumnWrapper iw2) {
+                            return iw1.getField().getPosition().compareTo(iw2.getField().getPosition());
+                        }
+                    });
+
+                    RequestTypeInvoiceColumnWrapper requestTypeInvoiceColumnWrapper = new RequestTypeInvoiceColumnWrapper(new DualListModel<>(serviceSourceInvoiceColumns, serviceTargetInvoiceColumns),
+                            DaoManager.get(RequestType.class, requestTypeId));
+                    getRequestTypeInvoiceColumns().add(requestTypeInvoiceColumnWrapper);
+                }
+
+            }
+
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
     }
 
     private void saveInvoiceColumns() throws PersistenceBeanException, HibernateException, IllegalAccessException, InstantiationException {
-    	List<BillingTypeFields> fields = new ArrayList<BillingTypeFields>();
-    	for(int j =0; j < this.getInvoiceColumns().getTarget().size(); j++) {
-    		InvoiceColumnWrapper wrapper = this.getInvoiceColumns().getTarget().get(j);
-    		if (wrapper != null) {
-    			if (wrapper.getSelected()) {
-    				wrapper.getField().setClient(getEntity());
-    				wrapper.getField().setPosition(j+1);
-    				DaoManager.save(wrapper.getField());
-    				fields.add(wrapper.getField().getField());
-    			} 
-    		}
-    	}
+        List<BillingTypeFields> fields = new ArrayList<BillingTypeFields>();
+        for(int j =0; j < this.getInvoiceColumns().getTarget().size(); j++) {
+            InvoiceColumnWrapper wrapper = this.getInvoiceColumns().getTarget().get(j);
+            if (wrapper != null) {
+                if (wrapper.getSelected()) {
+                    wrapper.getField().setClient(getEntity());
+                    wrapper.getField().setPosition(j+1);
+                    DaoManager.save(wrapper.getField());
+                    fields.add(wrapper.getField().getField());
+                }
+            }
+        }
 
-    	if(!getEntity().isNew()) {
-    		for(BillingTypeFields field : BillingTypeFields.values()) {
-    			if(!fields.contains(field)) {
-    				ClientInvoiceManageColumn clientInvoiceManageColumn = 
-    						DaoManager.get(ClientInvoiceManageColumn.class, new CriteriaAlias[]{
-    								new CriteriaAlias("client", "client", JoinType.INNER_JOIN)
-    						}, new Criterion[]{
-    								Restrictions.and(Restrictions.eq("field", field),Restrictions.eq("client.id", getEntity().getId()),
-    								        Restrictions.isNull("requestType"))
-    						});
+        if(!getEntity().isNew()) {
+            for(BillingTypeFields field : BillingTypeFields.values()) {
+                if(!fields.contains(field)) {
+                    ClientInvoiceManageColumn clientInvoiceManageColumn =
+                            DaoManager.get(ClientInvoiceManageColumn.class, new CriteriaAlias[]{
+                                    new CriteriaAlias("client", "client", JoinType.INNER_JOIN)
+                            }, new Criterion[]{
+                                    Restrictions.and(Restrictions.eq("field", field),Restrictions.eq("client.id", getEntity().getId()),
+                                            Restrictions.isNull("requestType"))
+                            });
 
-    				if(!ValidationHelper.isNullOrEmpty(clientInvoiceManageColumn))
-    					DaoManager.remove(clientInvoiceManageColumn);
-    			}
-    		}
-    	}
+                    if(!ValidationHelper.isNullOrEmpty(clientInvoiceManageColumn))
+                        DaoManager.remove(clientInvoiceManageColumn);
+                }
+            }
+        }
     }
-    
+
     public void addRequestTypeInvoiceColumns() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         getRequestTypeNames().removeIf(s -> ((Long)s.getValue()).equals(getSelectedBillingRequestTypeId()));
         List<InvoiceColumnWrapper> sourceInvoiceColumns = new LinkedList<>();
-        
+
         for (BillingTypeFields field : BillingTypeFields.values()) {
             InvoiceColumnWrapper invoiceColumnWrapper = new InvoiceColumnWrapper(field);
             sourceInvoiceColumns.add(invoiceColumnWrapper);
         }
         List<InvoiceColumnWrapper> targetInvoiceColumns = new LinkedList<>();
-        
+
         RequestTypeInvoiceColumnWrapper serviceInvoiceColumnWrapper = new RequestTypeInvoiceColumnWrapper(new DualListModel<>(sourceInvoiceColumns, targetInvoiceColumns),
                 DaoManager.get(RequestType.class, getSelectedBillingRequestTypeId()));
-        
+
         getRequestTypeInvoiceColumns().add(serviceInvoiceColumnWrapper);
     }
 
     private void saveRequestTypeInvoicecolumns() throws PersistenceBeanException, HibernateException, IllegalAccessException, InstantiationException {
-        
+
         for(RequestTypeInvoiceColumnWrapper serviceInvoiceColumnWrapper : this.getRequestTypeInvoiceColumns()) {
-            
+
             List<BillingTypeFields> fields = new ArrayList<BillingTypeFields>();
             for(int j =0; j < serviceInvoiceColumnWrapper.getInvoiceColumns().getTarget().size(); j++) {
                 InvoiceColumnWrapper wrapper = serviceInvoiceColumnWrapper.getInvoiceColumns().getTarget().get(j);
@@ -1547,13 +1676,13 @@ public class ClientEditBean extends EntityEditPageBean<Client>
                         wrapper.getField().setRequestType(serviceInvoiceColumnWrapper.getRequestType());
                         DaoManager.save(wrapper.getField());
                         fields.add(wrapper.getField().getField());
-                    } 
+                    }
                 }
             }
             if(!getEntity().isNew()) {
                 for(BillingTypeFields field : BillingTypeFields.values()) {
                     if(!fields.contains(field)) {
-                        ClientInvoiceManageColumn clientInvoiceManageColumn = 
+                        ClientInvoiceManageColumn clientInvoiceManageColumn =
                                 DaoManager.get(ClientInvoiceManageColumn.class, new CriteriaAlias[]{
                                         new CriteriaAlias("client", "client", JoinType.INNER_JOIN),
                                         new CriteriaAlias("requestType", "requestType", JoinType.INNER_JOIN)
@@ -1569,6 +1698,73 @@ public class ClientEditBean extends EntityEditPageBean<Client>
             }
         }
     }
+
+    public void copyPriceListClient() throws HibernateException, IllegalAccessException, PersistenceBeanException {
+        List<PriceList> priceListEntity = DaoManager.load(PriceList.class, new Criterion[]{
+                Restrictions.eq("client.id", getEntityId())});
+        for(PriceList price: priceListEntity) {
+            DaoManager.remove(price, true);
+        }
+
+        for(PriceList priceList: getPriceListToCopy()) {
+            DaoManager.getSession().evict(priceList);
+            priceList.setId(null);
+            PriceList newPrice = new PriceList();
+            newPrice = priceList;
+            newPrice.setClient(getEntity());
+            newPrice.setCreateDate(new Date());
+            newPrice.setUpdateDate(null);
+            newPrice.setUpdateUserId(null);
+            newPrice.setConfigureDate(null);
+            DaoManager.save(newPrice, true);
+        }
+    }
+
+    public void checkCopyPriceListClient() throws HibernateException, IllegalAccessException, PersistenceBeanException {
+        List<PriceList> priceLists = new ArrayList<>();
+        setPriceListToCopy(priceLists);
+        if(!ValidationHelper.isNullOrEmpty(getSelectedClientIdToCopy())) {
+            priceLists = DaoManager.load(PriceList.class, new Criterion[]{
+                    Restrictions.eq("client.id", getSelectedClientIdToCopy())});
+            if(ValidationHelper.isNullOrEmpty(priceLists)) {
+                System.out.println("pricelist empty");
+                setEmptyPriceListMessage(ResourcesHelper.getString("clientEditEmptyPriceList"));
+            } else {
+                System.out.println("pricelist size :: "+priceLists.size());
+                getPriceListToCopy().addAll(priceLists);
+            }
+            RequestContext.getCurrentInstance().update("confirmCopyPriceListDialog");
+            executeJS("PF('confirmCopyPriceListDialogWV').show();");
+        }
+    }
+    
+    public void saveConfigurePriceListData() {
+    	Transaction transaction = null;
+    	try {
+            transaction = DaoManager.getSession().beginTransaction();
+            savePriceList();
+            saveTaxRateExtraCostList();
+        } catch (Exception e) {
+            if (transaction != null) {
+            	transaction.rollback();
+            }
+            LogHelper.log(log, e);
+        } finally {
+            if (transaction != null && !transaction.wasRolledBack()
+                    && transaction.isActive()) {
+                try {
+                	transaction.commit();
+                } catch (StaleObjectStateException e) {
+                    LogHelper.log(log, e);
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    LogHelper.log(log, e);
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     public void lastStepListener(boolean isLast) {
         setLastStep(isLast);
     }
@@ -2019,13 +2215,13 @@ public class ClientEditBean extends EntityEditPageBean<Client>
         this.maximumFormalities = maximumFormalities;
     }
 
-	public DualListModel<InvoiceColumnWrapper> getInvoiceColumns() {
-		return invoiceColumns;
-	}
+    public DualListModel<InvoiceColumnWrapper> getInvoiceColumns() {
+        return invoiceColumns;
+    }
 
-	public void setInvoiceColumns(DualListModel<InvoiceColumnWrapper> invoiceColumns) {
-		this.invoiceColumns = invoiceColumns;
-	}
+    public void setInvoiceColumns(DualListModel<InvoiceColumnWrapper> invoiceColumns) {
+        this.invoiceColumns = invoiceColumns;
+    }
 
     public List<SelectItemWrapper<Area>> getSelectedAreas() {
         return selectedAreas;
@@ -2123,21 +2319,21 @@ public class ClientEditBean extends EntityEditPageBean<Client>
         this.requestTypeInvoiceColumns = requestTypeInvoiceColumns;
     }
 
-	public List<SelectItem> getNonManagerOrFiduciaryClientLists() {
-		return nonManagerOrFiduciaryClientLists;
-	}
+    public List<SelectItem> getNonManagerOrFiduciaryClientLists() {
+        return nonManagerOrFiduciaryClientLists;
+    }
 
-	public void setNonManagerOrFiduciaryClientLists(List<SelectItem> nonManagerOrFiduciaryClientLists) {
-		this.nonManagerOrFiduciaryClientLists = nonManagerOrFiduciaryClientLists;
-	}
+    public void setNonManagerOrFiduciaryClientLists(List<SelectItem> nonManagerOrFiduciaryClientLists) {
+        this.nonManagerOrFiduciaryClientLists = nonManagerOrFiduciaryClientLists;
+    }
 
-	public Long[] getSelectedNonManagerOrFiduciaryClientIds() {
-		return selectedNonManagerOrFiduciaryClientIds;
-	}
+    public Long[] getSelectedNonManagerOrFiduciaryClientIds() {
+        return selectedNonManagerOrFiduciaryClientIds;
+    }
 
-	public void setSelectedNonManagerOrFiduciaryClientIds(Long[] selectedNonManagerOrFiduciaryClientIds) {
-		this.selectedNonManagerOrFiduciaryClientIds = selectedNonManagerOrFiduciaryClientIds;
-	}
+    public void setSelectedNonManagerOrFiduciaryClientIds(Long[] selectedNonManagerOrFiduciaryClientIds) {
+        this.selectedNonManagerOrFiduciaryClientIds = selectedNonManagerOrFiduciaryClientIds;
+    }
 
     public List<SelectItem> getPaymentTypes() {
         return paymentTypes;
@@ -2153,5 +2349,85 @@ public class ClientEditBean extends EntityEditPageBean<Client>
 
     public void setPaymentTypeId(Long paymentTypeId) {
         this.paymentTypeId = paymentTypeId;
+    }
+
+    public List<SelectItem> getTaxRates() {
+        return taxRates;
+    }
+
+    public void setTaxRates(List<SelectItem> taxRates) {
+        this.taxRates = taxRates;
+    }
+
+    public Boolean getFromContactList() {
+        return fromContactList;
+    }
+
+    public void setFromContactList(Boolean fromContactList) {
+        this.fromContactList = fromContactList;
+    }
+
+    public Long getSelectedClientIdToCopy() {
+        return selectedClientIdToCopy;
+    }
+
+    public void setSelectedClientIdToCopy(Long selectedClientIdToCopy) {
+        this.selectedClientIdToCopy = selectedClientIdToCopy;
+    }
+
+    public List<SelectItem> getClientsToCopy() {
+        return clientsToCopy;
+    }
+
+    public void setClientsToCopy(List<SelectItem> clientsToCopy) {
+        this.clientsToCopy = clientsToCopy;
+    }
+
+    public String getEmptyPriceListMessage() {
+        return emptyPriceListMessage;
+    }
+
+    public void setEmptyPriceListMessage(String emptyPriceListMessage) {
+        this.emptyPriceListMessage = emptyPriceListMessage;
+    }
+
+    public List<PriceList> getPriceListToCopy() {
+        return priceListToCopy;
+    }
+
+    public void setPriceListToCopy(List<PriceList> priceListToCopy) {
+        this.priceListToCopy = priceListToCopy;
+    }
+
+	public Long getSelectedTaxRateUnauthorizedCostPay() {
+		return selectedTaxRateUnauthorizedCostPay;
+	}
+
+	public void setSelectedTaxRateUnauthorizedCostPay(Long selectedTaxRateUnauthorizedCostPay) {
+		this.selectedTaxRateUnauthorizedCostPay = selectedTaxRateUnauthorizedCostPay;
+	}
+
+	public Long getSelectedTaxRateUnauthorizedCostCadastral() {
+		return selectedTaxRateUnauthorizedCostCadastral;
+	}
+
+	public void setSelectedTaxRateUnauthorizedCostCadastral(Long selectedTaxRateUnauthorizedCostCadastral) {
+		this.selectedTaxRateUnauthorizedCostCadastral = selectedTaxRateUnauthorizedCostCadastral;
+	}
+
+	public Long getSelectedTaxRateUnauthorizedCostFormality() {
+		return selectedTaxRateUnauthorizedCostFormality;
+	}
+
+	public void setSelectedTaxRateUnauthorizedCostFormality(Long selectedTaxRateUnauthorizedCostFormality) {
+		this.selectedTaxRateUnauthorizedCostFormality = selectedTaxRateUnauthorizedCostFormality;
+	}
+
+    public Long getF24TaxRateId() {
+        return f24TaxRateId;
+    }
+
+    public void setF24TaxRateId(Long f24TaxRateId) {
+        this.f24TaxRateId = f24TaxRateId;
     }
 }

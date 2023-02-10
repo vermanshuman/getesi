@@ -89,7 +89,7 @@ public abstract class InterlayerTableGenerator extends TagTableGenerator {
             }
             List<Property> properties = formality.loadPropertiesByRelationship(presumableSubjects);
             List<Pair<String, String>> tempPairs = TemplatePdfTableHelper.groupPropertiesByQuoteTypeListLikePairs(properties,
-                    getRequest().getSubject(), presumableSubjects, false, formality, showCadastralIncome, showAgriculturalIncome);
+                    getRequest().getSubject(), presumableSubjects, false, formality, showCadastralIncome, showAgriculturalIncome, Boolean.TRUE);
 
             PartedPairsByCityWrapper pairsByCityWrapper = new PartedPairsByCityWrapper(formality, tempPairs);
             pairsByCityWrapper.fillPatredList();

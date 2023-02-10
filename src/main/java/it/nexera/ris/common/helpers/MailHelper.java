@@ -16,6 +16,7 @@ import it.nexera.ris.persistence.beans.entities.domain.WLGServer;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.beans.wrappers.logic.FileWrapper;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.message.DefaultBodyDescriptorBuilder;
 import org.apache.james.mime4j.parser.ContentHandler;
@@ -102,7 +103,7 @@ public class MailHelper extends BaseHelper {
         return id;
     }
 
-    public static List<String> parseMailAddress(String address) {
+    public static List<String> parseAutoCompleteMailAddress(String address) {
         if (ValidationHelper.isNullOrEmpty(address)) {
             return new ArrayList<>();
         }
@@ -114,6 +115,28 @@ public class MailHelper extends BaseHelper {
         for (String email : emails) {
             Matcher m = Pattern
                     .compile("[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+")
+                    .matcher(email);
+
+            while (m.find()) {
+                emailsSet.add(m.group().toLowerCase());
+            }
+        }
+
+        return new ArrayList<>(emailsSet);
+    }
+
+    public static List<String> parseMailAddress(String address) {
+        if (ValidationHelper.isNullOrEmpty(address)) {
+            return new ArrayList<>();
+        }
+
+        List<String> emails = Arrays.asList(address.split(","));
+
+        Set<String> emailsSet = new HashSet<>();
+
+        for (String email : emails) {
+            Matcher m = Pattern
+                    .compile("[a-zA-Z0-9'_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+")
                     .matcher(email);
 
             while (m.find()) {
@@ -156,16 +179,33 @@ public class MailHelper extends BaseHelper {
     public static void sendMail(WLGInbox mail, List<FileWrapper> files, List<FileWrapper> images)
             throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException,
             ServerNotFoundExceprion, UnsupportedEncodingException, MessagingException {
-        PersistenceSession ps = new PersistenceSession();
-        WLGServer server = ConnectionManager.get(WLGServer.class, new Criterion[]{
-                Restrictions.eq("id", Long.parseLong(ApplicationSettingsHolder.getInstance()
-                        .getByKey(ApplicationSettingsKeys.SENT_SERVER_ID).getValue()))
-        }, ps.getSession());
+        PersistenceSession ps = null;
+        WLGServer server = null;
+        try {
+            ps = new PersistenceSession();
+            server = ConnectionManager.get(WLGServer.class, new Criterion[]{
+                    Restrictions.eq("id", Long.parseLong(ApplicationSettingsHolder.getInstance()
+                            .getByKey(ApplicationSettingsKeys.SENT_SERVER_ID).getValue()))
+            }, ps.getSession());
+        }catch (Exception e) {
+            log.info("Error in sed mail ");
+            LogHelper.log(log, e);
+        } finally {
+//            if (ps != null && ps.getSession() != null) {
+//                ps.getSession().clear();
+//                if(ps.getSession().isOpen())
+//                    ps.getSession().close();
+//            }
+        }
 
         if (server == null) {
             throw new ServerNotFoundExceprion("can not load wlg_server for sendNotification email");
         }
 
+        if(StringUtils.isNotBlank(server.getHost()) && server.getHost().equalsIgnoreCase("smtp.sendgrid.net")
+                && StringUtils.isNotBlank(server.getSender())){
+            mail.setEmailFrom(server.getSender());
+        }
         Properties props = new Properties();
         props.put("mail.smtp.host", server.getHost());
         props.put("mail.smtp.auth", TRUE);
@@ -177,6 +217,10 @@ public class MailHelper extends BaseHelper {
         Session mailSession = Session.getInstance(props, auth);
 
         MimeMessage simpleMessage = new MimeMessage(mailSession);
+        log.info("sending mail with subject :: "+mail.getEmailSubject());
+        log.info("sending mail marked To :: "+mail.getEmailTo());
+        log.info("sending mail marked CC :: "+ (!ValidationHelper.isNullOrEmpty(mail.getEmailCC()) ? mail.getEmailCC() : ""));
+        log.info("sending mail marked BCC :: "+ (!ValidationHelper.isNullOrEmpty(mail.getEmailBCC()) ? mail.getEmailBCC() : ""));
 
         List<String> mailsTo = parseMailAddress(mail.getEmailTo());
 
@@ -189,6 +233,9 @@ public class MailHelper extends BaseHelper {
         InternetAddress[] bccAddress = new InternetAddress[mailBCC.size()];
 
         InternetAddress fromAddress = new InternetAddress(mail.getEmailFrom(), defaultSendFromName);
+        if(mail.getEmailFrom().contains("<")) {
+            fromAddress = new InternetAddress(getOnlyEmails(mail.getEmailFrom()).get(0), defaultSendFromName);
+        }
 
         for (int i = 0; i < mailsTo.size(); ++i) {
             toAddress[i] = new InternetAddress(mailsTo.get(i));
@@ -247,9 +294,13 @@ public class MailHelper extends BaseHelper {
 //        multipart.addBodyPart(messageBodyText);
 //        multipart.addBodyPart(messageBodyHtml);
 
+        log.info("Email Entity: " + mail.getId());
         if (files != null) {
+            log.info("Email Attachments: " + files.size());
             for (FileWrapper file : files) {
-                addAttachment(multipart, file.getFilePath(), file.getFileName());
+                log.info("Send attachment: " + file.getAddAttachment());
+                if(!ValidationHelper.isNullOrEmpty(file.getAddAttachment()) && file.getAddAttachment())
+                    addAttachment(multipart, file.getFilePath(), file.getFileName());
             }
         }
 
@@ -400,7 +451,7 @@ public class MailHelper extends BaseHelper {
             }
         }
 
-        return html;
+        return html.replaceAll("class=WordSection1", "").replaceAll("class=\"WordSection1\"", "");
     }
 
     private static void addAttachment(Multipart multipart, String filePath, String fileName) throws MessagingException {
@@ -491,5 +542,38 @@ public class MailHelper extends BaseHelper {
             result.add(m.group());
         }
         return result;
+    }
+
+    public static String getEmailFrom() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        PersistenceSession ps = null;
+        WLGServer server = null;
+        try {
+            ps = new PersistenceSession();
+            server = ConnectionManager.get(WLGServer.class, new Criterion[]{
+                    Restrictions.eq("id", Long.parseLong(ApplicationSettingsHolder.getInstance()
+                            .getByKey(ApplicationSettingsKeys.SENT_SERVER_ID).getValue()))
+            }, ps.getSession());
+        }catch (Exception e) {
+            log.info("Error in sed mail ");
+            LogHelper.log(log, e);
+        } finally {
+//            if (ps != null && ps.getSession() != null) {
+//                ps.getSession().clear();
+//                if(ps.getSession().isOpen())
+//                    ps.getSession().close();
+//            }
+        }
+        if(server != null && StringUtils.isNotBlank(server.getHost()) && server.getHost().equalsIgnoreCase("smtp.sendgrid.net")
+                && StringUtils.isNotBlank(server.getSender())){
+            return server.getSender();
+        }
+
+        List<String> emailsFrom = ConnectionManager.loadField(WLGServer.class, "login", String.class, new CriteriaAlias[]{},
+                new Criterion[]{Restrictions.eq("type", 15L)
+        }, ps.getSession());
+        if (!ValidationHelper.isNullOrEmpty(emailsFrom)) {
+            return emailsFrom.get(0);
+        }
+        return "";
     }
 }

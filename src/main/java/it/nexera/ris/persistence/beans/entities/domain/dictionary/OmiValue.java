@@ -39,6 +39,8 @@ public class OmiValue extends IndexedEntity {
     @Column(name = "state")
     private String state;
 
+    private Boolean manual;
+
     @Transient
     private Double minValue;
 

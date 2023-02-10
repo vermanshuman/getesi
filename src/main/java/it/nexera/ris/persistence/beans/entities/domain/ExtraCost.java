@@ -8,9 +8,13 @@ import javax.persistence.Table;
 
 import it.nexera.ris.common.enums.ExtraCostType;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "extra_request_cost")
+@Getter
+@Setter
 public class ExtraCost extends IndexedEntity {
     private static final long serialVersionUID = -5061989689681247463L;
 
@@ -27,35 +31,7 @@ public class ExtraCost extends IndexedEntity {
     @Column(name = "type")
     private ExtraCostType type;
 
-    public Long getRequestId() {
-        return requestId;
-    }
+    private Boolean transcription;
 
-    public void setRequestId(Long requestId) {
-        this.requestId = requestId;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    public ExtraCostType getType() {
-        return type;
-    }
-
-    public void setType(ExtraCostType type) {
-        this.type = type;
-    }
+    private Boolean certification;
 }

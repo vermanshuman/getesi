@@ -1,9 +1,18 @@
 package it.nexera.ris.web.beans.wrappers.logic;
 
+import it.nexera.ris.common.enums.ApplicationSettingsKeys;
 import it.nexera.ris.common.enums.MailManagerPriority;
+import it.nexera.ris.common.exceptions.PersistenceBeanException;
+import it.nexera.ris.common.helpers.LogHelper;
+import it.nexera.ris.common.helpers.MailHelper;
 import it.nexera.ris.common.helpers.ResourcesHelper;
 import it.nexera.ris.common.helpers.ValidationHelper;
+import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.WLGInbox;
+import it.nexera.ris.persistence.beans.entities.domain.WLGServer;
+import it.nexera.ris.settings.ApplicationSettingsHolder;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -209,10 +218,18 @@ public class MailEditWrapper {
 
     public void appendMailFooter() {
         if (wlgInboxEdit != null) {
+            String mail_footer = MAIL_FOOTER;
+            String emailsFrom;
+            try {
+                emailsFrom = MailHelper.getEmailFrom();
+                mail_footer = mail_footer.replace("info@brexa.it", emailsFrom);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             if (wlgInboxEdit.getEmailBody() != null) {
-                wlgInboxEdit.setEmailBody(wlgInboxEdit.getEmailBody().concat(MAIL_FOOTER));
+                wlgInboxEdit.setEmailBody(wlgInboxEdit.getEmailBody().concat(mail_footer));
             } else {
-                wlgInboxEdit.setEmailBody(MAIL_FOOTER);
+                wlgInboxEdit.setEmailBody(mail_footer);
             }
         }
     }

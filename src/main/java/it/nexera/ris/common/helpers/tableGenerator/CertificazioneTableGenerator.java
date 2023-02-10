@@ -24,6 +24,7 @@ import it.nexera.ris.common.exceptions.TypeFormalityNotConfigureException;
 import it.nexera.ris.persistence.beans.entities.domain.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
@@ -175,7 +176,12 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                 sb.append(frmTxt(property.getInterno(), ", interno "));
 
                 sb.append("<br/>");
-                sb.append(addCadastralDataToReport(property.getCadastralData()));
+                sb.append(addCadastralDataToReport(
+                        CollectionUtils.emptyIfNull(property.getCadastralData())
+                                .stream().filter(distinctByKey(x -> x.getId()))
+                                .collect(Collectors.toList())
+                ));
+
                 if (property.getCategoryCode().equals(CADASTRAL_CATEGORY_CODE)) {
                     sb.append(getLandData(property));
                 }
@@ -208,8 +214,15 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
         } else {
             if(ValidationHelper.isNullOrEmpty(property.getType()) 
                     || !RealEstateType.LAND.getId().equals(property.getType())) {
+                String consistency = property.getConsistency().toLowerCase().replaceAll(",", ".");
                 sb.append(", mq ");
-                sb.append(property.getConsistency().replaceAll("mq|MQ", ""));
+                if (consistency.contains("mq")) {
+                    sb.append(property.getConsistency().replaceAll("mq|MQ", ""));
+                } else if (consistency.contains("metri quadri")) {
+                    sb.append(property.getConsistency().replaceAll("metri quadri|METRI QUADRI", ""));
+                } else if (consistency.contains("metri quadrati")) {
+                    sb.append(property.getConsistency().replaceAll("metri quadrati|METRI QUADRATI", ""));
+                }
             }
         }
         return sb.toString();
@@ -302,6 +315,9 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                                 DateTimeHelper.getMonthWordDatePattert(), Locale.ITALY)
                         : DateTimeHelper.toString(subject.getBirthDate()));
                 result.append(", codice fiscale ").append(subject.getFiscalCode());
+                if((i == subjects.size() - 1)
+                        && !ValidationHelper.isNullOrEmpty(cType) && cType.equals(SectionCType.DEBITORI_NON_DATORI_DI_IPOTECA))
+                    result.append(";");
             } else {
                 result.append(subject.getBusinessName());
                 result.append(" sede ");
@@ -310,6 +326,9 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                         str -> subjectCityCamelCase ? WordUtils.capitalizeFully(str) : str));
                 result.append(frmTxt(subject.getBirthProvince(), " (", ")", Dictionary::getCode));
                 result.append(", codice fiscale ").append(subject.getNumberVAT());
+                if((i == subjects.size() - 1)
+                        && !ValidationHelper.isNullOrEmpty(cType) && cType.equals(SectionCType.DEBITORI_NON_DATORI_DI_IPOTECA))
+                    result.append(";");
             }
 
             if (addRelationshipData) {
@@ -677,11 +696,15 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
             }
             if(!ValidationHelper.isNullOrEmpty(formality.getSectionA()) &&  
                     !ValidationHelper.isNullOrEmpty(formality.getSectionA().getTotal())){
-                sb.append(" Importo totale ").append(formality.getSectionA().getTotal());
+                sb.append(" - Importo totale ").append(formality.getSectionA().getTotal()).append(" - ");
             }
             if(!ValidationHelper.isNullOrEmpty(formality.getSectionA()) &&  
                     !ValidationHelper.isNullOrEmpty(formality.getSectionA().getCapital())){
-                sb.append(" Importo Capitale ").append(formality.getSectionA().getCapital());
+                if(ValidationHelper.isNullOrEmpty(formality.getSectionA()) ||
+                        ValidationHelper.isNullOrEmpty(formality.getSectionA().getTotal())){
+                    sb.append(" - ");
+                }
+                sb.append("Importo Capitale ").append(formality.getSectionA().getCapital()).append(" - ");
             }
             if(!ValidationHelper.isNullOrEmpty(formality.getSectionA()) && 
                     !ValidationHelper.isNullOrEmpty(formality.getSectionA().getDuration())){
@@ -732,9 +755,9 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                     false, false, true);
             
             if(!ValidationHelper.isNullOrEmpty(result) && (!this.isSingularProperty || subjects != null && subjects.size() > 1))
-                sb.append(" e debitori non datori di ipoteca ").append(result);
+            sb.append("; Debitori non datori di ipoteca ").append(result);
             else if(!ValidationHelper.isNullOrEmpty(result))
-                sb.append(" e debitore non datore di ipoteca ").append(result);
+                sb.append("; Debitore non datore di ipoteca ").append(result);
             
             if (!ValidationHelper.isNullOrEmpty(getRequest().getDistraintFormality()) &&
                     !ValidationHelper.isNullOrEmpty(formality.getDistraintComment())) {
@@ -945,7 +968,10 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
             for (EstateSituation estateSituation : situationEstateLocations) {
                 if(!ValidationHelper.isNullOrEmpty(estateSituation.getSalesDevelopment()) && estateSituation.getSalesDevelopment())
                     continue;
-                List<Property> propertyList = estateSituation.getPropertyList();
+                //   List<Property> propertyList = estateSituation.getPropertyList();
+                List<Property> propertyList =  CollectionUtils.emptyIfNull(estateSituation.getPropertyList())
+                        .stream().filter(distinctByKey(x -> x.getId()))
+                        .collect(Collectors.toList());
                 sortPropertiesByDistraintActIdProperties(propertyList);
 
                 if (!ValidationHelper.isNullOrEmpty(propertyList)) {
@@ -964,7 +990,7 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
             List<Long> cadastralDataIdsFromDistrFormProps = getRequest().getDistraintFormality().getSectionB().stream()
                     .map(SectionB::getProperties).flatMap(List::stream)
                     .filter(x->!ValidationHelper.isNullOrEmpty(x.getCadastralData()))
-                    .map(x->x.getCadastralData().get(0).getId()).collect(Collectors.toList());
+                    .map(x->x.getCadastralData().stream().findFirst().orElse(null).getId()).collect(Collectors.toList());
 
             if(!cadastralDataIdsFromDistrFormProps.isEmpty()){
                 propertyList.sort((left, right) -> {
@@ -977,8 +1003,8 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                         return -1;
                     }else {
                         return Integer.compare(
-                                cadastralDataIdsFromDistrFormProps.indexOf(left.getCadastralData().get(0).getId()),
-                                cadastralDataIdsFromDistrFormProps.indexOf(right.getCadastralData().get(0).getId()));
+                                cadastralDataIdsFromDistrFormProps.indexOf(left.getCadastralData().stream().findFirst().orElse(null).getId()),
+                                cadastralDataIdsFromDistrFormProps.indexOf(right.getCadastralData().stream().findFirst().orElse(null).getId()));
                     }
                 });
             }
@@ -1014,7 +1040,9 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
 
             sb.append(getSubjectsRelationshipData(property));
 
-            addCadastralDataToReportCertificated(sb, property.getCadastralData());
+            addCadastralDataToReportCertificated(sb, CollectionUtils.emptyIfNull(property.getCadastralData())
+                    .stream().filter(distinctByKey(x -> x.getId()))
+                    .collect(Collectors.toList()));
             if(!ValidationHelper.isNullOrEmpty(property.getArea()) && !property.getArea().equals("0")) {
             	 sb.append(frmTxt(property.getArea(), ", zona censuaria "));
             }
@@ -1085,7 +1113,8 @@ public class CertificazioneTableGenerator extends InterlayerTableGenerator {
                         x -> x.replaceAll("vani|VANI", "").trim()));
             } else {
                 sb.append(frmTxt(property.getConsistency(), ", consistenza mq ", "",
-                        x -> x.replaceAll("mq|MQ", "").trim()));
+                        x -> x.replaceAll("mq|MQ", "").replaceAll("metri quadri|METRI QUADRI", "")
+                                .replaceAll("metri quadrati|METRI QUADRATI", "").trim()));
             }
         }
         return sb.toString();

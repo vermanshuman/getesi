@@ -24,6 +24,8 @@ public class EstateSituationEditInTableWrapper {
 
     private boolean edited;
 
+    private List<RelationshipEditInTableWrapper> estateSituationRelationshipList;
+
     public EstateSituationEditInTableWrapper(EstateSituation situation) {
         this.estateFormalityList = situation.getEstateFormalityList().stream()
                 .map(EstateFormalityEditInTableWrapper::new).collect(Collectors.toList());
@@ -133,5 +135,13 @@ public class EstateSituationEditInTableWrapper {
 
     public void setEdited(boolean edited) {
         this.edited = edited;
+    }
+
+    public List<RelationshipEditInTableWrapper> getEstateSituationRelationshipList() {
+        return estateSituationRelationshipList;
+    }
+
+    public void setEstateSituationRelationshipList(List<RelationshipEditInTableWrapper> estateSituationRelationshipList) {
+        this.estateSituationRelationshipList = estateSituationRelationshipList;
     }
 }

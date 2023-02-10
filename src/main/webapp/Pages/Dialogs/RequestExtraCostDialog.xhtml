@@ -3,9 +3,58 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html" xmlns:c="http://java.sun.com/jsp/jstl/core">
-    <p:dialog widgetVar="requestExtraCostDlg" modal="true" width="700" id="requestExtraCostDialog">
+    <style>
+        #requestExtraCostDialog .ui-dialog-titlebar {
+            padding: 0.4em 0.4em 0.4em 1em;
+        }
+
+        .ui-dialog .ui-widget-header {
+            background: #f8f9fa !important;
+            color: #495057 !important;
+        }
+
+        .cost_titles {
+            padding-top: 20px !important;
+        }
+
+        .cost_titles h3 {
+            font-size: 1.17em !important;
+            font-weight: bold !important;
+        }
+
+        .cost_titles>.p-field>span {
+            font-size: 14px !important;
+            font-weight: bold !important;
+        }
+
+        .ui-datatable-scrollable-theadclone {
+            height: 0;
+            display: none;
+        }
+
+        .ui-dialog-content {
+            max-height: 700px !important;
+            margin-bottom: 0px !important;
+        }
+
+        .action_column_width {
+            width: 14% !important;
+            text-align: center;
+        }
+
+        #requestExtraCostTable .ui-datatable-scrollable-header-box table,
+        .ui-datatable-scrollable-footer-box table,
+        .ui-datatable-scrollable-body table {
+            table-layout: auto;
+        }
+
+        #requestExtraCostTable .action_column_width {
+            max-width: 51px !important;
+        }
+    </style>
+    <p:dialog widgetVar="requestExtraCostDlg" modal="true" width="700" id="requestExtraCostDialog" onHide="cancelSaveRequestExtraCost()">
         <div class="cost_titles">
-            <c:if test="#{bean.costManipulationHelper.isEditable()}">
+            <c:if test="#{bean.costManipulationHelper ne null and bean.costManipulationHelper.isEditable()}">
                 <p:panelGrid rendered="#{bean.examRequest!=null}" columns="2" columnClasses="cost_form_column"
                              styleClass="ui-panelgrid-blank form-group cost_titles_table">
                     <h3>#{msg.estateSituationEditClientName}</h3>
@@ -19,7 +68,7 @@
                     </p:inputText>
                     <c:if test="#{bean.examRequest.showAuthorizedQuote()}">
                         <h3>#{msg.requestTextEditAuthorizedEstimate}</h3>
-                        <p:selectBooleanCheckbox id="authorizedEstimate" value="#{bean.examRequest.authorizedQuote}"/>
+                        <p:selectBooleanCheckbox id="authorizedEstimateView" value="#{bean.examRequest.authorizedQuote}"/>
                     </c:if>
                     <h3>#{msg.requestTextEditNumberSummaryList}</h3>
                     <h:outputText value="#{bean.examRequest.numberOfGroupsByDocumentOfEstateFormality}"/>
@@ -45,50 +94,86 @@
             </c:if>
             <c:if test="#{!bean.costManipulationHelper.isEditable()}">
                 <div class="p-field p-grid">
-                    <span class="p-col-fixed" >#{msg.estateSituationEditClientName}</span>   <h:outputText value="#{bean.examRequest.clientName}"/>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold" >#{msg.estateSituationEditClientName}</span>   <h:outputText value="#{bean.examRequest.clientName}"/><br/>
+                    </div>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.estateSituationEditRequestType} </span>  <h:outputText value="#{bean.examRequest.serviceName}"/>
+                    </div>
                 </div>
                 <div class="p-field p-grid">
-                    <span class="p-col-fixed ">#{msg.estateSituationEditRequestType} </span>  <h:outputText value="#{bean.examRequest.serviceName}"/>
-                </div>
-                <div class="p-field p-grid">
-                    <span class="p-col-fixed ">#{msg.requestTextEditNumberFormalities} </span> <h:outputText value="#{bean.costManipulationHelper.numberActOrSumOfEstateFormalitiesAndOtherTemp}"/>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.requestTextEditNumberFormalities} </span>
+                        <!-- <h:outputText value="#{bean.costManipulationHelper.numberActOrSumOfEstateFormalitiesAndOtherTemp}"/> -->
+                        <p:inputText value="#{bean.costManipulationHelper.numberActOrSumOfEstateFormalitiesAndOtherTemp}" style="width:60px;"
+                                 onkeypress="return numbers_only(this, event, 9, 0)" onkeyup="check_numbers(this, 9, 0);">
+                        	<p:ajax event="change" listener="#{bean.updateCosts(true)}"/>
+                    	</p:inputText>
+                    </div>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.requestTextEditNumberSummaryList}</span> <h:outputText value="#{bean.examRequest.numberOfGroupsByDocumentOfEstateFormality}"/>
+                    </div>
                 </div>
 
-                <c:if test="#{bean.examRequest.showAuthorizedQuote()}">
-                    <div class="p-field p-grid">
-                        <span class="p-col-fixed "> #{msg.requestTextEditAuthorizedEstimate}</span>
+                <h:panelGroup layout="block" styleClass="p-field p-grid" rendered="#{bean.examRequest ne null}">
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold"> #{msg.requestTextEditAuthorizedEstimate}</span>
                         <p:selectBooleanCheckbox id="authorizedEstimate" value="#{bean.examRequest.authorizedQuote}"/>
                     </div>
-                </c:if>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.requestTextEditAuthorizedNonEstimate} </span>
+                        <p:selectBooleanCheckbox id="nonAuthorizedEstimate"
+                                                 value="#{bean.examRequest.unauthorizedQuote}">
+                            <p:ajax listener="#{bean.viewExtraCost(true)}" update="@this requestExtraCostTable"/>
+                        </p:selectBooleanCheckbox>
+                    </div>
+                </h:panelGroup>
 
                 <div class="p-field p-grid">
-                    <span class="p-col-fixed ">#{msg.requestTextEditNumberSummaryList}</span> <h:outputText value="#{bean.examRequest.numberOfGroupsByDocumentOfEstateFormality}"/>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.requestTextEditMortgageExpenses} </span> <h:outputText value="#{bean.costManipulationHelper.costEstateFormalityTemp}"/>
+                    </div>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.requestTextEditLandRegistryFees} </span>
+                        <h:outputText value="#{bean.costManipulationHelper.costCadastralTemp}"/>
+                    </div>
                 </div>
+
                 <div class="p-field p-grid">
-                    <span class="p-col-fixed ">#{msg.requestTextEditMortgageExpenses} </span> <h:outputText value="#{bean.costManipulationHelper.costEstateFormalityTemp}"/>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.requestTextEditCompensation}</span>
+                        <h:outputText value="#{bean.costManipulationHelper.costPayTemp}"/>
+                    </div>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.requestTaxableCost}        </span>
+                        <h:outputText id="requestTaxableCost" value="#{bean.costManipulationHelper.taxableCostTemp}"/>
+                    </div>
                 </div>
+
                 <div class="p-field p-grid">
-                    <span class="p-col-fixed ">#{msg.requestTextEditLandRegistryFees} </span>
-                    <h:outputText value="#{bean.costManipulationHelper.costCadastralTemp}"/>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.requestIncludeNationalCost} </span>
+                        <p:selectBooleanCheckbox id="includeNationalCost" value="#{bean.costManipulationHelper.includeNationalCost}" widgetVar="includeNationalCostWV">
+                            <!-- <p:ajax listener="#{bean.updateNationalCost()}" update="@this requestExtraCostTable includeNationalCostDialog"/> -->
+                            <p:ajax event="change" oncomplete="applyClickListener();" update="@this"/>
+                        </p:selectBooleanCheckbox>
+                        <p:remoteCommand name="callPreCheckAddNationalCost" action="#{bean.preCheckAddNationalCost}" update="requestExtraCostTable includeNationalCostDialog"/>
+                        <p:remoteCommand name="updateNationalCost" action="#{bean.updateNationalCost()}" update="requestExtraCostTable includeNationalCostDialog"/>
+                    </div>
+                    <div class="p-field" style="width: 50%;">
+                        <span class="p-col-fixed text-bold">#{msg.requestExtraCostInit}  </span>
+                        <h:outputText  id="requestExtraCostInit" value="#{bean.costManipulationHelper.initCostTemp}"/>
+                    </div>
                 </div>
+                
                 <div class="p-field p-grid">
-                    <span class="p-col-fixed ">#{msg.requestTextEditCompensation}</span>
-                    <h:outputText value="#{bean.costManipulationHelper.costPayTemp}"/>
+                	<div class="p-field" style="width: 50%;">
+                		<span class="p-col-fixed text-bold">#{msg.requestExtraCostNote}</span>
+                    	<p:inputTextarea value="#{bean.costManipulationHelper.costNote}"
+                                         rows="2" style="width: 235px; height: 50px;"/>
+                    </div>
                 </div>
-                <div class="p-field p-grid">
-                    <span class="p-col-fixed ">#{msg.requestTaxableCost}        </span>
-                    <h:outputText id="requestTaxableCost" value="#{bean.costManipulationHelper.taxableCostTemp}"/>
-                </div>
-                <div class="p-field p-grid">
-                    <span class="p-col-fixed ">#{msg.requestIncludeNationalCost} </span>
-                    <p:selectBooleanCheckbox id="includeNationalCost" value="#{bean.costManipulationHelper.includeNationalCost}">
-                        <p:ajax listener="#{bean.updateNationalCost()}" update="@this requestExtraCostTable includeNationalCostDialog"/>
-                    </p:selectBooleanCheckbox>
-                </div>
-                <div class="p-field p-grid">
-                    <span class="p-col-fixed ">#{msg.requestExtraCostInit}  </span>
-                    <h:outputText  id="requestExtraCostInit" value="#{bean.costManipulationHelper.initCostTemp}"/>
-                </div>
+
                 <c:if test="#{bean.hideExtraCost ne null and bean.hideExtraCost}">
                     <div class="p-field p-grid">
                         <span class="p-col-fixed ">#{msg.requestCostNote} </span> <h:outputText value="#{bean.costNote}"/>
@@ -116,6 +201,14 @@
             <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('IPOTECARIO')}"
                              update="extraCostArea, requestExtraCostTable"/>
 
+            <span> #{msg.requestExtraCostMortgageTable.toUpperCase()}</span>
+            <p:column>
+                <p:inputNumber id="inputExtraCostMortgageTable" value="#{bean.costManipulationHelper.extraCostMortgageTable}"/>
+            </p:column>
+            <p:column/>
+            <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('IPOTECARIO_TAVOLARE')}"
+                             update="extraCostArea, requestExtraCostTable"/>
+
             <span> #{msg.requestExtraCostLandRegistry.toUpperCase()}</span>
             <p:column>
                 <p:inputText id="inputCostLandRegistry" value="#{bean.costManipulationHelper.extraCostLandRegistry}"/>
@@ -124,7 +217,35 @@
             <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('CATASTO')}"
                              update="extraCostArea, requestExtraCostTable"/>
 
-            <span> #{msg.requestExtraCostOther.toUpperCase()}</span>
+            <span> #{msg.requestExtraCostLandRegistryTable.toUpperCase()}</span>
+            <p:column>
+                <p:inputNumber id="inputCostLandRegistryTable" value="#{bean.costManipulationHelper.extraCostLandRegistryTable}"/>
+            </p:column>
+            <p:column/>
+            <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('CATASTO_TAVOLARE')}"
+                             update="extraCostArea, requestExtraCostTable"/>
+
+
+            <c:if test="#{bean.showRequestCost ne null and bean.showRequestCost}">
+                <span> #{msg.requestExtraCostStamps.toUpperCase()}</span>
+                <p:column>
+                    <p:spinner id="minMaxStamp" value="#{bean.costManipulationHelper.stampSpinnerNumber}" min="0" max="1000" size="1"/>
+                </p:column>
+                <p:column/>
+                <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('MARCA')}"
+                                 update="extraCostArea, requestExtraCostTable"/>
+
+                <span> #{msg.requestExtraCostPostalExpense.toUpperCase()}</span>
+                <p:column>
+                    <p:inputText id="inputCostPostalExp" value="#{bean.costManipulationHelper.extraCostPostalExpense}"/>
+                </p:column>
+                <p:column/>
+                <p:commandButton icon="fa fa-plus" action="#{bean.addExtraCost('POSTALE')}"
+                                 update="extraCostArea, requestExtraCostTable"/>
+
+                <span> #{msg.requestExtraCostOther.toUpperCase()}</span>
+            </c:if>
+
             <p:column>
                 <p:inputText id="inputCostOther" value="#{bean.costManipulationHelper.extraCostOther}" placeholder="Costo" />
             </p:column>
@@ -136,7 +257,7 @@
         </p:panelGrid>
 
 
-        <p:dataTable scrollable="true" scrollHeight="200" value="#{bean.costManipulationHelper.requestExtraCosts}"
+        <p:dataTable scrollable="true" scrollHeight="200" value="#{bean.costManipulationHelper.requestExtraCosts}" emptyMessage="#{msg.noRecordsFound}"
                      var="extraCost" id="requestExtraCostTable" rendered="#{bean.hideExtraCost eq null or not bean.hideExtraCost}">
 
             <p:column headerText="#{msg.requestExtraCostPrice}" styleClass="action_column_width">
@@ -155,7 +276,10 @@
             <p:commandButton value="#{msg.confirm}" update="@form" style="background-color: #00CC52 !important;margin-right: 0.5rem !important;"
                              action="#{bean.saveRequestExtraCost}" oncomplete="PF('requestExtraCostDlg').hide();"/>
 
-            <p:commandButton value="#{msg.cancel}" oncomplete="PF('requestExtraCostDlg').hide();" style="background-color: #F3362B !important;margin-right: 0.5rem"/>
+            <p:commandButton value="#{msg.cancel}" oncomplete="PF('requestExtraCostDlg').hide();cancelSaveRequestExtraCost();"
+                             style="background-color: #F3362B !important;margin-right: 0.5rem"/>
+            <p:commandButton value="#{msg.requestReGenerateCost}"  update="@form requestExtraCostDialog"
+                             action="#{bean.viewExtraCost(true)}"/>
         </div>
         <p:dialog id="includeNationalCostDialog" header="Note!" widgetVar="includeNationalCostDialogWV"
                   height="100px">
@@ -177,15 +301,41 @@
 
 
     </p:dialog>
-    <p:dialog id="reloadPageDialog" header="Note!"
-              widgetVar="reloadPageDialogWV" height="100px">
+    <p:dialog id="reloadPageDialog" header="Note!" styleClass="dialog-green dialog-green-width"
+              widgetVar="reloadPageDialogWV">
         #{msg.reloadPageMessage} <br />
         <div class="btn_line">
-            <p:commandButton value="#{msg.confirm}" update="@form"
-                             action="#{bean.reloadPage}"
+            <p:commandButton value="#{msg.confirm}" style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"
+                             update="@form" action="#{bean.reloadPage}"
                              oncomplete="PF('reloadPageDialogWV').hide();" />
-            <p:commandButton value="#{msg.cancel}"
+            <p:commandButton value="#{msg.cancel}" style="background-color: #F3362B !important; width: 100px;"
                              oncomplete="PF('reloadPageDialogWV').hide();" />
         </div>
     </p:dialog>
+    
+    
+    <p:dialog id="nationalCostAlreadyEnteredDialog" header="Note!" styleClass="dialog-orange" width="400"
+              widgetVar="nationalCostAlreadyEnteredDialogWV">
+        #{msg.requestNationalCostAlreadyEntered} <br />
+        <div class="btn_line">
+            <p:commandButton value="#{msg.confirm}" style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"
+                             update="@this requestExtraCostTable includeNationalCostDialog" action="#{bean.updateNationalCost}"
+                             oncomplete="PF('nationalCostAlreadyEnteredDialogWV').hide();" />
+            <p:commandButton value="#{msg.cancel}" style="background-color: #F3362B !important; width: 100px;"
+                             oncomplete="PF('nationalCostAlreadyEnteredDialogWV').hide();" />
+        </div>
+    </p:dialog>
+    <script>
+    	function applyClickListener() {
+    		var isChecked = PF("includeNationalCostWV").input.is(':checked');
+    		//console.log(isChecked);
+    		if(isChecked) {
+    			callPreCheckAddNationalCost();
+    		} else {
+    			updateNationalCost();
+    		}
+    	}
+    </script>
+    
+    
 </ui:composition>

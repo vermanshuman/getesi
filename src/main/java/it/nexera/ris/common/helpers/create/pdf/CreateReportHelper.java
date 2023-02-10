@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import it.nexera.ris.persistence.HibernateUtil;
+import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
@@ -44,7 +47,11 @@ public abstract class CreateReportHelper extends BaseHelper {
         }
     }
 
-    protected Double getCostEstateFormalityAndExtraCostRelated(Request request) throws PersistenceBeanException, IllegalAccessException {
+    public Double getCostEstateFormalityAndExtraCostRelated(Request request) throws PersistenceBeanException, IllegalAccessException {
+        return  getCostEstateFormalityAndExtraCostRelated(request, Boolean.FALSE, Boolean.FALSE);
+    }
+    public Double getCostEstateFormalityAndExtraCostRelated(Request request, Boolean manageTranscription,
+                                                            Boolean manageCertification) throws PersistenceBeanException, IllegalAccessException {
         Double result = 0d;
 
         if (!ValidationHelper.isNullOrEmpty(request.getCostEstateFormality())) {
@@ -57,6 +64,12 @@ public abstract class CreateReportHelper extends BaseHelper {
 
         if (!ValidationHelper.isNullOrEmpty(extraCosts)) {
             for (ExtraCost cost : extraCosts) {
+                if((manageTranscription != null && manageTranscription && (
+                        cost.getTranscription() == null || !cost.getTranscription())) ||
+                        (manageCertification != null && manageCertification && (
+                                cost.getCertification() == null || !cost.getCertification()))){
+                    break;
+                }
                 result += cost.getPrice();
             }
         }
@@ -82,8 +95,12 @@ public abstract class CreateReportHelper extends BaseHelper {
         return result.equals(0d) ? result : Math.round(result * 100000d) / 100000d;
     }
 
+    public Double getCostCadastralAndExtraCostRelated(Request request) throws PersistenceBeanException, IllegalAccessException {
+        return  getCostCadastralAndExtraCostRelated(request, Boolean.FALSE, Boolean.FALSE);
+    }
 
-    protected Double getCostCadastralAndExtraCostRelated(Request request) throws PersistenceBeanException, IllegalAccessException {
+    protected Double getCostCadastralAndExtraCostRelated(Request request,Boolean manageTranscription,
+                                                         Boolean manageCertification) throws PersistenceBeanException, IllegalAccessException {
         Double result = 0d;
 
         if (!ValidationHelper.isNullOrEmpty(request.getCostCadastral())) {
@@ -96,6 +113,12 @@ public abstract class CreateReportHelper extends BaseHelper {
 
         if (!ValidationHelper.isNullOrEmpty(extraCosts)) {
             for (ExtraCost cost : extraCosts) {
+                if((manageTranscription != null && manageTranscription && (
+                        cost.getTranscription() == null || !cost.getTranscription())) ||
+                        (manageCertification != null && manageCertification && (
+                                cost.getCertification() == null || !cost.getCertification()))){
+                    break;
+                }
                 result += cost.getPrice();
             }
         }
@@ -275,6 +298,9 @@ public abstract class CreateReportHelper extends BaseHelper {
     public Double getCostEstate(Request request, Service service, Boolean billingClient, boolean restictionForPriceList)
             throws PersistenceBeanException, IllegalAccessException {
         double result = 0d;
+        if(!ValidationHelper.isNullOrEmpty(request.getUnauthorizedQuote()) && request.getUnauthorizedQuote()){
+            return result;
+        }
         List<PriceList> priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
                 new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
                         Restrictions.eq("client", (billingClient == null || !billingClient)
@@ -336,11 +362,22 @@ public abstract class CreateReportHelper extends BaseHelper {
         int numRequestRegistry = 0;
         int numPlus = 0;
 
-        if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())
-                && !ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getLandChargesRegistries())) {
-            numRegistry = request.getAggregationLandChargesRegistry().getNumberOfVisualizedLandChargesRegistries();
+        if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())) {
+            if(!Hibernate.isInitialized(request.getAggregationLandChargesRegistry().getLandChargesRegistries())){
+                Hibernate.initialize(request.getAggregationLandChargesRegistry().getLandChargesRegistries());
+            }
+            if(ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getLandChargesRegistries())) {
+                numRegistry = request.getAggregationLandChargesRegistry().getNumberOfVisualizedLandChargesRegistries();
+            }
         }
-
+//
+//        if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry())
+//                && !ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getLandChargesRegistries())) {
+//            numRegistry = request.getAggregationLandChargesRegistry().getNumberOfVisualizedLandChargesRegistries();
+//        }
+        if(!Hibernate.isInitialized(request.getRequestFormalities())){
+            request.reloadRequestFormalities();
+        }
         if (!ValidationHelper.isNullOrEmpty(request.getRequestFormalities())) {
             List<Long> documentIds = request.getRequestFormalities().stream().map(RequestFormality::getDocumentId)
                     .distinct().collect(Collectors.toList());
@@ -444,5 +481,76 @@ public abstract class CreateReportHelper extends BaseHelper {
             }
         }
         return result;
+    }
+    
+    public List<ExtraCost> getExtraCostsAltro(Request request) throws PersistenceBeanException, IllegalAccessException {
+        List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
+                Restrictions.eq("requestId", request.getId()),
+                Restrictions.eq("type", ExtraCostType.ALTRO)});
+
+        return extraCosts;
+    }
+    public Double getRequestExtraCostSumByType(Long requestId, ExtraCostType type) throws PersistenceBeanException, IllegalAccessException {
+        return getRequestExtraCostSumByType(requestId, type, null, null);
+    }
+
+    public Double getRequestExtraCostSumByType(Long requestId, ExtraCostType type, Boolean manageTranscription,Boolean manageCertification)
+            throws PersistenceBeanException, IllegalAccessException {
+        Double extraCostSum = 0d;
+        List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
+                Restrictions.eq("requestId", requestId),
+                Restrictions.eq("type", type)});
+        if (!ValidationHelper.isNullOrEmpty(extraCosts)) {
+            for (ExtraCost cost : extraCosts) {
+                if((manageTranscription != null && manageTranscription && (
+                        cost.getTranscription() == null || !cost.getTranscription())) ||
+                        (manageCertification != null && manageCertification && (
+                                cost.getCertification() == null || !cost.getCertification()))){
+                    break;
+                }
+                extraCostSum += cost.getPrice();
+            }
+        }
+        return extraCostSum;
+    }
+    
+    public Double getTotalStampCost(Request request) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+      return getTotalStampCost(request, null, null);
+    }
+    
+    public Double getTotalStampCost(Request request,Boolean manageTranscription,Boolean manageCertification) throws HibernateException, IllegalAccessException, PersistenceBeanException {
+        Double totalStamp = 0d;
+
+        List<ExtraCost> marcaCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
+                Restrictions.eq("requestId", request.getId()),
+                Restrictions.eq("type", ExtraCostType.MARCA)});
+
+        if(!ValidationHelper.isNullOrEmpty(marcaCosts)){
+            for (ExtraCost cost : marcaCosts) {
+                if((manageTranscription != null && manageTranscription && (
+                        cost.getTranscription() == null || !cost.getTranscription())) ||
+                        (manageCertification != null && manageCertification && (
+                                cost.getCertification() == null || !cost.getCertification()))){
+                    break;
+                }
+                totalStamp += cost.getPrice();
+            }
+        }
+        return totalStamp;
+    }
+    
+    public Double getTotalAnagraficoCost(Request request) throws PersistenceBeanException, IllegalAccessException {
+    	Double totalAnagrafico = 0d;
+    	List<ExtraCost> extraCosts = DaoManager.load(ExtraCost.class, new Criterion[]{
+                Restrictions.eq("requestId", request.getId()),
+                Restrictions.eq("type", ExtraCostType.ANAGRAFICO),
+                Restrictions.eq("certification", Boolean.TRUE)});
+        if(!ValidationHelper.isNullOrEmpty(extraCosts)){
+            for (ExtraCost cost : extraCosts) {
+                totalAnagrafico += cost.getPrice();
+            }
+        }
+        return totalAnagrafico;
+
     }
 }

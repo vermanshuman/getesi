@@ -1,0 +1,302 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html">
+
+	<style>
+		#containerPanel_content {
+			border: 1px solid #dee2e6;
+		}
+
+		#fileUploadPanelGrid > * .ui-panelgrid-cell {
+			border: none;
+		}
+
+		#fieldsPanelGrid > * .ui-panelgrid-cell {
+			border: none;
+		}
+
+		#otherFilePanel .ui-panelgrid-cell {
+			padding: 0px;
+		}
+
+		#otherFileUpload .ui-fileupload-buttonbar {
+			border: none;
+			padding: 0px;
+		}
+
+		#otherFileUpload .ui-fileupload-content {
+			display: none;
+		}
+
+		#otherFileUpload .ui-widget-header {
+			background: #FFFFFF !important;
+			color: #495057 !important;
+		}
+		#addConservatoryDialog .ui-fieldset {
+			border: 1px solid #dee2e6;
+			background: #ffffff;
+			color: #495057;
+			padding: 1rem;
+			border-radius: 4px;
+		}
+		
+		#addConservatoryDialog .fieldset {
+			margin-top: 10px;
+			margin-left: 0;
+			margin-right: 0;
+		}
+		
+		#addConservatoryDialog fieldset div {
+			font-size: 16px;
+			text-align: left;
+		}
+		
+		.red-button {
+			background: red !important;
+		}
+		
+		#addConservatoryDialog .ui-panelgrid .ui-panelgrid-cell {
+			padding: 0.5rem;
+		}
+		
+		.vertical-center {
+			line-height: 30px;
+		}
+		
+		#referencesDataList_content {
+			border: none !important;
+			padding: 0px;
+		}
+		
+		#referencesDataList_list {
+			list-style-type: none;
+			margin-block-start: 0px;
+			margin-block-end: 0px;
+			margin-inline-start: 0px;
+			margin-inline-end: 0px;
+			padding: 0px;
+			padding-inline-start: 0px;
+		}
+		
+		#notesDataList_content {
+			border: none !important;
+			padding: 0px;
+		}
+		
+		#notesDataList_list {
+			list-style-type: none;
+			margin-block-start: 0px;
+			margin-block-end: 0px;
+			margin-inline-start: 0px;
+			margin-inline-end: 0px;
+			padding: 0px;
+			padding-inline-start: 0px;
+		}
+		.f-20 {
+			font-size: 20px !important;
+		}
+		
+		#officeCodePanel .ui-grid-col-2 {
+    		width: 13.6%;
+    	}
+    	body .fieldset .ui-fieldset-legend {
+    		width: 190px;
+    	}
+	</style>
+
+	<p:dialog widgetVar="addConservatoryDialogWV" id="addConservatoryDialog" modal="true" draggable="false" width="1150"
+		styleClass="dialog-white-bg addPaymentDialog newEntityDialog" position="center center" header="#{msg.estateFormalityConservatory}#{' di '}#{bean.entity.name}"
+		onHide="closePage();">
+		<div class="p-grid">
+			<div class="p-col-12 p-md-12">
+				<div class="card" style="border: none !important; padding-top: 0px; padding-bottom: 0px; margin-top: -10px;">
+					<ui:include src="/resources/tpl/common/ValidationMessages.xhtml" />
+					
+					<p:panelGrid id="officeCodePanel" columns="3" styleClass="ui-panelgrid-blank form-group"	style="width: 100%; padding: 0.5rem;" cellpadding="3"
+							cellspacing="0" columnClasses="ui-grid-col-2,ui-grid-col-2,ui-grid-col-8" layout="grid">
+						<span>#{msg.officeCode}</span>
+						<p:inputText value="#{bean.entity.codeOffice}" maxlength="3" id="codeOffice" styleClass="input-width">
+							<p:keyFilter regEx="/[a-zA-Z0-9\\s\\' ]+/" />
+						</p:inputText>
+					</p:panelGrid>
+
+					<p:fieldset legend="#{msg.streetAddress}" class="fieldset" toggleable="true" toggleSpeed="500">
+						<p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"	style="width: 100%; padding: 0.5rem;" cellpadding="3"
+							cellspacing="0" columnClasses="ui-grid-col-1,ui-grid-col-8,ui-grid-col-1,ui-grid-col-2" layout="grid">
+							
+							<span>#{msg.street}</span>
+							<p:inputText value="#{bean.entity.address}" id="address" styleClass="input-width" />
+
+							<span>#{msg.number}</span>
+							<p:inputText value="#{bean.entity.addressNumber}" id="addressNumber" maxlength="50" styleClass="input-width" />
+						</p:panelGrid>
+						<p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"	style="width: 100%; padding: 0.5rem;" cellpadding="3"
+									 cellspacing="0" columnClasses="ui-grid-col-1,ui-grid-col-2,ui-grid-col-1,ui-grid-col-8" layout="grid">
+
+							<span>#{msg.postalCode}</span>
+							<p:inputText value="#{bean.entity.addressCap}" id="addressCap" maxlength="50" styleClass="input-width" />
+
+							<span>#{msg.city}</span>
+							<p:inputText value="#{bean.entity.addressCity}" id="addressCity" maxlength="50" styleClass="input-width" style="width: 100% !important;" />
+						</p:panelGrid>
+					</p:fieldset>
+
+					<p:fieldset legend="#{msg.contactDetails}" class="fieldset" toggleable="true" toggleSpeed="500">
+						<p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" cellpadding="3" cellspacing="0"
+							columnClasses="ui-grid-col-2,ui-grid-col-4, ui-grid-col-2,ui-grid-col-4" layout="grid">
+							
+							<span>#{msg.mainTelephone}</span>
+							<p:inputText value="#{bean.entity.phone1}" id="phone1" maxlength="50" styleClass="input-width" />
+
+							<span>#{msg.secondaryTelephone}</span>
+							<p:inputText value="#{bean.entity.phone2}" id="phone2" maxlength="50" styleClass="input-width" />
+
+							<span>#{msg.email}</span>
+							<p:inputText value="#{bean.entity.mail}" id="mail" maxlength="50" styleClass="input-width" />
+
+							<span>#{msg.pec}</span>
+							<p:inputText value="#{bean.entity.pec}" id="pec" maxlength="50" styleClass="input-width" />
+						</p:panelGrid>
+					</p:fieldset>
+
+					<p:fieldset legend="#{msg.referencePerson}" class="fieldset" toggleable="true" toggleSpeed="500">
+						<p:dataList id="referencesDataList" widgetVar="referencesDataListWV" 
+							value="#{bean.entity.aggregationLandChargesRegistryReferences}" var="key">
+							<p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" cellpadding="3" cellspacing="0"
+								columnClasses="ui-grid-col-1,ui-grid-col-4,ui-grid-col-1,ui-grid-col-4,ui-grid-col-1,ui-grid-col-1" layout="grid">
+
+								<span>#{msg.name}</span>
+								<p:inputText id="name" value="#{key.name}" maxlength="50" styleClass="input-width" />
+
+								<span>#{msg.role}</span>
+								<p:inputText id="role" value="#{key.role}" maxlength="50" styleClass="input-width" />
+								
+								<p:outputLabel value="#{''}"></p:outputLabel>
+								<p:outputLabel value="#{''}"></p:outputLabel>
+								
+								<span>#{msg.cell}</span>
+								<p:inputText id="cellPhone" value="#{key.cellPhone}" maxlength="50" styleClass="input-width" />
+
+								<span>#{msg.email}</span>
+								<p:inputText id="email" value="#{key.email}" maxlength="50" styleClass="input-width" />
+								
+								<p:outputLabel value="#{''}"></p:outputLabel>
+								<p:commandButton icon="fa fa-close f-20" title="#{msg.delete}" action="#{bean.deleteReferences(key)}" update="referencesDataList"
+									styleClass="red-button" style="float:left;background-color: transparent!important; color: red !important;margin-left: 17px;
+									font-size:16px !important;"
+									rendered="#{bean.entity.aggregationLandChargesRegistryReferences.size() > 1}"></p:commandButton>
+							</p:panelGrid>
+						</p:dataList>
+
+						<p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" style="width: 99%;" cellpadding="3" cellspacing="0"
+							columnClasses="ui-grid-col-11, ui-grid-col-1" layout="grid">
+							<p:outputLabel value="#{''}"></p:outputLabel>
+							<p:commandButton value="#{msg.addNew}" action="#{bean.addNewReferences}" style="background-color: #000066 !important;"
+								update="@widgetVar(referencesDataListWV)"></p:commandButton>
+						</p:panelGrid>
+					</p:fieldset>
+
+					<p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" style="width: 100%;margin-top: 10px;margin-bottom: 5px;" cellpadding="3" cellspacing="0"
+						columnClasses="ui-grid-col-2,ui-grid-col-5, ui-grid-col-2,ui-grid-col-3">
+						<span>#{msg.stamps}</span>
+						<p:selectOneRadio id="stamp" value="#{bean.entity.stamp}">
+							<f:selectItem itemLabel="#{msg.yes}" itemValue="true" />
+							<f:selectItem itemLabel="#{msg.no}" itemValue="false" />
+						</p:selectOneRadio>
+
+						<span>#{msg.penalty}</span>
+						<p:selectOneRadio id="penalty" value="#{bean.entity.penalty}">
+							<f:selectItem itemLabel="#{msg.yes}" itemValue="true" />
+							<f:selectItem itemLabel="#{msg.no}" itemValue="false" />
+						</p:selectOneRadio>
+					</p:panelGrid>
+
+					<p:dataList id="notesDataList" widgetVar="notesDataListWV" value="#{bean.entity.aggregationLandChargesRegistryNotes}" var="notes">
+						<p:panelGrid id="notesPanelGrid" columns="3" styleClass="ui-panelgrid-blank form-group" style="width: 99%;" cellpadding="3" cellspacing="0"
+							columnClasses="ui-grid-col-1,ui-grid-col-10,ui-grid-col-1" layout="grid">
+							<span>#{msg.note}</span>
+							<p:inputTextarea value="#{notes.note}" rows="2" style="width:95%;"></p:inputTextarea>
+							<p:commandButton icon="fa fa-close f-20" title="#{msg.delete}" action="#{bean.deleteNote(notes)}" update="notesDataList"
+											 style="margin-top: 5px;background-color: transparent!important; color: red !important;margin-left: 17px;font-size:16px !important;"
+											 rendered="#{bean.entity.aggregationLandChargesRegistryNotes.size() > 1}"></p:commandButton>
+						</p:panelGrid>
+					</p:dataList>
+					
+					<p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" style="width: 98%;" cellpadding="3" cellspacing="0"
+						columnClasses="ui-grid-col-11, ui-grid-col-1" layout="grid">
+						<p:outputLabel value="#{''}"></p:outputLabel>
+						<p:commandButton value="#{msg.addNew}" action="#{bean.addNewNote}" update="@widgetVar(notesDataListWV)" 
+							style="background-color: #000066 !important;"></p:commandButton>
+					</p:panelGrid>
+
+					<p:panel id="containerPanel" rendered="#{bean.showDocumentSection}">
+						<p:panelGrid id="fileUploadPanelGrid" columns="2" style="width: 100%;"
+									 columnClasses="ui-grid-col-2, ui-grid-col-10">
+							<p:column>
+								<p:fileUpload 	id="otherFileUpload" label="#{msg.upload}"
+												 fileUploadListener="#{bean.handleOtherDocumentUpload}"
+												 multiple="false" mode="advanced"  auto="true" update="fileUploadPanelGrid">
+								</p:fileUpload>
+							</p:column>
+							<p:column>
+								<p:panelGrid columns="2" id="otherFilePanel" rendered="#{not empty bean.otherFileNameTemp}" style="padding: 0px;">
+									<h:outputText id="otherFileName" value="#{bean.otherFileNameTemp}" />
+									<p:commandButton icon="fa fa-close" title="#{msg.delete}" update="fileUploadPanelGrid"
+													 ajax="true" action="#{bean.deleteOtherTempDocument}"
+													 style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+									</p:commandButton>
+								</p:panelGrid>
+							</p:column>
+						</p:panelGrid>
+
+						<p:panelGrid id="fieldsPanelGrid" columns="3" style="width: 100%;" columnClasses="ui-grid-col-4, ui-grid-col-4, ui-grid-col-4">
+							<p:column>
+								<h:outputText value="#{msg.name}"/>
+								<p:inputText styleClass="input-width" value="#{bean.otherDocumentName}" />
+							</p:column>
+							<p:column>
+								<h:outputText value="#{msg.note}"/>
+								<p:inputText styleClass="input-width" value="#{bean.otherDocumentNote}" />
+							</p:column>
+							<p:column>
+								<p:commandButton value="#{msg.save.toUpperCase()}" style="margin-top: 23px;"
+												 action="#{bean.saveOtherDocument}" update="otherDocumentsTable containerPanel"
+												 styleClass="ui-button-success p-mr-2 p-mb-2" />
+							</p:column>
+						</p:panelGrid>
+					</p:panel>
+					<br /><br />
+					<p:dataTable value="#{bean.otherDocuments}" var="doc" id="otherDocumentsTable" emptyMessage="#{msg.noRecordsFound}"
+								 rowIndexVar="crow">
+						<p:column headerText="#{msg.name}">
+							<h:outputText value="#{doc.title}"/>
+						</p:column>
+						<p:column headerText="#{msg.note}">
+							<h:outputText value="#{doc.note}"/>
+						</p:column>
+						<p:column styleClass="action_column">
+							<p:commandButton icon="fa fa-fw new-pdf-icon" title="#{msg.download}" update="messages"
+											 ajax="false"
+											 action="#{doc.downloadFile}"
+											 rendered="#{not empty doc.title}"
+											 style="background-color: transparent!important; padding-right: 5px; font-size:18px !important;">
+							</p:commandButton>
+						</p:column>
+						<p:column styleClass="action_column">
+							<p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn" update="otherDocumentsTable"
+											 action="#{bean.deleteOtherDocument(crow)}"/>
+						</p:column>
+					</p:dataTable>
+					<div class="p-col-12" style="text-align: center;">
+						<p:commandButton value="#{msg.save.toUpperCase()}" style="margin-left:15px;" action="#{bean.save}"
+							update="validationMessages conservatoryTable" styleClass="ui-button-success p-mr-2 p-mb-2" />
+						<p:commandButton oncomplete="PF('addConservatoryDialogWV').hide();" value="#{msg.undo.toUpperCase()}"
+							style="background-color: #F3362B !important;" action="#{bean.resetFields}" />
+					</div>
+				</div>
+			</div>
+		</div>
+	</p:dialog>
+</ui:composition>

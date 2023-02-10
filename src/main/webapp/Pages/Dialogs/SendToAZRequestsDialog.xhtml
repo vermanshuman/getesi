@@ -1,0 +1,132 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+				xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html">
+	<p:dialog widgetVar="sendToAZRequestsDialogWV" modal="true" width="1400" styleClass="dialog-gray"
+			  header="#{msg.selectTypes}" id="sendToAZRequestsDialog">
+		<ui:include src="/resources/tpl/common/DialogValidationMessages.xhtml"/>
+		<p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" id="azSupplierArea">
+			<span>#{msg.supplier}:</span>
+			<p:selectOneMenu id="azSupplierList" value="#{bean.selectedSupplierId}"
+							 label="#{msg.supplier}">
+				<f:selectItems value="#{bean.suppliers}"/>
+				<p:ajax event="change" listener="#{bean.loadSendToAZTable(false)}"  update="sendToAZRequestsTable"/>
+			</p:selectOneMenu>
+		</p:panelGrid>
+	<p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group" id="sendToAZRequestsPanel">
+	        <p:dataTable value="#{bean.sendToAzRequests}" styleClass="simple-table" var="item" id="sendToAZRequestsTable"
+	                    style="margin-top:20px;" emptyMessage="#{msg.noRecordsFound}" rowKey="#{item.id}"
+						 rowIndexVar="row">
+<!--				<p:column selectionMode="multiple" style="width:16px;text-align:center"/>-->
+				<p:column style="width: 17px !important;" rendered="#{!bean.disableAllRowCheck}">
+					<f:facet name="header">
+						<p:selectBooleanCheckbox id="checkTop" async="true" value="#{bean.azCheckTop}">
+							<p:ajax event="change" update="sendToAZRequestsTable" listener="#{bean.azTopChangeListener}" />
+						</p:selectBooleanCheckbox>
+					</f:facet>
+					<p:selectBooleanCheckbox  async="true" value="#{item.selected}" styleClass="tableItems">
+						<p:ajax event="change" update="sendToAZRequestsTable" listener="#{bean.azItemChangeListener}" />
+					</p:selectBooleanCheckbox>
+					<f:facet name="footer">
+						<p:selectBooleanCheckbox id="checkBottom" async="true" value="#{bean.azCheckBottom}">
+							<p:ajax event="change" update="sendToAZRequestsTable" listener="#{bean.azDownChangeListener}" />
+						</p:selectBooleanCheckbox>
+					</f:facet>
+				</p:column>
+				<p:column style="width: 17px !important;" rendered="#{bean.disableAllRowCheck}">
+					<p:selectBooleanCheckbox async="true" disabled="#{item.differentSupplier}" value="#{item.selected}"/>
+				</p:column>
+				<p:column headerText="#{msg.requestService}">
+					<h:outputText value="#{item.service}" />
+				</p:column>
+				<p:column headerText="#{msg.databaseListRealEstateSubject}" rendered="#{!item.multiple}">
+					<h:outputText value="#{item.subject ne null ? item.subject : ''}"/>
+				</p:column>
+				<p:column headerText="#{msg.databaseListRealEstateSubject}" rendered="#{item.multiple and item.index eq 0}"
+						  rowspan="#{item.span}">
+					<h:outputText value="#{item.subject ne null ? item.subject : ''}"/>
+				</p:column>
+	        </p:dataTable>
+        </p:panelGrid>
+<!--		update="@form sendToAZRequestsTable"-->
+		<div id="btn_az_line" class="btn_line">
+			<p:commandButton value="#{msg.confirm}"
+							 style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;" widgetVar="azExecute"
+							 onclick="PF('azExecute').disable();"
+							 oncomplete="PF('azExecute').enable();"
+			                 action="#{bean.sendMultipleToAZ}"/>
+			<p:commandButton value="#{msg.cancel}" oncomplete="PF('azExecute').enable();PF('sendToAZRequestsDialogWV').hide();" update="sendToAZRequestsTable"
+							 style="background-color: #F3362B !important; width: 100px;" />
+		</div>
+		<style>
+			#sendToAZRequestsDialog .ui-datatable .ui-datatable-data > tr.ui-state-highlight {
+				background: #FFFFFF;
+				color: #000000;
+			}
+			#sendToAZRequestsDialog .ui-datatable-scrollable-theadclone {
+				display: none !important;
+			}	
+			#sendToAZRequestsDialog .ui-datatable:not(.borderless) thead th, #sendToAZRequestsDialog .ui-datatable tbody td, #sendToAZRequestsDialog .ui-datatable tfoot td, #sendToAZRequestsDialog .ui-datatable tfoot th {
+	           padding: 1rem 1rem !important;
+	        }
+			#sendToAZRequestsDialog .ui-datatable-scrollable-header th:nth-child(1) {
+				width: 40px !important;
+			}
+			#sendToAZRequestsDialog .ui-datatable-scrollable-body td:nth-child(1) {
+				width: 58px !important;
+			}
+			#sendToAZRequestsDialog .ui-datatable-scrollable-header th:nth-child(2) {
+				width: 90px !important;
+			}
+			#sendToAZRequestsDialog .ui-datatable-scrollable-body td:nth-child(2) {
+				width: 100px !important;
+			}
+	        #sendToAZRequestsDialog .ui-datatable-scrollable-header th:nth-child(3) {
+	            width: 90px !important;
+	        }
+	        #sendToAZRequestsDialog .ui-datatable-scrollable-body td:nth-child(3) {
+	            width: 100px !important;
+	        }
+	        #sendToAZRequestsDialog .ui-datatable-scrollable-header th:nth-child(4) {
+	            width: 230px !important;
+	        }
+	        #sendToAZRequestsDialog .ui-datatable-scrollable-body td:nth-child(4) {
+	            width: 220px !important;
+	        }
+	        #sendToAZRequestsDialog .ui-datatable-scrollable-header th:nth-child(5) {
+	            width: 150px !important;
+	        }
+	        #sendToAZRequestsDialog .ui-datatable-scrollable-body td:nth-child(5) {
+	            width: 150px !important;
+	        }
+	        #sendToAZRequestsDialog .ui-datatable-scrollable-header th:nth-child(6) {
+	            width: 151px !important;
+	        }
+	        #sendToAZRequestsDialog .ui-datatable-scrollable-body td:nth-child(6) {
+	            width: 150px !important;
+	        }
+	        #sendToAZRequestsDialog .ui-datatable-scrollable-header th:nth-child(7) {
+	            width: 150px !important;
+	        }
+	        #sendToAZRequestsDialog .ui-datatable-scrollable-body td:nth-child(7) {
+	            width: 150px !important;
+	        }
+	        #sendToAZRequestsDialog .ui-datatable-scrollable-header th:nth-child(8) {
+	            width: 150px !important;
+	        }
+	        #sendToAZRequestsDialog .ui-datatable-scrollable-body td:nth-child(8) {
+	            width: 150px !important;
+	        }
+	        #sendToAZRequestsDialog .ui-datatable .ui-datatable-data > tr > td {
+	            padding: 1rem 1rem;
+	            border: 1px solid #5f666c !important;
+	            text-align: center;
+	        }
+	        #sendToAZRequestsDialog .ui-datatable-scrollable table, .ui-datatable-sticky table {
+	            table-layout: fixed !important;
+	        }
+		</style>
+
+	</p:dialog>
+</ui:composition>

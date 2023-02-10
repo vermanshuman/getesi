@@ -52,6 +52,8 @@ public class ApplicationSettingsEditBean extends
 
     private ApplicationSettingsValueWrapper settingsCloudApiKey;
 
+    private ApplicationSettingsValueWrapper settingsApiURL;
+
     /*
      * (non-Javadoc)
      *
@@ -73,10 +75,10 @@ public class ApplicationSettingsEditBean extends
                 this.setMailServerReceive(new WLGServer());
                 this.setMailServerSend(new WLGServer());
             } else {
-                if (wlgServers.size() > 2) {
-                    LogHelper.log(log,
-                            "In table [wlg_server] present more than two rows! Check it!");
-                }
+//                if (wlgServers.size() > 2) {
+//                    LogHelper.log(log,
+//                            "In table [wlg_server] present more than two rows! Check it!");
+//                }
 
                 for (WLGServer server : wlgServers) {
                     if (SERVER_TYPE_15.equals(server.getType())
@@ -113,6 +115,9 @@ public class ApplicationSettingsEditBean extends
 
         setSettingsCloudApiURL(ApplicationSettingsHolder.getInstance().getByKey(
                 ApplicationSettingsKeys.CLOUD_API_URL));
+
+        setSettingsApiURL(ApplicationSettingsHolder.getInstance().getByKey(
+                ApplicationSettingsKeys.API_URL));
     }
 
     /*
@@ -170,6 +175,9 @@ public class ApplicationSettingsEditBean extends
 
         ApplicationSettingsHolder.getInstance()
                 .applyNewValue(getSettingsCloudApiURL());
+
+        ApplicationSettingsHolder.getInstance()
+                .applyNewValue(getSettingsApiURL());
 
         if (!ValidationHelper.isNullOrEmpty(this.getMailServerReceive())
                 && !ValidationHelper
@@ -249,5 +257,13 @@ public class ApplicationSettingsEditBean extends
 
     public void setSettingsCloudApiKey(ApplicationSettingsValueWrapper settingsCloudApiKey) {
         this.settingsCloudApiKey = settingsCloudApiKey;
+    }
+
+    public ApplicationSettingsValueWrapper getSettingsApiURL() {
+        return settingsApiURL;
+    }
+
+    public void setSettingsApiURL(ApplicationSettingsValueWrapper settingsApiURL) {
+        this.settingsApiURL = settingsApiURL;
     }
 }

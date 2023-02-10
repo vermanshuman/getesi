@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ff="http://readytech.com/functions"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+<ui:composition template="/resources/tpl/Admin/LazyListBase.xhtml">
+
+    <ui:param name="list_title" value="#{msg.aggregationAz}"/>
+    <ui:param name="bean" value="#{aggregationAZListBean}"/>
+    <ui:param name="entity_name" value="#{msg.aggregationAz}"/>
+    <ui:param name="disableSelection" value="true"/>
+    <ui:param name="additionalEditAction" value="window.scrollTo(0,0);"/>
+    <ui:define name="columns">
+        <p:column sortBy="#{item.code}"
+                  headerText="#{msg.code}">
+            <h:outputText value="#{item.code}"/>
+        </p:column>
+
+        <p:column headerText="#{msg.requestTypes}">
+            <h:outputText value="#{item.aggregationServiceName}"/>
+        </p:column>
+    </ui:define>
+
+    <ui:define name="dialogs_body">
+        <p:remoteCommand name="refreshTable" update="table"/>
+        <p:dialog widgetVar="addAggregationAzDialogWV"  id="addAggregationAzDialog" modal="true" draggable="false" width="600" styleClass="dialog-white-bg addPaymentDialog"
+                  position="center center" header="#{msg.aggregationAz}">
+            <div class="p-grid">
+                <div class="p-col-12 p-md-12">
+                    <div class="card"
+                         style="border: none !important; padding-top:0px; padding-bottom:0px; margin-top:10px;">
+                            <ui:include src="/resources/tpl/common/ValidationMessages.xhtml"/>
+                            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                                         columnClasses="ui-grid-col-3,ui-grid-col-9">
+                                <span><span class="red">*</span>#{msg.code}:</span>
+                                <p:inputText value="#{bean.entity.code}" id="code" label="#{msg.code}"
+                                             styleClass="input-width"/>
+
+                                <span><span class="red">*</span> #{msg.service_list}:</span>
+                                <p:selectCheckboxMenu id="services" value="#{bean.selectedService}"
+                                                      filter="true" filterMatchMode="startsWith"
+                                                      style="min-height: 35px;width: 98%;"
+                                                      multiple="true" converter="serviceSelectConverter" label="test">
+                                    <f:selectItems value="#{bean.services}"/>
+                                </p:selectCheckboxMenu>
+                            </p:panelGrid>
+
+                        <div class="p-col-12" style="text-align:center;">
+                            <p:commandButton value="#{msg.save.toUpperCase()}" style="margin-left:15px;"
+                                             action="#{bean.save()}" update="validationMessages"
+                                             styleClass="ui-button-success p-mr-2 p-mb-2"/>
+                            <p:commandButton oncomplete="PF('addAggregationAzDialogWV').hide();"
+                                             value="#{msg.undo.toUpperCase()}" style="background-color: #F3362B !important;"
+                                             action="#{bean.resetFields}"/>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </p:dialog>
+    </ui:define>
+
+
+</ui:composition>
+</html>

@@ -6,7 +6,9 @@ import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.Subject;
 import it.nexera.ris.persistence.beans.entities.domain.VisureDH;
 import it.nexera.ris.persistence.beans.entities.domain.VisureRTF;
+import it.nexera.ris.persistence.view.FormalityView;
 import it.nexera.ris.web.common.EntityLazyListModel;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -24,6 +26,8 @@ public class VisureDHBindingWrapper extends BaseTab implements Serializable {
     private static final long serialVersionUID = 3419737923499817710L;
 
     private Subject subject;
+
+    private LazyDataModel<FormalityView> lazyModel;
 
     public VisureDHBindingWrapper(Subject subject) {
         this.subject = subject;
@@ -51,7 +55,7 @@ public class VisureDHBindingWrapper extends BaseTab implements Serializable {
     }
 
     @Override
-    Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+    public Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
         return DaoManager.getCount(VisureDH.class, "id", new Criterion[]{
                 Restrictions.eq("fiscalCodeVat", getSubject().getFiscalCodeVATNamber())});
     }
@@ -62,5 +66,15 @@ public class VisureDHBindingWrapper extends BaseTab implements Serializable {
 
     public void setSubject(Subject subject) {
         this.subject = subject;
+    }
+
+    public LazyDataModel<FormalityView> getLazyModel() {
+        return new EntityLazyListModel(VisureDH.class, new Criterion[]{
+                Restrictions.eq("fiscalCodeVat", getSubject().getFiscalCodeVATNamber())},
+                new Order[]{Order.asc("id")});
+    }
+
+    public void setLazyModel(LazyDataModel<FormalityView> lazyModel) {
+        this.lazyModel = lazyModel;
     }
 }

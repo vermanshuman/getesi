@@ -5,6 +5,9 @@ import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.CalendarEvent;
 import it.nexera.ris.web.beans.EntityLazyInListEditPageBean;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
@@ -21,6 +24,7 @@ import org.primefaces.model.ScheduleModel;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.RequestScoped;
+import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.io.Serializable;
@@ -31,9 +35,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-@ManagedBean
-@RequestScoped
-@Data
+@ManagedBean(name = "calendarBean")
+@ViewScoped
+@Getter
+@Setter
 public class CalendarBean extends EntityLazyInListEditPageBean<CalendarEvent> implements Serializable {
 
 
@@ -60,7 +65,6 @@ public class CalendarBean extends EntityLazyInListEditPageBean<CalendarEvent> im
 
     public void onEventSelect(SelectEvent selectEvent) {
         event = (ScheduleEvent) selectEvent.getObject();
-        System.out.println(event + ">>>>>>>>>>>>>>>>>>" + selectEvent.getObject());
     }
 
     public void onDateSelect(SelectEvent selectEvent) {

@@ -11,19 +11,31 @@
     <ui:param name="goBackRendered" value="false"/>
     <ui:define name="view_body">
 
-    <style>
-            @media screen and (max-width: 1810px) {
+        <style>
+            /* @media screen and (max-width: 1810px) {
                 .estate-situation {
                     width: 100% !important;
                 }
 
                 .estate-situation .ui-grid-row .ui-panelgrid-cell:first-child {
-                    width: 66.66666% !important;
+                    width: 45% !important;
                 }
 
                 .estate-situation .ui-grid-row .ui-panelgrid-cell:nth-child(2) {
-                    width: 33.33333% !important;
+                    width: 45% !important;
                 }
+                .estate-situation .ui-grid-row .ui-panelgrid-cell:nth-child(3) {
+                    width: 265px !important;
+                }
+            } */
+
+
+            .estate-situation .ui-grid-row .ui-panelgrid-cell:first-child {
+                width: fit-content !important;
+            }
+
+            .estate-situation .ui-grid-row .ui-panelgrid-cell:nth-child(2) {
+                width: fit-content !important;
             }
 
             .sub-list-legend legend {
@@ -56,7 +68,8 @@
                 margin-top: 8px !important;
             }
 
-            body .ui-widget-header {
+            body .ui-widget-header:not(#formalityTab_paginator_top, #formalityTab_paginator_bottom,
+            #estateTab_paginator_top, #estateTab_paginator_bottom,#estateTabLand_paginator_top, #estateTabLand_paginator_bottom) {
                 background-color: #FFFFFF !important;
             }
 
@@ -84,10 +97,10 @@
                 padding-left: 5px !important;
             }
 
-            body .ui-widget, body .ui-widget .ui-widget {
+           /*  body .ui-widget, body .ui-widget .ui-widget {
                 font-family: "Open Sans","Helvetica Neue",sans-serif !important;
                 text-decoration: none !important;
-            }
+            } */
 
             body .ui-datatable .ui-datatable-data > tr {
                 color: #5f666c;
@@ -120,8 +133,30 @@
                 font-size: 14px;
             }
 
-            body .ui-panel .ui-panel-titlebar, body .ui-panel .ui-panel-content,.card , #immobiliFieldset, #formalityDettaglio, #sinteticheFieldSet{
+
+            #immobiliFieldset, #formalityDettaglio, #sinteticheFieldSet{
                 border: 1px solid #6c757d !important;
+            }
+
+
+            body .ui-panel .ui-panel-titlebar {
+                border-top: 1px solid #6c757d !important;
+                border-right: 1px solid #6c757d !important;
+                border-left: 1px solid #6c757d !important;
+            }
+
+            body .ui-panel .ui-panel-content{
+                border-right: 1px solid #6c757d !important;
+                border-left: 1px solid #6c757d !important;
+                border-bottom: 1px solid #6c757d !important;
+            }
+
+            .card .ui-panel-titlebar {
+                border-bottom:none !important
+            }
+
+            .card .ui-panel-content {
+                border-top:none !important
             }
 
             .ui-fileupload-buttonbar .ui-button .ui-icon-plusthick{
@@ -130,27 +165,90 @@
             .white-button{
                 background: white !important;
             }
-    </style>
+            .card {
+                padding:0 !important;
+            }
+            .ui-button.grey-button {
+                background-color: #3582b8  !important;
+            }
+
+            .ui-button.grey-button:hover {
+                background-color: #003871 !important;
+            }
+
+            #nationalCostPanel_content {
+                border:none !important;
+                padding:0 !important;
+            }
+            #fileTable_head tr {
+                display: none;
+            }
+            #formTable_head tr {
+                display: none;
+            }
+            #confirmAddNationalCostDialog .ui-widget-header {
+                display: block !important;
+            }
+            #confirmRemoveNationalCostDialog .ui-widget-header {
+                display: block !important;
+            }
+        </style>
         <p:remoteCommand name="removeFileCommand" update="form"/>
-        <div align="center">
-            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group estate-situation" layout="grid"
-                         style="text-align: left;width: 75%;">
-                <p:column><span style="font-size:20px;">
-                    #{ff:upper(msg.estateSituationEditSubjectName)}
-                    <b>#{ff:upper(bean.requestEntity.nameStr)}</b>
-                </span></p:column>
-                <p:column><span style="font-size:20px;">
-                    #{ff:upper(msg.estateSituationEditConservatory)}
-                    <b>#{ff:upper(bean.requestEntity.aggregationLandChargesRegistryName)}</b>
-                </span></p:column>
-                <p:column><span style="font-size:20px;">
-                    #{ff:upper(msg.estateSituationEditRequestType)} #{ff:upper(bean.requestEntity.service.name)}
-                </span></p:column>
-                <p:column><span style="font-size:20px;">
-                    #{ff:upper(msg.estateSituationEditClientName)} #{ff:upper(bean.requestEntity.clientName)}
-                </span></p:column>
-            </p:panelGrid>
+        <div style="width: 100%; display: flex;">
+            <div align="center"  style="width:50%;">
+                <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group estate-situation" layout="grid"
+                             style="text-align: left;width: fit-content;">
+                    <p:column>
+	                	<span style="font-size:20px;">
+	                    	#{ff:upper(msg.estateSituationEditSubjectName)}
+                            <b>#{ff:upper(bean.requestEntity.nameStr)}</b>
+	                	</span>
+                    </p:column>
+
+                    <p:column>
+	                	<span style="font-size:20px;">
+	                    	#{ff:upper(msg.estateSituationEditRequestType)} #{ff:upper(bean.requestEntity.service.name)}
+	                	</span>
+                    </p:column>
+                </p:panelGrid>
+            </div>
+            <div align="center"  style="width:50%;">
+                <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group estate-situation" layout="grid"
+                             style="text-align: left;width: fit-content;">
+                    <p:column>
+	                	<span style="font-size:20px; text-align: left;">
+	                    	#{ff:upper(msg.estateSituationEditConservatory)}
+                            <b>#{ff:upper(bean.requestEntity.aggregationLandChargesRegistryName)}</b>
+	                	</span>
+                    </p:column>
+
+                    <p:column>
+	                	<span style="font-size:20px;">
+	                    	#{ff:upper(msg.estateSituationEditClientName)} #{ff:upper(bean.requestEntity.clientName)}
+	                	</span>
+                    </p:column>
+                </p:panelGrid>
+            </div>
+            <div align="right" style="width:fit-content;">
+                <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group estate-situation" layout="grid">
+                    <p:column>
+                        <p:panel id="nationalCostPanel" style="border:none ; padding:0 !important; width: 265px;">
+                            <p:commandButton value="#{msg.estateSituationViewAddNationalCost}" style="width: 210px !important;margin-top: 80px;margin-left: -210px;position: absolute;"
+                                             styleClass="grey-button" rendered="#{bean.showAddNationalCostButton}" 
+                                             action="#{bean.preCheckAddNationalCost}"/>
+                            <ui:fragment rendered="#{not bean.showAddNationalCostButton}">
+			            		<span style="border: 2px solid #57c279 !important;padding: 5px 8px 8px 4px; border-radius: 2px;margin-top: 80px;margin-left: -210px;position: absolute;">
+			                		<i class="fa fa-check-circle-o" style="color: green; margin-right: 5px; margin-left: 5px;"/>
+			                		<p:commandLink value="#{msg.estateSituationViewAddNationalCost}" style="width: 265px !important;"
+                                                   oncomplete="PF('confirmRemoveNationalCostDialogWV').show();" />
+			            		</span>
+                            </ui:fragment>
+                        </p:panel>
+                    </p:column>
+                </p:panelGrid>
+            </div>
         </div>
+
         <p:fieldset id="immobiliFieldset" legend="#{msg.databaseListSubjectProperties}" toggleable="true" toggleSpeed="500" collapsed="false" styleClass="sub-list-legend" style="margin-top: 10px;">
             <p:panelGrid columns="9" styleClass="ui-panelgrid-blank form-group" layout="grid">
                 <p:commandButton value="#{msg.formalityEnterSectionBInsertProperty}"
@@ -176,22 +274,22 @@
 
             <br/>
             <p:outputPanel id="filePanel">
-                <p:dataTable id="fileTable" var="fileEntry" value="#{bean.uploadedFiles}" rowKey="#{fileEntry.id}"
+                <p:dataTable id="fileTable" var="fileEntry" value="#{bean.uploadedFiles}" rowKey="#{fileEntry.id}" emptyMessage="#{msg.noRecordsFound}"
                              rendered="#{not empty bean.uploadedFiles}" styleClass="without-header simple-table estate-table">
                     <p:column styleClass="filename_column">
                         <h:outputText value="#{fileEntry.getTitle()}"/>
                     </p:column>
-                    <p:column styleClass="action_column">
-                        <p:commandButton styleClass="white-button" icon="fa fa-fw fa-file-pdf-o red-file icon-align" action="#{bean.showPDF}" ajax="false">
+                    <p:column styleClass="action_column"  style="width: 60px">
+                        <p:commandButton icon="fa fa-fw new-pdf-icon" styleClass="hide-pdf-bg" action="#{bean.showPDF}" ajax="false">
                             <f:setPropertyActionListener value="#{fileEntry.id}" target="#{bean.downloadFileId}"/>
                         </p:commandButton>
                     </p:column>
-                    <p:column styleClass="action_column">
+                    <p:column styleClass="action_column"  style="width: 60px">
                         <p:commandButton icon="fa fa-fw fa-file-code-o icon-align" action="#{bean.showXML}" ajax="false">
                             <f:setPropertyActionListener value="#{fileEntry.id}" target="#{bean.downloadFileId}"/>
                         </p:commandButton>
                     </p:column>
-                    <p:column styleClass="action_column" style="width: 100px">
+                    <p:column styleClass="action_column" style="width: 150px">
                         <p:commandButton action="#{bean.removeFile}" oncomplete="removeFileCommand()"
                                          value="#{msg.estateSituationViewRemoveFile}">
                             <f:setPropertyActionListener value="#{fileEntry.id}" target="#{bean.downloadFileId}"/>
@@ -202,7 +300,7 @@
             </p:outputPanel>
             <br/>
             <h3 style="text-align: left;margin-bottom: 20px;font-weight: 100;">#{msg.realEstateBuild}</h3>
-            <p:dataTable value="#{bean.lazyPropertyListBuilding}" lazy="true"
+            <p:dataTable value="#{bean.lazyPropertyListBuilding}" lazy="true" emptyMessage="#{msg.noRecordsFound}"
                          style="width: 100%" styleClass="simple-table estate-table estateTabTable"
                          var="item" id="estateTab"
                          rowStyleClass="#{item.used?'user-row':''}"
@@ -315,7 +413,7 @@
             </p:dataTable>
             <br/>
             <h3 style="text-align: left;margin-bottom: 20px;font-weight: 100;">#{msg.realEstateLand}</h3>
-            <p:dataTable value="#{bean.lazyPropertyListLand}" lazy="true"
+            <p:dataTable value="#{bean.lazyPropertyListLand}" lazy="true" emptyMessage="#{msg.noRecordsFound}"
                          style="width: 100%!important;"
                          styleClass="simple-table estate-table" var="item" id="estateTabLand"
                          paginator="true" paginatorAlwaysVisible="false" rows="20"
@@ -327,7 +425,7 @@
                         <p:column rowspan="3" colspan="2" headerText="N." styleClass="action_column" style="width: 8%;" />
                         <p:column colspan="4" headerText="DATI IDENTIFICATIVI" style="width: 20%;"/>
                         <p:column colspan="6" headerText="DATI DI CLASSAMENTO" style="width: 37%;"/>
-                        <p:column colspan="5" headerText="ALTRE INFORMAZIONI" style="width: 38%;" />
+                        <p:column colspan="6" headerText="ALTRE INFORMAZIONI" style="width: 38%;" />
                     </p:row>
                     <p:row>
                         <p:column rowspan="2" headerText="Scheda"/>
@@ -341,6 +439,7 @@
                         <p:column rowspan="2" headerText="Preg." />
                         <p:column rowspan="2" headerText="Pres." />
                         <p:column rowspan="2" headerText="Coltura"  />
+                        <p:column rowspan="2" headerText="Valore"  />
                     </p:row>
                     <p:row>
                         <p:column headerText="mq"/>
@@ -431,6 +530,9 @@
                     <h:outputText rendered="#{item.cadastralCulture != null and item.cadastralCulture.landCulture != null}"
                                   value="#{item.cadastralCulture.landCulture.name}"/>
                 </p:column>
+                <p:column style="text-align: center;" >
+                    <p:selectBooleanCheckbox value="#{item.landOmiValueRelated}" disabled="true"/>
+                </p:column>
 
             </p:dataTable>
         </p:fieldset>
@@ -458,25 +560,25 @@
                         value="#{msg.importFromDatabase}" action="#{bean.loadMostRecentPresumableFile}"/>
             </p:panelGrid>
             <p:outputPanel id="formPanel">
-                <p:dataTable id="formTable" var="fileEntry" value="#{bean.formalityDocumentList}"
+                <p:dataTable id="formTable" var="fileEntry" value="#{bean.formalityDocumentList}" emptyMessage="#{msg.noRecordsFound}"
                              rowKey="#{fileEntry.id}" rendered="#{not empty bean.formalityDocumentList}"
                              styleClass="without-header simple-table estate-table">
                     <p:column styleClass="filename_column">
                         <h:outputText value="#{fileEntry.getTitle()}"/>
                     </p:column>
-                    <p:column styleClass="action_column">
-                        <p:commandButton styleClass="white-button" icon="fa fa-fw fa-file-pdf-o red-file icon-align" action="#{bean.downloadEstateFormalityPDF}"
+                    <p:column styleClass="action_column"  style="width: 60px">
+                        <p:commandButton icon="fa fa-fw new-pdf-icon" styleClass="hide-pdf-bg" action="#{bean.downloadEstateFormalityPDF}"
                                          ajax="false">
                             <f:setPropertyActionListener value="#{fileEntry.id}"
                                                          target="#{bean.downloadFileId}"/>
                         </p:commandButton>
                     </p:column>
-                    <p:column styleClass="action_column">
+                    <p:column styleClass="action_column"  style="width: 60px">
                         <p:commandButton icon="fa fa-fw fa-file-code-o icon-align" action="#{bean.showXML}" ajax="false">
                             <f:setPropertyActionListener value="#{fileEntry.id}" target="#{bean.downloadFileId}"/>
                         </p:commandButton>
                     </p:column>
-                    <p:column styleClass="action_column" style="width: 100px">
+                    <p:column styleClass="action_column" style="width: 150px">
                         <p:commandButton action="#{bean.removeFile}"
                                          oncomplete="removeFileCommand()"
                                          value="#{msg.estateSituationViewRemoveFile}">
@@ -486,7 +588,7 @@
                     </p:column>
                 </p:dataTable>
             </p:outputPanel>
-            <p:dataTable value="#{bean.lazyFormalityList}" lazy="true"
+            <p:dataTable value="#{bean.lazyFormalityList}" lazy="true" emptyMessage="#{msg.noRecordsFound}"
                          styleClass="simple-table simple-table-layout estate-table"
                          var="item" id="formalityTab"
                          paginator="true" paginatorAlwaysVisible="false" rows="20"
@@ -556,7 +658,7 @@
             <p:poll widgetVar="pdfPoll" interval="10" listener="#{bean.updatePDFTable}" update="formalityPDFTab"
                     autoStart="false"/>
             <p:remoteCommand update="formalityPDFTab" name="updatePdfTable"/>
-            <p:dataTable value="#{bean.formalityPDFList}" styleClass="simple-table estate-table" var="item" id="formalityPDFTab">
+            <p:dataTable value="#{bean.formalityPDFList}" styleClass="simple-table estate-table" var="item" id="formalityPDFTab" emptyMessage="#{msg.noRecordsFound}">
                 <p:column styleClass="action_column" exportable="false">
                     <p:commandButton icon="ui-icon pi pi-pencil" update=":form"
                                      action="#{bean.editFormality}">
@@ -572,7 +674,7 @@
                 </p:column>
                 <p:column styleClass="action_column">
                     <p:column headerText="#{msg.pdf}" styleClass="action_column">
-                        <p:commandButton styleClass="white-button" icon="fa fa-fw fa-file-pdf-o red-file" action="#{bean.downloadFormalityPdf}" ajax="false">
+                        <p:commandButton icon="fa fa-fw new-pdf-icon" styleClass="hide-pdf-bg" action="#{bean.downloadFormalityPdf}" ajax="false">
                             <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                         </p:commandButton>
                     </p:column>
@@ -624,7 +726,7 @@
         <p:dialog header="#{msg.formalityDocuments}" widgetVar="dlgFormalityDoc" modal="true" width="600"
                   draggable="false" position="center center">
             <p:outputPanel id="dialogFormalityDoc">
-                <p:dataTable value="#{bean.formalityDocList}" var="doc">
+                <p:dataTable value="#{bean.formalityDocList}" var="doc" emptyMessage="#{msg.noRecordsFound}">
                     <p:column headerText="#{msg.name}">
                         <h:outputText value="#{doc.title}"/>
                     </p:column>
@@ -663,22 +765,28 @@
             </div>
         </p:dialog>
         <p:dialog widgetVar="subjectUploadDialog" modal="true" width="600"
-                  draggable="false" position="center center">
+                  draggable="false" position="center center"
+                  style="max-width: 900px; height: auto !important; min-height: 300px !important;
+                    max-height: 700px !important; margin-top: 45px !important; border: 2px solid #57c279;">
             <h:outputText value="#{msg.subjectUploadDialogBeginning}"/>
             <h:outputText value="#{bean.subjectFromFile.fullDescriptionByEnum}" escape="false" id="subjectDialog"
                           style="font-size: large;"/>
             <h:outputText value="#{msg.subjectUploadDialogEnding}"/>
             <br/><br/>
             <div align="center">
-                <p:commandButton value="#{msg.yes}" action="#{bean.saveNewSubjectsProperties}"
-                                 onstart="PF('subjectUploadDialog').hide();"
-                                 update=":form:filePanel, :form:estateTab, :form:estateTabLand"/>
-                <p:commandButton value="#{msg.no}" action="#{bean.notSaveNewSubjectsProperties}"
+
+                <p:commandButton value="#{msg.confirm}" action="#{bean.saveNewSubjectsProperties}"
+                                 style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"
+                                 update=":form:filePanel, :form:estateTab, :form:estateTabLand"
+                                 oncomplete="PF('subjectUploadDialog').hide();"/>
+                <p:commandButton value="#{msg.cancel}" action="#{bean.notSaveNewSubjectsProperties}"
+                                 style="background-color: #F3362B !important; width: 100px;"
                                  onstart="PF('subjectUploadDialog').hide()"/>
             </div>
         </p:dialog>
         <p:dialog widgetVar="subjectEstateFormalityUploadDialog" modal="true" width="600"
-                  draggable="false" position="center center">
+                  draggable="false" position="center center"
+                  style="margin-top: 45px !important; border: 2px solid #57c279;">
             <p:outputPanel id="subjectEstateFormalityDialog">
                 <h:outputText value="#{val.estateFormalityConservatorySuccessBgn}"/>
                 <h:outputText value="#{bean.conservatoryFromFile}"/><br/>
@@ -687,10 +795,12 @@
             </p:outputPanel>
             <br/><br/>
             <div align="center">
-                <p:commandButton value="#{msg.yes}" action="#{bean.saveNewSubjectsEstateFormalities}"
-                                 onstart="PF('subjectEstateFormalityUploadDialog').hide();"
-                                 update=":form:formPanel, :form:formalityTab"/>
-                <p:commandButton value="#{msg.no}" action="#{bean.notSaveNewSubjectsEstateFormalities}"
+                <p:commandButton value="#{msg.confirm}" action="#{bean.saveNewSubjectsEstateFormalities}"
+                                 style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"
+                                 update=":form:formPanel, :form:formalityTab"
+                                 onstart="PF('subjectEstateFormalityUploadDialog').hide();"/>
+                <p:commandButton value="#{msg.cancel}" action="#{bean.notSaveNewSubjectsEstateFormalities}"
+                                 style="background-color: #F3362B !important; width: 100px;"
                                  onstart="PF('subjectEstateFormalityUploadDialog').hide()"/>
             </div>
         </p:dialog>
@@ -724,16 +834,73 @@
             </div>
         </p:dialog>
         <p:dialog widgetVar="previousRequest"
-                  modal="true" resizable="false" effect="SLIDE">
+                  modal="true" resizable="false" effect="SLIDE"
+                  styleClass="dialog-green" style="text-align: center;">
             #{bean.previousRequestListMessage}<br/>
             <span>#{msg.estateSituationPreviousRequestUpload}</span>
             <br/>
             <div class="btn_line">
                 <p:commandButton value="#{msg.submit}" action="#{bean.associatePreviousData}"
-                                 onclick="PF('previousRequest').hide()" update=":form"/>
-                <p:commandButton value="#{msg.no}" onclick="PF('previousRequest').hide()"/>
+                                 onclick="PF('previousRequest').hide()" update=":form"
+                                 style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"/>
+                <p:commandButton value="#{msg.no}" onclick="PF('previousRequest').hide()"
+                                 style="background-color: #F3362B !important; width: 100px;"/>
             </div>
         </p:dialog>
+
+        <p:dialog id="includeNationalCostDialog" header="Note!" widgetVar="includeNationalCostDialogWV"
+                  height="100px">
+            #{msg.requestIncludeNationalCostMessage} <br/>
+            <div class="btn_line">
+                <p:commandButton
+                        value="#{msg.ok}" oncomplete="PF('includeNationalCostDialogWV').hide()"/>
+            </div>
+        </p:dialog>
+
+        <p:dialog widgetVar="confirmAddNationalCostDialogWV" resizable="false" id="confirmAddNationalCostDialog" styleClass="dialog-green"
+                  draggable="false" modal="true" width="500" style="overflow: unset !important; height: 150px !important;">
+            <h:outputText value="#{msg.estateSituationViewAddNationalCostConfirmMessage}"/>
+
+            <div class="btn_line">
+                <p:commandButton value="#{msg.yes}" update=":form:nationalCostPanel" styleClass="yes-button"
+                                 oncomplete="PF('confirmAddNationalCostDialogWV').hide();" style="margin-right: 15px;"
+                                 action="#{bean.updateNationalCost}"/>
+                <p:commandButton value="#{msg.no}" styleClass="no-button"
+                                 onclick="PF('confirmAddNationalCostDialogWV').hide();"/>
+            </div>
+        </p:dialog>
+
+        <p:dialog widgetVar="confirmRemoveNationalCostDialogWV" resizable="false" id="confirmRemoveNationalCostDialog" styleClass="dialog-green"
+                  draggable="false" modal="true" width="500" style="overflow: unset !important; height: 150px !important;">
+            <h:outputText value="#{msg.estateSituationViewRemoveNationalCostConfirmMessage}"/>
+
+            <div class="btn_line">
+                <p:commandButton value="#{msg.yes}" update=":form:nationalCostPanel" styleClass="yes-button"
+                                 oncomplete="PF('confirmRemoveNationalCostDialogWV').hide();" style="margin-right: 15px;"
+                                 action="#{bean.deleteNationalCost}"/>
+                <p:commandButton value="#{msg.no}" styleClass="no-button"
+                                 onclick="PF('confirmRemoveNationalCostDialogWV').hide();"/>
+            </div>
+        </p:dialog>
+
+        <p:dialog id="includeNationalCost2Dialog" header="Note!" widgetVar="includeNationalCost2DialogWV" height="100px" styleClass="dialog-red">
+            #{msg.requestAlreadyIncludeNationalCostMessage} <br />
+            <div class="btn_line">
+                <p:commandButton value="#{msg.ok}" oncomplete="PF('includeNationalCost2DialogWV').hide()" />
+            </div>
+        </p:dialog>
+        
+        <p:dialog id="nationalCostAlreadyEnteredDialog" header="Note!" styleClass="dialog-orange" width="400"
+              widgetVar="nationalCostAlreadyEnteredDialogWV">
+	        #{msg.requestNationalCostAlreadyEntered} <br />
+	        <div class="btn_line">
+	            <p:commandButton value="#{msg.confirm}" style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"
+	                             update="@this"
+	                             oncomplete="PF('nationalCostAlreadyEnteredDialogWV').hide();PF('confirmAddNationalCostDialogWV').show();"/>
+	            <p:commandButton value="#{msg.cancel}" style="background-color: #F3362B !important; width: 100px;"
+	                             oncomplete="PF('nationalCostAlreadyEnteredDialogWV').hide();" />
+	        </div>
+	    </p:dialog>
 
         <p:remoteCommand name="associateFormalities" action="#{bean.associateFormalitiesToRequest()}"
                          oncomplete="updatePdfTable()"/>
@@ -754,8 +921,8 @@
 
     </ui:define>
     <ui:define name="next_buttons">
-        <p:commandButton id="backBtn" action="#{bean.goCancel}" style="margin-top: 3%"
-                         value="#{msg.goBack}" rendered="#{!bean.viewRelatedEstate}"
-                         icon="fa fa-chevron-circle-left"/>
+                <p:commandButton id="backBtn" action="#{bean.goCancel}" style="margin-top: 3%"
+                                 value="#{msg.goBack}" rendered="#{!bean.viewRelatedEstate}"
+                                 icon="fa fa-chevron-circle-left"/>
     </ui:define>
 </ui:composition>

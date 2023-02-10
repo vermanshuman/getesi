@@ -47,6 +47,7 @@
 
                 };
                 jQuery(document).ready(function() {
+                    loadNumberEmailsReadyForSent();
                     setTimeout(function(){
                         addUtentiIcon();
 
@@ -243,16 +244,21 @@
                         </p:commandLink>
                     </div>
                     <div class="p-col-12 p-lg-6 p-xl-3">
+                        <p:commandLink action="#{homeBean.openMailManagerListToBeSent()}" id="openMailManagerListToBeSent"
+                                       style="text-decoration: none" disabled="#{not sessionBean.loadingEmailCountDone}">
+                        <p:remoteCommand name="loadNumberEmailsReadyForSent" action="#{sessionBean.getNumberEmailsReadyForSentByStatusToBeSentOrEstToSent}" 
+                                     update="numberEmailsReadyForSent openMailManagerListToBeSent"/>
                         <div class="overview-box checkin" style="background-color: #DF6161;">
                             <i class="overview-icon pi pi-clock"/>
-                            <span class="overview-title">#{msg.numberOverdueRequests}</span>
+                            <span class="overview-title">#{msg.numberEmailsReadyToBesent}</span>
                             <div class="overview-numbers">
-                                <h:outputText
-                                        value="&#160;"/>
+                                <h:outputText id="numberEmailsReadyForSent"
+                                              value="#{sessionBean.numberEmailsReadyForSent}"/>
                             </div>
                             <div class="overview-subinfo">
                             </div>
                         </div>
+                        </p:commandLink>
                     </div>
                     <div class="p-col-12 p-lg-6 p-xl-3" style="display: #{homeBean.nextSlide ? '' : 'none'}">
                         <div class="overview-box views">
@@ -372,7 +378,7 @@
                                                     <i class="carico-icon topbar-icon #{workLoad.icon}" style="#{workLoad.style}"/>
                                                     <span class="project-title"><h:outputText value="#{workLoad.name}"/></span>
                                                     <div class="project-progressbar">
-                                                        <div class="project-progressbar-value" style="width: #{workLoad.percentage}%"></div>
+                                                        <div class="project-progressbar-value" style="width: #{workLoad.percentage}%;background-color: #{workLoad.barColor}"></div>
                                                     </div>
                                                     <span class="project-detail"><h:outputText value="#{workLoad.numberUnclosedRequestsInWork}"/> in lavorazione su <h:outputText value="#{workLoad.total}"/></span>
                                                 </li>

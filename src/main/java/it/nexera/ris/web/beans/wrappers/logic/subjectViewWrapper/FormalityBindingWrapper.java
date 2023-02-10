@@ -9,6 +9,7 @@ import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.Formality;
+import it.nexera.ris.persistence.beans.entities.domain.Request;
 import it.nexera.ris.persistence.beans.entities.domain.Subject;
 import it.nexera.ris.persistence.view.FormalityView;
 import it.nexera.ris.web.common.EntityLazyListModel;
@@ -39,6 +40,8 @@ public class FormalityBindingWrapper extends BaseTab implements Serializable {
 
     private List<Long> listIds;
 
+    private LazyDataModel<FormalityView> lazyModel;
+
     public FormalityBindingWrapper(Subject subject,List<Long> ids) {
         this.subject = subject;
         setListIds(ids);
@@ -59,7 +62,7 @@ public class FormalityBindingWrapper extends BaseTab implements Serializable {
             List<Long> filteredList = new ArrayList<>();
 
             for(Formality f : unfilteredList) {
-                if(!(forCadastralBindingWrapper && (f.getDocument() == null ||
+                if(!(forCadastralBindingWrapper && (!ValidationHelper.isNullOrEmpty(f.getDocument()) &&
                         f.getDocument().getTypeId() != DocumentType.INDIRECT_CADASTRAL_REQUEST.getId())))
                     filteredList.add(f.getId());
             }
@@ -88,7 +91,8 @@ public class FormalityBindingWrapper extends BaseTab implements Serializable {
         commandButton.setActionExpression(createMethodExpression(String.format("#{subjectBean.%s}",
                 "downloadFormalityPDF(tableVar.documentId)"), new Class[]{Long.class}));
         commandButton.setAjax(false);
-        commandButton.setIcon("fa fa-fw fa-file-pdf-o");
+        commandButton.setIcon("fa fa-fw new-pdf-icon");
+        commandButton.setStyleClass("hide-pdf-bg");
         columns.add(getButtonColumn("subjectViewFormalityPDF", commandButton, "", "action_column"));
 
         commandButton = new CommandButton();
@@ -111,7 +115,7 @@ public class FormalityBindingWrapper extends BaseTab implements Serializable {
     }
 
     @Override
-    Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+    public Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
         return (long) getList().size();
     }
 
@@ -137,5 +141,17 @@ public class FormalityBindingWrapper extends BaseTab implements Serializable {
 
     public void setListIds(List<Long> listIds) {
         this.listIds = listIds;
+    }
+
+    public LazyDataModel<FormalityView> getLazyModel() {
+        return new EntityLazyListModel(FormalityView.class, new Criterion[]{
+                (!ValidationHelper.isNullOrEmpty(getList()) ?
+                        Restrictions.in("id", getList()) :
+                        Restrictions.eq("id", 0L))
+        }, new Order[]{Order.asc("conservatoryName"), Order.asc("presentationDate"), Order.asc("generalRegister")});
+    }
+
+    public void setLazyModel(LazyDataModel<FormalityView> lazyModel) {
+        this.lazyModel = lazyModel;
     }
 }

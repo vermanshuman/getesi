@@ -29,9 +29,9 @@
         </a>
 
         <ul class="topbar-menu fadeInDown" id="top_bar_menu">
-            <li title="Logout">
+            <li title="Logout" style="margin-left: 18px;">
                 <a href="#{facesContext.externalContext.requestContextPath}/j_spring_security_logout">
-                    <i class="topbar-icon fa fa-fw fa-sign-out"/>
+                    <i class="topbar-icon fa fa-fw fa-sign-out"  style="font-size: 30px"/>
                 </a>
             </li>
             <ui:fragment id="topbarProfile">
@@ -40,15 +40,15 @@
                     <a href="#{facesContext.externalContext.requestContextPath}/Pages/Configuration/UserProfileView.jsf">
                         <p:graphicImage styleClass="profileImg" rendered="#{not empty sessionBean.currentUser.photo}" value="#{sessionBean.currentUser.photo}" width="35" />
                         <ui:fragment rendered="#{empty sessionBean.currentUser.photo}">
-                            <i class="topbar-icon fa fa-fw fa-user-circle"/>
+                            <i class="topbar-icon fa fa-fw fa-user-circle" style="font-size: 30px"/>
                         </ui:fragment>
                     </a>
                 </li>
             </ui:fragment>
             <ui:fragment>
-                <li title="Calendario">
+                <li title="Calendario" style="margin-left: 18px;">
                     <a href="#{facesContext.externalContext.requestContextPath}/Pages/Configuration/Calendar.jsf">
-                        <i class="topbar-icon pi pi-calendar-plus"/>
+                        <i class="topbar-icon pi pi-calendar-plus" style="font-size: 30px"/>
                     </a>
                 </li>
             </ui:fragment>

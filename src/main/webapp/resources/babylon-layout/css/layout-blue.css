@@ -106,8 +106,8 @@ html {
 }
 
 body {
-  font-family: "cabin", sans-serif;
-  font-size: 14px;
+  font-family: Calibri, sans-serif;
+  font-size: 16px;
   font-weight: 400;
   color: #212121;
   -webkit-font-smoothing: antialiased;
@@ -151,7 +151,7 @@ a {
 
 .layout-mask {
   display: none;
-  background-color: #252529;
+  background-color:#D3D3D3;
   position: fixed;
   top: 0;
   left: 0;
@@ -246,14 +246,14 @@ a {
 .layout-wrapper .layout-topbar .topbar-menu > li {
   float: right;
   position: relative;
-  margin-left: 14px;
+  margin-left: 18px;
 }
 .layout-wrapper .layout-topbar .topbar-menu > li > a {
   position: relative;
   display: block;
-  width: 44px;
-  height: 44px;
-  line-height: 44px;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
   text-align: center;
   -moz-border-radius: 50%;
   -webkit-border-radius: 50%;
@@ -2069,13 +2069,13 @@ a {
 }
 .layout-dashboard .live-support .new-message input {
   border: 0 none;
-  font-size: 14px;
+  font-size: 16px;
   width: 100%;
   padding: 0.5em;
   background-color: transparent;
   outline: 0 none;
   color: #727272;
-  font-family: "cabin", sans-serif;
+  font-family: Calibri, sans-serif;
 }
 .layout-dashboard .live-support .new-message .p-col-fixed {
   width: 100px;
@@ -3765,13 +3765,13 @@ html {
 }
 .widget-live-support .new-message input {
   border: 0 none;
-  font-size: 14px;
+  font-size: 16px;
   width: 100%;
   padding: 0.5em;
   background-color: transparent;
   outline: 0 none;
   color: #727272;
-  font-family: "cabin", sans-serif;
+  font-family: Calibri, sans-serif;
 }
 .widget-live-support .new-message .p-col-fixed {
   width: 100px;
@@ -4733,4 +4733,10 @@ html {
 
 .layout-dashboard .user-card .user-card-content .user-detail ul li .project-progressbar {
   width: calc(70% - 100px);
+}
+
+.ui-widget, .ui-widget .ui-widget {
+    font-family: Calibri, sans-serif !important;
+    text-decoration: none !important;
+    font-size: 16px !important;
 }

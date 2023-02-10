@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                template="/resources/tpl/Admin/EditBase.xhtml">
+    <ui:param name="edit_title" value="#{msg.importDocumentsLabel}"/>
+    <ui:param name="bean" value="#{importDocumentsBean}"/>
+    <ui:param name="showSave" value="false"/>
+    <ui:param name="showCancel" value="false"/>
+
+
+    <ui:define name="viewname">
+        <li>
+            <p:link outcome="/Pages/Configuration/DocumentConversionSettings.jsf">#{msg.importDocumentsLabel}</p:link>
+        </li>
+    </ui:define>
+    <ui:define name="edit_body">
+        <p:remoteCommand name="updateFakeButton" update="fakeSaveButton"/>
+        <p:remoteCommand name="updatePage" update="form_panel"/>
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" cellpadding="3" cellspacing="0"
+                     columnClasses="ui-grid-col-3,ui-grid-col-4" layout="grid" style="margin-left:20px; margin-right:20px;">
+            <h:outputText value="#{msg.databaseListDocumentTypes}:"/>
+            <p:selectOneMenu value="#{bean.selectedTypeDocumentId}" id="documentType" style="width: 100%;">
+                <p:ajax event="change" update="documentTitle"/>
+                <f:selectItems value="#{bean.documentTypes}"/>
+            </p:selectOneMenu>
+            <h:outputText value="#{msg.databaseListDocumentTitle}:"/>
+            <p:inputText value="#{bean.documentTitle}" id="documentTitle" style="width: 100%;"
+                         disabled="#{bean.needDisableDocumentTitle}"/>
+            <h:outputText value="#{msg.databaseListGenerateFilesReport}:"/>
+            <p:selectBooleanCheckbox value="#{bean.reportShouldBeGenerated}" onchange="updateFakeButton()"/>
+            <h:outputText value="#{msg.databaseListDocumentDocument}:"/>
+            <p:fileUpload multiple="true" fileUploadListener="#{bean.handleFileUpload}"
+                          auto="true" mode="advanced" oncomplete="updateTableDoc();"
+                          label="#{msg.mailManagerChooseAttachedFiles}" skinSimple="true"
+                          uploadLabel="#{msg.mailManagerUploadAttachedFiles}"
+                          cancelLabel="#{msg.mailManagerCancelAttachedFiles}" update="saveButton"/>
+
+            <h:outputText/>
+            <p:dataTable id="documentsTableId" value="#{bean.documents}" styleClass="without-header" var="itemDoc"
+                         scrollable="true" scrollHeight="#{(bean.documents ne null and bean.documents.size() > 0) ? 300 : 0}" emptyMessage="#{msg.noRecordsFound}">
+                <p:column style="width: 50px;text-align: center;">
+                    <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn" action="#{bean.removeDocument(itemDoc)}"
+                                     oncomplete="updateTableDoc()"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{itemDoc.fileName}"/>
+                </p:column>
+            </p:dataTable>
+
+            <h:outputText value="#{msg.databaseListDocumentDate}:"/>
+            <p:calendar id="documentDate" pattern="dd/MM/yyyy" mask="true"
+                        locale="it" navigator="true" popupIconOnly="true"
+                        value="#{bean.documentDate}"/>
+        </p:panelGrid>
+        <p:remoteCommand name="updateTableDoc" update="documentsTableId"/>
+        <div class="btn_line" style="margin-bottom: 20px;">
+            <p:commandButton value="#{msg.save}" action="#{bean.saveFile}" id="saveButton" styleClass="green-button"
+                             disabled="#{bean.documents == null}"
+                             oncomplete="updateTableDocument();"
+                             onsuccess="document.getElementById('fakeSaveButton').click();" update="form_panel"/>
+            <p:commandButton id="fakeSaveButton" ajax="false" styleClass="non_displayed_button" style="margin-left:10px;"
+                             disabled="#{!bean.reportShouldBeGenerated}">
+                <p:fileDownload value="#{bean.reportFile}"/>
+            </p:commandButton>
+            <p:commandButton value="#{msg.cancel}" action="#{bean.clearDocumentData}" ajax="true" styleClass="red-button" style="margin-left:10px;"
+            update="form_panel"/>
+        </div>
+    </ui:define>
+</ui:composition>

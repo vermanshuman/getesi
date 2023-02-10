@@ -163,13 +163,7 @@ public class LoginBean extends BaseValidationPageBean {
                 && !ValidationHelper.isNullOrEmpty(password)) {
             User user = null;
             try {
-                user = DaoManager.get(
-                        User.class,
-                        new Criterion[]
-                                {
-                                        Restrictions.eq("login", username),
-                                        Restrictions.eq("password", MD5.encodeString(
-                                                password, null))});
+            	user = UserHelper.getUser(username, password);
             } catch (Exception e) {
                 LogHelper.log(log, e);
             }

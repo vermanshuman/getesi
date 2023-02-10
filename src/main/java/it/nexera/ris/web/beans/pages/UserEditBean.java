@@ -156,6 +156,12 @@ public class UserEditBean extends EntityEditPageBean<User>
         if (!ValidationHelper.isNullOrEmpty(getDocument())) {
             this.getEntity().setPhotoPath(getDocument());
         }
+        
+        Integer applicationInstance = FileHelper.getApplicationInstance();
+        if(applicationInstance.equals(ApplicationInstance.GETESI.getId()))
+        	this.getEntity().setGetesi(Boolean.TRUE);
+        else if(applicationInstance.equals(ApplicationInstance.BREXA.getId()))
+        	this.getEntity().setBrexa(Boolean.TRUE);
 
         DaoManager.save(this.getEntity());
 

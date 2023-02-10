@@ -19,7 +19,9 @@ import it.nexera.ris.web.beans.wrappers.DocumentTemplateWrapper;
 import it.nexera.ris.web.beans.wrappers.Pair;
 import it.nexera.ris.web.beans.wrappers.logic.UploadDocumentWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.UserWrapper;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.xml.serialize.XMLSerializer;
 import org.bouncycastle.cms.CMSSignedData;
 import org.hibernate.Hibernate;
@@ -45,10 +47,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -298,7 +299,10 @@ public class GeneralFunctionsHelper extends BaseHelper {
 
                 documentTitle = titleAndCost.getFirst();
                 cost = titleAndCost.getSecond();
+            }else {
+                documentTitle = FilenameUtils.getBaseName(documentTitle);
             }
+
 
             if (!ValidationHelper.isNullOrEmpty(request)) {
                 DaoManager.refresh(request);
@@ -331,7 +335,7 @@ public class GeneralFunctionsHelper extends BaseHelper {
 
         uploadDocument.setDocument(document);
 
-        log.info("Document id - " + document.getId() + ", path" + document.getPath());
+        log.info("Document id - " + document.getId() + ", path - " + document.getPath());
         if (DocumentType.FORMALITY.getId().equals(selectedTypeId)) {
             StringBuilder sb = new StringBuilder();
 
@@ -420,7 +424,7 @@ public class GeneralFunctionsHelper extends BaseHelper {
         return uploadDocument;
     }
 
-    private static void invokeExternalTool(Document document, Boolean useRequestSubject, String uploadedFileName,
+    public static void invokeExternalTool(Document document, Boolean useRequestSubject, String uploadedFileName,
                                            StringBuilder sb, boolean openExternalToolPage) {
 
         if ((!ValidationHelper.isNullOrEmpty(useRequestSubject) && useRequestSubject) || !openExternalToolPage) {
@@ -490,36 +494,49 @@ public class GeneralFunctionsHelper extends BaseHelper {
     public static List<SelectItem> fillTemplates(DocumentGenerationPlaces place, RequestEnumTypes requestType,
                                                  Long documentId, Session session)
             throws HibernateException {
-        List<SelectItem> templates = new ArrayList<SelectItem>();
-        List<Criterion> criteria = new ArrayList<>();
-        criteria.add(Restrictions.eq("place", place));
-        criteria.add(Restrictions.isNotNull("model"));
+        return fillTemplates(place, requestType, documentId, false, session);
+    }
 
-        if (!ValidationHelper.isNullOrEmpty(requestType)) {
-            criteria.add(Restrictions.eq("requestTypeId", requestType.getId()));
-        }
+    public static List<SelectItem> fillTemplates(DocumentGenerationPlaces place, RequestEnumTypes requestType,
+                                                 Long documentId, boolean filter, Session session)
+            throws HibernateException {
+        List<Long> modelIds = new ArrayList<>();
 
-        if (!ValidationHelper.isNullOrEmpty(documentId)) {
-            criteria.add(Restrictions.eq("documentTypeId", documentId));
-        }
+        List<SelectItem> templates = new ArrayList<>();
+        if(!filter){
+            List<Criterion> criteria = new ArrayList<>();
+            criteria.add(Restrictions.eq("place", place));
+            criteria.add(Restrictions.isNotNull("model"));
 
-        List<InstancePhases> instancePhases = ConnectionManager.load(
-                InstancePhases.class,
-                criteria.toArray(new Criterion[criteria.size()]), session);
-
-        List<Long> modelIds = new ArrayList<Long>();
-
-        if (!ValidationHelper.isNullOrEmpty(instancePhases)) {
-            for (InstancePhases ip : instancePhases) {
-                modelIds.add(ip.getModel().getId());
+            if (!ValidationHelper.isNullOrEmpty(requestType)) {
+                criteria.add(Restrictions.eq("requestTypeId", requestType.getId()));
             }
-        }
 
-        modelIds.add(4L); // add model of certification
-        modelIds.add(5L); // add model of CATASTO NAZIONALE
+            if (!ValidationHelper.isNullOrEmpty(documentId)) {
+                criteria.add(Restrictions.eq("documentTypeId", documentId));
+            }
+
+            List<InstancePhases> instancePhases = ConnectionManager.load(
+                    InstancePhases.class,
+                    criteria.toArray(new Criterion[criteria.size()]), session);
+
+
+
+            if (!ValidationHelper.isNullOrEmpty(instancePhases)) {
+                for (InstancePhases ip : instancePhases) {
+                    modelIds.add(ip.getModel().getId());
+                }
+            }
+
+            modelIds.add(4L); // add model of certification
+            modelIds.add(5L); // add model of CATASTO NAZIONALE
+        }else {
+            modelIds.add(5L);
+            modelIds.add(2L);
+        }
 
         if (!ValidationHelper.isNullOrEmpty(modelIds)) {
-            List<Long> templateIds = new ArrayList<Long>();
+            List<Long> templateIds = new ArrayList<>();
 
             List<TemplateDocumentModel> templateDocumentModels = ConnectionManager
                     .load(TemplateDocumentModel.class, new Criterion[]
@@ -617,7 +634,7 @@ public class GeneralFunctionsHelper extends BaseHelper {
             document.setTypeId(reportId);
             document.setDate(new Date());
             document.setRequest(ConnectionManager.get(Request.class, radiologyExamRequest.getId(), session));
-            ConnectionManager.save(document, true, session);
+            ConnectionManager.save(document, false, session);
             return document;
 
         } catch (Exception e) {
@@ -808,6 +825,31 @@ public class GeneralFunctionsHelper extends BaseHelper {
         symbols.setGroupingSeparator('.');
         DecimalFormat formatter = new DecimalFormat("###,###.##", symbols);
         return formatter.format(new BigDecimal(value));
+    }
+
+    public static String formatOMIString(String value){
+        if(StringUtils.isNotBlank(value)){
+            NumberFormat format = NumberFormat.getInstance(Locale.GERMAN);
+            try {
+                Number number = format.parse(value);
+                double d = number.doubleValue();
+                return InvoiceHelper.format(d);
+            } catch (ParseException e) {
+                e.printStackTrace();
+                LogHelper.log(log, e);
+            }
+        }
+        return value;
+    }
+
+    public static String formatStringWithDecimal(String value){
+        if(StringUtils.isNotBlank(value)){
+            String[] toks = value.split("\\,");
+            if(toks.length > 1 && toks[1].length() == 1){
+                return value + "0";
+            }
+        }
+        return value;
     }
 }
 

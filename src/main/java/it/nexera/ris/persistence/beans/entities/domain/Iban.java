@@ -1,6 +1,8 @@
 package it.nexera.ris.persistence.beans.entities.domain;
 
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +13,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "iban")
+@Getter
+@Setter
 public class Iban extends IndexedEntity implements Serializable {
 
     private static final long serialVersionUID = -1710213345125196694L;
@@ -18,48 +22,20 @@ public class Iban extends IndexedEntity implements Serializable {
     @Column(name = "description")
     private String description;
 
-	@Column(name = "bankName")
+    @Column(name = "bankName")
     private String bankName;
-    
+
     @Column(name = "address")
     private String address;
 
     @OneToMany(mappedBy = "iban")
     private List<Client> client;
 
-	@Override
-	public String toString() {
-		return getDescription();
-	}
-	public String getDescription() {
-		return description;
-	}
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getBankName() {
-		return bankName;
-	}
-
-	public void setBankName(String bankName) {
-		this.bankName = bankName;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-    public List<Client> getClient() {
-        return client;
-    }
-
-    public void setClient(List<Client> client) {
-        this.client = client;
+    @Override
+    public String toString() {
+        return getDescription();
     }
 }

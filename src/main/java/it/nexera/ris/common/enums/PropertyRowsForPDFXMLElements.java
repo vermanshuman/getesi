@@ -50,7 +50,8 @@ public enum PropertyRowsForPDFXMLElements {
     PROPERTY_HISTORY_LAW_CODE("DirittiReali.CodiceDiritto", "%PROPERTY_HISTORY_LAW_CODE%", true),
     PROPERTY_HISTORY_REAL_RIGHTS_DESCRIPTION("DirittiReali.Descrizione", "%PROPERTY_HISTORY_REAL_RIGHTS_DESCRIPTION%", true),
     PROPERTY_HISTORY_REAL_RIGHTS_QUOTE("DirittiReali.Quota", "%PROPERTY_HISTORY_REAL_RIGHTS_QUOTE%", true),
-    PROPERTY_HISTORY_RESULT_DATA("DatiDerivantiDaMutazSogg", "%PROPERTY_HISTORY_RESULT_DATA%", true);
+    PROPERTY_HISTORY_RESULT_DATA("DatiDerivantiDaMutazSogg", "%PROPERTY_HISTORY_RESULT_DATA%", true),
+    PROPERTY_LAND_CONSISTENCY("ClassamentoT.SuperficieMQ", "%PROPERTY_LAND_CONSISTENCY%", true),;
 
 
     private String elementXML;

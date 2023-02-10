@@ -1,15 +1,14 @@
 package it.nexera.ris.persistence;
 
 import it.nexera.ris.common.helpers.LogHelper;
+import it.nexera.ris.common.helpers.UserHelper;
 import it.nexera.ris.common.security.api.UserDetailsImpl;
-import it.nexera.ris.persistence.beans.dao.ConnectionManager;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.User;
 import it.nexera.ris.web.beans.wrappers.logic.UserWrapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.faces.context.FacesContext;
@@ -133,15 +132,12 @@ public class UserHolder implements Serializable {
     public User loadUser(String username) throws Exception {
         User user = null;
         if (FacesContext.getCurrentInstance() != null) {
-            user = DaoManager.get(User.class,
-                    Restrictions.eq("login", username));
+        	user = UserHelper.getUser(username);
         } else {
             Session session = null;
             try {
                 session = PersistenceSession.createSession();
-
-                user = ConnectionManager.get(User.class,
-                        Restrictions.eq("login", username), session);
+                user = UserHelper.getUser(username, session);
             } catch (Exception e) {
                 throw e;
             } finally {

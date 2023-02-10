@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import it.nexera.ris.common.enums.DocumentType;
+import it.nexera.ris.persistence.view.FormalityView;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -31,6 +33,8 @@ public class FormalitySubjectBindingWrapper extends BaseTab implements Serializa
     private List<Long> listIds;
     
     List<String> list;
+
+    private LazyDataModel<FormalityView> lazyModel;
     
     public FormalitySubjectBindingWrapper(List<Long> ids) {
         this.listIds = ids;
@@ -63,7 +67,7 @@ public class FormalitySubjectBindingWrapper extends BaseTab implements Serializa
 
     @Override
     public LazyDataModel getLazyDataModel() {
-        return new EntityLazyListModel(ReportFormalitySubject.class, 
+        return new EntityLazyListModel(ReportFormalitySubject.class,
                 new Criterion[]{
                         Restrictions.or(
                                 Restrictions.in("fiscalCode", getList()),
@@ -72,7 +76,7 @@ public class FormalitySubjectBindingWrapper extends BaseTab implements Serializa
     }
 
     @Override
-    Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+    public Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
         return DaoManager.getCount(ReportFormalitySubject.class, "id", new Criterion[]{
                 Restrictions.or(
                         Restrictions.in("fiscalCode", getList()),
@@ -104,5 +108,18 @@ public class FormalitySubjectBindingWrapper extends BaseTab implements Serializa
 
     public List<String> getList() {
         return list;
+    }
+
+    public LazyDataModel<FormalityView> getLazyModel() {
+        return new EntityLazyListModel(ReportFormalitySubject.class,
+                new Criterion[]{
+                        Restrictions.or(
+                                Restrictions.in("fiscalCode", getList()),
+                                Restrictions.in("numberVAT", getList())
+                        )}, new Order[]{Order.asc("createDate")});
+    }
+
+    public void setLazyModel(LazyDataModel<FormalityView> lazyModel) {
+        this.lazyModel = lazyModel;
     }
 }

@@ -18,6 +18,8 @@ public class RelationshipGroupingWrapper {
 
     private City city;
 
+    private String sectionCity;
+
     public RelationshipGroupingWrapper(Relationship relationship) {
         this.unitaNeg = relationship.getUnitaNeg();
         this.propertyType = relationship.getPropertyType();
@@ -26,6 +28,7 @@ public class RelationshipGroupingWrapper {
         if(!ValidationHelper.isNullOrEmpty(relationship.getProperty())
                 && !ValidationHelper.isNullOrEmpty(relationship.getProperty().getCity()))
         this.city = relationship.getProperty().getCity();
+        this.sectionCity = relationship.getProperty().getSectionCity();
     }
 
     public RelationshipGroupingWrapper(String quote, String propertyType, String regime) {
@@ -41,6 +44,14 @@ public class RelationshipGroupingWrapper {
         this.city = city;
     }
 
+    public RelationshipGroupingWrapper(String quote, String propertyType, String regime, City city, String sectionCity) {
+        this.quote = quote;
+        this.propertyType = propertyType;
+        this.regime = regime;
+        this.city = city;
+        this.sectionCity = sectionCity;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -50,7 +61,8 @@ public class RelationshipGroupingWrapper {
                 Objects.equals(propertyType, that.propertyType) &&
                 Objects.equals(quote, that.quote) &&
                 Objects.equals(regime, that.regime) &&
-                Objects.equals(city, that.city);
+                Objects.equals(city, that.city) &&
+                Objects.equals(sectionCity, that.sectionCity);
     }
 
     @Override
@@ -119,5 +131,13 @@ public class RelationshipGroupingWrapper {
 
     public void setCity(City city) {
         this.city = city;
+    }
+
+    public String getSectionCity() {
+        return sectionCity;
+    }
+
+    public void setSectionCity(String sectionCity) {
+        this.sectionCity = sectionCity;
     }
 }

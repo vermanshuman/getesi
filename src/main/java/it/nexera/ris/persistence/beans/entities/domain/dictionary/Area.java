@@ -5,11 +5,7 @@ import it.nexera.ris.persistence.beans.entities.IEntity;
 import it.nexera.ris.persistence.beans.entities.ITreeNode;
 import it.nexera.ris.persistence.beans.entities.domain.Client;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.ManyToMany;
+import javax.persistence.*;
 import java.util.List;
 
 
@@ -27,6 +23,9 @@ public class Area extends Dictionary implements ITreeNode {
 
     @ManyToMany(mappedBy = "areas")
     private List<Client> clientsForManyAreas;
+
+    @Column(name = "external_brexa")
+    private Boolean externalBrexa;
 
     @Override
     public boolean isChild(IEntity parent) {
@@ -60,5 +59,13 @@ public class Area extends Dictionary implements ITreeNode {
 
     public void setClientsForManyAreas(List<Client> clientsForManyAreas) {
         this.clientsForManyAreas = clientsForManyAreas;
+    }
+
+    public Boolean getExternalBrexa() {
+        return externalBrexa;
+    }
+
+    public void setExternalBrexa(Boolean externalBrexa) {
+        this.externalBrexa = externalBrexa;
     }
 }

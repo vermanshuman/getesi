@@ -79,7 +79,7 @@
 				<br />
 				<br />
 				<p:dataTable value="#{bean.groupOmis}" var="group" id="groupOmi" styleClass="groupTable borderless"
-					paginator="false" paginatorAlwaysVisible="false"
+					paginator="false" paginatorAlwaysVisible="false" emptyMessage="#{msg.noRecordsFound}"
 					widgetVar="tableGroupOMIWV" style="width: 35%;">
 					<p:column>#{group.name}
 						<p:commandButton icon="pi pi-pencil"
@@ -102,7 +102,7 @@
 						<br />
 						<br />
 						<p:dataTable value="#{group.categoryGroupItems}" var="item" id="items" styleClass="withborder"
-							widgetVar="tableItemsWV">
+							widgetVar="tableItemsWV" emptyMessage="#{msg.noRecordsFound}">
 							<p:column headerText="#{msg.categoryPercentValueGroupItemPosition}" style="width: 25%;">
 								<h:outputText value="#{item.position}" />
 							</p:column>
@@ -127,13 +127,51 @@
 					</p:column>
 				</p:dataTable>
 			</p:tab>
+			<p:tab title="#{msg.categoryPercentValueTabTax}">
+				<p:commandButton value="#{msg.add}" icon="pi pi-plus-circle"
+								 oncomplete="PF('cadastralCategoryWV').show();"
+								 update="cadastralCategoryDlg"
+								 action="#{bean.handleCadastralCategoryDialogInit(null)}" />
+				<br />
+				<br />
+				<p:dataTable value="#{bean.categoryFiscalValues}" var="categoryFiscal" id="cadastral_table"
+							 emptyMessage="#{msg.noRecordsFound}" rows="10" lazy="true"
+							 paginator="true" paginatorAlwaysVisible="true"
+							 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+							 rowsPerPageTemplate="10,20,50" widgetVar="cadastralTableRealEstateWV">
+					<p:column headerText="#{msg.categoryFiscalValueCategoryCode}">
+						<h:outputText value="#{categoryFiscal.cadastralCategory.codeInVisura}" />
+					</p:column>
+					<p:column headerText="#{msg.categoryFiscalValueMultiply}">
+						<h:outputText value="#{categoryFiscal.value}" >
+							<f:convertNumber groupingUsed="true"
+											 maxFractionDigits="2"  />
+						</h:outputText>
+					</p:column>
+					<p:column styleClass="action_column" exportable="false">
+						<p:commandButton icon="pi pi-pencil"
+										 update="cadastral_table cadastralCategoryDlg"
+										 oncomplete="PF('cadastralCategoryWV').show();"
+										 action="#{bean.handleCadastralCategoryDialogInit(categoryFiscal)}">
+						</p:commandButton>
+					</p:column>
+					<p:column styleClass="action_column" exportable="false">
+						<p:commandButton icon="ui-icon pi pi-times"  update="cadastral_table"
+										 action="#{bean.handleCadastralCategoryDialogDeleteInit(categoryFiscal)}"
+										 oncomplete="PF('dlg2').show()"
+										 style="background-color: red;border: none !important;">
+
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+			</p:tab>
 		</p:tabView>
 
-        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
-            <p:outputPanel styleClass="btn_line">
-                <p:commandButton value="#{msg.confirm}" styleClass="ui-confirmdialog-yes"
+        <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" styleClass="dialog-green dialog-green-width">
+            <p:outputPanel styleClass="btn_line" style="margin-top: 0px;">
+                <p:commandButton value="#{msg.confirm}" styleClass="ui-confirmdialog-yes" style="margin-right: 10px;background-color: #00CC52!important;"
                                  update=":tabs:table"/>
-                <p:commandButton value="#{msg.cancel}" styleClass="ui-confirmdialog-no"/>
+                <p:commandButton value="#{msg.cancel}" styleClass="ui-confirmdialog-no" style="background-color: #F3362B !important;"/>
             </p:outputPanel>
         </p:confirmDialog>
 
@@ -198,6 +236,38 @@
                                  oncomplete="PF('omiGroupItemWV').hide();" styleClass="p-mr-2 p-mb-2"/>
             </div>
         </p:dialog>
+
+		<p:dialog id="cadastralCategoryDlg" widgetVar="cadastralCategoryWV"
+				  modal="true" draggable="false" resizable="false">
+			<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+				<h:outputText value="#{msg.categoryFiscalValueCategoryCode}"/>
+				<p:selectOneMenu value="#{bean.selectedCategoryId}">
+					<f:selectItems value="#{bean.categories}"/>
+				</p:selectOneMenu>
+				<h:outputText value="#{msg.categoryFiscalValueMultiply}"/>
+				<p:inputNumber value="#{bean.categoryFiscalValue}"/>
+			</p:panelGrid>
+			<div class="btn_line">
+				<p:commandButton id="cadastralSaveButton" value="#{msg.confirm}" update=":tabs:cadastral_table"
+								 action="#{bean.saveCadastralCategory}" styleClass="green-button p-mr-2 p-mb-2"
+								 oncomplete="PF('cadastralCategoryWV').hide();"/>
+				<p:commandButton value="#{msg.cancel}"
+								 oncomplete="PF('cadastralCategoryWV').hide();" styleClass="p-mr-2 p-mb-2"/>
+			</div>
+		</p:dialog>
+
+		<p:dialog id="cfvDelete" widgetVar="dlg2" modal="true" resizable="false" draggable="false" effect="SLIDE" styleClass="dialog-green dialog-green-width" >
+			#{msg.deleteConfirmation}<br/>
+			<br/>
+			<div class="btn_line">
+				<p:commandButton value="#{msg.confirm}"
+				action="#{bean.handleDeleteCategoryFiscalValue()}" style="margin-right: 20px !important;background-color: #00CC52!important;"
+								 oncomplete="PF('dlg2').hide();"
+								 update=":tabs:cadastral_table :form:messages"/>
+				<p:commandButton value="#{msg.cancel}" onclick="PF('dlg2').hide()" style="background-color: #F3362B !important;"/>
+			</div>
+		</p:dialog>
+
     </ui:define>
 
 </ui:composition>

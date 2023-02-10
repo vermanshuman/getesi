@@ -14,6 +14,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 
+import it.nexera.ris.common.helpers.*;
 import org.hibernate.HibernateException;
 import org.hibernate.StaleObjectStateException;
 import org.hibernate.criterion.Criterion;
@@ -32,19 +33,6 @@ import it.nexera.ris.common.enums.PropertyWrapperType;
 import it.nexera.ris.common.enums.SexTypes;
 import it.nexera.ris.common.enums.SubjectType;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
-import it.nexera.ris.common.helpers.CalcoloCodiceFiscale;
-import it.nexera.ris.common.helpers.ComboboxHelper;
-import it.nexera.ris.common.helpers.EstateSituationHelper;
-import it.nexera.ris.common.helpers.FileHelper;
-import it.nexera.ris.common.helpers.GeneralFunctionsHelper;
-import it.nexera.ris.common.helpers.LogHelper;
-import it.nexera.ris.common.helpers.MessageHelper;
-import it.nexera.ris.common.helpers.PrintPDFHelper;
-import it.nexera.ris.common.helpers.RedirectHelper;
-import it.nexera.ris.common.helpers.ResourcesHelper;
-import it.nexera.ris.common.helpers.SessionHelper;
-import it.nexera.ris.common.helpers.ValidationHelper;
-import it.nexera.ris.common.helpers.VisureManageHelper;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.Document;
@@ -390,7 +378,7 @@ public class SubjectBean extends EntityEditPageBean<Subject>
         listIds.add(getEntity().getId());
         setListIds(listIds);
 
-        tabList.add(new RequestBindingWrapper(listIds).getTab());
+        tabList.add(new RequestBindingWrapper(listIds, "subjectBean").getTab());
         Tab formalityTab = new FormalityBindingWrapper(getEntity(),getListIds()).getTab();
         formalityTab.setDisabled(Boolean.TRUE);
         tabList.add(formalityTab);
@@ -409,7 +397,7 @@ public class SubjectBean extends EntityEditPageBean<Subject>
         tabList.add(new VisureDHBindingWrapper(getEntity()).getTab());
         List<RequestType> requestTypes = DaoManager.load(RequestType.class, new Criterion[]{Restrictions.isNotNull("name")});
         for(RequestType requestType : requestTypes) {
-            tabList.add(new RequestTypeBindingWrapper(listIds,requestType, isOnlyView()).getTab());
+            tabList.add(new RequestTypeBindingWrapper(listIds,requestType, isOnlyView(), "subjectBean").getTab());
         }
         
 //        tabList.add(getEmptyTab("subjectViewInvestigation"));
@@ -481,8 +469,37 @@ public class SubjectBean extends EntityEditPageBean<Subject>
         setRequestDocuments(documents);
         executeJS("PF('documentDialog').show();");
     }
-    
+
     private List<Document> getAllegatiDocuments(Request request)
+            throws PersistenceBeanException, IllegalAccessException {
+        List<Document> documents = DaoManager.load(Document.class, new Criterion[]{
+                Restrictions.eq("request.id", request.getId()),
+                Restrictions.eq("selectedForEmail", true)
+                //Restrictions.eq("typeId", DocumentType.ALLEGATI.getId())
+        });
+
+        List<Document> formalities = DaoManager.load(Document.class, new CriteriaAlias[]{
+                new CriteriaAlias("formality", "f", JoinType.INNER_JOIN),
+                new CriteriaAlias("f.requestList", "r_f", JoinType.INNER_JOIN)
+        }, new Criterion[]{
+                //Restrictions.eq("r_f.id", request.getId()),
+                //Restrictions.eq("typeId", DocumentType.ALLEGATI.getId())
+                Restrictions.eq("request.id", request.getId()),
+                Restrictions.eq("selectedForEmail", true)
+        });
+
+        if (!ValidationHelper.isNullOrEmpty(formalities)) {
+            for (Document temp : formalities) {
+                if (!documents.contains(temp)) {
+                    documents.add(temp);
+                }
+            }
+        }
+        System.out.println("documents " + documents);
+        return documents;
+    }
+    
+   /* private List<Document> getAllegatiDocuments(Request request)
             throws PersistenceBeanException, IllegalAccessException {
             List<Document> documents = DaoManager.load(Document.class, new Criterion[]{
                     Restrictions.eq("request.id", request.getId()),
@@ -505,7 +522,7 @@ public class SubjectBean extends EntityEditPageBean<Subject>
                 }
             }
             return documents;
-        }
+        }*/
 
     
     public void showFile(Request request) throws PersistenceBeanException, IllegalAccessException {
@@ -671,7 +688,7 @@ public class SubjectBean extends EntityEditPageBean<Subject>
     
     public void downloadPdfFile() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         try {
-            String body = RequestListBean.getPdfRequestBody(null, this.getEntity());
+            String body = RequestHelper.getPdfRequestBody(null, this.getEntity());
             
             FileHelper.sendFile("soggetto-" + this.getEntityId() + ".pdf",
                     PrintPDFHelper.convertToPDF(null, body, null,

@@ -86,6 +86,15 @@ public class Document extends DocumentTagEntity implements Cloneable {
     
     @Column(name = "report_numer")
     private Long reportNumber;
+    
+    @Column(name = "note")
+    private String note;
+    
+    private Boolean complete;
+
+    @ManyToOne
+    @JoinColumn(name = "dic_aggregation_land_char_reg_id")
+    private AggregationLandChargesRegistry aggregationLandChargesRegistry;
 
     @Transient
     private byte[] uploadedDocumentContent;
@@ -206,7 +215,9 @@ public class Document extends DocumentTagEntity implements Cloneable {
         documentClone.setRequest(this.getRequest());
         documentClone.setMail(this.getMail());
         documentClone.setFormalityDuplicated(this.getFormalityDuplicated());
-
+        if(!ValidationHelper.isNullOrEmpty(this.getNote())) {
+            documentClone.setNote(this.getNote());
+        }
         return documentClone;
     }
 
@@ -394,11 +405,33 @@ public class Document extends DocumentTagEntity implements Cloneable {
     }
 
     public String getFileExtension() {
-        if (!ValidationHelper.isNullOrEmpty(getPath())) {
-            fileExtension = FileHelper.getFileExtension(getPath());
-        }else if (!ValidationHelper.isNullOrEmpty(getTitle())) {
-            fileExtension = FileHelper.getFileExtension(getTitle());
+        if(ValidationHelper.isNullOrEmpty(FileHelper.getFileExtension(getTitle()))){
+            if (!ValidationHelper.isNullOrEmpty(getPath())) {
+                fileExtension = FileHelper.getFileExtension(getPath());
+            }else if (!ValidationHelper.isNullOrEmpty(getTitle())) {
+                fileExtension = FileHelper.getFileExtension(getTitle());
+            }
         }
         return fileExtension;
+    }
+
+    public Boolean getComplete() {
+        return complete;
+    }
+
+    public void setComplete(Boolean complete) {
+        this.complete = complete;
+    }
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
+	}
+
+    public void setAggregationLandChargesRegistry(AggregationLandChargesRegistry aggregationLandChargesRegistry) {
+        this.aggregationLandChargesRegistry = aggregationLandChargesRegistry;
     }
 }

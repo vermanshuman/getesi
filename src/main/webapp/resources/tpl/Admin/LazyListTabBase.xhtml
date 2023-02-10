@@ -60,7 +60,13 @@
                                 }
 
                                 function getTotalPagesCount() {
-                                    var totalPages = document.getElementById("tabs:numTotalPages").value;
+                                    let totalPages = document.getElementById("tabs:numTotalPages");
+
+                                    if(!totalPages){
+                                        totalPages = document.getElementById("numTotalPages").value;
+                                    }else {
+                                        totalPages = totalPages.value;
+                                    }
                                     return totalPages;
                                 }
 

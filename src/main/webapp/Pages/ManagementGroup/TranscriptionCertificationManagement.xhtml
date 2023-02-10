@@ -1,0 +1,1168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ff="http://readytech.com/functions"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                template="/resources/tpl/Admin/FormBase.xhtml">
+    <ui:param name="bean" value="#{transcriptionAndCertificationManagementBean}"/>
+    <ui:param name="view_title" value="#{msg.transcriptionManagement}"/>
+    <ui:param name="goBackRendered" value="false"/>
+    <ui:param name="showSave" value="false"/>
+    <ui:param name="showCancel" value="false"/>
+
+    <ui:define name="form_body">
+        <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/transcriptionManagement.css"
+              media="all" rel="stylesheet" type="text/css"/>
+
+        <style>
+            .ui-cell-editor-output {
+                height: 22px;
+            }
+
+            nav {
+                position: relative;
+                z-index: 1;
+                white-space: nowrap;
+            }
+
+            nav a {
+                position: relative;
+                display: inline-block;
+                color: inherit;
+                text-decoration: none;
+                margin: 0 -4px;
+                width: 267px;
+                /* font-family: "Open Sans","Helvetica Neue",sans-serif !important; */
+                font-size: 18px;
+            }
+
+            nav a::before, main {
+                border: 1px solid #dddfe2;
+            }
+
+            nav a::before {
+                content: ''; /* To generate the box */
+                font-size: 18px;
+                position: absolute;
+                min-height: 50px;
+                height: 50px;
+                top: 0;
+                right: -10px;
+                bottom: .5em;
+                left: 0;
+                z-index: -1;
+                border-bottom: none;
+                border-radius: 7px 7px 0 0;
+                background: #f6f7f9;
+                box-shadow: 0 2px hsla(0, 0%, 100%, .5) inset;
+                transform: perspective(20px) rotateX(3deg);
+                transform-origin: bottom;
+            }
+
+            nav.left a {
+                padding: 1em 1em 1em 0.7em;
+            }
+
+            nav.left a::before {
+                transform-origin: bottom left;
+            }
+
+            nav.right a {
+                padding: 1.5em 1em 1em 2em;
+            }
+
+            nav.right a::before {
+                transform-origin: bottom right;
+            }
+
+            nav a.selected {
+                z-index: 2;
+            }
+
+            nav a.selected::before {
+                border-bottom: none;
+                height: 51px;
+            }
+
+            nav a.selected::before, main {
+                background: #fff;
+            }
+        </style>
+
+        <script>
+            function openConservatoryPage(){
+                var ids = document.getElementById('selectedCOnservatories').value;
+                console.log('cons :', ids);
+                if(ids &amp;&amp; ids.length > 0){
+                    var idArray = ids.split(",");
+                    for (var i = 0; i &lt; idArray.length; i++) {
+                        window.open("../ConfigurationArea/ConservatoryList.jsf?from=transcription&amp;conservatory_id=" + idArray[i],idArray[i]);
+                    }
+                }
+            }
+        </script>
+        
+        <nav class="left" style="margin-left:20px;">
+            <h:panelGroup rendered="#{bean.transcriptionCertificationPage or bean.transcriptionPage}"><a href="#" id="tab1" class="tab selected">#{ff:upper(msg.transcriptionManagementTranscriptTab)}</a></h:panelGroup>
+            <h:panelGroup rendered="#{bean.transcriptionCertificationPage or bean.certificationPage}"><a href="#" id="tab2" class="tab">#{ff:upper(msg.transcriptionManagementCertificationTab)}</a></h:panelGroup>
+            <h:panelGroup rendered="#{bean.renewalPage}"><a href="#" id="tab3" class="tab">#{ff:upper(msg.transcriptionManagementRenewalTab)}</a></h:panelGroup>
+        </nav>
+
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%; margin-top: -75px; position: relative;"
+                                 columnClasses="ui-grid-col-11, ui-grid-col-1">
+
+            <p:commandButton value="#{msg.conservancyVerification}" onclick="openConservatoryPage()"
+                             styleClass="align-right "
+                             style="z-index: 10;margin-right:20px"  disabled="#{empty bean.selectedConserItemId}"/>
+	        <p:commandButton value="#{msg.documentArea}" onclick="PF('documentAreaDlg').show()"
+                         	 styleClass="align-right blue-button"
+                         	 style="background-color: #f26b3a !important; z-index: 10;"/>
+
+		</p:panelGrid>
+        <main>
+            <h:inputHidden id="selectedCOnservatories" value="#{bean.selectedConserItemIds}"/>
+            <p:remoteCommand name="updateTabs" action="#{bean.updateTabs}"
+                             update=":wizard"/>
+            <p:remoteCommand name="loadTabs" action="#{bean.loadTabs}"
+                             update=":wizard"/>
+            <p:tabView widgetVar="transcriptionWizard" id="wizard" dynamic="true" cache="true" activeIndex="#{bean.activeTabIndex}">
+                <p:ajax event="tabChange" listener="#{bean.onTabChange}" update="@widgetVar(f24GenerationTableWV)"/>
+                <p:tab id="authorizationTAB" title="#{msg.authorizationTAB.toUpperCase()}" rendered="#{bean.renewalPage}">
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4">
+                        <h:outputLabel for="authorization" value="#{msg.authorizationTAB}"/>
+                        <p:selectOneRadio value="#{bean.transcriptionDataEntity.authorizationCustomer}" id="authorization">
+                            <f:selectItem itemLabel="#{msg.yes}" itemValue="#{true}"/>
+                            <f:selectItem itemLabel="#{msg.no}" itemValue="#{false}"/>
+                        </p:selectOneRadio>
+                        <h:outputLabel for="authorization" value="#{msg.emailSentDate}"/>
+                        <p:calendar id="authorizationDate" value="#{bean.transcriptionDataEntity.authorizationEmail}"
+                                    pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter"/>
+                    </p:panelGrid>
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.save}"
+                                         styleClass="align-right #{bean.hasAuthorization eq 1 ? 'blue-button' : 'green-button'}"
+                                         action="#{bean.saveTranscription}" update="@form wizard"/>
+                    </p:outputPanel>
+                    <br/>
+                    <br/>
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.transcriptionManagementCustomerEmail}" action="#{bean.createNewNoteMail('Allegati')}"
+                                         styleClass="green-button align-right"/>
+                    </p:outputPanel>
+                    <br/>
+                    <br/>
+                </p:tab>
+                <p:tab id="generationTabF24Generation" title="#{msg.generationTabF24Generation.toUpperCase()}"
+                       rendered="#{(bean.renewalPage and bean.authCustomer) or (bean.transcriptionTab and (bean.transcriptionPage or bean.transcriptionCertificationPage))}">
+                    <p:commandButton value="#{msg.mailManagerNewClient}"
+                                     action="#{bean.add}" update="addImportF24Dialog"
+                                     oncomplete="PF('addImportF24DialogWV').show();" />
+                    <br/><br/>
+                    <p:dataTable id="f24GenerationTable" widgetVar="f24GenerationTableWV" value="#{bean.importF24Pdfs}"
+                                 var="importF24" rowIndexVar="row" emptyMessage="#{msg.noRecordsFound}">
+                        <p:column headerText="#{msg.generationTabType}">#{importF24.type}</p:column>
+                        <p:column headerText="#{msg.generationTabItems}">#{importF24.f24IdentificationNumber}</p:column>
+                        <p:column headerText="#{msg.generationTabCode}">#{importF24.code}</p:column>
+                        <p:column headerText="#{msg.generationTabReferenceYear}">#{importF24.referenceYear}</p:column>
+                        <p:column headerText="#{msg.generationTabDebitAmountsPaid}">#{importF24.f24Import}</p:column>
+                        <p:column styleClass="action-column" style="text-align: center;">
+                            <p:commandButton icon="ui-icon pi pi-pencil" action="#{bean.edit(importF24, row)}"
+                                             oncomplete="PF('addImportF24DialogWV').show();" update=":addImportF24Dialog"
+                                             rendered="#{importF24.importF24Id eq null
+                                             or (bean.transcriptionDataEntity.manualF24 ne null and bean.transcriptionDataEntity.manualF24)}">
+                            </p:commandButton>
+                            <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn" style="margin-left: 10px;"
+                                             actionListener="#{bean.beforeDelete(importF24, row)}"
+                                             oncomplete="PF('deleteConfirmationWV').show()" rendered="#{importF24.importF24Id eq null}">
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                    <br/>
+                    <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-3, ui-grid-col-7">
+                        <h:outputLabel for="paymentDate" value="#{msg.generationTabF24AdvancedByCustomer}"/>
+                        <p:outputPanel>
+                            <p:selectBooleanCheckbox value="#{bean.transcriptionDataEntity.anticipatedF24}">
+                                <p:ajax event="change"
+                                        listener="#{bean.updateImportF24Anticipated}" update="@this transcriptionManagementAnticipatedF24Panel paymentDate"></p:ajax>
+                            </p:selectBooleanCheckbox>
+                            <p:outputPanel id="transcriptionManagementAnticipatedF24Panel" style="width: 175px;display: inline-block;margin-left: 10px;">
+                                <p:inputNumber label="#{msg.transcriptionManagementAmount}" rendered="#{bean.transcriptionDataEntity.anticipatedF24}"
+                                               value="#{bean.transcriptionDataEntity.importF24Anticipated}">
+                                </p:inputNumber>
+                            </p:outputPanel>
+                        </p:outputPanel>
+                    </p:panelGrid>
+                    <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-3, ui-grid-col-7">
+                        <h:outputLabel for="manualF24" value="#{msg.generationTabF24Manual}"/>
+                        <p:outputPanel>
+                            <p:selectBooleanCheckbox id="manualF24" value="#{bean.transcriptionDataEntity.manualF24}">
+                                <p:ajax event="change" update="f24GenerationTable"></p:ajax>
+                            </p:selectBooleanCheckbox>
+                        </p:outputPanel>
+                    </p:panelGrid>
+
+                    <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-3, ui-grid-col-7">
+                        <h:outputLabel for="paymentDate" value="#{msg.paymentDate}"/>
+                        <p:calendar id="paymentDate" widgetVar="paymentDateWV" pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.transcriptionDataEntity.paymentDate}" style="#{bean.transcriptionDataEntity.anticipatedF24 ? 'margin-left: 31px' : ''}">
+                            <p:ajax event="dateSelect" update="@this"></p:ajax>
+                        </p:calendar>
+                    </p:panelGrid>
+                    <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-9, ui-grid-col-1">
+                        <p:commandButton icon="pdf-icon" value="#{msg.pdf}"
+                                         styleClass="pdf-button" style="border: 1px solid #AD0B00 !important;margin-left: 5px"
+                                         action="#{bean.downloadPdfFile}" ajax="false">
+                        </p:commandButton>
+                        <p:outputLabel value=""></p:outputLabel>
+                        <!-- <p:outputPanel style=""> -->
+                        <p:commandButton value="#{msg.save}" styleClass="align-right #{bean.isPaymentDateSaved ? 'blue-button' : 'green-button'}"
+                                         action="#{bean.saveTranscription}" update="@form"/>
+                        <!-- </p:outputPanel> -->
+                    </p:panelGrid>
+                </p:tab>
+                <p:tab id="wizardTabLETTER" title="#{msg.wizardTabLETTER.toUpperCase()}" rendered="#{(bean.renewalPage and bean.authCustomer) or (bean.transcriptionTab and (bean.transcriptionPage or bean.transcriptionCertificationPage))}">
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4">
+                        <p:outputPanel styleClass="action_column" style="width: 100%;text-align: left;">
+                            <h:outputLabel for="transcriptionManagementAmount" value="#{msg.transcriptionManagementAmount}"/>
+                        </p:outputPanel>
+                        <p:inputNumber id="transcriptionManagementAmount" label="#{msg.transcriptionManagementAmount}"
+                                       value="#{bean.transcriptionDataEntity.transcriptionAmount}" widgetVar="transcriptionManagementAmount">
+                            <p:ajax event="change" update="@this @widgetVar(transcriptionManagementAmount2)"></p:ajax>
+                        </p:inputNumber>
+                        <h:outputLabel for="transcriptionManagementRevenue" value="#{msg.transcriptionManagementRevenue}"/>
+                        <p:inputText styleClass="input-width"
+                                     disabled="#{bean.disableStampFields}"
+                                     maxlength="200" id="transcriptionManagementRevenue" label="#{msg.transcriptionManagementRevenue}"
+                                     value="#{bean.transcriptionDataEntity.numberRevenueStamp}">
+                            <p:keyFilter mask="pint" />
+                        </p:inputText>
+                        <h:outputLabel for="transcriptionManagementBrand" value="#{msg.transcriptionManagementBrand}"/>
+                        <p:inputText styleClass="input-width"
+                                     disabled="#{bean.disableStampFields}"
+                                     maxlength="200" id="transcriptionManagementBrand" label="#{msg.transcriptionManagementBrand}"
+                                     value="#{bean.transcriptionDataEntity.numberServiceStamp}">
+                            <p:keyFilter mask="pint" />
+                        </p:inputText>
+                        <h:outputLabel for="transcriptionManagementPacket" value="#{msg.transcriptionManagementPacket}"/>
+                        <p:inputText styleClass="input-width"
+                                     maxlength="200" id="transcriptionManagementPacket" label="#{msg.transcriptionManagementPacket}"
+                                     value="#{bean.transcriptionDataEntity.packetNumber}">
+                            <p:keyFilter mask="pint" />
+                        </p:inputText>
+                        <h:outputLabel for="transcriptionSupportType" value="#{msg.transcriptionSupportType}:"/>
+                        <p:selectOneMenu id="transcriptionSupportType"
+                                         value="#{bean.transcriptionDataEntity.supportType}"
+                                         style="width: 100%;"
+                                         styleClass="#{bean.transcriptionDataEntity.supportType ne null ? 'select-one-menu' : ''}">
+                            <f:selectItem itemLabel="#{ff:upper(msg.transcriptionSupportType)}"
+                                          itemValue="#{null}"
+                                          noSelectionOption="true"/>
+                            <f:selectItems value="#{bean.supportTypes}"/>
+                            <p:ajax event="itemSelect" update="@this"/>
+                        </p:selectOneMenu>
+                        <h:outputLabel for="transcriptionManagementEnvelope" value="#{msg.transcriptionManagementEnvelope}"/>
+                        <p:selectBooleanCheckbox id="transcriptionManagementEnvelope"
+                                                 styleClass="booleanCheckbox" value="#{bean.transcriptionDataEntity.envelopStamp}"/>
+                        <h:outputLabel for="transcriptionManagementMobile" value="#{msg.transcriptionManagementMobile}"/>
+                        <p:selectBooleanCheckbox id="transcriptionManagementMobile" styleClass="booleanCheckbox"
+                                                 value="#{bean.transcriptionDataEntity.userPhone}"/>
+                        <h:outputLabel for="transcriptionManagementMobile" value="#{msg.note}"/>
+                        <p:inputTextarea value="#{bean.transcriptionDataEntity.note}" rows="2" style="width:95%;"></p:inputTextarea>
+                    </p:panelGrid>
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.save}" styleClass="align-right #{bean.isImportF24Saved ? 'blue-button' : 'green-button'}"
+                                         action="#{bean.saveTranscription}" update="@form"/>
+                    </p:outputPanel>
+                    <br/>
+                    <br/>
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.transcriptionManagementLetterInvite}"
+                                         styleClass="green-button align-right" actionListener="#{bean.preparePdfOfLetter}" ajax="false">
+                            <p:fileDownload value="#{bean.transcriptionAndCertificationHelper.pdfOfLetterFile}"/>
+                        </p:commandButton>
+                    </p:outputPanel>
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4">
+                        <h:outputLabel value="#{msg.transcriptionRequestDeadline}"/>
+                        <p:calendar widgetVar="transcriptionRequestDeadline1" pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.transcriptionDataEntity.expiration}">
+                            <p:ajax event="dateSelect" update="@this @widgetVar(transcriptionRequestDeadline2)
+		            		@widgetVar(transcriptionRequestDeadline3) @widgetVar(transcriptionRequestDeadline4) @widgetVar(transcriptionRequestDeadline5)"></p:ajax>
+                        </p:calendar>
+                    </p:panelGrid>
+                </p:tab>
+
+                <p:tab id="wizardTabCOURIERSERVICE" title="#{msg.wizardTabCourierService.toUpperCase()}" rendered="#{(bean.renewalPage and bean.authCustomer) or (bean.transcriptionTab and (bean.transcriptionPage or bean.transcriptionCertificationPage))}">
+                    <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"  style="width: 100%" id="panelGrid"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-1, ui-grid-col-1, ui-grid-col-4">
+                        <h:outputLabel for="transcriptionCourierReservation" value="#{msg.transcriptionCourierReservation}:"/>
+                        <p:selectBooleanCheckbox id="transcriptionCourierReservation" styleClass="booleanCheckbox"
+                                                 value="#{bean.transcriptionDataEntity.courierEnvelope}"/>
+                        <h:outputLabel for="transcriptionCourierDate" value="#{msg.transcriptionDate}:"/>
+                        <p:calendar id="transcriptionCourierDate" value="#{bean.transcriptionDataEntity.courierEnvelopeDate}"
+                                    pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter"/>
+
+                        <!-- <h:outputText value="#{msg.transcriptionCourierLabel}" style="font-weight:bold"/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                        <p:fileUpload fileUploadListener="#{bean.handleCourierFileUpload}" label="#{msg.upload}"
+                                      mode="advanced" auto="true" styleClass="special-upload" update="panelGrid"/>
+                        <p:panel style="margin-top: 6px; width: 400px;" id="courierFilePanel" rendered="#{not empty bean.courierFileName}">
+                            <h:outputText id="courierFileName" value="#{bean.courierFileName}" />
+                            <p:commandButton icon="fa fa-cloud-download" title="#{msg.download}" update=":form, messages"
+                                             ajax="false" action="#{bean.downloadCourierDocument}"
+                                             style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                            </p:commandButton>
+                            <p:commandButton icon="fa fa-close" title="#{msg.delete}" update="panelGrid"
+                                             ajax="true" action="#{bean.deleteCourierDocument}"
+                                             style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                            </p:commandButton>
+                        </p:panel>
+                        <h:outputText value="" rendered="#{empty bean.courierFileName}"/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+
+                        <p:outputPanel styleClass="transaction-date">
+                            <p:outputPanel style="width: 100px;padding-top: 4px;">
+                                <h:outputText value="#{msg.transactionDateLabel}:" style="font-weight:bold"/>
+                            </p:outputPanel>
+                            <p:calendar id="expirationNote"
+                                        pattern="dd/MM/yyyy" style="width: 200px;" mask="true" navigator="true"
+                                        converter="fullDateTimeConverter" value="#{bean.transcriptionDataEntity.expirationNote}"/>
+                        </p:outputPanel>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/> -->
+
+                    </p:panelGrid>
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.save}" styleClass="align-right #{bean.isCourierEnvelopeDataSaved ? 'blue-button' : 'green-button'}"
+                                         action="#{bean.saveTranscription}" update="@form"/>
+                    </p:outputPanel>
+                    <br/>
+                    <br/>
+
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4">
+                        <h:outputLabel value="#{msg.transcriptionRequestDeadline}"/>
+                        <p:calendar widgetVar="transcriptionRequestDeadline3" pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.transcriptionDataEntity.expiration}">
+                            <p:ajax event="dateSelect" update="@this @widgetVar(transcriptionRequestDeadline1)
+		            		@widgetVar(transcriptionRequestDeadline2) @widgetVar(transcriptionRequestDeadline4) @widgetVar(transcriptionRequestDeadline5)"></p:ajax>
+                        </p:calendar>
+                    </p:panelGrid>
+                    <br/>
+                    <br/>
+                </p:tab>
+
+                <p:tab id="wizardTabNOTASISTER" title="#{msg.wizardTabNoteSister.toUpperCase()}" rendered="#{(bean.renewalPage and bean.authCustomer) or (bean.transcriptionTab and (bean.transcriptionPage or bean.transcriptionCertificationPage))}">
+                    <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"  style="width: 100%" id="panelGridNotaSister"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-1, ui-grid-col-1, ui-grid-col-4">
+
+                        <p:fileUpload fileUploadListener="#{bean.handleCourierFileUpload}" label="#{msg.upload}"
+                                      mode="advanced" auto="true" styleClass="special-upload" update="panelGridNotaSister"/>
+                        <p:panel style="margin-top: 6px; width: 400px;" id="courierFilePanel" rendered="#{not empty bean.courierFileName}">
+                            <h:outputText id="courierFileName" value="#{bean.courierFileName}" />
+                            <p:commandButton icon="fa fa-cloud-download" title="#{msg.download}" update=":form, messages"
+                                             ajax="false" action="#{bean.downloadCourierDocument}"
+                                             style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                            </p:commandButton>
+                            <p:commandButton icon="fa fa-close" title="#{msg.delete}" update="panelGridNotaSister"
+                                             ajax="true" action="#{bean.deleteCourierDocument}"
+                                             style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                            </p:commandButton>
+                        </p:panel>
+                        <h:outputText value="" rendered="#{empty bean.courierFileName}"/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+
+                        <p:outputPanel styleClass="transaction-date">
+                            <p:outputPanel style="width: 100px;padding-top: 4px;">
+                                <h:outputText value="#{msg.transactionDateLabel}:" style="font-weight:bold"/>
+                            </p:outputPanel>
+                            <p:calendar id="expirationNote"
+                                        pattern="dd/MM/yyyy" style="width: 200px;" mask="true" navigator="true"
+                                        converter="fullDateTimeConverter" value="#{bean.transcriptionDataEntity.expirationNote}"/>
+                        </p:outputPanel>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                    </p:panelGrid>
+                    <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-3, ui-grid-col-7">
+                        <h:outputLabel for="emailSentDate" value="#{msg.emailSentDate}"/>
+                        <p:calendar id="emailSentDate" widgetVar="emailSentDateWV" pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.transcriptionDataEntity.emailSentDate}" disabled="true">
+                        </p:calendar>
+                    </p:panelGrid>
+
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.save}" styleClass="align-right #{bean.isCourierFileSaved ? 'blue-button' : 'green-button'}"
+                                         action="#{bean.saveTranscription}" update="@form"/>
+                    </p:outputPanel>
+                    <br/>
+                    <br/>
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.transcriptionManagementSendNote}"  action="#{bean.createNewNoteMail('Corriere')}"
+                                         styleClass="green-button align-right" disabled="#{bean.transcriptionDataEntity.isNew}"/>
+                    </p:outputPanel>
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4">
+                        <h:outputLabel value="#{msg.transcriptionRequestDeadline}"/>
+                        <p:calendar widgetVar="transcriptionRequestDeadline2" pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.transcriptionDataEntity.expiration}">
+                            <p:ajax event="dateSelect" update="@this @widgetVar(transcriptionRequestDeadline1)
+		            		@widgetVar(transcriptionRequestDeadline3) @widgetVar(transcriptionRequestDeadline4) @widgetVar(transcriptionRequestDeadline5)"></p:ajax>
+                        </p:calendar>
+                    </p:panelGrid>
+                </p:tab>
+
+                <p:tab id="wizardTabEXPENSEREPORT" title="#{msg.wizardTabExpenseReport.toUpperCase()}" rendered="#{(bean.renewalPage and bean.authCustomer) or (bean.transcriptionTab and (bean.transcriptionPage or bean.transcriptionCertificationPage))}">
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4">
+                        <h:outputLabel for="transcriptionMortgageCost" value="#{msg.transcriptionMortgageCost}"/>
+                        <p:inputNumber id="transcriptionMortgageCost"  value="#{bean.ipotecarioCost}"
+                                       label="#{msg.transcriptionMortgageCost}"/>
+
+                        <h:outputLabel for="transcriptionShippingCost" value="#{msg.transcriptionShippingCost}"/>
+                        <p:inputNumber id="transcriptionShippingCost"  value="#{bean.ipotecarioPostale}"
+                                       label="#{msg.transcriptionShippingCost}"/>
+
+                        <p:outputPanel styleClass="action_column" style="width: 100%;text-align: left;">
+                            <h:outputLabel for="transcriptionManagementAmount2" value="#{msg.transcriptionManagementAmount}"/>
+                        </p:outputPanel>
+                        <p:inputNumber id="transcriptionManagementAmount2" label="#{msg.transcriptionManagementAmount}"
+                                       value="#{bean.transcriptionDataEntity.transcriptionAmount}" widgetVar="transcriptionManagementAmount2">
+                            <p:ajax event="change" update="@this @widgetVar(transcriptionManagementAmount)"></p:ajax>
+                        </p:inputNumber>
+
+                        <p:outputPanel styleClass="action_column" style="width: 100%;text-align: left;">
+                            <h:outputLabel for="stamp" value="#{msg.stamp}"/>
+                        </p:outputPanel>
+                        <p:inputNumber id="stamp" label="#{msg.stamp}" disabled="true"
+                                       value="#{bean.stampValue}" />
+                    </p:panelGrid>
+
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%" layout="grid"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4">
+                        <h:outputLabel value="#{msg.additionalCosts}"/>
+                        <p:commandButton id="buttonCreate" style="width: 97px;"
+                                         styleClass="ui-button-success p-mr-2 p-mb-2 mail-button"
+                                         value="#{msg.newItem}"
+                                         update="@widgetVar(additionalCostsTableWV)"
+                                         action="#{bean.onAddNew()}"/>
+                        <h:outputLabel value=""/>
+                        <p:dataTable id="additionalCostsTable" var="extraCost" value="#{bean.additionalCosts}" editable="true"
+                                     editMode="cell" widgetVar="additionalCostsTableWV"
+                                     emptyMessage="#{msg.noRecordsFound}" rowIndexVar="crow">
+                            <p:ajax event="cellEdit" listener="#{bean.onCellEdit}" update="@widgetVar(additionalCostsTableWV)"/>
+
+                            <p:column headerText="#{msg.description}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{extraCost.note}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{extraCost.note}" style="width:100%"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+
+                            <p:column headerText="#{msg.requestExtraCostPrice}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{extraCost.price}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputText value="#{extraCost.price}" style="width:100%">
+                                            <p:keyFilter mask="num" />
+                                            <f:convertNumber pattern="#0.00" locale="EN" />
+                                        </p:inputText>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column>
+                                <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"
+                                                 style="margin-left: 10px;"
+                                action="#{bean.onDeleteCost(crow)}"
+                                                 update="@widgetVar(additionalCostsTableWV)"/>
+                            </p:column>
+
+                        </p:dataTable>
+                    </p:panelGrid>
+
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.pdf.toUpperCase()}" action="#{bean.generateReportSpesePdf(true)}"
+                        				 ajax="false" update="@form" styleClass="pdf-button" icon="pdf-icon" 
+                        				 style="border: 1px solid #AD0B00 !important;"/>
+                    	<p:commandButton icon="excel-icon" value="#{msg.requestPrintExcel.toUpperCase()}"
+                                         styleClass="excel-button" style="border: 1px solid #217346 !important;margin-left: 5px;"
+                                         action="#{bean.generateReportSpesePdf(false)}" ajax="false" update="@form">
+                        </p:commandButton>                 
+                    </p:outputPanel>
+
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%" layout="grid"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4" rendered="#{bean.transcriptionRequest.invoice ne null}">
+                            <h:outputLabel value="#{msg.invoiceNumber}:"/>
+                        <p:commandLink value="#{bean.transcriptionRequest.invoice.invoiceNumber}"
+                                       action="#{bean.openInvoiceDialog}" update="invoiceDialogBilling dialogTab"/>
+                    </p:panelGrid>
+
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.save}" styleClass="align-right #{bean.isExtraCostsSaved ? 'blue-button' : 'green-button'}"
+                                         action="#{bean.saveTranscription}" update="@form"/>
+                    </p:outputPanel>
+                    <br/>
+                    <br/>
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.requestTextEditCreateInvoice}" action="#{bean.preCheckDocument}"
+                                         update="otherRequestsExistsForInvoiceDialog invoiceMissingBillingClientDialog invoiceAlreadyCreatedDialog
+                                                    mailManagerViewRequestsForInvoiceDialog invoiceOpenErrorDialog"
+                                         rendered="#{bean.showCreateFatturaButton}" styleClass="green-button align-right"/>
+                    </p:outputPanel>
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4">
+                        <h:outputLabel value="#{msg.transcriptionRequestDeadline}"/>
+                        <p:calendar widgetVar="transcriptionRequestDeadline4" pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.transcriptionDataEntity.expiration}">
+                            <p:ajax event="dateSelect" update="@this @widgetVar(transcriptionRequestDeadline1)
+		            		@widgetVar(transcriptionRequestDeadline2) @widgetVar(transcriptionRequestDeadline3) @widgetVar(transcriptionRequestDeadline5)"></p:ajax>
+                        </p:calendar>
+                    </p:panelGrid>
+                </p:tab>
+                <p:tab id="wizardTabSEND" title="#{msg.wizardTabSend.toUpperCase()}" rendered="#{(bean.renewalPage and bean.authCustomer) or (bean.transcriptionTab and (bean.transcriptionPage or bean.transcriptionCertificationPage))}">
+                    <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"  style="width: 100%" id="panelGridSend"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-1, ui-grid-col-1, ui-grid-col-4">
+                        <h:outputText value="#{msg.transcriptionInvoiceLabel}" style="font-weight:bold"/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                        <p:fileUpload fileUploadListener="#{bean.handleEntryFileUpload}" label="#{msg.upload}"
+                                      mode="advanced" auto="true" styleClass="special-upload" update="panelGridSend"/>
+                        <p:panel style="margin-top: 6px; width: 400px;" id="entryFilePanel" rendered="#{not empty bean.entryFileName}">
+                            <h:outputText id="entryFileName" value="#{bean.entryFileName}" />
+                            <p:commandButton icon="fa fa-cloud-download" title="#{msg.download}" update=":form, messages"
+                                             ajax="false" action="#{bean.downloadEntryDocument}"
+                                             style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                            </p:commandButton>
+                            <p:commandButton icon="fa fa-close" title="#{msg.delete}" update="panelGridSend"
+                                             ajax="true" action="#{bean.deleteEntryDocument}"
+                                             style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                            </p:commandButton>
+                        </p:panel>
+                        <h:outputText value="" rendered="#{empty bean.entryFileName}"/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                        <p:outputPanel styleClass="transaction-date">
+                            <p:outputPanel style="width: 100px;padding-top: 4px;">
+                                <h:outputText value="#{msg.transactionDateLabel}:" style="font-weight:bold"/>
+                            </p:outputPanel>
+                            <p:calendar id="expirationDuplo"
+                                        pattern="dd/MM/yyyy" style="width: 200px;" mask="true" navigator="true"
+                                        converter="fullDateTimeConverter" value="#{bean.transcriptionDataEntity.expirationDuplo}"/>
+                        </p:outputPanel>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                        <h:outputLabel for="transcriptionInviteDate" value="#{msg.transcriptionDate}:"/>
+                        <p:calendar id="transcriptionInviteDate"
+                                    pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.transcriptionDataEntity.expirationCourierClient}"/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                        <h:outputLabel for="transcriptionDuploInviteDate" value="#{msg.emailSentDate}:"/>
+                        <p:calendar id="transcriptionDuploInviteDate"
+                                    pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.transcriptionDataEntity.duploEmailDate}"/>
+                    </p:panelGrid>
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.save}" styleClass="align-right #{bean.isEntryFileSaved ? 'blue-button' : 'green-button'}"
+                                         action="#{bean.saveTranscription}" update="@form"/>
+                    </p:outputPanel>
+                    <br/>
+                    <br/>
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.transcriptionManagementSendInvite}"
+                                         action="#{bean.createNewDuploMail('Invio Duplo')}"
+                                         styleClass="green-button align-right"  disabled="#{bean.transcriptionDataEntity.isNew}"/>
+                    </p:outputPanel>
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4">
+                        <h:outputLabel value="#{msg.transcriptionRequestDeadline}"/>
+                        <p:calendar widgetVar="transcriptionRequestDeadline5" pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.transcriptionDataEntity.expiration}">
+                            <p:ajax event="dateSelect" update="@this @widgetVar(transcriptionRequestDeadline1)
+		            		@widgetVar(transcriptionRequestDeadline2) @widgetVar(transcriptionRequestDeadline3) @widgetVar(transcriptionRequestDeadline4)"></p:ajax>
+                        </p:calendar>
+                    </p:panelGrid>
+                    <br/>
+                    <br/>
+                </p:tab>
+
+                <p:tab id="wizardTabCourierClient" title="#{msg.wizardTabCourierClient.toUpperCase()}"
+                       rendered="#{(bean.renewalPage and bean.authCustomer) or (bean.transcriptionTab and
+                       (bean.transcriptionPage or bean.transcriptionCertificationPage))}">
+
+                    <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"  style="width: 100%" id="panelGridCourierClient"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-1, ui-grid-col-1, ui-grid-col-4">
+                        <h:outputLabel for="transcriptionInviteDHL" value="#{msg.transcriptionInviteDHL}:"/>
+                        <p:selectBooleanCheckbox id="transcriptionInviteDHL" styleClass="booleanCheckbox"
+                                                 value="#{bean.transcriptionDataEntity.courierClient}"/>
+
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                        <h:outputLabel for="transcriptionClientInviteDate" value="#{msg.emailSentDate}:"/>
+                        <p:calendar id="transcriptionClientInviteDate"
+                                    pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.transcriptionDataEntity.courierEmailDate}"/>
+                    </p:panelGrid>
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.save}" styleClass="align-right #{bean.isEntryFileSaved ? 'blue-button' : 'green-button'}"
+                                         action="#{bean.saveTranscription}" update="@form"/>
+                    </p:outputPanel>
+                    <br/>
+                    <br/>
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.transcriptionManagementSendClientDelievery}"
+                                         action="#{bean.createNewMail('courier_client_email')}"
+                                         styleClass="green-button align-right"  disabled="#{bean.transcriptionDataEntity.isNew}"/>
+                    </p:outputPanel>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                </p:tab>
+
+                <p:tab id="wizardTabMORTGAGE" title="#{msg.wizardTabMORTGAGE.toUpperCase()}" rendered="#{!bean.transcriptionTab and (bean.certificationPage or bean.transcriptionCertificationPage)}">
+                    <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"  style="width: 100%" id="panelGridCertification"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-1, ui-grid-col-1, ui-grid-col-4">
+                        <h:outputText value="#{msg.cadastralAndMortgageDocuments}" style="font-weight:bold"/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+
+                        <p:fileUpload fileUploadListener="#{bean.handleCadastralFileUpload}" label="#{msg.upload}" disabled="true"
+                                      mode="advanced" auto="true" styleClass="special-upload" update="panelGridCertification"/>
+                        <p:panel style="margin-top: 6px; width: 400px;" id="mortgageFilePanel" rendered="#{not empty bean.cadastralFileName}">
+                            <h:outputText id="mortgageFileName" value="#{bean.cadastralFileName}" />
+                            <p:commandButton icon="fa fa-cloud-download" title="#{msg.download}" update=":form, messages"
+                                             ajax="false" action="#{bean.downloadCadastralDocument}"
+                                             style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                            </p:commandButton>
+                            <p:commandButton icon="fa fa-close" title="#{msg.delete}" update="panelGridCertification" disabled="true"
+                                             ajax="true" action="#{bean.deleteCadastralDocument}"
+                                             style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                            </p:commandButton>
+                        </p:panel>
+                        <h:outputText value="" rendered="#{empty bean.cadastralFileName}"/>
+                    </p:panelGrid>
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.save}" styleClass="align-right #{bean.certificationDataEntity.id ne null ? 'blue-button' : 'green-button'}"
+                                         action="#{bean.saveCertification}" update="@form"/>
+                    </p:outputPanel>
+                    <br/>
+                    <br/>
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.manageCertificationSendRequestToSupplier}"
+                                         action="#{bean.createNewMail('Verifiche Catastali e Ipotecarie')}"
+                                         styleClass="green-button align-right"  disabled="true"/>
+                    </p:outputPanel>
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4">
+                        <h:outputLabel value="#{msg.transcriptionRequestDeadline}"/>
+                        <p:calendar widgetVar="certificationRequestDeadline1" pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.certificationDataEntity.expiration}">
+                            <p:ajax event="dateSelect" update="@this @widgetVar(certificationRequestDeadline2)
+		            		@widgetVar(certificationRequestDeadline3) @widgetVar(certificationRequestDeadline4) @widgetVar(certificationRequestDeadline5)"></p:ajax>
+                        </p:calendar>
+                    </p:panelGrid>
+                    <br/>
+                    <br/>
+                </p:tab>
+                <p:tab id="wizardSENDNOTARY" title="#{msg.wizardSENDNOTARY.toUpperCase()}" rendered="#{!bean.transcriptionTab and (bean.certificationPage or bean.transcriptionCertificationPage)}">
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%" id="notaryPanelGrid"
+                                 columnClasses="ui-grid-col-8, ui-grid-col-4">
+                        <h:outputText value="#{msg.mapExtractLabel}" style="font-weight:bold"/>
+                        <h:outputText value=""/>
+                        <p:fileUpload fileUploadListener="#{bean.handleMapFileUpload}" label="#{msg.upload}"
+                                      mode="advanced" auto="true" styleClass="special-upload-mapFile" update="notaryFilePanel">
+                            <p:panel style="border-left: 1px solid #dee2e6;border-right: 1px solid #dee2e6;" id="notaryFilePanel" >
+                                <c:forEach var="item" items="#{bean.abstractMapDocumentList}" varStatus="loop">
+                                    <h:outputText value="#{item.title}" />
+                                    <p:commandButton icon="fa fa-cloud-download" title="#{msg.download}" update=":form, messages"
+                                                     ajax="false" action="#{item.downloadFile}"
+                                                     style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                                    </p:commandButton>
+                                    <p:commandButton icon="fa fa-close" title="#{msg.delete}" update="notaryPanelGrid"
+                                                     ajax="true" action="#{bean.deleteAbstractMapDocument}"
+                                                     style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                                        <f:setPropertyActionListener value="#{item.id}" target="#{bean.abstractMapDocumentId}"/>
+                                    </p:commandButton>
+                                    <br />
+                                </c:forEach>
+                            </p:panel>
+                        </p:fileUpload>
+                        <h:outputText value="" rendered="#{empty bean.mapFileName}"/>
+                        <!-- <h:outputText value=""/>
+                        <h:outputText value=""/> -->
+
+                        <!-- <p:outputPanel styleClass="transaction-date" style="justify-content: end;">
+                            <p:commandButton value="#{msg.sendNotaryButtonLabel}"
+                                             action="#{bean.createNewMail('Estratto mappa')}"
+                                             styleClass="green-button align-right"  disabled="true"/>
+                        </p:outputPanel> -->
+                    </p:panelGrid>
+
+
+                    <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"  style="width: 100%" id="notaryCertificationGrid"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-1, ui-grid-col-1, ui-grid-col-4">
+                        <h:outputText value="#{msg.notaryCertificationLabel}" style="font-weight:bold"/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                        <p:fileUpload fileUploadListener="#{bean.handleCertificationProcessedFileUpload}" label="#{msg.upload}" disabled="#{not empty bean.certificationProcessedFileName}"
+                                      mode="advanced" auto="true" styleClass="special-upload" update="notaryCertificationGrid"/>
+                        <p:panel style="margin-top: 6px; width: 400px;" id="notaryCertificationFilePanel" rendered="#{not empty bean.signedCertificationFileName or not empty bean.certificationProcessedFileName}">
+                            <h:outputText id="notaryCertificationFileName" value="#{bean.certificationProcessedFileName}" />
+                            <p:commandButton icon="fa fa-cloud-download" title="#{msg.download}" update=":form, messages"
+                                             ajax="false" action="#{bean.downloadCertificationProcessedDocument}"
+                                             style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                            </p:commandButton>
+                            <p:commandButton icon="fa fa-close" title="#{msg.delete}" update="notaryCertificationGrid" disabled="true"
+                                             ajax="true" action="#{bean.deleteCertificationProcessedDocument}"
+                                             style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                            </p:commandButton>
+                        </p:panel>
+                        <h:outputText value="" rendered="#{empty bean.certificationProcessedFileName}"/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+
+                        <!-- <p:outputPanel styleClass="transaction-date" style="justify-content: end;">
+                            <p:commandButton value="#{msg.sendClienteButtonLabel}"
+                                             action="#{bean.createNewMail('Certificazione firmata dal notaio')}"
+                                             styleClass="green-button align-right"  disabled="true"/> 
+                        </p:outputPanel> -->
+                    </p:panelGrid>
+
+                    <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"  style="width: 100%" id="unifiedFileGrid"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-1, ui-grid-col-1, ui-grid-col-4">
+                        <h:outputText value="#{msg.unifiedFile}" style="font-weight:bold"/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                        <p:fileUpload  label="#{msg.upload}"
+                                       disabled="true" mode="advanced" auto="true"
+                                       styleClass="special-upload" update="unifiedFileGrid"/>
+                        <p:panel style="margin-top: 6px; width: 400px;" id="unifiedFilePanel" rendered="#{not empty bean.mapFileName}">
+                            <h:outputText id="unifiedFileName" value="#{bean.mapFileName}" />
+                            <p:commandButton icon="fa fa-cloud-download" title="#{msg.download}" update=":form, messages"
+                                             ajax="false" action="#{bean.downloadMapDocument}"
+                                             style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                            </p:commandButton>
+                            <p:commandButton icon="fa fa-close" title="#{msg.delete}" update="unifiedFileGrid mergeFiles"
+                                             ajax="true" action="#{bean.deleteMapDocument}"
+                                             style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                            </p:commandButton>
+                        </p:panel>
+                        <h:outputText value="" rendered="#{empty bean.mapFileName}"/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+
+                        <!-- <p:outputPanel styleClass="transaction-date" style="justify-content: end;">
+                            <p:commandButton value="#{msg.sendClienteButtonLabel}"
+                                             action="#{bean.createNewMail('Certificazione firmata dal notaio')}"
+                                             styleClass="green-button align-right"  disabled="true"/> 
+                        </p:outputPanel> -->
+                    </p:panelGrid>
+                    
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4">
+                        <p:outputPanel style="padding-top: 4px;">
+                            <h:outputText value="#{msg.emailSentDate}:" style="font-weight:bold"/>
+                        </p:outputPanel>
+                        <p:calendar id="clientDate" value="#{bean.certificationDataEntity.sendingCertificationDate}"
+                                    pattern="dd/MM/yyyy" style="width: 200px;" mask="true" navigator="true"/>
+	                </p:panelGrid>
+                    
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.save}" styleClass="align-right #{bean.certificationDataEntity.id ne null ? 'blue-button' : 'green-button'}"
+                                         action="#{bean.saveCertification}" update="@form"/>
+                    </p:outputPanel>
+                    <br />
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton id="mergeFiles" value="#{msg.mergeFiles}" styleClass="align-right #{bean.mapFileExists ? 'blue-button' : 'green-button'}"
+                                         update="unifiedFileGrid unifiedFilePanel :form, messages" oncomplete="document.getElementById('wizard:downloadMergeFiles').click();"
+                                         actionListener="#{bean.mergeFiles}"
+                                         disabled="#{empty bean.abstractMapDocumentList}"/>
+                        <p:commandButton id="downloadMergeFiles" value="#{msg.mergeFiles}" style="display: none;" ajax="false"
+                                         actionListener="#{bean.downloadMergeFiles}"></p:commandButton>
+                    </p:outputPanel>
+                    <br/>
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.manageCertificationSendCertificationToNotary}"
+                                         styleClass="green-button align-right"
+                                         action="#{bean.createNewNotaryCertificationMail('Certificazione fusa')}"
+                                         disabled="#{bean.certificationDataEntity.isNew}"/>
+                    </p:outputPanel>
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4">
+                        <h:outputLabel value="#{msg.transcriptionRequestDeadline}"/>
+                        <p:calendar widgetVar="certificationRequestDeadline2" pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.certificationDataEntity.expiration}">
+                            <p:ajax event="dateSelect" update="@this @widgetVar(certificationRequestDeadline1)
+		            		@widgetVar(certificationRequestDeadline3) @widgetVar(certificationRequestDeadline4) @widgetVar(certificationRequestDeadline5)"></p:ajax>
+                        </p:calendar>
+                    </p:panelGrid>
+                </p:tab>
+
+                <p:tab id="wizardCUSTOMERANTICIPATION" title="#{msg.wizardCUSTOMERANTICIPATION.toUpperCase()}" rendered="#{!bean.transcriptionTab and (bean.certificationPage or bean.transcriptionCertificationPage)}">
+                    <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"  style="width: 100%" id="customerAnticipationPanelGrid"
+                                 columnClasses="ui-grid-col-3, ui-grid-col-1, ui-grid-col-1, ui-grid-col-4">
+                        <h:outputText value="#{msg.certificationSignedByNotary}" style="font-weight:bold"/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                        <p:fileUpload fileUploadListener="#{bean.handleSignedCertificationFileUpload}" label="#{msg.upload}"
+                                      mode="advanced" auto="true" styleClass="special-upload" update="customerAnticipationPanelGrid"/>
+                        <!-- <p:panel style="margin-top: 6px; width: 400px;" id="notaryFilePanel" rendered="#{not empty bean.mapFileName}">
+                            <h:outputText id="notaryFileName" value="#{bean.mapFileName}" />
+                            <p:commandButton icon="fa fa-cloud-download" title="#{msg.download}" update=":form, messages"
+                                             ajax="false" action="#{bean.downloadMapDocument}"
+                                             style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                            </p:commandButton>
+                            <p:commandButton icon="fa fa-close" title="#{msg.delete}" update="notaryPanelGrid"
+                                             ajax="true" action="#{bean.deleteMapDocument}"
+                                             style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                            </p:commandButton>
+                        </p:panel> -->
+                        <p:panel style="margin-top: 6px; width: 400px;" id="customerAnticipationFilePanel" rendered="#{not empty bean.signedCertificationFileName}">
+                            <h:outputText id="customerAnticipationFileName" value="#{bean.signedCertificationFileName}" />
+                            <p:commandButton icon="fa fa-cloud-download" title="#{msg.download}" update=":form, messages"
+                                             ajax="false" action="#{bean.downloadSignedCertificationDocument}"
+                                             style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                            </p:commandButton>
+                            <p:commandButton icon="fa fa-close" title="#{msg.delete}" update="customerAnticipationPanelGrid"
+                                             ajax="true" action="#{bean.deleteSignedCertificationDocument}"
+                                             style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                            </p:commandButton>
+                        </p:panel>
+                        <h:outputText value="" rendered="#{empty bean.signedCertificationFileName}"/>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+                    </p:panelGrid>
+                    <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-3, ui-grid-col-7">
+                        <h:outputLabel for="advanceToCustomer" value="#{msg.emailSentDate}"/>
+                        <p:calendar id="advanceToCustomer" widgetVar="advanceToCustomerWV" pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.certificationDataEntity.emailSentDate}">
+                        </p:calendar>
+                    </p:panelGrid>
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.save}" styleClass="align-right #{bean.certificationDataEntity.id ne null ? 'blue-button' : 'green-button'}"
+                                         action="#{bean.saveCertification}" update="@form"/>
+                    </p:outputPanel>
+                    <br />
+                    <br />
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.sendCertificationToClient}"  action="#{bean.createNewNoteMail('Certificazione firmata dal notaio')}"
+                                         styleClass="green-button align-right" disabled="#{bean.certificationDataEntity.isNew}"/>
+                    </p:outputPanel>
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4">
+                        <h:outputLabel value="#{msg.transcriptionRequestDeadline}"/>
+                        <p:calendar widgetVar="certificationRequestDeadline3" pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.certificationDataEntity.expiration}">
+                            <p:ajax event="dateSelect" update="@this @widgetVar(certificationRequestDeadline1)
+		            		@widgetVar(certificationRequestDeadline2) @widgetVar(certificationRequestDeadline4) @widgetVar(certificationRequestDeadline5)"></p:ajax>
+                        </p:calendar>
+                    </p:panelGrid>
+                </p:tab>
+
+                <p:tab id="wizardTabCertificateReport" title="#{msg.wizardTabExpenseReport.toUpperCase()}" rendered="#{!bean.transcriptionTab and (bean.certificationPage or bean.transcriptionCertificationPage)}">
+
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4">
+                        <h:outputLabel for="cadastralAssessment" value="#{msg.cadastralAssessment}"/>
+                        <p:inputNumber id="cadastralAssessment" label="#{msg.cadastralAssessment}"  value="#{bean.cadastralCost}"/>
+
+                        <h:outputLabel for="mortgageInvestigations" value="#{msg.mortgageInvestigations}"/>
+                        <p:inputNumber id="mortgageInvestigations" label="#{msg.mortgageInvestigations}" value="#{bean.mortgageCost}"/>
+
+                        <h:outputLabel for="personalCertificate" value="#{msg.personalCertificate}"/>
+                        <p:inputNumber id="personalCertificate" label="#{msg.personalCertificate}" value="#{bean.personalCost}"/>
+
+                        <h:outputLabel for="postalCosts" value="#{msg.postalCosts}"/>
+                        <p:inputNumber id="postalCosts" label="#{msg.postalCosts}" value="#{bean.postalCost}"/>
+                    </p:panelGrid>
+
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.pdf.toUpperCase()}" action="#{bean.generateCertificationReportSpese(true)}"
+                        				 ajax="false" update="@form" styleClass="pdf-button" icon="pdf-icon" 
+                        				 style="border: 1px solid #AD0B00 !important;"/>
+                    	<p:commandButton icon="excel-icon" value="#{msg.requestPrintExcel.toUpperCase()}"
+                                         styleClass="excel-button" style="border: 1px solid #217346 !important;margin-left: 5px;"
+                                         action="#{bean.generateCertificationReportSpese(false)}" ajax="false" update="@form">
+                        </p:commandButton>
+                    </p:outputPanel>
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%" layout="grid"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4" rendered="#{bean.certificationRequest.invoice ne null}">
+                        <h:outputLabel value="#{msg.invoiceNumber}:"/>
+                        <p:commandLink value="#{bean.certificationRequest.invoice.invoiceNumber}"
+                                       action="#{bean.openInvoiceDialog}" update="invoiceDialogBilling dialogTab"/>
+                    </p:panelGrid>
+
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.save}" styleClass="align-right #{bean.certificationDataEntity.id ne null ? 'blue-button' : 'green-button'}"
+                                         action="#{bean.saveCertification}" update="@form"/>
+                    </p:outputPanel>
+                    <br/>
+                    <br/>
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.requestTextEditCreateInvoice}" action="#{bean.preCheckDocument}"
+                                         update="otherRequestsExistsForInvoiceDialog invoiceMissingBillingClientDialog invoiceAlreadyCreatedDialog
+                                                    mailManagerViewRequestsForInvoiceDialog invoiceOpenErrorDialog"
+                                         rendered="#{bean.showCreateFatturaButton}" styleClass="green-button align-right"/>
+
+                    </p:outputPanel>
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4">
+                        <h:outputLabel value="#{msg.transcriptionRequestDeadline}"/>
+                        <p:calendar widgetVar="certificationRequestDeadline4" pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.certificationDataEntity.expiration}">
+                            <p:ajax event="dateSelect" update="@this @widgetVar(certificationRequestDeadline1)
+		            		@widgetVar(certificationRequestDeadline2) @widgetVar(certificationRequestDeadline3) @widgetVar(certificationRequestDeadline5)"></p:ajax>
+                        </p:calendar>
+                    </p:panelGrid>
+                </p:tab>
+                <p:tab id="wizardSENDCLIENT" title="#{msg.wizardSENDCLIENT.toUpperCase()}" rendered="#{!bean.transcriptionTab and (bean.certificationPage or bean.transcriptionCertificationPage)}">
+                    <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"  style="width: 100%" id="panelGridCertification1"
+                                 columnClasses="ui-grid-col-2 minW372, ui-grid-col-2, ui-grid-col-1, ui-grid-col-4">
+                        <p:outputPanel styleClass="manage-certificate-date br-none">
+                            <p:outputPanel style="width: 155px;padding-top: 4px;">
+                                <h:outputText value="#{msg.manageCertificationSendDhlNotary}:" style="font-weight:bold"/>
+                            </p:outputPanel>
+                            <p:selectBooleanCheckbox value="#{bean.certificationDataEntity.sendingCourier}" styleClass="booleanCheckbox" style="margin-top: 5px;margin-left: 40px;">
+                                <p:ajax event="change" update="send-dhl-notary"/>
+                            </p:selectBooleanCheckbox>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="manage-certificate-date" id="send-dhl-notary">
+                            <p:outputPanel style="width: 100px;padding-top: 4px;" rendered="#{bean.certificationDataEntity.sendingCourier}">
+                                <h:outputText value="#{msg.manageCertificationSendoriginalClientDate}:" style="font-weight:bold"/>
+                            </p:outputPanel>
+                            <p:calendar id="dhlNotaryDate" rendered="#{bean.certificationDataEntity.sendingCourier}"
+                                        pattern="dd/MM/yyyy" style="width: 200px;" mask="true" navigator="true" value="#{bean.certificationDataEntity.sendingCourierDate}"/>
+                        </p:outputPanel>
+                        <h:outputText value=""/>
+                        <h:outputText value=""/>
+
+                        <!-- <p:outputPanel styleClass="manage-certificate-date br-none" style="margin-top: -28px;padding-top: 1.1rem;">
+                            <p:outputPanel style="width: 155px;padding-top: 4px;">
+                                <h:outputText value="#{msg.manageCertificationSendCertification}" style="font-weight:bold"/><br/>
+                                <h:outputText value="#{msg.manageCertificationOriginalClient}:" style="font-weight:bold"/>
+                            </p:outputPanel>
+                            <p:selectBooleanCheckbox value="#{bean.certificationDataEntity.sendingCertification}" styleClass="booleanCheckbox" style="margin-top: 5px;margin-left: 40px;">
+                                <p:ajax event="change" update="send-certification-original-client"/>
+                            </p:selectBooleanCheckbox>
+                        </p:outputPanel>
+                        <p:outputPanel styleClass="manage-certificate-date" style="margin-top: -28px;" id="send-certification-original-client">
+                            <p:outputPanel style="width: 100px;padding-top: 4px;" rendered="#{bean.certificationDataEntity.sendingCertification}">
+                                <h:outputText value="#{msg.manageCertificationSendoriginalClientDate}:" style="font-weight:bold"/>
+                            </p:outputPanel>
+                            <p:calendar id="clientDate" rendered="#{bean.certificationDataEntity.sendingCertification}" value="#{bean.certificationDataEntity.sendingCertificationDate}"
+                                        pattern="dd/MM/yyyy" style="width: 200px;" mask="true" navigator="true"/>
+                        </p:outputPanel> -->
+                    </p:panelGrid>
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4">
+                        <h:outputLabel for="certificationCourierEmailDate" value="#{msg.courierDate}:"/>
+                        <p:calendar id="certificationCourierEmailDate" 
+                                    pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.certificationDataEntity.courierEmailDate}"/>
+                   	</p:panelGrid>
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.save}" styleClass="align-right #{bean.certificationDataEntity.id ne null ? 'blue-button' : 'green-button'}"
+                                         action="#{bean.saveCertification}" update="@form"/>
+                    </p:outputPanel>
+                    <br/>
+                    <br/>
+                    <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.manageCertificationEndFlowOperational}" 
+                        				 action="#{bean.createNewCourierCertificationMail('courier_client_email')}"
+                                         styleClass="green-button align-right" disabled="true"/>
+                    </p:outputPanel>
+                    <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-4">
+                        <h:outputLabel value="#{msg.transcriptionRequestDeadline}"/>
+                        <p:calendar widgetVar="certificationRequestDeadline5" pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                                    converter="fullDateTimeConverter" value="#{bean.certificationDataEntity.expiration}">
+                            <p:ajax event="dateSelect" update="@this @widgetVar(certificationRequestDeadline1)
+		            		@widgetVar(certificationRequestDeadline2) @widgetVar(certificationRequestDeadline3) @widgetVar(certificationRequestDeadline4)"></p:ajax>
+                        </p:calendar>
+                    </p:panelGrid>
+                    <br/>
+                    <br/>
+                </p:tab>
+
+            </p:tabView>
+        </main>
+        <script type="text/javascript">
+            // <![CDATA[
+            $(document).ready(function() {
+                loadTabs();
+            });
+            $(".tab").on("click", function (event) {
+                var elementId = event.target.id;
+                console.log(elementId);
+                $(".tab").removeClass("selected");
+                $('#' + elementId).addClass("selected");
+                updateTabs();
+            });
+            // ]]>
+        </script>
+
+        <p:dialog widgetVar="addImportF24DialogWV"  id="addImportF24Dialog" modal="true" draggable="false" width="600" styleClass="dialog-white-bg addPaymentDialog"
+                  position="center center" header="#{msg.generationTabF24Generation}">
+            <div class="p-grid">
+                <div class="p-col-12 p-md-12">
+                    <div class="card"
+                         style="border: none !important; padding-top:0px; padding-bottom:0px; margin-top:10px;">
+                        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                                     columnClasses="ui-grid-col-3,ui-grid-col-9">
+                            <span>#{msg.type}:</span>
+                            <p:inputText id="f24type" style="min-width: 351px;"
+                                         value="#{bean.importF24Pdf.type}"
+                                         label="#{msg.type}"/>
+                            <span>#{msg.generationTabItems}:</span>
+                            <p:inputText id="f24IdentificationNumber" type="text" style="min-width: 351px;"
+                                         value="#{bean.importF24Pdf.f24IdentificationNumber}"
+                                         label="#{msg.generationTabType}"/>
+
+                            <span>#{msg.generationTabCode}:</span>
+                            <p:inputText id="code" style="min-width: 351px;"
+                                         value="#{bean.importF24Pdf.code}"
+                                         label="#{msg.generationTabItems}"/>
+
+                            <span>#{msg.generationTabReferenceYear}:</span>
+                            <p:inputText id="referenceYear" style="min-width: 351px;"
+                                         value="#{bean.importF24Pdf.referenceYear}"
+                                         label="#{msg.generationTabCode}"/>
+                            <span>#{msg.generationTabDebitAmountsPaid}:</span>
+                            <p:inputText id="f24Import" style="min-width: 351px;"
+                                         value="#{bean.importF24Pdf.f24Import}"
+                                         label="#{msg.generationTabDebitAmountsPaid}"/>
+
+                        </p:panelGrid>
+
+                        <div class="p-col-12" style="text-align:center;">
+                            <p:commandButton value="#{msg.save.toUpperCase()}" style="margin-left:15px;"
+                                             action="#{bean.saveImportF24}" update="@widgetVar(f24GenerationTableWV)"
+                                             oncomplete="PF('addImportF24DialogWV').hide();"
+                                             styleClass="ui-button-success p-mr-2 p-mb-2"/>
+                            <p:commandButton value="#{msg.undo.toUpperCase()}" style="background-color: #F3362B !important;"
+                                             onclick="PF('addImportF24DialogWV').hide();"/>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </p:dialog>
+
+        <p:dialog header="#{msg.deleteConfirmationHeader}" widgetVar="deleteConfirmationWV" styleClass="dialog-green dialog-green-width"
+                  modal="true" resizable="false" effect="SLIDE" style="overflow: unset !important;">
+            #{msg.deleteConfirmation}<br/>
+            <br/>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" action="#{bean.delete}" style="margin-right: 10px;background-color: #00CC52!important;" update="wizard:f24GenerationTable"
+                                 oncomplete="PF('deleteConfirmationWV').hide()"/>
+                <p:commandButton value="#{msg.cancel}" onclick="PF('deleteConfirmationWV').hide()" style="background-color: #F3362B !important;"/>
+            </div>
+        </p:dialog>
+
+        <p:dialog id="requestsOtherThanEvasaDialog" widgetVar="requestsOtherThanEvasaDialogWV" modal="true" styleClass="dialog-orange"
+                  resizable="false" draggable="false" effect="SLIDE" header="" width="400">
+            <span>
+                <h:outputText value="#{bean.notAllRequestsFulfilled}"/>
+            </span>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.ok}" update="invoiceAlreadyCreatedDialog otherRequestsExistsForInvoiceDialog @widgetVar(mailManagerViewRequestsForInvoiceDlg) @widgetVar(requestsTableConsideredForInvoiceWV)" styleClass="confirm-button"
+                                 style="margin-right: 15px;" action="#{bean.preCheckDocument}"
+                                 oncomplete="PF('requestsOtherThanEvasaDialogWV').hide();"/>
+                <p:commandButton value="#{msg.cancel}" oncomplete="PF('requestsOtherThanEvasaDialogWV').hide();"
+                                 style="background-color: #F3362B !important; width: 100px;" update="@form" />
+            </div>
+        </p:dialog>
+
+        <p:dialog id="invoiceAlreadyCreatedDialog" widgetVar="invoiceAlreadyCreatedDialogWV" modal="true" styleClass="dialog-green"
+                  resizable="false" draggable="false" effect="SLIDE" header="">
+            <span>
+                <h:outputText value="#{bean.invoiceAlreadyCreated}"/>
+            </span>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.ok}" update="@form" styleClass="confirm-button"
+                                 style="margin-right: 15px;" action="#{bean.preCheckDocumentOtherRequests}"
+                                 oncomplete="PF('invoiceAlreadyCreatedDialogWV').hide();"/>
+                <p:commandButton value="#{msg.cancel}" oncomplete="PF('invoiceAlreadyCreatedDialogWV').hide();"
+                                 style="background-color: #F3362B !important; width: 100px;" update="@form" />
+            </div>
+        </p:dialog>
+
+        <p:dialog id="otherRequestsExistsForInvoiceDialog" widgetVar="otherRequestsExistsForInvoiceDialogWV" modal="true" styleClass="dialog-green"
+                  resizable="false" draggable="false" effect="SLIDE" header="">
+            <span>
+                <h:outputText value="#{bean.otherRequestsExistsForInvoice}"/>
+            </span>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.yes}"  styleClass="confirm-button"
+                                 style="margin-right: 15px;" action="#{bean.checkDocument(true)}" oncomplete="PF('otherRequestsExistsForInvoiceDialogWV').hide();"
+                                 update="@widgetVar(mailManagerViewRequestsForInvoiceDlg) @widgetVar(requestsTableConsideredForInvoiceWV)"/>
+                <p:commandButton value="#{msg.no}" oncomplete="PF('otherRequestsExistsForInvoiceDialogWV').hide();" action="#{bean.checkDocument(false)}"
+                                 style="background-color: #F3362B !important;"
+                                 update="@widgetVar(mailManagerViewRequestsForInvoiceDlg) @widgetVar(requestsTableConsideredForInvoiceWV)" />
+            </div>
+        </p:dialog>
+
+        <p:dialog id="invoiceOpenErrorDialog" widgetVar="invoiceOpenErrorDialogWV" modal="true" styleClass="dialog-red"
+                  resizable="false" draggable="false" effect="SLIDE"
+                  header="">
+            <span>
+                <h:outputText value="#{msg.openInvoiceErrorMsg}"/>
+            </span>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.close}" styleClass="confirm-button"
+                                 style="background-color: #F3362B !important;margin-right: 15px;"
+                                 oncomplete="PF('invoiceOpenErrorDialogWV').hide();"/>
+            </div>
+        </p:dialog>
+
+        <p:dialog id="nullTaxRateErrorDialog" widgetVar="nullTaxRateErrorDialogWV" modal="true" position="center center"
+                  resizable="false" draggable="false" effect="SLIDE">
+            <div class="ui-messages-error ui-corner-all">
+	            <span class="ui-messages-error-summary" style="margin-left:0px !important;">
+	            	<h:outputText value="#{bean.invoiceErrorMessage}" escape="false"/>
+	            </span><br/>
+            </div>
+            <div class="btn_line">
+                <p:commandButton action="#{bean.loadInvoiceDataAfterError}" oncomplete="PF('nullTaxRateErrorDialogWV').hide();"
+                                 value="#{msg.close}" style="background-color: #F3362B !important;" />
+            </div>
+        </p:dialog>
+
+        <ui:include src="../Dialogs/DocumentAreaDialog.xhtml"/>
+        <ui:include src="../Dialogs/InvoiceMissingBillingClientDialog.xhtml"></ui:include>
+        <ui:include src="../Dialogs/MailManagerViewRequestsForInvoiceDialog.xhtml"></ui:include>
+        <ui:include src="../Dialogs/InvoiceDialogBilling.xhtml"/>
+    </ui:define>
+</ui:composition>

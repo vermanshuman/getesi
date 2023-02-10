@@ -8,6 +8,7 @@ import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.Invoice;
 import it.nexera.ris.persistence.beans.entities.domain.InvoiceItem;
+import it.nexera.ris.persistence.beans.entities.domain.TaxRate;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,12 +26,14 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 public class FatturaAPI {
 
     public transient final Log log = LogFactory.getLog(getClass());
-    public String getDataForXML(Invoice invoice, List<InvoiceItem> invoiceItems) throws HibernateException, IllegalAccessException, PersistenceBeanException {
+    public String getDataForXML(Invoice invoice, List<InvoiceItem> invoiceItems) throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
         if(invoiceItems == null)
             invoiceItems = DaoManager.load(InvoiceItem.class, new Criterion[] { Restrictions.eq("invoice.id", invoice.getId()) });
         //first, get and initialize an engine
@@ -40,6 +43,11 @@ public class FatturaAPI {
         velocityEngine.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
         velocityEngine.init();
         //add data to a VelocityContext
+//        invoiceItems
+//                .stream()
+//                .filter(iv -> !ValidationHelper.isNullOrEmpty(iv.getDescription())
+//                        && iv.getDescription().contains("&"))
+//                .forEach(iv -> iv.setXmlDescription(iv.getDescription().replaceAll("&", "E")));
         VelocityContext context = addDataToVelocityContext(invoice, invoiceItems);
         //get the Template
         Template template = velocityEngine.getTemplate(FileHelper.getFatturaAPITemplatePath());
@@ -49,24 +57,36 @@ public class FatturaAPI {
         return writer.toString();
     }
 
-    public String getDataForXML(Invoice invoice) throws HibernateException, IllegalAccessException, PersistenceBeanException {
+    public String getDataForXML(Invoice invoice) throws HibernateException, IllegalAccessException, PersistenceBeanException, InstantiationException {
         return getDataForXML(invoice, null);
     }
 
-    public VelocityContext addDataToVelocityContext(Invoice invoice, List<InvoiceItem> invoiceItems) {
+    public VelocityContext addDataToVelocityContext(Invoice invoice, List<InvoiceItem> invoiceItems) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         VelocityContext context = new VelocityContext();
-        context.put("documentType", invoice.getDocumentType());
+        if(!ValidationHelper.isNullOrEmpty(invoice.getDocumentType()))
+            context.put("documentType", invoice.getDocumentType());
+        else
+            context.put("documentType", "FE");
         String customerName = invoice.getClient().getNameOfTheCompany();
         if(!(customerName != null && !customerName.equals("")))
             customerName = invoice.getClient().getNameProfessional();
         context.put("customerName", customerName);
-        String customerAddress = invoice.getClient().getAddressHouseNumber() != null ? invoice.getClient().getAddressHouseNumber() : ""
-                + invoice.getClient().getAddressStreet() != null ? invoice.getClient().getAddressStreet() : "";
+        String customerAddress = "";
+        if(!ValidationHelper.isNullOrEmpty(invoice.getClient())){
+            if(!ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressStreet())){
+                customerAddress = invoice.getClient().getAddressStreet();
+            }
+            if(!ValidationHelper.isNullOrEmpty(invoice.getClient().getAddressHouseNumber())){
+                customerAddress += invoice.getClient().getAddressHouseNumber();
+            }
+        }
         context.put("customerAddress", customerAddress);
         context.put("customerPostcode", invoice.getClient().getAddressPostalCode());
-        context.put("customerCity", invoice.getClient().getAddressCityId() != null ? invoice.getClient().getAddressCityId().getDescription() : "");
-        context.put("customerProvince", invoice.getClient().getAddressProvinceId() != null ? invoice.getClient().getAddressProvinceId().getCode() : "");
-        context.put("customerCountry", invoice.getClient().getCountry() != null ? invoice.getClient().getCountry().getDescription() : "");
+        context.put("customerCity", invoice.getClient().getAddressCityId() != null
+                ? invoice.getClient().getAddressCityId().getDescription() : "");
+        context.put("customerProvince", invoice.getClient().getAddressProvinceId() != null
+                ? invoice.getClient().getAddressProvinceId().getCode() : "");
+        context.put("customerCountry", "IT");
         context.put("customerFiscalCode", invoice.getClient().getFiscalCode());
         context.put("customerVatCode", invoice.getClient().getNumberVAT());
         context.put("customerCellPhone", invoice.getClient().getPhone());
@@ -89,8 +109,10 @@ public class FatturaAPI {
         context.put("sendEmail", false);
         context.put("invoiceItems", invoiceItems);
         context.put("numero", invoice.getInvoiceNumber());
-        if(!ValidationHelper.isNullOrEmpty(invoice.getNotes()))
+        if(!ValidationHelper.isNullOrEmpty(invoice.getNotes())){
             context.put("invoiceNote", invoice.getNotes());
+        }
+
         else
             context.put("invoiceNote", "");
         if(!ValidationHelper.isNullOrEmpty(invoice.getDate())){
@@ -102,6 +124,7 @@ public class FatturaAPI {
     }
 
     public FatturaAPIResponse callFatturaAPI(String xmlSource, Log log) {
+        log.info("Invoice XMLData : " + xmlSource);
         String apiURL =
                 ApplicationSettingsHolder.getInstance().getByKey(
                         ApplicationSettingsKeys.CLOUD_API_URL).getValue().trim();
@@ -131,23 +154,39 @@ public class FatturaAPI {
     public Double getTotalAmount(List<InvoiceItem> invoiceItems) {
         Double totalAmount = 0D;
         for(InvoiceItem item : invoiceItems){
-            if(!ValidationHelper.isNullOrEmpty(item.getAmount()))
-                totalAmount += item.getAmount();
+            if(!ValidationHelper.isNullOrEmpty(item.getInvoiceTotalCost()))
+                totalAmount += item.getInvoiceTotalCost();
         }
-
+        BigDecimal tot = BigDecimal.valueOf(totalAmount);
+        tot = tot.setScale(2, RoundingMode.HALF_UP);
+        totalAmount = tot.doubleValue();
         return totalAmount;
     }
 
-    public Double getTotalVat(List<InvoiceItem> invoiceItems) {
+    public Double getTotalVat(List<InvoiceItem> invoiceItems) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         Double totalVat = 0D;
-        for(InvoiceItem item : invoiceItems)
-            if(!ValidationHelper.isNullOrEmpty(item.getVatAmount()))
-                totalVat += item.getVatAmount();
+        for (InvoiceItem item : invoiceItems) {
+            if (!ValidationHelper.isNullOrEmpty(item.getInvoiceTotalCost())) {
+                if (!ValidationHelper.isNullOrEmpty(item.getTaxRate())) {
+                    TaxRate taxrate = DaoManager.get(TaxRate.class, item.getTaxRate().getId());
+                    if (!ValidationHelper.isNullOrEmpty(taxrate.getPercentage())) {
+                        totalVat += item.getInvoiceTotalCost().doubleValue() * (taxrate.getPercentage().doubleValue() / 100);
+                    }
+                }
+            }
+        }
+        BigDecimal tot = BigDecimal.valueOf(totalVat);
+        tot = tot.setScale(2, RoundingMode.HALF_UP);
+        totalVat = tot.doubleValue();
         return totalVat;
     }
 
-    public Double getTotalGrossAmount(List<InvoiceItem> invoiceItems) {
-        return getTotalAmount(invoiceItems) + getTotalVat(invoiceItems);
+    public Double getTotalGrossAmount(List<InvoiceItem> invoiceItems) throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        Double totalGross = getTotalAmount(invoiceItems) + getTotalVat(invoiceItems);
+        BigDecimal tot = BigDecimal.valueOf(totalGross);
+        tot = tot.setScale(2, RoundingMode.HALF_UP);
+        totalGross = tot.doubleValue();
+        return totalGross;
     }
 
 }

@@ -5,6 +5,7 @@ import it.nexera.ris.common.comparators.EstimateOMIComparator;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
+import it.nexera.ris.persistence.beans.entities.domain.CategoryFiscalValue;
 import it.nexera.ris.persistence.beans.entities.domain.CommercialValueHistory;
 import it.nexera.ris.persistence.beans.entities.domain.EstimateOMIHistory;
 import it.nexera.ris.persistence.beans.entities.domain.Property;
@@ -33,7 +34,7 @@ public class PropertyEntityHelper {
                                 Restrictions.eq("city", property.getCity()),
                                 Restrictions.eq("type", property.getType()),
                                 Restrictions.eq("category", property.getCategory()),
-                                Restrictions.eq("cData.id", property.getCadastralData().get(0).getId())});
+                                Restrictions.eq("cData.id", property.getCadastralData().stream().findFirst().orElse(null).getId())});
 
                 if (!ValidationHelper.isNullOrEmpty(properties)) {
                     return properties;
@@ -50,6 +51,11 @@ public class PropertyEntityHelper {
                 .flatMap(List::stream).sorted(new EstimateOMIComparator()).collect(Collectors.toList());
 
         return ValidationHelper.isNullOrEmpty(list) ? "" : list.get(0).getEstimateOMI();
+    }
+
+    public static String getLastEstimateOMIRequestText(Property property) {
+        List<EstimateOMIHistory> list = property.getEstimateOMIHistory();
+        return ValidationHelper.isNullOrEmpty(list) ? "" : list.get(list.size()-1).getEstimateOMI();
     }
 
     public static List<String> getTwoEstimateOMIRequestText(Property property) {
@@ -75,6 +81,11 @@ public class PropertyEntityHelper {
         return ValidationHelper.isNullOrEmpty(list) ? "" : list.get(0).getCommercialValue();
     }
 
+    public static String getLastEstimateLastCommercialValueRequestText(Property property) {
+        List<CommercialValueHistory> list = property.getCommercialValueHistory();
+        return ValidationHelper.isNullOrEmpty(list) ? "" : list.get(list.size()-1).getCommercialValue();
+    }
+
     public static List<Property> getPropertiesByFormalityIdThroughSectionB(Long formalityId)
             throws PersistenceBeanException, IllegalAccessException {
         return DaoManager.load(Property.class, new CriteriaAlias[]{
@@ -82,5 +93,30 @@ public class PropertyEntityHelper {
         }, new Criterion[]{
                 Restrictions.eq("sB.formality.id", formalityId)
         });
+    }
+
+    public static String getFiscalValue(Property property) {
+
+        List<CategoryFiscalValue> categoryFiscalValues = null;
+        try {
+            categoryFiscalValues = DaoManager.load(CategoryFiscalValue.class, new CriteriaAlias[]{
+                    new CriteriaAlias("cadastralCategory", "cC", JoinType.INNER_JOIN)
+            }, new Criterion[]{
+                    Restrictions.eq("cC.id", property.getCategory().getId())
+            });
+            if(categoryFiscalValues != null && categoryFiscalValues.size() > 0){
+                String revenue = property.getRevenue()
+                        .replaceAll("\\.", "").replaceAll("\\,", "\\.");
+
+                return InvoiceHelper.format(categoryFiscalValues.get(0).getValue()
+                        * Double.parseDouble(revenue));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(log, e);
+        }
+
+        return null;
     }
 }

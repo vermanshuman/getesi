@@ -11,6 +11,7 @@ import it.nexera.ris.persistence.beans.entities.domain.Property;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.CadastralCategory;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
@@ -91,6 +92,8 @@ public class PropertyXMLWrapper extends BaseXMLWrapper<Property> {
 
     private String sectionCity;
 
+    private List<String> consistencyDataAlt = new LinkedList<>();
+
     @Override
     public Property toEntity()
             throws HibernateException, InstantiationException,
@@ -131,8 +134,24 @@ public class PropertyXMLWrapper extends BaseXMLWrapper<Property> {
             sum += Double.parseDouble(temp.replaceAll(",", "."));
         }
         property.setCadastralIncome(sum.toString());
+
         property.setClassRealEstate(getClassRealEstate());
-        property.setConsistency(getConsistency());
+        if(!ValidationHelper.isNullOrEmpty(getConsistencyDataAlt())){
+            sum = 0d;
+            for (String temp : getConsistencyDataAlt()) {
+                if (temp.length() > NUMBER_OF_THOUSANDS_DIGITS) {
+                    temp = temp.replaceAll("\\.", "");
+                }
+                sum += Double.parseDouble(temp.replaceAll(",", "."));
+            }
+            String consistency = Double.toString(sum);
+            if(consistency.endsWith(".00") || consistency.endsWith(".0")){
+                consistency = consistency.substring(0, consistency.lastIndexOf("."));
+            }
+            property.setConsistency(consistency + " MQ");
+        }else
+            property.setConsistency(getConsistency());
+
         property.setDeduction(getDeduction());
         property.setMicroZone(getMicroZone());
         property.setNumberOfRooms(getNumberOfRooms());
@@ -345,7 +364,14 @@ public class PropertyXMLWrapper extends BaseXMLWrapper<Property> {
                     break;
 
                 case CITY_CODE_POSTFIX:
-                    setSectionCity(value);
+                    if(StringUtils.isBlank(getSectionCity())){
+                        setSectionCity(value);
+                    }
+                    break;
+
+                case CITY_CODE_POSTFIX_ALT:
+                    if(StringUtils.isNotBlank(value))
+                        setSectionCity(value);
                     break;
 
                 case CLASS_REAL_ESTATE:
@@ -357,9 +383,10 @@ public class PropertyXMLWrapper extends BaseXMLWrapper<Property> {
                     break;
 
                 case CONSISTENCY_ALT:
-                    if(!ValidationHelper.isNullOrEmpty(value))
-                        value += " MQ";
-                    setConsistency(value);
+                    if(!ValidationHelper.isNullOrEmpty(value)){
+                        getConsistencyDataAlt().add(value.replaceAll("\\.", ""));
+                    }
+
                     break;
 
                 case DEDUCTION:
@@ -518,14 +545,6 @@ public class PropertyXMLWrapper extends BaseXMLWrapper<Property> {
 
     public void setClassRealEstate(String classRealEstate) {
         this.classRealEstate = classRealEstate;
-    }
-
-    public String getConsistency() {
-        return consistency;
-    }
-
-    public void setConsistency(String consistency) {
-        this.consistency = consistency;
     }
 
     public String getDeduction() {
@@ -702,5 +721,21 @@ public class PropertyXMLWrapper extends BaseXMLWrapper<Property> {
 
     public void setExclusedArea(Double exclusedArea) {
         this.exclusedArea = exclusedArea;
+    }
+
+    public String getConsistency() {
+        return consistency;
+    }
+
+    public void setConsistency(String consistency) {
+        this.consistency = consistency;
+    }
+
+    public List<String> getConsistencyDataAlt() {
+        return consistencyDataAlt;
+    }
+
+    public void setConsistencyDataAlt(List<String> consistencyDataAlt) {
+        this.consistencyDataAlt = consistencyDataAlt;
     }
 }

@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:h="http://java.sun.com/jsf/html">
+    <script>
+        function openConservatoryPage(){
+            var ids = document.getElementById('selectedCOnservatories').value;
+            console.log('cons :', ids);
+            if(ids &amp;&amp; ids.length > 0){
+                var idArray = ids.split(",");
+                for (var i = 0; i &lt; idArray.length; i++) {
+                    window.open("../ConfigurationArea/ConservatoryList.jsf?from=request&amp;conservatory_id=" + idArray[i],idArray[i]);
+                }
+            }
+        }
+    </script>
+    <style>
+        #verificaConservatoria_content {
+            border: none;
+            padding-top: 16px;
+        }
+    </style>
+<!--    action="#{bean.openConservancyVerification}"-->
+    <p:panel id="verificaConservatoria" style="background: transparent; border: none" styleClass="ui-g-12">
+        <h:inputHidden id="selectedCOnservatories" value="#{bean.selectedConserItemIds}"/>
+        <p:commandButton value="#{msg.conservancyVerification}"
+                         disabled="#{empty bean.wrapper.selectedConserItemId}" onclick="openConservatoryPage()"/>
+
+    </p:panel>
+</ui:composition>

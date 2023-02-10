@@ -79,7 +79,9 @@ public class CommunicationMessageEditBean extends EntityEditPageBean<Communicati
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException {
         setDualListOfRoles(new DualListModel<>(DaoManager.load(Role.class), new ArrayList<Role>()));
         setDualListOfUsers(new DualListModel<>(DaoManager.load(User.class, new Criterion[] {
-                Restrictions.eq("category", UserCategories.ESTERNO)
+                Restrictions.eq("category", UserCategories.ESTERNO),
+                Restrictions.isNotNull("getesi"),
+                Restrictions.eq("getesi", Boolean.TRUE)
         }), new ArrayList<>()));
         Hibernate.initialize(getEntity().getAttachedFiles());
         setAttachedFiles(new ArrayList<>());

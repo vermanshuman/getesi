@@ -50,12 +50,9 @@ public class RequestView extends IndexedView {
     public static final String CREATE_PART = "CREATE OR REPLACE VIEW request_subject_view ";
 
     public static final String FROM_PART = "FROM request request " +
-           // "left join dic_service on request.service_id = dic_service.id " +
-            //"inner join dic_request_type on request.request_type_id = dic_request_type.id " +
-           // "left join dic_aggregation_land_char_reg on request.aggregation_land_char_reg_id = dic_aggregation_land_char_reg.id " +
             "left join formality on formality.id = request.distraint_act_id " +
-            //"left join wlg_inbox on wlg_inbox.id = request.mail_id " +
-            //"left join inbox_manager on inbox_manager.inbox_id = wlg_inbox.id " +
+            "left join request_managed_by AS rmb ON rmb.request_id = request.id  "+
+            "left join wlg_inbox on wlg_inbox.id = request.mail_id " +
             "left join section_c on section_c.formality_id = formality.id " +
             "left join subject_section_c on subject_section_c.section_c_id = section_c.id " +
             "left join subject on ifnull(request.subject_id,subject_section_c.subject_id) = subject.id ";
@@ -72,16 +69,12 @@ public class RequestView extends IndexedView {
             + "request.user_area_id user_area_id, "
             + "request.user_office_id user_office_id, "
             + "request.request_type_id request_type_id, "
-            //+ "dic_request_type.name request_type_name,"
-            //+ "dic_request_type.icon request_type_icon,"
             + "request.service_id service_id, "
-           // + "dic_service.name service_name, "
-           // + "dic_service.icon service_icon, "
-           // + "dic_service.is_Update service_is_Update, "
-            //+ "dic_aggregation_land_char_reg.name aggregation_land_char_reg_name, "
             + "request.subject_id subject_id, "
             + "request.state_id state_id, "
+            + "request.state_brexa state_brexa, "
             + "request.user_id user_id, "
+            + "request.user_brexa user_brexa, "
             + "request.city_id city_id, "
             + "request.mail_id mail_id, "
             + "request.number_act_update number_act_update, "
@@ -96,10 +89,11 @@ public class RequestView extends IndexedView {
             + "subject.type_id type_id, "
             + "request.province_id province_id, "
             + "request.invoice_id invoice_id, "
-            //+ "wlg_inbox.client_fiduciary_id fiduciary_id, "
-           // + "inbox_manager.client_id manager_id, "
             + "section_c.section_c_type section_c_type, "
-            + "request.distraint_act_id distraint_act_id ";
+            + "request.distraint_act_id distraint_act_id, "
+            + "request.visible_external visible_external, "
+            + "rmb.managed_by managed_by, "
+            + "wlg_inbox.external_brexa inbox_external_brexa ";
 
     private static final String GROUP_BY_PART = " group by ID ";
 
@@ -113,6 +107,7 @@ public class RequestView extends IndexedView {
             + FROM_PART
             + "where ((subject.last_name is not null and not subject.last_name='') or (subject.first_name is not null and not subject.first_name='') or (subject.type_id is null)) "
             + "and (section_c_type = 'Contro' or section_c_type is null)"
+            + " and ( SELECT MAX(id) FROM request_managed_by WHERE request_id = request.id ) IS NULL OR rmb.id = ( SELECT MAX(id) FROM request_managed_by WHERE request_id = request.id  ) "
             + GROUP_BY_PART
 
             + " UNION ALL "
@@ -125,6 +120,7 @@ public class RequestView extends IndexedView {
             + FROM_PART
             + "where ((subject.business_name is not null and not subject.business_name='') or (subject.business_name is not null and not subject.business_name='')) "
             + "and (section_c_type = 'Contro' or section_c_type is null)"
+            + " and ( SELECT MAX(id) FROM request_managed_by WHERE request_id = request.id ) IS NULL OR rmb.id = ( SELECT MAX(id) FROM request_managed_by WHERE request_id = request.id  ) "
             + GROUP_BY_PART
             + ") as rqsts group by rqsts.ID";
 
@@ -172,7 +168,7 @@ public class RequestView extends IndexedView {
 
     @Column(name = "name")
     private String name;
-    
+
     @Column(name = "reverse_name")
     private String reverseName;
 
@@ -182,17 +178,26 @@ public class RequestView extends IndexedView {
     @Column(name = "state_id")
     private Long stateId;
 
+    @Column(name = "state_brexa")
+    private Long stateIdBrexa;
+
     @Column(name = "subject_id")
     private Long subjectId;
 
     @Column(name = "user_id")
     private Long userId;
 
+    @Column(name = "user_brexa")
+    private Long userIdBrexa;
+
     @Column(name = "aggregation_land_char_reg_id")
     private Long aggregationLandChargesRegistryId;
 
     @Transient
     private User user;
+
+    @Transient
+    private User userBrexa;
 
     @Column(name = "mail_id")
     private Long mailId;
@@ -208,7 +213,7 @@ public class RequestView extends IndexedView {
 
     @Column(name = "city_id")
     private Long cityId;
-    
+
     @Column(name = "province_id")
     private Long provinceId;
 
@@ -242,11 +247,14 @@ public class RequestView extends IndexedView {
     @Column(name = "invoice_id")
     private Long invoiceId;
 
-    //    @Column(name = "fiduciary_id")
-//    private Long fiduciaryId;
-//    
-//    @Column(name = "manager_id")
-//    private Long managerId;
+    @Column(name = "visible_external")
+    private Boolean visibleExternal;
+
+    @Column(name = "managed_by")
+    private Integer managedBy;
+
+    @Column(name = "inbox_external_brexa")
+    private Boolean externalBrexa;
 
     @Transient
     private Boolean haveDocuments;
@@ -265,13 +273,13 @@ public class RequestView extends IndexedView {
 
     @Transient
     private Office office;
-    
+
     @Transient
     private String clientNameProfessional;
-    
+
     @Transient
     private int documentsCount;
-    
+
     @Transient
     private String serviceName;
 
@@ -280,21 +288,33 @@ public class RequestView extends IndexedView {
 
     @Transient
     private Boolean serviceIsUpdate;
-    
+
     @Transient
     private String requestTypeName;
 
     @Transient
     private String requestTypeIcon;
-    
+
     @Transient
     private String aggregationLandCharRegName;
-    
+
     @Transient
     private Long fiduciaryId;
-    
+
     @Transient
     private Long managerId;
+
+    @Transient
+    private Boolean manageTranscription;
+
+    @Transient
+    private Boolean manageCertification;
+
+    @Transient
+    private Boolean manageRenewal;
+
+    @Transient
+    private String textInVisura;
 
     public Boolean getHaveDocuments() {
         if (haveDocuments == null) {
@@ -361,11 +381,47 @@ public class RequestView extends IndexedView {
         return state == null ? "" : state.toString();
     }
 
+    public String getStateDescriptionBrexa() {
+        RequestState state = RequestState.getById(getStateIdBrexa());
+        return state == null ? "" : state.toString();
+    }
+
+    public String getStateDescriptionBrexaOrGetesi() {
+        String stateDescriptionBrexa = getStateDescriptionBrexa();
+        String stateDescriptionGetesi = getStateDescription();
+        if(!ValidationHelper.isNullOrEmpty(stateDescriptionBrexa)) {
+            return stateDescriptionBrexa;
+        } else if(!ValidationHelper.isNullOrEmpty(stateDescriptionGetesi)) {
+            return stateDescriptionGetesi;
+        } else {
+            return "";
+        }
+    }
+
     public String getUserName() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         if (user == null && userId != null) {
             user = DaoManager.get(User.class, userId);
         }
         return user == null ? "" : user.getFullname();
+    }
+
+    public String getUserNameBrexa() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        if (userBrexa == null && userIdBrexa != null) {
+            userBrexa = DaoManager.get(User.class, userIdBrexa);
+        }
+        return userBrexa == null ? "" : userBrexa.getFullname();
+    }
+
+    public String getUserNameBrexaOrGetesi() throws IllegalAccessException, InstantiationException, PersistenceBeanException {
+        String userBrexa = getUserName();
+        String userGetesi = getUserNameBrexa();
+        if(!ValidationHelper.isNullOrEmpty(userBrexa)) {
+            return userBrexa;
+        } else if(!ValidationHelper.isNullOrEmpty(userGetesi)) {
+            return userGetesi;
+        } else {
+            return "";
+        }
     }
 
     public String getServicesNames() {
@@ -378,7 +434,7 @@ public class RequestView extends IndexedView {
             return "";
         }
     }
-    
+
     public List<Service> getMultipleServices() {
         try {
             return DaoManager.get(Request.class, getId())
@@ -390,7 +446,7 @@ public class RequestView extends IndexedView {
     }
 
     public Boolean getExternal() {
-        if (isExternal == null) {
+        if (isExternal == null || createUser == null) {
             User user = null;
             if (getCreateUserId() == null) {
                 setExternal(false);
@@ -425,7 +481,7 @@ public class RequestView extends IndexedView {
             setCreateUserFullName(createUser.getFullname());
             if (getOffice() == null && !ValidationHelper.isNullOrEmpty(getUserOfficeId())) {
                 Office office = DaoManager.get(Office.class, getUserOfficeId());
-                setCreateUserFullName(String.format("%s <br/> %s - %s", createUser.getFullname(), office.getCode(),
+                setCreateUserFullName(String.format("%s - %s - %s", createUser.getFullname(), office.getCode(),
                         office.getDescription()));
             }
         }
@@ -444,13 +500,17 @@ public class RequestView extends IndexedView {
         } else {
             return getAggregationLandCharRegName();
         }
-        
+
         return "";
     }
 
     public boolean getIsInserted() {
-        if (!ValidationHelper.isNullOrEmpty(this.getStateId())
+        /*if (!ValidationHelper.isNullOrEmpty(this.getStateId())
                 && RequestState.INSERTED.getId().equals(this.getStateId())) {
+            return true;
+        }*/
+        if (!ValidationHelper.isNullOrEmpty(this.getStateIdBrexa())
+                && RequestState.INSERTED.getId().equals(this.getStateIdBrexa())) {
             return true;
         }
         return false;
@@ -503,17 +563,17 @@ public class RequestView extends IndexedView {
     public String getClientNameProfessional(Long clientId) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         if (clientNameProfessional == null && clientId != null) {
             Client client = DaoManager.get(Client.class, clientId);
-          
+
             if (client == null) {
                 clientNameProfessional = "";
             } else {
-                 if(client.getTypeId() == null || ClientType.PROFESSIONAL.getId().equals(client.getTypeId()) 
-                         && !ValidationHelper.isNullOrEmpty(client.getNameProfessional())){
-                     clientNameProfessional = client.getNameProfessional();
-                 }else if( !( client.getTypeId() == null || ClientType.PROFESSIONAL.getId().equals(client.getTypeId()) ) 
-                         && !ValidationHelper.isNullOrEmpty(client.getNameOfTheCompany())){
-                     clientNameProfessional = client.getNameOfTheCompany();
-                 }   
+                if(client.getTypeId() == null || ClientType.PROFESSIONAL.getId().equals(client.getTypeId())
+                        && !ValidationHelper.isNullOrEmpty(client.getNameProfessional())){
+                    clientNameProfessional = client.getNameProfessional();
+                }else if( !( client.getTypeId() == null || ClientType.PROFESSIONAL.getId().equals(client.getTypeId()) )
+                        && !ValidationHelper.isNullOrEmpty(client.getNameOfTheCompany())){
+                    clientNameProfessional = client.getNameOfTheCompany();
+                }
             }
         }
         return clientNameProfessional;
@@ -525,10 +585,10 @@ public class RequestView extends IndexedView {
             WLGInbox wlgInbox =  DaoManager.get(WLGInbox.class, getMailId());
             if(!ValidationHelper.isNullOrEmpty(wlgInbox) && !ValidationHelper.isNullOrEmpty(wlgInbox.getManagers())) {
                 return wlgInbox.getManagers()
-                .stream()
-                .distinct()
-                .map(w -> w.toString())
-                .collect(Collectors.joining(","));
+                        .stream()
+                        .distinct()
+                        .map(w -> w.toString())
+                        .collect(Collectors.joining(","));
             }
         }
         return null;
@@ -551,9 +611,9 @@ public class RequestView extends IndexedView {
 
     public String getRequestTypeName() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         if(!ValidationHelper.isNullOrEmpty(getRequestTypeId())) {
-            RequestType requestType = DaoManager.get(RequestType.class, getRequestTypeId()); 
+            RequestType requestType = DaoManager.get(RequestType.class, getRequestTypeId());
             if(requestType != null) {
-               setRequestTypeName(requestType.getName()); 
+                setRequestTypeName(requestType.getName());
             }
         }
         return requestTypeName;
@@ -565,9 +625,9 @@ public class RequestView extends IndexedView {
 
     public String getRequestTypeIcon() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         if(!ValidationHelper.isNullOrEmpty(getRequestTypeId())) {
-            RequestType requestType = DaoManager.get(RequestType.class, getRequestTypeId()); 
+            RequestType requestType = DaoManager.get(RequestType.class, getRequestTypeId());
             if(requestType != null) {
-               setRequestTypeIcon(requestType.getIcon()); 
+                setRequestTypeIcon(requestType.getIcon());
             }
         }
         return requestTypeIcon;
@@ -578,11 +638,14 @@ public class RequestView extends IndexedView {
     }
 
     public String getServiceName() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
-        
+
         if(!ValidationHelper.isNullOrEmpty(getServiceId())) {
-            Service service = DaoManager.get(Service.class, getServiceId()); 
+            Service service = DaoManager.get(Service.class, getServiceId());
             if(service != null) {
-               setServiceName(service.getName()); 
+                setServiceName(service.getName());
+                setManageTranscription(service.getManageTranscription());
+                setManageCertification(service.getManageCertification());
+                setManageRenewal(service.getManageRenewal());
             }
         }
         return serviceName;
@@ -596,9 +659,9 @@ public class RequestView extends IndexedView {
 
         if(!ValidationHelper.isNullOrEmpty(getAggregationLandChargesRegistryId())) {
             AggregationLandChargesRegistry aggregationLandChargesRegistry = DaoManager.get(
-                    AggregationLandChargesRegistry.class, getAggregationLandChargesRegistryId()); 
+                    AggregationLandChargesRegistry.class, getAggregationLandChargesRegistryId());
             if(aggregationLandChargesRegistry != null) {
-                setAggregationLandCharRegName(aggregationLandChargesRegistry.getName()); 
+                setAggregationLandCharRegName(aggregationLandChargesRegistry.getName());
             }
         }
         return aggregationLandCharRegName;
@@ -610,9 +673,9 @@ public class RequestView extends IndexedView {
 
     public String getServiceIcon() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         if(!ValidationHelper.isNullOrEmpty(getServiceId())) {
-            Service service = DaoManager.get(Service.class, getServiceId()); 
+            Service service = DaoManager.get(Service.class, getServiceId());
             if(service != null) {
-               setServiceIcon(service.getIcon()); 
+                setServiceIcon(service.getIcon());
             }
         }
         return serviceIcon;
@@ -826,9 +889,9 @@ public class RequestView extends IndexedView {
 
     public Boolean getServiceIsUpdate() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
         if(!ValidationHelper.isNullOrEmpty(getServiceId())) {
-            Service service = DaoManager.get(Service.class, getServiceId()); 
+            Service service = DaoManager.get(Service.class, getServiceId());
             if(service != null) {
-                setServiceIsUpdate(service.getIsUpdate()); 
+                setServiceIsUpdate(service.getIsUpdate());
             }
         }
         return serviceIsUpdate;
@@ -933,7 +996,7 @@ public class RequestView extends IndexedView {
             if(!ValidationHelper.isNullOrEmpty(invoice))
                 return invoice.getInvoiceNumber();
         }
-       return "";
+        return "";
     }
 
 
@@ -955,5 +1018,90 @@ public class RequestView extends IndexedView {
 
     public void setInvoiceId(Long invoiceId) {
         this.invoiceId = invoiceId;
+    }
+
+    public Boolean getManageTranscription() {
+        return manageTranscription;
+    }
+
+    public void setManageTranscription(Boolean manageTranscription) {
+        this.manageTranscription = manageTranscription;
+    }
+
+    public Boolean getManageCertification() {
+        return manageCertification;
+    }
+
+    public void setManageCertification(Boolean manageCertification) {
+        this.manageCertification = manageCertification;
+    }
+
+    public Boolean getVisibleExternal() {
+        return visibleExternal;
+    }
+
+    public void setVisibleExternal(Boolean visibleExternal) {
+        this.visibleExternal = visibleExternal;
+    }
+
+    public Integer getManagedBy() {
+        return managedBy;
+    }
+
+    public void setManagedBy(Integer managedBy) {
+        this.managedBy = managedBy;
+    }
+
+    public String getTextInVisura() {
+        try {
+            Request request = DaoManager.get(Request.class, this.getId());
+            if(!ValidationHelper.isNullOrEmpty(request.getSpecialFormality())
+                    && !ValidationHelper.isNullOrEmpty(request.getSpecialFormality().getTextInVisura())) {
+                textInVisura = request.getSpecialFormality().getTextInVisura();
+            }
+        }catch(Exception e){
+            LogHelper.log(log, e);
+        }
+        return textInVisura;
+    }
+
+    public Boolean getExternalBrexa() {
+        return externalBrexa;
+    }
+
+    public void setExternalBrexa(Boolean externalBrexa) {
+        this.externalBrexa = externalBrexa;
+    }
+
+    public Long getUserIdBrexa() {
+        return userIdBrexa;
+    }
+
+    public void setUserIdBrexa(Long userIdBrexa) {
+        this.userIdBrexa = userIdBrexa;
+    }
+
+    public User getUserBrexa() {
+        return userBrexa;
+    }
+
+    public void setUserBrexa(User userBrexa) {
+        this.userBrexa = userBrexa;
+    }
+
+    public Long getStateIdBrexa() {
+        return stateIdBrexa;
+    }
+
+    public void setStateIdBrexa(Long stateIdBrexa) {
+        this.stateIdBrexa = stateIdBrexa;
+    }
+
+    public Boolean getManageRenewal() {
+        return manageRenewal;
+    }
+
+    public void setManageRenewal(Boolean manageRenewal) {
+        this.manageRenewal = manageRenewal;
     }
 }

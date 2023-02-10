@@ -25,6 +25,6 @@ hs_err_pid*
 
 src/main/resources/hibernate.cfg.xml
 
-src/main/resources/project.properties
+
 
 getesi/src/main/webapp/META-INF/MANIFEST.MF

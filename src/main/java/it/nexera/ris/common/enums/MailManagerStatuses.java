@@ -17,7 +17,9 @@ public enum MailManagerStatuses {
     CANCELED(7l, false, true, false),
     SUSPENDED(8l, true, false, true),
     DELETED(9l, false, false, false),
-    PARTIAL(10l, true, false, true);
+    PARTIAL(10l, true, false, true),
+    EXTERNAL(11l, true, false, true),
+    PROFILED(12l, true, false, true);
 
     private Long id;
 

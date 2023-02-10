@@ -28,6 +28,9 @@
         <ui:insert name="head"/>
         <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/main.css"
               media="all" rel="stylesheet" type="text/css"/>
+        <script type="text/javascript">
+            var timerStart = Date.now();
+        </script>
     </h:head>
 
     <h:body styleClass="outlined">
@@ -45,7 +48,7 @@
                     </h:panelGroup>
                     <ui:insert name="content"/>
                 </div>
-                <h:panelGroup layout="block" styleClass="layout-footer" rendered="#{empty renderFooterMenu ? true : renderFooterMenu}">
+                <h:panelGroup layout="block" styleClass="ui-g-12 layout-footer" rendered="#{empty renderFooterMenu ? true : renderFooterMenu}">
                     <ui:include src="/Pages/home/footer.xhtml"/>
                 </h:panelGroup>
             </div>
@@ -60,7 +63,13 @@
                 </f:facet>
             </p:ajaxStatus>
 
-            <div class="layout-mask"></div>
+            <div class="layout-mask" style="background-color: rgba(0, 0, 0, 0.4) !important;">
+                <div class="layout-ajax-loader">
+                    <div>
+                        <i class="pi pi-spin pi-spinner layout-ajax-loader-icon" aria-hidden="true"></i>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <h:outputStylesheet name="css/primeicons.css" library="babylon-layout" />

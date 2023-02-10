@@ -18,4 +18,6 @@ public class WorkLoadWrapper {
     private long numberUnclosedRequestsInWork;
 
     private long total;
+
+    private String barColor;
 }

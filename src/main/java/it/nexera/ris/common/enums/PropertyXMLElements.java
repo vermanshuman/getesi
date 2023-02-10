@@ -42,6 +42,7 @@ public enum PropertyXMLElements implements XMLElements {
     CATEGORY_CODE("DatiClassamentoF.Categoria", true),
     CITY_CODE("GruppoUnitaImmobiliari.CodiceComune", false),
     CITY_CODE_POSTFIX("GruppoUnitaImmobiliari.Sezione", false),
+    CITY_CODE_POSTFIX_ALT("IdentificativoDefinitivo.SezCensuaria", false),
     PROVINCE_CODE("DatiRichiesta.Provincia", true),
     ARISING_FROM_DATA("DatiDerivantiDa", false),
     QUOTE("DirittiReali.Quota", false),
@@ -49,10 +50,10 @@ public enum PropertyXMLElements implements XMLElements {
     FLOOR("Piano", true),
     /* Tags for new fromat */
     DATA_FROM_ALT("DatiDerivantiDa.Descrizione", false),
-    CONSISTENCY_ALT("ClassamentoT.SuperficieMQ", false),
+    CONSISTENCY_ALT("ClassamentoT.SuperficieMQ", false, true),
     AGRICULTURAL_INCOME_ALT("ClassamentoT.RedditoAgrarioEuro", false, true),
     CADASTRAL_INCOME_ALT("ClassamentoT.RedditoDominicaleEuro", false, true),
-    QUALITY_ALT("ClassamentoT.Qualita", false),;
+    QUALITY_ALT("ClassamentoT.Qualita", false);
 
     private String element;
 

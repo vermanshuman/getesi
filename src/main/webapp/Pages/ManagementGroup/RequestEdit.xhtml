@@ -4,10 +4,12 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://java.sun.com/jsf/html"
                 xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ff="http://readytech.com/functions"
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:c="http://java.sun.com/jsp/jstl/core"
                 template="/resources/tpl/Admin/ViewBase.xhtml">
     <ui:param name="bean" value="#{requestEditBean}"/>
+    <ui:param name="requestBean" value="#{requestListBean}"/>
     <ui:param name="view_title" value="#{bean.entity.isNew ? msg.requestNew : msg.requestEdit}"/>
     <ui:param name="goBackRendered" value="false"/>
 
@@ -17,7 +19,7 @@
                 width: 100% !important;
             }
 
-            body .ui-button {
+            body .ui-button:not(#editButton)  {
                 margin-right: 3px !important;
                 background: #3582b8;
             }
@@ -40,11 +42,11 @@
                 color: #2196F3 !important;
             }
 
-            body .ui-widget, body .ui-widget .ui-widget {
+            /* body .ui-widget, body .ui-widget .ui-widget {
                 font-family: "Open Sans","Helvetica Neue",sans-serif !important;
                 text-decoration: none !important;
                 font-size: 14px;
-            }
+            } */
 
             body .ui-tabmenu .ui-tabmenu-nav .ui-tabmenuitem {
                 list-style: none;
@@ -109,18 +111,231 @@
             body .ui-button.ui-button-success {
                 background: #00CC52 !important;
             }
-            #changeUserDlg {
-                border: 2px solid #57c279;
-            }
-            #changeUserDlg .ui-dialog-titlebar {
-                border-bottom: none;
-                background: #f8f9fa !important;
-                color: #000;
-            }
+
             .dynamic-fields input{
                 width : 98% !important;
             }
+
+            body .custom-design-tooltip .ui-tooltip-text {
+                background: #D9E0E7;
+                color: #6688AA;
+                border: 10px solid #68a;
+                border-radius: 10px;
+                padding: 10px !important;
+                box-shadow: none;
+                position: relative;
+                top: 20px;
+                min-width: 220px !important;
+            }
+
+            body .custom-design-tooltip .ui-tooltip-arrow {
+                display: none;
+            }
+
+            body a {
+                color: #003871 !important;
+            }
+            #requestSaved .ui-dialog-titlebar.ui-widget-header {
+                display: none;
+            }
+            #requestSaved .ui-dialog-content.ui-widget-content {
+                padding-top: 25px;
+            }
+            #requestSaved_modal {
+                background: rgba(255, 255, 255, 0.6) !important;
+            }
+
+            #multipleServiceRequest .ui-inputfield.ui-state-hover{
+                border: none !important;
+            }
+            #multipleServiceRequest .ui-inputfield.ui-state-hover{
+                border: none !important;
+            }
+
+            #table_paginator_top, #table_paginator_bottom {
+                text-align: center;
+                padding-bottom: 4px !important;
+                padding: 8px 35px;
+            }
+
+            .ui-paginator-rpp-options {
+                float: left;
+                margin-top: 6px !important;
+            }
+
+            .ui-paginator-current {
+                margin-top: 2px !important;
+            }
+
+            body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+                background: #FFF !important;
+                color: #000000 !important;
+            }
+
+            #table table {
+                margin-top: 20px;
+                padding-left: 13px;
+                padding-right: 13px;
+                border-collapse: separate;
+                border-spacing: 0 0.6em;
+            }
+
+            body .ui-datatable:not(.borderless) thead th {
+                background-color: #D9E0E7 !important;
+                border-color: #808080 !important;
+                color: #5f666c !important;
+                padding: 8px 2px !important;
+                border-width: 1px!important;
+                border-style: solid!important;
+            }
+
+
+            #table_data td {
+                color: #003871;
+                border-top: none;
+                border-bottom: none;
+                background-color: #ffffff !important;
+            }
+
+            #table_data td:nth-child(1) {
+                border-left: none;
+                border-top-left-radius: 5px;
+                border-bottom-left-radius: 5px;
+                vertical-align: top;
+            }
+
+            #table_data td:last-child {
+                border-right: none;
+                border-top-right-radius: 5px;
+                border-bottom-right-radius: 5px;
+                -webkit-box-shadow: 4px 0px 7px -2px rgba(0, 0, 0, 0.75);
+                -moz-box-shadow: 4px 0px 7px -2px rgba(0, 0, 0, 0.75);
+                box-shadow: 4px 0px 7px -2px rgba(0, 0, 0, 0.75);
+            }
+
+            #table_data tr {
+                background-color: transparent !important;
+                border-top: none;
+                -webkit-box-shadow: 0px 4px 7px -2px rgba(0, 0, 0, 0.75);
+                -moz-box-shadow: 0px 4px 7px -2px rgba(0, 0, 0, 0.75);
+                box-shadow: 0px 4px 7px -2px rgba(0, 0, 0, 0.75);
+            }
+
+            #table_data tr {
+                margin-bottom: 8px;
+                border-left: none;
+            }
+
+            #table_data {
+                border: none;
+                background: transparent;
+            }
+
+            body .ui-widget, body .ui-widget .ui-widget {
+                font-weight: 400 !important;
+            }
+
+            .status-icon {
+                height: 24px;
+                width: 142px;
+                padding-right: 4px;
+                padding-left: 4px;
+                border-radius: 10px;
+                text-align: center;
+                box-sizing: border-box;
+                font-size: 12px;
+                font-weight: 600;
+                font-family: 'Mukta', sans-serif;
+            }
+
+            .status-green {
+                border: 2px solid #00C347;
+                color: #00C347;
+            }
+            #newRequestList_content .ui-panelgrid-cell.ui-grid-col-12 {
+                padding: 1rem 0px;
+            }
+            .h35.ui-selectcheckboxmenu-multiple .ui-selectcheckboxmenu-multiple-container {
+                height: 35px !important;
+            }
+            .h38 {
+                height: 38px;
+            }
+            .h38 .ui-selectonemenu-label {
+                padding: 0.6rem 0.5rem !important;
+            }
+            .ih_36 .ui-inputfield.ui-inputtext{
+                height: 36px;
+                width: 100% !important;
+            }
+            .select-width, .ih_36 {
+                margin-bottom: 20px;
+            }
+            .input-width {
+                width: 100% !important;
+            }
+            .extended-note {
+                width: 45.55%;
+                overflow: visible;
+                position: absolute;
+                margin-top: 70px;
+            }
+            .mt-95 {
+                margin-top: 95px;
+            }
+            #URGENT {
+                display: initial;
+                margin-left: 10px;
+            }
+
+            body .ui-fieldset .ui-fieldset-legend {
+                background-color: #dee2e6 !important;
+                color: #495057; !important;
+            }
+
+            fieldset div {
+                font-size: 14px;
+                text-align: left;
+            }
+
+            .al-cen-fx div {
+                justify-content: center;
+            }
+            body .ui-button.ui-button-icon-only .ui-icon.fa.fa-times {
+                margin-left: -0.45rem;
+                margin-top: -0.6rem;
+                font-size: 16px;
+            }
+
+            #editButton .ui-button-icon-left {
+                color:#000066 !important;
+            }
+            .shopping-cart-icon {
+                background-image: url("../../resources/images/shopping-cart.png");
+                background-position: 50%;
+                background-size: 85%;
+                width: 25px;
+                height: 25px;
+                margin-top: -12px !important;
+                margin-right: -3px !important;
+            }
+            #addRequestService .ui-button-text {
+                margin-right: 7px;
+            }
+            #dynamicHiddenPanel .ui-fieldset-legend {
+                height: 31px;
+                padding-top: 4px;
+            }
+            .ui-fieldset-legend {
+                font-size: 14px !important;
+            }
+            
+            #goToWorkflowPanel .ui-grid-col-3, .ui-grid-col-9 {
+            	padding: 0px !important;
+            }
+            
         </style>
+
         <script>
             function next(activeMenu, totalTabs) {
                 var nextMenu = activeMenu + 1;
@@ -131,6 +346,10 @@
                 var previousMenu = activeMenu - 1;
                 PrimeFaces.ab({s:"pageTabMenu",u:"form",g:false,pa:[{name:"pageTabMenu_menuid",value:previousMenu.toString()}],f:"form"});return false;
             }
+            function setTab(activeMenu) {
+                PrimeFaces.ab({s:"pageTabMenu",u:"form",g:false,pa:[{name:"pageTabMenu_menuid",value:activeMenu.toString()}],f:"form"});return false;
+            }
+
             jQuery(document).ready(function() {
                 $(".ui-g-3").each(function()
                 {
@@ -140,9 +359,29 @@
                     }
                 });
             });
+            var time;
+
+            function setTimer() {
+                time=setTimeout(function(){ PF('saveDlgWV').hide()},2000);
+            }
+
+            function stopTimer() {
+                clearTimeout(time);
+            }
+
         </script>
         <p:remoteCommand name="updateSubjects" update="form"/>
-
+        <p:remoteCommand  name="executeOnOnServicehide"
+                          action="#{bean.onMultipleServiceChanges()}"  update="form"/>
+        <p:panelGrid id="goToWorkflowPanel" columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" 
+                         columnClasses="ui-grid-col-9,ui-grid-col-3" rendered="#{bean.isTranscriptionCertification}">
+        	<p:outputLabel></p:outputLabel>
+        	<p:commandButton value="#{ff:upper(msg.goToWorkflow)}"
+                             class="action-btn" 
+                             style="background-color: #f26b3a!important; float:right;"
+                             action="#{bean.openTranscriptionManagement}" >
+            </p:commandButton>
+        </p:panelGrid>                 
         <p:tabMenu activeIndex="#{bean.activeMenuTabNum}" model="#{bean.topMenuModel}" style="background-color:#FFFFFF !important;"
                    id="pageTabMenu"  />
         <ui:fragment rendered="#{bean.multipleCreate and bean.activeMenuTabNum==0}">
@@ -153,30 +392,42 @@
             </div>
         </ui:fragment>
 
-        <ui:fragment rendered="#{(bean.multipleCreate and bean.activeMenuTabNum==1)
-        or(!bean.multipleCreate and bean.activeMenuTabNum==0)}">
+        <ui:fragment rendered="#{(bean.multipleCreate and bean.activeMenuTabNum==1 and not bean.manageTranscription)
+        or(!bean.multipleCreate and bean.activeMenuTabNum==0) or (bean.manageTranscription and bean.activeMenuTabNum==0)}">
             <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" layout="grid" id="initialTab"
-                         style="margin-top: 1%">
+                         >
                 <p:column>
                     <span> #{msg.requestClient}<span class="red">*</span>:</span><br/>
                     <p:selectOneMenu id="client" value="#{bean.selectedClientId}"
-                                     label="#{msg.requestClient}" styleClass="select-width">
+                                     label="#{msg.requestClient}" styleClass="select-width h38">
                         <p:ajax listener="#{bean.onClientChange(false)}"
                                 update="invoicesRecipient, branchPanel, officePanel, gestore"/>
                         <f:selectItems value="#{bean.clients}"/>
                     </p:selectOneMenu>
-                    <p:outputPanel id="branchPanel">
+                    <p:outputPanel id="branchPanel" rendered="#{bean.isClientHasArea}">
                         <br/>
                         <h:outputText value="#{msg.requeBranch}: #{bean.areaOfClient}" rendered="#{bean.isClientHasArea}"/>
                     </p:outputPanel>
-                    <p:outputPanel id="officePanel">
+                    <p:outputPanel id="officePanel" rendered="#{bean.isClientHasArea}">
                         <br/>
                         <h:outputText value="#{msg.requeOffice}: #{bean.officeOfClient}" rendered="#{bean.isClientHasArea}"/>
                     </p:outputPanel>
+                    <span>#{msg.titleOffice}</span><br/>
+                    <p:selectOneMenu id="mail_ofice_id" value="#{bean.selectedOfficeId}"  styleClass="select-width" style="height: 37px;">
+                        <f:selectItems value="#{bean.officeList}"/>
+                    </p:selectOneMenu>
+                    <br/>
+                    <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
+                        <c:if test="#{objItem.contains('POSITION_PRACTICE')}">
+                            <div class="ui-g-12 ih_36" style="padding: 0">
+                                <ui:include src="#{objItem}"/>
+                            </div>
+                        </c:if>
+                    </c:forEach>
                 </p:column>
                 <p:column>
                     <span>#{msg.requestInvoicesRecipient}:</span><br/>
-                    <p:selectOneMenu id="invoicesRecipient" styleClass="select-width"
+                    <p:selectOneMenu id="invoicesRecipient" styleClass="select-width h38"
                                      value="#{bean.selectedBillingClientId}"
                                      label="#{msg.requestInvoicesRecipient}">
                         <f:selectItems value="#{bean.billingClients}"/>
@@ -186,22 +437,19 @@
 
                     <span>#{msg.clientManager}</span>
                     <p:selectCheckboxMenu id="gestore" value="#{bean.fiduciaryClientsSelected}"
-                                          style="width: 100%" label="#{enums.documentGenerationTagsMANAGER}"
+                                          styleClass="select-width h35"
+                                          label="#{enums.documentGenerationTagsMANAGER}"
                                           converter="#{bean.clientSelectItemWrapperConverter}"
                                           multiple="true" filter="true" filterMatchMode="startsWith" >
                         <f:selectItems value="#{bean.fiduciaryClients}" var="con" itemValue="#{con}"
                                        itemLabel="#{con.label}"/>
                         <p:ajax process="gestore"/>
                     </p:selectCheckboxMenu>
-
-                    <span> #{msg.requestNotary}</span><br/>
-                    <p:selectOneMenu id="requestNotary" styleClass="select-width"
-                                     value="#{bean.selectedNotaryId}"
-                                     label="#{msg.requestNotary}">
-                        <f:selectItems value="#{bean.notaryList}"/>
-                    </p:selectOneMenu>
-
-
+                    <c:forEach items="#{bean.mutipleRequestNDGPath}" var="objItem">
+                        <div class="ih_36" style="padding: 0">
+                            <ui:include src="#{objItem}"/>
+                        </div>
+                    </c:forEach>
 
                 </p:column>
                 <p:column rendered="#{!bean.multipleRequestCreate}">
@@ -216,26 +464,79 @@
                 <p:column rendered="#{!bean.multipleRequestCreate}">
                     <span> #{msg.requestService}<span class="red">*</span>:</span><br/>
                     <p:selectOneMenu value="#{bean.selectedServiceId}" rendered="#{!bean.multipleCreate}"
-                                     label="#{msg.requestService}" styleClass="select-width" id="service">
+                                     label="#{msg.requestService}" styleClass="select-width h38" id="service">
                         <p:ajax listener="#{bean.onServiceChange}" update="form"/>
                         <f:selectItems value="#{bean.services}"/>
                     </p:selectOneMenu>
                     <p:selectCheckboxMenu value="#{bean.selectedServiceIds}" id="multipleService"
                                           rendered="#{bean.multipleCreate}" label="#{msg.requestService}"
-                                          styleClass="select-width">
+                                          styleClass="select-width h38">
                         <f:selectItems value="#{bean.services}"/>
                     </p:selectCheckboxMenu>
                 </p:column>
                 <p:column rendered="#{bean.multipleRequestCreate}">
+                    <span> #{msg.requestNotary}</span><br/>
+                    <p:selectOneMenu id="requestNotary" styleClass="select-width h38"
+                                     value="#{bean.selectedNotaryId}"
+                                     label="#{msg.requestNotary}">
+                        <f:selectItems value="#{bean.notaryList}"/>
+                    </p:selectOneMenu>
+                    <span> #{msg.clientTypeTrust}</span><br/>
+                    <p:inputText id="clientTypeTrust" value="#{bean.fiduciary}" styleClass="input-width"  style="width: 100% !important;margin-bottom: 20px;"/>
+                    <!--                    <p:selectOneMenu id="clientTypeTrust" styleClass="select-width h38"-->
+                    <!--                                     value="#{bean.selectedFiduciaryId}"-->
+                    <!--                                     label="#{msg.clientTypeTrust}">-->
+                    <!--                        <f:selectItems value="#{bean.fiduciaryList}"/>-->
+                    <!--                    </p:selectOneMenu>-->
                     <c:forEach items="#{bean.mutipleRequestObjTabPath}" var="objItem">
-                        <div class="ui-g-6" style="padding: 1%">
+                        <div class="ui-g-12 ih_36" style="padding: 0">
                             <ui:include src="#{objItem}"/>
                         </div>
                     </c:forEach>
                 </p:column>
 
             </p:panelGrid>
-            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" id="requstType">
+
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" id="initialTab1"
+                         style="margin-top: -30px">
+                <p:column>
+                    <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
+                        <c:if test="#{not (objItem.contains('POSITION_PRACTICE')) and not (objItem.contains('URGENT')) and not (objItem.contains('ATTACHED_DOCUMENTS'))}">
+                            <div class="ui-g-12 ih_36" style="padding: 0">
+                                <ui:include src="#{objItem}"/>
+                            </div>
+                        </c:if>
+                    </c:forEach>
+                </p:column>
+                <p:column>
+                    <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
+                        <c:if test="#{objItem.contains('ATTACHED_DOCUMENTS')}">
+                            <div class="ui-g-6 ih_36" style="padding:0; text-align: left;">
+                                <ui:include src="#{objItem}"/>
+                            </div>
+                        </c:if>
+                    </c:forEach>
+                    <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">
+                        <c:if test="#{objItem.contains('URGENT')}">
+                            <div class="ui-g-6 ih_36" style="padding: 0;margin-top:40px;text-align: left; padding-left:50px;">
+                                <ui:include src="#{objItem}"/>
+                            </div>
+                        </c:if>
+                    </c:forEach>
+                </p:column>
+                <!--                <p:column>-->
+                <!--                    <c:forEach items="#{bean.mutipleRequestFirstObjTabPath}" var="objItem">-->
+                <!--                        <c:if test="#{objItem.contains('URGENT')}">-->
+                <!--                            <div class="ui-g-6 ih_36" style="padding: 0;margin-top:40px;text-align: left;">-->
+                <!--                                <ui:include src="#{objItem}"/>-->
+                <!--                            </div>-->
+                <!--                        </c:if>-->
+                <!--                    </c:forEach>-->
+                <!--                </p:column>-->
+                <!--                <p:column styleClass="test123"></p:column>-->
+            </p:panelGrid>
+
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid" id="requstType" rendered="#{bean.requestType eq null || bean.requestType eq -1}">
                 <p:selectOneRadio value="#{bean.selectedRequestEnumTypeFirst}" styleClass="request-select-radio">
                     <p:ajax update="requstType"/>
                     <f:selectItems value="#{bean.requestEnumTypesFirst}"/>
@@ -247,65 +548,198 @@
             </p:panelGrid>
         </ui:fragment>
 
-        <ui:fragment id="dynamicFragment" rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size() - 1 ) or (!bean.multipleRequestCreate and not empty bean.shownFields)}">
-            <div class="dynamic-fields">
+        <ui:fragment id="dynamicFragment" rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size() - 2 ) or (!bean.multipleRequestCreate and not empty bean.shownFields)}">
+
+
+            <h:panelGroup styleClass="dynamic-fields" layout="block" >
                 <c:if test="#{bean.multipleRequestCreate}">
                     <div class="ui-g">
                         <div class="ui-g-3" style="padding: 1%">
                             <span> #{msg.requestRequestType}<span class="red">*</span>:</span><br/>
-                            <p:selectCheckboxMenu id="servicerequestType" value="#{bean.selectedRequestTypes}"
-                                                  label="#{msg.requestRequestType}" styleClass="select-width">
-                                <p:ajax delay="2000" event="change" listener="#{bean.onRequestTypeChange}"
-                                        update="multipleServiceRequest"/>
+                            <p:selectOneMenu id="servicerequestType" value="#{bean.selectedRequestTypesIdMultiple}"
+                                             label="#{msg.requestRequestType}" styleClass="select-width servicedropdowns" style="min-height: 37px;">
+                                <p:ajax event="change" listener="#{bean.onRequestTypeChangeBlock}"
+                                        update="form @this"/>
                                 <f:selectItems value="#{bean.requestTypes}"/>
-                            </p:selectCheckboxMenu>
+                            </p:selectOneMenu>
                         </div>
-                        <div class="ui-g-3" style="padding: 1%">
+
+                        <h:panelGroup styleClass="ui-g-3" style="padding: 1%" rendered="#{!bean.requestTypeMultiple}">
                             <span> #{msg.requestService}<span class="red">*</span>:</span><br/>
-                            <p:selectCheckboxMenu value="#{bean.selectedServiceIds}" id="multipleServiceRequest"
+                            <p:selectOneMenu id="singleServiceRequest" value="#{bean.selectedServiceId}"
+                                             label="#{msg.requestRequestType}" styleClass="select-width" style="min-height: 37px;">
+                                <p:ajax event="change" listener="#{bean.onMultipleServiceChanges()}"
+                                        update="form @this" />
+                                <f:selectItem itemValue="" itemLabel="- Non selezionato -" />
+                                <f:selectItems value="#{bean.services}"/>
+                            </p:selectOneMenu>
+
+                        </h:panelGroup>
+
+                        <h:panelGroup styleClass="ui-g-3" style="padding: 1%" rendered="#{bean.requestTypeMultiple}">
+                            <span> #{msg.requestService}<span class="red">*</span>:</span><br/>
+                            <p:selectCheckboxMenu value="#{bean.selectedServiceIds}" id="multipleServiceRequest" multiple="true"
                                                   label="#{msg.requestService}"
-                                                  styleClass="select-width"   >
-                                <p:ajax delay="2000" event="change" listener="#{bean.onMultipleServiceChange()}" update="form" />
+                                                  styleClass="select-width servicedropdowns" style="min-height: 37px;"
+                                                  onHide="executeOnOnServicehide()">
                                 <f:selectItems value="#{bean.services}"/>
                             </p:selectCheckboxMenu>
+                        </h:panelGroup>
+                        <div class="ui-g-3" style="padding: 1%">
+                            <p:commandButton
+                                    style="margin-top: 18px;"
+                                    id="addRequestService"
+                                    action="#{bean.validateMultipleRequest(false)}"
+                                    value="#{msg.addRequestService.toUpperCase()}"
+                                    icon="shopping-cart-icon" styleClass="ui-button-success" iconPos="right"
+                                    disabled="#{bean.selectedRequestTypesIdMultiple eq null}"
+                                    update="saveMultipleRequest table newRequestList @(.servicedropdowns) form"
+                                    rendered="#{bean.showAddServiceButton and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2
+                                                            and bean.multipleRequestCreate}"/>
                         </div>
+                        <!--                        <div class="ui-g-3" style="padding: 1%">-->
+
+                        <!--                        </div>-->
+                        <div>
+                            <span></span><br/>
+                            <!--                            <p:commandButton id="confirmButton" value="#{msg.submit}"-->
+                            <!--                                             update="form @this" style="margin-top: 17px;background-color: #dee2e6 !important;color: #495057 !important;font-weight: 700 !important;"-->
+                            <!--                                             styleClass="ui-button-success"-->
+                            <!--                                             action="#{bean.generateDynamicContent(true)}"-->
+                            <!--                                             rendered="#{bean.showConfirmButton and bean.requestTypeMultiple}"/>-->
+                        </div>
+                        <!--                        <div id="request-btns" style="padding-top: 1%;">-->
+                        <!--                            <p:commandButton style="margin-top: 20px;"-->
+                        <!--                                             id="addRequestService"-->
+                        <!--                                             action="#{bean.validateMultipleRequest(false)}"-->
+                        <!--                                             value="#{msg.addRequestService.toUpperCase()}"-->
+                        <!--                                             icon="shopping-cart-icon" styleClass="ui-button-success" iconPos="right"-->
+                        <!--                                             update="saveMultipleRequest table newRequestList servicerequestType multipleServiceRequest form"-->
+                        <!--                                             disabled="#{bean.selectedRequestTypesIdMultiple eq null}"-->
+                        <!--                                             rendered="#{bean.showAddServiceButton and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2-->
+                        <!--                                                            and bean.multipleRequestCreate}"/>-->
+                        <!--                            <div style="clear: both"></div>-->
+                        <!--                        </div>-->
                     </div>
                 </c:if>
-                <c:forEach rendered="#{not empty bean.shownFields}" items="#{bean.shownFields}" var="item">
-                    <div class="ui-g" style="#{item.getLineEven()?'background-color: #F5F5F5;':''}">
-                        <c:if test="#{item.field != null}">
-                            <div class="ui-g-12" style="padding: 1%; background: transparent">
-                                <ui:include src="#{item.field.field.getPath()}"/>
-                            </div>
-                        </c:if>
-                        <c:if test="#{(item.fields != null) and item.isAttachedDocumentsBlock()}">
-                            <c:forEach items="#{item.fields}" var="block">
-                                <div class="ui-g-6" style="padding: 1%">
+                <!--                <c:forEach rendered="#{not empty bean.shownFields}" items="#{bean.shownFields}" var="item">-->
+                <!--                    <div class="ui-g" style="#{item.getLineEven()?'background-color: #F5F5F5;':''}">-->
+                <!--                        <c:if test="#{item.field != null}">-->
+                <!--                            <div class="ui-g-12" style="padding: 1%; background: transparent">-->
+                <!--                                <ui:include src="#{item.field.field.getPath()}"/>-->
+                <!--                            </div>-->
+                <!--                        </c:if>-->
+                <!--                        <c:if test="#{(item.fields != null) and item.isAttachedDocumentsBlock()}">-->
+                <!--                            <c:forEach items="#{item.fields}" var="block">-->
+                <!--                                <div class="ui-g-6" style="padding: 1%">-->
+                <!--                                    <ui:include src="#{block.field.getPath()}"/>-->
+                <!--                                </div>-->
+                <!--                            </c:forEach>-->
+                <!--                        </c:if >-->
+                <!--                        <c:if test="#{(item.fields != null) and !item.isAttachedDocumentsBlock()}">-->
+                <!--                            <c:forEach items="#{item.fields}" var="block">-->
+                <!--                                <div class="ui-g-3" style="padding: 1%">-->
+                <!--                                    <ui:include src="#{block.field.getPath()}"/>-->
+                <!--                                </div>-->
+                <!--                            </c:forEach>-->
+                <!--                        </c:if>-->
+                <!--                    </div>-->
+                <!--                </c:forEach>-->
+                <p:outputPanel id="dynamicPanel" rendered="#{not empty bean.shownFields}" style="margin-bottom:10px">
+                    <div class="ui-g">
+                        <c:set var="index" value="0" />
+                        <c:forEach rendered="#{not empty bean.shownFields}" items="#{bean.shownFields}" var="item">
+                                <c:if test="#{item.field != null}">
+                                    <div class="ui-g-12" style="padding: 1%; background: transparent">
+                                        <ui:include src="#{item.field.field.getPath()}"/>
+                                    </div>
+                                </c:if>
+                                <!--                            <c:if test="#{(item.fields != null) and item.isAttachedDocumentsBlock()}">-->
+                                <!--                                <c:forEach items="#{item.fields}" var="block">-->
+                                <!--                                    <div class="ui-g-6" style="padding: 1%">-->
+                                <!--                                        <ui:include src="#{block.field.getPath()}"/>-->
+                                <!--                                    </div>-->
+                                <!--                                </c:forEach>-->
+                                <!--                            </c:if >-->
+                                <c:if test="#{(item.fields != null) and !item.isAttachedDocumentsBlock()}">
+                                    <c:forEach items="#{item.fields}" var="block">
+                                        <div class="#{block.field == 'SUBJECT_LIST' ? 'ui-g-12' : 'ui-g-3'}" style="padding: 1%">
+                                            <ui:include src="#{block.field.getPath()}"/>
+                                        </div>
+                                        <c:if test="${block.field != 'SUBJECT_LIST' and ((index+1) % 3 == 0)}">
+                                            <div class="ui-g-3" style="padding: 1%"><span></span></div>
+                                        </c:if>
+                                        <c:set var="index" value="#{(block.field == 'SUBJECT_LIST' or index==2) ? 0 : (index+1)}" />
+                                    </c:forEach>
                                     <ui:include src="#{block.field.getPath()}"/>
-                                </div>
-                            </c:forEach>
-                        </c:if >
-                        <c:if test="#{(item.fields != null) and !item.isAttachedDocumentsBlock()}">
-                            <c:forEach items="#{item.fields}" var="block">
-                                <div class="ui-g-3" style="padding: 1%">
-                                    <ui:include src="#{block.field.getPath()}"/>
-                                </div>
-                            </c:forEach>
-                        </c:if>
+                                </c:if>
+                        </c:forEach>
                     </div>
-                </c:forEach>
+                </p:outputPanel>
+
+                <p:outputPanel id="dynamicHiddenPanel" style="margin-top: 20px;margin-bottom:10px" rendered="#{not empty bean.hiddenFields}">
+                    <p:fieldset rendered="#{not empty bean.hiddenFields}" legend="#{msg.requestHiddenFieldsHeader}" toggleable="true" toggleSpeed="500" collapsed="true">
+                        <c:forEach items="#{bean.hiddenFields}" var="item">
+                            <div class="ui-g">
+                                <c:if test="#{item.field != null}">
+                                    <div class="ui-g-12" style="padding: 1%; background: transparent">
+                                        <ui:include src="#{item.field.field.getPath()}"/>
+                                    </div>
+                                </c:if>
+                                <!--                                <c:if test="#{(item.fields != null) and item.isAttachedDocumentsBlock()}">-->
+                                <!--                                    <c:forEach items="#{item.fields}" var="block">-->
+                                <!--                                        <div class="ui-g-6" style="padding: 1%">-->
+                                <!--                                            <ui:include src="#{block.field.getPath()}"/>-->
+                                <!--                                        </div>-->
+                                <!--                                    </c:forEach>-->
+                                <!--                                </c:if >-->
+                                <c:if test="#{(item.fields != null) and !item.isAttachedDocumentsBlock()}">
+                                    <c:forEach items="#{item.fields}" var="block">
+                                        <div class="ui-g-3" style="padding: 1%">
+                                            <ui:include src="#{block.field.getPath()}"/>
+                                        </div>
+                                    </c:forEach>
+                                </c:if>
+                            </div>
+                        </c:forEach>
+                    </p:fieldset>
+
+                </p:outputPanel>
+            </h:panelGroup>
+
+            <div id="request-btns">
+                <p:outputPanel style="margin-bottom:10px">
+                    <div class="ui-g">
+                        <div class="ui-g-3" style="padding: 1%"><span></span></div>
+                        <div class="ui-g-3" style="padding: 1%"><span></span></div>
+                        <div class="ui-g-3" style="padding: 1%"><span></span></div>
+                        <!--                        <div class="ui-g-3" style="padding: 1%">-->
+                        <!--                            <p:commandButton-->
+                        <!--                                    style="margin-left: 18px"-->
+                        <!--                                    id="addRequestService"-->
+                        <!--                                    action="#{bean.validateMultipleRequest(false)}"-->
+                        <!--                                    value="#{msg.addRequestService.toUpperCase()}"-->
+                        <!--                                    icon="shopping-cart-icon" styleClass="ui-button-success" iconPos="right"-->
+                        <!--                                    disabled="#{bean.selectedRequestTypesIdMultiple eq null}"-->
+                        <!--                                    update="saveMultipleRequest table newRequestList @(.servicedropdowns) form"-->
+                        <!--                                    rendered="#{bean.showAddServiceButton and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2-->
+                        <!--                                                            and bean.multipleRequestCreate}"/>-->
+                        <!--                        </div>-->
+                    </div>
+                </p:outputPanel>
             </div>
         </ui:fragment>
 
-        <ui:fragment rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2) or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)}">
+        <ui:fragment
+                rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)
+                or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)}">
             <p:panel id="userAddPanel" style="margin-top: 1%">
-                <span>#{msg.requestUserChange}:</span><br/>
+                <span>#{msg.requestUserChange}:</span>
                 <ui:fragment rendered="#{!empty bean.entity.userName}">
-                    <span><i class="fa fa-user"/></span>
+                    <span style="margin-left:10px"><i class="fa fa-user"/></span>
                 </ui:fragment>
                 <h:outputText value="#{bean.entity.userName}"/>
                 <br/>
-
                 <p:commandButton value="#{msg.requestUserChangeBtn}" oncomplete="PF('changeUserDlgWV').show();"
                                  styleClass="grey-btn"/>
             </p:panel>
@@ -313,36 +747,42 @@
 
         <ui:fragment>
             <div class="ui-g">
-                <div class="ui-g-3" id="request-btns-2" style="margin-top:2%">
-                    <p:commandButton style="float: left"
-                                     value="#{msg.requestEntered}"
-                                     styleClass="ui-button-primary" iconPos="left"
-                                     rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1 and bean.multipleRequestCreate}"
-                                     oncomplete="PF('requestubjectDlg').show();" update="requestubjectDlgId" actionListener="#{bean.openRequestSubjectDialog}"
+                <!--                <div class="ui-g-3" id="request-btns-4" style="margin-top:2%">-->
+                <!--                    <p:commandButton style="float: left"-->
+                <!--                                     value="#{msg.requestEntered}"-->
+                <!--                                     styleClass="ui-button-primary" iconPos="left"-->
+                <!--                                     rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1 and bean.multipleRequestCreate}"-->
+                <!--                                     oncomplete="PF('requestubjectDlg').show();" update="requestubjectDlgId" actionListener="#{bean.openRequestSubjectDialog}"-->
 
-                    />
-                    <div style="clear: both"></div>
-                </div>
-                <div class="ui-g-5" style="margin-top:2%"></div>
-                <div class="ui-g-2" id="request-btns" style="margin-top:2%">
-                    <p:commandButton style="float: right" action="#{bean.validateMultipleRequest(false)}" value="#{msg.save.toUpperCase()}"
-                                     icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left" update="saveMultipleRequest"
-                                     rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1 and bean.multipleRequestCreate}"/>
-                    <div style="clear: both"></div>
-                </div>
-                <div class="ui-g-2" id="request-btns-1" style="margin-top:2%">
-                    <p:commandButton style="float: left" action="#{bean.validateMultipleRequest(true)}" value="#{bean.multipleRequestCreate ? msg.saveAndClose.toUpperCase() : msg.save.toUpperCase() }"
-                                     icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left"
-                                     rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1}"/>
+                <!--                    />-->
+                <!--                    <div style="clear: both"></div>-->
+                <!--                </div>-->
+                <div class="ui-g-10" style="margin-top:2%"></div>
+                <!--                <div class="ui-g-2" id="request-btns" style="margin-top:2%">-->
+                <!--                    <p:commandButton style="float: right" action="#{bean.validateMultipleRequest(false)}" value="#{msg.save.toUpperCase()}"-->
+                <!--                                     icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left" update="saveMultipleRequest table newRequestList servicerequestType multipleServiceRequest form"-->
+                <!--                                     rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2 and bean.multipleRequestCreate}"/>-->
+                <!--                    <div style="clear: both"></div>-->
+                <!--                </div>-->
+                <!--                <div class="ui-g-2" id="request-btns-1" style="margin-top:2%;text-align:right;">-->
+                <!--                    <p:commandButton action="#{bean.validateMultipleRequest(true)}" value="#{bean.multipleRequestCreate ? msg.saveAndClose.toUpperCase() : msg.save.toUpperCase() }"-->
+                <!--                                     icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left"-->
+                <!--                                     rendered="#{bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2    }"/>-->
 
-                    <div style="clear: both"></div>
-                </div>
+                <!--                    <div style="clear: both"></div>-->
+                <!--                </div>-->
             </div>
         </ui:fragment>
 
-        <ui:include src="../Dialogs/RequestSubjectDialog.xhtml" />
+        <!--        <ui:include src="../Dialogs/RequestSubjectDialog.xhtml" />-->
 
-        <p:dialog id="changeUserDlg" widgetVar="changeUserDlgWV" modal="true"
+        <p:dialog id="saveDlg" widgetVar="saveDlgWV" modal="true" onShow="setTimer();" onHide="stopTimer();" styleClass="dialog-green dialog-green-width"
+                  resizable="false" draggable="false" effect="SLIDE">
+            <p:outputLabel value="#{msg.requestListSave}"/>
+
+        </p:dialog>
+
+        <p:dialog id="changeUserDlg" widgetVar="changeUserDlgWV" modal="true" styleClass="dialog-green"
                   resizable="false" draggable="false" effect="SLIDE"
                   header="#{msg.requestUserChangeDlg}">
             <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid">
@@ -361,15 +801,16 @@
             </div>
         </p:dialog>
 
-        <p:dialog id="saveMultipleRequest" widgetVar="multipleRequestSave" modal="true"
+        <p:dialog id="saveMultipleRequest" widgetVar="multipleRequestSave" modal="true" styleClass="dialog-green"
                   resizable="false" draggable="false" effect="SLIDE"
                   header="#{msg.requestUserChangeDlg}">
             <span>
                 <h:outputText value="#{bean.multipleReqMessage}"/>
             </span>
             <div class="btn_line">
-                <p:commandButton value="#{msg.yes}" action="#{bean.pageSave}"
-                                 update="@form" oncomplete="PF('multipleRequestSave').hide();"/>
+                <p:commandButton value="#{msg.yes}" action="#{bean.saveServiceRequest(false)}"
+                                 update="saveMultipleRequest table newRequestList @(.servicedropdowns) form"
+                                 oncomplete="PF('multipleRequestSave').hide();"/>
                 <p:commandButton value="#{msg.no}"
                                  oncomplete="PF('multipleRequestSave').hide();"/>
             </div>
@@ -443,10 +884,56 @@
                 <p:commandButton value="#{msg.submit}" oncomplete="PF('diffFiscalCodeWV').hide()"/>
             </div>
         </p:dialog>
+        <p:dialog id="requestSaved" widgetVar="requestSaved" modal="true" closable="false" styleClass="dialog-green"
+                  resizable="false" draggable="false" effect="SLIDE" style="border: 1px solid #00CC52;">
+            <span>
+                <h:outputText value="#{msg.requestListSave}"/>
+            </span>
+        </p:dialog>
+
+        <p:dialog id="requestDataChangedWarning" widgetVar="requestDataChangedWarningWV" modal="true" styleClass="dialog-green"
+                  resizable="false" draggable="false" effect="SLIDE"
+                  header="">
+            <span>
+                <h:outputText value="#{msg.requestDataChangedWarning}"/>
+            </span>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" styleClass="confirm-button"
+                                 style="margin-right: 15px;"
+                                 action="#{bean.cancelAndSaveServiceRequest(true, true)}"
+                                 oncomplete="PF('requestDataChangedWarningWV').hide();"/>
+                <p:commandButton value="#{msg.cancel}" oncomplete="PF('requestDataChangedWarningWV').hide();"
+                                 style="background-color: #F3362B !important; width: 100px;"
+                                 action="#{bean.cancelAndSaveServiceRequest(true, false)}"/>
+            </div>
+        </p:dialog>
+
+        <p:dialog id="certificationConfirmation" widgetVar="certificationConfirmationWV" modal="true" styleClass="dialog-green"
+                  resizable="false" draggable="false" effect="SLIDE"
+                  header="">
+            <span>
+                <h:outputText value="#{msg.certificationConfirmation}"/>
+            </span>
+            <div class="btn_line">
+                <p:commandButton value="#{msg.confirm}" styleClass="confirm-button"
+                                 style="margin-right: 15px;"
+                                 action="#{bean.saveServiceRequest(true)}"
+                                 oncomplete="PF('certificationConfirmationWV').hide();">
+                    <f:setPropertyActionListener value="#{true}"
+                                                 target="#{bean.createCertificate}" />
+                </p:commandButton>
+                <p:commandButton value="#{msg.cancel}" oncomplete="PF('certificationConfirmationWV').hide();"
+                                 style="background-color: #F3362B !important; width: 100px;"
+                                 action="#{bean.saveServiceRequest(true)}">
+                    <f:setPropertyActionListener value="#{false}"
+                                                 target="#{bean.createCertificate}" />
+                </p:commandButton>
+            </div>
+        </p:dialog>
     </ui:define>
 
     <ui:define name="view_buttons">
-        <ui:fragment>
+        <ui:fragment rendered="#{bean.activeMenuTabNum==0}">
             <div style="margin: 2% 1% 1%;text-align: center">
                 <ui:remove>
                     <p:commandButton value="#{msg.edit}" action="#{bean.editSubject}"
@@ -462,13 +949,15 @@
                 <p:commandButton value="#{msg.requestReactivate}"
                                  rendered="#{!bean.entity.isNew and bean.isSuspend}"
                                  oncomplete="PF('reactivateDialogWV').show();"/>
-                <!-- <p:commandButton value="#{msg.requestPrint}" ajax="false"
-                                  update="@form" action="#{bean.printPDF}"
-                                  rendered="#{!bean.entity.isNew}"/>-->
-                <p:commandButton value="#{msg.requestManageEstateLocation}"
-                                 action="#{bean.openEstateLocation}" rendered="#{!bean.entity.isNew }"/>
+                <p:commandButton value="#{(bean.showUploadButton) ? msg.requestUploadingFiles : msg.requestManageEstateLocation}"
+                                 action="#{bean.openEstateLocation}" rendered="#{bean.showEstateLocation}"/>
+                <p:commandButton value="#{msg.requestCertification}"
+                                 action="#{bean.generatePdf}" rendered="#{bean.showGenerateCertificate and (bean.showUploadButton eq null
+                                 or !bean.showUploadButton)}"/>
                 <p:commandButton value="#{msg.requestManagePrint}"
-                                 action="#{bean.generatePdf}" rendered="#{!bean.entity.isNew}"/>
+                                 action="#{bean.generatePdf}" rendered="#{!bean.showGenerateCertificate and bean.editRequest and (bean.showUploadButton eq null
+                                 or !bean.showUploadButton)}"/>
+
             </div>
         </ui:fragment>
         <ui:fragment id="buttonFragment">
@@ -479,9 +968,256 @@
                                          onclick="previous(#{bean.activeMenuTabNum}, #{bean.topMenuModel.getElements().size()-1});" icon="fa fa-arrow-left" styleClass="nav-button"/>
                     </div>
                     <div class="ui-g-6" style="text-align:right;">
-                        <p:commandButton id="nextButton" value="#{msg.next}" rendered="#{bean.activeMenuTabNum != bean.topMenuModel.getElements().size()-1}" update="@form :buttonFragment"
+                        <p:commandButton id="nextButton" value="#{msg.next}" rendered="#{bean.activeMenuTabNum != bean.topMenuModel.getElements().size()-1}" update=":form:messages :form:pageTabMenu :buttonFragment"
                                          onclick="next(#{bean.activeMenuTabNum}, #{bean.topMenuModel.getElements().size()-1});"  icon="fa fa-arrow-right" styleClass="nav-button"/>
+                        <p:commandButton id="editButton" action="#{bean.editTable}" update="@form :buttonFragment" style="position: absolute;margin-top: 64px;right: 70px;" styleClass="editButton"
+                                         onclick="setTab(0);"
+                                         icon="pi pi-pencil" rendered="#{!bean.regSubjectList.isEmpty() and (bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size() - 2 ) or (!bean.multipleRequestCreate and not empty bean.shownFields)}" />
                     </div>
+                </div>
+            </div>
+        </ui:fragment>
+
+        <ui:fragment id="requestListFragment" rendered="#{(bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size() - 2 ) or (!bean.multipleRequestCreate and not empty bean.shownFields)}">
+            <!--                <ui:repeat var="req" value="#{bean.regSubjectList}" varStatus="requestIndex">-->
+            <!--                    <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" layout="grid" id="serviceList">-->
+            <!--                        <p:selectOneMenu id="subjectServicerequestType" value="#{req.requestTypeId}"-->
+            <!--                                         label="#{msg.requestRequestType}" styleClass="select-width" style="min-height: 37px;" disabled="true">-->
+            <!--                            <f:selectItems value="#{bean.requestTypes}"/>-->
+            <!--                        </p:selectOneMenu>-->
+            <!--                        <p:selectCheckboxMenu value="#{bean.subjectListServiceIds.get(req.id)}" multiple="true"-->
+            <!--                                              label="#{msg.requestService}"-->
+            <!--                                              styleClass="select-width" style="min-height: 37px;" disabled="true">-->
+            <!--                            <f:selectItems value="#{bean.subjectListServices.get(req.requestTypeId)}"/>-->
+            <!--                        </p:selectCheckboxMenu>-->
+            <!--                    </p:panelGrid>-->
+            <!--                </ui:repeat>-->
+
+            <p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group" layout="grid" id="newRequestList">
+                <p:dataTable var="item" id="table" style="height: 98%" rendered="#{!bean.regSubjectList.isEmpty()}"
+                             emptyMessage="#{msg.noRecordsFound}" value="#{bean.regSubjectList}"
+                             rowKey="#{item.id}" rows="10" lazy="true" paginator="true"
+                             paginatorAlwaysVisible="true" rowIndexVar="rowId"
+                             paginatorTemplate="&lt;span style='float: left;margin-top: 7px;'&gt;Elementi visibili nella pagina&lt;/span&gt; {RowsPerPageDropdown}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {CurrentPageReport}"
+                             currentPageReportTemplate="Pagina {currentPage} di {totalPages}"
+                             rowsPerPageTemplate="10,20,50" widgetVar="tableWV" styleClass="request-table">
+
+                    <p:column headerText="#{ff:upper(msg.requestListDate)}" sortBy="#{item.createDate}"
+                              style="width: 7vw;min-width: 163px;text-align: center;">
+                        <p:outputPanel style="margin-left: 10px;text-align: left;max-height: 80px;">
+                            <h:outputText value="#{item.createDate}" converter="dateTimeConverter"
+                                          style="color:#003871;font-weight: bold !important;"/>
+                            <br/>
+                            <h:outputText value="#{item.createDate}" converter="timeConverter" style="color:#003871;"/>
+                            <br/>
+                            <br/>
+                            <h:outputText
+                                    value="#{not empty item.stateDescription ? ff:upper(item.stateDescription) : ''}"
+                                    styleClass="#{item.stateDescription eq 'Inserita'
+			                        ? 'status-icon status-green' : (item.stateDescription eq 'In lavorazione' ? 'status-icon status-yellow' :(item.stateDescription eq 'Da inviare' ? 'status-icon status-navy' : (item.stateDescription eq 'Sospesa' ? 'status-icon status-magenta' : (item.stateDescription eq 'Evasa' ? 'status-icon status-red': (item.stateDescription eq 'Inviata allo SDI' ? 'status-icon status-cyan': (item.stateDescription eq 'Fatturata' ? 'status-icon state-blue': ''))))))}"/>
+                            <br/>
+                            <h:outputText rendered="#{item.urgent}" styleClass="vertical-txt"
+                                          value="#{ff:upper(msg.requestListUrgent)}"/>
+                            <br/>
+                        </p:outputPanel>
+                    </p:column>
+
+
+                    <p:column style="width: 9vw;min-width: 159px;position: relative"
+                              headerText="#{ff:upper(msg.requestListClient)}">
+                        <p:outputPanel>
+                            <h:outputText value="#{item.clientName}"/>
+                        </p:outputPanel>
+                        <br/>
+                        <p:graphicImage id="info" url="/resources/images/tooltip.png"
+                                        style="height :25px;bottom: 5px;position: absolute;"
+                                        rendered="#{not empty item.mailId and (not empty item.fiduciaryId or not empty item.managerId)}"/>
+                        <p:tooltip for="info" styleClass="custom-design-tooltip">
+                            <h:outputText value="#{ff:upper(msg.requestManagers)}"
+                                          style="font-weight:bold;color:#003871;"/>
+                            <br/>
+                            <h:outputText value="#{item.haveManagers()}" escape="false"
+                                          rendered="#{not empty item.haveManagers()}"/>
+                            <br/>
+                            <h:outputText value="#{ff:upper(msg.requestTrustees)}"
+                                          style="font-weight:bold;color:#003871;"/>
+                            <br/>
+                            <h:outputText value="#{item.getClientNameProfessional(item.fiduciaryId)}" escape="false"
+                                          rendered="#{not empty item.fiduciaryId}" style="color:#003871;"/>
+                        </p:tooltip>
+                    </p:column>
+
+                    <p:column headerText="#{ff:upper(msg.requestListServiceCap)}" styleClass="min_padding_margin"
+                              style="width: 13.1vw;min-width: 180px;">
+                        <p:outputPanel style="margin-left: 20px;text-align: left;">
+                            <p:outputPanel id="servicesColumn"
+                                           rendered="#{item.serviceName eq null}"
+                                           style="background-color: transparent;width: inherit;"/>
+                            <p:outputPanel>
+                                <h:outputText styleClass="#{requestBean.getItemIconStyleClass(item.requestTypeId)}"
+                                              style="display: inline-flex;margin-right: 5px;"/>
+                                <h:outputText id="requestTypeName" value="#{item.requestTypeName}"
+                                              style="vertical-align: top;font-weight: bold !important;"
+                                              rendered="#{item.requestTypeName ne null}"/>
+                            </p:outputPanel>
+                            <h:outputText id="serviceName" value="#{item.serviceName}"
+                                          rendered="#{item.serviceName ne null}"/>
+                            <br/>
+                            <p:graphicImage id="multipleservice" url="/resources/images/tooltip.png"
+                                            style="height :25px;margin-top: -9px;margin-left: -20px;position: absolute;"
+                                            rendered="#{not empty item.multipleServices or not empty item.textInVisura}"/>
+                            <p:tooltip for="multipleservice" styleClass="custom-design-tooltip"
+                                       rendered="#{not empty item.multipleServices or not empty item.textInVisura}">
+                                <ui:repeat var="ele" value="#{item.multipleServices}" varStatus="service">
+                                    <h:outputText value="#{ele}" escape="false"
+                                                  style="color:#003871;margin-left: 24px;"/>
+                                    <br/>
+                                </ui:repeat>
+                                <h:outputText value="&lt;br/&gt;" escape="false" rendered="#{not empty item.multipleServices and not empty item.textInVisura}"/>
+                                <h:outputText id="visuraText" value="#{item.textInVisura}" rendered="#{not empty item.textInVisura}"
+                                              style="color:#003871;margin-left: 24px;"/>
+                            </p:tooltip>
+                        </p:outputPanel>
+
+                    </p:column>
+
+
+                    <p:column rendered="false" style="width: 100px;min-width: 100px;"
+                              headerText="#{ff:upper(msg.requestLastBusinessName)}" sortBy="#{item.name}">
+                        <p:commandLink value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId ne null}"
+                                       action="#{requestBean.openRequestSubject}" style="cursor: pointer;">
+                            <f:setPropertyActionListener value="#{item.subjectId}"
+                                                         target="#{requestBean.entityEditId}"/>
+                        </p:commandLink>
+                        <h:outputText value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId eq null}"/>
+                    </p:column>
+
+                    <p:column headerText="#{ff:upper(msg.requestNameFiscalCodeVATNumber)}"
+                              style="width: 13.1vw;min-width: 180px;"
+                              sortBy="#{item.code}">
+                        <p:commandLink value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId ne null}"
+                                       action="#{requestBean.openRequestSubject}" style="cursor: pointer;">
+                            <f:setPropertyActionListener value="#{item.subjectId}"
+                                                         target="#{requestBean.entityEditId}"/>
+                        </p:commandLink>
+                        <h:outputText value="#{ff:upper(item.nameStr)}" rendered="#{item.subjectId eq null}"/>
+                        <br/>
+                        <h:outputText value="#{item.code}" style="color:#003871"/>
+                    </p:column>
+                    <p:column headerText="#{ff:upper(msg.requestListCorservatoryName)}"
+                              style="width: 9vw;min-width: 159px;text-align: center;">
+                        <h:outputText value="#{item.aggregationLandCharRegNameOrCity}"/>
+                    </p:column>
+                    <p:column styleClass="min_padding_margin" headerText="#{ff:upper(msg.requestListCurrentOperator)}"
+                              rendered="#{!requestBean.getCurrentUser().isExternal()}"
+                              style="width: 8.3vw;min-width: 177px;">
+                        <h:outputText value="#{item.userName}"/>
+                    </p:column>
+
+                    <p:column style="width: 6vw;min-width: 125px;text-align: center;"
+                              headerText="#{ff:upper(msg.expirationDateCap)}" sortBy="#{item.expirationDate}"
+                              rendered="#{!requestBean.getCurrentUser().isExternal()}">
+                        <h:outputText value="#{item.expirationDate}" converter="dateTimeConverter"/>
+                    </p:column>
+
+                    <p:column style="width: 4vw;min-width: 81px;" headerText="#{ff:upper(msg.requestListOpenMail)}">
+                        <p:outputPanel
+                                style="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments ? 'text-align: center;' : 'display: flex;'}">
+                            <p:commandButton id="mailBtn" styleClass="richiesta-da-mail-icon"
+                                             action="#{requestBean.openRequestMailNew}"
+                                             style="color: transparent !important;background-color: transparent !important;border-color: transparent !important;margin: 0 auto;cursor: pointer;"
+                                             rendered="#{not empty item.mailId}">
+                                <f:setPropertyActionListener value="#{item.mailId}"
+                                                             target="#{requestBean.entityEditId}"/>
+                            </p:commandButton>
+                            <p:tooltip for="mailBtn" styleClass="custom-design-tooltip">
+                                <h:outputText value="#{item.mailSubject}"
+                                              style="font-weight:bold;color:#003871;"/>
+                            </p:tooltip>
+
+                            <h:outputText id="externalUserIcon"
+                                          rendered="#{item.external and not item.haveAllegatiDocuments}"
+                                          style="margin: 0 auto;" styleClass="richiesta-da-clienti-icon"/>
+                            <p:tooltip for="externalUserIcon" value="#{item.createUserFullName}" escape="false"/>
+
+                            <p:outputPanel rendered="#{item.external and item.haveAllegatiDocuments}"
+                                           style="display: flex;margin-left: calc( 50% - 15px );">
+                                <p:commandButton id="externalUserIconA" styleClass="richiesta-da-clienti-icon"
+                                                 action="#{requestBean.loadAllegatiDocuments}" update="requestDocs"
+                                                 style="color: transparent !important;background-color: transparent !important;border-color: transparent !important;margin: 0 auto;cursor: pointer;"
+                                                 oncomplete="PF('documentDialog').show();">
+                                    <f:setPropertyActionListener value="#{item.id}"
+                                                                 target="#{requestBean.entityEditId}"/>
+                                </p:commandButton>
+                                <p:tooltip for="externalUserIconA" value="#{item.createUserFullName}" escape="false"/>
+                                <h:outputText value="A"
+                                              style="width: 19px;height: 20px;background-color: #003871;border-radius: 50%;color: white;display: block;margin-top: -10px;margin-left: -6px;text-align: center;"/>
+                            </p:outputPanel>
+
+
+                            <p:graphicImage id="internalUserIcon"
+                                            url="/resources/images/richiesta-da-operatore-getesi.png"
+                                            style="height :28px;"
+                                            rendered="#{not item.external and empty item.mailId and not item.haveAllegatiDocuments}"/>
+                            <p:tooltip for="internalUserIcon" value="#{item.createUserFullName}" escape="false"/>
+
+                            <p:outputPanel style="display: flex;#{empty item.mailId ? 'margin-left: 38%;' : ''}"
+                                           rendered="#{not item.external and empty item.mailId and item.haveAllegatiDocuments}">
+                                <p:commandButton id="internalUserIconA" value="G"
+                                                 action="#{requestBean.loadAllegatiDocuments}" update="requestDocs"
+                                                 styleClass="g-btn"
+                                                 style="background-color: transparent !important;display: block;width: 24px;height: 24px;border: 2px solid;border-radius: 50%;color: #003871;margin: 0 auto;cursor: pointer;"
+                                                 oncomplete="PF('documentDialog').show();">
+                                    <f:setPropertyActionListener value="#{item.id}"
+                                                                 target="#{requestBean.entityEditId}"/>
+                                </p:commandButton>
+                                <p:tooltip for="internalUserIconA" value="#{item.createUserFullName}" escape="false"/>
+                                <h:outputText value="A"
+                                              style="width: 19px;height: 20px;background-color: #003871;border-radius: 50%;color: white;display: block;margin-top: -10px;margin-left: -6px;text-align: center;"/>
+                            </p:outputPanel>
+
+
+                        </p:outputPanel>
+                    </p:column>
+
+                    <p:column styleClass=" action_midle_column al-cen-fx"
+                              headerText="" style="width: 4vw;min-width: 81px;">
+                        <div class="btn_line">
+                            <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn"  oncomplete="PF('dlg2').show()"
+                                             disabled="#{!bean.canDelete}">
+                                <f:setPropertyActionListener value="#{item.tempId}"
+                                                             target="#{bean.selectedIdForDelete}"/>
+                            </p:commandButton>
+                        </div>
+                    </p:column>
+                    <ui:remove>
+                        <p:column styleClass=" min_padding_margin" headerText="#{ff:upper(msg.requestListOpenEditor)}"
+                                  rendered="#{!requestBean.getCurrentUser().isExternal()}">
+                            <p:commandButton icon="fa fa-indent" action="#{requestBean.openRequestEditor}">
+                                <f:setPropertyActionListener value="#{item.id}" target="#{requestBean.entityEditId}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </ui:remove>
+                </p:dataTable>
+            </p:panelGrid>
+        </ui:fragment>
+
+        <ui:fragment>
+            <div class="ui-g">
+                <div class="#{bean.entity.isNew ? 'ui-g-10' : 'ui-g-9'}" style="margin-top:2%"></div>
+                <div class="#{bean.entity.isNew ? 'ui-g-2' : 'ui-g-3'}" id="request-btns-1" style="#{bean.entity.isNew ? 'margin-top:2%;text-align:right;' : 'margin-top:2%;text-align:right;'}">
+                    <p:commandButton action="#{bean.modifyEditedRequest()}" value="#{msg.saveChanges.toUpperCase()}"
+                                     icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left"
+                                     rendered="#{!bean.entity.isNew and (bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2)
+                                     or ((bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1 and !bean.entity.isNew)
+                or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1))}"/>
+                    <p:commandButton action="#{bean.validateMultipleRequest(true)}"
+                                     value="#{bean.multipleRequestCreate ? msg.saveAndClose.toUpperCase() : msg.save.toUpperCase() }"
+                                     icon="fa fa-floppy-o" styleClass="ui-button-success" iconPos="left"
+                                     rendered="#{!bean.regSubjectList.isEmpty() and (bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-2)
+                                     or ((bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1)
+                or (!bean.multipleRequestCreate and bean.activeMenuTabNum==bean.topMenuModel.getElements().size()-1))}"/>
+                    <div style="clear: both"></div>
                 </div>
             </div>
         </ui:fragment>
@@ -503,7 +1239,7 @@
                     <p:column>
                         <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_PERSON_TYPE}"/><br/>
                         <p:selectOneRadio value="#{bean.subjectWrapper.typeId}"
-                                          update="subjectDialogPanel">
+                                          update="subjectDialogPanel" id="subjectWrapperTypId">
                             <f:selectItems value="#{bean.wrapper.persons}"/>
                             <p:ajax update="subjectDialogPanel"/>
                         </p:selectOneRadio>
@@ -514,7 +1250,7 @@
                              style="width: 100%;" styleClass="ui-panelgrid-blank form-group" layout="grid">
                     <p:column rendered="#{bean.subjectWrapper.typeId eq 1}">
                         <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_SURNAME}"/><br/>
-                        <p:inputText styleClass="input-width" required="true"
+                        <p:inputText styleClass="input-width" id="subjectWrapperSurname"
                                      value="#{bean.subjectWrapper.surname}" onkeyup="fieldValueToUpperCase(this);">
                             <f:validateLength minimum="2"/>
                         </p:inputText>
@@ -522,22 +1258,22 @@
                     </p:column>
                     <p:column rendered="#{bean.subjectWrapper.typeId eq 1}">
                         <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_NAME}"/><br/>
-                        <p:inputText value="#{bean.subjectWrapper.name}" styleClass="input-width" required="true"
-                                     onkeyup="fieldValueToUpperCase(this);">
+                        <p:inputText value="#{bean.subjectWrapper.name}" styleClass="input-width"
+                                     id="subjectWrapperName" onkeyup="fieldValueToUpperCase(this);">
                             <f:validateLength minimum="2"/>
                         </p:inputText>
                         <p:message for="@previous" display="icon"/>
                     </p:column>
                     <p:column rendered="#{bean.subjectWrapper.typeId eq 1}">
                         <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_SEX_TYPE}"/><br/>
-                        <p:selectOneRadio value="#{bean.subjectWrapper.selectedSexTypeId}" required="true">
+                        <p:selectOneRadio value="#{bean.subjectWrapper.selectedSexTypeId}" id="subjectWrapperSexType">
                             <f:selectItems value="#{bean.wrapper.sexTypes}"/>
                         </p:selectOneRadio>
                         <p:message for="@previous" display="icon"/>
                     </p:column>
                     <p:column rendered="#{bean.subjectWrapper.typeId eq 1}">
                         <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_BIRTHDAY}"/><br/>
-                        <p:calendar id="birhDateFromDialog" value="#{bean.subjectWrapper.birthDate}" required="true"
+                        <p:calendar id="birhDateFromDialog" value="#{bean.subjectWrapper.birthDate}"
                                     pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
                                     converter="fullDateTimeConverter" maxdate="#{bean.todayDate}"/>
                         <p:message for="@previous" display="icon"/>
@@ -545,15 +1281,16 @@
 
                     <p:column rendered="#{bean.subjectWrapper.typeId eq 2}">
                         <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_SOCIAL_REGION}"/><br/>
-                        <p:inputText value="#{bean.subjectWrapper.businessName}" required="true"
-                                     styleClass="input-width" onkeyup="fieldValueToUpperCase(this);"/>
+                        <p:inputText value="#{bean.subjectWrapper.businessName}"
+                                     styleClass="input-width" onkeyup="fieldValueToUpperCase(this);"
+                                     id="subjectWrapperSocial"/>
                         <p:message for="@previous" display="icon"/>
                     </p:column>
 
-                    <p:column rendered="#{not empty bean.subjectWrapper.typeId}">
+                    <p:column rendered="#{not empty bean.subjectWrapper.typeId and bean.subjectWrapper.typeId gt 0}">
                         <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_PROVINCE}"/><br/>
-                        <p:selectOneMenu value="#{bean.subjectWrapper.provinceId}" required="true"
-                                         styleClass="select-width" filter="true">
+                        <p:selectOneMenu value="#{bean.subjectWrapper.provinceId}"
+                                         styleClass="select-width" filter="true" id="subjectWrapperProvince">
                             <f:selectItems value="#{bean.wrapper.provinces}"/>
                             <p:ajax event="change" process="@this"
                                     oncomplete="updateSubjectCreateDialogPanel();"
@@ -564,11 +1301,11 @@
                     </p:column>
 
                     <p:column
-                            rendered="#{not empty bean.subjectWrapper.typeId and bean.subjectWrapper.provinceId!=-1}">
+                            rendered="#{not empty bean.subjectWrapper.typeId and bean.subjectWrapper.typeId gt 0 and bean.subjectWrapper.provinceId!=-1}">
                         <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_COMUNE}"/><br/>
-                        <p:selectOneMenu value="#{bean.subjectWrapper.cityId}" required="true"
+                        <p:selectOneMenu value="#{bean.subjectWrapper.cityId}"
                                          styleClass="select-width" filter="true" filterFunction="filterCity"
-                                         filterMatchMode="custom">
+                                         filterMatchMode="custom" id="subjectWrapperCity">
                             <f:selectItems value="#{bean.subjectWrapper.cities}"/>
                         </p:selectOneMenu>
                         <p:message for="@previous" display="icon"/>
@@ -576,8 +1313,8 @@
                     <p:column
                             rendered="#{bean.subjectWrapper.typeId==2 and bean.subjectWrapper.provinceId == -1}">
                         <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_JURIDICAL_NATIONS}"/><br/>
-                        <p:selectOneMenu styleClass="select-width" required="true"
-                                         value="#{bean.subjectWrapper.selectedJuridicalNationId}" filter="true">
+                        <p:selectOneMenu styleClass="select-width"
+                                         value="#{bean.subjectWrapper.selectedJuridicalNationId}" filter="true" id="subjectWrapperNation">
                             <f:selectItems value="#{bean.wrapper.juridicalNations}"/>
                         </p:selectOneMenu>
                         <p:message for="@previous" display="icon"/>
@@ -588,7 +1325,6 @@
                     <p:column rendered="#{bean.subjectWrapper.typeId eq 2}">
                         <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_IVA}"/><br/>
                         <p:inputText id="subjectCreateNumberVat" value="#{bean.subjectWrapper.numberVAT}"
-                                     required="#{bean.subjectWrapper.typeId==2 and empty bean.subjectWrapper.fiscalCode}"
                                      styleClass="input-width">
                             <p:ajax update="subjectCreateFiscalCode"/>
                         </p:inputText>
@@ -602,7 +1338,6 @@
                     <p:column rendered="#{bean.subjectWrapper.typeId eq 2}">
                         <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_OLD_IVA}"/><br/>
                         <p:inputText id="subjectCreateOldNumberVat" value="#{bean.subjectWrapper.oldNumberVAT}"
-                                     required="#{bean.subjectWrapper.typeId==2 and empty bean.subjectWrapper.fiscalCode}"
                                      styleClass="input-width">
                             <p:ajax update="subjectCreateFiscalCode"/>
                         </p:inputText>
@@ -612,16 +1347,15 @@
                     <p:column
                             rendered="#{bean.subjectWrapper.typeId==1 and bean.subjectWrapper.provinceId==-1}">
                         <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_NATIONS}"/><br/>
-                        <p:selectOneMenu value="#{bean.subjectWrapper.selectedNationId}" required="true"
-                                         styleClass="select-width" filter="true">
+                        <p:selectOneMenu value="#{bean.subjectWrapper.selectedNationId}"
+                                         styleClass="select-width" filter="true" id="subjectWrapperMasterNation">
                             <f:selectItems value="#{bean.wrapper.nations}"/>
                         </p:selectOneMenu>
                         <p:message for="@previous" display="icon"/>
                     </p:column>
-                    <p:column rendered="#{not empty bean.subjectWrapper.typeId}">
+                    <p:column rendered="#{not empty bean.subjectWrapper.typeId and bean.subjectWrapper.typeId gt 0}">
                         <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_FISCAL_CODE}"/><br/>
                         <p:inputText id="subjectCreateFiscalCode" value="#{bean.subjectWrapper.fiscalCode}"
-                                     required="#{bean.subjectWrapper.typeId==1 || empty bean.subjectWrapper.numberVAT}"
                                      onkeyup="fieldValueToUpperCase(this);" styleClass="input-width">
                             <p:ajax update="subjectCreateNumberVat"/>
                         </p:inputText>
@@ -638,17 +1372,6 @@
                         </p:outputPanel>
                     </p:column>
 
-                    <p:column rendered="#{not empty bean.subjectWrapper.typeId}">
-                        <h:outputText value="#{enums.documentGenerationTagsSUBJECT_MASTERY_TIPO_RELAZIONE}"/><br/>
-                        <p:selectOneMenu id="sectionCType" style="width: 92%"
-                                         value="#{bean.subjectWrapper.sectionCType}"
-                                         label="#{enums.documentGenerationTagsSUBJECT_MASTERY_TIPO_RELAZIONE}">
-                            <f:selectItem itemValue="" itemLabel="- Non selezionato -" />
-                            <f:selectItem itemValue="A favore" itemLabel="A favore" />
-                            <f:selectItem itemValue="Contro" itemLabel="Contro" />
-                        </p:selectOneMenu>
-                        <p:message for="@previous" display="icon"/>
-                    </p:column>
                 </p:panelGrid>
                 <div class="btn_line">
                     <p:commandButton value="#{msg.save}" styleClass="ui-button-success"
@@ -661,7 +1384,7 @@
             <p:dialog widgetVar="subjectRestoreDlg" modal="true"
                       draggable="false" position="center center" width="1500">
                 <p:scrollPanel mode="native" id="restoreRequestSubjectTableScrollBar" style="width: 100%; min-height: 300px; max-height: 600px;">
-                    <p:dataTable value="#{bean.subjectWrapper.subjectsToRestore}"
+                    <p:dataTable value="#{bean.subjectWrapper.subjectsToRestore}" emptyMessage="#{msg.noRecordsFound}"
                                  var="subject"
                                  selection="#{bean.subjectWrapper.selectedSubjectToRestore}"
                                  rowKey="#{subject.id}" id="restoreRequestSubjectTable">
@@ -720,6 +1443,41 @@
                     </p:dataTable>
                 </p:scrollPanel>
             </p:dialog>
+            <p:dialog id="documentDialog" widgetVar="documentDialog" modal="true" resizable="false" draggable="false"
+                      width="700">
+                <p:scrollPanel mode="native"  style="width: 100%; min-height: 300px; max-height: 600px;">
+                    <p:dataTable value="#{bean.requestDocuments}" var="doc" id="requestDocs" emptyMessage="#{msg.noRecordsFound}">
+                        <p:column headerText="#{msg.name}">
+                            <h:outputText value="#{doc.title}#{not empty doc.fileExtension ? doc.fileExtension : '' }"/>
+                        </p:column>
+                        <p:column styleClass="action_column">
+                            <p:commandButton icon="fa fa-download" action="#{bean.downloadRequestFile}" ajax="false">
+                                <f:setPropertyActionListener value="#{doc.id}" target="#{bean.entityEditId}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </p:scrollPanel>
+            </p:dialog>
+            <p:dialog id="requestDelete" widgetVar="dlg2" modal="true" resizable="false" draggable="false" effect="SLIDE" styleClass="dialog-green dialog-green-width" >
+                #{msg.deleteConfirmation}<br/>
+                <br/>
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.confirm}" action="#{bean.deleteEntity}" style="margin-right: 20px !important;background-color: #00CC52!important;"
+                                     oncomplete="PF('dlg2').hide();"
+                                     update=":form:table :form:messages newRequestList :form"/>
+                    <p:commandButton value="#{msg.cancel}" onclick="PF('dlg2').hide()" style="background-color: #F3362B !important;"/>
+                </div>
+            </p:dialog>
+
+            <p:dialog id="subjectMasteryAgeDialog" header="#{msg.note}!" styleClass="dialog-orange" width="400"
+                      widgetVar="subjectMasteryAgeDialogWV">
+                #{msg.requestEditSubjectAge} <br />
+                <div class="btn_line">
+                    <p:commandButton value="#{msg.yes}" style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"
+                                     oncomplete="PF('subjectMasteryAgeDialogWV').hide()"/>
+                </div>
+            </p:dialog>
+
         </p:fragment>
     </ui:define>
 </ui:composition>

@@ -1,20 +1,29 @@
 package it.nexera.ris.web.beans.pages.dictionary;
 
+import it.nexera.ris.common.enums.CostType;
 import it.nexera.ris.common.enums.RequestOutputTypes;
 import it.nexera.ris.common.enums.ServiceReferenceTypes;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.*;
+import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
+import it.nexera.ris.persistence.beans.entities.IndexedEntity;
+import it.nexera.ris.persistence.beans.entities.domain.PriceList;
+import it.nexera.ris.persistence.beans.entities.domain.Supplier;
+import it.nexera.ris.persistence.beans.entities.domain.TaxRate;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.CostConfiguration;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.DataGroup;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import it.nexera.ris.web.beans.EntityEditPageBean;
 import it.nexera.ris.web.beans.wrappers.Icon;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.primefaces.model.DualListModel;
 
 import javax.faces.bean.ManagedBean;
@@ -23,9 +32,12 @@ import javax.faces.model.SelectItem;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ManagedBean(name = "serviceEditBean")
 @ViewScoped
+@Getter
+@Setter
 public class ServiceEditBean extends EntityEditPageBean<Service>
         implements Serializable {
 
@@ -64,6 +76,20 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
     private List<SelectItem> referenceItems;
 
     private Long selectedReferenceId;
+
+    private Boolean salesDevelopment;
+
+    private Boolean landOmi;
+
+    private Boolean detailProperties;
+    
+    private List<SelectItem> taxRates;
+    
+    private Long selectedNationalTaxRateId;
+
+    private List<SelectItem> suppliers;
+
+    private Long selectedSupplierId;
     
     @Override
     public void onLoad() throws NumberFormatException, HibernateException,
@@ -110,9 +136,7 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
             targetCost = this.getEntity().getCostConfigurations();
 
             for (CostConfiguration costEntity : targetCost) {
-                if (sourceCost.contains(costEntity)) {
-                    sourceCost.remove(costEntity);
-                }
+                sourceCost.remove(costEntity);
             }
         }
 
@@ -120,9 +144,7 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
             targetCostUnauthorizedQuote = this.getEntity().getServiceCostUnauthorizedQuoteList();
 
             for (CostConfiguration costEntity : targetCostUnauthorizedQuote) {
-                if (sourceCostUnauthorizedQuote.contains(costEntity)) {
-                    sourceCostUnauthorizedQuote.remove(costEntity);
-                }
+                sourceCostUnauthorizedQuote.remove(costEntity);
             }
         }
 
@@ -154,6 +176,34 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
         this.setReferenceItems(ComboboxHelper.fillList(ServiceReferenceTypes.class, true));
 
         executeJS("setIcon();");
+
+        setSalesDevelopment(this.getEntity().getSalesDevelopment());
+        setLandOmi(this.getEntity().getLandOmi());
+        setDetailProperties(this.getEntity().getDetailProperties());
+        
+        setTaxRates(new ArrayList<>());
+        getTaxRates().add(SelectItemHelper.getNotSelected());
+        List<TaxRate> activeTaxRates = DaoManager.load(TaxRate.class, new Criterion[]{
+                Restrictions.and(
+                        Restrictions.isNotNull("use"),
+                        Restrictions.eq("use", Boolean.TRUE)
+                )
+        });
+        activeTaxRates.forEach(tr -> {
+            getTaxRates().add(new SelectItem(tr.getId(), tr.getPercentage() +  "% - " + tr.getDescription()));
+        });
+        
+        if(!ValidationHelper.isNullOrEmpty(getEntity().getNationalTaxRate())) {
+        	setSelectedNationalTaxRateId(getEntity().getNationalTaxRate().getId());
+        }
+
+        this.setSuppliers(ComboboxHelper.fillList(Supplier.class, Order.asc("name"),
+                Restrictions.eq("getesi", Boolean.TRUE)));
+
+        if (this.getEntity().getSupplier() != null) {
+            this.setSelectedSupplierId(
+                    this.getEntity().getSupplier().getId());
+        }
     }
 
     public void editService() {
@@ -246,8 +296,53 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
         this.getEntity().setRequestOutputType(RequestOutputTypes.getById(getSelectedRequestOutputId()));
 
         this.getEntity().setServiceReferenceType(ServiceReferenceTypes.getById(getSelectedReferenceId()));
-        
+
+        if (!ValidationHelper.isNullOrEmpty(this.getSalesDevelopment()) && this.getSalesDevelopment()) {
+            this.getEntity().setSalesDevelopment(this.getSalesDevelopment());
+        }else {
+            this.getEntity().setSalesDevelopment(null);
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(this.getLandOmi()) && this.getLandOmi()) {
+            this.getEntity().setLandOmi(this.getLandOmi());
+        }else {
+            this.getEntity().setLandOmi(null);
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(this.getDetailProperties()) && this.getDetailProperties()) {
+            this.getEntity().setDetailProperties(this.getDetailProperties());
+        }else {
+            this.getEntity().setDetailProperties(null);
+        }
+
+        if(!ValidationHelper.isNullOrEmpty(getSelectedNationalTaxRateId())) {
+        	this.getEntity().setNationalTaxRate(DaoManager.get(TaxRate.class, getSelectedNationalTaxRateId()));
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(this.getSelectedSupplierId())) {
+            this.getEntity().setSupplier(DaoManager.get(Supplier.class, this.getSelectedSupplierId()));
+        }else
+            this.getEntity().setSupplier(null);
+
         DaoManager.save(this.getEntity());
+
+        List<Long> costConfigurationIds = new ArrayList<>();
+        if(!ValidationHelper.isNullOrEmpty(this.getEntity().getCostConfigurations())){
+            costConfigurationIds = this.getEntity().getCostConfigurations()
+                    .stream()
+                    .map(CostConfiguration::getId)
+                    .collect(Collectors.toList());
+        }
+        List<PriceList>  priceList = DaoManager.load(PriceList.class, new CriteriaAlias[]{
+                new CriteriaAlias("costConfiguration", "cc", JoinType.INNER_JOIN)}, new Criterion[]{
+                Restrictions.eq("service", getEntity())});
+        for(PriceList price : priceList){
+            if(!ValidationHelper.isNullOrEmpty(price.getCostConfiguration()) &&
+                !costConfigurationIds.contains(price.getCostConfiguration().getId())){
+                price.setCostConfiguration(null);
+                DaoManager.save(price);
+            }
+        }
     }
 
     private void fillIconList() {
@@ -442,4 +537,45 @@ public class ServiceEditBean extends EntityEditPageBean<Service>
         this.selectedReferenceId = selectedReferenceId;
     }
 
+    public Boolean getSalesDevelopment() {
+        return salesDevelopment;
+    }
+
+    public void setSalesDevelopment(Boolean salesDevelopment) {
+        this.salesDevelopment = salesDevelopment;
+    }
+
+    public Boolean getLandOmi() {
+        return landOmi;
+    }
+
+    public void setLandOmi(Boolean landOmi) {
+        this.landOmi = landOmi;
+    }
+
+    public Boolean getDetailProperties() {
+        return detailProperties;
+    }
+
+    public void setDetailProperties(Boolean detailProperties) {
+        this.detailProperties = detailProperties;
+    }
+
+    public List<SelectItem> getTaxRates() {
+		return taxRates;
+	}
+
+	public void setTaxRates(List<SelectItem> taxRates) {
+		this.taxRates = taxRates;
+	}
+
+	public Long getSelectedNationalTaxRateId() {
+		return selectedNationalTaxRateId;
+	}
+
+	public void setSelectedNationalTaxRateId(Long selectedNationalTaxRateId) {
+		this.selectedNationalTaxRateId = selectedNationalTaxRateId;
+	}
+	
+	
 }

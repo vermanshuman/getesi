@@ -24,6 +24,11 @@ public class LandCulture extends IndexedEntity implements Serializable {
     @OneToMany(mappedBy = "landCulture")
     private List<LandCadastralCulture> landCadastralCultures;
 
+    private Boolean unavailable;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     @Override
     public String toString() {
         return name;

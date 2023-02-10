@@ -66,7 +66,7 @@
     <div style="margin-bottom: 1%;">
 
         <p:dataTable value="#{bean.requestConservatoryList}" var="item" styleClass="without-header simple-table"
-                     rendered="#{empty bean.examRequest.distraintFormality}">
+                     rendered="#{empty bean.examRequest.distraintFormality}" emptyMessage="#{msg.noRecordsFound}">
             <p:column>
                 <h:outputText
                         value="#{empty item.registry ? msg.subjectViewCadastralDateC: msg.subjectViewCadastralDate}
@@ -94,290 +94,306 @@
             </p:outputPanel>
         </div>
     </div>
-    <p:dataTable value="#{bean.estateSituations}" styleClass="simple-table" var="item" id="tableProcedure"
-                 rowIndexVar="index" widgetVar="tableProcedureWV">
-        <p:column style="width: 30%; vertical-align: top;" headerText="#{msg.formality}">
-            <p:dataTable rendered="#{not empty item.estateFormalityList}" value="#{item.estateFormalityList}"
-                         var="weakForm" styleClass="without-header cadastral_table" editable="true" editMode="cell">
-                <p:column style="width: 15%; text-align: center">
-                    <p:cellEditor>
-                        <f:facet name="output">
-                            <h:outputText value="#{weakForm.numRG}/#{weakForm.numRP}"/>
-                        </f:facet>
-                        <f:facet name="input">
-                            <p:inputNumber value="#{weakForm.numRG}" style="width: 45%" decimalSeparator=""
-                                           thousandSeparator="" decimalPlaces="0"/>
-                            /
-                            <p:inputNumber value="#{weakForm.numRP}" style="width: 45%" decimalSeparator=""
-                                           thousandSeparator="" decimalPlaces="0"/>
-                        </f:facet>
-                    </p:cellEditor>
-                </p:column>
-                <p:column style="width: 10%; text-align: center">
-                    <p:cellEditor>
-                        <f:facet name="output">
-                            <h:outputText value="#{weakForm.estateFormalityType.toString()}"/>
-                        </f:facet>
-                        <f:facet name="input">
-                            <p:selectOneMenu value="#{weakForm.estateFormalityType}" style="width:50%">
-                                <f:selectItems value="#{bean.estateFormalityTypes}"/>
-                            </p:selectOneMenu>
-                        </f:facet>
-                    </p:cellEditor>
-                </p:column>
-                <p:column style="width: 30%; padding: 2px; text-align: center">
-                    <p:cellEditor>
-                        <f:facet name="output">
-                            <h:outputText value="#{weakForm.description}"/>
-                        </f:facet>
-                        <f:facet name="input">
-                            <p:inputText value="#{weakForm.description}"/>
-                        </f:facet>
-                    </p:cellEditor>
-                </p:column>
-                <p:column style="width: 10%;padding: 2px;">
-                    <p:commandButton icon="fa fa-comment" oncomplete="PF('commentEditDlg').show();"
-                                     update=":form:commentArea" action="#{bean.prepareComment}">
-                        <f:setPropertyActionListener value="SELECTED_ESTATE_FORMALITY" target="#{bean.currentComment}"/>
-                        <f:setPropertyActionListener value="#{weakForm.id}" target="#{bean.selectedId}"/>
-                    </p:commandButton>
-                </p:column>
-            </p:dataTable>
-        </p:column>
-        <p:column headerText="#{msg.esateSituationRegime}:" style="width: 74px;">
-            <p:selectBooleanCheckbox value="#{item.regime}">
-                <p:ajax listener="#{item.handleRegimeEdit()}" global="false" update="@this" />
-            </p:selectBooleanCheckbox>
-        </p:column>
-        <p:column style="width: 70%; vertical-align: top;" headerText="#{msg.estateLocation}">
-            <p:dataTable rendered="#{not empty item.propertyList}" value="#{item.propertyList}" var="estate"
-                         editable="true" editMode="cell" styleClass="without-header cadastral_table">
-                <p:column style="text-align: center; width: 15%">
-                    <p:cellEditor>
-                        <f:facet name="output">
-                            <h:outputText value="#{estate.getCategoryType()}"/>
-                        </f:facet>
-                        <f:facet name="input">
-                            <p:selectOneMenu value="#{estate.selectedCategoryId}" style="width:82%">
-                                <p:ajax listener="#{estate.categoryChange}"/>
-                                <f:selectItems value="#{bean.categories}"/>
-                            </p:selectOneMenu>
-                        </f:facet>
-                    </p:cellEditor>
-                </p:column>
-                <p:column style="text-align: center; width: 15%">
-                    <p:cellEditor>
-                        <f:facet name="output">
-                            <h:outputText value="#{estate.address}"/>
-                        </f:facet>
-                        <f:facet name="input">
-                            <p:inputText value="#{estate.address}">
-                                <p:ajax listener="#{estate.handleRowEditEvent()}" global="false" update="@this" />
-                            </p:inputText>
-                        </f:facet>
-                    </p:cellEditor>
-                </p:column>
-                <p:column style="text-align: center; width: 40%">
-                    <p:dataTable value="#{estate.cadastralData}" var="exam" rendered="#{not empty estate.cadastralData}"
-                                 styleClass="without-header cadastral_table" editable="true" editMode="cell">
-                        <p:column style="text-align: center">
-                            <p:cellEditor>
-                                <f:facet name="output">
-                                    <h:outputText value="#{exam.sheet}" style="font-size: 1.1em; font-weight:bold;"/>
-                                </f:facet>
-                                <f:facet name="input">
-                                    <p:inputText value="#{exam.sheet}"/>
-                                </f:facet>
-                            </p:cellEditor>
-                        </p:column>
-                        <p:column style="text-align: center">
-                            <p:cellEditor>
-                                <f:facet name="output">
-                                    <h:outputText value="#{exam.particle}" style="font-size: 1.1em; font-weight:bold;"/>
-                                </f:facet>
-                                <f:facet name="input">
-                                    <p:inputText value="#{exam.particle}"/>
-                                </f:facet>
-                            </p:cellEditor>
-                        </p:column>
-                        <p:column style="text-align: center">
-                            <p:cellEditor>
-                                <f:facet name="output">
-                                    <h:outputText value="#{exam.sub}" style="font-size: 1.1em; font-weight:bold;"/>
-                                </f:facet>
-                                <f:facet name="input">
-                                    <p:inputText value="#{exam.sub}"/>
-                                </f:facet>
-                            </p:cellEditor>
-                        </p:column>
-                    </p:dataTable>
-                    <br/>
-                    <p:panelGrid columns="2" layout="grid" columnClasses="ui-grid-col-4, ui-grid-col-6">
-                        <h:outputText value="#{msg.formalityConsistency}:" style="color: black;"/>
-                        <p:inputText value="#{estate.consistency}"/>
-                        <h:outputText value="#{msg.requestTextEditCadastralArea}:" style="color: black;"/>
-                        <p:inputText value="#{estate.cadastralArea}"/>
-                        <h:outputText value="#{msg.requestTextEditRevenue}:" style="color: black;"/>
-                        <p:inputText value="#{estate.revenue}"/>
-                        <h:outputText value="#{msg.requestTextEditMinimum}:" style="color: black;" rendered="#{estate.calculateOmiValue}"/>
-                        <p:inputText value="#{estate.minimumValue}" rendered="#{estate.calculateOmiValue}"/>
-                        <h:outputText value="#{msg.requestTextEditMaximum}:" style="color: black;" rendered="#{estate.calculateOmiValue}"/>
-                        <p:inputText value="#{estate.maximumValue}" rendered="#{estate.calculateOmiValue}"/>
-                        <p:commandButton action="#{estate.reCalculateOMI}" value="#{msg.requestTextEditCalculate}"
-                                         update="tableProcedure" style="margin-top: 1%;" oncomplete="updateTemplate();" rendered="#{not estate.calculateOmiValue}"/>
-                        <p:commandButton action="#{bean.reCalculateOMI}" value="#{msg.requestTextEditCalculate}"
-                                         update="tableProcedure" style="margin-top: 1%;" oncomplete="updateTemplate();" rendered="#{estate.calculateOmiValue}"/>
-                    </p:panelGrid>
-                </p:column>
-                <p:column style="text-align: center; width: 17%">
-                    <p:outputPanel styleClass="visible-cell-editor-value">
-                        <h:outputText value="#{msg.estateLocationOMI}"/>
-                        <p:dataTable value="#{estate.lastOmi}" var="omi" editable="true" editMode="cell" styleClass="background-lightorange-td">
-                            <p:ajax event="rowEdit" listener="#{estate.setEdit(true)}"/>
-                            <p:column>
-                                <p:cellEditor>
-                                    <f:facet name="output">
-                                        <h:outputText value="#{omi.value}"/>
-                                    </f:facet>
-                                    <f:facet name="input">
-                                        <p:outputPanel id="inputPanelOmi">
-                                            <p:inputText value="#{omi.value}"
-                                                         onkeypress="return numbers_only_if_should(#{omi.inappropriate},this, event, 9, 2);"
-                                                         onkeyup="check_numbers_if_should(#{omi.inappropriate},this, 9, 2);">
-                                                <p:ajax listener="#{estate.handleRowEditEvent()}" global="false" update="@this" />
-                                            </p:inputText>
-                                            <h:outputText value="#{msg.estateLocationOMINotInappropriate} "
-                                                          style="color: white;"/>
-                                            <p:selectBooleanCheckbox value="#{omi.inappropriate}">
-                                                <p:ajax event="change" update="inputPanelOmi"
-                                                        listener="#{estate.changeOmi(omi)}"/>
-                                            </p:selectBooleanCheckbox>
-                                        </p:outputPanel>
-                                    </f:facet>
-                                </p:cellEditor>
-                            </p:column>
-                        </p:dataTable>
-                        <p:panelGrid columns="1" styleClass="border-omi-value background-lightblue-td">
-                            <p:outputPanel style="display:inline-flex;">
-                                <h:outputText value="#{estate.calculatedOmi.value}" style="color: #5f666c;"/>
-                                <p:outputPanel style="margin-left: 3px;" id="omiSevZones" rendered="#{estate.calculatedOmi.severalZones}">
-                                    <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
-                                </p:outputPanel>
-                                <p:tooltip for="omiSevZones" value="#{msg.requestTextEditSeveralZones}"/>
-                                <p:outputPanel style="margin-left: 3px;" id="omiSevComprs" rendered="#{estate.calculatedOmi.severalComprs}">
-                                    <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
-                                </p:outputPanel>
-                                <p:tooltip for="omiSevComprs" value="#{msg.requestTextEditSeveralMaxMinComprs}"/>
-                                <p:outputPanel style="margin-left: 3px;" id="omiMultiCoord" rendered="#{estate.calculatedOmi.multipleCoordinates}">
-                                    <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
-                                </p:outputPanel>
-                                <p:tooltip for="omiMultiCoord" value="#{msg.requestTextEditMultipleCoordinates}"/>
-                                <p:outputPanel style="margin-left: 3px;" id="categoryCodeInfo" rendered="#{not estate.calculatedOmi.multipleCoordinates and estate.calculatedOmi.categoryCodeMissing}">
-                                    <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
-                                </p:outputPanel>
-                                <p:tooltip for="categoryCodeInfo" value="#{msg.requestTextEditCategoryCodeMissing}"/>
-                            </p:outputPanel>
-                        </p:panelGrid>
-                    </p:outputPanel>
-                    <p:cellEditor>
-                        <f:facet name="output">
-                            <h:outputText value="#{msg.estateLocationCommercial}"/>
-                            <p:panelGrid columns="1" styleClass="border-omi-value background-lightorange-td">
-                                <h:outputText value="#{estate.lastCommercial}"/>
-                            </p:panelGrid>
-                        </f:facet>
-                        <f:facet name="input">
-                            <p:outputPanel id="inputPanel">
-                                <h:outputText value="#{msg.estateLocationCommercial}"/>
-                                <p:inputText value="#{estate.lastCommercial}"
-                                             onkeypress="return numbers_only(this, event, 9, 2)"
-                                             onkeyup="check_numbers(this, 9, 2);">
-                                    <p:ajax listener="#{estate.handleRowEditEvent()}" global="false" update="@this" />
-                                </p:inputText>
-                            </p:outputPanel>
-                        </f:facet>
-                    </p:cellEditor>
-                    <p:panelGrid columns="1" styleClass="border-omi-value background-lightblue-td">
-                        <h:outputText value="#{estate.calculatedCommercial}" style="color: #5f666c;"/>
-                    </p:panelGrid>
-                </p:column>
-                <p:column style="width: 30px;padding: 2px;">
-                    <p:commandButton icon="fa fa-comment" oncomplete="PF('commentEditDlg').show();"
-                                     rendered="#{empty bean.examRequest.distraintFormality}"
-                                     update=":form:commentArea" action="#{bean.prepareComment}">
-                        <f:setPropertyActionListener value="SELECTED_PROPERTY" target="#{bean.currentComment}"/>
-                        <f:setPropertyActionListener value="#{estate.id}" target="#{bean.selectedId}"/>
-                    </p:commandButton>
-                    <p:rowToggler rendered="#{not empty bean.examRequest.distraintFormality}"/>
-                </p:column>
-                <p:column style="width: 30px;padding: 2px;">
-                    <p:commandButton icon="fa fa-bars" onclick="PF('relationshipDlg').show();"
-                                     update=":form:relationshipArea, :form:relationshipTable"
-                                     action="#{bean.prepareRelationships}" onerror="console.log(arguments)">
-                        <f:setPropertyActionListener value="SELECTED_PROPERTY" target="#{bean.currentComment}"/>
-                        <f:setPropertyActionListener value="#{estate.id}" target="#{bean.selectedId}"/>
-                    </p:commandButton>
-                </p:column>
-                <p:rowExpansion>
-                    <p:dataTable value="#{estate.associatedWithEstateSituationDatafromProperties}" var="datafrom"
-                                 id="datafromTable" rowStyleClass="#{datafrom.associated ? null : 'delete-row'}">
-                        <p:column>
-                            <h:outputText value="#{datafrom.text}"/>
-                        </p:column>
-                        <p:column style="width: 34px;padding: 2px;">
-                            <p:commandButton icon="fa fa-comment" oncomplete="PF('datafromEditDlg').show();"
-                                             update=":form:datafromArea">
-                                <f:setPropertyActionListener value="#{bean.estateSituations.indexOf(item)}"
-                                                             target="#{bean.estateSituationId}"/>
-                                <f:setPropertyActionListener
-                                        value="#{estate.associatedWithEstateSituationDatafromProperties.indexOf(datafrom)}"
-                                        target="#{bean.entityEditId}"/>
-                                <f:setPropertyActionListener value="#{item.propertyList.indexOf(estate)}"
-                                                             target="#{bean.selectedId}"/>
-                                <f:setPropertyActionListener value="#{datafrom.text}"
-                                                             target="#{bean.datafromPropertyText}"/>
-                            </p:commandButton>
-                        </p:column>
-                        <p:column style="width: 34px;padding: 2px;">
-                            <p:commandButton icon="fa fa-close" update="datafromTable"
-                                             action="#{bean.deleteDatafromPropertyAssociation}" >
-                                <f:setPropertyActionListener value="#{bean.estateSituations.indexOf(item)}"
-                                                             target="#{bean.estateSituationId}"/>
-                                <f:setPropertyActionListener
-                                        value="#{estate.associatedWithEstateSituationDatafromProperties.indexOf(datafrom)}"
-                                        target="#{bean.entityEditId}"/>
-                                <f:setPropertyActionListener value="#{item.propertyList.indexOf(estate)}"
-                                                             target="#{bean.selectedId}"/>
-                            </p:commandButton>
-                        </p:column>
-                    </p:dataTable>
-                    <p:commandButton style="margin-top: 10px" icon="fa fa-plus" oncomplete="PF('datafromEditDlg').show();"
-                                     update=":form:datafromArea">
-                        <f:setPropertyActionListener value="#{bean.estateSituations.indexOf(item)}"
-                                                     target="#{bean.estateSituationId}"/>
-                        <f:setPropertyActionListener value="#{null}" target="#{bean.entityEditId}"/>
-                        <f:setPropertyActionListener value="#{item.propertyList.indexOf(estate)}"
-                                                     target="#{bean.selectedId}"/>
-                        <f:setPropertyActionListener value="" target="#{bean.datafromPropertyText}"/>
-                    </p:commandButton>
-                </p:rowExpansion>
-            </p:dataTable>
-        </p:column>
-        <p:column style="width: 34px;padding: 7px 2px 2px;vertical-align: top;">
-            <p:commandButton icon="fa fa-commenting" oncomplete="PF('commentEditDlg').show();"
-                             update=":form:commentArea" action="#{bean.prepareComment}">
-                <f:setPropertyActionListener value="SELECTED_ESTATE_SITUATION_INIT" target="#{bean.currentComment}"/>
-                <f:setPropertyActionListener value="#{item.comment.id}" target="#{bean.selectedId}"/>
-            </p:commandButton>
-            <br/>
-            <br/>
-            <p:commandButton icon="fa fa-comment" oncomplete="PF('commentEditDlg').show();"
-                             update=":form:commentArea" action="#{bean.prepareComment}">
-                <f:setPropertyActionListener value="SELECTED_ESTATE_SITUATION" target="#{bean.currentComment}"/>
-                <f:setPropertyActionListener value="#{item.comment.id}" target="#{bean.selectedId}"/>
-            </p:commandButton>
-        </p:column>
-    </p:dataTable>
+    <p:outputPanel id="estateSituationArea">
+	    <p:dataTable value="#{bean.estateSituations}" styleClass="simple-table" var="item" id="tableProcedure"
+	                 rowIndexVar="index" widgetVar="tableProcedureWV" emptyMessage="#{msg.noRecordsFound}">
+	        <p:column style="width: 30%; vertical-align: top;" headerText="#{msg.formality}">
+	            <p:dataTable rendered="#{not empty item.estateFormalityList}" value="#{item.estateFormalityList}" emptyMessage="#{msg.noRecordsFound}"
+	                         var="weakForm" styleClass="without-header cadastral_table" editable="true" editMode="cell">
+	                <p:column style="width: 15%; text-align: center">
+	                    <p:cellEditor>
+	                        <f:facet name="output">
+	                            <h:outputText value="#{weakForm.numRG}/#{weakForm.numRP}"/>
+	                        </f:facet>
+	                        <f:facet name="input">
+	                            <p:inputNumber value="#{weakForm.numRG}" style="width: 45%" decimalSeparator=""
+	                                           thousandSeparator="" decimalPlaces="0"/>
+	                            /
+	                            <p:inputNumber value="#{weakForm.numRP}" style="width: 45%" decimalSeparator=""
+	                                           thousandSeparator="" decimalPlaces="0"/>
+	                        </f:facet>
+	                    </p:cellEditor>
+	                </p:column>
+	                <p:column style="width: 10%; text-align: center">
+	                    <p:cellEditor>
+	                        <f:facet name="output">
+	                            <h:outputText value="#{weakForm.estateFormalityType.toString()}"/>
+	                        </f:facet>
+	                        <f:facet name="input">
+	                            <p:selectOneMenu value="#{weakForm.estateFormalityType}" style="width:50%">
+	                                <f:selectItems value="#{bean.estateFormalityTypes}"/>
+	                            </p:selectOneMenu>
+	                        </f:facet>
+	                    </p:cellEditor>
+	                </p:column>
+	                <p:column style="width: 30%; padding: 2px; text-align: center">
+	                    <p:cellEditor>
+	                        <f:facet name="output">
+	                            <h:outputText value="#{weakForm.description}"/>
+	                        </f:facet>
+	                        <f:facet name="input">
+	                            <p:inputText value="#{weakForm.description}"/>
+	                        </f:facet>
+	                    </p:cellEditor>
+	                </p:column>
+	                <p:column style="width: 10%;padding: 2px;">
+	                    <p:commandButton icon="fa fa-comment" oncomplete="PF('commentEditDlg').show();"
+	                                     update=":form:commentArea" action="#{bean.prepareComment}">
+	                        <f:setPropertyActionListener value="SELECTED_ESTATE_FORMALITY" target="#{bean.currentComment}"/>
+	                        <f:setPropertyActionListener value="#{weakForm.id}" target="#{bean.selectedId}"/>
+	                    </p:commandButton>
+	                </p:column>
+	            </p:dataTable>
+	        </p:column>
+	        <p:column headerText="#{msg.esateSituationRegime}:" style="width: 74px;">
+	            <p:selectBooleanCheckbox value="#{item.regime}">
+	                <p:ajax listener="#{item.handleRegimeEdit()}" global="false" update="@this" />
+	            </p:selectBooleanCheckbox>
+	        </p:column>
+	        <p:column style="width: 70%; vertical-align: top;" headerText="#{msg.estateLocation}">
+	            <p:dataTable rendered="#{not empty item.propertyList}" value="#{item.propertyList}" var="estate"
+	                         editable="true" editMode="cell" styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}">
+	                <p:column style="text-align: center; width: 15%">
+	                    <p:cellEditor>
+	                        <f:facet name="output">
+	                            <h:outputText value="#{estate.getCategoryType()}"/>
+	                        </f:facet>
+	                        <f:facet name="input">
+	                            <p:selectOneMenu value="#{estate.selectedCategoryId}" style="width:82%">
+	                                <p:ajax listener="#{estate.categoryChange}"/>
+	                                <f:selectItems value="#{bean.categories}"/>
+	                            </p:selectOneMenu>
+	                        </f:facet>
+	                    </p:cellEditor>
+	                </p:column>
+	                <p:column style="text-align: center; width: 15%">
+	                    <p:cellEditor>
+	                        <f:facet name="output">
+	                            <h:outputText value="#{estate.address}"/>
+	                        </f:facet>
+	                        <f:facet name="input">
+	                            <p:inputText value="#{estate.address}">
+	                                <p:ajax listener="#{estate.handleRowEditEvent()}" global="false" update="@this" />
+	                            </p:inputText>
+	                        </f:facet>
+	                    </p:cellEditor>
+	                </p:column>
+	                <p:column style="text-align: center; width: 40%">
+	                    <p:dataTable value="#{estate.cadastralData}" var="exam" rendered="#{not empty estate.cadastralData}"
+	                                 styleClass="without-header cadastral_table" editable="true" editMode="cell" emptyMessage="#{msg.noRecordsFound}">
+	                        <p:column style="text-align: center">
+	                            <p:cellEditor>
+	                                <f:facet name="output">
+	                                    <h:outputText value="#{exam.sheet}" style="font-size: 1.1em; font-weight:bold;"/>
+	                                </f:facet>
+	                                <f:facet name="input">
+	                                    <p:inputText value="#{exam.sheet}"/>
+	                                </f:facet>
+	                            </p:cellEditor>
+	                        </p:column>
+	                        <p:column style="text-align: center">
+	                            <p:cellEditor>
+	                                <f:facet name="output">
+	                                    <h:outputText value="#{exam.particle}" style="font-size: 1.1em; font-weight:bold;"/>
+	                                </f:facet>
+	                                <f:facet name="input">
+	                                    <p:inputText value="#{exam.particle}"/>
+	                                </f:facet>
+	                            </p:cellEditor>
+	                        </p:column>
+	                        <p:column style="text-align: center">
+	                            <p:cellEditor>
+	                                <f:facet name="output">
+	                                    <h:outputText value="#{exam.sub}" style="font-size: 1.1em; font-weight:bold;"/>
+	                                </f:facet>
+	                                <f:facet name="input">
+	                                    <p:inputText value="#{exam.sub}"/>
+	                                </f:facet>
+	                            </p:cellEditor>
+	                        </p:column>
+	                    </p:dataTable>
+	                    <br/>
+	                    <p:panelGrid columns="2" layout="grid" columnClasses="ui-grid-col-4, ui-grid-col-6">
+	                        <h:outputText value="#{msg.formalityConsistency}:" style="color: black;"/>
+	                        <p:inputText value="#{estate.consistency}"/>
+	                        <h:outputText value="#{msg.requestTextEditCadastralArea}:" style="color: black;"/>
+	                            <p:inputText value="#{estate.cadastralArea}"/>
+	                        <h:outputText value="#{msg.requestTextEditRevenue}:" style="color: black;"/>
+	                        <p:inputText value="#{estate.revenue}">
+	                            <p:ajax listener="#{estate.handleRowEditEvent()}" global="false" update="@this" />
+	                        </p:inputText>
+	                        <h:outputText value="#{msg.requestTextEditMinimum}:" style="color: black;" rendered="#{estate.calculateOmiValue}"/>
+	                        <p:inputText value="#{estate.minimumValue}" rendered="#{estate.calculateOmiValue}"/>
+	                        <h:outputText value="#{msg.requestTextEditMaximum}:" style="color: black;" rendered="#{estate.calculateOmiValue}"/>
+	                        <p:inputText value="#{estate.maximumValue}" rendered="#{estate.calculateOmiValue}"/>
+	                        <p:commandButton action="#{estate.reCalculateOMI}" value="#{msg.requestTextEditCalculate}"
+	                                         update="estateSituationArea" style="margin-top: 1%;" oncomplete="updateTemplate();" rendered="#{not estate.calculateOmiValue}"/> 
+	                        <p:commandButton action="#{bean.reCalculateOMI}" value="#{msg.requestTextEditCalculate}"
+	                                         update="estateSituationArea" style="margin-top: 1%;" oncomplete="updateTemplate();" rendered="#{estate.calculateOmiValue}"/> 
+	                    </p:panelGrid>
+	                </p:column>
+	                <p:column style="text-align: center; width: 17%">
+	                    <p:outputPanel styleClass="visible-cell-editor-value">
+	                        <h:outputText value="#{msg.estateLocationOMI}"/>
+	                        <p:dataTable value="#{estate.lastOmi}" var="omi" editable="true" emptyMessage="#{msg.noRecordsFound}" editMode="cell" styleClass="background-lightorange-td">
+	                            <p:ajax event="rowEdit" listener="#{estate.setEdit(true)}"/>
+	                            <p:column style="padding: 0px !important;border: none !important;">
+	                                <p:cellEditor>
+	                                    <f:facet name="output">
+											<p:panelGrid columns="1" styleClass="border-omi-value background-lightorange-td">
+	                                        	<h:outputText value="#{omi.value}"/>
+											</p:panelGrid>
+	                                    </f:facet>
+	                                    <f:facet name="input">
+	                                        <p:outputPanel id="inputPanelOmi">
+	                                            <p:inputText value="#{omi.value}"
+	                                                         onkeypress="return numbers_only_if_should(#{omi.inappropriate},this, event, 9, 2);"
+	                                                         onkeyup="check_numbers_if_should(#{omi.inappropriate},this, 9, 2);">
+	                                                <p:ajax listener="#{estate.handleRowEditEvent()}" global="false" update="@this" />
+	                                            </p:inputText>
+	                                            <h:outputText value="#{msg.estateLocationOMINotInappropriate} "
+	                                                          style="color: white;"/>
+	                                            <p:selectBooleanCheckbox value="#{omi.inappropriate}">
+	                                                <p:ajax event="change" update="inputPanelOmi"
+	                                                        listener="#{estate.changeOmi(omi)}"/>
+	                                            </p:selectBooleanCheckbox>
+	                                        </p:outputPanel>
+	                                    </f:facet>
+	                                </p:cellEditor>
+	                            </p:column>
+	                        </p:dataTable>
+	                        <p:panelGrid columns="1" styleClass="border-omi-value background-lightblue-td">
+	                            <p:outputPanel style="display:inline-flex;">
+									<h:outputText value="#{estate.calculatedOmi.value}
+	                        	#{(not empty estate.calculatedOmi.value and not empty estate.manualOmi) ? ' - M' : ''}" style="color: #5f666c;"/>
+	                                <p:outputPanel style="margin-left: 3px;" id="omiSevZones" rendered="#{estate.calculatedOmi.severalZones}">
+	                                    <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
+	                                </p:outputPanel>
+	                                <p:tooltip for="omiSevZones" value="#{msg.requestTextEditSeveralZones}"/>
+	                                <p:outputPanel style="margin-left: 3px;" id="omiSevComprs" rendered="#{estate.calculatedOmi.severalComprs}">
+	                                    <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
+	                                </p:outputPanel>
+	                                <p:tooltip for="omiSevComprs" value="#{msg.requestTextEditSeveralMaxMinComprs}"/>
+	                                <p:outputPanel style="margin-left: 3px;" id="omiMultiCoord" rendered="#{estate.calculatedOmi.multipleCoordinates}">
+	                                    <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
+	                                </p:outputPanel>
+	                                <p:tooltip for="omiMultiCoord" value="#{msg.requestTextEditMultipleCoordinates}"/>
+	                                <p:outputPanel style="margin-left: 3px;" id="categoryCodeInfo" rendered="#{not estate.calculatedOmi.multipleCoordinates and estate.calculatedOmi.categoryCodeMissing}">
+	                                    <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
+	                                </p:outputPanel>
+	                                <p:tooltip for="categoryCodeInfo" value="#{msg.requestTextEditCategoryCodeMissing}"/>
+	                            </p:outputPanel>
+	                        </p:panelGrid>
+	                    </p:outputPanel>
+	                    <p:cellEditor>
+	                        <f:facet name="output">
+	                            <h:outputText value="#{msg.estateLocationCommercial}"/>
+	                            <p:panelGrid columns="1" styleClass="border-omi-value background-lightorange-td">
+	                                <h:outputText value="#{estate.lastCommercial}"/>
+	                            </p:panelGrid>
+	                        </f:facet>
+	                        <f:facet name="input">
+	                            <p:outputPanel id="inputPanel">
+	                                <h:outputText value="#{msg.estateLocationCommercial}"/>
+	                                <p:inputText value="#{estate.lastCommercial}"
+	                                             onkeypress="return numbers_only(this, event, 9, 2)"
+	                                             onkeyup="check_numbers(this, 9, 2);">
+	                                    <p:ajax listener="#{estate.handleRowEditEvent()}" global="false" update="@this" />
+	                                </p:inputText>
+	                            </p:outputPanel>
+	                        </f:facet>
+	                    </p:cellEditor>
+	                    <p:panelGrid columns="1" styleClass="border-omi-value background-lightblue-td">
+	                        <h:outputText value="#{estate.calculatedCommercial}
+	                        	#{(not estate.calculatedCommercial and not empty estate.manualCommercial) ? ' - M' : ''}" style="color: #5f666c;"/>
+	                    </p:panelGrid>
+	                </p:column>
+	                <p:column style="width: 30px;padding: 2px;">
+	                    <p:commandButton icon="fa fa-comment" oncomplete="PF('commentEditDlg').show();"
+	                                     rendered="#{empty bean.examRequest.distraintFormality}"
+	                                     update=":form:commentArea" action="#{bean.prepareComment}">
+	                        <f:setPropertyActionListener value="SELECTED_PROPERTY" target="#{bean.currentComment}"/>
+	                        <f:setPropertyActionListener value="#{estate.id}" target="#{bean.selectedId}"/>
+	                    </p:commandButton>
+	                    <p:rowToggler rendered="#{not empty bean.examRequest.distraintFormality}"/>
+	                </p:column>
+	                <p:column style="width: 30px;padding: 2px;">
+	                    <p:commandButton icon="fa fa-bars" onclick="PF('relationshipDlg').show();"
+	                                     update=":form:relationshipArea, :form:relationshipTable"
+	                                     action="#{bean.prepareRelationships}" onerror="console.log(arguments)">
+	                        <f:setPropertyActionListener value="SELECTED_PROPERTY" target="#{bean.currentComment}"/>
+	                        <f:setPropertyActionListener value="#{estate.id}" target="#{bean.selectedId}"/>
+	                    </p:commandButton>
+	                </p:column>
+	                <p:rowExpansion>
+	                    <p:dataTable value="#{estate.associatedWithEstateSituationDatafromProperties}" var="datafrom"
+	                                 id="datafromTable" emptyMessage="#{msg.noRecordsFound}" rowStyleClass="#{datafrom.associated ? null : 'delete-row'}">
+	                        <p:column>
+	                            <h:outputText value="#{datafrom.text}"/>
+	                        </p:column>
+	                        <p:column style="width: 34px;padding: 2px;">
+	                            <p:commandButton icon="fa fa-comment" oncomplete="PF('datafromEditDlg').show();"
+	                                             update=":form:datafromArea">
+	                                <f:setPropertyActionListener value="#{bean.estateSituations.indexOf(item)}"
+	                                                             target="#{bean.estateSituationId}"/>
+	                                <f:setPropertyActionListener
+	                                        value="#{estate.associatedWithEstateSituationDatafromProperties.indexOf(datafrom)}"
+	                                        target="#{bean.entityEditId}"/>
+	                                <f:setPropertyActionListener value="#{item.propertyList.indexOf(estate)}"
+	                                                             target="#{bean.selectedId}"/>
+	                                <f:setPropertyActionListener value="#{datafrom.text}"
+	                                                             target="#{bean.datafromPropertyText}"/>
+	                            </p:commandButton>
+	                        </p:column>
+	                        <p:column style="width: 34px;padding: 2px;">
+	                            <p:commandButton icon="fa fa-close" update="datafromTable"
+	                                             action="#{bean.deleteDatafromPropertyAssociation}" >
+	                                <f:setPropertyActionListener value="#{bean.estateSituations.indexOf(item)}"
+	                                                             target="#{bean.estateSituationId}"/>
+	                                <f:setPropertyActionListener
+	                                        value="#{estate.associatedWithEstateSituationDatafromProperties.indexOf(datafrom)}"
+	                                        target="#{bean.entityEditId}"/>
+	                                <f:setPropertyActionListener value="#{item.propertyList.indexOf(estate)}"
+	                                                             target="#{bean.selectedId}"/>
+	                            </p:commandButton>
+	                        </p:column>
+	                    </p:dataTable>
+	                    <p:commandButton style="margin-top: 10px" icon="fa fa-plus" oncomplete="PF('datafromEditDlg').show();"
+	                                     update=":form:datafromArea">
+	                        <f:setPropertyActionListener value="#{bean.estateSituations.indexOf(item)}"
+	                                                     target="#{bean.estateSituationId}"/>
+	                        <f:setPropertyActionListener value="#{null}" target="#{bean.entityEditId}"/>
+	                        <f:setPropertyActionListener value="#{item.propertyList.indexOf(estate)}"
+	                                                     target="#{bean.selectedId}"/>
+	                        <f:setPropertyActionListener value="" target="#{bean.datafromPropertyText}"/>
+	                    </p:commandButton>
+	                </p:rowExpansion>
+	            </p:dataTable>
+	        </p:column>
+	        <p:column style="width: 34px;padding: 7px 2px 2px;vertical-align: top;">
+	            <p:commandButton icon="fa fa-commenting" oncomplete="PF('commentEditDlg').show();"
+	                             update=":form:commentArea" action="#{bean.prepareComment}">
+	                <f:setPropertyActionListener value="SELECTED_ESTATE_SITUATION_INIT" target="#{bean.currentComment}"/>
+	                <f:setPropertyActionListener value="#{item.comment.id}" target="#{bean.selectedId}"/>
+	            </p:commandButton>
+	            <br/>
+	            <br/>
+	            <p:commandButton icon="fa fa-comment" oncomplete="PF('commentEditDlg').show();"
+	                             update=":form:commentArea" action="#{bean.prepareComment}">
+	                <f:setPropertyActionListener value="SELECTED_ESTATE_SITUATION" target="#{bean.currentComment}"/>
+	                <f:setPropertyActionListener value="#{item.comment.id}" target="#{bean.selectedId}"/>
+	            </p:commandButton>
+	            <br/>
+	            <br/>
+	            <p:commandButton icon="fa fa-bars" oncomplete="PF('estateSituationRelationshipDlg').show();"
+	                             update=":form:estaeRelationshipArea, :form:estateRelationshipTable"
+	                             action="#{bean.prepareRelationships}">
+	                <f:setPropertyActionListener value="SELECTED_ESTATE_SITUATION" target="#{bean.currentComment}"/>
+	                <f:setPropertyActionListener value="#{item.estateSituationId}" target="#{bean.selectedId}"/>
+	            </p:commandButton>
+	        </p:column>
+	    </p:dataTable>
+    </p:outputPanel>
     <br/>
     <p:commandButton icon="fa fa-comment" value="#{msg.requestTextEditCertificateComment}"
                      oncomplete="PF('commentEditDlg').show();"
@@ -388,7 +404,7 @@
     <br/>
     <h3>#{msg.textEditTableGravami}</h3>
     <p:outputPanel deferred="true">
-        <p:dataTable value="#{bean.estateSituationFormalities}" styleClass="simple-table" var="item" id="formalityTable">
+        <p:dataTable value="#{bean.estateSituationFormalities}" styleClass="simple-table" emptyMessage="#{msg.noRecordsFound}" var="item" id="formalityTable">
             <p:column headerText="#{msg.estateFormalityNumRG}">
                 <h:outputText value="#{item.generalRegister}"/>
             </p:column>
@@ -430,7 +446,7 @@
         <p:outputPanel rendered="#{bean.formalityDetailsRendered}">
             <br/>
             <h3>#{msg.textEditTableFormalityDetails}</h3>
-            <p:dataTable value="#{bean.gravamiEstateSituations}" var="gitem" id="formalityDetailsTable"
+            <p:dataTable value="#{bean.gravamiEstateSituations}" var="gitem" id="formalityDetailsTable" emptyMessage="#{msg.noRecordsFound}"
                          rowIndexVar="gindex" widgetVar="formalityDetailsTableWV" editable="true" editMode="cell"
                          styleClass="simple-table without-header cadastral_table">
                 <p:column style="width: 20%; vertical-align: top;" headerText="#{msg.formality}">
@@ -448,7 +464,7 @@
                     </p:cellEditor>
                 </p:column>
                 <p:column style="width: 80%; vertical-align: top;" headerText="#{msg.estateLocation}">
-                    <p:dataTable rendered="#{not empty gitem.propertyList}" value="#{gitem.propertyList}" var="gestate"
+                    <p:dataTable rendered="#{not empty gitem.propertyList}" value="#{gitem.propertyList}" var="gestate" emptyMessage="#{msg.noRecordsFound}"
                                  editable="true" editMode="cell" styleClass="without-header cadastral_table">
                         <p:column style="text-align: center">
                             <p:cellEditor>
@@ -477,7 +493,7 @@
                         </p:column>
                         <p:column style="text-align: center; width: 35%">
                             <p:dataTable value="#{gestate.cadastralData}" var="gexam" rendered="#{not empty gestate.cadastralData}"
-                                         styleClass="without-header cadastral_table" editable="true" editMode="cell">
+                                         styleClass="without-header cadastral_table" editable="true" editMode="cell" emptyMessage="#{msg.noRecordsFound}">
                                 <p:column style="text-align: center">
                                     <p:cellEditor>
                                         <f:facet name="output">
@@ -516,28 +532,32 @@
                                 <h:outputText value="#{msg.requestTextEditCadastralArea}:" style="color: black;"/>
                                 <p:inputText value="#{gestate.cadastralArea}"/>
                                 <h:outputText value="#{msg.requestTextEditRevenue}:" style="color: black;"/>
-                                <p:inputText value="#{gestate.revenue}"/>
+                                <p:inputText value="#{gestate.revenue}">
+                                    <p:ajax listener="#{gestate.handleRowEditEvent()}" global="false" update="@this" />
+                                </p:inputText>
                                 <h:outputText value="#{msg.requestTextEditMinimum}:" style="color: black;" rendered="#{gestate.calculateOmiValue}"/>
                                 <p:inputText value="#{gestate.minimumValue}" rendered="#{gestate.calculateOmiValue}"/>
                                 <h:outputText value="#{msg.requestTextEditMaximum}:" style="color: black;" rendered="#{gestate.calculateOmiValue}"/>
                                 <p:inputText value="#{gestate.maximumValue}" rendered="#{gestate.calculateOmiValue}"/>
-                                <p:commandButton action="#{gestate.reCalculateOMI}" value="#{msg.requestTextEditCalculate}"
-                                                 update="formalityDetailsTable" style="margin-top: 1%;" rendered="#{not gestate.calculateOmiValue}"/>
-                                <p:commandButton action="#{bean.reCalculateOMI}" value="#{msg.requestTextEditCalculate}"
-                                                 update="formalityDetailsTable" style="margin-top: 1%;" rendered="#{gestate.calculateOmiValue}"/>
-                            </p:panelGrid>
+                                <p:commandButton action="#{gestate.reCalculateOMI}" value="#{msg.requestTextEditCalculate}" oncomplete="updateTemplate();"
+                                                 update="formalityDetailsArea" style="margin-top: 1%;" rendered="#{not gestate.calculateOmiValue}"/>
+                                <p:commandButton action="#{bean.reCalculateOMI}" value="#{msg.requestTextEditCalculate}" oncomplete="updateTemplate();"
+                                                 update="formalityDetailsArea" style="margin-top: 1%;" rendered="#{gestate.calculateOmiValue}"/>
+                            </p:panelGrid> 
 
                         </p:column>
                         <p:column style="text-align: center; width: 20%">
                             <p:outputPanel styleClass="visible-cell-editor-value">
                                 <h:outputText value="#{msg.estateLocationOMI}"/>
-                                <p:dataTable value="#{gestate.lastOmi}" var="gomi" editable="true" editMode="cell">
+                                <p:dataTable value="#{gestate.lastOmi}" var="gomi" editable="true" editMode="cell" emptyMessage="#{msg.noRecordsFound}">
                                     <p:ajax event="rowEdit" listener="#{gestate.setEdit(true)}"/>
-                                    <p:column>
+									<p:column style="padding: 0px !important;border: none !important;">
                                         <p:cellEditor>
                                             <f:facet name="output">
-                                                <h:outputText value="#{gomi.value}"/>
-                                            </f:facet>
+												<p:panelGrid columns="1" styleClass="border-omi-value background-lightorange-td">
+													<h:outputText value="#{gomi.value}"/>
+												</p:panelGrid>
+											</f:facet>
                                             <f:facet name="input">
                                                 <p:outputPanel id="inputGPanelOmiNotSelected">
                                                     <p:inputText value="#{gomi.value}"
@@ -558,7 +578,8 @@
                                 </p:dataTable>
                                 <p:panelGrid columns="1" styleClass="border-omi-value background-lightblue-td">
                                     <p:outputPanel style="display: inline-flex;">
-                                        <h:outputText value="#{gestate.calculatedOmi.value}" style="color: #5f666c;"/>
+										<h:outputText value="#{gestate.calculatedOmi.value}
+	                        				#{(not empty gestate.calculatedOmi.value and not empty gestate.manualOmi) ? ' - M' : ''}" style="color: #5f666c;"/>
                                         <p:outputPanel style="margin-left: 3px;" id="omiGSevZonesNotSelected" rendered="#{gestate.calculatedOmi.severalZones}">
                                             <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
                                         </p:outputPanel>
@@ -581,6 +602,8 @@
                                     </p:outputPanel>
                                 </p:panelGrid>
                             </p:outputPanel>
+                            
+                            <!-- <p:outputPanel styleClass="visible-cell-editor-value" id="commercialPanel"> -->
                             <p:cellEditor>
                                 <f:facet name="output">
                                     <h:outputText value="#{msg.estateLocationCommercial}"/>
@@ -598,8 +621,10 @@
                                 </f:facet>
                             </p:cellEditor>
                             <p:panelGrid columns="1" styleClass="border-omi-value background-lightblue-td">
-                                <h:outputText value="#{gestate.calculatedCommercial}" style="color: #5f666c;"/>
+								<h:outputText value="#{gestate.calculatedCommercial}
+	                        	#{(not empty gestate.calculatedCommercial and not empty gestate.manualCommercial) ? ' - M' : ''}" style="color: #5f666c;"/>
                             </p:panelGrid>
+                            <!-- </p:outputPanel> -->
                         </p:column>
                     </p:dataTable>
                 </p:column>
@@ -630,9 +655,9 @@
     <br/>
     <br/>
     <ui:fragment rendered="#{bean.showSalesSection}"><h3>#{msg.requestActsDevelopment}</h3></ui:fragment>
-    <p:outputPanel deferred="true" deferredMode="visible">
+    <p:outputPanel deferred="true" deferredMode="load" id="salesOtherArea">
         <p:dataTable value="#{bean.salesOtherEstateSituations}" styleClass="simple-table" var="salesitem" id="salesTableNotSelected"
-                     rowIndexVar="sindex" widgetVar="salesTableProcedureNotSelectedWV">
+                     rowIndexVar="sindex" widgetVar="salesTableProcedureNotSelectedWV" emptyMessage="#{msg.noRecordsFound}">
             <p:column style="width: 20%; vertical-align: top;" headerText="#{msg.formality}">
                 <p:cellEditor>
                     <f:facet name="output">
@@ -649,7 +674,7 @@
             </p:column>
             <p:column style="width: 80%; vertical-align: top;" headerText="#{msg.estateLocation}">
                 <p:dataTable rendered="#{not empty salesitem.propertyList}" value="#{salesitem.propertyList}" var="salesestate"
-                             editable="true" editMode="cell" styleClass="without-header cadastral_table">
+                             editable="true" editMode="cell" styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}">
                     <p:column style="text-align: center; width:17%;">
                         <p:cellEditor>
                             <f:facet name="output">
@@ -677,7 +702,7 @@
                     </p:column>
                     <p:column style="text-align: center; width: 35%">
                         <p:dataTable value="#{salesestate.cadastralData}" var="salesexam" rendered="#{not empty salesestate.cadastralData}"
-                                     styleClass="without-header cadastral_table" editable="true" editMode="cell">
+                                     styleClass="without-header cadastral_table" editable="true" editMode="cell" emptyMessage="#{msg.noRecordsFound}">
                             <p:column style="text-align: center">
                                 <p:cellEditor>
                                     <f:facet name="output">
@@ -716,26 +741,30 @@
                             <h:outputText value="#{msg.requestTextEditCadastralArea}:" style="color: black;"/>
                             <p:inputText value="#{salesestate.cadastralArea}"/>
                             <h:outputText value="#{msg.requestTextEditRevenue}:" style="color: black;"/>
-                            <p:inputText value="#{salesestate.revenue}"/>
+                            <p:inputText value="#{salesestate.revenue}">
+                                <p:ajax listener="#{salesestate.handleRowEditEvent()}" global="false" update="@this" />
+                            </p:inputText>
                             <h:outputText value="#{msg.requestTextEditMinimum}:" style="color: black;" rendered="#{gestate.calculateOmiValue}"/>
                             <p:inputText value="#{salesestate.minimumValue}" rendered="#{gestate.calculateOmiValue}"/>
                             <h:outputText value="#{msg.requestTextEditMaximum}:" style="color: black;" rendered="#{gestate.calculateOmiValue}"/>
                             <p:inputText value="#{salesestate.maximumValue}" rendered="#{gestate.calculateOmiValue}"/>
                             <p:commandButton action="#{salesestate.reCalculateOMI}" value="#{msg.requestTextEditCalculate}"
-                                             update="salesTableNotSelected" style="margin-top: 1%;" oncomplete="updateTemplate();"/>
+                                             update="salesOtherArea" style="margin-top: 1%;" oncomplete="updateTemplate();"/>
                         </p:panelGrid>
 
                     </p:column>
                     <p:column style="text-align: center; width: 20%">
                         <p:outputPanel styleClass="visible-cell-editor-value">
                             <h:outputText value="#{msg.estateLocationOMI}"/>
-                            <p:dataTable value="#{salesestate.lastOmi}" var="salesomi" editable="true" editMode="cell">
+                            <p:dataTable value="#{salesestate.lastOmi}" var="salesomi" editable="true" emptyMessage="#{msg.noRecordsFound}" editMode="cell">
                                 <p:ajax event="rowEdit" listener="#{salesestate.setEdit(true)}"/>
-                                <p:column>
+								<p:column style="padding: 0px !important;border: none !important;">
                                     <p:cellEditor>
                                         <f:facet name="output">
-                                            <h:outputText value="#{salesomi.value}"/>
-                                        </f:facet>
+											<p:panelGrid columns="1" styleClass="border-omi-value background-lightorange-td">
+												<h:outputText value="#{salesomi.value}"/>
+											</p:panelGrid>
+										</f:facet>
                                         <f:facet name="input">
                                             <p:outputPanel id="inputSalesPanelOmiNotSelected">
                                                 <p:inputText value="#{salesomi.value}"
@@ -756,7 +785,8 @@
                             </p:dataTable>
                             <p:panelGrid columns="1" styleClass="border-omi-value background-lightblue-td">
                                 <p:outputPanel style="display: inline-flex;">
-                                    <h:outputText value="#{salesestate.calculatedOmi.value}" style="color: #5f666c;"/>
+									<h:outputText value="#{salesestate.calculatedOmi.value}
+	                        				#{(not empty salesestate.calculatedOmi.value and not empty salesestate.manualOmi) ? ' - M' : ''}" style="color: #5f666c;"/>
                                     <p:outputPanel style="margin-left: 3px;" id="omiSalesSevZonesNotSelected" rendered="#{salesestate.calculatedOmi.severalZones}">
                                         <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
                                     </p:outputPanel>
@@ -796,7 +826,8 @@
                             </f:facet>
                         </p:cellEditor>
                         <p:panelGrid columns="1" styleClass="border-omi-value background-lightblue-td">
-                            <h:outputText value="#{salesestate.calculatedCommercial}" style="color: #5f666c;"/>
+							<h:outputText value="#{salesestate.calculatedCommercial}
+	                        	#{(not empty salesestate.calculatedCommercial and not empty salesestate.manualCommercial) ? ' - M' : ''}" style="color: #5f666c;"/>
                         </p:panelGrid>
                     </p:column>
                     <p:column style="width: 34px;padding: 2px;">
@@ -820,12 +851,12 @@
     </p:outputPanel>
     <br/>
     <br/>
-    <p:outputPanel deferred="true" deferredMode="visible">
+    <p:outputPanel deferred="true" deferredMode="load">
         <p:dataTable value="#{bean.otherEstateSituations}" styleClass="simple-table" var="item" id="tableNotSelected"
-                     rowIndexVar="index" widgetVar="tableProcedureNotSelectedWV">
+                     rowIndexVar="index" widgetVar="tableProcedureNotSelectedWV" emptyMessage="#{msg.noRecordsFound}">
             <p:column style="width: 50%; vertical-align: top;" headerText="#{msg.estateFormalityNotSelect}">
                 <p:dataTable rendered="#{not empty item.estateFormalityList}" value="#{item.estateFormalityList}"
-                             var="weakForm" styleClass="without-header cadastral_table" editable="true" editMode="cell">
+                             var="weakForm" styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}" editable="true" editMode="cell">
                     <p:column style="text-align: center">
                         <p:cellEditor>
                             <f:facet name="output">
@@ -874,7 +905,7 @@
             </p:column>
             <p:column style="width: 60%; vertical-align: top;" headerText="#{msg.estateNotSelect}">
                 <p:dataTable rendered="#{not empty item.propertyList}" value="#{item.propertyList}" var="estate"
-                             editable="true" editMode="cell" styleClass="without-header cadastral_table">
+                             editable="true" editMode="cell" emptyMessage="#{msg.noRecordsFound}" styleClass="without-header cadastral_table">
                     <p:column style="text-align: center">
                         <p:cellEditor>
                             <f:facet name="output">
@@ -900,7 +931,7 @@
                     </p:column>
                     <p:column style="text-align: center; width: 25%">
                         <p:dataTable value="#{estate.cadastralData}" var="exam" rendered="#{not empty estate.cadastralData}"
-                                     styleClass="without-header cadastral_table" editable="true" editMode="cell">
+                                     styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}" editable="true" editMode="cell">
                             <p:column style="text-align: center">
                                 <p:cellEditor>
                                     <f:facet name="output">
@@ -936,13 +967,15 @@
                     <p:column style="text-align: center; width: 20%">
                         <p:outputPanel styleClass="visible-cell-editor-value">
                             <h:outputText value="#{msg.estateLocationOMI}"/>
-                            <p:dataTable value="#{estate.lastOmi}" var="omi" editable="true" editMode="cell">
+                            <p:dataTable value="#{estate.lastOmi}" var="omi" editable="true" emptyMessage="#{msg.noRecordsFound}" editMode="cell">
                                 <p:ajax event="rowEdit" listener="#{estate.setEdit(true)}"/>
-                                <p:column>
+								<p:column style="padding: 0px !important;border: none !important;">
                                     <p:cellEditor>
                                         <f:facet name="output">
-                                            <h:outputText value="#{omi.value}"/>
-                                        </f:facet>
+											<p:panelGrid columns="1" styleClass="border-omi-value background-lightorange-td">
+												<h:outputText value="#{omi.value}"/>
+											</p:panelGrid>
+										</f:facet>
                                         <f:facet name="input">
                                             <p:outputPanel id="inputPanelOmiNotSelected">
                                                 <p:inputText value="#{omi.value}"
@@ -963,7 +996,8 @@
                             </p:dataTable>
                             <p:panelGrid columns="1" styleClass="border-omi-value background-lightblue-td">
                                 <p:outputPanel style="display: inline-flex;">
-                                    <h:outputText value="#{estate.calculatedOmi.value}" style="color: #5f666c;"/>
+									<h:outputText value="#{estate.calculatedOmi.value}
+	                        				#{(not empty estate.calculatedOmi.value and not empty estate.manualOmi) ? ' - M' : ''}" style="color: #5f666c;"/>
                                     <p:outputPanel style="margin-left: 3px;" id="omiSevZonesNotSelected" rendered="#{estate.calculatedOmi.severalZones}">
                                         <img alt="?" src="../../resources/images/attention.png" style="width: 19px;"/>
                                     </p:outputPanel>
@@ -1003,7 +1037,8 @@
                             </f:facet>
                         </p:cellEditor>
                         <p:panelGrid columns="1" styleClass="border-omi-value background-lightblue-td">
-                            <h:outputText value="#{estate.calculatedCommercial}" style="color: #5f666c;"/>
+							<h:outputText value="#{estate.calculatedCommercial}
+	                        	#{(not empty estate.calculatedCommercial and not empty estate.manualCommercial) ? ' - M' : ''}" style="color: #5f666c;"/>
                         </p:panelGrid>
                     </p:column>
                     <p:column style="width: 9%;padding: 2px;">
@@ -1033,7 +1068,7 @@
                          update=":form:commentArea" action="#{bean.prepareComment}" style="margin-top: 1%;">
             <f:setPropertyActionListener value="REQUEST" target="#{bean.currentComment}"/>
         </p:commandButton>
-        <p:dataTable value="#{bean.examRequest.commentsWithInitialize}" var="item" id="commentTable" styleClass="simple-table">
+        <p:dataTable value="#{bean.examRequest.commentsWithInitialize}" var="item" emptyMessage="#{msg.noRecordsFound}" id="commentTable" styleClass="simple-table">
             <p:column headerText="#{msg.requestTextEditComments}">
                 <h:outputText value="#{item.comment}" escape="false"/>
             </p:column>
@@ -1115,7 +1150,7 @@
     <p:dialog widgetVar="relationshipDlg" resizable="false" modal="true" draggable="false" closable="true"
               id="relationshipDlg" width="600">
         <p:dataTable value="#{bean.currentProperty.relationshipListToShow}" var="item" id="relationshipTable"
-                     styleClass="simple-table">
+                     styleClass="simple-table" emptyMessage="#{msg.noRecordsFound}">
             <p:column headerText="#{msg.databaseListRealEstateQuote}">
                 <h:outputText value="#{item.quote1} / #{item.quote2}"/>
             </p:column>
@@ -1139,9 +1174,9 @@
         <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" id="relationshipArea">
             <span> #{msg.databaseListRealEstateQuote}:</span>
             <p:column>
-                <p:inputText id="inputQuote1" value="#{bean.quote1}" onkeypress="numbers_only('#inputQuote1');"/>
+                <p:inputText id="inputQuote1" value="#{bean.quote1}" onkeypress="numbers_only('#inputQuote1');" style="width:45%"/>
                 <h:outputText value=" / "/>
-                <p:inputText id="inputQuote2" value="#{bean.quote2}" onkeypress="numbers_only('#inputQuote2');"/>
+                <p:inputText id="inputQuote2" value="#{bean.quote2}" onkeypress="numbers_only('#inputQuote2');" style="width:45%"/>
             </p:column>
             <p:column/>
             <span> #{msg.databaseListRealEstatePropertyType}:</span>
@@ -1150,8 +1185,65 @@
                     <f:selectItems value="#{bean.propertyTypeList}"/>
                 </p:selectOneMenu>
             </p:column>
+            <p:column/>
+            <span> #{msg.databaseListRegime}:</span>
+            <p:column>
+                <p:selectOneMenu value="#{bean.selectedRegime}" id="regimeType">
+                    <f:selectItems value="#{bean.regimes}"/>
+                </p:selectOneMenu>
+            </p:column>
             <p:commandButton icon="fa fa-plus" action="#{bean.saveRelationship}"
                              update="relationshipArea, relationshipTable"/>
         </p:panelGrid>
     </p:dialog>
+    <p:dialog widgetVar="estateSituationRelationshipDlg" resizable="false" modal="true" draggable="false" closable="true"
+              id="estateSituationRelationshipDlg" width="600">
+        <p:dataTable value="#{bean.estateSituationRelationshipList}" var="item" id="estateRelationshipTable"
+                     styleClass="simple-table" emptyMessage="#{msg.noRecordsFound}">
+            <p:column headerText="#{msg.databaseListRealEstateQuote}">
+                <h:outputText value="#{item.quote1} / #{item.quote2}"/>
+            </p:column>
+            <p:column headerText="#{msg.databaseListRealEstatePropertyType}">
+                <h:outputText value="#{item.type.description}"/>
+            </p:column>
+            <p:column headerText="#{msg.databaseListRealEstateSubject}">
+                <h:outputText value="#{item.subject.fullName}"/>
+            </p:column>
+            <p:column styleClass="action_column">
+                <p:commandButton update="estaeRelationshipArea" icon="fa fa-edit" action="#{bean.editAllRelationShip}">
+                    <f:setPropertyActionListener value="#{item}" target="#{bean.editRelationship}"/>
+                </p:commandButton>
+            </p:column>
+            <p:column styleClass="action_column">
+                <p:commandButton update="estateRelationshipTable" icon="fa fa-remove" action="#{bean.deleteAllRelationship}">
+                    <f:setPropertyActionListener value="#{item}" target="#{bean.deleteRelationship}"/>
+                </p:commandButton>
+            </p:column>
+        </p:dataTable>
+        <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group" id="estaeRelationshipArea">
+            <span> #{msg.databaseListRealEstateQuote}:</span>
+            <p:column>
+                <p:inputText id="estateInputQuote1" value="#{bean.estateQuote1}" onkeypress="numbers_only('#estateInputQuote1');"/>
+                <h:outputText value=" / "/>
+                <p:inputText id="estateInputQuote2" value="#{bean.estateQuote2}" onkeypress="numbers_only('#estateInputQuote2');"/>
+            </p:column>
+            <p:column/>
+            <span> #{msg.databaseListRealEstatePropertyType}:</span>
+            <p:column>
+                <p:selectOneMenu value="#{bean.estatePropertyType}" id="estatePropertyType">
+                    <f:selectItems value="#{bean.propertyTypeList}"/>
+                </p:selectOneMenu>
+            </p:column>
+            <p:column/>
+            <span> #{msg.databaseListRegime}:</span>
+            <p:column>
+                <p:selectOneMenu value="#{bean.estateSelectedRegime}" id="estateRegimeType">
+                    <f:selectItems value="#{bean.regimes}"/>
+                </p:selectOneMenu>
+            </p:column>
+            <p:commandButton icon="fa fa-plus" action="#{bean.saveAllRelationship}"
+                             update="estaeRelationshipArea, estateRelationshipTable"/>
+        </p:panelGrid>
+    </p:dialog>
+
 </ui:composition>

@@ -4,50 +4,132 @@ import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.ComboboxHelper;
 import it.nexera.ris.common.helpers.LogHelper;
 import it.nexera.ris.common.helpers.ValidationHelper;
+import it.nexera.ris.persistence.PersistenceSessionManager;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
-import it.nexera.ris.web.beans.EntityLazyInListEditPageBean;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.TypeFormality;
+import it.nexera.ris.web.beans.EntityLazyListPageBean;
 import it.nexera.ris.web.beans.wrappers.Icon;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.HibernateException;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.primefaces.context.RequestContext;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @ManagedBean(name = "requestTypeListBean")
 @ViewScoped
+@Getter
+@Setter
 public class RequestTypeListBean extends
-        EntityLazyInListEditPageBean<RequestType> implements Serializable {
+        EntityLazyListPageBean<RequestType> implements Serializable {
 
     private static final long serialVersionUID = -6260035111902337296L;
+
+    private String name;
+
+    private String description;
+
+    private RequestType entity;
 
     private Icon icon;
 
     private List<Icon> icons;
-    
+
     private List<SelectItem> landAggregations;
-    
-    private Long aggregationFilterId;
+
+    private Long aggregationId;
 
     @Override
-    protected void setEditedValues() {
-        this.getEditedEntity().setName(this.getEntity().getName());
-        this.getEditedEntity()
-                .setDescription(this.getEntity().getDescription());
-        this.getEditedEntity().setIcon(this.getEntity().getIcon());
-        this.getEditedEntity().setDefault_registry(this.getEntity().getDefault_registry());
+    public void onLoad() throws NumberFormatException, HibernateException,
+            PersistenceBeanException, InstantiationException,
+            IllegalAccessException, IOException {
+        setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.TRUE));
+        filterTableFromPanel();
+        fillIconList();
+        setEntity(new RequestType());
+    }
+
+    public void filterTableFromPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        List<Criterion> restrictions = new ArrayList<>();
+        if (!ValidationHelper.isNullOrEmpty(getName())) {
+            restrictions.add(Restrictions.ilike("name", getName(), MatchMode.ANYWHERE));
+        }
+        if (!ValidationHelper.isNullOrEmpty(getDescription())) {
+            restrictions.add(Restrictions.ilike("description", getDescription(), MatchMode.ANYWHERE));
+        }
+        restrictions.add(Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                Restrictions.isNull("isDeleted")));
+        this.loadList(RequestType.class, restrictions.toArray(new Criterion[0]), new Order[]
+                {Order.asc("name")});
+    }
+
+    public void clearFilterPanel() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        setName(null);
+        setDescription(null);
+        filterTableFromPanel();
     }
 
     @Override
+    public void editEntity() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        if (this.getCanEdit()) {
+            this.cleanValidation();
+            if (!ValidationHelper.isNullOrEmpty(this.getEntityEditId())) {
+                try {
+                    this.setEntity(DaoManager.get(getType(), this.getEntityEditId()));
+                    DaoManager.getSession().evict(this.getEntity());
+                    if(!ValidationHelper.isNullOrEmpty(this.getEntity().getDefault_registry()))
+                        setAggregationId(this.getEntity().getDefault_registry().getId());
+                } catch (Exception e) {
+                    LogHelper.log(log, e);
+                }
+            }
+            RequestContext.getCurrentInstance().update("addRequestTypeDialog");
+            executeJS("PF('addRequestTypeDialogWV').show();");
+        }
+    }
+
+    @Override
+    public void addEntity() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        if (this.getCanCreate()) {
+            setEntity(new RequestType());
+            setAggregationId(null);
+            this.cleanValidation();
+            RequestContext.getCurrentInstance().update("addRequestTypeDialog");
+            executeJS("PF('addRequestTypeDialogWV').show();");
+        }
+    }
+
+    public void save() throws HibernateException, PersistenceBeanException, NumberFormatException, IOException,
+            InstantiationException, IllegalAccessException {
+        this.cleanValidation();
+        this.setValidationFailed(false);
+
+        try {
+            this.validate();
+        } catch (PersistenceBeanException e) {
+            LogHelper.log(log, e);
+        }
+        if (this.getValidationFailed()) {
+            return;
+        }
+        saveEntity();
+        this.resetFields();
+        executeJS("PF('addRequestTypeDialogWV').hide()");
+        executeJS("refreshTable()");
+    }
+
     protected void validate() throws PersistenceBeanException {
         if (ValidationHelper.isNullOrEmpty(this.getEntity().getName())) {
             addRequiredFieldException("form:name");
@@ -57,41 +139,39 @@ public class RequestTypeListBean extends
         }
     }
 
-    @Override
-    public void save() throws HibernateException, PersistenceBeanException,
-            NumberFormatException, IOException, InstantiationException,
-            IllegalAccessException {
-        if(!ValidationHelper.isNullOrEmpty(getAggregationFilterId()))
-            this.getEntity().setDefault_registry(DaoManager.get(AggregationLandChargesRegistry.class, getAggregationFilterId()));
-        DaoManager.save(this.getEntity());
+    public void resetFields() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        setEntity(new RequestType());
+        this.cleanValidation();
+        this.filterTableFromPanel();
     }
 
     @Override
-    public void onLoad() throws NumberFormatException, HibernateException,
-            PersistenceBeanException, InstantiationException,
-            IllegalAccessException, IOException {
-        fillIconList();
-        setAggregationFilterId(aggregationFilterId);
-        setLandAggregations(ComboboxHelper.fillList(AggregationLandChargesRegistry.class, Order.asc("name"), Boolean.TRUE));
-        this.loadList(RequestType.class, new Criterion[]
-                {Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
-                        Restrictions.isNull("isDeleted"))}, new Order[]
-                {Order.asc("name")});
+    public void deleteEntity() throws HibernateException, PersistenceBeanException, InstantiationException, IllegalAccessException, NumberFormatException, IOException {
+        this.setEntity(DaoManager.get(getType(), this.getEntityDeleteId()));
+        getEntity().setIsDeleted(Boolean.TRUE);
+        saveEntity();
+        filterTableFromPanel();
     }
 
-    @Override
-    protected void deleteEntityInternal(Long id)
-            throws HibernateException, PersistenceBeanException,
-            InstantiationException, IllegalAccessException {
+    private void saveEntity() {
+        Transaction tr = null;
         try {
-            super.deleteEntityInternal(id);
+            tr = PersistenceSessionManager.getBean().getSession()
+                    .beginTransaction();
+            if (!ValidationHelper.isNullOrEmpty(getAggregationId()))
+                this.getEntity().setDefault_registry(
+                        DaoManager.get(AggregationLandChargesRegistry.class,
+                                getAggregationId()));
+            DaoManager.save(this.getEntity());
         } catch (Exception e) {
-            try {
-                this.getEntity().setIsDeleted(Boolean.TRUE);
-
-                DaoManager.save(getEntity());
-            } catch (Exception e1) {
-                LogHelper.log(log, e1);
+            if (tr != null) {
+                tr.rollback();
+            }
+            LogHelper.log(log, e);
+        } finally {
+            if (tr != null && !tr.wasRolledBack()
+                    && tr.isActive()) {
+                tr.commit();
             }
         }
     }
@@ -109,59 +189,4 @@ public class RequestTypeListBean extends
             LogHelper.log(log, e);
         }
     }
-
-    @Override
-    public void editEntity() {
-        this.cleanValidation();
-        setAggregationFilterId(null);
-        executeJS("setIcon();");
-        if (!ValidationHelper.isNullOrEmpty(this.getEntityEditId())) {
-            try {
-                this.setEntity(DaoManager.get(getType(), this.getEntityEditId()));
-                DaoManager.getSession().evict(this.getEntity());
-                setAggregationFilterId(this.getEntity().getDefault_registry().getId());
-            } catch (Exception e) {
-                LogHelper.log(log, e);
-            }
-        }
-    }
-    
-    @Override
-    public void resetFields() {
-        setAggregationFilterId(null);
-        super.resetFields();
-    }
-
-    public Icon getIcon() {
-        return icon;
-    }
-
-    public void setIcon(Icon icon) {
-        this.icon = icon;
-    }
-
-    public List<Icon> getIcons() {
-        return icons;
-    }
-
-    public void setIcons(List<Icon> icons) {
-        this.icons = icons;
-    }
-
-    public List<SelectItem> getLandAggregations() {
-        return landAggregations;
-    }
-
-    public void setLandAggregations(List<SelectItem> landAggregations) {
-        this.landAggregations = landAggregations;
-    }
-
-    public Long getAggregationFilterId() {
-        return aggregationFilterId;
-    }
-
-    public void setAggregationFilterId(Long aggregationFilterId) {
-        this.aggregationFilterId = aggregationFilterId;
-    }
-
 }

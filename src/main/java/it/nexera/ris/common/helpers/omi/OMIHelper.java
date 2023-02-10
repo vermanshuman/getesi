@@ -133,6 +133,7 @@ public final class OMIHelper {
         }
         log.info("Zones: " + zones);
         if (ValidationHelper.isNullOrEmpty(zones)) {
+            calculatedOmi.setCategoryCodeMissing(true);
             return calculatedOmi;
         }
 

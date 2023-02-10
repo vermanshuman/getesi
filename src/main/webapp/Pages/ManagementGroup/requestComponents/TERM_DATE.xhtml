@@ -1,11 +1,22 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
                 xmlns:p="http://primefaces.org/ui">
+<style>
+    #termDate .ui-panel-content {
+        border: none !important;
+        padding: 0px !important;
+    }
+</style>
+<p:panel id="termDate" style="background: transparent; border: none" styleClass="ui-g-12">
+        <span>#{enums.documentGenerationTagsTERM_DATE}
+            <h:panelGroup rendered="#{not empty block}" style="#{block.isRequired()?'':'display:none;'}">*</h:panelGroup>
+            <h:panelGroup rendered="#{not empty item and not empty item.field}" style="#{item.field.isRequired()?'':'display:none;'}">*</h:panelGroup>
+        </span>
 
-    <span>#{enums.documentGenerationTagsTERM_DATE}<span class="red" style="#{block.isRequired()?'':'display:none;'}">*</span></span>
-    <p:calendar id="TERM_DATE" value="#{bean.entity.termDate}" styleClass="calendar-width"/>
-
+    <p:calendar id="TERM_DATE"
+                value="#{bean.wrapper.termDate}" pattern="dd/MM/yyyy" mask="true" locale="it" styleClass="input-width"/>
+</p:panel>
 </ui:composition>

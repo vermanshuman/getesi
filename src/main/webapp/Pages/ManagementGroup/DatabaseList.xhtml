@@ -14,12 +14,12 @@
     <ui:param name="centerPartStyleClass" value="false"/>
     <ui:define name="list_body">
         <style type="text/css">
-            body .ui-dialog .ui-dialog-titlebar {
-                padding: 0;
-            }
-            body .ui-dialog .ui-dialog-content {
+            /* body .ui-dialog .ui-dialog-titlebar {
+                padding: 15px;
+            } */
+            /* body .ui-dialog .ui-dialog-content {
                 padding: 2rem 1.5rem 2rem 1.5rem;
-            }
+            } */
             .customFilter span:nth-child(2) {
                 display: none !important;
             }
@@ -104,17 +104,10 @@
                 border: 0.2em solid #57c279 !important;
             }
 
-            #subjectDelete {
-                border: 2px solid #57c279;
-            }
-
-            #subjectDelete .ui-dialog-titlebar {
-                border-bottom: none;
-            }
-
             #tabs ul {
                 background-color: transparent !important;
                 text-transform: uppercase;
+                font-size: 15px !important;
             }
 
             #tabs ul::before {
@@ -138,8 +131,47 @@
             body .ui-datatable .ui-datatable-data > tr.ui-datatable-selectable {
                 cursor: default;
             }
+
+            body .ui-inputfield {
+                border: 1px solid #a8acb1;
+            }
+            
+            .ui-dialog .ui-widget-header {
+                background: #f8f9fa !important;
+                color: #495057 !important;
+            }
+            
+            .ui-button.red-button {
+			    background-color: #F3362B !important;
+			    width: 150px;
+			}
+			
+			.ui-button.green-button {
+			    background-color: #00cc52 !important;
+			    width: 150px;
+			}
+			
+			.non_displayed_button{
+			    display: none;
+			}
+			
+			#documentDate_input{
+				width: 100%;
+			}
+
+            .pdf-ml {
+                margin-left: -12px !important;
+            }
+
+            .ui-dialog .ui-dialog-titlebar {
+                padding: 3px !important;
+            }
         </style>
         <script>
+            function resetPage(pageNumber) {
+                $('input[name="tabs:pageNumber"]').val(pageNumber);
+                onResetPage();
+            }
 
             function delay(callback, ms) {
                 var timer = 0;
@@ -183,6 +215,8 @@
                     <p:remoteCommand name="filterTableSubject"
                                      update="tabs:tableSubject"
                                      action="#{bean.filterSubjectTable}"/>
+                    <p:remoteCommand name="onResetPage"
+                                     action="#{bean.resetPage()}" oncomplete="setPageNumber()" update="tabs:tableSubject"/>
                     <p:remoteCommand name="handleRowsChange"
                                      action="#{bean.handleRowsChange()}" update="tabs:tableSubject" oncomplete="setPageNumber()"/>
                     <p:remoteCommand name="onPageChange"
@@ -209,8 +243,9 @@
                                                      placeholder="#{msg.databaseListSubjectFiscalCodeVAT}"
                                                      style=" width: 300px !important;"/>
                                     </div>
+<!--                                    <p:commandButton id="cercaButton" onclick="filterTableSubject();"-->
                                     <div class="p-field">
-                                        <p:commandButton id="cercaButton" onclick="filterTableSubject();"
+                                        <p:commandButton id="cercaButton" onclick="resetPage(1);"
                                                          update="searchPanel" icon="ui-icon ui-icon-search pi pi-search"
                                                          styleClass="searchPanelButton"/>
                                     </div>
@@ -224,7 +259,8 @@
                                             $("body").click(function (e) {
                                                 var target = $(e.target);
                                                 if (!target.parents('#settingButton').length && !target.parents('#tabs\\:settingButton').length &&
-                                                    !target.parents('.ui-selectcheckboxmenu-panel').length && !target.parents('#tabs\\:settingPanel').length) {
+                                                    !target.parents('.ui-selectcheckboxmenu-panel').length && !target.parents('#tabs\\:settingPanel').length
+                                                    && !target.parents('#ui-datepicker-div').length && !target.parents('.ui-datepicker-header').length) {
                                                     PF('panelSetting').getJQ().hide();
                                                 }
 
@@ -235,7 +271,9 @@
                                             }
 
                                             jQuery(document).ready(function () {
-                                                PF('panelSetting').getJQ().hide();
+                                                if(PF('panelSetting') != undefined) {
+                                                    PF('panelSetting').getJQ().hide();
+                                                }
                                             });
                                             // ]]>
                                         </script>
@@ -266,7 +304,7 @@
                                                     <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}"
                                                                      style="background: #00CC52;margin-right: 20px;"
                                                                      id="subjectSearchButton"
-                                                                     onclick="filterTableSubject();" update="searchPanel"
+                                                                     onclick="resetPage(1);" update="searchPanel"
                                                                      oncomplete="PF('panelSetting').getJQ().hide()"/>
                                                     <p:commandButton id="manageReestablishBtn"
                                                                      value="#{ff:upper(msg.mailManageReestablish)}"
@@ -409,7 +447,7 @@
                                 <tr class="ui-widget-content ui-datatable-selectable ${cssClass} ${evenclass}">
                                     <td style="width: 25px !important;"
                                         class="ui-selection-column min_padding_margin icon_column">
-                                        <h:outputText value="#{item.fullName}"/>
+                                        <h:outputText value="#{ff:upper(item.fullName)}"/>
                                     </td>
 
                                     <td style="width: 25px !important;"
@@ -437,11 +475,18 @@
 
                                     <td style="width: 0px !important;"
                                         class="ui-selection-column min_padding_margin icon_column">
-                                        <p:commandButton icon="ui-icon pi pi-search" update=":form"
-                                                         action="#{bean.viewEntity}">
+                                        <p:commandButton icon="ui-icon pi pi-search" update=":form" oncomplete="PF('searchDlgWV').show();PF('searchDlgWV').toggleMaximize();"
+                                                         action="#{bean.loadSelectedSubject}">
                                             <f:setPropertyActionListener value="#{item.id}"
                                                                          target="#{bean.entityEditId}"/>
+
                                         </p:commandButton>
+
+<!--                                        <p:commandButton icon="ui-icon pi pi-search" update=":form"-->
+<!--                                                         action="#{bean.viewEntity}">-->
+<!--                                            <f:setPropertyActionListener value="#{item.id}"-->
+<!--                                                                         target="#{bean.entityEditId}"/>-->
+<!--                                        </p:commandButton>-->
                                     </td>
 
                                     <td style="width: 0px !important;"
@@ -681,7 +726,7 @@
                     <p:column headerText="#{msg.databaseListRealEstateSub}" styleClass="min_padding_margin">
                         <p:dataGrid value="#{item.subList}" columns="1" var="exam"
                                     rendered="#{not empty item.subList}" styleClass="cadastral_table">
-                            <p:column>
+                            <p:column rendered="#{!(exam == null or exam eq '')}">
                                 <h:outputText value="#{exam}"
                                               style="font-size: 1.1em; font-weight:bold;"/>
                             </p:column>
@@ -705,7 +750,7 @@
                         <h:outputText value="#{item.cadastralArea}"/>
                     </p:column>
 
-                    <p:column headerText="#{msg.databaseListRealEstateRevenue}"
+                    <p:column headerText="#{msg.databaseListRealEstateRevenue}" style="width: 6%;"
                               filterBy="#{item.revenue}" sortBy="#{item.revenue}" styleClass="min_padding_margin">
                         <h:outputText value="#{item.revenue}"/>
                     </p:column>
@@ -723,7 +768,7 @@
                     </p:column>
 
                     <p:column styleClass="action_column min_padding_margin" exportable="false">
-                        <p:commandButton icon="ui-icon pi pi-times" update=":form"
+                        <p:commandButton icon="ui-icon pi pi-times" update=":form" styleClass="red-btn"
                                          oncomplete="PF('dlg3').show()">
                             <f:setPropertyActionListener value="#{item.id}"
                                                          target="#{bean.entityDeleteId}"/>
@@ -820,7 +865,7 @@
                     </p:column>
                     <p:column styleClass="action_column">
                         <p:column headerText="#{msg.pdf}" styleClass="action_column">
-                            <p:commandButton icon="fa fa-file-pdf-o" action="#{bean.downloadFormalityPdf}" ajax="false">
+                            <p:commandButton icon="fa fa-fw new-pdf-icon pdf-ml" styleClass="hide-pdf-bg" action="#{bean.downloadFormalityPdf}" ajax="false">
                                 <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                             </p:commandButton>
                         </p:column>
@@ -839,7 +884,7 @@
                         </p:commandButton>
                     </p:column>
                     <p:column styleClass="action_column">
-                        <p:commandButton icon="ui-icon pi pi-times" update=":form"
+                        <p:commandButton icon="ui-icon pi pi-times" update=":form" styleClass="red-btn"
                                          action="#{bean.checkFormalityForcedRequestEstateSituation}">
                             <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                         </p:commandButton>
@@ -925,7 +970,7 @@
                         <h:outputText value="#{item.sumOfEstateFormalities}"/>
                     </p:column>
                     <p:column headerText="#{msg.pdf}" styleClass="action_column">
-                        <p:commandButton icon="fa fa-file-pdf-o" action="#{bean.downloadRequestPdf}" ajax="false"
+                        <p:commandButton icon="fa fa-fw new-pdf-icon pdf-ml" styleClass="hide-pdf-bg" action="#{bean.downloadRequestPdf}" ajax="false"
                                          rendered="#{item.haveRequestReport}">
                             <f:setPropertyActionListener value="#{item.id}" target="#{bean.entityEditId}"/>
                         </p:commandButton>
@@ -947,7 +992,7 @@
                                      action="#{bean.filterReportFormalitySubjectTable}"/>
                     <p:panelGrid columns="6" styleClass="ui-panelgrid-blank form-group" layout="grid">
                         <p:column>
-                            <h:outputText value="#{msg.reportFormalitySubjectConservatorship}:"/>
+                            <h:outputText value="#{msg.reportFormalitySubjectConservatorship}:"/><br/>
                             <p:selectOneMenu value="#{bean.rfsConservatorshipFilterId}" styleClass="select-width">
                                 <f:selectItems value="#{bean.conservatories}"/>
                             </p:selectOneMenu>
@@ -979,7 +1024,7 @@
                             <p:inputText value="#{bean.rfsLastNameFilter}" styleClass="input-width"/>
                             <br/>
 
-                            <h:outputText value="#{msg.reportFormalitySubjectDate}:"/>
+                            <h:outputText value="#{msg.reportFormalitySubjectDate}:"/><br/>
                             <p:calendar value="#{bean.rfsDateFilter}" styleClass="calendar-width"
                                         pattern="dd/MM/yyyy" mask="true"/>
                             <br/>
@@ -990,7 +1035,7 @@
                         </p:column>
 
                         <p:column>
-                            <h:outputText value="#{msg.reportFormalitySubjectBirthDate}:"/>
+                            <h:outputText value="#{msg.reportFormalitySubjectBirthDate}:"/><br/>
                             <p:calendar value="#{bean.rfsBirthDateFilter}" styleClass="calendar-width"
                                         pattern="dd/MM/yyyy" mask="true"/>
                             <br/>
@@ -1160,8 +1205,8 @@
                     </p:column>
                     <p:rowExpansion>
                         <div align="center">
-                            <p:dataTable value="#{item.uploadedVisureRTFList}" var="visure" style="width: 40%;"
-                                         styleClass="no_datatable_header">
+                            <p:dataTable value="#{item.uploadedVisureRTFList}" var="visure" style="width: 40%;" 
+                                         styleClass="no_datatable_header" emptyMessage="#{msg.noRecordsFound}">
                                 <p:column>
                                     <h:outputText value="#{visure.visureName}" escape="false"
                                                   style="padding-right: 10px;"/>
@@ -1207,20 +1252,25 @@
             <p:tab title="#{msg.databaseListImportFile}">
                 <p:outputPanel id="searchPanelDocument">
                     <div>
-                        <p:commandButton value="#{msg.databaseListDocumentAdd}" styleClass="standard_button"
+                       <!-- <p:commandButton value="#{msg.databaseListDocumentAdd}" styleClass="standard_button"
                                          action="#{bean.setReportShouldBeGenerated(true)}"
                                          id="addDocumentBtn" oncomplete="PF('documentAddDlgWV').show();"
-                                         process="@this"/>
-                        <p:commandButton value="#{msg.databaseListOpenReport}" styleClass="right-side"
+                                         process="@this"/>-->
+                        <p:commandButton value="#{msg.databaseListDocumentAdd}" styleClass="standard_button"
+                                         action="#{bean.openImportDocumentsPage}"
+                                         id="addDocumentBtn"/>
+                        <p:commandButton value="#{msg.databaseListOpenReport}" style="float: right !important;"
                                          id="openReport" actionListener="#{bean.downloadExistingReport}" ajax="false">
                             <p:fileDownload value="#{bean.reportFile}"/>
                         </p:commandButton>
                     </div>
+                    <div style="margin-top:10px; margin-bottom: 10px;">
                     <span>
                         <p:commandButton styleClass="standard_button" value="#{msg.databaseListFolderAdd}"
-                                         id="addFolderBtn"
+                                         id="addFolderBtn" 
                                          oncomplete="PF('folderAddDlgWV').show(); clearAndUpdateDialogData()"/>
                     </span>
+                    </div>
                 </p:outputPanel>
                 <p:remoteCommand name="updateTableDocument" update="tableDocument, openReport"/>
                 <p:dataTable var="item" id="tableDocument"
@@ -1339,7 +1389,7 @@
 
         </p:dialog>
 
-        <p:dialog id="subjectDelete" widgetVar="dlg2" modal="true" resizable="false" effect="SLIDE">
+        <p:dialog id="subjectDelete" widgetVar="dlg2" modal="true" resizable="false" effect="SLIDE" styleClass="dialog-green dialog-green-width">
             #{msg.deleteConfirmation}<br/>
             <br/>
             <div class="btn_line">
@@ -1349,35 +1399,35 @@
             </div>
         </p:dialog>
 
-        <p:dialog header="#{msg.deleteConfirmationHeader}" widgetVar="dlg3"
-                  modal="true" resizable="false" effect="SLIDE">
+        <p:dialog header="#{msg.deleteConfirmationHeader}" widgetVar="dlg3" modal="true" resizable="false" effect="SLIDE" styleClass="dialog-green dialog-green-width">
             #{msg.deleteConfirmation}<br/>
             <br/>
             <div class="btn_line">
-                <p:commandButton value="#{msg.yes}"
+                <p:commandButton value="#{msg.yes}" style="margin-right: 10px;background-color: #00CC52!important;"
                                  action="#{bean.deleteEntityRealEstate}"
                                  oncomplete="PF('dlg3').hide()"
                                  update="tabs:tableRealEstate,:form:messages"/>
-                <p:commandButton value="#{msg.no}" onclick="PF('dlg3').hide()"/>
+                <p:commandButton value="#{msg.no}" onclick="PF('dlg3').hide()" style="background-color: #F3362B !important;"/>
             </div>
         </p:dialog>
 
         <p:remoteCommand name="updateFakeButton" update="fakeSaveButton"/>
         <p:remoteCommand name="clearAndUpdateDialogData" action="#{bean.clearDocumentData}"
                          update="documentType, documentTitle, documentDate, documentAddDlg"/>
-        <p:dialog header="#{msg.databaseListDocumentAddDlg}" modal="true"
-                  width="600"
+        
+        <p:dialog header="#{msg.databaseListDocumentAddDlg}" modal="true" width="500" style="max-height: 700px; overflow:auto;"
                   id="documentAddDlg" resizable="false" draggable="false"
                   dynamic="true" widgetVar="documentAddDlgWV" onHide="clearAndUpdateDialogData()">
-            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" cellpadding="3" cellspacing="0" 
+            			 columnClasses="ui-grid-col-3,ui-grid-col-8" layout="grid" style="margin-left:20px; margin-right:20px;">
                 <h:outputText value="#{msg.databaseListDocumentTypes}:"/>
-                <p:selectOneMenu value="#{bean.selectedTypeDocumentId}" id="documentType">
+                <p:selectOneMenu value="#{bean.selectedTypeDocumentId}" id="documentType" style="width: 100%;">
                     <p:ajax event="change" update="documentTitle"/>
                     <f:selectItems value="#{bean.documentTypes}"/>
                 </p:selectOneMenu>
 
                 <h:outputText value="#{msg.databaseListDocumentTitle}:"/>
-                <p:inputText value="#{bean.documentTitle}" id="documentTitle"
+                <p:inputText value="#{bean.documentTitle}" id="documentTitle" style="width: 100%;"
                              disabled="#{bean.needDisableDocumentTitle}"/>
 
                 <h:outputText value="#{msg.databaseListGenerateFilesReport}:"/>
@@ -1392,9 +1442,9 @@
 
                 <h:outputText/>
                 <p:dataTable id="documentsTableId" value="#{bean.documents}" styleClass="without-header" var="itemDoc"
-                             scrollable="true" scrollHeight="300">
+                             scrollable="true" scrollHeight="#{(bean.documents ne null and bean.documents.size() > 0) ? 300 : 0}" emptyMessage="#{msg.noRecordsFound}">
                     <p:column styleClass="action_column">
-                        <p:commandButton icon="ui-icon pi pi-times" action="#{bean.removeDocument(itemDoc)}"
+                        <p:commandButton icon="ui-icon pi pi-times" styleClass="red-btn" action="#{bean.removeDocument(itemDoc)}"
                                          oncomplete="updateTableDoc()"/>
                     </p:column>
                     <p:column>
@@ -1403,33 +1453,33 @@
                 </p:dataTable>
 
                 <h:outputText value="#{msg.databaseListDocumentDate}:"/>
-                <p:calendar id="documentDate" pattern="dd/MM/yyyy" mask="true"
+                <p:calendar id="documentDate" pattern="dd/MM/yyyy" mask="true" 
                             locale="it" navigator="true" popupIconOnly="true"
                             value="#{bean.documentDate}"/>
             </p:panelGrid>
             <p:remoteCommand name="updateTableDoc" update="documentsTableId"/>
-            <div class="btn_line">
+            <div class="btn_line" style="margin-bottom: 20px;">
 
-                <p:commandButton value="#{msg.save}" action="#{bean.saveFile}" id="saveButton"
+                <p:commandButton value="#{msg.save}" action="#{bean.saveFile}" id="saveButton" styleClass="green-button"
                                  disabled="#{bean.documents == null}" update="tabs:reportFileTable"
                                  oncomplete="PF('documentAddDlgWV').hide();updateTableDocument();"
                                  onsuccess="document.getElementById('fakeSaveButton').click();"/>
-                <p:commandButton id="fakeSaveButton" ajax="false" styleClass="non_displayed_button"
+                <p:commandButton id="fakeSaveButton" ajax="false" styleClass="non_displayed_button" style="margin-left:10px;"
                                  disabled="#{!bean.reportShouldBeGenerated}">
                     <p:fileDownload value="#{bean.reportFile}"/>
                 </p:commandButton>
 
-                <p:commandButton value="#{msg.cancel}" ajax="true"
+                <p:commandButton value="#{msg.cancel}" ajax="true" styleClass="red-button" style="margin-left:10px;"
                                  action="#{bean.clearDocumentData}"
                                  oncomplete="PF('documentAddDlgWV').hide();"/>
             </div>
 
         </p:dialog>
         <p:remoteCommand value="#{bean.saveFolder}" name="getfolder"/>
-        <p:dialog header="#{msg.databaseListDocumentAddDlg}" modal="true"
+        <p:dialog header="#{msg.databaseListDocumentAddDlg}" modal="true" width="450" style="max-height: 700px; overflow:auto;"
                   id="folderAddDlg" resizable="false" draggable="false"
                   dynamic="true" widgetVar="folderAddDlgWV">
-            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" id="folderAddPanel">
+            <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" id="folderAddPanel" style="margin-left:20px; margin-right:20px;">
                 <h:outputText value="#{msg.databaseListDocumentTypes}:"/>
                 <p:selectOneMenu value="#{bean.selectedTypeId}" id="folderType">
                     <p:ajax event="change" update="documentTitle"/>
@@ -1437,12 +1487,12 @@
                 </p:selectOneMenu>
 
                 <h:outputText value="#{msg.databaseListDocumentDocument}:"/>
-                <p:inputText value="#{bean.pathToFolder}" label="#{msg.databaseListDocumentDocument}"
+                <p:inputText value="#{bean.pathToFolder}" label="#{msg.databaseListDocumentDocument}" style="width: 100%;"
                              id="path_to_folder"/>
             </p:panelGrid>
-            <div class="btn_line">
-                <p:commandButton value="#{msg.save}" action="#{bean.saveFolder}" update="folderAddPanel, messages"/>
-                <p:commandButton value="#{msg.cancel}" action="#{bean.cancelSaveFolder}" update="form"
+            <div class="btn_line" style="margin-bottom: 20px;">
+                <p:commandButton value="#{msg.save}" action="#{bean.saveFolder}" update="folderAddPanel, messages" styleClass="green-button"/>
+                <p:commandButton value="#{msg.cancel}" action="#{bean.cancelSaveFolder}" update="form" styleClass="red-button" style="margin-left:10px;"
                                  oncomplete="PF('folderAddDlgWV').hide();"/>
             </div>
 
@@ -1536,10 +1586,10 @@
             </div>
         </p:dialog>
 
-        <p:dialog widgetVar="formalityRequestForcedEstateSituationWV" modal="true" width="1200">
+        <p:dialog widgetVar="formalityRequestForcedEstateSituationWV" modal="true" width="700" styleClass="dialog-green">
             <h:outputText value="#{msg.formalityForcedRequestOrEstateSituationExistDialog}"/>
             <div class="btn_line">
-                <p:commandButton value="#{msg.confirm}" update="@form"
+                <p:commandButton value="#{msg.confirm}" update="@form" style="margin-right: 5px;"
                                  action="#{bean.deleteFormality}" styleClass="green-button"
                                  oncomplete="PF('formalityRequestForcedEstateSituationWV').hide();"/>
                 <p:commandButton value="#{msg.cancel}" styleClass="red-button"
@@ -1552,6 +1602,7 @@
                 <p:commandButton value="#{msg.yes}" oncomplete="PF('vecchiDatiWV').hide();"/>
             </div>
         </p:dialog>
+        <ui:include src="../Dialogs/SelectSubjectDialog.xhtml"/>
     </ui:define>
 
 </ui:composition>

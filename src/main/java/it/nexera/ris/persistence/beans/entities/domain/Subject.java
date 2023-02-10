@@ -75,7 +75,7 @@ public class Subject extends IndexedEntity implements BeforeSave{
     @JoinColumn(name = "birth_city_id")
     private City birthCity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "country_id")
     private Country country;
 
@@ -242,6 +242,15 @@ public class Subject extends IndexedEntity implements BeforeSave{
         }
     }
 
+    public String toFormalityTableAttachmentCString() {
+        if (getTypeIsPhysicalPerson()) {
+            return String.format("<b>%s %s</b>", getSurname().toUpperCase(), getName().toUpperCase());
+        } else {
+            return String.format("<b>%s</b>", getBusinessName().toUpperCase());
+        }
+    }
+
+
     public String toFormalityTableDebitore() {
         return String.format("%s %s %s %s", getSurname().toUpperCase(), getName().toUpperCase(),
                 getBirthCity() != null ? WordUtils.capitalizeFully(getBirthCity().getDescription()) : "",
@@ -329,17 +338,21 @@ public class Subject extends IndexedEntity implements BeforeSave{
     }
 
     public String getNameBirthDateUpperCase() {
+        String description = "";
+        if(getBirthCity() == null && getCountry() != null)
+            description = WordUtils.capitalizeFully(getCountry().getDescription());
+        else if(getBirthCity() != null ){
+            if (getTypeIsPhysicalPerson())
+                description = WordUtils.capitalizeFully(getBirthCityDescription());
+            else
+                description = getBirthCity().getCamelCityDescription();
+        }
         if (getTypeIsPhysicalPerson()) {
             return String.format("<b>%s %s</b> (%s %s)", getSurname().toUpperCase(), getName().toUpperCase(),
-                    getBirthCity() == null ? WordUtils.capitalizeFully(getCountry().getDescription())
-                            : WordUtils.capitalizeFully(getBirthCityDescription()),
-                            DateTimeHelper.toString(getBirthDate()));
+                    description, DateTimeHelper.toString(getBirthDate()));
         } else {
             return String.format(ResourcesHelper.getString("alienatedTableGiur"),
-                    getBusinessName(),
-                    getBirthCity() == null ? WordUtils.capitalizeFully(getCountry().getDescription())
-                            : getBirthCity().getCamelCityDescription(),
-                            getNumberVAT());
+                    getBusinessName(), description,getNumberVAT());
         }
     }
 

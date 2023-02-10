@@ -1,0 +1,316 @@
+@charset "ISO-8859-1";
+#transcriptionTable table, #certificationTable table, #renewalTable table {
+	margin-top: 20px;
+	padding-left: 13px;
+	width: calc(100% - 13px);
+}
+
+#transcriptionTable_head th, #certificationTable_head th, #renewalTable_head th {
+	background-color: #D9E0E7 !important;
+    color: #5f666c !important;
+    font-weight: 700;
+    vertical-align: middle;
+    padding: 4px 10px!important;
+    border-color: #808080 !important;
+    border-width: 1px!important;
+    border-style: solid!important;
+}
+
+.status-yellow {
+	border: 2px solid #ED9C43;
+	color: #ED9C43;
+}
+
+.status-green {
+	border: 2px solid #00C347;
+	color: #00C347;
+}
+
+.status-navy {
+	border: 2px solid #123df7;
+	color: #123df7;
+}
+
+.status-magenta {
+	border: 2px solid #616CA2;
+	color: #616CA2;
+}
+
+.status-red {
+	border: 2px solid #FF0000;
+	color: #FF0000;
+}
+
+.status-icon {
+	height: 24px;
+	width: 142px;
+	padding-right: 4px;
+	padding-left: 4px;
+	border-radius: 10px;
+	text-align: center;
+	box-sizing: border-box;
+	font-size: 12px;
+	font-weight: 600;
+	font-family: 'Mukta', sans-serif;
+}
+
+.request-table table {
+	border-collapse: separate;
+	border-spacing: 0 0.6em;
+	width: auto;
+}
+
+::-webkit-input-placeholder { /* Edge */
+	color: #003871;
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+	color: #003871;
+}
+
+::placeholder {
+	color: #003871;
+}
+
+input {
+	background-color: #F0F3F5 !important;
+	border: none !important;;
+	border-radius: 7px !important;
+	min-height: 28px;
+}
+
+.ui-calendar:not(#currentDay) .ui-datepicker-trigger {
+	color: #003871 !important;;
+}
+
+body .ui-calendar:not(#currentDay) .ui-button {
+	background-color: transparent !important;
+	margin-left: -37px;
+}
+
+.ui-selectonemenu {
+	background-color: #F0F3F5 !important;
+	border: none !important;
+	border-radius: 7px !important;
+}
+
+.ui-selectonemenu-label {
+	background-color: #F0F3F5 !important;
+	border-radius: 7px !important;
+	color: #003871;
+	margin-top: 4px;
+	margin-bottom: 4px;
+}
+
+.ui-selectonemenu-trigger {
+	color: #003871;
+	margin-top: 4px;
+}
+
+.ui-calendar input {
+	width: calc(100% - 8px);
+}
+
+body .custom-design-tooltip .ui-tooltip-text {
+	background: #D9E0E7;
+	color: #6688AA;
+	border: 10px solid #68a;
+	border-radius: 10px;
+	padding: 10px !important;
+	box-shadow: none;
+	position: relative;
+	top: 20px;
+	min-width: 220px !important;
+}
+
+body .custom-design-tooltip .ui-tooltip-arrow {
+	display: none;
+}
+
+.search-btn {
+	margin-top: 20px;
+	min-height: 36px;
+	border-radius: 7px !important;
+}
+
+.vertical-txt {
+	font-size: 12px;
+	font-weight: 600;
+	font-family: 'Mukta', sans-serif;
+	-webkit-transform: rotate(-90deg);
+	-moz-transform: rotate(-90deg);
+	-ms-transform: rotate(-90deg);
+	-o-transform: rotate(-90deg);
+	position: absolute;
+	margin-left: -74px;
+	margin-top: -34px;
+	color: #FFFCFC !important;
+	background-color: #FF0000 !important;
+	border-radius: 3px !important;
+	min-width: 93px;
+	height: 13.4px;
+	text-align: center;
+}
+
+.action-btn {
+	border-radius: 7px !important;
+	width: 100%;
+}
+
+.action-btn>span {
+	font-weight: 600 !important;
+}
+
+body .ui-tooltip-text .ui-button {
+	background-color: #D9E0E7 !important;
+}
+
+body .ui-tooltip-text .ui-button .ui-button-text {
+	color: #003871 !important;
+}
+
+.ui-tooltip .ui-tooltip-text {
+	padding: 0 !important;
+	color: #D9E0E7;
+}
+
+.ui-tooltip .ui-panelgrid-content {
+	background-color: #6688AA;
+	border-radius: 7px;
+	border: 1px solid #547ac4;
+	opacity: 1.0;
+}
+
+.action-tooltip-grid .ui-tooltip-text {
+	background-color: transparent !important;
+}
+
+.g-btn .ui-button-text {
+	margin-top: -5px;
+	margin-left: -5px;
+	font-weight: 600;
+	color: #003871 !important;
+}
+
+body .ui-state-highlight {
+	background-color: inherit !important;
+}
+
+body .ui-state-highlight {
+	color: inherit !important;
+}
+
+body .ui-datatable .ui-datatable-data tr.ui-state-highlight {
+	border-color: inherit !important;
+}
+
+#transcriptionTable_data td, #certificationTable_data td, #renewalTable_data td {
+	color: #003871;
+	border-top: none;
+	border-bottom: none;
+	background-color: #ffffff !important;
+}
+
+#transcriptionTable_data td:nth-child(1), #certificationTable_data td:nth-child(1), #renewalTable_data td:nth-child(1) {
+	border-left: none;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+}
+
+#transcriptionTable_data td:last-child, #certificationTable_data td:last-child, #renewalTable_data td:last-child {
+	border-right: none;
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	-webkit-box-shadow: 4px 0px 7px -2px rgba(0, 0, 0, 0.75);
+	-moz-box-shadow: 4px 0px 7px -2px rgba(0, 0, 0, 0.75);
+	box-shadow: 4px 0px 7px -2px rgba(0, 0, 0, 0.75);
+}
+
+#transcriptionTable_data tr, #certificationTable_data tr, #renewalTable_data tr {
+	background-color: transparent !important;
+	border-top: none;
+	-webkit-box-shadow: 0px 4px 7px -2px rgba(0, 0, 0, 0.75);
+	-moz-box-shadow: 0px 4px 7px -2px rgba(0, 0, 0, 0.75);
+	box-shadow: 0px 4px 7px -2px rgba(0, 0, 0, 0.75);
+}
+
+#transcriptionTable_data tr, #certificationTable_data tr, #renewalTable_data tr {
+	margin-bottom: 8px;
+	border-left: none;
+}
+
+#transcriptionTable_data, #certificationTable_data, #renewalTable_data {
+	border: none;
+	background: transparent;
+}
+
+#transcriptionTable_head, #certificationTable_head, #renewalTable_head {
+	width: 100%;
+}
+
+#transcriptionTable_paginator_top, #transcriptionTable_paginator_bottom, #certificationTable_paginator_top, #certificationTable_paginator_bottom, 
+#renewalTable_paginator_top , #renewalTable_paginator_bottom {
+	text-align: center;
+	padding: 8px 35px;
+}
+
+.ui-paginator-rpp-options {
+	float: left;
+}
+
+.ui-paginator-current {
+	float: right;
+}
+
+body .ui-state-active {
+	background-color: #ffffff !important;
+	border-radius: 15px;
+}
+
+.ui-paginator-first, .ui-paginator-prev, .ui-paginator-next, .ui-paginator-last {
+	color: #ffffff !important;
+}
+
+.ui-paginator .ui-paginator-page {
+	padding: 2px 8px;
+}
+
+.ui-paginator .ui-paginator-rpp-options {
+	background-color: #ffffff;
+	border: none;
+	border-radius: 5px;
+}
+
+body a {
+	color: #003871 !important;
+}
+
+.tableColumnHeader {
+	text-decoration: none;
+	color: black;
+}
+
+.user-filled-icon {
+	background-image: url("../images/user-filled.png");
+	background-repeat: no-repeat;
+	background-position: 50%;
+	width: 28px;
+	height: 29px;
+	margin: 0 auto;
+	display: block;
+}
+
+.card.card-w-title {
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
+.search-panel-btns {
+	gap: 30px;
+	display: flex;
+	justify-content: center;
+}
+
+.search-panel-btns button {
+	width: 98px;
+}

@@ -378,4 +378,39 @@
 		<position>2</position>
 		<isTemplate>true</isTemplate>
 	</data_entry>
+	<data_entry>
+		<code>TRL</code>
+		<name>permissionTaxRateList</name>
+		<parent entity_field="code">GENERAL</parent>
+		<position>2</position>
+		<isTemplate>true</isTemplate>
+	</data_entry>
+	<data_entry>
+		<code>AAZL</code>
+		<name>permissionAggregationAZList</name>
+		<parent entity_field="code">GENERAL</parent>
+		<position>2</position>
+		<isTemplate>true</isTemplate>
+	</data_entry>
+	<data_entry>
+		<code>CVL</code>
+		<name>permissionConservatoryList</name>
+		<parent entity_field="code">GENERAL</parent>
+		<position>2</position>
+		<isTemplate>true</isTemplate>
+	</data_entry>
+	<data_entry>
+		<code>CSSL</code>
+		<name>permissionCostStampsOrServices</name>
+		<parent entity_field="code">GENERAL</parent>
+		<position>2</position>
+		<isTemplate>true</isTemplate>
+	</data_entry>
+	<data_entry>
+		<code>SPL</code>
+		<name>permissionSupplierList</name>
+		<parent entity_field="code">GENERAL</parent>
+		<position>2</position>
+		<isTemplate>true</isTemplate>
+	</data_entry>
 </module>

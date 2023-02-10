@@ -1,6 +1,8 @@
 package it.nexera.ris.persistence.beans.entities.domain.dictionary;
 
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +12,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "dic_cost_configuration")
+@Getter
+@Setter
 public class CostConfiguration extends IndexedEntity {
 
     private static final long serialVersionUID = 4353731225922784701L;
@@ -57,61 +61,5 @@ public class CostConfiguration extends IndexedEntity {
     @Override
     public String toString() {
         return this.getName();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Boolean getIsDeleted() {
-        return isDeleted;
-    }
-
-    public void setIsDeleted(Boolean isDeleted) {
-        this.isDeleted = isDeleted;
-    }
-
-    public Long getTypeId() {
-        return typeId;
-    }
-
-    public void setTypeId(Long typeId) {
-        this.typeId = typeId;
-    }
-
-    public List<Service> getServices() {
-        return services;
-    }
-
-    public void setServices(List<Service> services) {
-        this.services = services;
-    }
-
-    public List<Service> getServiceCostUnauthorizedQuoteServices() {
-        return serviceCostUnauthorizedQuoteServices;
-    }
-
-    public void setServiceCostUnauthorizedQuoteServices(List<Service> serviceCostUnauthorizedQuoteServices) {
-        this.serviceCostUnauthorizedQuoteServices = serviceCostUnauthorizedQuoteServices;
-    }
-
-    public Boolean getUrgency() {
-        return urgency;
-    }
-
-    public void setUrgency(Boolean urgency) {
-        this.urgency = urgency;
     }
 }

@@ -18,6 +18,41 @@
             .to-bottom-text td.ui-panelgrid-cell {
                 vertical-align: bottom !important;
             }
+
+            legend {
+                font-size: 14px !important;
+            }
+
+            fieldset {
+                margin-left: 15px;
+                margin-right: 15px;
+            }
+
+            fieldset div {
+                font-size: 14px;
+                text-align: left;
+            }
+
+            body .ui-fieldset .ui-fieldset-content {
+                padding: 8px 14px;
+            }
+
+            body .ui-fieldset .ui-fieldset-legend {
+                border: 1px solid #c9cdd2;
+                background: #f8f9fa;
+                color: #FFFFFF !important;
+                padding: 1rem;
+                font-weight: 200 !important;
+                border-radius: 4px;
+                user-select: none;
+                transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+            }
+
+            .pdf-button {
+                background-color: #FFFFFF !important;
+                color: #AD0B00 !important;
+                width: 100px !important;
+            }
         </style>
         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group to-bottom-text">
             <h:outputText style="font-size: 20px" value="#{msg.formalityTitle}"/>
@@ -48,7 +83,7 @@
 
             </p:panelGrid>
         </p:panelGrid>
-        <p:fieldset legend="#{msg.formalitySectionA}">
+        <p:fieldset legend="#{msg.formalitySectionA}" toggleable="true" toggleSpeed="500">
             <p:dataGrid styleClass="ui-datagrid-no-border" value="#{bean.entity.sectionA}" var="secA">
                 <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
                     <h:outputText style="font-size: 20px"
@@ -186,20 +221,20 @@
             </p:dataGrid>
         </p:fieldset>
         <br/>
-        <p:fieldset legend="#{msg.formalitySectionB}" rendered="#{not empty bean.entity.sectionB}">
+        <p:fieldset legend="#{msg.formalitySectionB}" rendered="#{not empty bean.entity.sectionB}" toggleable="true" toggleSpeed="500">
             <p:dataGrid columns="1" styleClass="ui-datagrid-no-border" value="#{bean.entity.sectionBMap}" var="sec"
                         emptyMessage="">
                 <h:outputText style="font-size: 20px" value="#{msg.formalitySectionBMapKey} #{sec.key}"/>
                 <br/><br/>
                 <p:dataGrid columns="1" styleClass="ui-datagrid-no-border" value="#{sec.value}" var="prop"
                             emptyMessage="">
-                    <p:panelGrid styleClass="ui-panelgrid-blank form-group" style="width: 60%">
+                    <p:panelGrid styleClass="ui-panelgrid-blank form-group" style="width: 60%" rendered="#{prop.cadastralData ne null}">
                         <p:row>
                             <p:column class="ui-g-1"><h:outputText value="#{prop.numberInFormalityGroup}"/></p:column>
                             <p:column styleClass="ui-g-1">#{msg.formalityCity}</p:column>
                             <p:column styleClass="ui-g-10">#{prop.city}</p:column>
                         </p:row>
-                        <ui:repeat value="#{prop.cadastralData}" var="data">
+                        <ui:repeat value="#{prop.cadastralData.toArray()}" var="data">
                             <p:row rendered="#{(empty data.scheda and empty data.dataScheda)}">
                                 <p:column class="ui-g-1"></p:column>
                                 <p:column styleClass="ui-g-2">#{msg.formalitySection} #{data.section}</p:column>
@@ -242,7 +277,7 @@
                         </p:row>
                     </p:panelGrid>
                     <p:panelGrid styleClass="ui-panelgrid-blank form-group" style="width: 60%"
-                                 rendered="#{not empty prop.oldPropertiesToView}">
+                                 rendered="#{not empty prop.oldPropertiesToView and prop.cadastralData ne null}">
                         <ui:repeat value="#{prop.oldPropertiesToView}" var="data">
                         <p:row>
                             <p:column class="ui-g-1"></p:column>
@@ -259,7 +294,7 @@
                             <p:column styleClass="ui-g-10">#{prop.city}</p:column>
                         </p:row>
 
-                            <ui:repeat value="#{data.cadastralData}" var="cadastralData">
+                            <ui:repeat value="#{data.cadastralData.toArray()}" var="cadastralData">
                                 <p:row>
                                     <p:column class="ui-g-1"></p:column>
                                     <p:column styleClass="ui-g-2">#{msg.formalitySection} #{cadastralData.section}</p:column>
@@ -276,7 +311,7 @@
             </p:dataGrid>
         </p:fieldset>
         <br/>
-        <p:fieldset legend="#{msg.formalitySectionC}" rendered="#{not empty bean.sectionC}">
+        <p:fieldset legend="#{msg.formalitySectionC}" rendered="#{not empty bean.sectionC}" toggleable="true" toggleSpeed="500">
             <p:dataGrid columns="1" styleClass="ui-datagrid-no-border" value="#{bean.sectionCEntries}" var="cEntry">
                 <h:outputText style="font-size: 20px" value="#{cEntry.key}" rendered="#{not empty cEntry.value}"/>
                 <p:dataGrid columns="1" styleClass="ui-datagrid-no-border" value="#{cEntry.value}" var="sub"
@@ -344,7 +379,7 @@
             </p:dataGrid>
         </p:fieldset>
         <br/>
-        <p:fieldset legend="#{msg.formalitySectionD}" rendered="#{not empty bean.entity.sectionD}">
+        <p:fieldset legend="#{msg.formalitySectionD}" rendered="#{not empty bean.entity.sectionD}" toggleable="true" toggleSpeed="500">
             <p:dataGrid columns="1" styleClass="ui-datagrid-no-border" value="#{bean.entity.sectionD}" var="secD"
                         emptyMessage="">
                 <h:outputText value="#{secD.additionalInformation}"/>
@@ -353,16 +388,15 @@
     </ui:define>
     <ui:define name="additional_buttons">
         <p:commandButton value="#{msg.edit}"
-                         update="@form" action="#{bean.onEdit}"
-                         icon="ui-icon ui-icon-pencil"/>
-         <p:commandButton id="backBtn" action="#{bean.goCancel}" style="margin-top: 3%"
+                         update="@form" action="#{bean.onEdit}" />
+         <p:commandButton id="backBtn" action="#{bean.goCancel}" style="margin-top: 3%;margin-left: 5px;"
                          value="#{msg.goBack}" rendered="#{bean.showButtons}"
                          icon="fa fa-chevron-circle-left"/>
 		<p:commandButton action="#{bean.goTextEdit}"
 			value="#{msg.requestPrintRequestEvent}"
-			rendered="#{bean.showButtons}" />
-		<p:commandButton action="#{bean.downloadFormalityPdf}" 
-			value="#{msg.pdf}" 
+			rendered="#{bean.showButtons}" style="margin-left: 5px" />
+		<p:commandButton action="#{bean.downloadFormalityPdf}" icon="pdf-icon"
+			value="#{msg.pdf}" styleClass="pdf-button" style="border: 1px solid #AD0B00 !important;margin-left: 5px"
 			rendered="#{bean.showButtons}" ajax="false"/>
 	</ui:define>
     

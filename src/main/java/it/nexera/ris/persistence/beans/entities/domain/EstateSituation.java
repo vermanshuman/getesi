@@ -141,7 +141,7 @@ public class EstateSituation extends IndexedEntity implements BeforeSave, AfterS
                 propertyList = new ArrayList<>();
             }
         }
-        return propertyList;
+        return propertyList.stream().distinct().collect(Collectors.toList());
     }
 
     public List<Property> getPropertyListWithoutInit() {

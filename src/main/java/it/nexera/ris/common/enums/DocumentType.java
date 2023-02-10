@@ -15,6 +15,18 @@ public enum DocumentType {
     ALLEGATI(8L, ""),
     INDIRECT_CADASTRAL_REQUEST(9L, ""),
     INVOICE_REPORT(11L, ""),
+    INVOICE(12L, ""),
+    COURTESY_INVOICE(13L, ""),
+    ATTACHMENT_C(14L, ""),
+
+    COURIER(15L, ""),
+    ENTRY(16L, ""),
+    ESTRATTO_MAPPA(17L, ""),
+    SIGNED_CERTIFICATE(18L, ""),
+    TRANSCRIPTION_AND_CERTIFICATION(19L, ""),
+    CERTIFICATION_MERGED(20L, ""),
+    SINGLE_FULFILMENT_FILE(22L, ""),
+    
     OTHER(2l, "");
 
     private Long id;

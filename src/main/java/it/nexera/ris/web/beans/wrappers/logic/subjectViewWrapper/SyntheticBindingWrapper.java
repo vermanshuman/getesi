@@ -3,10 +3,12 @@ package it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper;
 import it.nexera.ris.common.enums.DocumentType;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.ResourcesHelper;
+import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.Document;
 import it.nexera.ris.persistence.beans.entities.domain.DocumentSubject;
 import it.nexera.ris.persistence.beans.entities.domain.Subject;
+import it.nexera.ris.persistence.view.FormalityView;
 import it.nexera.ris.web.common.EntityLazyListModel;
 import it.nexera.ris.web.converters.DateConverter;
 import org.hibernate.criterion.Criterion;
@@ -28,6 +30,8 @@ public class SyntheticBindingWrapper extends BaseTab implements Serializable {
 
     private List<Long> listIds;
 
+    private LazyDataModel<FormalityView> lazyModel;
+
     public SyntheticBindingWrapper(List<Long> ids) {
         this.listIds = ids;
     }
@@ -44,9 +48,10 @@ public class SyntheticBindingWrapper extends BaseTab implements Serializable {
         CommandButton commandButton = new CommandButton();
         commandButton.setActionExpression(createMethodExpression(String.format("#{subjectBean.%s}",
                 "downloadEstateFormalityPDF(tableVar.document.id)"), new Class[]{Long.class}));
-        commandButton.setIcon("fa fa-fw fa-file-pdf-o");
         commandButton.setAjax(false);
-        columns.add(getButtonColumn("subjectViewSyntheticPDF", commandButton));
+        commandButton.setIcon("fa fa-fw new-pdf-icon");
+        commandButton.setStyleClass("hide-pdf-bg");
+        columns.add(getButtonColumn("subjectViewSyntheticPDF", commandButton, "", "action_column"));
 
         columns.add(getTextColumn("subjectViewSyntheticNote", null));
         return columns;
@@ -65,7 +70,7 @@ public class SyntheticBindingWrapper extends BaseTab implements Serializable {
     }
 
     @Override
-    Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+    public Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
         return DaoManager.getCount(DocumentSubject.class, "id", new Criterion[]{
                 Restrictions.in("subject.id", getListIds()),
                 Restrictions.eq("type", DocumentType.ESTATE_FORMALITY),
@@ -82,5 +87,20 @@ public class SyntheticBindingWrapper extends BaseTab implements Serializable {
 
     public void setListIds(List<Long> listIds) {
         this.listIds = listIds;
+    }
+
+    public LazyDataModel<FormalityView> getLazyModel() {
+        return new EntityLazyListModel(DocumentSubject.class, new Criterion[]{
+                Restrictions.in("subject.id", getListIds()),
+                Restrictions.eq("type", DocumentType.ESTATE_FORMALITY),
+                Restrictions.or(
+                        Restrictions.isNull("useSubjectFromXml"),
+                        Restrictions.eq("useSubjectFromXml", false)
+                )
+        }, new Order[]{Order.asc("id")});
+    }
+
+    public void setLazyModel(LazyDataModel<FormalityView> lazyModel) {
+        this.lazyModel = lazyModel;
     }
 }

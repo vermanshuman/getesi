@@ -79,7 +79,7 @@
     color: white;
 }
 
-body .ui-state-highlight {
+body ui:not(#client_not_manger_or_fiduciary_id_items).ui-state-highlight {
     color: #D0D7DE !important;
 }
 td.ui-panelgrid-cell {
@@ -90,7 +90,7 @@ td.ui-panelgrid-cell {
     position: absolute;
     z-index: 1;
     margin-top: 10px;
-    max-width: 560px;
+    max-width: 600px;
     right: 33px;
     border: 1px solid #547ac4;
 }
@@ -114,6 +114,14 @@ td.ui-panelgrid-cell {
 }
 
 #hyphen {
+    display: inline-block;
+    width: 20px;
+    height: 5px;
+    margin-right: 12px;
+    border-top: 2px solid #000;
+}
+
+#subjecthyphen {
     display: inline-block;
     width: 20px;
     height: 5px;

@@ -12,6 +12,8 @@ import it.nexera.ris.persistence.beans.entities.domain.dictionary.Area;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Sublevel;
 import it.nexera.ris.web.beans.BaseEntityPageBean;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Restrictions;
 import org.primefaces.event.NodeCollapseEvent;
 import org.primefaces.event.NodeExpandEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -138,7 +140,14 @@ public class StructureListBean extends BaseEntityPageBean {
         setSelectedElement(null);
 
         try {
-            List<Area> areas = DaoManager.load(Area.class);
+            List<Area> areas = DaoManager.load(Area.class,
+                    new Criterion[]
+                            {
+                                    Restrictions.or(
+                                            Restrictions.isNull("externalBrexa"),
+                                            Restrictions.eq("externalBrexa", Boolean.FALSE)
+                                            )
+                            });
             List<Office> offices = DaoManager.load(Office.class);
             List<Sublevel> sublevels = new CopyOnWriteArrayList<>(DaoManager.load(Sublevel.class));
 

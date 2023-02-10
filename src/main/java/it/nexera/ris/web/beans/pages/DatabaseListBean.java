@@ -16,11 +16,13 @@ import it.nexera.ris.web.beans.EntityLazyListPageBean;
 import it.nexera.ris.web.beans.wrappers.UploadFilesWithContent;
 import it.nexera.ris.web.beans.wrappers.logic.DocumentWrapper;
 import it.nexera.ris.web.beans.wrappers.logic.FileWrapper;
+import it.nexera.ris.web.beans.wrappers.logic.SelectedSubjectWrapper;
 import it.nexera.ris.web.common.EntityLazyListModel;
 import it.nexera.ris.web.common.ListPaginator;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -49,6 +51,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.stream.Collectors;
+import static it.nexera.ris.persistence.ConcatenateIlikeCriterion.ilike;
 
 @ManagedBean(name = "databaseListBean")
 @ViewScoped
@@ -243,6 +246,31 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
     @Getter
     @Setter
     private ListPaginator paginator;
+
+    @Getter
+    @Setter
+    private int activeSubjectTabIndex;
+
+    @Getter
+    @Setter
+    private SelectedSubjectWrapper selectedSubjectWrapper = new SelectedSubjectWrapper();
+
+    @Getter
+    @Setter
+    private Long formalityDocumentId;
+
+    @Getter
+    @Setter
+    private Long propertyDocumentId;
+
+
+    @Getter
+    @Setter
+    private Long estateFormalityDocumentId;
+
+    @Getter
+    @Setter
+    private Long visureRTFDocumentId;
 
     private void pageLoadStatic() {
         if (SessionHelper.get("requestFormalityView") != null)
@@ -457,6 +485,17 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
 
     public void filterSubjectTable() {
 
+        log.info("Search Filters : " +
+                "nominativo : {} " +  this.getNominativo()+ ", " +
+                "Cognome : {} " +  this.getCogNome()+ ", " +
+                "Nome : {} " +  this.getNome()+ ", " +
+                "subjectBusinessName : {} " +  this.getSubjectBusinessName()+ ", " +
+                "subjectFiscalCodeVAT : {} " +  this.getSubjectFiscalCodeVAT()+ ", " +
+                "subjectFiscalCodeVAT : {} " +  this.getSubjectBirthPlace()+ ", " +
+                "subjectFiscalCodeVAT : {} " +  this.getSubjectBirthDate()+ ", " +
+                "cityColumnFilter : {} " +  this.getCityColumnFilter()+ ", " +
+                "birthDateColumnFilter : {} " +  this.getBirthDateColumnFilter()
+        );
         if (ValidationHelper.isNullOrEmpty(this.getNominativo()) &&
                 ValidationHelper.isNullOrEmpty(this.getCogNome()) &&
                 ValidationHelper.isNullOrEmpty(this.getNome()) &&
@@ -466,12 +505,6 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
                 ValidationHelper.isNullOrEmpty(this.getSubjectBirthDate()) &&
                 ValidationHelper.isNullOrEmpty(this.getCityColumnFilter()) &&
                 ValidationHelper.isNullOrEmpty(this.getBirthDateColumnFilter())) {
-//            this.loadList(Subject.class, new Criterion[]{
-//                    Restrictions.ne("incomplete", true)
-//            }, new Order[]{
-//                    Order.asc("surname"), Order.asc("name"), Order.asc("birthDate")
-//            });
-
             this.setLazyModel(new EntityLazyListModel<>(Subject.class, new Criterion[]{
                     Restrictions.ne("incomplete", true)
             }, new Order[]{
@@ -603,18 +636,10 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
                 criterionList.add(Restrictions.or(
                         Restrictions.ilike("name", getNominativo(), MatchMode.ANYWHERE),
                         Restrictions.ilike("surname", getNominativo(), MatchMode.ANYWHERE),
-                        Restrictions.ilike("businessName", getNominativo(), MatchMode.ANYWHERE)));
+                        Restrictions.ilike("businessName", getNominativo(), MatchMode.ANYWHERE),
+                        ilike(getNominativo(), MatchMode.ANYWHERE, "surname", "name")));
+            	
             }
-
-//            if (!ValidationHelper.isNullOrEmpty(getCogNome())) {
-//                criterionList.add(Restrictions.ilike("surname", getCogNome(),
-//                        MatchMode.ANYWHERE));
-//            }
-//
-//            if (!ValidationHelper.isNullOrEmpty(getSubjectBusinessName())) {
-//                criterionList.add(Restrictions.ilike("businessName", getSubjectBusinessName(),
-//                        MatchMode.ANYWHERE));
-//            }
 
             if (!ValidationHelper.isNullOrEmpty(getSubjectFiscalCodeVAT())) {
                 criterionList.add(Restrictions.or(Restrictions.ilike("fiscalCode", getSubjectFiscalCodeVAT(),
@@ -657,19 +682,14 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
             }
 
             criterionList.add(Restrictions.ne("incomplete", true));
-
-//            this.loadList(Subject.class, criterionList.toArray(new Criterion[0]),
-//                    new Order[]{
-//                            Order.asc("surname"), Order.asc("name"), Order.asc("birthDate")
-//            }, new CriteriaAlias[]{
-//                    new CriteriaAlias("birthCity", "b", JoinType.INNER_JOIN)
-//            });
-
+            Arrays.stream(criterionList.toArray(new Criterion[0]))
+                    .forEach(r -> LogHelper.debugInfo(log, "DashboardList : " + r));
             this.setLazyModel(new EntityLazyListModel<>(Subject.class, criterionList.toArray(new Criterion[0]), new Order[]{
                     Order.asc("surname"), Order.asc("name"), Order.asc("birthDate")
             }, new CriteriaAlias[]{
                     new CriteriaAlias("birthCity", "b", JoinType.INNER_JOIN)
             }));
+
             getLazyModel().load((getPaginator().getTablePage() - 1) * getPaginator().getRowsPerPage(), getPaginator().getRowsPerPage(),
                     getPaginator().getTableSortColumn(),
                     (getPaginator().getTableSortOrder() == null || getPaginator().getTableSortOrder().equalsIgnoreCase("DESC")
@@ -1093,6 +1113,99 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
     public void downloadFormalityPdf() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         if (!ValidationHelper.isNullOrEmpty(getEntityEditId())) {
             FormalityHelper.downloadFormalityPdf(getEntityEditId());
+        }
+    }
+
+    public void setFormalityDocument() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        FacesContext context = FacesContext.getCurrentInstance();
+        Map<String,String> params = context.getExternalContext().getRequestParameterMap();
+        if(StringUtils.isNotBlank(params.get("selectedTabFormalityDocumentId"))){
+            setFormalityDocumentId( Long.parseLong(params.get("selectedTabFormalityDocumentId")));
+        }else
+            setFormalityDocumentId(null);
+    }
+
+    public void setPropertyDocument() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        FacesContext context = FacesContext.getCurrentInstance();
+        Map<String,String> params = context.getExternalContext().getRequestParameterMap();
+        if(StringUtils.isNotBlank(params.get("selectedTabPropertyDocumentId"))){
+            setPropertyDocumentId( Long.parseLong(params.get("selectedTabPropertyDocumentId")));
+        }else
+            setPropertyDocumentId(null);
+    }
+
+    public void setEstateFormalityPDFDocument() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        FacesContext context = FacesContext.getCurrentInstance();
+        Map<String,String> params = context.getExternalContext().getRequestParameterMap();
+        if(StringUtils.isNotBlank(params.get("selectedTabEstateFormalityDocumentId"))){
+            setEstateFormalityDocumentId( Long.parseLong(params.get("selectedTabEstateFormalityDocumentId")));
+        }else
+            setEstateFormalityDocumentId(null);
+    }
+
+    public void downloadFormalityPDF() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        if(!ValidationHelper.isNullOrEmpty(getFormalityDocumentId())){
+            Document document = DaoManager.get(Document.class, getFormalityDocumentId());
+            File file = new File(document.getPath());
+            String title = document.getTitle();
+            if (document.getPath().endsWith(".tif") || document.getPath().endsWith(".htm")) {
+                title = FileHelper.getFileName(document.getPath());
+            } else if (!title.endsWith(".pdf")) {
+                if (title.contains(".")) {
+                    int point = title.lastIndexOf(".");
+                    title = title.substring(0, point + 1) + "pdf";
+                } else {
+                    title += ".pdf";
+                }
+            }
+            try {
+                FileHelper.sendFile(title, new FileInputStream(file), (int) file.length());
+            } catch (Exception e) {
+                LogHelper.log(log, e);
+            }
+        }
+
+    }
+
+    public void downloadPropertyPDF() {
+        if(!ValidationHelper.isNullOrEmpty(getPropertyDocumentId())){
+            String projectUrl = this.getRequest().getHeader("referer");
+            projectUrl = projectUrl.substring(0, projectUrl.indexOf(this.getCurrentPage().getPagesContext())) + "/";
+            PrintPDFHelper.generatePDFOnDocument(getPropertyDocumentId(), projectUrl);
+        }
+
+    }
+
+    public void downloadEstateFormalityPDF(){
+        if(!ValidationHelper.isNullOrEmpty(getEstateFormalityDocumentId())){
+            String projectUrl = this.getRequest().getHeader("referer");
+            projectUrl = projectUrl.substring(0, projectUrl.indexOf(this.getCurrentPage().getPagesContext())) + "/";
+            PrintPDFHelper.generatePDFOnDocument(getEstateFormalityDocumentId(), projectUrl);
+        }
+
+    }
+
+    public void setVisureRTFDocument() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        FacesContext context = FacesContext.getCurrentInstance();
+        Map<String,String> params = context.getExternalContext().getRequestParameterMap();
+        if(StringUtils.isNotBlank(params.get("selectedTabVisureRTFDocumentId"))){
+            setVisureRTFDocumentId( Long.parseLong(params.get("selectedTabVisureRTFDocumentId")));
+        }else
+            setVisureRTFDocumentId(null);
+    }
+
+    public void downloadVisureRTFDocument() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        if(!ValidationHelper.isNullOrEmpty(getVisureRTFDocumentId())){
+            VisureManageHelper.downloadVisureRTF(getVisureRTFDocumentId());
+        }
+
+    }
+
+    public void goToFormality() {
+        FacesContext context = FacesContext.getCurrentInstance();
+        Map<String, String> params = context.getExternalContext().getRequestParameterMap();
+        if (StringUtils.isNotBlank(params.get("selectedTabFormalityId"))) {
+            RedirectHelper.goTo(PageTypes.REQUEST_FORMALITY, Long.parseLong(params.get("selectedTabFormalityId")));
         }
     }
 
@@ -1989,7 +2102,7 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
             } else if (tableHeader.equalsIgnoreCase("fiscal_code_header")) {
                 getPaginator().setTableSortColumn("fiscalCode");
                 filterSubjectTable();
-            }else if (tableHeader.equalsIgnoreCase("birth_date_header")) {
+            } else if (tableHeader.equalsIgnoreCase("birth_date_header")) {
                 getPaginator().setTableSortColumn("birthDate");
                 filterSubjectTable();
             }
@@ -1998,6 +2111,20 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
 
     public void filterColumn() {
         filterSubjectTable();
+    }
+
+    public final void onSubjectTabChange(final TabChangeEvent event) {
+        TabView tv = (TabView) event.getComponent();
+        this.activeSubjectTabIndex = tv.getActiveIndex();
+        SessionHelper.put("activeSubjectTabIndex", activeSubjectTabIndex);
+    }
+
+    public void loadSelectedSubject() throws NumberFormatException, HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+        getSelectedSubjectWrapper().onLoad(this.getEntityEditId());
+    }
+
+    public void saveSelectedSubject() {
+        getSelectedSubjectWrapper().saveFromDialog();
     }
 
     public boolean standardContainsFilterForStringColumn(Object columnValue, Object filterValue, Locale locale) {
@@ -2131,5 +2258,59 @@ public class DatabaseListBean extends EntityLazyListPageBean<Subject> implements
 
     public void setNominativo(String nominativo) {
         this.nominativo = nominativo;
+    }
+
+    public void resetPage() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        getPaginator().setCurrentPageNumber(1);
+        onPageChange();
+    }
+
+    public void loadAllegatiDocuments(Request request) throws PersistenceBeanException, IllegalAccessException {
+        List<Document> documents = getAllegatiDocuments(request);
+        getSelectedSubjectWrapper().setRequestDocuments(documents);
+        if(!ValidationHelper.isNullOrEmpty(getSelectedSubjectWrapper().getRequestDocuments()))
+            executeJS("PF('documentDialog').show();");
+    }
+
+    public void loadAllegatiDocuments() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+
+        FacesContext context = FacesContext.getCurrentInstance();
+        Map<String,String> params = context.getExternalContext().getRequestParameterMap();
+        if(StringUtils.isNotBlank(params.get("selectedTabRequestId"))){
+            Request request = DaoManager.get(Request.class, Long.parseLong(params.get("selectedTabRequestId")));
+           loadAllegatiDocuments(request);
+        }
+    }
+
+    private List<Document> getAllegatiDocuments(Request request)
+            throws PersistenceBeanException, IllegalAccessException {
+        List<Document> documents = DaoManager.load(Document.class, new Criterion[]{
+                Restrictions.eq("request.id", request.getId()),
+                Restrictions.eq("selectedForEmail", true)
+                //Restrictions.eq("typeId", DocumentType.ALLEGATI.getId())
+        });
+
+        List<Document> formalities = DaoManager.load(Document.class, new CriteriaAlias[]{
+                new CriteriaAlias("formality", "f", JoinType.INNER_JOIN),
+                new CriteriaAlias("f.requestList", "r_f", JoinType.INNER_JOIN)
+        }, new Criterion[]{
+                //Restrictions.eq("r_f.id", request.getId()),
+                //Restrictions.eq("typeId", DocumentType.ALLEGATI.getId())
+                Restrictions.eq("request.id", getEntityEditId()),
+                Restrictions.eq("selectedForEmail", true)
+        });
+
+        if (!ValidationHelper.isNullOrEmpty(formalities)) {
+            for (Document temp : formalities) {
+                if (!documents.contains(temp)) {
+                    documents.add(temp);
+                }
+            }
+        }
+        return documents;
+    }
+
+    public void openImportDocumentsPage() throws PersistenceBeanException {
+        RedirectHelper.goToWIthoutId(PageTypes.IMPORT_DOCUMENTS, true);
     }
 }

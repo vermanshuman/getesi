@@ -1,5 +1,6 @@
 package it.nexera.ris.persistence.beans.entities.domain.readonly;
 
+import it.nexera.ris.common.enums.Activity;
 import it.nexera.ris.common.enums.ApplicationSettingsKeys;
 import it.nexera.ris.common.enums.MailManagerPriority;
 import it.nexera.ris.common.enums.MailManagerStatuses;
@@ -14,6 +15,7 @@ import it.nexera.ris.persistence.beans.entities.IndexedEntity;
 import it.nexera.ris.persistence.beans.entities.domain.User;
 import it.nexera.ris.persistence.beans.entities.domain.WLGExport;
 import it.nexera.ris.persistence.beans.entities.domain.WLGFolder;
+import it.nexera.ris.persistence.beans.entities.domain.WLGInbox;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.beans.wrappers.logic.MailManagerPriorityWrapper;
 import org.apache.commons.logging.Log;
@@ -46,7 +48,7 @@ public class WLGInboxShort extends IndexedEntity {
     @Column(name = "xpriority")
     private Integer xpriority;
 
-    @Column(name = "send_date", columnDefinition = "TIMESTAMP", nullable = false)
+    @Column(name = "send_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", nullable = false)
     private Date sendDate;
 
     @Column(name = "email_from", length = 200)
@@ -78,6 +80,9 @@ public class WLGInboxShort extends IndexedEntity {
     @JoinColumn(name = "change_state_user_id")
     private User userChangedState;
 
+    @Column(name = "email_cc", length = 400)
+    private String emailCC;
+
     @Transient
     private String[] emailFromStr;
 
@@ -89,6 +94,9 @@ public class WLGInboxShort extends IndexedEntity {
 
     @Transient
     private Boolean received;
+
+    @Transient
+    private Boolean rowCheck;
 
     public boolean getRead() {
         boolean isRead = false;
@@ -305,5 +313,32 @@ public class WLGInboxShort extends IndexedEntity {
 
     public void setUserChangedState(User userChangedState) {
         this.userChangedState = userChangedState;
+    }
+
+    public String getEmailCC() {
+        return emailCC == null ? "" : emailCC;
+    }
+
+    public void setEmailCC(String emailCC) {
+        this.emailCC = emailCC;
+    }
+
+    public Boolean getRowCheck() {
+        return rowCheck;
+    }
+
+    public void setRowCheck(Boolean rowCheck) {
+        this.rowCheck = rowCheck;
+    }
+
+    public String getActivityString() {
+        WLGInbox wlgInbox = null;
+        try {
+            wlgInbox = DaoManager.get(WLGInbox.class, new Criterion[]{
+                    Restrictions.eq("id", getId())});
+        } catch (PersistenceBeanException | IllegalAccessException | InstantiationException e) {
+            LogHelper.log(log, e);
+        }
+        return wlgInbox != null && wlgInbox.getActivity() != null ? wlgInbox.getActivity().toString()  : "";
     }
 }

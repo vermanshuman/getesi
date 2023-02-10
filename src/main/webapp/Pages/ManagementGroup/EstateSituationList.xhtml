@@ -4,8 +4,13 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ff="http://readytech.com/functions"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition template="/resources/tpl/Admin/ListBase.xhtml">
+    <ui:define name="head">
+        <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/estate-situation.css"
+              media="all" rel="stylesheet" type="text/css"/>
+    </ui:define>
     <ui:param name="bean" value="#{estateSituationListBean}"/>
     <ui:param name="renderTitle" value="false"/>
     <ui:param name="renderCss" value="margin-left: -13px;"/>
@@ -13,17 +18,30 @@
     <ui:param name="centerPartStyleClass" value="false"/>
     <ui:param name="disableSelection" value="true"/>
     <ui:param name="tableInsideField" value="true"></ui:param>
+    <ui:param name="showFirstTable" value="#{bean.showBaseTab}"></ui:param>
+
+    <p:remoteCommand name="cancelSaveRequestExtraCost" action="#{bean.cancelSaveRequestExtraCost}"/>
     <ui:define name="back_buttons_panel">
-        <p:commandButton id="add_btn" action="#{bean.addEstate}" value="#{msg.estateAddButton}" styleClass="p-mr-2 p-mb-2"/>
-        <p:commandButton id="cancel_btn" action="#{bean.goBack}" value="#{msg.requestListOpenEdit}"
-                         icon="pi pi-times-circle"/>
-        <p:commandButton id="print_btn" action="#{bean.goTextEdit}" value="#{msg.requestManagePrint}"
-                         style="float: right"/>
+        <div class="p-col-10" style="width: 60%; display: inline-block;">
+	        <p:commandButton id="add_btn" action="#{bean.addEstate}" value="#{msg.estateAddButton}" 
+	        				 styleClass="p-mr-2 p-mb-2" rendered="#{bean.showBaseTab}"/>
+	        <p:commandButton id="cancel_btn" action="#{bean.goBack}" value="#{msg.requestListOpenEdit}"
+	                         icon="pi pi-times-circle"/>
+        </div>
+        <div class="p-col-2" style="text-align:right;width: 30%; display: inline-block; float:right;">                 
+        	<p:commandButton id="print_btn" action="#{bean.goTextEdit}" value="#{(bean.showGenera) ? msg.requestCertification : msg.requestManagePrint}"/>
+        	<p:commandButton value="#{ff:upper(msg.goToWorkflow)}"
+                             class="action-btn" 
+                             style="background-color: #f26b3a!important;"
+                             action="#{bean.openTranscriptionManagement}"
+                             rendered="#{bean.isTranscriptionCertification}">
+            </p:commandButton>
+        </div>
     </ui:define>
     <ui:define name="columns">
         <p:column headerText="#{msg.formality}">
             <p:dataTable rendered="#{not empty item.estateFormalityList}" value="#{item.estateFormalityList}"
-                         var="weakForm" styleClass="without-header cadastral_table">
+                         var="weakForm" styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}">
                 <p:column>
                     <span>#{weakForm.numRP}/#{weakForm.numRG} #{msg.estateFormalityDatePrefix}</span><h:outputText
                         value="#{weakForm.date}" converter="dateTimeConverter"/>
@@ -39,7 +57,7 @@
         </p:column>
         <p:column headerText="#{msg.estateLocation}">
             <p:dataTable rendered="#{not empty item.propertyList}" value="#{item.propertyList}" var="estate"
-                         styleClass="without-header cadastral_table">
+                         styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}">
                 <p:column style="width: 8%">
                     <h:outputText value="#{estate.category.codeInVisura}" id="category"/>
                     <p:tooltip for="category" value="#{estate.category.description}"/>
@@ -48,7 +66,7 @@
                     <h:outputText value="#{estate.address}"/>
                 </p:column>
                 <p:column>
-                    <p:dataTable value="#{estate.cadastralData}" var="exam"
+                    <p:dataTable value="#{estate.cadastralData}" var="exam" emptyMessage="#{msg.noRecordsFound}"
                                  rendered="#{not empty estate.cadastralData}"
                                  styleClass="without-header cadastral_table">
                         <p:column>
@@ -79,7 +97,7 @@
         </p:column>
         <p:column headerText="#{msg.pdfFormality}">
             <p:dataTable rendered="#{not empty item.formalityList}" value="#{item.formalityList}"
-                         styleClass="without-header cadastral_table" var="item">
+                         styleClass="without-header cadastral_table" var="item" emptyMessage="#{msg.noRecordsFound}">
                 <p:column>
                     <h:outputText value="#{item.formalityStr}"/>
                 </p:column>
@@ -215,11 +233,11 @@
                 border: 1px solid #c9cdd2 !important;
             }
 
-            body .ui-widget, body .ui-widget .ui-widget {
+            /* body .ui-widget, body .ui-widget .ui-widget {
                 font-family: "Open Sans","Helvetica Neue",sans-serif !important;
                 text-decoration: none !important;
                 font-size: 14px !important;
-            }
+            } */
 
             body .ui-datatable .ui-datatable-data > tr {
                 color: #5f666c;
@@ -238,9 +256,9 @@
                 margin-left: 1cm;
                 margin-right: 1cm;
             }
-            div[id*='menuform1:menu_div'] {
+           /* div[id*='menuform1:menu_div'] {
                 margin-left: -4px;
-            }
+            }*/
             .btn-green {
                 background-color: #00CC52!important;
             }
@@ -287,8 +305,9 @@
                 padding: 3px !important;
             }
         </style>
+
         <br/><br/><br/>
-        <p:fieldset class="fieldset" legend="#{msg.estateSituationListDocuments}" toggleable="true" toggleSpeed="500" collapsed="true">
+        <p:fieldset class="fieldset" legend="#{msg.estateSituationListDocuments}" toggleable="true" toggleSpeed="500" collapsed="#{bean.showBaseTab}">
             <p:fileUpload label="#{msg.upload}" fileUploadListener="#{bean.saveDocumentXML}"
                           multiple="false" mode="advanced" styleClass="special-upload" auto="true"
                           update=":form:documentTable"/>
@@ -318,7 +337,8 @@
 
 
         <!-- <ui:fragment><br /></ui:fragment> -->
-        <p:fieldset class="fieldset" legend="#{msg.estateSituationSalesDevelopmentHeader}" rendered="#{bean.salesDevelopmentShowing}" toggleable="true" toggleSpeed="500" collapsed="true">
+        <p:fieldset class="fieldset" legend="#{msg.estateSituationSalesDevelopmentHeader}"
+                    rendered="#{bean.salesDevelopmentShowing and bean.showBaseTab}" toggleable="true" toggleSpeed="500" collapsed="true">
             <p:commandButton disabled="#{!bean.canCreate}" id="buttonCreateSalesDevelopment" style="margin-left: -13px;"
                              icon="pi pi-plus-circle" styleClass="ui-button-success p-mr-2 p-mb-2"
                              value="#{not empty addButtonTitle ? addButtonTitle : msg.newItem}"
@@ -356,7 +376,7 @@
                 </p:column>
                 <p:column headerText="#{msg.formality}">
                     <p:dataTable rendered="#{not empty item.estateFormalityList}" value="#{item.estateFormalityList}"
-                                 var="weakForm" styleClass="without-header cadastral_table">
+                                 var="weakForm" styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}">
 
                         <p:column>
                             <span>#{weakForm.numRP}/#{weakForm.numRG} #{msg.estateFormalityDatePrefix}</span><h:outputText
@@ -373,7 +393,7 @@
                 </p:column>
                 <p:column headerText="#{msg.estateLocation}">
                     <p:dataTable rendered="#{not empty item.propertyList}" value="#{item.propertyList}" var="estate"
-                                 styleClass="without-header cadastral_table">
+                                 styleClass="without-header cadastral_table" emptyMessage="#{msg.noRecordsFound}">
                         <p:column style="width: 8%">
                             <h:outputText value="#{estate.category.codeInVisura}" id="sales_category"/>
                             <p:tooltip for="sales_category" value="#{estate.category.description}"/>
@@ -382,7 +402,7 @@
                             <h:outputText value="#{estate.address}"/>
                         </p:column>
                         <p:column>
-                            <p:dataTable value="#{estate.cadastralData}" var="exam"
+                            <p:dataTable value="#{estate.cadastralData}" var="exam" emptyMessage="#{msg.noRecordsFound}"
                                          rendered="#{not empty estate.cadastralData}"
                                          styleClass="without-header cadastral_table">
                                 <p:column>
@@ -413,7 +433,7 @@
                 </p:column>
                 <p:column headerText="#{msg.pdfFormality}">
                     <p:dataTable rendered="#{not empty item.formalityList}" value="#{item.formalityList}"
-                                 styleClass="without-header cadastral_table" var="item">
+                                 styleClass="without-header cadastral_table" var="item" emptyMessage="#{msg.noRecordsFound}">
                         <p:column>
                             <h:outputText value="#{item.formalityStr}"/>
                         </p:column>
@@ -479,6 +499,7 @@
         </p:dialog>
         <ui:include src="../Dialogs/RequestDocumentListDialog.xhtml"/>
         <ui:include src="../Dialogs/RequestExtraCostDialog.xhtml"/>
+        <ui:include src="../Dialogs/ConfirmRequestToEvasaDialog.xhtml"/>
     </ui:define>
 </ui:composition>
 </html>

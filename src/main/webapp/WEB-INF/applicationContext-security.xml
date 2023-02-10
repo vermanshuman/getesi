@@ -9,7 +9,7 @@
 
 	<global-method-security secured-annotations="enabled">
 	</global-method-security>
-
+	<http pattern="/rest/**" security="none"/>
 	<http auto-config="true" access-denied-page="/Common/AccessDenied.jsf" >
 		<intercept-url pattern="/monitoring" access="ROLE_USER" />
 		<intercept-url pattern="/**" access="IS_AUTHENTICATED_ANONYMOUSLY" />

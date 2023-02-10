@@ -13,6 +13,7 @@ import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Country;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.Nationality;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
@@ -81,7 +82,8 @@ public class SubjectHelper {
 
         restrictionsList.add(Restrictions.eq("name", subject.getName()));
         restrictionsList.add(Restrictions.eq("surname", subject.getSurname()));
-        restrictionsList.add(Restrictions.eq("birthDate", subject.getBirthDate()));
+        if(!ValidationHelper.isNullOrEmpty(subject.getBirthDate()))
+        	restrictionsList.add(Restrictions.eq("birthDate", subject.getBirthDate()));
 
 
         if ((subject.getSelectProvinceId() == null && subject.getBirthProvince() == null)
@@ -177,6 +179,23 @@ public class SubjectHelper {
             boolean match = false;
             for (SectionC c : subject.getSectionC()) {
                 if (formalities.contains(c.getFormality())) {
+                    match = true;
+                }
+            }
+            if (!match) {
+                list.add(subject);
+            }
+        }
+        return list;
+    }
+
+    public static List<Subject> filterPresumable(List<Subject> presumableSubjects, List<Formality> formalities) {
+        List<Subject> list = new ArrayList<>();
+        for (Subject subject : presumableSubjects) {
+            boolean match = false;
+            for (SectionC c : subject.getSectionC()) {
+                if (formalities.contains(c.getFormality()) &&
+                        StringUtils.isNotBlank(c.getSectionCType()) && c.getSectionCType().equalsIgnoreCase("A favore")) {
                     match = true;
                 }
             }

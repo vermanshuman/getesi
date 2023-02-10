@@ -72,8 +72,18 @@ body .cyan-blue-btn {
     background-color: #547ac4 !important;
 }
 
-body .ui-button {
+body .ui-button:not(#editButton) {
     background: #547ac4;
+    color: #ffffff;
+    border: none !important;
+    /*margin: 0;*/
+    outline: 0 none;
+    border-radius: 4px;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+body .editButton {
+    background: #788FA7 !important;
     color: #ffffff;
     border: none !important;
     margin: 0;
@@ -82,6 +92,21 @@ body .ui-button {
     transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 
+body .editButton.ui-button:not(.stampaButton){
+    background: #788FA7 !important;
+}
+
+body .editButton.ui-button.ui-state-focus {
+    outline: 0 none;
+    outline-offset: 0;
+    box-shadow: 0 0 0 0.2em #788FA7;
+}
+
+body .editButton.ui-button.ui-state-active, body .ui-button.ui-state-down {
+    background: #788FA7;
+    border-color: #788FA7;
+    color: #ffffff;
+}
 .mail_style {
     color: #4c5156 !important;
 }
@@ -202,8 +227,8 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/servizio_anagrafico.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    width: 25px;
-    height: 25px;
+    width: 20px;
+    height: 20px;
     margin: 0 auto;
     display: inline-block;
 }
@@ -213,9 +238,9 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/serv_anagrafico.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 25px;
-    width: 25px;
-    height: 25px;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
     margin: 0 auto;
     display: inline-block;
 }
@@ -236,9 +261,9 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/servizi-comunali.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 25px;
-    width: 25px;
-    height: 25px;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
     margin: 0 auto;
     display: inline-block;
 }
@@ -247,9 +272,9 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/servizi-immobiliari.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 25px;
-    width: 25px;
-    height: 25px;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
     margin: 0 auto;
     display: inline-block;
 }
@@ -258,9 +283,9 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/servizi-investigativi.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 25px;
-    width: 25px;
-    height: 25px;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
     margin: 0 auto;
     display: inline-block;
 }
@@ -324,9 +349,9 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/servizi-catastali.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 25px;
-    width: 25px;
-    height: 25px;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
     margin: 0 auto;
     display: inline-block;
 }
@@ -350,9 +375,9 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/servizi-legali.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 25px;
-    width: 25px;
-    height: 25px;
+    background-size: 20px;
+    width: 20px;
+    height: 20px;
     margin: 0 auto;
     display: inline-block;
 }
@@ -393,7 +418,7 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/previous.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 21px;
+    background-size: 30px;
     height: 21px;
     width: 20px;
     display: block;
@@ -404,7 +429,7 @@ body .top-bar-cal .ui-widget-header {
     background-image: url("../images/previous.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 21px;
+    background-size: 30px;
     height: 21px;
     width: 20px;
     display: block;
@@ -636,20 +661,19 @@ body .ui-datatable thead th.ui-state-hover {
     color: #5f666c !important;
 }
 
-body .ui-datatable thead th {
+body .ui-datatable:not(.borderless) thead th {
     background-color: #ffffff !important;
     padding: 8px 2px;
     border-color: #808080 !important;
     color: #5f666c !important;
 }
 
-.ui-datatable thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
+.ui-datatable:not(.borderless) thead th, .ui-datatable tbody td, .ui-datatable tfoot td, .ui-datatable tfoot th {
     padding: 4px 10px!important;
     overflow: hidden!important;
     border-width: 1px!important;
     border-style: solid!important;
 }
-
 
 body .ui-datatable .ui-datatable-data tr td {
     padding: 6px 12px;
@@ -752,7 +776,7 @@ select-width {
 }
 
 .layout-wrapper .layout-menu-container .layout-menu-logo img {
-    width: 60px;
+    width: 50px;
     margin-top: 15px;
 }
 
@@ -804,7 +828,7 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
     }
 }*/
 .layout-wrapper .layout-topbar, .layout-menu-logo {
-    background-color: #c5d3df !important;
+    background-color: #ffffff !important;
 }
 
 .layout-wrapper .layout-topbar .topbar-menu > li > a .topbar-icon{
@@ -815,8 +839,9 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
     background-image: url("../images/impostazioni-system.png");
     background-repeat: no-repeat;
     background-position: 50%;
-    background-size: 26px;
-    height: 42px;
+    background-size: 30px;
+    height: 30px;
+    margin-top: 3px;
     display: block;
 }
 
@@ -894,4 +919,233 @@ body .ui-button.ui-button-success, body .ui-splitbutton.ui-button-success > .ui-
     .alignEnd {
         place-content: flex-start;
     }
+}
+.ui-datatable.borderless thead th, .ui-datatable.borderless tbody,
+.ui-datatable.borderless tbody tr, .ui-datatable.borderless tbody td {
+    border-style: none;
+    background: #ffffff;
+}
+
+.email-icon-new {
+    background-image: url("../images/email_new.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 26px;
+    height: 42px;
+    display: block;
+}
+
+.correct-email-icon {
+    background-image: url("../images/icons8-segno-di-spunta-48.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 26px;
+    height: 42px;
+    display: block;
+}
+
+.email-check-icon {
+    background-image: url("../images/email-check.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 38px;
+    height: 42px;
+    display: block;
+    background-position-y: calc(50% - 2px);
+}
+
+.menu-dots-icon {
+    background-image: url("../images/menu-dots.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    background-size: 30px;
+    height: 42px;
+    display: block;
+}
+
+.icon-block {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+
+.icon-block i {
+    width: 50px;
+}
+
+.confirmationDialog {
+    border: 7px solid #57c279 !important;
+}
+
+.confirmationDialog .ui-dialog-titlebar {
+    border-bottom: none !important;
+}
+
+body .confirmationDialog .ui-widget-header {
+    background: #f8f9fa !important;
+    color: #495057 !important;
+}
+
+.confirm-button {
+    background-color: #00CC52 !important;
+}
+
+#subjectRestoreDlg, #chooseSingleOrMultipleRequestCreate {
+    border: 2px solid #57c279;
+}
+
+.dialog-gray {
+    border: 7px solid #d9e0e7 !important;
+}
+
+.dialog-gray-width {
+    width: 370px !important;
+}
+
+.dialog-gray .ui-dialog-titlebar {
+    background: #f8f9fa !important;
+    color: #495057 !important;
+}
+
+.dialog-orange {
+    border: 7px solid #ffa500 !important;
+}
+
+.dialog-orange .ui-dialog-titlebar {
+    background: #f8f9fa !important;
+    color: #495057 !important;
+}
+
+.dialog-green {
+    border: 7px solid #57c279 !important;
+}
+
+.dialog-green-width {
+    width: 370px !important;
+}
+
+.dialog-green .ui-dialog-titlebar {
+    background: #f8f9fa !important;
+    color: #495057 !important;
+}
+
+.dialog-red {
+    border: 7px solid #F3362B !important;
+}
+
+.pdf-icon {
+    background-image: url("../images/pdf.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 25px;
+    height: 25px;
+    background-size: 21px;
+    display: block;
+    margin-top: -14% !important;
+}
+
+.newEntityDialog.ui-dialog .ui-widget-header {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+}
+
+.ui-button.yes-button {
+    background-color: #00cc52 !important;
+    width: 50px !important;
+}
+
+.ui-button.no-button {
+    background-color: #F3362B !important;
+    width: 50px !important;
+}
+
+.unlock-icon {
+    background-image: url("../images/icons8-sblocca-documento-blu.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 28px;
+    height: 28px;
+    background-size: 25px;
+}
+
+#estateTab .ui-datatable .ui-datatable-data > tr {
+    color: inherit;
+}
+
+.user-row {
+    color: darkgrey !important;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.simple-table .ui-datatable .ui-datatable-data > tr > td {
+    background-color: white !important;
+    border-color: #5f666c !important;
+    text-align: center;
+}
+
+.without-header thead {
+    display: none;
+}
+
+body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+    background: #FFF !important;
+    color: #000000 !important;
+}
+
+.fieldset {
+    margin-top: 10px;
+    margin-left: 1cm;
+    margin-right: 1cm;
+}
+
+body .fieldset .ui-fieldset-legend {
+    border: 1px solid #c9cdd2;
+    color: #FFFFFF !important;
+    padding: 1rem;
+    font-weight: 200 !important;
+    border-radius: 4px;
+    user-select: none;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+    background-color: #000066 !important;
+    font-size: 14px !important;
+}
+
+.new-pdf-icon, .ui-widget .ui-icon.fa.new-pdf-icon, .ui-icon.fa.new-pdf-icon {
+    background-image: url("../images/new-pdf-icon.png") !important;
+    background-repeat: no-repeat !important;
+    background-position: 50% !important;
+    width: 25px;
+    height: 25px;
+    margin-top: -13px !important;
+    margin-left: -10px;
+}
+
+.hide-pdf-bg, body .hide-pdf-bg.ui-state-active {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.non_displayed_button{
+    display: none;
+}
+
+.ui-button.green-button {
+    background-color: #00cc52 !important;
+}
+
+.ui-button.red-button {
+    background-color: #F3362B !important;
+}
+
+.excel-icon {
+    background-image: url("../images/excel_icon.png");
+    background-repeat: no-repeat;
+    background-position: 50%;
+    width: 25px;
+    height: 25px;
+    background-size: 25px;
+    display: block;
+    margin-top: -14% !important;
 }

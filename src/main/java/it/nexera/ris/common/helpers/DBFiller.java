@@ -656,4 +656,15 @@ public abstract class DBFiller extends BaseHelper {
 //        
 //        return "";
 //    }
+
+    public static void updateTable(Session session) {
+        try {
+            session.createSQLQuery("ALTER TABLE tracking_bank_account  MODIFY COLUMN notes varchar(4000)")
+                    .executeUpdate();
+        } catch (Exception e) {
+            LogHelper.log(log,e);
+            e.printStackTrace();
+        }
+    }
+
 }

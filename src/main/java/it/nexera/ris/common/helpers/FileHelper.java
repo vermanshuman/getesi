@@ -3,20 +3,17 @@ package it.nexera.ris.common.helpers;
 import it.nexera.ris.persistence.UserHolder;
 import it.nexera.ris.web.listeners.ApplicationListener;
 
-import java.util.Map;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.primefaces.model.UploadedFile;
 
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.Date;
-import java.util.Properties;
-import java.util.StringJoiner;
-import java.util.UUID;
 
 /**
  * FileHelper class Used for working with filesystem
@@ -27,6 +24,8 @@ public class FileHelper extends BaseHelper {
     private static String CONTEXT_NAME = "ris";
 
     private static String realPath;
+
+    private static Map<String, XWPFRun> templateMapping = new HashMap<>();
 
     public static String getLocalFilePath(String path) throws IOException {
         if (FileHelper.exists(FileHelper.getLocalFileDir(), path)) {
@@ -436,7 +435,7 @@ public class FileHelper extends BaseHelper {
         }
     }
 
-    public static String writeFileToFolder(String name, File folder,
+    /*public static String writeFileToFolder(String name, File folder,
                                            byte[] data) throws IOException {
         File f = new File(folder, name);
         if (!f.exists()) {
@@ -452,7 +451,52 @@ public class FileHelper extends BaseHelper {
         }
 
         return f.getAbsolutePath();
-    }
+    }*/
+    
+	public static String writeFileToFolder(String name, File folder, byte[] data) throws IOException {
+		File f = new File(folder, name.trim());
+		if (!f.exists()) {
+
+			boolean isCreatedDirs = new File(f.getParent()).mkdirs();
+			boolean isCreatedFile = f.createNewFile();
+			LogHelper.debugInfo(log, "Directories were created " + String.valueOf(isCreatedDirs));
+			LogHelper.debugInfo(log, "File was created " + String.valueOf(isCreatedFile));
+		}
+		LogHelper.debugInfo(log, "File exists " + String.valueOf(f.exists()));
+		log.info("folderName :: "+folder + " :: fileName :: "+name);
+		File file = new File(folder, name.trim());
+		if(file.exists()) {
+			log.info("File exists: ");
+        } else {
+        	log.info("File does not exists");
+        }
+		if (file.canRead()) {
+			log.info("File is Readable: ");
+        } else {
+        	log.info("File not readable");
+        	file.setReadable(true);
+        }
+		
+		if (file.canWrite()) {
+			log.info("Can Write file ");
+        } else {
+        	log.info("Cannot Write file ");
+        	file.setWritable(true);
+        }
+		
+		if (file.canExecute()) {
+			log.info("Can Execute file ");
+        } else {
+        	log.info("Cannot Execute file");
+        	file.setExecutable(true);
+        }
+
+		try (FileOutputStream out = new FileOutputStream(file)) {
+			out.write(data);
+		}
+
+		return f.getAbsolutePath();
+	}
 
     public static byte[] loadContentByPath(String path) {
         if (!ValidationHelper.isNullOrEmpty(path)) {
@@ -483,6 +527,14 @@ public class FileHelper extends BaseHelper {
 
     public static void setRealPath(String realPath) {
         FileHelper.realPath = realPath;
+    }
+
+    public static Map<String, XWPFRun> getTemplateMapping() {
+        return templateMapping;
+    }
+
+    public static void setTemplateMapping(Map<String, XWPFRun> templateMapping) {
+        FileHelper.templateMapping = templateMapping;
     }
 
     public static Properties getApplicationProperties() {
@@ -575,5 +627,41 @@ public class FileHelper extends BaseHelper {
 
     public static String getFatturaAPITemplatePath() {
         return getApplicationProperties().getProperty("fatturaAPITemplatePath");
+    }
+
+    public static String getTranscriptionDocumentSavePath(Long entityId, String directory, String page) {
+        Calendar calendar = Calendar.getInstance(Locale.ITALY);
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        StringBuffer sb = new StringBuffer();
+        sb.append(FileHelper.getDocumentSavePath());
+        sb.append("\\");
+        sb.append(page);
+        sb.append("\\");
+        sb.append(directory);
+        sb.append("\\");
+        sb.append(year);
+        sb.append("\\");
+        sb.append(month+1);
+        sb.append("\\");
+        sb.append(day);
+        sb.append("\\");
+        sb.append(entityId);
+        sb.append("\\");
+        return sb.toString();
+    }
+
+    public static String getEvasionDocumentSavePath(Long entityId) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(FileHelper.getApplicationProperties().getProperty("destinationPath"));
+        sb.append(File.separator);
+        sb.append(entityId);
+        sb.append(File.separator);
+        return sb.toString();
+    }
+    
+    public static Integer getApplicationInstance() {
+    	return Integer.parseInt(getApplicationProperties().getProperty("applicationInstance"));
     }
 }

@@ -417,7 +417,7 @@ public class RealEstateHelper {
             newList.add(data);
         }
 
-        property.setCadastralData(newList.stream().distinct().collect(Collectors.toList()));
+        property.setCadastralData(newList.stream().collect(Collectors.toSet()));
 
         if (cadastralDataToDelete != null) {
             for (CadastralData data : cadastralDataToDelete) {
@@ -503,7 +503,8 @@ public class RealEstateHelper {
     public static List<Property> getCadastralDatesEqualsProperties(Property property, Session session) {
         List<Property> propertyCadastralDatesEquals = new ArrayList<>();
 
-        List<Long> longList = RealEstateHelper.getExistingPropertiesIdsByCD(property.getCadastralData(),
+        List<Long> longList = RealEstateHelper.getExistingPropertiesIdsByCD(
+                property.getCadastralData().stream().collect(Collectors.toList()),
                 session, false);
 
         if (!ValidationHelper.isNullOrEmpty(longList)) {
@@ -531,7 +532,8 @@ public class RealEstateHelper {
         List<Long> result;
         StringBuffer sb = new StringBuffer();
         sb.append("select property_id as num "
-                + "from (" + formExistingPropertiesIdsByCDQuery(property.getCadastralData(), session, false) + ") tmp "
+                + "from (" + formExistingPropertiesIdsByCDQuery(
+                        property.getCadastralData().stream().collect(Collectors.toList()), session, false) + ") tmp "
                 + "inner join cadastral_property cp on tmp.id = cp.property_id "
                 + "where cp.cadastral_data_id IN"
                 + "(select cadastral_data_id from cadastral_property where property_id = " + property.getId() + ")");

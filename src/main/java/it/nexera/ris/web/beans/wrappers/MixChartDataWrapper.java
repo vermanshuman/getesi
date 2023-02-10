@@ -16,7 +16,7 @@ public class MixChartDataWrapper implements Serializable {
 
     private String type;
     private String label;
-    private List<Integer> data;
+    private List<Double> data;
     private List<String> backgroundColor;
     private List<String> borderColor;
     private int borderWidth;

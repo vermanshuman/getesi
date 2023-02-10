@@ -3,67 +3,243 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:p="http://primefaces.org/ui" xmlns:f="http://xmlns.jcp.org/jsf/core">
-<ui:composition template="/resources/tpl/Admin/LazyInListEditBase.xhtml">
-    <ui:param name="list_title" value="#{msg.requestType}"/>
+      xmlns:ff="http://readytech.com/functions"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition template="/resources/tpl/Admin/LazyListBase.xhtml">
+    <ui:param name="list_title" value="#{msg.payment_type_list}"/>
     <ui:param name="bean" value="#{paymentTypeListBean}"/>
     <ui:param name="entity_name" value="#{msg.requestTypeEntity}"/>
     <ui:param name="disableSelection" value="true"/>
     <ui:param name="additionalEditAction" value="window.scrollTo(0,0);"/>
 
-    <ui:define name="edit_fields">
-        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
+    <ui:define name="search_body">
+        <div class="settingsBlock">
+            <p:commandButton id="settingButton" onclick="togglePanel();" type="button" style="margin-left: 110px;position: absolute;"
+                             icon="ui-icon ui-icon-search pi pi-sliders-h" styleClass="searchPanelButton"/>
+            <script type="text/javascript">
+                // <![CDATA[
+                $("body").click(function(e){
+                    var target = $(e.target);
+                    if (!target.parents('#settingButton').length && !target.parents('#settingPanel').length && !target.parents('.ui-selectcheckboxmenu-panel').length
+                        && !target.parents('#ui-datepicker-div').length && !target.parents('#filterCourtCity_items').length) {
+                        PF('panelSetting').getJQ().hide();
+                    }
+                    if(target.closest('.ui-selectcheckboxmenu-item').length) {
+                        console.log("hello");
+                        $("#states").addClass("border_class");
+                    } else {
+                        $("#states").removeClass("border_class");
+                    }
+                });
+                function togglePanel() {
+                    PF('panelSetting').getJQ().toggle();
+                    if($('#statoAllLabel').length==0) {
+                        $('.ui-selectcheckboxmenu-header .ui-chkbox.ui-widget').after('<label id="statoAllLabel">Stato</label>');
+                    }
+                }
+                jQuery(document).ready(function() {
+                    PF('panelSetting').getJQ().hide();
+                });
+                // ]]>
+            </script>
+            <style>
+                #settingPanel {
+                    position: absolute;
+                    z-index: 1;
+                    margin-top: 40px;
+                    max-width: 560px;
+                    left: 200px;
+                    border: 1px solid #547ac4;
+                }
+                #settingPanel .ui-selectonemenu {
+                    background-color: #F0F3F5 !important;
+                    border-radius: 7px !important;
+                    min-height: 38px;
+                }
+                #settingPanel .ui-selectonemenu .ui-selectonemenu-label {
+                    margin-top: 3px;
+                }
+                #settingPanel .ui-selectonemenu:not(.green-border) {
+                    border: none !important;
+                }
+                .green-border {
+                    border: 1px solid #009900 !important;
+                }
+                #buttonCreate .ui-button-text {
+                    margin-left: -15px;
+                }
+                body .ui-datatable .ui-datatable-data tr.ui-datatable-even {
+                    background-color: #f0f3f5 !important;
+                }
+                body .ui-datatable:not(.borderless) thead th {
+                    padding: 10px 10px !important;
+                }
+            </style>
+            <p:remoteCommand name="updateFilterInput"
+                             update=":filterDescription :filterAcronym :filterCode :filterBeneficiary :filterIstitutionName :filterIban"/>
+            <p:remoteCommand name="filterTableFromPanel"
+                             action="#{bean.filterTableFromPanel}" update=":form:table"/>
+            <p:panel id="settingPanel" widgetVar="panelSetting" closable="true" toggleable="true" styleClass="panelSetting" style="display: none;">
+                <div class="p-grid">
+                    <div class="p-col-12" style="text-align: center;">
+                        <h2>Filtra per</h2>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value="#{ff:upper(msg.description)}:"/>
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value="#{ff:upper(msg.code)}:"/>
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:inputText id="filterDescription" onblur="updateFilterInput()" value="#{bean.description}" style="width: 99%;min-height: 38px;" styleClass="#{bean.description ne null and bean.description ne '' ? 'green-border' : ''}" />
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:inputText id="filterCode" onblur="updateFilterInput()" value="#{bean.code}" style="width: 99%;min-height: 38px;" styleClass="#{bean.code ne null and bean.code ne '' ? 'green-border' : ''}" />
+                        </div>
+                    </div>
 
-            <span><span class="red">*</span> #{msg.description}:</span>
-            <p:inputText id="description"
-            			value="#{bean.entity.description}"
-                         label="#{msg.description}"/>
-			 
-            <span>#{msg.code}:</span>
-            <p:inputText id="code"
-            			value="#{bean.entity.code}"
-                         label="#{msg.code}"/>
-            <span>#{msg.beneficiary}:</span>
-            <p:inputText id="beneficiary"
-                         value="#{bean.entity.beneficiary}"
-                         label="#{msg.beneficiary}"/>
-
-            <span>#{msg.istitutionName}:</span>
-            <p:inputText id="istitutionName"
-                         value="#{bean.entity.istitutionName}"
-                         label="#{msg.istitutionName}"/>
-
-            <span>#{msg.iban}:</span>
-            <p:inputText id="iban"
-                         value="#{bean.entity.iban}"
-                         label="#{msg.iban}"/>
-        </p:panelGrid>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value="#{ff:upper(msg.beneficiary)}:"/>
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value="#{ff:upper(msg.istitutionName)}:"/>
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:inputText id="filterBeneficiary" onblur="updateFilterInput()" value="#{bean.beneficiary}" style="width: 99%;min-height: 38px;" styleClass="#{bean.beneficiary ne null and bean.beneficiary ne '' ? 'green-border' : ''}" />
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:inputText id="filterIstitutionName" onblur="updateFilterInput()" value="#{bean.istitutionName}" style="width: 99%;min-height: 38px;" styleClass="#{bean.istitutionName ne null and bean.istitutionName ne '' ? 'green-border' : ''}" />
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value="#{ff:upper(msg.iban)}:"/>
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <h:outputText style="color: #003871;"
+                                          value="#{ff:upper(msg.acronym)}:"/>
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:inputText id="filterIban" onblur="updateFilterInput()" value="#{bean.iban}" style="width: 99%;min-height: 38px;" styleClass="#{bean.iban ne null and bean.iban ne '' ? 'green-border' : ''}" />
+                        </div>
+                    </div>
+                    <div class="p-col-6">
+                        <div style="">
+                            <p:inputText id="filterAcronym" onblur="updateFilterInput()" value="#{bean.acronym}" style="width: 99%;min-height: 38px;" styleClass="#{bean.acronym ne null and bean.acronym ne '' ? 'green-border' : ''}" />
+                        </div>
+                    </div>
+                    <div class="p-col-12" style="text-align: center;">
+                        <p:commandButton value="#{ff:upper(msg.requestPrintSelectTemplate)}" style="background: #00CC52;margin-right: 20px;" id="searchButton"
+                                         onclick="filterTableFromPanel();" onsuccess="PF('panelSetting').getJQ().hide()"/>
+                        <p:commandButton id="manageReestablishBtn" value="#{ff:upper(msg.mailManageReestablish)}" actionListener="#{bean.clearFilterPanel}" update="settingPanel" oncomplete="filterTableFromPanel();PF('panelSetting').getJQ().hide()"/>
+                    </div>
+                </div>
+            </p:panel>
+        </div>
     </ui:define>
 
     <ui:define name="columns">
-        <p:column sortBy="#{item.description}" filterBy="#{item.description}"
-                  headerText="#{msg.description}">
+        <p:column sortBy="#{item.description}" headerText="#{msg.description}">
             <h:outputText value="#{item.description}"/>
         </p:column>
 
-        <p:column sortBy="#{item.code}" filterBy="#{item.code}"
-                  headerText="#{msg.code}">
+        <p:column sortBy="#{item.acronym}" headerText="#{msg.acronym}">
+            <h:outputText value="#{item.acronym}"/>
+        </p:column>
+
+        <p:column sortBy="#{item.code}" headerText="#{msg.code}">
             <h:outputText value="#{item.code}"/>
         </p:column>
-        <p:column sortBy="#{item.beneficiary}" filterBy="#{item.beneficiary}"
-                  headerText="#{msg.beneficiary}">
+        <p:column sortBy="#{item.beneficiary}" headerText="#{msg.beneficiary}">
             <h:outputText value="#{item.beneficiary}"/>
         </p:column>
 
-        <p:column sortBy="#{item.istitutionName}" filterBy="#{item.istitutionName}"
-                  headerText="#{msg.istitutionName}">
+        <p:column sortBy="#{item.istitutionName}" headerText="#{msg.istitutionName}">
             <h:outputText value="#{item.istitutionName}"/>
         </p:column>
 
-        <p:column sortBy="#{item.iban}" filterBy="#{item.iban}"
-                  headerText="#{msg.iban}">
+        <p:column sortBy="#{item.iban}" headerText="#{msg.iban}">
             <h:outputText value="#{item.iban}"/>
         </p:column>
+    </ui:define>
+
+    <ui:define name="dialogs_body">
+        <p:remoteCommand name="refreshTable" update="@form"/>
+        <p:dialog widgetVar="addPaymentTypeDialogWV"  id="addPaymentTypeDialog" modal="true" draggable="false"
+                  width="600" styleClass="dialog-white-bg addPaymentDialog newEntityDialog"
+                  position="center center" header="#{msg.payment_type_list}">
+            <div class="p-grid">
+                <div class="p-col-12 p-md-12">
+                    <div class="card"
+                         style="border: none !important; padding-top:0px; padding-bottom:0px; margin-top:10px;">
+                        <ui:include src="/resources/tpl/common/ValidationMessages.xhtml"/>
+                        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
+                                     columnClasses="ui-grid-col-3,ui-grid-col-9">
+                            <span><span class="red">*</span> #{msg.description}:</span>
+                            <p:inputText id="description"
+                                         value="#{bean.entity.description}"
+                                         label="#{msg.description}"/>
+
+                            <span>#{msg.acronym}:</span>
+                            <p:inputText id="acronym"
+                                         value="#{bean.entity.acronym}"
+                                         label="#{msg.acronym}"/>
+
+                            <span>#{msg.code}:</span>
+                            <p:inputText id="code"
+                                         value="#{bean.entity.code}"
+                                         label="#{msg.code}"/>
+                            <span>#{msg.beneficiary}:</span>
+                            <p:inputText id="beneficiary"
+                                         value="#{bean.entity.beneficiary}"
+                                         label="#{msg.beneficiary}"/>
+
+                            <span>#{msg.istitutionName}:</span>
+                            <p:inputText id="istitutionName"
+                                         value="#{bean.entity.istitutionName}"
+                                         label="#{msg.istitutionName}"/>
+
+                            <span>#{msg.iban}:</span>
+                            <p:inputText id="iban"
+                                         value="#{bean.entity.iban}"
+                                         label="#{msg.iban}"/>
+                        </p:panelGrid>
+                        <div class="p-col-12" style="text-align:center;">
+                            <p:commandButton value="#{msg.save.toUpperCase()}" style="margin-left:15px;"
+                                             action="#{bean.save}" update="validationMessages"
+                                             styleClass="ui-button-success p-mr-2 p-mb-2"/>
+                            <p:commandButton oncomplete="PF('addPaymentTypeDialogWV').hide();"
+                                             value="#{msg.undo.toUpperCase()}" style="background-color: #F3362B !important;"
+                                             action="#{bean.resetFields}"/>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </p:dialog>
     </ui:define>
 
 </ui:composition>

@@ -143,12 +143,13 @@ public class ImportOmiXlsxService extends BaseService {
             omiValue.setCategoryCode((long) codeCell.getNumericCellValue());
             omiValue.setCityDescription(cityDescriptionCell.getStringCellValue());
             omiValue.setZone(zoneCell.getStringCellValue());
-            omiValue.setComprMin((long) comprMinCell.getNumericCellValue());
-            omiValue.setComprMax((long) comprMaxCell.getNumericCellValue());
             if(stateCell != null)
             	omiValue.setState(stateCell.getStringCellValue());
-            result.add(omiValue);
-
+            if(!ValidationHelper.isNullOrEmpty(comprMinCell) && !ValidationHelper.isNullOrEmpty(comprMaxCell.getNumericCellValue())){
+                omiValue.setComprMin((long) comprMinCell.getNumericCellValue());
+                omiValue.setComprMax((long) comprMaxCell.getNumericCellValue());
+                result.add(omiValue);
+            }
             getProcessMonitor().setStartValue(++i);
             if (i % step == 0) {
                 socketPush();
@@ -172,8 +173,8 @@ public class ImportOmiXlsxService extends BaseService {
                 if (i % step == 0) {
                     socketPush();
                 }
-
-                Long countOfPresumableEntitiesInDb = ConnectionManager.getCount(OmiValue.class, "id",
+                
+                /*Long countOfPresumableEntitiesInDb = ConnectionManager.getCount(OmiValue.class, "id",
                         new Criterion[]{
                                 Restrictions.eq("zone", omiValue.getZone()),
                                 Restrictions.eq("cityCfis", omiValue.getCityCfis()),
@@ -182,23 +183,40 @@ public class ImportOmiXlsxService extends BaseService {
                         }, session);
 
                 if (ValidationHelper.isNullOrEmpty(countOfPresumableEntitiesInDb)) {
+                    ConnectionManager.save(omiValue, session);*/
+                
+                OmiValue omiValueDb = ConnectionManager.get(OmiValue.class, 
+                        new Criterion[]{
+                                Restrictions.eq("zone", omiValue.getZone()),
+                                Restrictions.eq("cityCfis", omiValue.getCityCfis()),
+                                Restrictions.eq("categoryCode", omiValue.getCategoryCode()),
+                                Restrictions.eq("state", omiValue.getState())
+                        }, session);
+
+                if (ValidationHelper.isNullOrEmpty(omiValueDb)) {
                     ConnectionManager.save(omiValue, session);
-
-                    if (numberOfElements++ > MAX_NUMBER_OF_ELEMENTS_BEFORE_COMMIT) {
-                        if (tr != null && !tr.wasCommitted())
-                            tr.commit();
-
-                        if (ps != null)
-                            ps.closeSession();
-
-                        ps = new PersistenceSession();
-                        session = ps.getSession();
-
-                        tr = session.beginTransaction();
-
-                        numberOfElements = 0;
-                    }
+                } else {
+                	omiValueDb.setManual(null);
+                	omiValueDb.setComprMax(omiValue.getComprMax());
+                	omiValueDb.setComprMin(omiValue.getComprMin());
+                	ConnectionManager.save(omiValueDb, session);
                 }
+                
+                if (numberOfElements++ > MAX_NUMBER_OF_ELEMENTS_BEFORE_COMMIT) {
+                    if (tr != null && !tr.wasCommitted())
+                        tr.commit();
+
+                    if (ps != null)
+                        ps.closeSession();
+
+                    ps = new PersistenceSession();
+                    session = ps.getSession();
+
+                    tr = session.beginTransaction();
+
+                    numberOfElements = 0;
+                }
+                //}
             }
         } catch (Exception e) {
             LogHelper.log(log, e);

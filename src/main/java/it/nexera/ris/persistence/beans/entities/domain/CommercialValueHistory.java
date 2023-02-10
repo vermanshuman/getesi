@@ -25,6 +25,8 @@ public class CommercialValueHistory extends IndexedEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    private Boolean manual;
+
     public CommercialValueHistory copy() {
         CommercialValueHistory history = new CommercialValueHistory();
         history.setCommercialValue(getCommercialValue());
@@ -65,4 +67,11 @@ public class CommercialValueHistory extends IndexedEntity {
         this.user = user;
     }
 
+    public Boolean getManual() {
+        return manual;
+    }
+
+    public void setManual(Boolean manual) {
+        this.manual = manual;
+    }
 }

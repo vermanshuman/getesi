@@ -65,14 +65,55 @@ public class InvoiceEditBean extends EntityEditPageBean<Invoice> implements Seri
     
     private Double invoiceItemAmount;
     
-    private Double invoiceItemVat;
+    // private Double invoiceItemVat;
     
     private InvoiceItem selectedItem;
     
     private List<InvoiceItem> scheduledForDeletion;
     
     private String fiscalCode;
-    
+
+	private Long selectedTaxRateId;
+
+	@Override
+	public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException {
+
+		try {
+			scheduledForDeletion = new ArrayList<>();
+
+			clients = ComboboxHelper.fillList(Client.class);
+			paymentTypes = ComboboxHelper.fillList(new PaymentType[] { });
+			setVatAmounts(ComboboxHelper.fillList(TaxRate.class, Order.asc("description"), new CriteriaAlias[]{}, new Criterion[]{
+					Restrictions.eq("use", Boolean.TRUE)
+			}, true, false, true));
+			selectedClientId = null;
+			selectedPaymentTypeId = null;
+
+			if(!getEntity().isNew()) {
+				setSplitPayment(getEntity().getSplitPayment());
+				setNotes(getEntity().getNotes());
+				setDate(getEntity().getDate());
+				setFiscalCode(getEntity().getFiscalCode());
+
+				selectedClientId = getEntity().getClient().getId();
+				selectedPaymentTypeId = getEntity().getPaymentType().getId();
+
+				invoiceItems = DaoManager.load(InvoiceItem.class,
+						new Criterion[]{
+								Restrictions.eq("invoice.id", getEntity().getId())
+						});
+
+				fillPaymentTypeList();
+			} else {
+				invoiceItems = new ArrayList<>();
+			}
+		}
+
+		catch(Exception e) {
+			log.error(e);
+		}
+	}
+
     public String getFiscalCode() {
 		return fiscalCode;
 	}
@@ -186,14 +227,7 @@ public class InvoiceEditBean extends EntityEditPageBean<Invoice> implements Seri
 		this.vatAmounts = vatAmounts;
 	}
 
-	public Double getInvoiceItemVat() {
-		return invoiceItemVat;
-	}
 
-	public void setInvoiceItemVat(Double invoiceItemVat) {
-		this.invoiceItemVat = invoiceItemVat;
-	}
-	
 	public Double getTotalAmount() {
 		Double totalAmount = 0D;
 		
@@ -228,12 +262,13 @@ public class InvoiceEditBean extends EntityEditPageBean<Invoice> implements Seri
 				invoiceItemSubject = selectedItem.getSubject();
 				invoiceItemDescription = selectedItem.getDescription();
 				invoiceItemAmount = selectedItem.getAmount();
-				invoiceItemVat = selectedItem.getVat();
+				if(!ValidationHelper.isNullOrEmpty(selectedItem.getTaxRate()))
+					setSelectedTaxRateId(selectedItem.getTaxRate().getId());
 			} else {
 				invoiceItemSubject = "";
 				invoiceItemDescription = "";
 				invoiceItemAmount = 0D;
-				invoiceItemVat = 0D;
+				setSelectedTaxRateId(null);
 			}
 		}
 		
@@ -242,7 +277,7 @@ public class InvoiceEditBean extends EntityEditPageBean<Invoice> implements Seri
 		}
 	}
 	
-	public void completeEditInvoiceItemDialog() {		
+	public void completeEditInvoiceItemDialog() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
 		if (ValidationHelper.isNullOrEmpty(invoiceItemSubject) ||
 			ValidationHelper.isNullOrEmpty(invoiceItemDescription) ||
 			invoiceItemAmount < 0 ) {
@@ -255,7 +290,9 @@ public class InvoiceEditBean extends EntityEditPageBean<Invoice> implements Seri
 			item.setSubject(invoiceItemSubject);
 			item.setDescription(invoiceItemDescription);
 			item.setAmount(invoiceItemAmount);
-			item.setVat(invoiceItemVat);
+			if(!ValidationHelper.isNullOrEmpty(getSelectedTaxRateId())){
+				item.setTaxRate(DaoManager.get(TaxRate.class, getSelectedTaxRateId()));
+			}
 			
 			if (selectedItem == null)
 				invoiceItems.add(item);
@@ -271,49 +308,7 @@ public class InvoiceEditBean extends EntityEditPageBean<Invoice> implements Seri
 		invoiceItems.remove(selectedItem);
 	}
 
-    @Override
-    public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException {
-    	
-    	try {    		
-    		scheduledForDeletion = new ArrayList<>();
-    		
-    		clients = ComboboxHelper.fillList(Client.class);
-    		paymentTypes = ComboboxHelper.fillList(new PaymentType[] { });
-    		
-    		vatAmounts = new ArrayList<>();
-    		
-    		vatAmounts.add(new SelectItem(0D, "0%"));
-    		vatAmounts.add(new SelectItem(4D, "4%"));
-    		vatAmounts.add(new SelectItem(10D, "10%"));
-    		vatAmounts.add(new SelectItem(22D, "22%"));
-    		
-    		selectedClientId = null;
-    		selectedPaymentTypeId = null;
-    		
-    		if(!getEntity().isNew()) {
-    			setSplitPayment(getEntity().getSplitPayment());
-    			setNotes(getEntity().getNotes());
-    			setDate(getEntity().getDate());
-    			setFiscalCode(getEntity().getFiscalCode());
-    			
-    			selectedClientId = getEntity().getClient().getId();
-    			selectedPaymentTypeId = getEntity().getPaymentType().getId();
-    			
-    			invoiceItems = DaoManager.load(InvoiceItem.class, 
-    					new Criterion[]{
-    							Restrictions.eq("invoice.id", getEntity().getId())
-    					});
-    			
-    			fillPaymentTypeList();
-    		} else {
-    			invoiceItems = new ArrayList<>();
-    		}
-    	}
-    	
-    	catch(Exception e) {
-    		log.error(e);
-    	}
-    }
+
 
 	@Override
 	public void onValidate() throws PersistenceBeanException, HibernateException, IllegalAccessException {
@@ -380,5 +375,11 @@ public class InvoiceEditBean extends EntityEditPageBean<Invoice> implements Seri
 		fillPaymentTypeList();
 	}
 
+	public Long getSelectedTaxRateId() {
+		return selectedTaxRateId;
+	}
 
+	public void setSelectedTaxRateId(Long selectedTaxRateId) {
+		this.selectedTaxRateId = selectedTaxRateId;
+	}
 }

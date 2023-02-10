@@ -2,6 +2,11 @@ package it.nexera.ris.persistence.beans.entities.domain.dictionary;
 
 import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
+import it.nexera.ris.persistence.beans.entities.domain.AggregationLandChargesRegistryNote;
+import it.nexera.ris.persistence.beans.entities.domain.AggregationLandChargesRegistryReference;
+import it.nexera.ris.persistence.beans.entities.domain.Document;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.Collections;
@@ -28,6 +33,56 @@ public class AggregationLandChargesRegistry extends IndexedEntity {
 
     @Column(name = "national")
     private Boolean national;
+
+    @Column(name = "code_office")
+    private String codeOffice;
+
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "phone1")
+    private String phone1;
+
+    @Column(name = "phone2")
+    private String phone2;
+
+    @Column(name = "mail")
+    private String mail;
+
+    @Column(name = "pec")
+    private String pec;
+
+    @Column(name = "cell_phone")
+    private String cellPhone;
+
+    @Column(name = "stamp")
+    private Boolean stamp;
+
+    @Column(name = "penalty")
+    private Boolean penalty;
+
+    @Column(name = "address_number")
+    private String addressNumber;
+
+    @Column(name = "address_cap")
+    private String addressCap;
+
+    @Column(name = "address_city")
+    private String addressCity;
+
+    @OneToMany(mappedBy = "aggregationLandChargesRegistry", cascade = CascadeType.ALL, orphanRemoval = true)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<AggregationLandChargesRegistryReference> aggregationLandChargesRegistryReferences;
+
+    @OneToMany(mappedBy = "aggregationLandChargesRegistry", cascade = CascadeType.ALL, orphanRemoval = true)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<AggregationLandChargesRegistryNote> aggregationLandChargesRegistryNotes;
+
+    private String type;
+
+    @OneToMany(mappedBy = "aggregationLandChargesRegistry")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    private List<Document> documents;
 
     @Override
     public String toString() {
@@ -60,7 +115,7 @@ public class AggregationLandChargesRegistry extends IndexedEntity {
         return result;
     }
 
-    public List<Long> getAggregationLandChargesRegistersIds(){
+    public List<Long> getAggregationLandChargesRegistersIds() {
         List<Long> chargesRegistryIds;
         if (!ValidationHelper.isNullOrEmpty(getLandChargesRegistries())) {
             chargesRegistryIds = getLandChargesRegistries().stream()
@@ -102,5 +157,134 @@ public class AggregationLandChargesRegistry extends IndexedEntity {
 
     public void setNational(Boolean national) {
         this.national = national;
+    }
+
+    public String getCodeOffice() {
+        return codeOffice;
+    }
+
+    public void setCodeOffice(String codeOffice) {
+        this.codeOffice = codeOffice;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getPhone1() {
+        return phone1;
+    }
+
+    public void setPhone1(String phone1) {
+        this.phone1 = phone1;
+    }
+
+    public String getPhone2() {
+        return phone2;
+    }
+
+    public void setPhone2(String phone2) {
+        this.phone2 = phone2;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
+    }
+
+    public String getPec() {
+        return pec;
+    }
+
+    public void setPec(String pec) {
+        this.pec = pec;
+    }
+
+    public String getCellPhone() {
+        return cellPhone;
+    }
+
+    public void setCellPhone(String cellPhone) {
+        this.cellPhone = cellPhone;
+    }
+
+    public Boolean getStamp() {
+        return stamp;
+    }
+
+    public void setStamp(Boolean stamp) {
+        this.stamp = stamp;
+    }
+
+    public Boolean getPenalty() {
+        return penalty;
+    }
+
+    public void setPenalty(Boolean penalty) {
+        this.penalty = penalty;
+    }
+
+    public String getAddressNumber() {
+        return addressNumber;
+    }
+
+    public void setAddressNumber(String addressNumber) {
+        this.addressNumber = addressNumber;
+    }
+
+    public String getAddressCap() {
+        return addressCap;
+    }
+
+    public void setAddressCap(String addressCap) {
+        this.addressCap = addressCap;
+    }
+
+    public String getAddressCity() {
+        return addressCity;
+    }
+
+    public void setAddressCity(String addressCity) {
+        this.addressCity = addressCity;
+    }
+
+    public List<AggregationLandChargesRegistryReference> getAggregationLandChargesRegistryReferences() {
+        return aggregationLandChargesRegistryReferences;
+    }
+
+    public void setAggregationLandChargesRegistryReferences(List<AggregationLandChargesRegistryReference> aggregationLandChargesRegistryReferences) {
+        this.aggregationLandChargesRegistryReferences = aggregationLandChargesRegistryReferences;
+    }
+
+    public List<AggregationLandChargesRegistryNote> getAggregationLandChargesRegistryNotes() {
+        return aggregationLandChargesRegistryNotes;
+    }
+
+    public void setAggregationLandChargesRegistryNotes(List<AggregationLandChargesRegistryNote> aggregationLandChargesRegistryNotes) {
+        this.aggregationLandChargesRegistryNotes = aggregationLandChargesRegistryNotes;
+    }
+
+    public String getType() {
+
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public List<Document> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<Document> documents) {
+        this.documents = documents;
     }
 }

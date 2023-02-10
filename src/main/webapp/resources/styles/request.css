@@ -45,6 +45,11 @@
 	color: #7E57C2;
 }
 
+.state-brown {
+	border: 2px solid #8A6642;
+	color: #8A6642;
+}
+
 .status-icon {
 	height: 24px;
 	width: 142px;
@@ -146,15 +151,22 @@ body .custom-design-tooltip .ui-tooltip-arrow {
 	-ms-transform: rotate(-90deg);
 	-o-transform: rotate(-90deg);
 	position: absolute;
-	margin-left: -73px;
-	margin-top: -3.6em;
+	margin-left: -5.2rem;
+	margin-top: -2.26rem;
 	color: #FFFCFC !important;
 	background-color: #FF0000 !important;
 	border-radius: 3px !important;
-	min-width: 89px;
+	min-width: 6.45rem;
 	height: 14px;
 	text-align: center;
 	padding-top: 0.4px;
+}
+
+@media (max-width: 1400px) {
+	.vertical-txt {
+		margin-left: -5.3rem;
+		margin-top: -2.4rem;
+	}
 }
 
 .action-btn {
@@ -271,7 +283,7 @@ body .ui-datatable .ui-datatable-data tr.ui-state-highlight {
 
 .ui-paginator .ui-paginator-page {
 	padding: 2px 8px;
-}o08la
+}
 
  .ui-paginator .ui-paginator-rpp-options {
 	 background-color: #ffffff;
@@ -313,7 +325,7 @@ body a {
 	justify-content: center;
 }
 
-.search-panel-btns button {
+.search-panel-btns button:not(#manageReestablishBtn) {
 	width: 98px;
 }
 
@@ -329,4 +341,27 @@ body a {
 }
 .btn-green {
 	background-color: #00cc52 !important;
+}
+
+#supplierArea td.ui-panelgrid-cell{
+	padding-left: 0px;
+}
+
+#azSupplierArea td.ui-panelgrid-cell{
+	padding-left: 0px;
+}
+
+#supplierList, #azSupplierList {
+	min-width: 350px !important;
+}
+
+.disabledCheckbox {
+	opacity: 0.5 !important;
+	pointer-events: none !important;
+	background-color: #808080;
+}
+
+
+#azServicesTable .ui-state-disabled,#sendToAZRequestsTable .ui-state-disabled{
+	background: #ced4da !important;
 }

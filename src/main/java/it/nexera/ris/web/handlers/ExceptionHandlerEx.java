@@ -4,6 +4,8 @@ import it.nexera.ris.common.enums.PageTypes;
 import it.nexera.ris.common.helpers.LogHelper;
 import it.nexera.ris.common.helpers.RedirectHelper;
 import it.nexera.ris.web.beans.wrappers.ExceptionWrapper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import javax.faces.FacesException;
 import javax.faces.context.ExceptionHandler;
@@ -18,6 +20,8 @@ import java.util.List;
 public class ExceptionHandlerEx extends ExceptionHandlerWrapper {
 
     private ExceptionHandler exceptionHandler;
+
+    public transient final Log log = LogFactory.getLog(getClass());
 
     public ExceptionHandlerEx(ExceptionHandler exceptionHandler) {
         this.exceptionHandler = exceptionHandler;
@@ -43,6 +47,8 @@ public class ExceptionHandlerEx extends ExceptionHandlerWrapper {
             try {
                 if (throwable instanceof Throwable) {
                     Throwable t = (Throwable) throwable;
+                    t.printStackTrace();
+                    LogHelper.log(log, t);
 
                     FacesContext facesContext = FacesContext
                             .getCurrentInstance();

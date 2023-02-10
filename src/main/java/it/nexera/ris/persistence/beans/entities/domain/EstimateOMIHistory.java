@@ -25,6 +25,8 @@ public class EstimateOMIHistory extends IndexedEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
+    private Boolean manual;
+
     public EstimateOMIHistory copy() {
         EstimateOMIHistory history = new EstimateOMIHistory();
         history.setEstimateOMI(getEstimateOMI());
@@ -65,4 +67,11 @@ public class EstimateOMIHistory extends IndexedEntity {
         this.user = user;
     }
 
+    public Boolean getManual() {
+        return manual;
+    }
+
+    public void setManual(Boolean manual) {
+        this.manual = manual;
+    }
 }

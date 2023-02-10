@@ -47,7 +47,7 @@
         </p:panelGrid>
         <p:panel>
             <p:dataTable value="#{bean.landOmiValueList}" var="item" id="landOmiValue" style="margin-top: 10px"
-                         rowIndexVar="index">
+                         rowIndexVar="index" emptyMessage="#{msg.noRecordsFound}">
                 <p:column styleClass="action_column">
                     <p:commandButton action="#{bean.deleteLandOmiValue}" update="landOmiValue"
                                      icon="fa fa-fw fa-close">

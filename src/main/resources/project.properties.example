@@ -39,3 +39,5 @@ file.deploy.dir=.
 
 fatturaAPITemplatePath=FatturaAPITemplate.vm
 version=1.0
+
+applicationInstance=1

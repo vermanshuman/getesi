@@ -30,8 +30,10 @@ public class ClientView extends IndexedView {
             + "client.fiscal_code fiscal_code, "
             + "client.address_street address_street, "
             + "client.external external, "
+            + "client.visible visible, "
             + "client.manager manager, "
-            + "client.fiduciary fiduciary";
+            + "client.fiduciary fiduciary, "
+            + "client.brexa brexa ";
 
     public static final String SELECT_PART = "AS SELECT "
             + "client.name_of_the_company name, "
@@ -72,6 +74,11 @@ public class ClientView extends IndexedView {
     
     @Column(name = "fiduciary")
     private Boolean fiduciary;
+
+    @Column(name = "brexa")
+    private Boolean brexa;
+
+    private Boolean visible;
 
     @Override
     public String toString() {
@@ -151,4 +158,19 @@ public class ClientView extends IndexedView {
 		this.fiduciary = fiduciary;
 	}
 
+    public Boolean getBrexa() {
+        return brexa;
+    }
+
+    public void setBrexa(Boolean brexa) {
+        this.brexa = brexa;
+    }
+
+    public Boolean getVisible() {
+        return visible;
+    }
+
+    public void setVisible(Boolean visible) {
+        this.visible = visible;
+    }
 }

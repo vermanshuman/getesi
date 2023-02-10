@@ -2,11 +2,7 @@ package it.nexera.ris.web.beans.pages;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -886,7 +882,8 @@ public class FormalityCreateBean extends EntityEditPageBean<Formality> implement
                             }
                             list.add(data);
                         }
-                        property.setCadastralData(list);
+                        property.setCadastralData(list.stream()
+                        .collect(Collectors.toSet()));
                         DaoManager.save(property);
                     }
                 }
@@ -1024,7 +1021,7 @@ public class FormalityCreateBean extends EntityEditPageBean<Formality> implement
 
 
         if (ValidationHelper.isNullOrEmpty(getNewProperty().getCadastralData())) {
-            getNewProperty().setCadastralData(new ArrayList<>());
+            getNewProperty().setCadastralData(new HashSet<>());
             getNewProperty().getCadastralData().add(getNewCadastralData());
         } else if (!getNewProperty().getCadastralData().contains(getNewCadastralData())) {
             getNewProperty().getCadastralData().add(getNewCadastralData());
@@ -1381,7 +1378,7 @@ public class FormalityCreateBean extends EntityEditPageBean<Formality> implement
         setSelectedTypeId(property.getType());
         setNewProperty(property);
         if(!ValidationHelper.isNullOrEmpty(property.getCadastralData()))
-                setNewCadastralData(property.getCadastralData().get(0));
+                setNewCadastralData(property.getCadastralData().stream().findFirst().orElse(null));
 
         fillFilteredProvinces();
         handleAddressProvinceChangeSectionB();

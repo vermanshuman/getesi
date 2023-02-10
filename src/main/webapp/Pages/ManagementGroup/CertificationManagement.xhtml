@@ -1,0 +1,218 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.org/ui"
+                template="/resources/tpl/Admin/FormBase.xhtml">
+    <ui:param name="bean" value="#{transcriptionAndCertificationManagementBean}"/>
+    <ui:param name="view_title" value="#{msg.transcriptionManagement}"/>
+    <ui:param name="goBackRendered" value="false"/>
+    <ui:param name="showSave" value="false"/>
+    <ui:param name="showCancel" value="false"/>
+
+    <ui:define name="form_body">
+        <link href="#{facesContext.externalContext.requestContextPath}/resources/styles/transcriptionManagement.css"
+              media="all" rel="stylesheet" type="text/css"/>
+        <style>
+
+        </style>
+
+        <p:tabView widgetVar="transcriptionWizard" id="wizard" activeIndex="#{bean.activeTabIndex}">
+            <p:tab id="wizardTabMORTGAGE" title="#{msg.wizardTabMORTGAGE.toUpperCase()}" >
+                <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"  style="width: 100%" id="panelGridCertification"
+                             columnClasses="ui-grid-col-2, ui-grid-col-1, ui-grid-col-1, ui-grid-col-4">
+                    <h:outputText value="#{msg.cadastralAndMortgageDocuments}" style="font-weight:bold"/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+
+                    <p:fileUpload fileUploadListener="#{bean.handleCadastralFileUpload}" label="#{msg.upload}"
+                                  mode="advanced" auto="true" styleClass="special-upload" update="panelGridCertification"/>
+                    <p:panel style="margin-top: 6px; width: 400px;" id="mortgageFilePanel" rendered="#{not empty bean.cadastralFileName}">
+                        <h:outputText id="mortgageFileName" value="#{bean.cadastralFileName}" />
+                        <p:commandButton icon="fa fa-cloud-download" title="#{msg.download}" update=":form, messages"
+                                         ajax="false" action="#{bean.downloadCadastralDocument}"
+                                         style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                        </p:commandButton>
+                        <p:commandButton icon="fa fa-close" title="#{msg.delete}" update="panelGridCertification"
+                                         ajax="true" action="#{bean.deleteCadastralDocument}"
+                                         style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                        </p:commandButton>
+                    </p:panel>
+                    <h:outputText value="" rendered="#{empty bean.cadastralFileName}"/>
+                </p:panelGrid>
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                    <p:commandButton value="#{msg.save}" styleClass="green-button align-right"
+                                     action="#{bean.saveCertification}" update="@form"/>
+                </p:outputPanel>
+                <br/>
+                <br/>
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                        <p:commandButton value="#{msg.manageCertificationSendRequestToSupplier}"
+                                         action="#{bean.createNewMail('Verifiche Catastali e Ipotecarie')}"
+                                         styleClass="green-button align-right"  disabled="true"/>
+                </p:outputPanel>
+                <br/>
+                <br/>
+            </p:tab>
+            <p:tab id="wizardSENDNOTARY" title="#{msg.wizardSENDNOTARY.toUpperCase()}" >
+                <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"  style="width: 100%" id="notaryPanelGrid"
+                             columnClasses="ui-grid-col-2, ui-grid-col-1, ui-grid-col-1, ui-grid-col-4">
+                    <h:outputText value="#{msg.mapExtractLabel}" style="font-weight:bold"/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+                    <p:fileUpload fileUploadListener="#{bean.handleMapFileUpload}" label="#{msg.upload}"
+                                  mode="advanced" auto="true" styleClass="special-upload" update="notaryPanelGrid"/>
+                    <p:panel style="margin-top: 6px; width: 400px;" id="notaryFilePanel" rendered="#{not empty bean.mapFileName}">
+                        <h:outputText id="notaryFileName" value="#{bean.mapFileName}" />
+                        <p:commandButton icon="fa fa-cloud-download" title="#{msg.download}" update=":form, messages"
+                                         ajax="false" action="#{bean.downloadMapDocument}"
+                                         style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                        </p:commandButton>
+                        <p:commandButton icon="fa fa-close" title="#{msg.delete}" update="notaryPanelGrid"
+                                         ajax="true" action="#{bean.deleteMapDocument}"
+                                         style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                        </p:commandButton>
+                    </p:panel>
+                    <h:outputText value="" rendered="#{empty bean.mapFileName}"/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+
+                    <p:outputPanel styleClass="transaction-date" style="justify-content: end;">
+                        <p:commandButton value="#{msg.sendNotaryButtonLabel}"
+                                         action="#{bean.createNewMail('Estratto mappa')}"
+                                         styleClass="green-button align-right"  disabled="true"/>
+                    </p:outputPanel>
+                </p:panelGrid>
+
+
+                <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"  style="width: 100%" id="notaryCertificationGrid"
+                             columnClasses="ui-grid-col-2, ui-grid-col-1, ui-grid-col-1, ui-grid-col-4">
+                    <h:outputText value="#{msg.notaryCertificationLabel}" style="font-weight:bold"/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+                    <p:fileUpload fileUploadListener="#{bean.handleSignedCertificationFileUpload}" label="#{msg.upload}"
+                                  mode="advanced" auto="true" styleClass="special-upload" update="notaryCertificationGrid"/>
+                    <p:panel style="margin-top: 6px; width: 400px;" id="notaryCertificationFilePanel" rendered="#{not empty bean.signedCertificationFileName}">
+                        <h:outputText id="notaryCertificationFileName" value="#{bean.signedCertificationFileName}" />
+                        <p:commandButton icon="fa fa-cloud-download" title="#{msg.download}" update=":form, messages"
+                                         ajax="false" action="#{bean.downloadSignedCertificationDocument}"
+                                         style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                        </p:commandButton>
+                        <p:commandButton icon="fa fa-close" title="#{msg.delete}" update="notaryCertificationGrid"
+                                         ajax="true" action="#{bean.deleteSignedCertificationDocument}"
+                                         style="background-color: transparent!important; color: #5f666c!important; padding-right: 5px; font-size:18px !important;">
+                        </p:commandButton>
+                    </p:panel>
+                    <h:outputText value="" rendered="#{empty bean.signedCertificationFileName}"/>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+
+                    <p:outputPanel styleClass="transaction-date" style="justify-content: end;">
+                        <p:commandButton value="#{msg.sendClienteButtonLabel}"
+                                         action="#{bean.createNewMail('Certificazione firmata dal notaio')}"
+                                         styleClass="green-button align-right"  disabled="true"/>
+                    </p:outputPanel>
+                </p:panelGrid>
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                    <p:commandButton value="#{msg.save}" styleClass="green-button align-right"
+                                     action="#{bean.saveCertification}" update="@form"/>
+                </p:outputPanel>
+            </p:tab>
+            <p:tab id="wizardTabCertificateReport" title="#{msg.wizardTabExpenseReport.toUpperCase()}" >
+
+                <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                             columnClasses="ui-grid-col-2, ui-grid-col-4">
+                    <h:outputLabel for="cadastralAssessment" value="#{msg.cadastralAssessment}"/>
+                    <p:inputNumber id="cadastralAssessment" label="#{msg.cadastralAssessment}"  value="#{bean.cadastralCost}"/>
+
+                    <h:outputLabel for="mortgageInvestigations" value="#{msg.mortgageInvestigations}"/>
+                    <p:inputNumber id="mortgageInvestigations" label="#{msg.mortgageInvestigations}" value="#{bean.mortgageCost}"/>
+
+                    <h:outputLabel for="personalCertificate" value="#{msg.personalCertificate}"/>
+                    <p:inputNumber id="personalCertificate" label="#{msg.personalCertificate}" value="#{bean.personalCost}"/>
+
+                    <h:outputLabel for="postalCosts" value="#{msg.postalCosts}"/>
+                    <p:inputNumber id="postalCosts" label="#{msg.postalCosts}" value="#{bean.postalCost}"/>
+                </p:panelGrid>
+
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                    <p:commandButton value="#{msg.transcriptionPDFReport.toUpperCase()}"/>
+                </p:outputPanel>
+
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                    <p:commandButton value="#{msg.save}" styleClass="green-button align-right"
+                                     action="#{bean.saveCertification}" update="@form"/>
+                </p:outputPanel>
+                <br/>
+                <br/>
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                    <p:commandButton value="#{msg.transcriptionManagementSendInvoice}"
+                                     styleClass="green-button align-right" disabled="true"/>
+                </p:outputPanel>
+
+            </p:tab>
+            <p:tab id="wizardSENDCLIENT" title="#{msg.wizardSENDCLIENT.toUpperCase()}" >
+                <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group"  style="width: 100%" id="panelGridCertification1"
+                             columnClasses="ui-grid-col-2 minW372, ui-grid-col-2, ui-grid-col-1, ui-grid-col-4">
+                    <p:outputPanel styleClass="manage-certificate-date br-none">
+                        <p:outputPanel style="width: 155px;padding-top: 4px;">
+                            <h:outputText value="#{msg.manageCertificationSendDhlNotary}:" style="font-weight:bold"/>
+                        </p:outputPanel>
+                        <p:selectBooleanCheckbox value="#{bean.certificationDataEntity.sendingCourier}" styleClass="booleanCheckbox" style="margin-top: 5px;margin-left: 40px;">
+                            <p:ajax event="change" update="send-dhl-notary"/>
+                        </p:selectBooleanCheckbox>
+                    </p:outputPanel>
+                    <p:outputPanel styleClass="manage-certificate-date" id="send-dhl-notary">
+                        <p:outputPanel style="width: 100px;padding-top: 4px;" rendered="#{bean.certificationDataEntity.sendingCourier}">
+                            <h:outputText value="#{msg.manageCertificationSendoriginalClientDate}:" style="font-weight:bold"/>
+                        </p:outputPanel>
+                        <p:calendar id="dhlNotaryDate" rendered="#{bean.certificationDataEntity.sendingCourier}"
+                                    pattern="dd/MM/yyyy" style="width: 200px;" mask="true" navigator="true" value="#{bean.certificationDataEntity.sendingCourierDate}"/>
+                    </p:outputPanel>
+                    <h:outputText value=""/>
+                    <h:outputText value=""/>
+
+                    <p:outputPanel styleClass="manage-certificate-date br-none" style="margin-top: -28px;padding-top: 1.1rem;">
+                        <p:outputPanel style="width: 155px;padding-top: 4px;">
+                            <h:outputText value="#{msg.manageCertificationSendCertification}" style="font-weight:bold"/><br/>
+                            <h:outputText value="#{msg.manageCertificationOriginalClient}:" style="font-weight:bold"/>
+                        </p:outputPanel>
+                        <p:selectBooleanCheckbox value="#{bean.certificationDataEntity.sendingCertification}" styleClass="booleanCheckbox" style="margin-top: 5px;margin-left: 40px;">
+                            <p:ajax event="change" update="send-certification-original-client"/>
+                        </p:selectBooleanCheckbox>
+                    </p:outputPanel>
+                    <p:outputPanel styleClass="manage-certificate-date" style="margin-top: -28px;" id="send-certification-original-client">
+                        <p:outputPanel style="width: 100px;padding-top: 4px;" rendered="#{bean.certificationDataEntity.sendingCertification}">
+                            <h:outputText value="#{msg.manageCertificationSendoriginalClientDate}:" style="font-weight:bold"/>
+                        </p:outputPanel>
+                        <p:calendar id="clientDate" rendered="#{bean.certificationDataEntity.sendingCertification}" value="#{bean.certificationDataEntity.sendingCertificationDate}"
+                                    pattern="dd/MM/yyyy" style="width: 200px;" mask="true" navigator="true"/>
+                    </p:outputPanel>
+                </p:panelGrid>
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                    <p:commandButton value="#{msg.save}" styleClass="green-button align-right"
+                                     action="#{bean.saveCertification}" update="@form"/>
+                </p:outputPanel>
+                <br/>
+                <br/>
+                <p:outputPanel style="margin: 15px 0 25px 0; position: relative;">
+                    <p:commandButton value="#{msg.manageCertificationEndFlowOperational}"
+                                     styleClass="green-button align-right" disabled="true"/>
+                </p:outputPanel>
+                <br/>
+                <br/>
+            </p:tab>
+        </p:tabView>
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group"  style="width: 100%"
+                     columnClasses="ui-grid-col-2, ui-grid-col-4">
+            <h:outputLabel for="transcriptionExpirationDate" value="#{msg.transcriptionRequestDeadline}"/>
+            <p:calendar id="transcriptionExpirationDate"
+                        pattern="dd/MM/yyyy" styleClass="calendar-width" mask="true" navigator="true"
+                        converter="fullDateTimeConverter" value="#{bean.certificationDataEntity.expiration}"/>
+        </p:panelGrid>
+    </ui:define>
+</ui:composition>

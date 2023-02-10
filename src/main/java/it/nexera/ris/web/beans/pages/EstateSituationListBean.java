@@ -8,12 +8,16 @@ import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import it.nexera.ris.common.helpers.*;
 import it.nexera.ris.persistence.beans.entities.domain.*;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 
 import it.nexera.ris.common.enums.DocumentType;
@@ -22,18 +26,9 @@ import it.nexera.ris.common.enums.MailEditType;
 import it.nexera.ris.common.enums.MortgageType;
 import it.nexera.ris.common.enums.PageTypes;
 import it.nexera.ris.common.enums.RequestOutputTypes;
+import it.nexera.ris.common.enums.RequestState;
 import it.nexera.ris.common.enums.RoleTypes;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
-import it.nexera.ris.common.helpers.ComboboxHelper;
-import it.nexera.ris.common.helpers.CostManipulationHelper;
-import it.nexera.ris.common.helpers.EstateSituationHelper;
-import it.nexera.ris.common.helpers.GeneralFunctionsHelper;
-import it.nexera.ris.common.helpers.LogHelper;
-import it.nexera.ris.common.helpers.RedirectHelper;
-import it.nexera.ris.common.helpers.ResourcesHelper;
-import it.nexera.ris.common.helpers.SaveRequestDocumentsHelper;
-import it.nexera.ris.common.helpers.SendNotificationHelper;
-import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.view.FormalityView;
 import it.nexera.ris.web.beans.EntityListPageBean;
@@ -55,11 +50,11 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
     private List<Document> requestDocuments;
 
     private CostManipulationHelper costManipulationHelper;
-    
+
     private String costNote;
-    
+
     private Boolean hideExtraCost = Boolean.FALSE;
-    
+
     private List<Document> otherDocuments;
 
     private List<EstateSituation> salesEstateSituationList;
@@ -67,6 +62,8 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
     private Long editSalesId;
 
     private Long deletedSalesId;
+
+    private Boolean showRequestCost = Boolean.TRUE;
 
     @Getter
     @Setter
@@ -76,19 +73,68 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
     @Setter
     private List<Document> requestSaleDocuments;
 
+    @Getter
+    @Setter
+    private Boolean showBaseTab;
+    
+    @Getter
+    @Setter
+    private Boolean  showAttachmentC;
+    
+    @Getter
+    @Setter
+    private TranscriptionAndCertificationHelper transcriptionAndCertificationHelper;
+    
+    @Getter
+    @Setter
+    private Boolean isTranscriptionCertification;
+    @Getter
+    @Setter
+    private Boolean showGenera;
+
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
             InstantiationException, IllegalAccessException, IOException {
+        setShowBaseTab(Boolean.TRUE);
+        setShowGenera(Boolean.FALSE);
         String parameter = getRequestParameter(RedirectHelper.ID_PARAMETER);
         if (!ValidationHelper.isNullOrEmpty(parameter)) {
             setRequestId(Long.parseLong(parameter));
             setExamRequest(DaoManager.get(Request.class, getRequestId()));
             updateTable();
+            setShowBaseTab(RequestHelper.checkOutputType(getExamRequest()));
+            if(!ValidationHelper.isNullOrEmpty(getExamRequest()) && !ValidationHelper.isNullOrEmpty(getExamRequest().getService())
+                    && !ValidationHelper.isNullOrEmpty(getExamRequest().getService().getManageCertification())){
+                if(getExamRequest().getService().getManageCertification().equals(true))
+                    setShowGenera(Boolean.TRUE);
+            }
+//            if(!ValidationHelper.isNullOrEmpty(getExamRequest())) {
+//                if( !ValidationHelper.isNullOrEmpty(getExamRequest().getService())){
+//                    if(getExamRequest().getService().getRequestOutputType() != null &&
+//                            getExamRequest().getService().getRequestOutputType().equals(
+//                                    RequestOutputTypes.ONLY_FILE))
+//                        setShowBaseTab(Boolean.FALSE);
+//                }else if(!ValidationHelper.isNullOrEmpty(getExamRequest().getMultipleServices())) {
+//                    Service filteredService = getExamRequest()
+//                            .getMultipleServices()
+//                            .stream().filter(service -> (service.getRequestOutputType() != null &&
+//                                   service.getRequestOutputType().equals(
+//                                            RequestOutputTypes.ONLY_FILE)))
+//                            .findFirst()
+//                            .orElse(null);
+//                    if(filteredService != null){
+//                        setShowBaseTab(Boolean.FALSE);
+//                    }
+//                }
+//            }
+
         }
         loadDocumentList();
         setCostManipulationHelper(new CostManipulationHelper());
         getCostManipulationHelper().setMortgageTypeList(ComboboxHelper.fillList(MortgageType.class, false, false));
         updateSalesTable();
+        setTranscriptionAndCertificationHelper(new TranscriptionAndCertificationHelper());
+        setIsTranscriptionCertification(getTranscriptionAndCertificationHelper().checkTranscriptionCertificationExists(getExamRequest()));
     }
 
     private void loadDocumentList() throws PersistenceBeanException, IllegalAccessException {
@@ -192,7 +238,7 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
             type = RequestOutputTypes.ALL;
         }
 
-        List<Document> documentListToView = EstateSituationHelper.getDocuments(type, getExamRequest());
+        List<Document> documentListToView = EstateSituationHelper.getDocuments(type, getExamRequest(), null);
 
         for (Document document : documentListToView) {
             if (Objects.equals(document.getTypeId(), DocumentType.OTHER.getId())
@@ -200,6 +246,10 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
                 document.setSelectedForEmail(true);
             } else {
                 document.setSelectedForEmail(false);
+            }
+
+            if (Objects.equals(document.getTypeId(), DocumentType.OTHER.getId())) {
+                document.setSelectedForDialogList(true);
             }
         }
 
@@ -209,12 +259,25 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
     public void onConfirm() throws Exception {
         saveRequestDocumentsAndNotify();
     }
-    
+
     public void saveRequestDocumentsAndNotify() throws Exception {
-        SaveRequestDocumentsHelper.saveRequestDocuments(getExamRequest(), getRequestDocuments(),true);
-        if(!ValidationHelper.isNullOrEmpty(getOtherDocuments())){
-            SaveRequestDocumentsHelper.saveRequestDocuments(getExamRequest(), getOtherDocuments(), true);
-        }
+    	ClientServiceInfo clientServiceInfo = DaoManager.get(ClientServiceInfo.class, new Criterion[]{
+                    Restrictions.eq("client", getExamRequest().getClient()),
+                    Restrictions.eq("service", getExamRequest().getService())});
+    	if(!ValidationHelper.isNullOrEmpty(clientServiceInfo) 
+    			&& !ValidationHelper.isNullOrEmpty(clientServiceInfo.getSingleEvasionFile())
+    			&& clientServiceInfo.getSingleEvasionFile()) {
+    		List<Document> documents = getRequestDocuments();
+    		if(!ValidationHelper.isNullOrEmpty(getOtherDocuments())){
+    			documents.addAll(getOtherDocuments());
+    		}
+    		SaveRequestDocumentsHelper.saveRequestDocumentsSingleFile(getExamRequest(), documents, true);
+    	} else {
+	        SaveRequestDocumentsHelper.saveRequestDocuments(getExamRequest(), getRequestDocuments(),true);
+	        if(!ValidationHelper.isNullOrEmpty(getOtherDocuments())){
+	            SaveRequestDocumentsHelper.saveRequestDocuments(getExamRequest(), getOtherDocuments(), true);
+	        }
+    	}
 
         SendNotificationHelper.checkAndSendNotification(getExamRequest());
 
@@ -263,25 +326,42 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
     public void saveRequestEstateFormalityCost() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         getCostManipulationHelper().saveRequestEstateFormalityCost(getExamRequest());
         if (!ValidationHelper.isNullOrEmpty(getExamRequest().getNumberActUpdate())) {
-            getCostManipulationHelper().viewExtraCost(getExamRequest());
+            boolean reCalculate = true;
+            if(getExamRequest().getCostButtonConfirmClicked() != null && getExamRequest().getCostButtonConfirmClicked()){
+                reCalculate = false;
+            }
+            getCostManipulationHelper().viewExtraCost(getExamRequest(), reCalculate);
         }
     }
 
     public boolean showAuthorizedQuote() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
         if (!ValidationHelper.isNullOrEmpty(getExamRequest()) && (ValidationHelper.isNullOrEmpty(getExamRequest().getCostButtonConfirmClicked())
                 || !getExamRequest().getCostButtonConfirmClicked())
-        		 && !ValidationHelper.isNullOrEmpty(getExamRequest().getClient())
+                && !ValidationHelper.isNullOrEmpty(getExamRequest().getClient())
                 && !ValidationHelper.isNull(getExamRequest().getClient().getMaxNumberAct()) &&
                 !ValidationHelper.isNullOrEmpty(getExamRequest().getNumberActOrSumOfEstateFormalitiesAndOther()) &&
                 getExamRequest().getNumberActOrSumOfEstateFormalitiesAndOther() > getExamRequest().getClient().getMaxNumberAct()) {
-           return true;
+            return true;
         }else {
-        	return false;
+            return false;
         }
     }
-    
+
     public void viewExtraCost() throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        getCostManipulationHelper().viewExtraCost(getExamRequest());
+        log.debug("Fecthing extra cost for request(EstateSituation) " + getExamRequest());
+        boolean reCalculate = true;
+        if(getExamRequest().getCostButtonConfirmClicked() != null && getExamRequest().getCostButtonConfirmClicked()){
+            reCalculate = false;
+        }
+        viewExtraCost(reCalculate);
+    }
+
+    public void viewExtraCost(boolean recalculate) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        if(recalculate) {
+            getExamRequest().setCostNote(null);
+            getCostManipulationHelper().setCostNote(null);
+        }
+        getCostManipulationHelper().viewExtraCost(getExamRequest(), recalculate);
     }
 
     public void addExtraCost(String extraCostValue) {
@@ -294,16 +374,39 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
     }
 
     public void saveRequestExtraCost() throws Exception {
+    	if(!ValidationHelper.isNullOrEmpty(getExamRequest().getUnauthorizedQuote()) && getExamRequest().getUnauthorizedQuote()
+    			&& !getExamRequest().getStateId().equals(RequestState.EVADED.getId())) {
+    		executeJS("PF('confirmRequestToEvasaDialogWV').show();");
+            return;
+    	}
+    		
         getCostManipulationHelper().saveRequestExtraCost(getExamRequest());
     }
-
+    
+    public void preCheckAddNationalCost() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
+    	Request request = DaoManager.get(Request.class, new Criterion[]{
+                Restrictions.eq("id", getRequestId())});
+    	if(!ValidationHelper.isNullOrEmpty(request) && !ValidationHelper.isNullOrEmpty(request.getSubject())) {
+    		List<Request> otherRequests = DaoManager.load(Request.class, new Criterion[]{
+                    Restrictions.eq("subject", request.getSubject()), 
+                    Restrictions.or(Restrictions.eq("stateId", RequestState.INSERTED.getId()), Restrictions.eq("stateId", RequestState.IN_WORK.getId())),
+                    Restrictions.eq("includeNationalCost", Boolean.TRUE)});
+    		if(!ValidationHelper.isNullOrEmpty(otherRequests)) {
+    			executeJS("PF('nationalCostAlreadyEnteredDialogWV').show();");
+    			RequestContext.getCurrentInstance().update("nationalCostAlreadyEnteredDialog");
+    			return;
+    		}
+    	} 
+    	updateNationalCost();
+    }
+    
     public void updateNationalCost() throws HibernateException, InstantiationException, IllegalAccessException, PersistenceBeanException {
-        
+
         if(!ValidationHelper.isNullOrEmpty(getCostManipulationHelper().getIncludeNationalCost())
                 && getCostManipulationHelper().getIncludeNationalCost()) {
             Request request = DaoManager.get(Request.class, new Criterion[]{
                     Restrictions.eq("id", getRequestId())});
-            
+
             if(!ValidationHelper.isNullOrEmpty(request.getMail())) {
                 List<Request> requestsWithSameMailId = DaoManager.load(Request.class, new Criterion[] {Restrictions.eq("mail.id", request.getMail().getId())});
                 boolean haveAnyWithIncludeSet = requestsWithSameMailId.stream().anyMatch(
@@ -314,12 +417,12 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
                     return;
                 }
             }
-            
+
             if(!ValidationHelper.isNullOrEmpty(request) && !ValidationHelper.isNullOrEmpty(request.getService())
                     && !ValidationHelper.isNullOrEmpty(request.getService().getNationalPrice())) {
                 getCostManipulationHelper().setExtraCostOther(request.getService().getNationalPrice().toString());
-                getCostManipulationHelper().setExtraCostOtherNote(ResourcesHelper.getString("requestServiceNationalPriceNote"));    
-                getCostManipulationHelper().addExtraCost("NAZIONALEPOSITIVA", getRequestId());    
+                getCostManipulationHelper().setExtraCostOtherNote(ResourcesHelper.getString("requestServiceNationalPriceNote"));
+                getCostManipulationHelper().addExtraCost("NAZIONALEPOSITIVA", getRequestId());
             }
         }else {
             if(!ValidationHelper.isNullOrEmpty(getCostManipulationHelper().getRequestExtraCosts())) {
@@ -328,12 +431,12 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
                         .filter(ec -> ec.getType().equals(ExtraCostType.NAZIONALEPOSITIVA))
                         .findFirst();
                 if(nationalExtraCost.isPresent()) {
-                    deleteExtraCost(nationalExtraCost.get());    
+                    deleteExtraCost(nationalExtraCost.get());
                 }
             }
         }
     }
-    
+
     private void fillOtherDocumentList()  {
         List<FormalityView> formalityPDFList = null;
         setOtherDocuments(new ArrayList<>());
@@ -364,7 +467,12 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
         }
     }
 
-    
+    public void saveRequestAsEvasa() throws Exception {
+    	getCostManipulationHelper().saveRequestExtraCost(getExamRequest());
+    	getExamRequest().setStateId(RequestState.EVADED.getId());
+    	DaoManager.save(getExamRequest(), true);
+    }
+
     public Long getRequestId() {
         return requestId;
     }
@@ -420,7 +528,7 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
     public void setCostNote(String costNote) {
         this.costNote = costNote;
     }
-    
+
     public List<Document> getOtherDocuments() {
         return otherDocuments;
     }
@@ -444,7 +552,7 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
     public boolean isSalesDevelopmentShowing() {
         if(!ValidationHelper.isNullOrEmpty(getExamRequest()) && !ValidationHelper.isNullOrEmpty(getExamRequest().getClient()) &&
                 !ValidationHelper.isNullOrEmpty(getExamRequest().getClient().getSalesDevelopment()) &&
-            getExamRequest().getClient().getSalesDevelopment()){
+                getExamRequest().getClient().getSalesDevelopment()){
             return true;
         }
 
@@ -491,6 +599,12 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
         //RedirectHelper.goTo(PageTypes.REQUEST_ESTATE_SITUATION_EDIT, getRequestId(), getEntityEditId());
         RedirectHelper.goToSalesDevelopment(PageTypes.REQUEST_ESTATE_SITUATION_EDIT, getRequestId(), getEditSalesId());
     }
+    
+    public void openTranscriptionManagement() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+    	if(!ValidationHelper.isNullOrEmpty(getRequestId())) {
+    		getTranscriptionAndCertificationHelper().openTranscriptionManagement(getRequestId());
+    	}
+    }
 
     public Long getEditSalesId() {
         return editSalesId;
@@ -506,5 +620,16 @@ public class EstateSituationListBean extends EntityListPageBean<EstateSituation>
 
     public void setDeletedSalesId(Long deletedSalesId) {
         this.deletedSalesId = deletedSalesId;
+    }
+
+    public Boolean getShowRequestCost() {
+        return showRequestCost;
+    }
+
+    public void setShowRequestCost(Boolean showRequestCost) {
+        this.showRequestCost = showRequestCost;
+    }
+
+    public void cancelSaveRequestExtraCost() {
     }
 }

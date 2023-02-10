@@ -791,6 +791,7 @@ body .btn-green {
 
 .simple-table thead th {
     border-color: #5f666c !important;
+    text-align: center;
 }
 
 .simple-table tbody tr {
@@ -801,12 +802,6 @@ body .btn-green {
 
 .estate-situation-edit-select .ui-state-highlight{
     color: #5f666c !important;
-}
-
-.user-row {
-    color: darkgrey;
-    font-weight: bold;
-    text-decoration: underline;
 }
 
 .delete-row {

@@ -260,5 +260,14 @@ public class VisureManageHelper {
         
         FileUtils.deleteDirectory(new File(tempDir));
     }
+    
+    public static void sendXLSFile(String fileName, File file, String tempDir, String path) 
+            throws IOException, InterruptedException {
+        FileHelper.sendFile(fileName.trim(),
+                new ByteArrayInputStream(FileUtils.readFileToByteArray(file)),
+                (int) file.length());
+        FileHelper.delete(path);
+        FileUtils.deleteDirectory(new File(tempDir));
+    }
 }
 

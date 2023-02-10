@@ -62,10 +62,10 @@ public class WLGInbox extends IndexedEntity {
     @Column(name = "message_uid", length = 200)
     private String messageUid;
 
-    @Column(name = "receive_date", columnDefinition = "TIMESTAMP", nullable = false)
+    @Column(name = "receive_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", nullable = false)
     private Date receiveDate;
 
-    @Column(name = "send_date", columnDefinition = "TIMESTAMP", nullable = false)
+    @Column(name = "send_date", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", nullable = false)
     private Date sendDate;
 
     @Column(name = "process_date", columnDefinition = "TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP")
@@ -180,8 +180,16 @@ public class WLGInbox extends IndexedEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "received_inbox_id")
     private WLGInbox recievedInbox;
+    
+    @Column(name = "external_brexa")
+    private Boolean externalBrexa;
 
-	@Transient
+    private String fiduciary;
+
+    @Column(name = "activity")
+    private Activity activity;
+
+    @Transient
     private List<WLGExport> files;
 
     @Transient
@@ -207,6 +215,12 @@ public class WLGInbox extends IndexedEntity {
 
     @Transient
     private Boolean received;
+
+//    @Column(name = "user_brexa")
+//    private Long userBrexa;
+//
+//    @Column(name = "state_brexa")
+//    private Long stateBrexa;
 
     public boolean getRead() {
         boolean isRead = false;
@@ -397,7 +411,12 @@ public class WLGInbox extends IndexedEntity {
             imgFiles = (List<WLGExport>) DaoManager.getSession().createSQLQuery("SELECT * FROM wlg_export "
                     + "WHERE wlg_inbox_id = " + getId() + " AND (image_selected IS NULL OR image_selected = FALSE) AND "
                     + "(destination_path LIKE '%image0%.jpeg' OR destination_path LIKE '%image0%.jpg' OR "
-                    + "destination_path LIKE '%image0%.gif' OR destination_path LIKE '%image0%.png')")
+                    + "destination_path LIKE '%image0%.gif' OR destination_path LIKE '%image0%.png'" +
+                    " OR destination_path LIKE '%OutlookEmoji%.png'" +
+                    " OR destination_path LIKE '%OutlookEmoji%.jpg'" +
+                    " OR destination_path LIKE '%OutlookEmoji%.gif'" +
+                    " OR destination_path LIKE '%ATT00%.png'" +
+                    ")")
                     .addEntity(WLGExport.class).list();
             if (imgFiles == null) {
                 imgFiles = new ArrayList<>();
@@ -935,4 +954,56 @@ public class WLGInbox extends IndexedEntity {
         }
         return null;
     }
+
+    public List<Request> getFullFillRequests() throws PersistenceBeanException, IllegalAccessException {
+        if (!Hibernate.isInitialized(getRequests())) {
+            reloadRequests();
+        }
+        if (!ValidationHelper.isNullOrEmpty(getRequests())) {
+            return getRequests().stream().filter(
+                    request -> (request.isDeletedRequest() && (RequestState.TO_BE_SENT.getId() == request.getStateId()
+                        || RequestState.EST_TO_SENT.getId() == request.getStateId())))
+                    .sorted(Comparator.comparing(Request::getRequestTypeName))
+                    .collect(Collectors.toList());
+        }
+        return null;
+    }
+
+    public String getFiduciary() {
+        return fiduciary;
+    }
+
+    public void setFiduciary(String fiduciary) {
+        this.fiduciary = fiduciary;
+    }
+
+	public Boolean getExternalBrexa() {
+		return externalBrexa;
+	}
+
+	public void setExternalBrexa(Boolean externalBrexa) {
+		this.externalBrexa = externalBrexa;
+	}
+
+    public Activity getActivity() {
+        return activity;
+    }
+
+    public void setActivity(Activity activity) {
+        this.activity = activity;
+    }
+//    public Long getStateBrexa() {
+//        return stateBrexa;
+//    }
+//
+//    public void setStateBrexa(Long stateBrexa) {
+//        this.stateBrexa = stateBrexa;
+//    }
+//    public Long getUserBrexa() {
+//        return userBrexa;
+//    }
+//
+//    public void setUserBrexa(Long userBrexa) {
+//        this.userBrexa = userBrexa;
+//    }
 }

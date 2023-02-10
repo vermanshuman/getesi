@@ -3,17 +3,16 @@ package it.nexera.ris.common.security.beans;
 import it.nexera.ris.common.enums.PageTypes;
 import it.nexera.ris.common.helpers.LogHelper;
 import it.nexera.ris.common.helpers.RedirectHelper;
+import it.nexera.ris.common.helpers.UserHelper;
 import it.nexera.ris.common.security.api.UserDetailsImpl;
 import it.nexera.ris.persistence.PersistenceSession;
 import it.nexera.ris.persistence.UserHolder;
-import it.nexera.ris.persistence.beans.dao.ConnectionManager;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.User;
 import it.nexera.ris.web.beans.wrappers.logic.UserWrapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -44,10 +43,7 @@ public class AuthenticationSuccessHandlerEx implements
             try {
                 User user = null;
                 if (FacesContext.getCurrentInstance() != null) {
-                    user = DaoManager
-                            .get(User.class,
-                                    Restrictions.eq("login",
-                                            userDetails.getUsername()));
+                	user = UserHelper.getUser(userDetails);
 
                   /*  if (user != null) {
                         HttpSessionCollector.checkUniqueUser(user.getId());
@@ -60,11 +56,7 @@ public class AuthenticationSuccessHandlerEx implements
                     Session session = null;
                     try {
                         session = PersistenceSession.createSession();
-
-                        user = ConnectionManager.get(
-                                User.class,
-                                Restrictions.eq("login",
-                                        userDetails.getUsername()), session);
+                        user = UserHelper.getUser(userDetails, session);
 
                         /*if (user != null) {
                             HttpSessionCollector.checkUniqueUser(user.getId());

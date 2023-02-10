@@ -1,29 +1,21 @@
 package it.nexera.ris.web.listeners;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.math.BigInteger;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.TimeZone;
-import java.util.stream.Collectors;
-
-import javax.faces.context.FacesContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
+import com.mchange.v2.c3p0.C3P0Registry;
+import com.mchange.v2.c3p0.PooledDataSource;
+import it.nexera.ris.common.enums.LandChargesRegistryType;
+import it.nexera.ris.common.exceptions.PersistenceBeanException;
+import it.nexera.ris.common.helpers.*;
+import it.nexera.ris.persistence.HibernateUtil;
+import it.nexera.ris.persistence.IConnectionListner;
+import it.nexera.ris.persistence.PersistenceSession;
+import it.nexera.ris.persistence.beans.dao.ConnectionManager;
+import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
+import it.nexera.ris.persistence.beans.entities.Entity;
+import it.nexera.ris.persistence.beans.entities.domain.*;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
+import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.services.*;
+import it.nexera.ris.web.services.base.ServiceHolder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,47 +25,15 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 
-import com.mchange.v2.c3p0.C3P0Registry;
-import com.mchange.v2.c3p0.PooledDataSource;
-
-import it.nexera.ris.common.exceptions.PersistenceBeanException;
-import it.nexera.ris.common.helpers.DBFiller;
-import it.nexera.ris.common.helpers.FileHelper;
-import it.nexera.ris.common.helpers.ImportOmiXlsxService;
-import it.nexera.ris.common.helpers.ImportXLSXService;
-import it.nexera.ris.common.helpers.LogHelper;
-import it.nexera.ris.common.helpers.ValidationHelper;
-import it.nexera.ris.persistence.HibernateUtil;
-import it.nexera.ris.persistence.IConnectionListner;
-import it.nexera.ris.persistence.PersistenceSession;
-import it.nexera.ris.persistence.beans.dao.ConnectionManager;
-import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
-import it.nexera.ris.persistence.beans.entities.Entity;
-import it.nexera.ris.persistence.beans.entities.domain.Client;
-import it.nexera.ris.persistence.beans.entities.domain.Formality;
-import it.nexera.ris.persistence.beans.entities.domain.Module;
-import it.nexera.ris.persistence.beans.entities.domain.ModulePage;
-import it.nexera.ris.persistence.beans.entities.domain.Permission;
-import it.nexera.ris.persistence.beans.entities.domain.Relationship;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
-import it.nexera.ris.persistence.beans.entities.domain.Role;
-import it.nexera.ris.persistence.beans.entities.domain.SectionC;
-import it.nexera.ris.persistence.beans.entities.domain.Subject;
-import it.nexera.ris.persistence.beans.entities.domain.User;
-import it.nexera.ris.persistence.beans.entities.domain.WLGFolder;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.AggregationLandChargesRegistry;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Asl;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.AslRegion;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.CadastralTopology;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Country;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.LandChargesRegistry;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Nationality;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Province;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.TypeAct;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.TypeFormality;
-import it.nexera.ris.settings.ApplicationSettingsHolder;
-import it.nexera.ris.web.services.base.ServiceHolder;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import java.io.*;
+import java.lang.reflect.Method;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ApplicationListener implements ServletContextListener, IConnectionListner {
     public transient final Log log = LogFactory.getLog(getClass());
@@ -84,15 +44,13 @@ public class ApplicationListener implements ServletContextListener, IConnectionL
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
+        LogHelper.debugInfo(log, "GETESI VERSION : 2.1.71.16");
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         Locale.setDefault(Locale.ITALIAN);
-
-        System.out.println("Using JSF: " + FacesContext.class.getPackage().getImplementationVersion());
 
         initializeProps();
 
         FileHelper.setRealPath(servletContextEvent.getServletContext().getRealPath("/"));
-
         HibernateUtil.addConnectionListener(this);
         HibernateUtil.getSessionFactory(false);
     }
@@ -169,6 +127,38 @@ public class ApplicationListener implements ServletContextListener, IConnectionL
                 ps = new PersistenceSession();
                 tr = ps.getSession().beginTransaction();
 
+                List<AggregationLandChargesRegistry> aggregationLandChargesRegistries =
+                        ConnectionManager.load(AggregationLandChargesRegistry.class,
+                                new CriteriaAlias[]{
+                                        new CriteriaAlias("landChargesRegistries", "l", JoinType.LEFT_OUTER_JOIN)
+                                },
+                                new Criterion[]{
+                                Restrictions.or(
+                                        Restrictions.eq("isDeleted", Boolean.FALSE),
+                                        Restrictions.isNull("isDeleted"))
+                }, ps.getSession());
+
+                for (AggregationLandChargesRegistry aggregationLandChargesRegistry : aggregationLandChargesRegistries) {
+                    String typeValue = null;
+                    if (!ValidationHelper.isNullOrEmpty(aggregationLandChargesRegistry.getLandChargesRegistries())) {
+                        boolean allConservatory = aggregationLandChargesRegistry.getLandChargesRegistries()
+                                .stream()
+                                .filter(lcr -> !ValidationHelper.isNullOrEmpty(lcr.getType()))
+                                .allMatch(x -> x.getType().equals(LandChargesRegistryType.CONSERVATORY));
+                        boolean allTavolare = aggregationLandChargesRegistry.getLandChargesRegistries()
+                                .stream()
+                                .filter(lcr -> !ValidationHelper.isNullOrEmpty(lcr.getType()))
+                                .allMatch(lcr -> lcr.getType().equals(LandChargesRegistryType.TAVOLARE));
+
+                        if (allConservatory)
+                            typeValue = "C";
+                        else if (allTavolare)
+                            typeValue = "T";
+                    }
+                    aggregationLandChargesRegistry.setType(typeValue);
+                    ConnectionManager.save(aggregationLandChargesRegistry, ps.getSession());
+                }
+
                 if (DBFiller.needFillEntity(ps.getSession(), Role.class)) {
                     for (Role item : DBFiller.fillRoles()) {
                         ConnectionManager.save(item, ps.getSession());
@@ -191,7 +181,7 @@ public class ApplicationListener implements ServletContextListener, IConnectionL
             try {
                 ps = new PersistenceSession();
                 tr = ps.getSession().beginTransaction();
-
+                DBFiller.updateTable(ps.getSession());
                 if (DBFiller.needFillUsers(ps.getSession())) {
                     for (User item : DBFiller.fillUsers(ps.getSession())) {
                         ConnectionManager.save(item, ps.getSession());

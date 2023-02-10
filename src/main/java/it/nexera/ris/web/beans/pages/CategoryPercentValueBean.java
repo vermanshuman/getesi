@@ -11,6 +11,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 
+import it.nexera.ris.persistence.beans.entities.domain.CategoryFiscalValue;
 import org.apache.commons.collections4.ListUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
@@ -68,6 +69,18 @@ public class CategoryPercentValueBean extends EntityLazyListPageBean<CategoryPer
     private Long groupOmiEditId;
     
     private CategoryGroupItemWrapper wrapperPVForDialog;
+
+    private List<CategoryFiscalValue> categoryFiscalValues;
+
+    private List<SelectItem> categories;
+
+    private Long selectedCategoryId;
+
+    private Double categoryFiscalValue;
+
+    private CategoryFiscalValue categoryFVForDialog;
+
+    private CategoryFiscalValue categoryFVForDelete;
     
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
@@ -78,6 +91,7 @@ public class CategoryPercentValueBean extends EntityLazyListPageBean<CategoryPer
      
        loadGroupOmis();
        loadCategories();
+       loadCategoryFiscalValues();
     }
 
     public void handleCategoryPercentValueDialogInit(CategoryPercentValue categoryPercentValue)
@@ -224,6 +238,7 @@ public class CategoryPercentValueBean extends EntityLazyListPageBean<CategoryPer
         }
         List<CategoryColumnWrapper> targetCategoryColumns = new LinkedList<>();
         this.setCategoryColumns(new DualListModel<>(sourceCategoryColumns, targetCategoryColumns));
+        setCategories(ComboboxHelper.fillList(CadastralCategory.class));
     }
     
     private void loadGroupOmis() throws HibernateException, IllegalAccessException, PersistenceBeanException {
@@ -353,5 +368,47 @@ public class CategoryPercentValueBean extends EntityLazyListPageBean<CategoryPer
             }
             loadGroupOmis();
         }
+    }
+
+    public void saveCadastralCategory() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
+        CategoryFiscalValue categoryFiscalValue = getCategoryFVForDialog();
+        if (ValidationHelper.isNullOrEmpty(categoryFiscalValue)) {
+            categoryFiscalValue = new CategoryFiscalValue();
+        }
+        if (!ValidationHelper.isNullOrEmpty(getSelectedCategoryId())) {
+            categoryFiscalValue.setCadastralCategory(DaoManager.get(CadastralCategory.class, getSelectedCategoryId()));
+        } else {
+            categoryFiscalValue.setCadastralCategory(null);
+        }
+
+        if(getCategoryFiscalValue() != null && getCategoryFiscalValue() > 0.0) {
+            categoryFiscalValue.setValue(getCategoryFiscalValue());
+        }else
+            categoryFiscalValue.setValue(null);
+
+        DaoManager.save(categoryFiscalValue, true);
+
+        setCategoryFVForDialog(null);
+        loadCategoryFiscalValues();
+    }
+
+    public void handleCadastralCategoryDialogInit(CategoryFiscalValue categoryFiscalValue) {
+        setCategoryFVForDialog(categoryFiscalValue);
+        setSelectedCategoryId(categoryFiscalValue != null ? categoryFiscalValue.getCadastralCategory().getId() : null);
+        setCategoryFiscalValue(categoryFiscalValue != null ? categoryFiscalValue.getValue() : null);
+    }
+
+    private void loadCategoryFiscalValues() throws HibernateException, IllegalAccessException, PersistenceBeanException {
+        setCategoryFiscalValues(DaoManager.load(CategoryFiscalValue.class,new Criterion[]{},new Order[]{}));
+    }
+
+    public void handleCadastralCategoryDialogDeleteInit(CategoryFiscalValue categoryFiscalValue) {
+        setCategoryFVForDelete(categoryFiscalValue);
+    }
+
+    public void handleDeleteCategoryFiscalValue()
+            throws PersistenceBeanException, IllegalAccessException {
+        DaoManager.remove(getCategoryFVForDelete(), true);
+        loadCategoryFiscalValues();
     }
 }

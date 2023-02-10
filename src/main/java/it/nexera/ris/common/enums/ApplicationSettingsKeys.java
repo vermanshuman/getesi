@@ -56,13 +56,22 @@ public enum ApplicationSettingsKeys {
     COMPANY_NAME,
     FISCAL_CODE,
     ADDRESS,
+    COMPANY_POSTAL_CODE,
+    COMPANY_PROVINCE,
+    COMPANY_CITY,
+    TELEPHONE,
+    FAX,
     
     CLIENT_CONSERVATIVE_CODE_FILES,
     TABLE_CONSERVATIVE_CODE_FILES,
     DTD,
 
     CLOUD_API_URL,
-    CLOUD_API_KEY
+    CLOUD_API_KEY,
+
+    NEXT_INVOICE_NUMBER,
+
+    API_URL
     ;
 
     boolean needToRefresh;

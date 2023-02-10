@@ -20,6 +20,26 @@
               value="#{bean.onlyView ? msg.close : msg.cancel}"/>
 
     <ui:define name="edit_body">
+        <style type="text/css">
+            .card fieldset {
+                border: 1px solid #6c757d !important;
+            }
+            body .ui-fieldset .ui-fieldset-legend {
+                border: 1px solid #dee2e6 !important;
+                color: #FFFFFF !important;
+                padding: 0.6em 1em !important;
+                font-weight: normal !important;
+                border-radius: 4px !important;
+                user-select: none !important;
+                font-size: 14px !important;
+                transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+            }
+            fieldset div {
+                font-size: 14px !important;
+                text-align: left !important;
+            }
+        </style>
+
         <p:panelGrid columns="4" styleClass="ui-panelgrid-blank form-group" layout="grid"
                      columnClasses="ui-grid-col-0, ui-grid-col-0, ui-grid-col-0, ui-grid-col-0">
 
@@ -72,7 +92,7 @@
         </p:panelGrid>
 
         <h:outputText value="&#160;"/>
-        <p:fieldset legend="#{msg.databaseListRealEstateLeadingPropertyData}">
+        <p:fieldset legend="#{msg.databaseListRealEstateLeadingPropertyData}" collapsed="false" toggleable="true">
             <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group"
                          columnClasses="ui-grid-col-0,ui-grid-col-0,ui-grid-col-0" layout="grid"
                          cellpadding="0" cellspacing="0" rendered="#{!bean.onlyView and bean.isBuilding}">
@@ -265,7 +285,7 @@
 
         <h:outputText value="&#160;"/>
 
-        <p:fieldset legend="#{msg.databaseListRealEstateSubjects}">
+        <p:fieldset legend="#{msg.databaseListRealEstateSubjects}" collapsed="false" toggleable="true">
 
             <div class="btn_line" style="text-align:left;margin-bottom: 10px;">
                 <p:commandButton oncomplete="PF('addSubjectDLGWV').show();"
@@ -557,7 +577,7 @@
         </p:dialog>
 
         <p:dialog draggable="false" id="addSubjectDLG" modal="true"
-                  resizable="false" widgetVar="addSubjectDLGWV" width="550">
+                  resizable="false" widgetVar="addSubjectDLGWV" width="575">
             <p:outputPanel id="addSubjectPanel">
                 <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" layout="grid"
                              columnClasses="ui-grid-col-3, ui-grid-col-9">
@@ -572,7 +592,7 @@
                         <!--label="#{msg.databaseListRealEstateSubject}">-->
                         <!--<f:selectItems value="#{bean.allSubjects}"/>-->
                         <!--</p:selectOneMenu>-->
-                        <p:commandButton icon="ui-icon-circle-plus"
+                        <p:commandButton icon="pi pi-plus-circle"
                                          action="#{bean.openSubjectDlg}">
                             <p:ajax event="dialogReturn"
                                     listener="#{bean.onEditSubjectDlgClose}"
@@ -595,9 +615,9 @@
                 </p:panelGrid>
                 <div class="btn_line">
                     <p:commandButton value="#{msg.save}"
-                                     action="#{bean.saveRelationship}"
+                                     action="#{bean.saveRelationship}" styleClass="save-btn p-mr-2 p-mb-2"
                                      update=":form:addSubjectPanel, :form:tableSubjects, messages"/>
-                    <p:commandButton value="#{msg.cancel}"
+                    <p:commandButton value="#{msg.cancel}" styleClass="annula-btn"
                                      oncomplete="PF('addSubjectDLGWV').hide();"/>
                 </div>
             </p:outputPanel>

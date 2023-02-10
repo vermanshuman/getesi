@@ -291,10 +291,11 @@ public class EstateFormality extends IndexedEntity implements BeforeSave {
                 .filter(f -> f.getRequest().getId().equals(requestFormality.getRequest().getId())).findFirst().orElse(null);
 
         if (ValidationHelper.isNullOrEmpty(alreadyExistsRequestFormality)) {
-
-            ConnectionManager.saveObject(requestFormality, false, session);
             this.getRequestFormalities().add(requestFormality);
+            ConnectionManager.saveObject(requestFormality, false, session);
             return true;
+        }else {
+            alreadyExistsRequestFormality.setDocumentId(requestFormality.getDocumentId());
         }
         return false;
     }

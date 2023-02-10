@@ -173,22 +173,22 @@ public class SectionA extends IndexedEntity {
             Integer code = Integer.parseInt(getDerivedFromCode()) % 1000;
             if (!ValidationHelper.isNullOrEmpty(code)) {
                 if (code == 112) {
-                    return "vende ";
+                    return " vende ";
                 }
                 if (code >= 133 && code <= 136) {
-                    return "dona ";
+                    return " dona ";
                 }
                 if (code >= 107 && code <= 109) {
-                    return "cede ";
+                    return " cede ";
                 }
                 if (code == 607) {
-                    return "trasferisce  ";
+                    return " trasferisce  ";
                 }
                 if (code >= 103 && code <= 105) {
-                    return "assegna ";
+                    return " assegna ";
                 }
                 if (code >= 113 && code <= 115) {
-                    return "conferisce ";
+                    return " conferisce ";
                 }
             }
         }

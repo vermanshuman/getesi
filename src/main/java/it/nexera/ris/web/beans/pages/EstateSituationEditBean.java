@@ -15,7 +15,11 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import it.nexera.ris.persistence.beans.entities.domain.*;
+import it.nexera.ris.web.beans.wrappers.logic.PropertyGroupingWrapper;
+import it.nexera.ris.web.beans.wrappers.logic.RelationshipGroupingWrapper;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
@@ -27,19 +31,15 @@ import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.EstateSituationHelper;
 import it.nexera.ris.common.helpers.PropertyEntityHelper;
 import it.nexera.ris.common.helpers.RedirectHelper;
+import it.nexera.ris.common.helpers.TranscriptionAndCertificationHelper;
 import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
-import it.nexera.ris.persistence.beans.entities.domain.DatafromProperty;
-import it.nexera.ris.persistence.beans.entities.domain.EstateFormality;
-import it.nexera.ris.persistence.beans.entities.domain.EstateSituation;
-import it.nexera.ris.persistence.beans.entities.domain.EstateSituationFormalityProperty;
-import it.nexera.ris.persistence.beans.entities.domain.Formality;
-import it.nexera.ris.persistence.beans.entities.domain.Property;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
-import it.nexera.ris.persistence.beans.entities.domain.SituationProperty;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.City;
 import it.nexera.ris.persistence.view.FormalityView;
 import it.nexera.ris.web.beans.EntityEditPageBean;
+import lombok.Getter;
+import lombok.Setter;
+
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 
 @ManagedBean(name = "estateSituationEditBean")
@@ -78,7 +78,15 @@ public class EstateSituationEditBean extends EntityEditPageBean<EstateSituation>
     
     private Boolean reportRelationship;
 
-   private Boolean salesDevelopment;
+    private Boolean salesDevelopment;
+   
+    @Getter
+    @Setter
+    private TranscriptionAndCertificationHelper transcriptionAndCertificationHelper;
+    
+    @Getter
+    @Setter
+    private Boolean isTranscriptionCertification;
 
     @Override
     public void onLoad() throws NumberFormatException, HibernateException, PersistenceBeanException,
@@ -109,7 +117,8 @@ public class EstateSituationEditBean extends EntityEditPageBean<EstateSituation>
                 ? getEntity().getOtherType() : false);
         setReportRelationship(!ValidationHelper.isNullOrEmpty(getEntity().getReportRelationship())
                 ? getEntity().getReportRelationship() : Boolean.TRUE);
-
+        setTranscriptionAndCertificationHelper(new TranscriptionAndCertificationHelper());
+        setIsTranscriptionCertification(getTranscriptionAndCertificationHelper().checkTranscriptionCertificationExists(getRequestEntity()));
     }
 
     private void selectDatafromProperties() {
@@ -151,6 +160,7 @@ public class EstateSituationEditBean extends EntityEditPageBean<EstateSituation>
         }
 
         setPropertyList(result);
+        sortProperties();
     }
 
     private void fillFormalityWrapper() throws IllegalAccessException, PersistenceBeanException {
@@ -226,7 +236,8 @@ public class EstateSituationEditBean extends EntityEditPageBean<EstateSituation>
         List<FormalityView> result = new ArrayList<>();
         List<FormalityView> formalityList;
         if(ValidationHelper.isNullOrEmpty(getSalesDevelopment()) || !getSalesDevelopment()){
-            if(!ValidationHelper.isNullOrEmpty(getRequestEntity().getDistraintFormality())) {
+            if(!ValidationHelper.isNullOrEmpty(getRequestEntity())
+                    && !ValidationHelper.isNullOrEmpty(getRequestEntity().getDistraintFormality())) {
                 formalityList = EstateSituationHelper.loadFormalityViewByDistraint(getRequestEntity());
                 setSubjectsList(formalityList);
             } else {
@@ -248,7 +259,8 @@ public class EstateSituationEditBean extends EntityEditPageBean<EstateSituation>
                     }
                 }
             }
-            setRequestHasDistraintFormality(getRequestEntity().getDistraintFormality() != null);
+            setRequestHasDistraintFormality(!ValidationHelper.isNullOrEmpty(getRequestEntity())
+                    && !ValidationHelper.isNullOrEmpty(getRequestEntity().getDistraintFormality()));
             if (getRequestHasDistraintFormality()) {
                 setSaveEstateSituationFormalityPropertiesMap(new HashMap<>());
                 setEstateSituationFormalityProperties(DaoManager.load(EstateSituationFormalityProperty.class, new Criterion[]{
@@ -326,8 +338,25 @@ public class EstateSituationEditBean extends EntityEditPageBean<EstateSituation>
         if (!getValidationFailed() && !isPropertyConfirmed()
                 && !ValidationHelper.isNullOrEmpty(getPropertyList()) && getPropertyList().stream()
                 .anyMatch(f -> f.getVisible() != null && f.getVisible())) {
-            if (1 < getPropertyList().stream().filter(f -> f.getVisible() != null && f.getVisible())
+
+            boolean showWarning = false;
+
+            List<Property> distinctProperties = getPropertyList().stream()
+                    .filter(p -> p.getVisible() != null && p.getVisible())
+                    .filter(EstateSituationHelper.distinctByKeys(Property::getCity, Property::getSectionCity))
+                    .collect(Collectors.toList());
+
+            if(distinctProperties != null && distinctProperties.size() > 1)
+                showWarning = true;
+            /*if (1 < getPropertyList().stream().filter(f -> f.getVisible() != null && f.getVisible())
                     .map(Property::getCity).map(City::getId).distinct().count()) {
+                showWarning = true;
+            }else if (1 < getPropertyList().stream().filter(f -> f.getVisible() != null && f.getVisible())
+                    .filter(f -> StringUtils.isNotBlank(f.getSectionCity()))
+                    .map(Property::getSectionCity).distinct().count()) {
+                showWarning = true;
+            }*/
+            if(showWarning){
                 executeJS("PF('propertyCityDlg').show();");
                 setValidationFailed(true);
             }
@@ -347,34 +376,43 @@ public class EstateSituationEditBean extends EntityEditPageBean<EstateSituation>
                             .collect(Collectors.toList()))
             });
         }
-
-        if (getEntity().isNew() && getPropertyList().stream().anyMatch(f -> f.getVisible() != null && f.getVisible())) {
-            Map<City, List<Property>> cityMap = new HashMap<>();
+        //Map<PropertyGroupingWrapper, List<Property>> cityMap = new HashMap<>();
+        boolean isPropertyConfirmed = getEntity().isNew()
+                && getPropertyList().stream().anyMatch(f -> f.getVisible() != null && f.getVisible());
+        
+        /*if(isPropertyConfirmed() || isPropertyConfirmed){
             for (Property property : getPropertyList().stream()
                     .filter(f -> f.getVisible() != null && f.getVisible()).collect(Collectors.toList())) {
-                if (!cityMap.containsKey(property.getCity())) {
-                    cityMap.put(property.getCity(), new LinkedList<>());
+                PropertyGroupingWrapper propertyGroupingWrapper =
+                        new PropertyGroupingWrapper(property);
+                if (!cityMap.containsKey(propertyGroupingWrapper)) {
+                    cityMap.put(propertyGroupingWrapper, new LinkedList<>());
                 }
-                cityMap.get(property.getCity()).add(property);
+                cityMap.get(propertyGroupingWrapper).add(property);
             }
-            for (Map.Entry<City, List<Property>> entry : cityMap.entrySet()) {
-                EstateSituation estateSituation = new EstateSituation();
-                estateSituation.setRequest(getRequestEntity());
-                estateSituation.setPropertyList(entry.getValue());
-                estateSituation.setEstateFormalityList(getFormalityList().stream()
-                        .filter(estate -> estate.getVisible() != null && estate.getVisible()).collect(Collectors.toList()));
-                estateSituation.setFormalityList(formalityList);
-                estateSituation.setOtherType(isOtherTypeFormalities());
-                estateSituation.setReportRelationship(getReportRelationship());
-                estateSituation.setSalesDevelopment(getSalesDevelopment());
-                DaoManager.save(estateSituation);
+        }*/
+        /*for (Map.Entry<PropertyGroupingWrapper, List<Property>> entry : cityMap.entrySet()) {
+            EstateSituation estateSituation = new EstateSituation();
+            estateSituation.setRequest(getRequestEntity());
+            estateSituation.setPropertyList(entry.getValue());
+            estateSituation.setEstateFormalityList(getFormalityList().stream()
+                    .filter(estate -> estate.getVisible() != null && estate.getVisible()).collect(Collectors.toList()));
+            estateSituation.setFormalityList(formalityList);
+            estateSituation.setOtherType(isOtherTypeFormalities());
+            estateSituation.setReportRelationship(getReportRelationship());
+            estateSituation.setSalesDevelopment(getSalesDevelopment());
+            DaoManager.save(estateSituation);
+            saveOrUpdateDatafromProperties(estateSituation);
+            if (getRequestHasDistraintFormality()) {
+                saveNewEstateSituationFormalityPropertyToDB(formalityList, estateSituation);
+            }
+        }*/
+        
+        if(isPropertyConfirmed() || isPropertyConfirmed){
+        	saveEstateSituation(formalityList, getPropertyList());
+        } 
 
-                saveOrUpdateDatafromProperties(estateSituation);
-                if (getRequestHasDistraintFormality()) {
-                    saveNewEstateSituationFormalityPropertyToDB(formalityList, estateSituation);
-                }
-            }
-        } else {
+       if(!isPropertyConfirmed){
             if(getEntity().isNew()){
                 getEntity().setSalesDevelopment(getSalesDevelopment());
             }
@@ -383,7 +421,7 @@ public class EstateSituationEditBean extends EntityEditPageBean<EstateSituation>
                     .filter(estate -> estate.getVisible() != null && estate.getVisible()).collect(Collectors.toList()));
             getEntity().setEstateFormalityList(getFormalityList().stream()
                     .filter(estate -> estate.getVisible() != null && estate.getVisible()).collect(Collectors.toList()));
-            
+
             getEntity().setFormalityList(formalityList);
             getEntity().setOtherType(isOtherTypeFormalities());
             getEntity().setReportRelationship(getReportRelationship());
@@ -397,6 +435,46 @@ public class EstateSituationEditBean extends EntityEditPageBean<EstateSituation>
                     clearSaveMapFromAlreadyExistingESFP();
                     saveNewEstateSituationFormalityPropertyToDB(formalityList, getEntity());
                 }
+            }
+        }
+    }
+    
+    private void saveEstateSituation(List<Formality> formalityList, List<Property> propertyList) 
+    		throws HibernateException, PersistenceBeanException, IllegalAccessException, InstantiationException {
+    	Map<PropertyGroupingWrapper, List<Property>> cityMap = new HashMap<>();
+    	List<Property> newPropertyList = new ArrayList<>();
+    	newPropertyList.addAll(getPropertyList());
+    	if(!ValidationHelper.isNullOrEmpty(getEntity().getPropertyList())) {
+    		for(Property property : getEntity().getPropertyList()) {
+    			newPropertyList.removeIf(p -> p.getId().longValue() == property.getId());
+    		}
+    		for(Property property : newPropertyList) {
+    			getPropertyList().removeIf(p -> p.getId().longValue() == property.getId());
+    		}
+    	}
+    	for (Property property : newPropertyList.stream()
+                .filter(f -> f.getVisible() != null && f.getVisible()).collect(Collectors.toSet())) {
+            PropertyGroupingWrapper propertyGroupingWrapper =
+                    new PropertyGroupingWrapper(property);
+            if (!cityMap.containsKey(propertyGroupingWrapper)) {
+                cityMap.put(propertyGroupingWrapper, new LinkedList<>());
+            }
+            cityMap.get(propertyGroupingWrapper).add(property);
+        }
+    	for (Map.Entry<PropertyGroupingWrapper, List<Property>> entry : cityMap.entrySet()) {
+            EstateSituation estateSituation = new EstateSituation();
+            estateSituation.setRequest(getRequestEntity());
+            estateSituation.setPropertyList(entry.getValue());
+            estateSituation.setEstateFormalityList(getFormalityList().stream()
+                    .filter(estate -> estate.getVisible() != null && estate.getVisible()).collect(Collectors.toList()));
+            estateSituation.setFormalityList(formalityList);
+            estateSituation.setOtherType(isOtherTypeFormalities());
+            estateSituation.setReportRelationship(getReportRelationship());
+            estateSituation.setSalesDevelopment(getSalesDevelopment());
+            DaoManager.save(estateSituation);
+            saveOrUpdateDatafromProperties(estateSituation);
+            if (getRequestHasDistraintFormality()) {
+                saveNewEstateSituationFormalityPropertyToDB(formalityList, estateSituation);
             }
         }
     }
@@ -534,6 +612,82 @@ public class EstateSituationEditBean extends EntityEditPageBean<EstateSituation>
             DaoManager.save(formality, true);
         }
         RedirectHelper.goTo(PageTypes.REQUEST_ESTATE_SITUATION_LIST, getRequestEntity().getId());
+    }
+    
+    private void sortProperties() {
+    	Comparator<CadastralData> comparatorCadastralData = (o1, o2) -> {
+            if(o1==null && o2==null) {
+                return 0;
+            }else if(o1==null) {
+                return -1;
+            }else if(o2==null) {
+                return 1;
+            }else {
+                if(o1.getSheet() != null && o2.getSheet() != null) {
+                    int result = extractInt(o1.getSheet()).compareTo(extractInt(o2.getSheet()));
+                    if(result == 0) {
+                        result = extractInt(o1.getParticle()).compareTo(extractInt(o2.getParticle()));
+                    }
+                    if(result == 0) {
+                        result = extractInt(o1.getSub()).compareTo(extractInt(o2.getSub()));
+                    }
+                    return result;
+                }else if(o1.getSheet()==null) {
+                    return -1;
+                }else if(o2.getSheet()==null) {
+                    return 1;
+                }else {
+                    return 0;
+                }
+            }
+        };
+
+        Comparator<Property> comparatorProperty = (o1, o2) -> {
+            if (o1 == null && o2 == null) {
+                return 0;
+            } else if (o1 == null) {
+                return -1;
+            } else if (o2 == null) {
+                return 1;
+            } else {
+                if (ValidationHelper.isNullOrEmpty(o1.getCadastralData())
+                        && ValidationHelper.isNullOrEmpty(o2.getCadastralData())) {
+                    return 0;
+                } else if ((ValidationHelper.isNullOrEmpty(o1.getCadastralData())
+                        || o1.getCadastralData().size() < 1)
+                        && ((ValidationHelper.isNullOrEmpty(o2.getCadastralData())
+                        || o2.getCadastralData().size() < 1))) {
+                    return 0;
+                } else if (!ValidationHelper.isNullOrEmpty(o1.getCadastralData())
+                        && !ValidationHelper.isNullOrEmpty(o2.getCadastralData())
+                        && o1.getCadastralData().size() > 0 && o2.getCadastralData().size() > 0) {
+                    CadastralData data1 = o1.getCadastralData().stream().findFirst().orElse(null);
+                    CadastralData data2 = o2.getCadastralData().stream().findFirst().orElse(null);
+                    return comparatorCadastralData.compare(data1, data2);
+                } else if (!ValidationHelper.isNullOrEmpty(o1.getCadastralData())
+                        && o1.getCadastralData().size() > 0) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        };
+
+        propertyList = propertyList.stream().sorted(comparatorProperty).collect(Collectors.toList());
+    }
+    
+    private static Integer extractInt(String s) {
+        String num = "";
+        if(StringUtils.isNotBlank(s))
+            num = s.replaceAll("\\D", "");
+        // return 0 if no digits found
+        return num.isEmpty() ? 0 : Integer.parseInt(num);
+    }
+    
+    public void openTranscriptionManagement() throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+    	if(!ValidationHelper.isNullOrEmpty(getRequestEntity()) && !ValidationHelper.isNullOrEmpty(getRequestEntity().getId())) {
+    		getTranscriptionAndCertificationHelper().openTranscriptionManagement(getRequestEntity().getId());
+    	}
     }
 
     public void setEntityEditId(Long entityEditId) {

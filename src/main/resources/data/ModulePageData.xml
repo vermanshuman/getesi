@@ -70,11 +70,11 @@
 		<module_code entity_field="code">PDTDM</module_code>
 	</data_entry>
 	<data_entry>
-		<page_type>DAY_PHRASE</page_type>
+		<page_type>DAY_PHRASE_LIST</page_type>
 		<module_code entity_field="code">PDP</module_code>
 	</data_entry>
 	<data_entry>
-		<page_type>TYPE_ACT</page_type>
+		<page_type>TYPE_ACT_LIST</page_type>
 		<module_code entity_field="code">PTA</module_code>
 	</data_entry>
 	<data_entry>
@@ -82,7 +82,7 @@
 		<module_code entity_field="code">PCD</module_code>
 	</data_entry>
 	<data_entry>
-		<page_type>TYPE_FORMALITY</page_type>
+		<page_type>TYPE_FORMALITY_LIST</page_type>
 		<module_code entity_field="code">PTF</module_code>
 	</data_entry>
 	<data_entry>
@@ -94,7 +94,7 @@
 		<module_code entity_field="code">PTR</module_code>
 	</data_entry>
 	<data_entry>
-		<page_type>FOREIGN_STATES_LIST</page_type>
+		<page_type>FOREIGN_STATE_LIST</page_type>
 		<module_code entity_field="code">FSL</module_code>
 	</data_entry>
 	<data_entry>
@@ -198,7 +198,7 @@
 		<module_code entity_field="code">CC</module_code>
 	</data_entry>
 	<data_entry>
-		<page_type>RELATIONSHIP_TYPES</page_type>
+		<page_type>RELATIONSHIP_TYPES_LIST</page_type>
 		<module_code entity_field="code">RT</module_code>
 	</data_entry>
 	<data_entry>
@@ -220,5 +220,29 @@
 	<data_entry>
 		<page_type>LAND_CULTURE_LIST</page_type>
 		<module_code entity_field="code">LCl</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>TAX_RATE_LIST</page_type>
+		<module_code entity_field="code">TRL</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>CONTACT_LIST</page_type>
+		<module_code entity_field="code">CONTACT</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>AGGREGATION_AZ_LIST</page_type>
+		<module_code entity_field="code">AAZL</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>CONSERVATORY_LIST</page_type>
+		<module_code entity_field="code">CVL</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>COST_STAMPS_OR_SERVICES</page_type>
+		<module_code entity_field="code">CSSL</module_code>
+	</data_entry>
+	<data_entry>
+		<page_type>SUPPLIER_LIST</page_type>
+		<module_code entity_field="code">SPL</module_code>
 	</data_entry>
 </module_page>

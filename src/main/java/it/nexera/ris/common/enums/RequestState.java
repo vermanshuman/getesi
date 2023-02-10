@@ -12,7 +12,13 @@ public enum RequestState {
     INVOICED(4l, false),
     SUSPENDED(5l, false),
     TO_BE_SENT(6l, true),
-    SENT_TO_SDI(7l, false);
+    SENT_TO_SDI(7l, false),
+    TURNOVER_OLD(8l, false),
+    EST_TO_SENT(9l, true),
+    PROFILED(10l, true),
+    EXTERNAL(11l, true),
+    SHIPPED(12l, true),
+    CANCELLED(13l, true);
 
     private Long id;
 

@@ -6,6 +6,7 @@ import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.*;
 import it.nexera.ris.common.utils.ForecastUtil;
 import it.nexera.ris.common.xml.wrappers.CitySelectItem;
+import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.Event;
 import it.nexera.ris.persistence.beans.entities.domain.Request;
@@ -20,10 +21,12 @@ import it.nexera.ris.web.beans.wrappers.WorkLoadWrapper;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.primefaces.model.*;
 
 import javax.faces.bean.ManagedBean;
@@ -64,6 +67,8 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
 
     private String chartData;
 
+    private List<String> fixedColors;
+
     private List<String> colors;
 
     private Long selectedUserId;
@@ -82,6 +87,8 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
 
     private Long selectedExpirationId;
 
+    Map<String, String> colorMapping;
+
     @Override
     protected void onConstruct() {
         try {
@@ -92,7 +99,9 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
                                         Restrictions.eq("category", UserCategories.INTERNO),
                                         Restrictions.isNull("category")
                                 ),
-                                Restrictions.eq("status", UserStatuses.ACTIVE)
+                                Restrictions.eq("status", UserStatuses.ACTIVE),
+                                Restrictions.isNotNull("getesi"),
+                                Restrictions.eq("getesi", Boolean.TRUE)
                         )}, Boolean.FALSE));
             } else {
                 setSelectedUserId(getCurrentUser().getId());
@@ -100,13 +109,16 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
 
             setExpirationFilters(ComboboxHelper.fillList(ExpirationFilter.class, false));
 
+            fixedColors = new LinkedList<>();
             colors = new LinkedList<>();
+
+            fixedColors.add("rgb(255, 124, 67");
+            fixedColors.add("rgb(72, 143, 49");
+            fixedColors.add("rgb(249, 93, 106");
+
             colors.add("rgb(0, 63, 92");
-            colors.add("rgb(72, 143, 49");
             colors.add("rgb(102, 81, 145");
             colors.add("rgb(66, 165, 245");
-            colors.add("rgb(249, 93, 106");
-            colors.add("rgb(255, 124, 67");
             colors.add("rgb(255, 166, 0");
             colors.add("rgb(131, 175, 112");
             colors.add("rgb(83, 131, 161");
@@ -153,14 +165,15 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
 
 
         List<MixChartDataWrapper> dataSets = new ArrayList<>();
-        List<Integer> data = new ArrayList<>();
-        Map<RequestType, Integer> dataMapping = new HashMap<>();
+        List<Double> data = new ArrayList<>();
+        Map<RequestType, Double> dataMapping = new HashMap<>();
         Collections.shuffle(colors);
         Map<RequestType, List<String>> tooltips = new HashMap<>();
         //List<List<String>> tooltips = new ArrayList<>();
         List<Long> stateIds = new ArrayList<>();
         stateIds.add(RequestState.INSERTED.getId());
         stateIds.add(RequestState.IN_WORK.getId());
+        stateIds.add(RequestState.PROFILED.getId());
         for (RequestType requestType : requestTypes) {
             List<String> tooltip = new ArrayList<>();
             List<Criterion> restrictions = new ArrayList<>();
@@ -185,6 +198,15 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
             restrictions.add(
                     Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
                             Restrictions.isNull("isDeleted")));
+            /*restrictions.add(Restrictions.or(Restrictions.eq("rmb.managedBy", 1), 
+            		Restrictions.isNull("rmb.managedBy"), Restrictions.eq("rmb.managedBy", 0)));
+            List<Request> requests = DaoManager.load(Request.class,
+                    new CriteriaAlias[]{
+                            new CriteriaAlias("requestManagedBy", "rmb", JoinType.LEFT_OUTER_JOIN)
+                    },
+                    restrictions.toArray(new Criterion[0]));
+            Arrays.stream(restrictions.toArray(new Criterion[0]))
+                    .forEach(r -> LogHelper.debugInfo(log, "Restriction(Home) : " + r)); */
             List<Request> requests = DaoManager.load(Request.class, restrictions.toArray(new Criterion[0]));
             requests.sort(Comparator.comparing(Request::getExpirationDate, Comparator.nullsFirst(Comparator.naturalOrder())));
 
@@ -216,7 +238,7 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
 
             if (!ValidationHelper.isNullOrEmpty(tooltip))
                 tooltips.put(requestType, tooltip);
-            Integer requestCount = requests.size();
+            Double requestCount = Double.valueOf(requests.size());
             if (requestCount > 0) {
                 dataMapping.put(requestType, requestCount);
             }
@@ -238,8 +260,14 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
             List<String> borderColors = new ArrayList<>();
             List<String> backgroundColors = new ArrayList<>();
             for (int c = 0; c < chartXAxisData.size(); c++) {
-                borderColors.add(colors.get(c) + ")");
-                backgroundColors.add(colors.get(c) + ", 0.2)");
+                if(c <3 ){
+                    borderColors.add(fixedColors.get(c) + ")");
+                    backgroundColors.add(fixedColors.get(c) + ", 0.2)");
+                }else {
+                    borderColors.add(colors.get(c) + ")");
+                    backgroundColors.add(colors.get(c) + ", 0.2)");
+                }
+
             }
             List<List<String>> tooltipData = new ArrayList<>();
 
@@ -253,6 +281,15 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
                 tooltipData.add(tooltips.get(sortedrequestType));
             }
 
+            colorMapping = new HashMap<>();
+            for (int c = 0; c < sortedData.size(); c++) {
+                if(c <3 ){
+                    colorMapping.put(sortedData.get(c).getName(), fixedColors.get(c) + ")");
+
+                }else {
+                    colorMapping.put(sortedData.get(c).getName(), colors.get(c) + ")");
+                }
+            }
             MixChartDataWrapper dataSet = MixChartDataWrapper.builder()
                     .label(ResourcesHelper.getString("requestListService"))
                     .data(data)
@@ -412,7 +449,9 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
                                     Restrictions.eq("category", UserCategories.INTERNO),
                                     Restrictions.isNull("category")
                             ),
-                            Restrictions.eq("status", UserStatuses.ACTIVE)
+                            Restrictions.eq("status", UserStatuses.ACTIVE),
+                            Restrictions.isNotNull("getesi"),
+                            Restrictions.eq("getesi", Boolean.TRUE)
                     )}, Boolean.FALSE));
         }
         List<Criterion> restrictions = new ArrayList<>();
@@ -422,15 +461,23 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
         List<Long> stateIds = new ArrayList<>();
         stateIds.add(RequestState.INSERTED.getId());
         stateIds.add(RequestState.IN_WORK.getId());
+        stateIds.add(RequestState.PROFILED.getId());
 
         restrictions.add(Restrictions.in("stateId", stateIds));
         restrictions.add(
                 Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
                         Restrictions.isNull("isDeleted")));
-
+        /*restrictions.add(Restrictions.or(Restrictions.eq("rmb.managedBy", 1), 
+        		Restrictions.isNull("rmb.managedBy"), Restrictions.eq("rmb.managedBy", 0)));
+        List<Request> requests = DaoManager.load(Request.class,
+                new CriteriaAlias[]{
+                        new CriteriaAlias("requestManagedBy", "rmb", JoinType.LEFT_OUTER_JOIN)
+                },
+                restrictions.toArray(new Criterion[0]));*/
         List<Request> requests = DaoManager.load(Request.class, restrictions.toArray(new Criterion[0]));
 
         Map<RequestType, List<Request>> groupedByRequestTypes = requests.stream()
+                .filter(r -> !ValidationHelper.isNullOrEmpty(r.getRequestType()))
                 .collect(Collectors.groupingBy(Request::getRequestType));
 
         for (Map.Entry<RequestType, List<Request>> entry : groupedByRequestTypes.entrySet()) {
@@ -451,13 +498,20 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
                         .stream()
                         .filter(r -> r.getStateId().equals(RequestState.INSERTED.getId()))
                         .count();
+                Long numberProfiledRequests = groupedRequests
+                        .stream()
+                        .filter(r -> r.getStateId().equals(RequestState.PROFILED.getId()))
+                        .count();
                 workLoadWrapper.setNumberUnclosedRequestsInWork(numberUnclosedRequestsInWork);
-                workLoadWrapper.setTotal(numberUnclosedRequestsInWork + numberNewRequests);
-                if (numberNewRequests != null && numberNewRequests > 0) {
-                    Double percentage = (numberUnclosedRequestsInWork * 1.0 / (numberNewRequests + numberUnclosedRequestsInWork)) * 100;
-                    workLoadWrapper.setPercentage(percentage.intValue());
-                }
+                workLoadWrapper.setTotal(numberUnclosedRequestsInWork + numberNewRequests + numberProfiledRequests );
+                //if (numberNewRequests != null && numberNewRequests > 0) {
+                Double percentage = (numberUnclosedRequestsInWork * 1.0 / (numberNewRequests + numberUnclosedRequestsInWork+numberProfiledRequests)) * 100;
+                workLoadWrapper.setPercentage(percentage.intValue());
+                //}
             }
+            if(colorMapping != null && StringUtils.isNotBlank(entry.getKey().getName()) &&
+                    colorMapping.containsKey(entry.getKey().getName()))
+                workLoadWrapper.setBarColor(colorMapping.get(entry.getKey().getName()));
             getWorkLoadWrappers().add(workLoadWrapper);
         }
 
@@ -521,6 +575,12 @@ public class HomeBean extends BaseValidationPageBean implements Serializable {
     public void openRequestList(Long stateId) {
         setSessionValue("REQUEST_LIST_FILTER_BY",RequestState.getById(stateId).name());
         RedirectHelper.goTo(PageTypes.REQUEST_LIST);
+
+    }
+
+    public void openMailManagerListToBeSent() {
+        setSessionValue("MAIL_MANAGER_LIST_TO_BE_SENT", "true");
+        RedirectHelper.goTo(PageTypes.MAIL_MANAGER_LIST);
 
     }
 

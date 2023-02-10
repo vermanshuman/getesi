@@ -19,14 +19,28 @@ public class FileWrapper implements Serializable {
 
     private Date createDate;
 
+    private Boolean addAttachment;
+
     public FileWrapper(String fileName, String filePath, Date createDate) {
         this.fileName = fileName;
         this.filePath = filePath;
         this.createDate = createDate;
     }
 
+    public FileWrapper(Long id, String fileName, String filePath, Boolean addAttachment) {
+        this.id = id;
+        this.fileName = fileName;
+        this.filePath = filePath;
+        this.addAttachment = addAttachment;
+    }
+
     public FileWrapper(Long id, String fileName, String filePath) {
         this.id = id;
+        this.fileName = fileName;
+        this.filePath = filePath;
+    }
+
+    public FileWrapper(String fileName, String filePath) {
         this.fileName = fileName;
         this.filePath = filePath;
     }

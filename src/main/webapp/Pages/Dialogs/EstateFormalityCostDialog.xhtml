@@ -3,24 +3,46 @@
                 xmlns:p="http://primefaces.org/ui"
                 xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:h="http://java.sun.com/jsf/html">
-    <p:dialog widgetVar="estateFormalityCostDlg" modal="true" width="600">
+
+    <style>
+        .ui-dialog .ui-widget-header {
+            background: #f8f9fa !important;
+            color: #495057 !important;
+        }
+
+        .confirm-button {
+            background-color: #00CC52 !important;
+            width: 100px;
+        }
+        .cancel-button {
+            background-color: #F3362B !important;
+            width: 100px;
+            margin-left: 15px !important;
+        }
+        #estateFormalityCostDialog .ui-panelgrid-cell {
+            vertical-align: baseline!important;
+        }
+    </style>
+    <p:dialog widgetVar="estateFormalityCostDlg" modal="true" width="600" styleClass="dialog-green" id="estateFormalityCostDialog">
 
         <div class="cost_titles">
             <h3>#{msg.requestEstateFormalityCostText}</h3>
         </div>
 
-        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" id="estateFormalityArea">
-            <span> #{msg.requestExtraNumberActs}:</span>
+        <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group" id="estateFormalityArea" style="text-align:center; width: 100%;">
             <p:column>
-                <p:inputText id="inputEstateCost" value="#{bean.costManipulationHelper.estateFormalityCost}"
+                <h:outputText value="#{msg.requestExtraNumberActs}:"/>
+            </p:column>
+            <p:column>
+                <p:inputText id="inputEstateCost" value="#{bean.costManipulationHelper.estateFormalityCost}" style="width:70%;"
                              onkeypress="return numbers_only(this, event, 9, 0)" onkeyup="check_numbers(this, 9, 0);"/>
             </p:column>
         </p:panelGrid>
 
-           <div class="btn_line">
-             <p:commandButton value="#{msg.confirm}" update="@form"
-                              action="#{bean.saveRequestEstateFormalityCost}" oncomplete="PF('estateFormalityCostDlg').hide();"/>
-             <p:commandButton value="#{msg.cancel}" oncomplete="PF('estateFormalityCostDlg').hide();"/>
-         </div>
+        <div class="btn_line">
+            <p:commandButton value="#{msg.confirm}" update="@form" styleClass="confirm-button"
+                             action="#{bean.saveRequestEstateFormalityCost}" oncomplete="PF('estateFormalityCostDlg').hide();"/>
+            <p:commandButton value="#{msg.cancel}" oncomplete="PF('estateFormalityCostDlg').hide();" styleClass="cancel-button"/>
+        </div>
     </p:dialog>
 </ui:composition>

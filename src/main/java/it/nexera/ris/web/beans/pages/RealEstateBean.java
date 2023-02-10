@@ -216,7 +216,10 @@ public class RealEstateBean extends EntityEditPageBean<Property>
 
         this.setNewCadastralData(new CadastralData());
         this.setCadastralData(new ArrayList<>());
-        this.addCadastralData(this.getEntity().getCadastralData());
+        if(!ValidationHelper.isNullOrEmpty(this.getEntity().getCadastralData())){
+            for (CadastralData cadastralData : this.getEntity().getCadastralData())
+                this.addCadastralData(cadastralData);
+        }
 
         if (getEntity().getEstimateOMIHistory() != null) {
             setEstimateOMIHistory(getEntity().getEstimateOMIHistory());

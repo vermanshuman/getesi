@@ -2,6 +2,9 @@ package it.nexera.ris.common.helpers;
 
 import it.nexera.ris.common.enums.MailEditType;
 import it.nexera.ris.common.enums.PageTypes;
+import it.nexera.ris.common.enums.TranscriptionEmailType;
+import it.nexera.ris.common.enums.TranscriptionPage;
+
 import org.apache.commons.io.IOUtils;
 
 import javax.faces.context.FacesContext;
@@ -53,6 +56,28 @@ public class RedirectHelper extends BaseHelper {
     public static final String SELECTED = "selected";
 
     public static final String SALES = "sales";
+
+    public static final String TAB = "tab";
+
+    public static final String REQUEST_TYPE_PARAM = "type";
+
+    public static final String BILLING_LIST = "billing";
+    
+    public static final String MANAGE_TRANSCRIPTION = "transcription";
+
+    public static final String TRANSCRIPTION_ID = "transcription_id";
+
+    public static final String DOCUMENT = "document";
+
+    public static final String CONSERVATORY_ID = "conservatory_id";
+    
+    public static final String CERTIFICATION_ID = "certification_id";
+    
+    public static final String PAGE = "page";
+    
+    public static final String TRANSCRIPTION_MAIL_TYPE = "mail_type";
+
+    public static final String CERTIFICATION_LIST = "certification_list";
 
     public static void goTo(PageTypes type) {
         try {
@@ -136,6 +161,14 @@ public class RedirectHelper extends BaseHelper {
             sendRedirect(type.getPagesContext() + "?" + PARENT_ID_PARAMETER
                     + "=" + parentId + "&" + ID_PARAMETER + "="
                     + (id == null ? "" : id.toString()) + "&" + EDIT_ID + "=" + editId);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+    public static void goToWIthoutId(PageTypes type, boolean newTab) {
+        try {
+            sendRedirect(type.getPagesContext(), newTab);
         } catch (Exception e) {
             LogHelper.log(log, e);
         }
@@ -425,6 +458,170 @@ public class RedirectHelper extends BaseHelper {
     public static void goToMultiple(PageTypes type,String queryParameter) {
         try {
             sendRedirect(type.getPagesContext() + "?" + MULTIPLE + "=" + true + "&"+ queryParameter);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+    public static void goToCreateMultipleRequestFromMail(Serializable id, boolean needArchive, boolean isMultipleCreate, Integer requestType) {
+        goToCreateMultipleRequestFromMail(id, "", needArchive, isMultipleCreate, requestType);
+    }
+
+    public static void goToCreateMultipleRequestFromMail(Serializable id, Serializable requestId, boolean needArchive, boolean isMultipleCreate, Integer requestType) {
+        try {
+            sendRedirect(PageTypes.REQUEST_EDIT.getPagesContext() + "?"
+                    + ID_PARAMETER + "=" + requestId + "&"
+                    + (needArchive ? ARCHIVE_MAIL : MAIL) + "=" + id + "&"
+                    + REQUEST_TYPE_PARAM + "=" + requestType
+                    + (isMultipleCreate ? "&" + MULTIPLE + "=true" : "") + "&"+ RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE");
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+    
+    public static void goToCreateMultipleRequestFromMail(Serializable id, Serializable requestId, 
+    		boolean needArchive, boolean isMultipleCreate, Integer requestType, int executionType) {
+        try {
+            sendRedirect(PageTypes.REQUEST_EDIT.getPagesContext() + "?"
+                    + ID_PARAMETER + "=" + requestId + "&"
+                    + (needArchive ? ARCHIVE_MAIL : MAIL) + "=" + id + "&"
+                    + REQUEST_TYPE_PARAM + "=" + requestType
+                    + (isMultipleCreate ? "&" + MULTIPLE + "=true" : "") + "&"+ RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE"
+                    + "&" + MANAGE_TRANSCRIPTION + "=" + executionType);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+    public static void goToMailManagerViewFromBillingList(Serializable mailId) {
+        try {
+            sendRedirect(PageTypes.MAIL_MANAGER_VIEW.getPagesContext() + "?"
+                    + ID_PARAMETER + "=" + mailId + "&page=0" + "&" +BILLING_LIST + "=3");
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+    public static void goToBillingListFromMailManagerView(Serializable tab) {
+        try {
+            sendRedirect(PageTypes.BILLING_LIST.getPagesContext() + "?" +BILLING_LIST + "=" + tab);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+    public static void goToExcelDataRequest(Serializable requestId, Serializable mailId, Boolean mailIdPresent ) {
+        try {
+            if(mailIdPresent)
+                sendRedirect(PageTypes.EXCEL_DATA_REQUEST.getPagesContext() + "?" + MAIL_ID + "=" + mailId);
+            else
+                sendRedirect(PageTypes.EXCEL_DATA_REQUEST.getPagesContext() + "?" + REQUEST_ID + "=" + requestId);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+    public static void goToCreateCertificationRequest(Serializable parentRequestId,
+                                                      boolean isMultipleCreate,
+                                                      Integer requestType, int executionType) {
+        try {
+            sendRedirect(PageTypes.REQUEST_EDIT.getPagesContext() + "?"
+                    + PARENT_ID_PARAMETER + "=" + parentRequestId + "&"
+                    + REQUEST_TYPE_PARAM + "=" + requestType
+                    + (isMultipleCreate ? "&" + MULTIPLE + "=true" : "") + "&"+ RedirectHelper.FROM_PARAMETER + "=RICHESTE_MULTIPLE"
+                    + "&" + MANAGE_TRANSCRIPTION + "=" + executionType);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+
+    public static void goToMailEditTranscription(Serializable requestId, Serializable transcriptionId, String documentType, MailEditType type, TranscriptionEmailType transcriptionEmailType) {
+        try {
+            sendRedirect(PageTypes.MAIL_MANAGER_EDIT.getPagesContext() + "?" + REQUEST_ID + "="
+                    + (requestId == null ? "" : requestId.toString()) + "&" + TRANSCRIPTION_ID + "="
+                    + (transcriptionId == null ? "" : transcriptionId.toString()) + "&" + DOCUMENT + "=" + documentType
+                    + "&" + MAIL + "=" + type.name() + "&" + TRANSCRIPTION_MAIL_TYPE + "=" +transcriptionEmailType.getType());
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+    public static void goToMailEditCertification(Serializable requestId, Serializable certificationId, String documentType, MailEditType type, TranscriptionEmailType transcriptionEmailType) {
+        try {
+            sendRedirect(PageTypes.MAIL_MANAGER_EDIT.getPagesContext() + "?" + REQUEST_ID + "="
+                    + (requestId == null ? "" : requestId.toString()) + "&" + CERTIFICATION_ID + "="
+                    + (certificationId == null ? "" : certificationId.toString()) + "&" + DOCUMENT + "=" + documentType
+                    + "&" + MAIL + "=" + type.name() + "&" + TRANSCRIPTION_MAIL_TYPE + "=" +transcriptionEmailType.getType());
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+
+    public static void goToConservatoryDetail(Long conservatoryId, boolean newTab) {
+        try {
+            sendRedirect(PageTypes.CONSERVATORY_LIST.getPagesContext() + "?" + CONSERVATORY_ID + "="
+                    + conservatoryId, newTab);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+    
+	/*public static void goToTranscriptionCertification(PageTypes type, Serializable parentId, 
+			Serializable transcriptionId, Serializable certificationId) {
+		try {
+			sendRedirect(type.getPagesContext() + "?" + PARENT_ID_PARAMETER + "=" + parentId + "&" + TRANSCRIPTION_ID + "="
+					+ (transcriptionId == null ? "" : transcriptionId.toString()) + "&" + CERTIFICATION_ID + "=" 
+					+ (certificationId == null ? "" : certificationId.toString()));
+		} catch (Exception e) {
+			LogHelper.log(log, e);
+		}
+	}*/
+    
+    public static void goToTranscriptionCertification(PageTypes type, TranscriptionPage transcriptionPage, Serializable parentId, 
+			Serializable transcriptionId, Serializable certificationId) {
+		try {
+			sendRedirect(type.getPagesContext() + "?" + PAGE + "=" + transcriptionPage.getPage() + "&" + PARENT_ID_PARAMETER + "=" + parentId + "&" + TRANSCRIPTION_ID + "="
+					+ (transcriptionId == null ? "" : transcriptionId.toString()) + "&" + CERTIFICATION_ID + "=" 
+					+ (certificationId == null ? "" : certificationId.toString()));
+		} catch (Exception e) {
+			LogHelper.log(log, e);
+		}
+	}
+
+    public static void goToMailViewFromCertificationList(Serializable id) {
+        try {
+            sendRedirect(PageTypes.MAIL_MANAGER_VIEW.getPagesContext() + "?"
+                    + CERTIFICATION_LIST + "=1&" + ID_PARAMETER + "="
+                    + (id == null ? "" : id.toString()));
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+    public static void goToCertificationListFromMailManagerView(Serializable tab) {
+        try {
+            sendRedirect(PageTypes.NOTARIAL_CERTIFICATION_LIST.getPagesContext() + "?" +CERTIFICATION_LIST + "=" + tab);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+    public static void goToRequestEditFromCertification(Serializable id, Serializable requestId,String tab) {
+        try {
+            sendRedirect(PageTypes.REQUEST_EDIT.getPagesContext() + "?"
+                    + ID_PARAMETER + "=" + requestId + "&"
+                    + RedirectHelper.FROM_PARAMETER + "=CERTIFICATION&"
+            + TAB + "=" + tab);
+        } catch (Exception e) {
+            LogHelper.log(log, e);
+        }
+    }
+
+    public static void goToCertificationListFromRequestList() {
+        try {
+            sendRedirect(PageTypes.NOTARIAL_CERTIFICATION_LIST.getPagesContext());
         } catch (Exception e) {
             LogHelper.log(log, e);
         }

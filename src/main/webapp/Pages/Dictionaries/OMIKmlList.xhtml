@@ -6,10 +6,10 @@
 	xmlns:h="http://java.sun.com/jsf/html">
 <ui:composition template="/resources/tpl/Admin/EmptyBase.xhtml">
 	<ui:param name="view_title" value="#{msg.omiKmlListHeader}" />
-	<ui:param name="bean" value="#{omiKmlList}" />
 	<ui:param name="showAjax" value="#{true}" />
 
 	<ui:define name="view_body">
+		<ui:param name="bean" value="#{omiKmlList}" />
 
 		<p:dataTable value="#{bean.files}" var="file" id="file"
 			emptyMessage="#{msg.noRecordsFound}">

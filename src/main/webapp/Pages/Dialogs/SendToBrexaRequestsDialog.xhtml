@@ -1,0 +1,125 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html">
+	<p:dialog widgetVar="sendToBrexaRequestsDialogWV" modal="true" width="1400" styleClass="dialog-gray"
+			  header="#{msg.mailManagerViewRequestsDialogHeader}" id="sendToBrexaRequestsDialog" maximizable="true" >
+
+	<p:panelGrid columns="1" styleClass="ui-panelgrid-blank form-group" id="sendToBrexaRequestsPanel">
+	        <p:dataTable value="#{bean.sendToBrexaRequests}" styleClass="simple-table" var="item" id="sendToBrexaRequestsTable"
+	                     rendered="#{not empty bean.sendToBrexaRequests}"  scrollable="true"
+						 scrollHeight="300" style="margin-top:20px;" emptyMessage="#{msg.noRecordsFound}">
+	            <p:column styleClass="action-column">
+					<f:facet name="header">
+						<p:selectBooleanCheckbox value="#{bean.selectedAllSendToBrexaRequests}">
+							<p:ajax update="sendToBrexaRequestsTable" event="change"/>
+						</p:selectBooleanCheckbox>
+					</f:facet>
+	                <p:selectBooleanCheckbox value="#{item.selectedForVisibleExternal}">
+	                	<p:ajax event="change" update="@this"/> 
+	                </p:selectBooleanCheckbox>
+	            </p:column>
+				<p:column headerText="#{msg.requestSendToBrexaDate}">
+					<h:outputText value="#{item.createDate}" converter="dateTimeConverter" />
+				</p:column>
+				<p:column headerText="#{msg.requestSendToBrexaClient}">
+					<h:outputText value="#{item.client ne null  ? item.client.clientName : ''}"/>
+				</p:column>
+	            <p:column headerText="#{msg.databaseListRealEstateSubject}">
+	                <h:outputText value="#{item.mailViewSubject ne null ? item.mailViewSubject : ''}"/>
+	            </p:column>
+	            <p:column headerText="#{msg.requestListRequestType}">
+	                <h:outputText value="#{item.requestTypeName}"/>
+	            </p:column>
+	            <p:column headerText="#{msg.requestListService}">
+	                <h:outputText value="#{item.service ne null ? item.serviceName : (item.multipleServices ne null ? item.multipleServiceNames : '')}"/>
+	            </p:column>
+	            <p:column headerText="#{msg.requestListCorservatoryName}">
+	                <h:outputText value="#{item.aggregationLandCharRegNameOrCity}"/>
+	            </p:column>
+	            <p:column headerText="#{msg.requestState}">
+	                <h:outputText value="#{item.stateDescription}"/>
+	            </p:column>
+	        </p:dataTable>
+        </p:panelGrid>
+
+		<div class="btn_line">
+			<p:commandButton value="#{msg.confirm}" update="@form sendToBrexaRequestsTable"
+							 style="background-color: #00CC52 !important;margin-right: 15px;width: 100px;"
+			                 action="#{bean.setVisibleExternalStatus}" oncomplete="PF('sendToBrexaRequestsDialogWV').hide();"/>
+			<p:commandButton value="#{msg.cancel}" oncomplete="PF('sendToBrexaRequestsDialogWV').hide();" update="sendToBrexaRequestsTable"
+							 style="background-color: #F3362B !important; width: 100px;" />
+		</div>
+		<style>
+			#sendToBrexaRequestsDialog .ui-datatable-scrollable-theadclone {
+				display: none !important;
+			}	
+			#sendToBrexaRequestsDialog .ui-datatable:not(.borderless) thead th, #sendToBrexaRequestsDialog .ui-datatable tbody td, #sendToBrexaRequestsDialog .ui-datatable tfoot td, #sendToBrexaRequestsDialog .ui-datatable tfoot th {
+	           padding: 1rem 1rem !important;
+	        }
+			#sendToBrexaRequestsDialog .ui-datatable-scrollable-header th:nth-child(1) {
+				width: 40px !important;
+			}
+			#sendToBrexaRequestsDialog .ui-datatable-scrollable-body td:nth-child(1) {
+				width: 58px !important;
+			}
+			#sendToBrexaRequestsDialog .ui-datatable-scrollable-header th:nth-child(2) {
+				width: 91px !important;
+			}
+			#sendToBrexaRequestsDialog .ui-datatable-scrollable-body td:nth-child(2) {
+				width: 100px !important;
+			}
+	        #sendToBrexaRequestsDialog .ui-datatable-scrollable-header th:nth-child(3) {
+	            width: 90px !important;
+	        }
+	        #sendToBrexaRequestsDialog .ui-datatable-scrollable-body td:nth-child(3) {
+	            width: 100px !important;
+	        }
+	        #sendToBrexaRequestsDialog .ui-datatable-scrollable-header th:nth-child(4) {
+	            width: 230px !important;
+	        }
+	        #sendToBrexaRequestsDialog .ui-datatable-scrollable-body td:nth-child(4) {
+	            width: 220px !important;
+	        }
+	        #sendToBrexaRequestsDialog .ui-datatable-scrollable-header th:nth-child(5) {
+	            width: 150px !important;
+	        }
+	        #sendToBrexaRequestsDialog .ui-datatable-scrollable-body td:nth-child(5) {
+	            width: 150px !important;
+	        }
+	        #sendToBrexaRequestsDialog .ui-datatable-scrollable-header th:nth-child(6) {
+	            width: 151px !important;
+	        }
+	        #sendToBrexaRequestsDialog .ui-datatable-scrollable-body td:nth-child(6) {
+	            width: 150px !important;
+	        }
+	        #sendToBrexaRequestsDialog .ui-datatable-scrollable-header th:nth-child(7) {
+	            width: 150px !important;
+	        }
+	        #sendToBrexaRequestsDialog .ui-datatable-scrollable-body td:nth-child(7) {
+	            width: 150px !important;
+	        }
+	        #sendToBrexaRequestsDialog .ui-datatable-scrollable-header th:nth-child(8) {
+	            width: 150px !important;
+	        }
+	        #sendToBrexaRequestsDialog .ui-datatable-scrollable-body td:nth-child(8) {
+	            width: 150px !important;
+	        }
+	        #sendToBrexaRequestsDialog .ui-datatable .ui-datatable-data > tr > td {
+	            padding: 1rem 1rem;
+	            border: 1px solid #5f666c !important;
+	            text-align: center;
+	        }
+	        #sendToBrexaRequestsDialog .ui-datatable-scrollable table, .ui-datatable-sticky table {
+	            table-layout: fixed !important;
+	        }
+			.ui-dialog {
+				overflow: scroll;
+				max-height: 100%;
+			}
+
+		</style>
+
+	</p:dialog>
+</ui:composition>

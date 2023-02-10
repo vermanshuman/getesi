@@ -1,48 +1,32 @@
 package it.nexera.ris.web.beans.pages;
 
-import it.nexera.ris.common.enums.*;
+import it.nexera.ris.common.enums.PageTypes;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
-import it.nexera.ris.common.helpers.*;
-import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
+import it.nexera.ris.common.helpers.ComboboxHelper;
+import it.nexera.ris.common.helpers.DateTimeHelper;
+import it.nexera.ris.common.helpers.RedirectHelper;
+import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.Client;
-import it.nexera.ris.persistence.beans.entities.domain.Document;
 import it.nexera.ris.persistence.beans.entities.domain.Invoice;
 import it.nexera.ris.persistence.beans.entities.domain.InvoiceItem;
 import it.nexera.ris.persistence.beans.entities.domain.PaymentType;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
-import it.nexera.ris.persistence.beans.entities.domain.Role;
-import it.nexera.ris.persistence.beans.entities.domain.User;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Office;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.Service;
-import it.nexera.ris.persistence.view.RequestView;
 import it.nexera.ris.web.beans.EntityLazyListPageBean;
-import it.nexera.ris.web.beans.base.AccessBean;
-import it.nexera.ris.web.beans.wrappers.logic.RequestStateWrapper;
-import it.nexera.ris.web.beans.wrappers.logic.UserFilterWrapper;
 import it.nexera.ris.web.cloud.FattureInCloud;
-
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -232,7 +216,8 @@ public class InvoiceListBean extends EntityLazyListPageBean<Invoice>
         		article.put("descrizione", item.getDescription());
         		article.put("prezzo_lordo", item.getGrossAmount());
         		article.put("prezzo_netto", item.getAmount());
-        		article.put("cod_iva", item.getVat());
+				if(!ValidationHelper.isNullOrEmpty(item.getTaxRate()) && !ValidationHelper.isNullOrEmpty(item.getTaxRate().getPercentage()))
+					article.put("cod_iva", item.getTaxRate().getPercentage());
         		
         		articleArray.put(article);
         	}

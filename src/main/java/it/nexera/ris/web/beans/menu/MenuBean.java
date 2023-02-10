@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
 import javax.faces.bean.ViewScoped;
 
 import org.primefaces.model.menu.DefaultMenuItem;
@@ -22,7 +23,7 @@ import it.nexera.ris.web.beans.PageBean;
 import it.nexera.ris.web.beans.base.AccessBean;
 
 @ManagedBean(name = "menuBean")
-@ViewScoped 
+@SessionScoped
 public class MenuBean extends PageBean implements Serializable {
 
     private static final long serialVersionUID = -5426864162684772597L;
@@ -62,10 +63,15 @@ public class MenuBean extends PageBean implements Serializable {
             LogHelper.log(log, e);
         }
 
-        addBackBtn();
-        //pushSubMenu(firstSubmenu);
-        //pushSubMenu(secondSubmenu);
-        addForwardBtn();
+        try {
+            log.info("Adding Back Button");
+            addBackBtn();
+            log.info("Adding Forward Button");
+            addForwardBtn();
+        } catch (Exception e) {
+           log.error("Error in adding back forward button");
+            LogHelper.log(log, e);
+        }
 
         // sort Configurazioni menu
         for(MenuElement menuElement : mainMenuModel.getElements()) {
@@ -93,7 +99,11 @@ public class MenuBean extends PageBean implements Serializable {
     }
 
     private void addBackBtn() {
-        boolean isESVPage = this.getContext().getViewRoot().getViewId().contains("EstateSituationView");
+        boolean isESVPage = false;
+
+        if(this.getContext() != null && this.getContext().getViewRoot() != null
+                && this.getContext().getViewRoot().getViewId() != null)
+            isESVPage = this.getContext().getViewRoot().getViewId().contains("EstateSituationView");
 
         DefaultMenuItem item = new DefaultMenuItem();
         // item.setValue(ResourcesHelper.getString("menuBackBtn"));
@@ -142,9 +152,9 @@ public class MenuBean extends PageBean implements Serializable {
             submenuAddElement(submenu, PageTypes.DATA_GROUP_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.EVENT_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.INPUT_CARD_LIST, "fa fa-fw fa-bars");
-            submenuAddElement(submenu, PageTypes.DAY_PHRASE, "fa fa-fw fa-quote-right");
-            submenuAddElement(submenu, PageTypes.TYPE_ACT, "fa fa-fw fa-bars");
-            submenuAddElement(submenu, PageTypes.TYPE_FORMALITY, "fa fa-fw fa-bars");
+            submenuAddElement(submenu, PageTypes.DAY_PHRASE_LIST, "fa fa-fw fa-quote-right");
+            submenuAddElement(submenu, PageTypes.TYPE_ACT_LIST, "fa fa-fw fa-bars");
+            submenuAddElement(submenu, PageTypes.TYPE_FORMALITY_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.CADASTRAL_TOPOLOGY, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.IBAN_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.PAYMENT_TYPE_LIST, "fa fa-fw fa-bars");
@@ -154,11 +164,14 @@ public class MenuBean extends PageBean implements Serializable {
             submenuAddElement(submenu, PageTypes.OMI_KML_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.CATEGORY_PERCENT_VALUE_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.COURT_LIST, "fa fa-fw fa-legal");
-            submenuAddElement(submenu, PageTypes.RELATIONSHIP_TYPES, "fa fa-fw fa-bars");
+            submenuAddElement(submenu, PageTypes.RELATIONSHIP_TYPES_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.REGIME_CONIUGI_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.SECTION_D_FORMAT_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.LAND_OMI_LIST, "fa fa-fw fa-bars");
             submenuAddElement(submenu, PageTypes.LAND_CULTURE_LIST, "fa fa-fw fa-bars");
+            submenuAddElement(submenu, PageTypes.TAX_RATE_LIST, "fa fa-fw fa-bars");
+            submenuAddElement(submenu, PageTypes.AGGREGATION_AZ_LIST, "fa fa-fw fa-bars");
+            submenuAddElement(submenu, PageTypes.COST_STAMPS_OR_SERVICES, "fa fa-fw fa-bars");
         } catch (Exception e) {
             LogHelper.log(log, e);
         }

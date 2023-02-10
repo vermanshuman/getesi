@@ -11,6 +11,9 @@ import it.nexera.ris.persistence.beans.entities.domain.Notary;
 import it.nexera.ris.persistence.beans.entities.domain.Request;
 import it.nexera.ris.persistence.beans.entities.domain.Residence;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -18,10 +21,13 @@ import org.hibernate.sql.JoinType;
 
 import javax.faces.model.SelectItem;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Getter
+@Setter
 public class RequestWrapper {
 
     private final Long ID_FOREIGN_COUNTRY = 112L;
@@ -89,11 +95,68 @@ public class RequestWrapper {
     private List<SelectItem> juridicalNations;
 
     private List<SelectItem> notaries;
-    
+
     private Long selectedNotaryId;
-    
-    public RequestWrapper(Request request, boolean multiple) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        this(request);
+
+    private boolean reset;
+
+    private String reaNumber;
+    private String natureLegal;
+    private String istat;
+    private String ultimaResidenza;
+    private String sheet;
+    private String particle;
+    private String sub;
+    private String addressProperty;
+    private String section;
+    private List<SelectItem> formalities;
+    private Long selectedFormalityId;
+    private List<SelectItem> types;
+    private Long selectedType;
+    private String f24IdentificationNumber;
+    private Date lastNotificationDate;
+    private Integer referenceYear;
+    private Date actDate;
+    private Date updateDate;
+    private Date termDate;
+    List<ManageTypeFields> fields;
+
+    public RequestWrapper(Request request, boolean multiple, boolean reset, boolean resetWrapper) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        this(request, reset);
+        if (multiple) {
+            InputCardManageField field = new InputCardManageField();
+            field.setField(ManageTypeFields.SUBJECT_MASTERY);
+            setLists(Collections.singletonList(field));
+        }
+        if (!reset && resetWrapper) {
+            setSelectedProvincePropertyId(null);
+            setSelectedCityPropertyId(null);
+            setReaNumber(null);
+            setNatureLegal(null);
+            setIstat(null);
+            setSelectedBuildingId(null);
+            setUltimaResidenza(null);
+            setSheet(null);
+            setParticle(null);
+            setSub(null);
+            setAddressProperty(null);
+            setSection(null);
+            setSelectedConserItemId(new LinkedList<>());
+            setSelectedTaloreItemId(new LinkedList<>());
+            setSelectedNotaryId(null);
+            setSelectedFormalityId(null);
+            setSelectedType(null);
+            setLastNotificationDate(null);
+            setF24IdentificationNumber(null);
+            setReferenceYear(null);
+            setActDate(null);
+            setTermDate(null);
+            setUpdateDate(null);
+        }
+    }
+
+    public RequestWrapper(Request request, boolean multiple, boolean reset) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        this(request, reset);
         if (multiple) {
             InputCardManageField field = new InputCardManageField();
             field.setField(ManageTypeFields.SUBJECT_MASTERY);
@@ -101,45 +164,99 @@ public class RequestWrapper {
         }
     }
 
-    public RequestWrapper(Request request) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        if (!request.isNew()) {
-            setSelectedConservatoryItemId(new LinkedList<>());
-            setSelectedTaloreItemId(new LinkedList<>());
-            setSelectedConserItemId(new LinkedList<>());
-            if (request.getAggregationLandChargesRegistry() != null) {
-                if (!ValidationHelper.isNullOrEmpty(request.getAggregationLandChargesRegistry().getLandChargesRegistries())) {
-                    for (LandChargesRegistry registry : request.getAggregationLandChargesRegistry().getLandChargesRegistries()) {
-                        if (!ValidationHelper.isNullOrEmpty(registry.getType())) {
-                            if (LandChargesRegistryType.CONSERVATORY.name().equalsIgnoreCase(registry.getType().name())) {
-                                ConservatoriaSelectItem item = new ConservatoriaSelectItem(request.getAggregationLandChargesRegistry());
-                                if(!getSelectedConserItemId().contains(item)) {
-                                    getSelectedConserItemId().add(item);
-                                }
-                            } else if (LandChargesRegistryType.TAVOLARE.name().equalsIgnoreCase(registry.getType().name())) {
-                                ConservatoriaSelectItem item = new ConservatoriaSelectItem(request.getAggregationLandChargesRegistry());
-                                if(!getSelectedTaloreItemId().contains(item)) {
-                                    getSelectedTaloreItemId().add(item);
-                                }
+    public RequestWrapper(Request request)
+            throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        this(request, false);
+    }
 
+    public RequestWrapper(Request request, boolean reset) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        //  if (!request.isNew()) {
+        setSelectedConservatoryItemId(new LinkedList<>());
+        setSelectedTaloreItemId(new LinkedList<>());
+        setSelectedConserItemId(new LinkedList<>());
+
+        if (!reset && request.getAggregationLandChargesRegistry() != null) {
+
+            AggregationLandChargesRegistry aggregationLandChargesRegistry = DaoManager.get(
+                    AggregationLandChargesRegistry.class,
+                    new CriteriaAlias[]{
+                            new CriteriaAlias("landChargesRegistries", "landChargesRegistries", JoinType.INNER_JOIN)
+                    },
+                    new Criterion[]{
+                            Restrictions.eq("id", request.getAggregationLandChargesRegistry().getId())
+                    }
+            );
+
+            if (!ValidationHelper.isNullOrEmpty(aggregationLandChargesRegistry.getLandChargesRegistries())) {
+                for (LandChargesRegistry registry : aggregationLandChargesRegistry.getLandChargesRegistries()) {
+                    if (!ValidationHelper.isNullOrEmpty(registry.getType())) {
+                        if (LandChargesRegistryType.CONSERVATORY.name().equalsIgnoreCase(registry.getType().name())) {
+                            ConservatoriaSelectItem item = new ConservatoriaSelectItem(request.getAggregationLandChargesRegistry());
+                            if (!getSelectedConserItemId().contains(item)) {
+                                getSelectedConserItemId().add(item);
                             }
+                        } else if (LandChargesRegistryType.TAVOLARE.name().equalsIgnoreCase(registry.getType().name())) {
+                            ConservatoriaSelectItem item = new ConservatoriaSelectItem(request.getAggregationLandChargesRegistry());
+                            if (!getSelectedTaloreItemId().contains(item)) {
+                                getSelectedTaloreItemId().add(item);
+                            }
+
                         }
                     }
                 }
             }
+        }
+        if (!reset) {
             setSelectedBuildingId(request.getPropertyTypeId());
             setSelectedProvincePropertyId(request.getProvince() != null ? request.getProvince().getId() : null);
-            
+            setReaNumber(request.getReaNumber());
+            setNatureLegal(request.getNatureLegal());
+            setIstat(request.getIstat());
+            setUltimaResidenza(request.getUltimaResidenza());
+            setSheet(request.getSheet());
+            setParticle(request.getParticle());
+            setSub(request.getSub());
+            setAddressProperty(request.getAddressProperty());
+            setSection(request.getSection());
             if (request.getNotary() != null)
-            setSelectedNotaryId(request.getNotary().getId());
-            
+                setSelectedNotaryId(request.getNotary().getId());
+
+            if (request.getSpecialFormality() != null)
+                setSelectedFormalityId(request.getSpecialFormality().getId());
+
+            if (StringUtils.isNotBlank(request.getActType())){
+                NoteType noteType = NoteType.getEnumByString(request.getActType().toUpperCase());
+                if(noteType != null)
+                    setSelectedType(noteType.getId());
+            }
             if (!ValidationHelper.isNullOrEmpty(getSelectedProvincePropertyId())) {
                 onChangePropertyProvince();
                 setSelectedCityPropertyId(request.getCity() != null ? request.getCity().getId() : null);
             }
-            setSubjectFields(request);
-            setResidenceFields(request);
-            setDomicileFields(request);
+
+            if (request.getLastNotificationDate() != null)
+                setLastNotificationDate(request.getLastNotificationDate());
+
+            if (request.getF24IdentificationNumber() != null)
+                setF24IdentificationNumber(request.getF24IdentificationNumber());
+
+            if (request.getReferenceYear() != null)
+                setReferenceYear(request.getReferenceYear());
+
+            if (request.getActDate() != null){
+               setActDate(request.getActDate());
+            }
+            if (request.getTermDate() != null){
+                setTermDate(request.getTermDate());
+            }
+            if (request.getUpdateDate() != null){
+                setUpdateDate(request.getUpdateDate());
+            }
         }
+        setSubjectFields(request);
+        setResidenceFields(request);
+        setDomicileFields(request);
+        //}
     }
 
     private void setSubjectFields(Request request) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
@@ -198,7 +315,7 @@ public class RequestWrapper {
         }
     }
 
-    public void saveFields(Request request) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+    public void setRequestFields(Request request) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
         request.setPropertyTypeId(getSelectedBuildingId());
         if (getSelectedProvincePropertyId() != null) {
             request.setProvince(DaoManager.get(Province.class, getSelectedProvincePropertyId()));
@@ -206,19 +323,244 @@ public class RequestWrapper {
         if (getSelectedCityPropertyId() != null) {
             request.setCity(DaoManager.get(City.class, getSelectedCityPropertyId()));
         }
-        
+
         if (getSelectedNotaryId() != null)
-        	request.setNotary(DaoManager.get(Notary.class, getSelectedNotaryId()));
+            request.setNotary(DaoManager.get(Notary.class, getSelectedNotaryId()));
         else
-        	request.setNotary(null);
-        
-        saveSubjectFields(request);
-        saveResidenceFields(request);
-        saveDomicileFields(request);
+            request.setNotary(null);
+
+        if (getSelectedFormalityId() != null)
+            request.setSpecialFormality(DaoManager.get(TypeFormality.class, getSelectedFormalityId()));
+        else
+            request.setSpecialFormality(null);
+
+        if (!ValidationHelper.isNullOrEmpty(getSelectedType())) {
+            request.setActType(NoteType.findById(getSelectedType()).getShortCode());
+        } else {
+            request.setActType(null);
+        }
+
+        if (!ValidationHelper.isNullOrEmpty(getActDate())) {
+            request.setActDate(getActDate());
+        } else {
+            request.setActDate(null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(getTermDate())) {
+            request.setTermDate(getTermDate());
+        } else {
+            request.setTermDate(null);
+        }
+        if (!ValidationHelper.isNullOrEmpty(getUpdateDate())) {
+            request.setUpdateDate(getUpdateDate());
+        } else {
+            request.setUpdateDate(null);
+        }
+
+        request.setReaNumber(getReaNumber());
+        request.setNatureLegal(getNatureLegal());
+        request.setUltimaResidenza(getUltimaResidenza());
+        request.setIstat(getIstat());
+        request.setSheet(getSheet());
+        request.setParticle(getParticle());
+        request.setAddressProperty(getAddressProperty());
+        request.setSection(getSection());
+        request.setSub(getSub());
+        setRequestSubjectFields(request);
+        setRequestResidenceFields(request);
+        setRequestDomicileFields(request);
+        if (getLastNotificationDate() != null)
+            request.setLastNotificationDate(getLastNotificationDate());
+        else
+            request.setLastNotificationDate(null);
+        if (getF24IdentificationNumber() != null)
+            request.setF24IdentificationNumber(getF24IdentificationNumber());
+        else
+            request.setF24IdentificationNumber(null);
+        if (getReferenceYear() != null)
+            request.setReferenceYear(getReferenceYear());
+        else
+            request.setReferenceYear(null);
+        if (getActDate() != null)
+            request.setActDate(getActDate());
+        else
+            request.setActDate(null);
+        if (getTermDate() != null)
+            request.setTermDate(getTermDate());
+        else
+            request.setTermDate(null);
+        if (getUpdateDate() != null)
+            request.setUpdateDate(getUpdateDate());
+        else
+            request.setUpdateDate(null);
     }
 
-    private void saveSubjectFields(Request request) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+
+    private void setRequestSubjectFields(Request request) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
         if (getSelectedPersonId() == null) {
+            request.setSubject(null);
+        } else {
+            request.getSubject().setTypeId(getSelectedPersonId());
+            request.getSubject().setSex(getSelectedSexTypeId());
+            if (!ValidationHelper.isNull(getSelectProvinceId())) {
+                if (getSelectProvinceId().equals(Province.FOREIGN_COUNTRY_ID)) {
+                    request.getSubject().setBirthProvince(null);
+                    request.getSubject().setBirthCity(null);
+                    setSelectedCityId(null);
+                } else {
+                    setSelectedNationId(null);
+                    setSelectedJuridicalNationId(null);
+                    request.getSubject().setCountry(null);
+                    request.getSubject().setForeignCountry(false);
+                    request.getSubject().setBirthProvince(DaoManager.get(Province.class, getSelectProvinceId()));
+                }
+            }
+            if (!ValidationHelper.isNull(getSelectedCityId())) {
+                request.getSubject().setBirthCity(DaoManager.get(City.class, getSelectedCityId()));
+            }
+            if (!ValidationHelper.isNull(getSelectedNationId())) {
+                request.getSubject().setCountry(DaoManager.get(Country.class, getSelectedNationId()));
+                request.getSubject().setForeignCountry(true);
+            }
+            if (!ValidationHelper.isNull(getSelectedJuridicalNationId())) {
+                request.getSubject().setCountry(DaoManager.get(Country.class, getSelectedJuridicalNationId()));
+                request.getSubject().setForeignCountry(true);
+            }
+            if (request.isPhysicalPerson()) {
+                request.getSubject().setBusinessName(null);
+            } else {
+                request.getSubject().setSurname(null);
+            }
+
+            if (request.getSubject().getTypeIsPhysicalPerson()) {
+                if (ValidationHelper.isNullOrEmpty(request.getSubject().getNumberVAT())) {
+                    request.getSubject().setNumberVAT(request.getSubject().getFiscalCode());
+                }
+            } else if (ValidationHelper.isNullOrEmpty(request.getSubject().getFiscalCode())) {
+                request.getSubject().setFiscalCode(request.getSubject().getNumberVAT());
+            }
+        }
+    }
+
+    private void setRequestResidenceFields(Request request) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        if (getSelectedResidenceProvinceId() == null) {
+            request.setResidence(null);
+        } else {
+            if (ValidationHelper.isNullOrEmpty(request.getResidence())) {
+                request.setResidence(new Residence());
+            }
+            if (!ValidationHelper.isNull(getSelectedResidenceProvinceId())) {
+                request.getResidence().setProvince(DaoManager.get(Province.class, getSelectedResidenceProvinceId()));
+            }
+            if (!ValidationHelper.isNull(getSelectedResidenceCityId())) {
+                request.getResidence().setCity(DaoManager.get(City.class, getSelectedResidenceCityId()));
+            }
+            if (!ValidationHelper.isNull(getSelectedResidenceNationId())) {
+                request.getResidence().setCountry(DaoManager.get(Country.class, getSelectedResidenceNationId()));
+            }
+        }
+    }
+
+    private void setRequestDomicileFields(Request request) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+        if (getSelectedDomicileProvinceId() == null) {
+            request.setDomicile(null);
+        } else {
+            if (ValidationHelper.isNullOrEmpty(request.getDomicile())) {
+                request.setDomicile(new Residence());
+            }
+            if (!ValidationHelper.isNull(getSelectedDomicileProvinceId())) {
+                request.getDomicile().setProvince(DaoManager.get(Province.class, getSelectedDomicileProvinceId()));
+            }
+            if (!ValidationHelper.isNull(getSelectedDomicileCityId())) {
+                request.getDomicile().setCity(DaoManager.get(City.class, getSelectedDomicileCityId()));
+            }
+            if (!ValidationHelper.isNull(getSelectedDomicileNationId())) {
+                request.getDomicile().setCountry(DaoManager.get(Country.class, getSelectedDomicileNationId()));
+            }
+        }
+    }
+
+    public void saveFields(Request request, Boolean saveSubject) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+        saveFields(request, saveSubject, false);
+    }
+
+    public void saveFields(Request request, Boolean saveSubject, Boolean isEditedRequest) throws PersistenceBeanException, InstantiationException, IllegalAccessException {
+        // Request not save start
+        request.setPropertyTypeId(getSelectedBuildingId());
+        if (getSelectedProvincePropertyId() != null) {
+            request.setProvince(DaoManager.get(Province.class, getSelectedProvincePropertyId()));
+        }
+        if (getSelectedCityPropertyId() != null) {
+            request.setCity(DaoManager.get(City.class, getSelectedCityPropertyId()));
+        }
+
+        if (getSelectedNotaryId() != null)
+            request.setNotary(DaoManager.get(Notary.class, getSelectedNotaryId()));
+        else
+            request.setNotary(null);
+        // Request not save end
+
+        request.setReaNumber(getReaNumber());
+        request.setNatureLegal(getNatureLegal());
+        request.setUltimaResidenza(getUltimaResidenza());
+        request.setIstat(getIstat());
+        request.setSheet(getSheet());
+        request.setParticle(getParticle());
+        request.setAddressProperty(getAddressProperty());
+        request.setSection(getSection());
+        request.setSub(getSub());
+        if(isEditedRequest){
+            if (getSelectedFormalityId() != null)
+                request.setSpecialFormality(DaoManager.get(TypeFormality.class, getSelectedFormalityId()));
+            else
+                request.setSpecialFormality(null);
+            if (!ValidationHelper.isNullOrEmpty(getSelectedType())) {
+                request.setActType(NoteType.findById(getSelectedType()).getShortCode());
+            } else {
+                request.setActType(null);
+            }
+            if (getLastNotificationDate() != null)
+                request.setLastNotificationDate(getLastNotificationDate());
+            else
+                request.setLastNotificationDate(null);
+            if (getF24IdentificationNumber() != null)
+                request.setF24IdentificationNumber(getF24IdentificationNumber());
+            else
+                request.setF24IdentificationNumber(null);
+            if (getReferenceYear() != null)
+                request.setReferenceYear(getReferenceYear());
+            else
+                request.setReferenceYear(null);
+
+            if (getActDate() != null) {
+                request.setActDate(getActDate());
+            } else {
+                request.setActDate(null);
+            }
+            if (getTermDate() != null) {
+                request.setTermDate(getTermDate());
+            } else {
+                request.setTermDate(null);
+            }
+            if (getUpdateDate() != null) {
+                request.setUpdateDate(getUpdateDate());
+            } else {
+                request.setUpdateDate(null);
+            }
+        }
+        saveSubjectFields(request, saveSubject);
+
+        //setRequestSubjectFields(request);
+        //saveResidenceFields(request);
+        //setDomicileFields(request);
+        try {
+            saveDomicileFields(request);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void saveSubjectFields(Request request, boolean saveSubject) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
+       if (getSelectedPersonId() == null) {
             request.setSubject(null);
         } else {
             request.getSubject().setTypeId(getSelectedPersonId());
@@ -261,12 +603,22 @@ public class RequestWrapper {
                 request.getSubject().setFiscalCode(request.getSubject().getNumberVAT());
             }
 
-            DaoManager.save(request.getSubject());
+            if(saveSubject)
+                DaoManager.save(request.getSubject());
         }
+
+
+//        if (getSelectedPersonId() == null) {
+//            request.setSubject(null);
+//        } else {
+//            if (saveSubject)
+//                DaoManager.save(request.getSubject());
+//        }
+
     }
 
     private void saveResidenceFields(Request request) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        if (getSelectedResidenceProvinceId() == null) {
+       /* if (getSelectedResidenceProvinceId() == null) {
             request.setResidence(null);
         } else {
             if (ValidationHelper.isNullOrEmpty(request.getResidence())) {
@@ -283,10 +635,18 @@ public class RequestWrapper {
             }
             DaoManager.save(request.getResidence());
         }
+
+        */
+
+        if (getSelectedResidenceProvinceId() == null) {
+            request.setResidence(null);
+        } else {
+            DaoManager.save(request.getResidence());
+        }
     }
 
     private void saveDomicileFields(Request request) throws PersistenceBeanException, IllegalAccessException, InstantiationException {
-        if (getSelectedDomicileProvinceId() == null) {
+     /*   if (getSelectedDomicileProvinceId() == null) {
             request.setDomicile(null);
         } else {
             if (ValidationHelper.isNullOrEmpty(request.getDomicile())) {
@@ -303,12 +663,20 @@ public class RequestWrapper {
             }
             DaoManager.save(request.getDomicile());
         }
+      */
+        if (getSelectedDomicileProvinceId() == null) {
+            request.setDomicile(null);
+        } else if(request.getDomicile() != null){
+            DaoManager.save(request.getDomicile());
+        }
     }
 
     public void onChangeProvince() throws IllegalAccessException, PersistenceBeanException, InstantiationException {
         setCities(ComboboxHelper.fillList(City.class, Order.asc("description"), new Criterion[]{
                 Restrictions.eq("province.id", getSelectProvinceId()),
-                Restrictions.eq("external", Boolean.TRUE)
+                Restrictions.eq("external", Boolean.TRUE),
+                Restrictions.or(Restrictions.eq("isDeleted", Boolean.FALSE),
+                        Restrictions.isNull("isDeleted"))
         }));
     }
 
@@ -335,7 +703,7 @@ public class RequestWrapper {
 
     public void setLists(List<InputCardManageField> list) throws PersistenceBeanException, IllegalAccessException {
         if (!ValidationHelper.isNullOrEmpty(list)) {
-            List<ManageTypeFields> fields = list.stream().map(InputCardManageField::getField)
+            fields = list.stream().map(InputCardManageField::getField)
                     .collect(Collectors.toList());
             if (fields.contains(ManageTypeFields.CONSERVATORY)) {
                 List<AggregationLandChargesRegistry> conservatories = DaoManager.load(AggregationLandChargesRegistry.class, new CriteriaAlias[]{
@@ -359,6 +727,7 @@ public class RequestWrapper {
             if (fields.contains(ManageTypeFields.PROPERTY_DATA)) {
                 setBuildings(ComboboxHelper.fillList(RealEstateType.class, false));
             }
+
             if (fields.contains(ManageTypeFields.SUBJECT_MASTERY)
                     || fields.contains(ManageTypeFields.SUBJECT_LIST)) {
                 setPersons(ComboboxHelper.fillList(SubjectType.class, false));
@@ -377,10 +746,51 @@ public class RequestWrapper {
                     || fields.contains(ManageTypeFields.SUBJECT_MASTERY)
                     || fields.contains(ManageTypeFields.SUBJECT_LIST)
                     || fields.contains(ManageTypeFields.DOMICILE)) {
-                setNations(ComboboxHelper.fillList(Country.class, true));
+                setNations(ComboboxHelper.fillList(
+                        Country.class, Order.asc("description"),
+                        new Criterion[]{
+                                Restrictions.or(
+                                        Restrictions.isNotNull("external"),
+                                        Restrictions.eq("external", Boolean.TRUE)
+                                )
+                        }));
             }
             if (fields.contains(ManageTypeFields.NOTARY)) {
-            	setNotaries(ComboboxHelper.fillList(Notary.class, true));
+                setNotaries(ComboboxHelper.fillList(Notary.class, true));
+            }
+            if (fields.contains(ManageTypeFields.SPECIAL_FORMALITY)) {
+                setFormalities(ComboboxHelper.fillListDictionary(TypeFormality.class,new Criterion[]{
+                        Restrictions.isNotNull("visible"),
+                        Restrictions.eq("visible", Boolean.TRUE)
+                }));
+            }
+            if (fields.contains(ManageTypeFields.ACT_TYPE)) {
+                setTypes(ComboboxHelper.fillList(NoteType.class));
+            }
+        }
+    }
+
+    public void onChangeActType(boolean multiple) throws PersistenceBeanException, IllegalAccessException {
+        if (multiple) {
+            if (fields.contains(ManageTypeFields.SPECIAL_FORMALITY)) {
+                if (!fields.contains(ManageTypeFields.ACT_TYPE) || ValidationHelper.isNullOrEmpty(selectedType)) {
+                    setFormalities(ComboboxHelper.fillListDictionary(TypeFormality.class, new Criterion[]{
+                            Restrictions.isNotNull("visible"),
+                            Restrictions.eq("visible", Boolean.TRUE)
+                    }));
+                } else {
+                    TypeActEnum actType = TypeActEnum.TYPE_T;
+                    if(selectedType.equals(3L)) {
+                        actType = TypeActEnum.TYPE_A;
+                    } else if(selectedType.equals(2L)) {
+                        actType = TypeActEnum.TYPE_I;
+                    }
+                    setFormalities(ComboboxHelper.fillListDictionary(TypeFormality.class, new Criterion[]{
+                            Restrictions.isNotNull("visible"),
+                            Restrictions.eq("visible", Boolean.TRUE),
+                            Restrictions.eq("type", actType)
+                    }));
+                }
             }
         }
     }
@@ -638,19 +1048,27 @@ public class RequestWrapper {
         this.taloreItems = taloreItems;
     }
 
-	public List<SelectItem> getNotaries() {
-		return notaries;
-	}
+    public List<SelectItem> getNotaries() {
+        return notaries;
+    }
 
-	public void setNotaries(List<SelectItem> notaries) {
-		this.notaries = notaries;
-	}
+    public void setNotaries(List<SelectItem> notaries) {
+        this.notaries = notaries;
+    }
 
-	public Long getSelectedNotaryId() {
-		return selectedNotaryId;
-	}
+    public Long getSelectedNotaryId() {
+        return selectedNotaryId;
+    }
 
-	public void setSelectedNotaryId(Long selectedNotaryId) {
-		this.selectedNotaryId = selectedNotaryId;
-	}
+    public void setSelectedNotaryId(Long selectedNotaryId) {
+        this.selectedNotaryId = selectedNotaryId;
+    }
+
+    public boolean isReset() {
+        return reset;
+    }
+
+    public void setReset(boolean reset) {
+        this.reset = reset;
+    }
 }

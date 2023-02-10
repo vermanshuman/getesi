@@ -15,6 +15,11 @@
     </ui:define>
 
     <ui:define name="content">
+        <style>
+            .card {
+                border: none;
+            }
+        </style>
 
         <div class="ui-g">
             <div class="ui-g-12">
@@ -48,7 +53,7 @@
                                                 <p:commandButton id="cancel_btn" action="#{bean.goBack}" styleClass="p-mr-2 p-mb-2 ui-button-danger"
                                                                  rendered="#{empty showCancel ? true : showCancel}"
                                                                  value="#{empty customCancelMsg ? msg.cancel : customCancelMsg}"
-                                                                 icon="pi pi-times-circle"/>
+                                                                 icon="pi pi-times-circle" style="background-color: #F3362B !important; width: 100px;"/>
 
                                                 <p:commandButton value="#{msg.setDefault}"
                                                                  rendered="#{!empty showDefaultBtn}"

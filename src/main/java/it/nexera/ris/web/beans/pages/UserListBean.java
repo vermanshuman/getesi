@@ -3,8 +3,8 @@ package it.nexera.ris.web.beans.pages;
 import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.ComboboxHelper;
 import it.nexera.ris.common.helpers.LogHelper;
+import it.nexera.ris.common.helpers.UserHelper;
 import it.nexera.ris.common.helpers.ValidationHelper;
-import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.Role;
 import it.nexera.ris.persistence.beans.entities.domain.User;
 import it.nexera.ris.web.beans.EntityListPageBean;
@@ -51,7 +51,7 @@ public class UserListBean extends EntityListPageBean<User>
         List<User> resListStep1 = new ArrayList<User>();
 
         if (getUsers() == null) {
-            setUsers(DaoManager.load(User.class));
+        	setUsers(UserHelper.loadUsers());
         }
 
         if (!ValidationHelper.isNullOrEmpty(getSelectedRole())) {

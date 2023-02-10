@@ -1,6 +1,8 @@
 package it.nexera.ris.persistence.beans.entities.domain;
 
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
+import lombok.Getter;
+import lombok.Setter;
 
 
 import javax.persistence.*;
@@ -8,8 +10,9 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "payment_type")
-public class
-PaymentType extends IndexedEntity implements Serializable {
+@Getter
+@Setter
+public class PaymentType extends IndexedEntity implements Serializable {
 
 	private static final long serialVersionUID = -203805995863279495L;
 
@@ -27,48 +30,14 @@ PaymentType extends IndexedEntity implements Serializable {
 
     @Column(name = "iban")
     private String iban;
-    
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
+    private String acronym;
+
     public String toString() {
-    	return description;
-    }
-    
-    public String getCode() {
-    	return code;
+        return description;
     }
 
-    public void setCode(String code) {
-    	this.code = code;
-    }
-	
-    public String getDescription() {
-    	return description;
-    }
-
-    public void setDescription(String description) {
-    	this.description = description;
-    }
-
-    public String getBeneficiary() {
-        return beneficiary;
-    }
-
-    public void setBeneficiary(String beneficiary) {
-        this.beneficiary = beneficiary;
-    }
-
-    public String getIstitutionName() {
-        return istitutionName;
-    }
-
-    public void setIstitutionName(String istitutionName) {
-        this.istitutionName = istitutionName;
-    }
-
-    public String getIban() {
-        return iban;
-    }
-
-    public void setIban(String iban) {
-        this.iban = iban;
-    }
 }

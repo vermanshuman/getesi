@@ -5,10 +5,13 @@ import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.ResourcesHelper;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.DocumentSubject;
+import it.nexera.ris.persistence.beans.entities.domain.ReportFormalitySubject;
 import it.nexera.ris.persistence.beans.entities.domain.Subject;
 import it.nexera.ris.persistence.beans.entities.domain.VisureRTF;
+import it.nexera.ris.persistence.view.FormalityView;
 import it.nexera.ris.web.common.EntityLazyListModel;
 import it.nexera.ris.web.converters.DateConverter;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -27,6 +30,8 @@ public class VisureRTFBindingWrapper extends BaseTab implements Serializable {
     private static final long serialVersionUID = 3419737923499817710L;
 
     private Subject subject;
+
+    private LazyDataModel<FormalityView> lazyModel;
 
     public VisureRTFBindingWrapper(Subject subject) {
         this.subject = subject;
@@ -54,15 +59,17 @@ public class VisureRTFBindingWrapper extends BaseTab implements Serializable {
 
     @Override
     LazyDataModel getLazyDataModel() {
+        String fiscalCode = getSubject().getFiscalCodeVATNamber();
         return new EntityLazyListModel(VisureRTF.class, new Criterion[]{
-                Restrictions.eq("fiscalCodeVat", getSubject().getFiscalCodeVATNamber())},
+                Restrictions.eq("fiscalCodeVat",  StringUtils.isNotBlank(fiscalCode) ? fiscalCode.trim() : fiscalCode)},
                 new Order[]{Order.asc("id")});
     }
 
     @Override
-    Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+    public Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+        String fiscalCode = getSubject().getFiscalCodeVATNamber();
         return DaoManager.getCount(VisureRTF.class, "id", new Criterion[]{
-                Restrictions.eq("fiscalCodeVat", getSubject().getFiscalCodeVATNamber())});
+                Restrictions.eq("fiscalCodeVat", StringUtils.isNotBlank(fiscalCode) ? fiscalCode.trim() : fiscalCode)});
     }
 
     public Subject getSubject() {
@@ -71,5 +78,16 @@ public class VisureRTFBindingWrapper extends BaseTab implements Serializable {
 
     public void setSubject(Subject subject) {
         this.subject = subject;
+    }
+
+    public LazyDataModel<FormalityView> getLazyModel() {
+        String fiscalCode = getSubject().getFiscalCodeVATNamber();
+        return new EntityLazyListModel(VisureRTF.class, new Criterion[]{
+                Restrictions.eq("fiscalCodeVat",  StringUtils.isNotBlank(fiscalCode) ? fiscalCode.trim() : fiscalCode)},
+                new Order[]{Order.asc("id")});
+    }
+
+    public void setLazyModel(LazyDataModel<FormalityView> lazyModel) {
+        this.lazyModel = lazyModel;
     }
 }

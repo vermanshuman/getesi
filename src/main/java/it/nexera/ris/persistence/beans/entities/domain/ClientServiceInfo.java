@@ -21,6 +21,12 @@ public class ClientServiceInfo extends IndexedEntity {
 
     @Column(name = "days_to_expire")
     private Integer daysToExpire;
+    
+    @Column(name = "single_evasione_file")
+    private Boolean singleEvasionFile;
+    
+    @Column(name = "visible")
+    private Boolean visible;
 
     public ClientServiceInfo() {
     }
@@ -54,4 +60,21 @@ public class ClientServiceInfo extends IndexedEntity {
     public void setDaysToExpire(Integer daysToExpire) {
         this.daysToExpire = daysToExpire;
     }
+
+	public Boolean getSingleEvasionFile() {
+		return singleEvasionFile;
+	}
+
+	public void setSingleEvasionFile(Boolean singleEvasionFile) {
+		this.singleEvasionFile = singleEvasionFile;
+	}
+
+	public Boolean getVisible() {
+		return visible;
+	}
+
+	public void setVisible(Boolean visible) {
+		this.visible = visible;
+	}
+    
 }

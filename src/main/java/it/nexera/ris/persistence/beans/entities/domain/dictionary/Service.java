@@ -2,10 +2,16 @@ package it.nexera.ris.persistence.beans.entities.domain.dictionary;
 
 import it.nexera.ris.common.enums.RequestOutputTypes;
 import it.nexera.ris.common.enums.ServiceReferenceTypes;
+import it.nexera.ris.common.exceptions.PersistenceBeanException;
 import it.nexera.ris.common.helpers.ValidationHelper;
+import it.nexera.ris.persistence.beans.dao.ConnectionManager;
 import it.nexera.ris.persistence.beans.entities.IndexedEntity;
+import it.nexera.ris.persistence.beans.entities.domain.*;
+import org.bouncycastle.ocsp.Req;
+import org.hibernate.Session;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -108,6 +114,45 @@ public class Service extends IndexedEntity {
 
     @Column(name = "sales_development")
     private Boolean salesDevelopment;
+
+    @Column(name = "land_omi")
+    private Boolean landOmi;
+    
+    @ManyToOne
+    @JoinColumn(name = "national_tax_rate")
+    private TaxRate nationalTaxRate;
+    
+    @Column(name = "manage_transcription")
+    private Boolean manageTranscription;
+    
+    @Column(name = "manage_certification")
+    private Boolean manageCertification;
+
+    @Column(name = "detail_properties")
+    private Boolean detailProperties ;
+
+    @Column(name = "physical_subject")
+    private Boolean physicalSubject ;
+
+    @Column(name = "giuridic_subject")
+    private Boolean giuridicSubject ;
+
+    @ManyToMany
+    @JoinTable(name = "aggregation_az_services", joinColumns =
+            {
+                    @JoinColumn(name = "service_id", table = "dic_service")
+            }, inverseJoinColumns =
+            {
+                    @JoinColumn(name = "aggregation_service_id", table = "aggregation_service")
+            })
+    private List<AggregationService> aggregationServices;
+
+    @Column(name = "manage_renewal")
+    private Boolean manageRenewal ;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade={CascadeType.ALL})
+    @JoinColumn(name="supplier_id")
+    private Supplier supplier;
 
     @Override
     public String toString() {
@@ -318,5 +363,93 @@ public class Service extends IndexedEntity {
 
     public void setSalesDevelopment(Boolean salesDevelopment) {
         this.salesDevelopment = salesDevelopment;
+    }
+
+    public Boolean getLandOmi() {
+        return landOmi;
+    }
+
+    public void setLandOmi(Boolean landOmi) {
+        this.landOmi = landOmi;
+    }
+    
+    public TaxRate getNationalTaxRate() {
+		return nationalTaxRate;
+	}
+
+	public void setNationalTaxRate(TaxRate nationalTaxRate) {
+		this.nationalTaxRate = nationalTaxRate;
+	}
+
+	public Boolean getManageTranscription() {
+		return manageTranscription;
+	}
+
+	public void setManageTranscription(Boolean manageTranscription) {
+		this.manageTranscription = manageTranscription;
+	}
+
+	public Boolean getManageCertification() {
+		return manageCertification;
+	}
+
+	public void setManageCertification(Boolean manageCertification) {
+		this.manageCertification = manageCertification;
+	}
+
+    public Boolean getDetailProperties() {
+        return detailProperties;
+    }
+
+    public void setDetailProperties(Boolean detailProperties) {
+        this.detailProperties = detailProperties;
+    }
+
+    public Boolean getPhysicalSubject() {
+        return physicalSubject;
+    }
+
+    public void setPhysicalSubject(Boolean physicalSubject) {
+        this.physicalSubject = physicalSubject;
+    }
+
+    public Boolean getGiuridicSubject() {
+        return giuridicSubject;
+    }
+
+    public void setGiuridicSubject(Boolean giuridicSubject) {
+        this.giuridicSubject = giuridicSubject;
+    }
+
+/*    public AggregationService getAggregationService() {
+        return aggregationService;
+    }
+
+    public void setAggregationService(AggregationService aggregationService) {
+        this.aggregationService = aggregationService;
+    }*/
+
+    public List<AggregationService> getAggregationServices() {
+        return aggregationServices;
+    }
+
+    public void setAggregationServices(List<AggregationService> aggregationServices) {
+        this.aggregationServices = aggregationServices;
+    }
+
+    public Boolean getManageRenewal() {
+        return manageRenewal;
+    }
+
+    public void setManageRenewal(Boolean manageRenewal) {
+        this.manageRenewal = manageRenewal;
+    }
+
+    public Supplier getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
     }
 }

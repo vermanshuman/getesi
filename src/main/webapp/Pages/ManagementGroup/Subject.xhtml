@@ -21,11 +21,29 @@
               value="#{bean.onlyView ? msg.close : msg.cancel}"/>
 
     <ui:define name="edit_body">
-        <script>
+        <script type="application/javascript">
+            // <![CDATA[
             window.onload = function() {
                 document.getElementById('hidden:link').onclick();
+                var frameElement = document.getElementsByTagName("iframe");
+                if(frameElement.length > 0) {
+                    var doc = frameElement[0];
+                    doc.parentElement.insertAdjacentHTML("afterend", "<style>span.menu {display: none;} .layout-main {padding-top: 0 !important;margin-left: 0 !important;}</style>");
+                }
             }
+            // ]]>
         </script>
+        <style type="text/css">
+            .ui-button.green-button {
+                background-color: #00cc52 !important;
+                width: 150px;
+                margin-right: 5px;
+            }
+            .ui-button.red-button {
+                background-color: #F3362B !important;
+                width: 150px;
+            }
+        </style>
         <h:form id="hidden" style="display:none">
             <h:commandLink id="link">
                 <f:ajax event="click" listener="#{bean.loadTabs}" />
@@ -34,7 +52,7 @@
 
 		<f:facet name="actions">
         	<h:commandLink styleClass="ui-panel-titlebar-icon
-               ui-corner-all ui-state-default" 
+               ui-corner-all ui-state-default" style="color: #ffffff;width: auto;position: relative;top: 2px;background-color: transparent;"
                action="#{bean.downloadPdfFile}" ajax="false">
             	<h:outputText value="#{msg.subjectDossier}" />
 			</h:commandLink>
@@ -234,7 +252,7 @@
         
         <p:dialog id="documentDialog" widgetVar="documentDialog" modal="true" resizable="false" draggable="false"
                   width="600">
-            <p:dataTable value="#{bean.requestDocuments}" var="doc" id="requestDocs">
+            <p:dataTable value="#{bean.requestDocuments}" var="doc" id="requestDocs" emptyMessage="#{msg.noRecordsFound}">
                 <p:column headerText="#{msg.name}">
                     <h:outputText value="#{doc.title}"/>
                 </p:column>
@@ -262,9 +280,9 @@
                          update=":form" action="#{bean.editSubject}"
                          con="ui-icon ui-icon-pencil" style="background-color: #00CC52 !important; margin-right: 10px;"/>
         <p:commandButton value="#{msg.save}" rendered="#{not bean.showSave}"
-                         update=":form" action="#{bean.saveFromDialog}"
+                         update=":form" action="#{bean.saveFromDialog}" styleClass="green-button"
                          icon="ui-icon ui-icon-disk"/>
-        <p:commandButton action="#{bean.closeDialog}"
+        <p:commandButton action="#{bean.closeDialog}" styleClass="red-button"
                          rendered="#{not bean.showCancel}" value="#{msg.cancel}"
                          icon="ui-icon-circle-close" style="background-color: #F3362B !important"/>
     </ui:define>

@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.faces.component.html.HtmlOutputText;
 
+import it.nexera.ris.common.helpers.ValidationHelper;
+import it.nexera.ris.persistence.view.FormalityView;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -36,6 +38,8 @@ public class CadastralBindingWrapper extends BaseTab implements Serializable {
 
     private List<Long> listIds;
 
+    private LazyDataModel<FormalityView> lazyModel;
+
     public CadastralBindingWrapper(List<Long> ids, Subject subject, DocumentType type) {
         this.listIds = ids;
         this.type = type;
@@ -49,7 +53,7 @@ public class CadastralBindingWrapper extends BaseTab implements Serializable {
     public Tab getTab() throws PersistenceBeanException, IllegalAccessException {
     	Tab tab = super.getTab();
     	HtmlOutputText text = new HtmlOutputText();
-    	
+
     	if (DocumentType.CADASTRAL != getType()) {
     	   	text.setValue(ResourcesHelper.getString("subjectViewIndirectCadasters"));
     	
@@ -87,9 +91,9 @@ public class CadastralBindingWrapper extends BaseTab implements Serializable {
         commandButton.setActionExpression(createMethodExpression(String.format("#{subjectBean.%s}",
                 "downloadPropertyPDF(tableVar.document.id)"), new Class[]{Long.class}));
         commandButton.setAjax(false);
-        commandButton.setIcon("fa fa-fw fa-file-pdf-o");
-        columns.add(getButtonColumn("subjectViewCadastralPDF", commandButton));
-
+        commandButton.setIcon("fa fa-fw new-pdf-icon");
+        commandButton.setStyleClass("hide-pdf-bg");
+        columns.add(getButtonColumn("subjectViewCadastralPDF", commandButton, "", "action_column"));
         columns.add(getTextColumn("subjectViewCadastralNote", null));
         return columns;
     }
@@ -103,7 +107,7 @@ public class CadastralBindingWrapper extends BaseTab implements Serializable {
     }
 
     @Override
-    Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+    public Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
         return DaoManager.getCount(DocumentSubject.class, "id", new Criterion[]{
                 Restrictions.in("subject.id", getListIds()),
                 Restrictions.eq("type", getType())
@@ -133,4 +137,15 @@ public class CadastralBindingWrapper extends BaseTab implements Serializable {
 	public void setFormalityBindingWrapper(FormalityBindingWrapper formalityBindingWrapper) {
 		this.formalityBindingWrapper = formalityBindingWrapper;
 	}
+
+    public LazyDataModel<FormalityView> getLazyModel() {
+        return new EntityLazyListModel(DocumentSubject.class, new Criterion[]{
+                Restrictions.in("subject.id", getListIds()),
+                Restrictions.eq("type", getType())
+        }, new Order[]{Order.asc("id")});
+    }
+
+    public void setLazyModel(LazyDataModel<FormalityView> lazyModel) {
+        this.lazyModel = lazyModel;
+    }
 }

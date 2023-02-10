@@ -6,10 +6,14 @@ import it.nexera.ris.common.helpers.DateTimeHelper;
 import it.nexera.ris.common.helpers.LogHelper;
 import it.nexera.ris.common.helpers.RedirectHelper;
 import it.nexera.ris.common.helpers.SessionHelper;
+import it.nexera.ris.common.helpers.ValidationHelper;
 import it.nexera.ris.persistence.UserHolder;
+import it.nexera.ris.persistence.beans.dao.CriteriaAlias;
 import it.nexera.ris.persistence.beans.dao.DaoManager;
 import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.beans.entities.domain.dictionary.*;
+import it.nexera.ris.persistence.beans.entities.domain.readonly.RequestMailShort;
+import it.nexera.ris.persistence.beans.entities.domain.readonly.WLGInboxHome;
 import it.nexera.ris.persistence.beans.entities.domain.readonly.WLGInboxShort;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
 import it.nexera.ris.web.beans.base.AccessBean;
@@ -17,18 +21,25 @@ import it.nexera.ris.web.beans.wrappers.logic.UserWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bouncycastle.ocsp.Req;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.primefaces.context.RequestContext;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
+import java.awt.event.ActionEvent;
 import java.io.Serializable;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -48,6 +59,10 @@ public class SessionBean implements Serializable {
     private Integer mailCounts=0;
     
     private Integer requestCounts=0;
+    
+    private Integer numberEmailsReadyForSent=0;
+
+    private Boolean loadingEmailCountDone = false;
 
     public SessionBean() {
         Session.put("my_session_id", DateTimeHelper.toSessionTime(new Date()));
@@ -159,9 +174,11 @@ public class SessionBean implements Serializable {
     }
 
     public int getNumberUnclosedRequestsInWork() {
-        return getNumberUnclosedRequestsByStatus(RequestState.IN_WORK, false);
+        return getNumberUnclosedRequestsByStatuses(Arrays.asList(RequestState.IN_WORK.getId(), RequestState.PROFILED.getId()),
+                false);
     }
 
+    
     public long getSumOfEntriesCountInManyTables(){
         try {
             long count = 0L;
@@ -187,7 +204,7 @@ public class SessionBean implements Serializable {
         return 0;
     }
 
-    public boolean getNeedShowNumberUnclosedRequests() {
+	public boolean getNeedShowNumberUnclosedRequests() {
         return getNumberUnclosedRequests() > 0;
     }
 
@@ -207,6 +224,94 @@ public class SessionBean implements Serializable {
             LogHelper.log(log, e);
         }
         return 0;
+    }
+
+    private int getNumberUnclosedRequestsByStatuses(List<Long> states, boolean onlyWithDistraintActId) {
+        try {
+            return DaoManager.getCount(Request.class, "id", new Criterion[]{
+                    Restrictions.isNotNull(onlyWithDistraintActId ? "distraintFormality" : "id"),
+                    Restrictions.in("stateId", states),
+                    Restrictions.or(
+                            Restrictions.isNull("isDeleted"),
+                            Restrictions.ne("isDeleted", true))}).intValue();
+        } catch (PersistenceBeanException | IllegalAccessException e) {
+            LogHelper.log(log, e);
+        }
+        return 0;
+    }
+
+    public void getNumberEmailsReadyForSentByStatusToBeSentOrEstToSent() {
+        long start = System.currentTimeMillis();
+
+        NumberFormat formatter = new DecimalFormat("#0.00000");
+        try {
+            loadingEmailCountDone = false;
+            List<Long> stateIds = Arrays.stream(RequestState.values())
+                    .filter(r -> !r.equals(RequestState.EVADED) && !r.equals(RequestState.TO_BE_SENT) &&
+                            !r.equals(RequestState.EST_TO_SENT))
+                    .map(r -> r.getId())
+                    .collect(Collectors.toList());
+
+            List<Long> dashboardDataIds = DaoManager.loadIds(WLGInbox.class,
+                    new Criterion[]{
+                            Restrictions.or(
+                                    Restrictions.isNull("requests"),
+                                    Restrictions.isEmpty("requests"))
+                    }
+            );
+
+            dashboardDataIds.addAll(DaoManager.loadIds(WLGInbox.class,
+                    new CriteriaAlias[]{
+                            new CriteriaAlias("requests", "r", JoinType.INNER_JOIN)
+                    },
+                    new Criterion[]{
+                            Restrictions.in("r.stateId", stateIds)
+                    }
+            ));
+            long end = System.currentTimeMillis();
+            log.info("Execution time for laod list 1 " + formatter.format((end - start) / 1000d) + " seconds");
+
+            List<WLGInboxHome> mailsWithEvaded = DaoManager.load(WLGInboxHome.class,
+                    new CriteriaAlias[]{
+                            new CriteriaAlias("requests", "r", JoinType.INNER_JOIN)
+                    },
+                    new Criterion[]{
+                            Restrictions.eq("r.stateId", RequestState.EVADED.getId()),
+                            Restrictions.or(Restrictions.eq("r.isDeleted", Boolean.FALSE),
+                                    Restrictions.isNull("r.isDeleted"))
+                    }
+            );
+            end = System.currentTimeMillis();
+            log.info("Execution time for laod list 2 " + formatter.format((end - start) / 1000d) + " seconds");
+            dashboardDataIds.addAll(mailsWithEvaded
+                    .stream()
+                    .filter(w -> w.getRequests()
+                            .stream()
+                            .filter(r -> r.isDeletedRequest() && r.getStateId() != null
+                                    && !r.getStateId().equals(3l))
+                            .findFirst().orElse(null) == null)
+                    .map(w -> w.getId())
+                    .collect(Collectors.toList()));
+
+            end = System.currentTimeMillis();
+            log.info("Execution time for laod list 3 " + formatter.format((end - start) / 1000d) + " seconds");
+            List<Criterion> restrictions = new ArrayList<>();
+            if(!ValidationHelper.isNullOrEmpty(dashboardDataIds)){
+                restrictions.add(Restrictions.not(Restrictions.in("id",dashboardDataIds)));
+            }
+            restrictions.add(Restrictions.ne("state",MailManagerStatuses.CANCELED.getId()));
+            SessionHelper.put("MAIL_MANAGER_LIST_TO_BE_SENT_R", restrictions);
+            setNumberEmailsReadyForSent(DaoManager.getCount(WLGInbox.class, "id",
+                    restrictions.toArray(new Criterion[0])).intValue());
+            end = System.currentTimeMillis();
+            log.info("Execution time for laod list " + formatter.format((end - start) / 1000d) + " seconds");
+        } catch (PersistenceBeanException | IllegalAccessException e) {
+            LogHelper.log(log, e);
+        }finally {
+            loadingEmailCountDone = true;
+        }
+
+
     }
     
     private int getNumberUnclosedInserted() {
@@ -314,4 +419,35 @@ public class SessionBean implements Serializable {
     public void getBillingListPage() {
         RedirectHelper.goTo(PageTypes.BILLING_LIST);
     }
+
+    public void getBillingListOldPage() {
+        RedirectHelper.goTo(PageTypes.BILLING_LIST_OLD);
+    }
+    
+    public Integer getNumberEmailsReadyForSent() {
+		return numberEmailsReadyForSent;
+	}
+
+	public void setNumberEmailsReadyForSent(Integer numberEmailsReadyForSent) {
+		this.numberEmailsReadyForSent = numberEmailsReadyForSent;
+	}
+
+    public Boolean getLoadingEmailCountDone() {
+        return loadingEmailCountDone;
+    }
+
+    public void setLoadingEmailCountDone(Boolean loadingEmailCountDone) {
+        this.loadingEmailCountDone = loadingEmailCountDone;
+    }
+    public void cleanFiltersOnMailManager() {
+        SessionHelper.removeObject("MAIL_MANAGER_LIST_TO_BE_SENT");
+        SessionHelper.removeObject("MAIL_MANAGER_LIST_TO_BE_SENT_R");
+        SessionHelper.put("resetMailLoaded", "true");
+    }
+
+    public void getMailListPage() {
+        RedirectHelper.goTo(PageTypes.MAIL_MANAGER_LIST);
+    }
+
 }
+

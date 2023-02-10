@@ -213,6 +213,11 @@ public class PrintPDFHelper extends BaseHelper {
 
     public static byte[] convertToPDF(String header, String body, String footer, DocumentType type)
             throws InvalidParameterException, IOException {
+
+        return convertToPDF(header, body, footer, type, false);
+    }
+    public static byte[] convertToPDF(String header, String body, String footer, DocumentType type, Boolean enableSmartTableBreaks)
+            throws InvalidParameterException, IOException {
         if (body == null) {
             return null;
         }
@@ -242,6 +247,28 @@ public class PrintPDFHelper extends BaseHelper {
                     marginLeft = 30l;
                     marginRight = 30l;
                     marginBottom = 30l;
+                    break;
+
+                case INVOICE:
+                case COURTESY_INVOICE:
+                    marginTop = 1l;
+                    marginLeft = 10l;
+                    marginRight = 10l;
+                    marginBottom = 2l;
+                    break;
+                    
+                case OTHER:
+                    marginTop = 1l;
+                    marginLeft = 10l;
+                    marginRight = 10l;
+                    marginBottom = 2l;
+                    break;
+
+                case TRANSCRIPTION_AND_CERTIFICATION:
+                    marginTop = 1l;
+                    marginLeft = 2l;
+                    marginRight = 2l;
+                    marginBottom = 2l;
                     break;
 
                 default:
@@ -302,7 +329,9 @@ public class PrintPDFHelper extends BaseHelper {
             Class<?> beanClass = urlClassLoader.loadClass("org.zefer.pd4ml.PD4ML");
             Constructor<?> constructor = beanClass.getConstructor();
             Object beanObj = constructor.newInstance();
-            Method method = beanClass.getMethod("outputFormat",new Class[]{String.class});
+            Method method = beanClass.getMethod("enableSmartTableBreaks",new Class[]{boolean.class});
+            method.invoke(beanObj,enableSmartTableBreaks);
+            method = beanClass.getMethod("outputFormat",new Class[]{String.class});
             method.invoke(beanObj,PD4Constants.getField("PDF").get(null));
            
             method = beanClass.getMethod("useTTF",new Class[]{String.class, boolean.class});
@@ -320,7 +349,17 @@ public class PrintPDFHelper extends BaseHelper {
             }else if (type == DocumentType.INVOICE_REPORT) {
                 setPageSize.invoke(beanObj,PD4Constants.getField("LEDGER").get(null));
                 setHtmlWidth.invoke(beanObj,1024);
-            } else {
+            }else if (type == DocumentType.INVOICE) {
+                setPageSize.invoke(beanObj,PD4Constants.getField("A4").get(null));
+                setHtmlWidth.invoke(beanObj,768);
+            }else if (type == DocumentType.COURTESY_INVOICE) {
+                setPageSize.invoke(beanObj,PD4Constants.getField("A4").get(null));
+                setHtmlWidth.invoke(beanObj,768);
+            } else if (type == DocumentType.OTHER || type == DocumentType.TRANSCRIPTION_AND_CERTIFICATION) {
+                setPageSize.invoke(beanObj,PD4Constants.getField("A4").get(null));
+                setHtmlWidth.invoke(beanObj,768);
+            }
+            else {
                 Method changePageOrientation = beanClass.getMethod("changePageOrientation",new Class[]{Dimension.class});
                 Dimension dim = (Dimension)changePageOrientation.invoke(beanObj,PD4Constants.getField("A4").get(null));
                 setPageSize.invoke(beanObj,dim);

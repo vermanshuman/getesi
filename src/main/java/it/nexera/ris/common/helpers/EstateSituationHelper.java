@@ -12,12 +12,17 @@ import it.nexera.ris.persistence.beans.entities.domain.dictionary.TypeFormality;
 import it.nexera.ris.persistence.view.FormalityView;
 import it.nexera.ris.web.beans.wrappers.logic.SubjectDifferenceWrapper;
 import it.nexera.ris.web.common.WrapperLazyModel;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static it.nexera.ris.common.helpers.TemplatePdfTableHelper.distinctByKey;
@@ -60,7 +65,7 @@ public class EstateSituationHelper extends BaseHelper {
             return false;
         }
         List<CadastralData> selectedPropertyCadastral = propertyList.stream()
-                .map(Property::getCadastralData).flatMap(List::stream).distinct().collect(Collectors.toList());
+                .map(Property::getCadastralData).flatMap(Set::stream).distinct().collect(Collectors.toList());
         if (ValidationHelper.isNullOrEmpty(selectedPropertyCadastral)) {
             return false;
         }
@@ -393,7 +398,7 @@ public class EstateSituationHelper extends BaseHelper {
                         Restrictions.eq("city", prop.getCity()),
                         Restrictions.eq("type", prop.getType()),
                         Restrictions.eq("category", prop.getCategory()),
-                        Restrictions.eq("cData.id", prop.getCadastralData().get(0).getId())});
+                        Restrictions.eq("cData.id", prop.getCadastralData().stream().findFirst().orElse(null).getId())});
     }
 
     public static List<FormalityView> loadFormalityViewForSales(Request request) throws PersistenceBeanException, IllegalAccessException {
@@ -456,40 +461,64 @@ public class EstateSituationHelper extends BaseHelper {
         while (itr.hasNext()) {
             Formality formality = itr.next();
             if (formality.getSectionA() != null && !ValidationHelper.isNullOrEmpty(formality.getType())) {
-                NoteType id = NoteType.getEnumByString(formality.getTypeEnum().toString());
                 String code = "";
                 TypeFormality typeFormality = null;
                 List<TypeFormality> typeFormalities;
-                switch (id) {
-                    case NOTE_TYPE_I:
-                        code = getCodeSectionA(formality.getSectionA().getDerivedFrom());
-                        typeFormalities = DaoManager.load(TypeFormality.class, new Criterion[]{
-                                Restrictions.eq("code", code), Restrictions.eq("type", TypeActEnum.TYPE_I)});
-                        if(!ValidationHelper.isNullOrEmpty(typeFormalities)) {
-                            typeFormality = typeFormalities.get(0);
-                        }
-                        break;
-                    case NOTE_TYPE_A:
-                        code = getCodeSectionA(formality.getSectionA().getAnnotationDescription());
-                        typeFormalities = DaoManager.load(TypeFormality.class, new Criterion[]{
-                                Restrictions.eq("code", code), Restrictions.eq("type", TypeActEnum.TYPE_A)});
-                        if(!ValidationHelper.isNullOrEmpty(typeFormalities)) {
-                            typeFormality = typeFormalities.get(0);
-                        }
-                        break;
-                    case NOTE_TYPE_T:
-                        code = getCodeSectionA(formality.getSectionA().getConventionDescription());
-                        typeFormalities = DaoManager.load(TypeFormality.class, new Criterion[]{
-                                Restrictions.eq("code", code), Restrictions.eq("type", TypeActEnum.TYPE_T)});
-                        if (!ValidationHelper.isNullOrEmpty(typeFormalities)) {
-                            typeFormality = typeFormalities.get(0);
-                        }
-                        break;
+                Integer typeAct = null;
+                if((formality.getType().equalsIgnoreCase("annotazione") || formality.getType().equalsIgnoreCase("annotamento"))) {
+                    typeAct = 0;
+                } else if(formality.getType().equalsIgnoreCase("iscrizione")) {
+                    typeAct = 1;
+                } else if(formality.getType().equalsIgnoreCase("trascrizione")) {
+                    typeAct = 3;
                 }
-                if(typeFormality != null)
-                if(ValidationHelper.isNullOrEmpty(typeFormality) || ValidationHelper.isNullOrEmpty(typeFormality.getSalesDevelopment())
-                    || !typeFormality.getSalesDevelopment()){
-                    itr.remove();
+
+                String derivedCode = formality.getSectionA().getCodeWithoutFirstZero();
+
+                if(typeAct != null){
+                    switch (typeAct) {
+                        case 0:
+                            code = getCodeSectionA(formality.getSectionA().getDerivedFrom());
+                            log.info("TYPE_A : " + code);
+                            typeFormalities = DaoManager.load(TypeFormality.class, new Criterion[]{
+                                    Restrictions.eq("code", StringUtils.isNotBlank(code) ? code : derivedCode),
+                                    Restrictions.eq("type", TypeActEnum.TYPE_A)});
+                            if(!ValidationHelper.isNullOrEmpty(typeFormalities)) {
+                                typeFormality = typeFormalities.get(0);
+                            }
+                            break;
+                        case 1:
+                            code = getCodeSectionA(formality.getSectionA().getAnnotationDescription());
+                            log.info("TYPE_I : " + code);
+                            typeFormalities = DaoManager.load(TypeFormality.class, new Criterion[]{
+                                    Restrictions.eq("code", StringUtils.isNotBlank(code) ? code : derivedCode),
+                                    Restrictions.eq("type", TypeActEnum.TYPE_I)});
+                            if(!ValidationHelper.isNullOrEmpty(typeFormalities)) {
+                                typeFormality = typeFormalities.get(0);
+                            }
+                            break;
+                        case 3:
+                            code = getCodeSectionA(formality.getSectionA().getConventionDescription());
+                            log.info("TYPE_T : " + code);
+                            typeFormalities = DaoManager.load(TypeFormality.class, new Criterion[]{
+                                    Restrictions.eq("code", StringUtils.isNotBlank(code) ? code : derivedCode),
+                                    Restrictions.eq("type", TypeActEnum.TYPE_T)});
+                            if (!ValidationHelper.isNullOrEmpty(typeFormalities)) {
+                                typeFormality = typeFormalities.get(0);
+                            }
+                            break;
+                    }
+                }
+                /*if(ValidationHelper.isNullOrEmpty(typeFormality) || ValidationHelper.isNullOrEmpty(typeFormality.getSalesDevelopment())
+                        || !typeFormality.getSalesDevelopment()) {
+                        itr.remove();
+                }*/
+               // if(typeFormality != null)
+                log.info(formality.getId() + " , derived Code " + derivedCode + " , typeact " + typeAct + " ," + typeFormality);
+                if(ValidationHelper.isNullOrEmpty(typeFormality) ||
+                        ValidationHelper.isNullOrEmpty(typeFormality.getSalesDevelopment())
+                            || !typeFormality.getSalesDevelopment()){
+                        itr.remove();
                 }
             }
         }
@@ -765,7 +794,8 @@ public class EstateSituationHelper extends BaseHelper {
         List<Subject> difference;
         if (subject.getTypeIsPhysicalPerson()) {
             Calendar subjectBirthDate = Calendar.getInstance();
-            subjectBirthDate.setTime(subject.getBirthDate());
+            if(!ValidationHelper.isNullOrEmpty(subject.getBirthDate()))
+                subjectBirthDate.setTime(subject.getBirthDate());
             difference = DaoManager.load(Subject.class, new CriteriaAlias[]{
                     new CriteriaAlias("birthCity", "city", JoinType.LEFT_OUTER_JOIN)
             }, new Criterion[]{
@@ -949,7 +979,7 @@ public class EstateSituationHelper extends BaseHelper {
         });
     }
 
-    public static List<Document> getDocuments(RequestOutputTypes type, Request request) throws PersistenceBeanException,
+    public static List<Document> getDocuments(RequestOutputTypes type, Request request, Boolean isSale) throws PersistenceBeanException,
             IllegalAccessException {
         List<Criterion> restrictions = new ArrayList<>();
         restrictions.add(Restrictions.eq("request.id", request.getId()));
@@ -964,25 +994,33 @@ public class EstateSituationHelper extends BaseHelper {
         }
 
         List<Document> documentList = DaoManager.load(Document.class, restrictions.toArray(new Criterion[0]));
+
         if ((type == RequestOutputTypes.ALL || type == RequestOutputTypes.ONLY_EDITOR)
                 && !ValidationHelper.isNullOrEmpty(request.getSituationEstateLocations())
                 && request.getSituationEstateLocations().stream()
                 .map(EstateSituation::getFormalityList).flatMap(List::stream).anyMatch(Objects::nonNull)) {
-            Criterion[] criterions = getCriterions(request, documentList);
+            Criterion[] criterions = getCriterions(request, documentList, isSale);
 
             if (criterions.length != 0) {
                 List<Document> formalityDocs = DaoManager.load(Document.class, criterions);
                 documentList.addAll(formalityDocs);
             }
+            if(isSale != null && isSale){
+                criterions = getCriterions(request, documentList, false);
+                if (criterions.length != 0) {
+                    List<Document> formalityDocs = DaoManager.load(Document.class, criterions);
+                    documentList.addAll(formalityDocs);
+                }
+            }
         }
-        if (!ValidationHelper.isNullOrEmpty(documentList)) {
+
+        if (ValidationHelper.isNullOrEmpty(isSale) && !ValidationHelper.isNullOrEmpty(documentList)) {
             List<Formality> formalities = new ArrayList<>();
             for (Document tempDocument : documentList) {
                 if (DocumentType.FORMALITY.getId().equals(tempDocument.getTypeId())) {
                     formalities.addAll(tempDocument.getFormality());
                 }
             }
-
             DaoManager.refresh(request);
             request.setFormalityPdfList(formalities);
             DaoManager.save(request, true);
@@ -993,8 +1031,24 @@ public class EstateSituationHelper extends BaseHelper {
         for (Document document : documentList) {
             if (!ValidationHelper.isNullOrEmpty(document.getFormality())) {
                 for (Formality formality : document.getFormality()) {
-                    if (!ValidationHelper.isNullOrEmpty(formality.getEstateSituationList()) && formality
-                            .getEstateSituationList().stream().anyMatch(x -> x.getRequest().equals(request))) {
+                    AtomicBoolean includeDicType = new AtomicBoolean(Boolean.TRUE);
+                    if(ValidationHelper.isNullOrEmpty(formality.getDicTypeFormality()) ||
+                            ValidationHelper.isNullOrEmpty(formality.getDicTypeFormality().getPrejudicial()) ||
+                            !formality.getDicTypeFormality().getPrejudicial()){
+                        includeDicType.getAndSet(Boolean.FALSE);
+                    }
+
+                    if (!ValidationHelper.isNullOrEmpty(formality.getEstateSituationList())
+                            && formality.getEstateSituationList()
+                            .stream()
+                            .filter(es -> isSale == null || (!isSale && includeDicType.get()
+                                    && (es.getSalesDevelopment() == null || !es.getSalesDevelopment())) ||
+                                    (isSale) && ((es.getSalesDevelopment() != null && es.getSalesDevelopment()) ||
+                                            ((es.getSalesDevelopment() == null
+                                                    || es.getSalesDevelopment()) && !includeDicType.get())
+                                    )
+                            )
+                            .anyMatch(x -> x.getRequest().equals(request))) {
                         documentListToView.add(document);
                     }
                 }
@@ -1005,12 +1059,42 @@ public class EstateSituationHelper extends BaseHelper {
         return documentListToView;
     }
 
-    private static Criterion[] getCriterions(Request request, List<Document> documentList) {
+    private static Criterion[] getCriterions(Request request, List<Document> documentList, Boolean isSale) {
         List<Criterion> restrictionsList = new ArrayList<>();
+        List<Long> documentIds = null;
 
-        List<Long> documentIds = request.getSituationEstateLocations().stream()
-                .map(EstateSituation::getFormalityList).flatMap(List::stream).map(Formality::getDocument)
-                .filter(Objects::nonNull).map(Document::getId).collect(Collectors.toList());
+        if(ValidationHelper.isNullOrEmpty(isSale)){
+            documentIds = request.getSituationEstateLocations()
+                    .stream()
+                    .map(EstateSituation::getFormalityList)
+                    .flatMap(List::stream)
+                    .map(Formality::getDocument)
+                    .filter(Objects::nonNull)
+                    .map(Document::getId)
+                    .collect(Collectors.toList());
+        }else if(!isSale){
+            documentIds = request
+                    .getSituationEstateLocations()
+                    .stream()
+                    .filter(s -> s.getSalesDevelopment() == null || !s.getSalesDevelopment())
+                    .map(EstateSituation::getFormalityList)
+                    .flatMap(List::stream)
+                    .map(Formality::getDocument)
+                    .filter(Objects::nonNull)
+                    .map(Document::getId)
+                    .collect(Collectors.toList());
+        }else {
+            documentIds = request
+                    .getSituationEstateLocations()
+                    .stream()
+                    .filter(s -> s.getSalesDevelopment() != null && s.getSalesDevelopment())
+                    .map(EstateSituation::getFormalityList)
+                    .flatMap(List::stream)
+                    .map(Formality::getDocument)
+                    .filter(Objects::nonNull)
+                    .map(Document::getId)
+                    .collect(Collectors.toList());
+        }
 
         List<Long> notInIds = documentList.stream().map(Document::getId).collect(Collectors.toList());
 
@@ -1184,5 +1268,19 @@ public class EstateSituationHelper extends BaseHelper {
 
     public static List<Long> getDistinctIdsSubjects() {
         return distinctIdsSubjects;
+    }
+
+    public static <T> Predicate<T> distinctByKeys(final Function<? super T, ?>... keyExtractors)
+    {
+        final Map<List<?>, Boolean> seen = new ConcurrentHashMap<>();
+
+        return t ->
+        {
+            final List<?> keys = Arrays.stream(keyExtractors)
+                    .map(ke -> ke.apply(t))
+                    .collect(Collectors.toList());
+
+            return seen.putIfAbsent(keys, Boolean.TRUE) == null;
+        };
     }
 }

@@ -1,5 +1,9 @@
 package it.nexera.ris.web.handlers;
 
+import it.nexera.ris.common.helpers.LogHelper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import javax.faces.FacesException;
 import javax.faces.application.ViewHandler;
 import javax.faces.component.UIViewRoot;
@@ -9,6 +13,7 @@ import java.io.IOException;
 import java.util.Locale;
 
 public class ViewHandlerEx extends ViewHandler {
+    public transient final Log log = LogFactory.getLog(getClass());
     private ViewHandler parent;
 
     public ViewHandlerEx(ViewHandler parent) {
@@ -22,7 +27,16 @@ public class ViewHandlerEx extends ViewHandler {
          * {@link javax.faces.application.ViewExpiredException}. This happens only  when we try to logout from timed out pages.
          */
         UIViewRoot root = null;
-        root = parent.restoreView(facesContext, viewId);
+        try {
+            root = parent.restoreView(facesContext, viewId);
+        } catch (Exception e) {
+            log.error("Error occur for " + viewId);
+            LogHelper.log(log, e);
+            if(viewId == null || !viewId.equals("/Pages/ManagementGroup/DatabaseList.jsf")){
+                throw e;
+            }
+            log.error("Exception not thrown");
+        }
         if (root == null) {
             root = createView(facesContext, viewId);
         }

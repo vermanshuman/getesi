@@ -424,4 +424,23 @@ public class ComboboxHelper extends BaseHelper {
 
         return list;
     }
+
+    public static <T extends Entity> List<SelectItem> fillList(Class<T> clazz, Order order,
+                                                               CriteriaAlias[] criteriaAliases, Criterion[] criterions, boolean addNotSelected, boolean addAllElements, boolean uppercase)
+            throws PersistenceBeanException, IllegalAccessException {
+        List<SelectItem> list = new ArrayList<SelectItem>();
+        if (addNotSelected) {
+            list.add(SelectItemHelper.getNotSelected());
+        }
+        if (addAllElements) {
+            list.add(SelectItemHelper.getAllElement());
+        }
+
+        for (T item : DaoManager.load(clazz, criteriaAliases, criterions, order)) {
+            if(!ValidationHelper.isNullOrEmpty(item.toString()) && uppercase)
+                list.add(new SelectItem(item.getId(), item.toString().toUpperCase()));
+        }
+
+        return list;
+    }
 }

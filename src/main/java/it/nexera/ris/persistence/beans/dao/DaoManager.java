@@ -12,6 +12,7 @@ import it.nexera.ris.persistence.beans.entities.domain.*;
 import it.nexera.ris.persistence.interfaces.AfterSave;
 import it.nexera.ris.persistence.interfaces.BeforeSave;
 import it.nexera.ris.settings.ApplicationSettingsHolder;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.*;
@@ -658,17 +659,16 @@ public class DaoManager {
                     WLGInbox wlgInbox = new WLGInbox();
 
 
-                    List<String> emailsFrom = null;
+                    String emailFrom = null;
                     try {
-                        emailsFrom = DaoManager.loadField(WLGServer.class, "login", String.class, new Criterion[]{
-                                Restrictions.eq("id", Long.parseLong(ApplicationSettingsHolder.getInstance()
-                                        .getByKey(ApplicationSettingsKeys.SENT_SERVER_ID).getValue()))
-                        });
+                        emailFrom = MailHelper.getEmailFrom();
                     } catch (PersistenceBeanException | IllegalAccessException e) {
                         LogHelper.log(log, e);
+                    } catch (InstantiationException e) {
+                        e.printStackTrace();
                     }
-                    if (emailsFrom != null) {
-                        wlgInbox.setEmailFrom(emailsFrom.get(0));
+                    if (StringUtils.isNotBlank(emailFrom)) {
+                        wlgInbox.setEmailFrom(emailFrom);
                     }
 
                     if (!ValidationHelper.isNullOrEmpty(((Request) entity).getClient().getEmails())) {

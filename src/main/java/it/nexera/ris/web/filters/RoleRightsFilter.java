@@ -53,6 +53,58 @@ public class RoleRightsFilter extends BaseFilter implements Filter {
             return;
         }
 
+        SessionHelper.removeObject("loadMailFilters");
+        SessionHelper.removeObject("loadRequestFilters");
+        if(!httpRequest.getRequestURI().contains("MailManager")){
+            SessionHelper.removeObject("MAIL_MANAGER_LIST_TO_BE_SENT");
+            SessionHelper.removeObject("MAIL_MANAGER_LIST_TO_BE_SENT_R");
+        }
+        if(!ValidationHelper.isNullOrEmpty(SessionHelper.get("currentPageURL"))) {
+            String previousURL = SessionHelper.get("currentPageURL").toString();
+            if(!previousURL.contains(PageTypes.TRANSCRIPTION_CERTIFICATION_MANAGEMENT.getPage()) &&
+                    httpRequest.getRequestURI().contains(PageTypes.TRANSCRIPTION_CERTIFICATION_MANAGEMENT.getPage())){
+                if (!ValidationHelper.isNullOrEmpty(SessionHelper.get("selectedTranscriptionTab"))){
+                    SessionHelper.removeObject("selectedTranscriptionTab");
+                }
+                if (!ValidationHelper.isNullOrEmpty(SessionHelper.get("selectedMainTab"))){
+                    SessionHelper.removeObject("selectedMainTab");
+                }
+            }
+
+
+            if(previousURL.endsWith(PageTypes.EXCEL_DATA_REQUEST.getPage()) &&
+                    !httpRequest.getRequestURI().endsWith(PageTypes.REQUEST_TEXT_EDIT.getPage()) &&
+                    !ValidationHelper.isNullOrEmpty(SessionHelper.get("templateIdForExcelData"))){
+                SessionHelper.removeObject("templateIdForExcelData");
+            }
+            if(previousURL.endsWith(PageTypes.REQUEST_EDIT.getPage()) ||
+                    previousURL.endsWith(PageTypes.REQUEST_ESTATE_SITUATION_LIST.getPage()) ||
+                    previousURL.endsWith(PageTypes.REQUEST_ESTATE_SITUATION_VIEW.getPage()) ||
+                    previousURL.endsWith(PageTypes.REQUEST_TEXT_EDIT.getPage()) ||
+                    previousURL.endsWith(PageTypes.SUBJECT.getPage())){
+                if(httpRequest.getRequestURI().endsWith(PageTypes.REQUEST_LIST.getPage())){
+                    SessionHelper.put("loadRequestFilters", "true");
+                }
+            }else
+                //if(previousURL.endsWith(PageTypes.MAIL_MANAGER_LIST.getPage()) ||
+                if( previousURL.endsWith(PageTypes.MAIL_MANAGER_EDIT.getPage()) ||
+                    previousURL.endsWith(PageTypes.MAIL_MANAGER_FOLDER.getPage()) ||
+                    previousURL.endsWith(PageTypes.MAIL_MANAGER_VIEW.getPage())){
+//                if( httpRequest.getParameter("page") != null
+//                        && httpRequest.getRequestURI().endsWith(PageTypes.MAIL_MANAGER_LIST.getPage())){
+                    if(httpRequest.getRequestURI().endsWith(PageTypes.MAIL_MANAGER_LIST.getPage())){
+                        SessionHelper.put("loadMailFilters", "true");
+                    }else
+                    {
+                        SessionHelper.removeObject("MAIL_MANAGER_LIST_TO_BE_SENT");
+                        SessionHelper.removeObject("MAIL_MANAGER_LIST_TO_BE_SENT_R");
+                    }
+            }
+        }
+        SessionHelper.removeObject("currentPageURL");
+        SessionHelper.put("currentPageURL", httpRequest.getRequestURI());
+
+
         UserWrapper currentUser = getCurrentUser(httpRequest, httpResponse);
 
         int result = doCustomHandle(httpRequest, httpResponse);

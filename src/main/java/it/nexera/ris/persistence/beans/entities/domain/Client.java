@@ -268,6 +268,47 @@ public class Client extends IndexedEntity implements Serializable {
     @Column(name = "address_SDI")
     private String addressSDI;
 
+    @Column(name = "unauthorized_cost_pay")
+    private Double unauthorizedCostPay;
+
+    @Column(name = "unauthorized_cost_cadastral")
+    private Double unauthorizedCostCadastral;
+
+    @Column(name = "unauthorized_cost_formality")
+    private Double unauthorizedCostFormality;
+
+    @Column(name = "invoice_expiration_days")
+    private Double invoiceExpirationDays;
+    
+    @ManyToOne
+    @JoinColumn(name = "tax_rate_unauthorized_cost_pay")
+    private TaxRate taxRateUnauthorizedCostPay;
+    
+    @ManyToOne
+    @JoinColumn(name = "tax_rate_unauthorized_cost_cadastral")
+    private TaxRate taxRateUnauthorizedCostCadastral;
+    
+    @ManyToOne
+    @JoinColumn(name = "tax_rate_unauthorized_cost_formality")
+    private TaxRate taxRateUnauthorizedCostFormality;
+
+    @Column(name = "detail_properties")
+    private Boolean detailProperties ;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "f24_tax_rate_id")
+    private TaxRate f24TaxRat;
+
+    @Column(name = "fiscal_value")
+    private Boolean fiscalValue ;
+
+    private Boolean brexa;
+
+    @Column(name = "excel_detail_property")
+    private Boolean  excelDetailProperty;
+
+    private Boolean  visible;
+
     @Override
     public String toString() {
         if (ClientType.PROFESSIONAL.getId().equals(getTypeId())) {
@@ -861,5 +902,109 @@ public class Client extends IndexedEntity implements Serializable {
 
     public void setAddressSDI(String addressSDI) {
         this.addressSDI = addressSDI;
+    }
+
+    public Double getUnauthorizedCostPay() {
+        return unauthorizedCostPay;
+    }
+
+    public void setUnauthorizedCostPay(Double unauthorizedCostPay) {
+        this.unauthorizedCostPay = unauthorizedCostPay;
+    }
+
+    public Double getUnauthorizedCostCadastral() {
+        return unauthorizedCostCadastral;
+    }
+
+    public void setUnauthorizedCostCadastral(Double unauthorizedCostCadastral) {
+        this.unauthorizedCostCadastral = unauthorizedCostCadastral;
+    }
+
+    public Double getUnauthorizedCostFormality() {
+        return unauthorizedCostFormality;
+    }
+
+    public void setUnauthorizedCostFormality(Double unauthorizedCostFormality) {
+        this.unauthorizedCostFormality = unauthorizedCostFormality;
+    }
+
+    public Double getInvoiceExpirationDays() {
+        return invoiceExpirationDays;
+    }
+
+    public void setInvoiceExpirationDays(Double invoiceExpirationDays) {
+        this.invoiceExpirationDays = invoiceExpirationDays;
+    }
+
+	public TaxRate getTaxRateUnauthorizedCostPay() {
+		return taxRateUnauthorizedCostPay;
+	}
+
+	public void setTaxRateUnauthorizedCostPay(TaxRate taxRateUnauthorizedCostPay) {
+		this.taxRateUnauthorizedCostPay = taxRateUnauthorizedCostPay;
+	}
+
+	public TaxRate getTaxRateUnauthorizedCostCadastral() {
+		return taxRateUnauthorizedCostCadastral;
+	}
+
+	public void setTaxRateUnauthorizedCostCadastral(TaxRate taxRateUnauthorizedCostCadastral) {
+		this.taxRateUnauthorizedCostCadastral = taxRateUnauthorizedCostCadastral;
+	}
+
+	public TaxRate getTaxRateUnauthorizedCostFormality() {
+		return taxRateUnauthorizedCostFormality;
+	}
+
+	public void setTaxRateUnauthorizedCostFormality(TaxRate taxRateUnauthorizedCostFormality) {
+		this.taxRateUnauthorizedCostFormality = taxRateUnauthorizedCostFormality;
+	}
+
+    public Boolean getDetailProperties() {
+        return detailProperties;
+    }
+
+    public void setDetailProperties(Boolean detailProperties) {
+        this.detailProperties = detailProperties;
+    }
+
+    public TaxRate getF24TaxRat() {
+        return f24TaxRat;
+    }
+
+    public void setF24TaxRat(TaxRate f24TaxRat) {
+        this.f24TaxRat = f24TaxRat;
+    }
+
+    public Boolean getFiscalValue() {
+        return fiscalValue;
+    }
+
+    public void setFiscalValue(Boolean fiscalValue) {
+        this.fiscalValue = fiscalValue;
+    }
+
+    public Boolean getBrexa() {
+        return brexa;
+    }
+
+    public void setBrexa(Boolean brexa) {
+        this.brexa = brexa;
+    }
+
+    public Boolean getExcelDetailProperty() {
+        return excelDetailProperty;
+    }
+
+    public void setExcelDetailProperty(Boolean excelDetailProperty) {
+        this.excelDetailProperty = excelDetailProperty;
+    }
+
+    public Boolean getVisible() {
+        return visible;
+    }
+
+    public void setVisible(Boolean visible) {
+        this.visible = visible;
     }
 }

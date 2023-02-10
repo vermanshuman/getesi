@@ -1,10 +1,12 @@
 package it.nexera.ris.web.beans.wrappers.logic.subjectViewWrapper;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import it.nexera.ris.common.exceptions.PersistenceBeanException;
+import it.nexera.ris.persistence.beans.dao.DaoManager;
+import it.nexera.ris.persistence.beans.entities.domain.Request;
+import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
+import it.nexera.ris.web.common.EntityLazyListModel;
+import it.nexera.ris.web.converters.DateConverter;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -12,13 +14,10 @@ import org.primefaces.component.column.Column;
 import org.primefaces.component.commandbutton.CommandButton;
 import org.primefaces.model.LazyDataModel;
 
-import it.nexera.ris.common.exceptions.PersistenceBeanException;
-import it.nexera.ris.common.helpers.ResourcesHelper;
-import it.nexera.ris.persistence.beans.dao.DaoManager;
-import it.nexera.ris.persistence.beans.entities.domain.Request;
-import it.nexera.ris.persistence.beans.entities.domain.dictionary.RequestType;
-import it.nexera.ris.web.common.EntityLazyListModel;
-import it.nexera.ris.web.converters.DateConverter;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 
 public class RequestTypeBindingWrapper extends BaseTab implements Serializable {
@@ -26,10 +25,12 @@ public class RequestTypeBindingWrapper extends BaseTab implements Serializable {
     private static final long serialVersionUID = -6547841494395752324L;
 
     private List<Long> listIds;
-    
+
     private RequestType requestType;
 
     private boolean onlyView;
+
+    private String beanName;
 
     public RequestTypeBindingWrapper(List<Long> ids, RequestType requestType) {
         this.listIds = ids;
@@ -42,6 +43,13 @@ public class RequestTypeBindingWrapper extends BaseTab implements Serializable {
         this.onlyView = onlyView;
     }
 
+    public RequestTypeBindingWrapper(List<Long> ids, RequestType requestType, boolean onlyView, String beanName) {
+        this.listIds = ids;
+        this.requestType = requestType;
+        this.onlyView = onlyView;
+        this.beanName = beanName;
+    }
+
     @Override
     public String getTabTitle() {
         return this.getRequestType().getName();
@@ -49,7 +57,7 @@ public class RequestTypeBindingWrapper extends BaseTab implements Serializable {
 
     @Override
     public LazyDataModel getLazyDataModel() {
-        return new EntityLazyListModel(Request.class, 
+        return new EntityLazyListModel(Request.class,
                 new Criterion[]{
                         Restrictions.and(Restrictions.in("subject.id", getListIds()),
                                 Restrictions.eq("requestType", getRequestType())
@@ -57,26 +65,26 @@ public class RequestTypeBindingWrapper extends BaseTab implements Serializable {
                                 Restrictions.or(
                                         Restrictions.isNull("isDeleted"),
                                         Restrictions.eq("isDeleted", false)
-                                        ))}, new Order[]{Order.asc("id")});
+                                ))}, new Order[]{Order.asc("id")});
     }
 
     @Override
-    Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
-        return DaoManager.getCount(Request.class, "id", 
+    public Long getCountTable() throws PersistenceBeanException, IllegalAccessException {
+        return DaoManager.getCount(Request.class, "id",
                 new Criterion[]{
                         Restrictions.and(Restrictions.in("subject.id", getListIds()),
                                 Restrictions.eq("requestType", getRequestType()),
                                 Restrictions.or(
                                         Restrictions.isNull("isDeleted"),
                                         Restrictions.eq("isDeleted", false)
-                                        ))});
+                                ))});
     }
 
     @Override
     public List<Column> getColumns() {
         List<Column> columns = new ArrayList<>();
         columns.add(getTextColumn("subjectViewRequestDate", "createDate", new DateConverter(), Date.class, ""));
-        if(!isOnlyView()) {
+        if (!isOnlyView()) {
             columns.add(getTextColumn("subjectViewRequestService", "service"));
         }
         columns.add(getTextColumn("subjectViewRequestType", "service.name"));
@@ -84,10 +92,17 @@ public class RequestTypeBindingWrapper extends BaseTab implements Serializable {
         columns.add(getTextColumn("subjectViewRequestClient", "client"));
 
         CommandButton commandButton = new CommandButton();
-        commandButton.setActionExpression(createMethodExpression(String.format("#{subjectBean.%s}", "showFile(tableVar)"), new Class[]{Request.class}));
-        commandButton.setIcon("fa fa-fw fa-file-pdf-o");
+        //commandButton.setActionExpression(createMethodExpression(String.format("#{subjectBean.%s}", "showFile(tableVar)"), new Class[]{Request.class}));
 
-        columns.add(getButtonColumn("subjectViewRequestOutput", commandButton));
+        commandButton.setActionExpression(createMethodExpression(String.format("#{" + (StringUtils.isBlank(getBeanName()) ? "databaseListBean" : getBeanName())
+                + ".%s}", "loadAllegatiDocuments(tableVar)"), new Class[]{Request.class}));
+
+        // commandButton.setActionExpression(createMethodExpression(String.format("#{databaseListBean.%s}", "loadAllegatiDocuments(tableVar)"), new Class[]{Request.class}));
+        commandButton.setIcon("fa fa-fw new-pdf-icon");
+        commandButton.setStyleClass("hide-pdf-bg");
+        commandButton.setUpdate("@widgetVar(templates)");
+
+        columns.add(getButtonColumn("subjectViewRequestOutput", commandButton, "", "action_column"));
 
         columns.add(getTextColumn("subjectViewRequestBilling", "billingClient"));
         columns.add(getTextColumn("subjectViewRequestNote", "note"));
@@ -116,5 +131,13 @@ public class RequestTypeBindingWrapper extends BaseTab implements Serializable {
 
     public void setOnlyView(boolean onlyView) {
         this.onlyView = onlyView;
+    }
+
+    public String getBeanName() {
+        return beanName;
+    }
+
+    public void setBeanName(String beanName) {
+        this.beanName = beanName;
     }
 }

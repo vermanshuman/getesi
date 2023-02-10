@@ -3,9 +3,25 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
                 xmlns:p="http://primefaces.org/ui">
+    <style>
+        #actType .ui-panel-content {
+            border: none !important;
+            padding: 0px !important;
+        }
+    </style>
+    <p:panel id="actType" style="background: transparent; border: none" styleClass="ui-g-12">
+        <span>#{enums.manageTypeFieldsACT_TYPE}
+            <h:panelGroup rendered="#{not empty block}" style="#{block.isRequired()?'':'display:none;'}">*</h:panelGroup>
+            <h:panelGroup rendered="#{not empty item and not empty item.field}" style="#{item.field.isRequired()?'':'display:none;'}">*</h:panelGroup>
+        </span>
 
-    <span>#{enums.documentGenerationTagsACT_TYPE}<span class="red" style="#{block.isRequired()?'':'display:none;'}">*</span></span>
-    <p:inputText id="ACT_TYPE" value="#{bean.entity.actType}" styleClass="input-width"/>
+        <p:selectOneMenu id="ACT_TYPE"  value="#{bean.wrapper.selectedType}"
+                         styleClass="select-width">
+            <f:selectItems value="#{bean.wrapper.types}"/>
+            <p:ajax listener="#{bean.onChangeActType}"/>
+        </p:selectOneMenu>
+    </p:panel>
 
 </ui:composition>

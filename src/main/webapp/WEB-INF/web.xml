@@ -29,6 +29,55 @@
 		<url-pattern>*.jsf</url-pattern>
 	</servlet-mapping>
 
+	<!-- Get Document API -->
+	<servlet>
+		<servlet-name>Get DocumentById API Servlet</servlet-name>
+		<servlet-class>it.nexera.ris.web.services.GetDocumentByIdServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+		<async-supported>true</async-supported>
+	</servlet>
+
+	<servlet>
+		<servlet-name>Update DocumentById API Servlet</servlet-name>
+		<servlet-class>it.nexera.ris.web.services.UpdateDocumentByIdServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+		<async-supported>true</async-supported>
+	</servlet>
+
+	<servlet>
+		<servlet-name>Get InboxById API Servlet</servlet-name>
+		<servlet-class>it.nexera.ris.web.services.GetInboxByIdServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+		<async-supported>true</async-supported>
+	</servlet>
+
+	<servlet>
+		<servlet-name>Receive Data API Servlet</servlet-name>
+		<servlet-class>it.nexera.ris.web.services.ReceiveDataServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+		<async-supported>true</async-supported>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>Get DocumentById API Servlet</servlet-name>
+		<url-pattern>/rest/getDocumentById</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>Update DocumentById API Servlet</servlet-name>
+		<url-pattern>/rest/updateDocumentById</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>Get InboxById API Servlet</servlet-name>
+		<url-pattern>/rest/getInboxMessageById</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>Receive Data API Servlet</servlet-name>
+		<url-pattern>/rest/receiveData</url-pattern>
+	</servlet-mapping>
+
 	<context-param>
 		<param-name>javax.faces.STATE_SAVING_METHOD</param-name>
 		<param-value>server</param-value>
@@ -110,18 +159,18 @@
 		<dispatcher>REQUEST</dispatcher>
 	</filter-mapping>
 
-	<listener>
-		<listener-class>net.bull.javamelody.SessionListener</listener-class>
-	</listener>
-	<filter>
-		<filter-name>monitoring</filter-name>
-		<filter-class>net.bull.javamelody.MonitoringFilter</filter-class>
-		<async-supported>true</async-supported>
-	</filter>
-	<filter-mapping>
-		<filter-name>monitoring</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
+<!--	<listener>-->
+<!--		<listener-class>net.bull.javamelody.SessionListener</listener-class>-->
+<!--	</listener>-->
+<!--	<filter>-->
+<!--		<filter-name>monitoring</filter-name>-->
+<!--		<filter-class>net.bull.javamelody.MonitoringFilter</filter-class>-->
+<!--		<async-supported>true</async-supported>-->
+<!--	</filter>-->
+<!--	<filter-mapping>-->
+<!--		<filter-name>monitoring</filter-name>-->
+<!--		<url-pattern>/*</url-pattern>-->
+<!--	</filter-mapping>-->
 	
 	<filter>
 		<filter-name>SessionTimeoutFilter</filter-name>
